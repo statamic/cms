@@ -13,7 +13,7 @@ import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
-const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container } = injectContainerContext();
+const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, rememberTab } = injectContainerContext();
 const tabs = ref(blueprint.value.tabs);
 const width = ref(null);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
@@ -52,14 +52,27 @@ function setActive(tab) {
 }
 
 function setActiveTabFromHash() {
+    if (!rememberTab.value) return;
+
     if (window.location.hash.length === 0) return;
 
     setActive(window.location.hash.substr(1));
 }
 
 watch(
+	() => shouldShowSidebar.value,
+	() => {
+		if (shouldShowSidebar.value && activeTab.value === 'sidebar') {
+			setActive(visibleMainTabs.value[0].handle);
+		}
+	}
+);
+
+watch(
     () => activeTab.value,
-    (tab) => window.location.hash = tab,
+    (tab) => {
+        if (rememberTab.value) window.location.hash = tab
+    }
 );
 
 const fieldTabMap = computed(() => {

@@ -64,8 +64,9 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -77,11 +78,8 @@
                 <PublishComponents />
 
                 <PublishTabs>
-                    <template #actions>
-                        <div
-                            class="space-y-6"
-                            v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
-                        >
+                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector" #actions>
+                        <div class="space-y-6">
                             <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
@@ -113,7 +111,7 @@
         </PublishContainer>
 
         <confirmation-modal
-            v-if="pendingLocalization"
+            :open="pendingLocalization"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"
@@ -344,7 +342,7 @@ export default {
                     saving: this.savingRef,
                 })
                 .through([
-                    new BeforeSaveHooks('entry', {
+                    new BeforeSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         values: this.values,
                     }),
@@ -353,7 +351,7 @@ export default {
                         published: this.published,
                         _localized: this.localizedFields,
                     }),
-                    new AfterSaveHooks('entry', {
+                    new AfterSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         reference: this.initialReference,
                     }),
@@ -519,7 +517,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

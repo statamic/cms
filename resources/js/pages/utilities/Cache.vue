@@ -1,7 +1,11 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, Panel, PanelHeader, Heading, Card, Description, Badge, DocsCallout, CommandPaletteItem } from '@ui';
+import {
+	Header, Button, Panel, PanelHeader, Heading, Card, Description, Badge, DocsCallout, CommandPaletteItem,
+	Dropdown, DropdownMenu, DropdownItem, Textarea, ErrorMessage, Modal, ModalClose
+} from '@ui';
+import { ref } from 'vue';
 
 const props = defineProps([
     'stache',
@@ -12,6 +16,7 @@ const props = defineProps([
     'clearStacheUrl',
     'warmStacheUrl',
     'clearStaticUrl',
+	'invalidatePagesUrl',
     'clearApplicationUrl',
     'clearImageUrl',
 ]);
@@ -38,6 +43,31 @@ function clearApplication() {
 
 function clearImage() {
     router.post(props.clearImageUrl);
+}
+
+const staticUrls = ref(null);
+const invalidateStaticUrlsModal = ref(false);
+const isInvalidatingStaticUrls = ref(false);
+const invalidateStaticUrlsError = ref(null);
+
+function invalidateStaticUrls() {
+	isInvalidatingStaticUrls.value = true;
+	invalidateStaticUrlsError.value = null;
+
+	router.post(
+		props.invalidatePagesUrl, // todo: rename this to match the method?
+		{
+			urls: staticUrls.value?.split('\n'),
+		},
+		{
+			onSuccess: () => {
+				staticUrls.value = null;
+				invalidateStaticUrlsModal.value = false;
+			},
+			onError: (errors) => invalidateStaticUrlsError.value = errors.urls,
+			onFinish: () => isInvalidatingStaticUrls.value = false,
+		},
+	);
 }
 </script>
 
@@ -102,14 +132,41 @@ function clearImage() {
                 <PanelHeader class="flex items-center justify-between min-h-10">
                     <Heading>{{ __('Static Page Cache') }}</Heading>
                     <div v-if="static.enabled" class="flex gap-2">
-                        <CommandPaletteItem
-                            category="Actions"
-                            :text="[__('Clear'), __('Static Page Cache')]"
-                            icon="live-preview"
-                            :action="clearStatic"
-                        >
-                            <Button :text="__('Clear')" size="sm" @click="clearStatic" />
-                        </CommandPaletteItem>
+	                    <CommandPaletteItem
+		                    category="Actions"
+		                    :text="[__('Clear'), __('Static Page Cache')]"
+		                    icon="live-preview"
+		                    :action="invalidateStaticUrls"
+	                    >
+		                    <Dropdown align="end">
+			                    <template #trigger>
+			                        <Button :text="__('Invalidate')" size="sm" icon-append="chevron-down" />
+			                    </template>
+			                    <DropdownMenu>
+				                    <DropdownItem :text="__('Everything')" icon="layers-stacks" @click="clearStatic" />
+				                    <DropdownItem :text="__('Specific URLs')" icon="link" @click="invalidateStaticUrlsModal = true" />
+			                    </DropdownMenu>
+		                    </Dropdown>
+	                    </CommandPaletteItem>
+
+	                    <Modal :title="__('Invalidate Static Cache')" v-model:open="invalidateStaticUrlsModal">
+		                    <p>{{ __('Specify the URLs you want to invalidate. One line per URL.') }}</p>
+		                    <Textarea class="font-mono" v-model="staticUrls" :disabled="isInvalidatingStaticUrls" />
+		                    <ErrorMessage v-if="invalidateStaticUrlsError" :text="invalidateStaticUrlsError" class="mt-2" />
+
+		                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+			                    <ModalClose asChild>
+				                    <Button variant="ghost" :disabled="isInvalidatingStaticUrls" :text="__('Cancel')" />
+			                    </ModalClose>
+			                    <Button
+				                    type="submit"
+				                    variant="primary"
+				                    :disabled="isInvalidatingStaticUrls"
+				                    :text="__('Invalidate URLs')"
+				                    @click="invalidateStaticUrls"
+			                    />
+		                    </div>
+	                    </Modal>
                     </div>
                 </PanelHeader>
                 <Card class="flex-1">

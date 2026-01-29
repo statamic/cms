@@ -3,7 +3,9 @@ import { computed, ref, watch } from 'vue';
 import { getIconSet } from './registry.js';
 
 const props = defineProps({
+    /** Icon name */
     name: { type: String, required: true },
+    /** Name of the icon set */
     set: { type: String, default: 'default' },
 });
 

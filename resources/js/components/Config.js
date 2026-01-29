@@ -1,6 +1,9 @@
 import { ref } from 'vue';
+import { data_get } from '@/bootstrap/globals';
 
 export default class Config {
+    config = ref({});
+
     initialize(initialConfig) {
         this.config = ref(initialConfig);
     }

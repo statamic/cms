@@ -28,6 +28,20 @@ vi.mock('reka-ui', async () => {
     };
 });
 
+// Mock the Scrollbar component since it relies on DOM APIs not available in tests
+vi.mock('@ui/Combobox/Scrollbar.vue', () => ({
+    default: {
+        name: 'Scrollbar',
+        props: ['viewport'],
+        setup() {
+            return {
+                update: vi.fn()
+            };
+        },
+        template: '<div />'
+    }
+}));
+
 beforeEach(() => {
     Element.prototype.scrollIntoView = vi.fn();
 
@@ -71,7 +85,7 @@ test('can select option', async () => {
     expect(wrapper.emitted('update:modelValue')[0]).toEqual(['jason']);
     await wrapper.setProps({ modelValue: 'jason' });
 
-    expect(trigger.find('button').text()).toBe('Jason');
+    expect(trigger.find('[data-ui-combobox-selected-option]').text()).toBe('Jason');
 });
 
 test('dropdown closes on selection', async () => {
@@ -148,7 +162,7 @@ test('can use different optionLabel and optionValue keys', async () => {
     expect(wrapper.emitted('update:modelValue')[0]).toEqual(['jason']);
     await wrapper.setProps({ modelValue: 'jason' });
 
-    expect(trigger.find('button').text()).toBe('Jason');
+    expect(trigger.find('[data-ui-combobox-selected-option]').text()).toBe('Jason');
 });
 
 describe('multiple options', () => {

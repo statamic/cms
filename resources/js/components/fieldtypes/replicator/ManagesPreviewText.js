@@ -11,7 +11,7 @@ export default {
                     return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
                 })
                 .map(([handle, value]) => value)
-                .filter((value) => (['null', '[]', '{}', ''].includes(JSON.stringify(value)) ? null : value))
+                .filter((value) => (['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)) ? null : value))
                 .map((value) => {
                     if (value instanceof PreviewHtml) return value.html;
 

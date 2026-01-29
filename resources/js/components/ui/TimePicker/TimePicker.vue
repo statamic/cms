@@ -5,10 +5,14 @@ import Button from '../Button/Button.vue';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
+    /** Badge text to display. */
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
+    /** The controlled time value. */
     modelValue: { type: Object, default: null },
+    /** The granularity of the time picker. <br><br> Options: `hour`, `minute`, `second` */
     granularity: { type: String, default: null },
+    /** When `true`, clear and "set to now" buttons are displayed. */
     clearable: { type: Boolean, default: true },
 });
 
@@ -32,7 +36,7 @@ const setToNow = () => {
         :granularity="granularity"
         :class="[
             'flex items-center w-full bg-white dark:bg-gray-900',
-            'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/10 dark:inset-shadow-2xs dark:inset-shadow-black',
+            'border border-gray-300 dark:border-gray-700',
             'leading-5 text-gray-600 dark:text-gray-300',
             'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-3 disabled:shadow-none',
             'data-invalid:border-red-500',

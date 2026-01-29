@@ -52,7 +52,7 @@ function complete() {
 </script>
 
 <template>
-    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" :open="true" @update:model-value="$emit('cancel')">
+    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" open @update:model-value="$emit('cancel')">
         <div>
             <div v-if="loading" class="flex items-center justify-center text-center">
                 <Icon name="loading" />

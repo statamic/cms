@@ -13,6 +13,7 @@
             :model-value="datePickerValue"
             :number-of-months="config.number_of_months"
             :read-only="isReadOnly"
+            :clearable="config.clearable"
             @update:model-value="datePickerUpdated"
         />
     </div>
@@ -47,7 +48,7 @@ export default {
         },
 
         hasDate() {
-            return !!(this.config.required || this.value);
+            return this.config.required || (this.value && this.value !== 'now');
         },
 
         hasTime() {
@@ -67,7 +68,7 @@ export default {
         },
 
         datePickerValue() {
-            if (!this.value) {
+            if (!this.value || this.value === 'now') {
                 return null;
             }
 
@@ -100,6 +101,10 @@ export default {
 
     created() {
         this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
+
+        if (this.value === 'now') {
+            this.injectedPublishContainer.withoutDirtying(() => this.addDate());
+        }
     },
 
     unmounted() {

@@ -3,8 +3,11 @@ import { useId } from 'vue';
 import { RadioGroupRoot } from 'reka-ui';
 
 defineProps({
+    /** When `true`, displays radio buttons horizontally */
     inline: { type: Boolean, default: false },
-    modelValue: { type: [String, Number, Boolean], default: null },
+    /** The controlled value of the radio group */
+    modelValue: { type: String, default: null },
+    /** Name attribute for the radio group */
     name: { type: String, default: () => useId() },
     required: { type: Boolean, default: false },
 });

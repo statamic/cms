@@ -29,7 +29,7 @@ class Searchables
     public static function addCpSearchable($searchable)
     {
         if (method_exists($searchable, 'handle')) {
-            $searchable = $searchable::handle();
+            $searchable = "{$searchable::handle()}:*";
         }
 
         static::$cpSearchables[] = $searchable;
@@ -43,7 +43,7 @@ class Searchables
     public static function addContentSearchable($searchable)
     {
         if (method_exists($searchable, 'handle')) {
-            $searchable = $searchable::handle();
+            $searchable = "{$searchable::handle()}:*";
         }
 
         static::$contentSearchables[] = $searchable;

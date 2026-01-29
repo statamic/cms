@@ -26,7 +26,6 @@ const fields = computed(() => {
             v-for="field in fields"
             :key="field.handle"
             :config="field"
-            :as-config="asConfig"
             :class="[
                 'form-group',
                 asConfig ? '' : `field-w-${field.width}`

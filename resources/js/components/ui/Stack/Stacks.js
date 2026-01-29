@@ -10,7 +10,6 @@ export default class Stacks {
     add(vm) {
         return this.$portals.create('stack', {
             type: 'stack',
-            depth: this.count() + 1,
             vm,
         });
     }

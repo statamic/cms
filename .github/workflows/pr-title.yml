@@ -8,6 +8,56 @@ jobs:
   pr-title:
     runs-on: ubuntu-latest
     steps:
-      - uses: deepakputhraya/action-pr-title@master
-        with:
-          regex: '^\[\d+\.x\]\s'
+      - name: Validate PR title matches target branch
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          # Validates PR title against target branch
+          # Returns error message if invalid, empty string if valid
+          validate_pr_title() {
+            local target_branch="$1"
+            local pr_title="$2"
+            local default_branch="$3"
+
+            # Check if target branch is a version branch (e.g., 5.x, 4.x)
+            if [[ $target_branch =~ ^([0-9]+)\.x$ ]]; then
+              local version="${BASH_REMATCH[1]}"
+              if [[ ! $pr_title =~ ^\[$version\.x\][[:space:]] ]]; then
+                echo "PR targeting '$target_branch' must have title starting with '[$version.x] '"
+                return
+              fi
+
+            # Check if target branch is master (next major version)
+            elif [[ $target_branch == "master" ]]; then
+              local current_version="${default_branch//\.x/}"
+              local next_version=$((current_version + 1))
+              if [[ ! $pr_title =~ ^\[$next_version\.x\][[:space:]] ]]; then
+                echo "PR targeting 'master' must have title starting with '[$next_version.x] '"
+                return
+              fi
+
+            # For other branches, just enforce that there's a version prefix
+            else
+              if [[ ! $pr_title =~ ^\[[0-9]+\.x\][[:space:]] ]]; then
+                echo "PR title must start with a version prefix like '[5.x] '"
+                return
+              fi
+            fi
+
+            echo ""
+          }
+
+          echo "PR Title: $PR_TITLE"
+          echo "Base Branch: $BASE_BRANCH"
+          echo "Default Branch: $DEFAULT_BRANCH"
+
+          ERROR=$(validate_pr_title "$BASE_BRANCH" "$PR_TITLE" "$DEFAULT_BRANCH")
+
+          if [[ -n $ERROR ]]; then
+            echo $ERROR
+            exit 1
+          fi
+
+          echo "PR title validation passed"

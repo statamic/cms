@@ -1,9 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Table, TableColumns, TableColumn, TableRows, TableRow, TableCell, Badge } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Badge, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows} from '@ui';
 
 const meta = {
-    title: 'Components/Table',
+    title: 'Layout/Table',
     component: Table,
+    subcomponents: {
+        TableColumns,
+        TableColumn,
+        TableRows,
+        TableRow,
+        TableCell,
+    },
     argTypes: {},
 } satisfies Meta<typeof Table>;
 
@@ -23,21 +30,21 @@ const defaultCode = `
             <TableCell>
                 <Badge color="green" pill>In Stock</Badge>
             </TableCell>
-            <TableCell class="text-right font-semibold text-black">$159.00</TableCell>
+            <TableCell class="text-right font-semibold text-gray-925">$159.00</TableCell>
         </TableRow>
         <TableRow>
             <TableCell>Ergonomic Mouse</TableCell>
             <TableCell>
                 <Badge color="red" pill>Out of Stock</Badge>
             </TableCell>
-            <TableCell class="text-right font-semibold text-black">$89.00</TableCell>
+            <TableCell class="text-right font-semibold text-gray-925">$89.00</TableCell>
         </TableRow>
         <TableRow>
             <TableCell>4K Monitor</TableCell>
             <TableCell>
                 <Badge color="yellow" pill>Low Stock</Badge>
             </TableCell>
-            <TableCell class="text-right font-semibold text-black">$349.00</TableCell>
+            <TableCell class="text-right font-semibold text-gray-925">$349.00</TableCell>
         </TableRow>
     </TableRows>
 </Table>

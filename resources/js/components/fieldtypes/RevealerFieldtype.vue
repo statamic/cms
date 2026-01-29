@@ -23,7 +23,7 @@ import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { update, expose, isReadOnly } = Fieldtype.use(emit, props);
+const { update, expose, isReadOnly, defineReplicatorPreview } = Fieldtype.use(emit, props);
 defineExpose(expose);
 
 const { setRevealerField, unsetRevealerField, setHiddenField } = injectContainerContext();
@@ -50,4 +50,6 @@ function buttonReveal() {
 
     update(true);
 }
+
+defineReplicatorPreview(() => null);
 </script>

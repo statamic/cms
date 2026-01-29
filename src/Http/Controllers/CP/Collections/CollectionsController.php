@@ -202,6 +202,7 @@ class CollectionsController extends CpController
         if ($collection->queryEntries()->count() === 0) {
             return Inertia::render('collections/Empty', [
                 ...Arr::only($props, [
+                    'icon',
                     'title',
                     'blueprints',
                     'canEdit',

@@ -11,12 +11,7 @@
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
-                <button
-                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ms-1"
-                    :aria-label="__('Open Dropdown')"
-                >
-                    <Icon name="chevron-down" />
-                </button>
+                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
             </template>
             <DropdownMenu>
                 <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
@@ -24,21 +19,14 @@
             </DropdownMenu>
         </Dropdown>
 
-        <ui-stack
-            narrow
-            v-if="editing"
+        <Stack
+	        size="narrow"
+            :open="editing"
             @opened="() => $nextTick(() => $refs.title.focus())"
-            @closed="editCancelled"
+            @update:open="editCancelled"
+            :title="editText"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-white px-6 dark:bg-dark-800">
-                <header class="py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-700 mb-5">
-                    <div class="flex items-center justify-between">
-                        <ui-heading size="lg">
-                            {{ editText }}
-                        </ui-heading>
-                        <ui-button icon="x" variant="ghost" class="-me-2" @click="editCancelled" />
-                    </div>
-                </header>
+            <div class="">
                 <div class="space-y-6">
                     <Field :label="__('Title')" class="form-group field-w-100">
                         <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
@@ -75,15 +63,15 @@
                     </div>
                 </div>
             </div>
-        </ui-stack>
+        </Stack>
     </TabTrigger>
 </template>
 
 <script>
-import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input } from '@/components/ui';
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
 
 export default {
-    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Icon, Field, Input },
+    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose },
 
     props: {
         tab: {
@@ -134,7 +122,7 @@ export default {
 
         isSoloNarrowStack() {
             const stacks = this.$stacks.stacks();
-            return stacks.length === 1 && stacks[0]?.data?.vm?.narrow === true;
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
         },
     },
 

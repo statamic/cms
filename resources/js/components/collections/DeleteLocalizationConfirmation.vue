@@ -1,5 +1,5 @@
 <template>
-    <Modal :title="__('Delete')" :open="true" @update:open="$emit('cancel')">
+    <Modal :title="__('Delete')" open @update:open="$emit('cancel')">
         <p>Are you sure you want to delete this?</p>
 
         <Field

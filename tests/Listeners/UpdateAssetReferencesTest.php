@@ -4,10 +4,12 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\LazyCollection;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
+use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -1848,6 +1850,19 @@ EOT;
         Facades\Entry::makePartial();
 
         $this->assetHoff->path('hoff-new.jpg')->save();
+    }
+
+    #[Test]
+    public function it_gets_items_from_a_hook()
+    {
+        UpdateAssetReferences::hook('additional', function () {
+            return LazyCollection::make(['additional-1', 'additional-2']);
+        });
+
+        $items = ((new UpdateAssetReferences)->getItemsContainingData())->all();
+
+        $this->assertContains('additional-1', $items);
+        $this->assertContains('additional-2', $items);
     }
 
     protected function setSingleBlueprint($namespace, $blueprintContents)

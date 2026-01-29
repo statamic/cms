@@ -114,12 +114,12 @@ class CoreNav
                             || $nav->sites()->contains(Site::selected()->handle());
                     })
                     ->map(function ($nav) {
+                        $availableInSelectedSite = Site::hasMultiple()
+                            ? $nav->sites()->contains(Site::selected()->handle())
+                            : true;
+
                         return Nav::item($nav->title())
-                            ->url(
-                                $nav->sites()->contains(Site::selected()->handle())
-                                    ? $nav->showUrl()
-                                    : $nav->editUrl()
-                            )
+                            ->url($availableInSelectedSite ? $nav->showUrl() : $nav->editUrl())
                             ->can('view', $nav)
                             ->extra([
                                 'breadcrumbs' => [

@@ -73,7 +73,6 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 /* GROUP PUBLISH COMPONENT / FIELD
 =================================================== */
 .publish-field {
-    border: 1px solid red;
     position: relative;
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;

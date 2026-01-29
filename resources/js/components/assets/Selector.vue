@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-gray-800 h-full bg-white">
+    <div class="h-full">
         <div class="flex h-full min-h-0 flex-col">
             <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                 <AssetBrowser

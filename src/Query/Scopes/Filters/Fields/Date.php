@@ -24,6 +24,7 @@ class Date extends FieldtypeFilter
             'value' => [
                 'type' => 'date',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'contains_any >, <',
                 ],
@@ -32,6 +33,7 @@ class Date extends FieldtypeFilter
                 'type' => 'date',
                 'mode' => 'range',
                 'full_width' => true,
+                'clearable' => false,
                 'if' => [
                     'operator' => 'between',
                 ],
@@ -63,13 +65,16 @@ class Date extends FieldtypeFilter
     {
         $field = $this->fieldtype->field()->display();
         $operator = $values['operator'];
-        $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
+        $translatedOperator = strtolower(Arr::get($this->fieldItems(), "operator.options.{$operator}"));
 
-        if ($operator == 'between') {
-            return $field.' '.strtolower($translatedOperator).' '.$values['range_value']['start'].' '.__('and').' '.$values['range_value']['end'];
-        }
+        $value = ($operator == 'between')
+            ? [
+                'start' => Carbon::parse($values['range_value']['start'])->toIso8601ZuluString('millisecond'),
+                'end' => Carbon::parse($values['range_value']['end'])->toIso8601ZuluString('millisecond'),
+            ]
+            : Carbon::parse(Arr::get($values, 'value'))->toIso8601ZuluString('millisecond');
 
-        return $field.' '.strtolower($translatedOperator).' '.$values['value'];
+        return compact('field', 'operator', 'translatedOperator', 'value');
     }
 
     public function isComplete($values): bool

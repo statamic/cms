@@ -42,6 +42,7 @@ class UserGroupBlueprintController extends CpController
         return $this->renderEditPage([
             'blueprint' => $this->toVueObject($blueprint),
             'action' => cp_route('blueprints.user-groups.update'),
+            'canDefineLocalizable' => false,
         ]);
     }
 

@@ -80,7 +80,7 @@ abstract class Relationship extends Fieldtype
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $this->statusIcons() ? $item->published() : null,
+                'status' => $this->statusIcons() ? $item->status() : null,
             ];
         });
     }
