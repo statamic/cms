@@ -81,12 +81,13 @@ abstract class EloquentQueryBuilder implements Builder
     public function pluck($column, $key = null)
     {
         $items = $this->get();
+        $resolver = new ResolveValue;
 
         if (! $key) {
-            return $items->map(fn ($item) => $item->{$column})->values();
+            return $items->map(fn ($item) => $resolver($item, $column))->values();
         }
 
-        return $items->mapWithKeys(fn ($item) => [$item->{$key} => $item->{$column}]);
+        return $items->mapWithKeys(fn ($item) => [$resolver($item, $key) => $resolver($item, $column)]);
     }
 
     public function first()
