@@ -38,7 +38,7 @@ const reloadPage = () => router.reload();
 <template>
     <Head :title="__('User Groups')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <template v-if="groups.length">
             <Header :title="__('User Groups')" icon="groups">
                 <CommandPaletteItem

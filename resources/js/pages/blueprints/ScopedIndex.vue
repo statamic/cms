@@ -47,7 +47,7 @@ const reloadPage = () => router.reload();
 <template>
     <Head :title="__('Blueprints')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Blueprints')" icon="blueprints">
             <Button v-if="reorderable" :disabled="!hasBeenReordered" @click="saveOrder">
                 {{ __('Save Order') }}

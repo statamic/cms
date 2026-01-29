@@ -20,15 +20,17 @@ provide('isFormSubmission', true);
 </script>
 
 <template>
-    <Head :title="[title, formTitle, __('Forms')]" />
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+        <Head :title="[title, formTitle, __('Forms')]" />
 
-    <PublishForm
-        icon="forms"
-        :title="formattedDate"
-        :blueprint="blueprint"
-        :initial-values="values"
-        :initial-meta="meta"
-        :submit-url="null"
-        read-only
-    />
+        <PublishForm
+            icon="forms"
+            :title="formattedDate"
+            :blueprint="blueprint"
+            :initial-values="values"
+            :initial-meta="meta"
+            :submit-url="null"
+            read-only
+        />
+    </div>
 </template>
