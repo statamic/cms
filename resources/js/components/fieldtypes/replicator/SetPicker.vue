@@ -268,6 +268,7 @@ export default {
                     .filter((set) => {
                         return (
                             __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
+	                        __(set.instructions)?.toLowerCase().includes(this.search.toLowerCase()) ||
                             set.handle.toLowerCase().includes(this.search.toLowerCase())
                         );
                     });
