@@ -121,6 +121,7 @@
                             />
 
                             <Table
+                                ref="table"
                                 v-if="mode === 'table'"
                                 :assets="items"
                                 :folders="folders"
@@ -132,6 +133,7 @@
                             />
 
                             <Grid
+                                ref="grid"
                                 v-if="mode === 'grid'"
                                 :assets="items"
                                 :action-url="actionUrl"
