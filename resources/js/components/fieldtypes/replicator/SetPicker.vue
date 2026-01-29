@@ -263,8 +263,7 @@ export default {
                   }, []);
 
             if (this.search) {
-                return sets
-                    .filter((set) => !set.hide)
+                sets = sets
                     .filter((set) => {
                         return (
                             __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
