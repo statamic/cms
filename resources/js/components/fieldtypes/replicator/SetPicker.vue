@@ -263,14 +263,7 @@ export default {
                   }, []);
 
             if (this.search) {
-                sets = sets
-                    .filter((set) => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-	                        __(set.instructions)?.toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                sets = this.filterSetsBySearch(sets);
             }
 
             return sets.filter((set) => !set.hide);
@@ -317,13 +310,7 @@ export default {
 
                 // Apply search filter if there's a search term
                 if (this.search) {
-                    filteredSets = filteredSets.filter(set => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            __(set.instructions)?.toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                    filteredSets = this.filterSetsBySearch(filteredSets);
                 }
 
                 groups[group.handle] = {
@@ -480,6 +467,16 @@ export default {
         isSetLoading(handle) {
             return this.loadingSet === handle;
         },
+
+        filterSetsBySearch(sets) {
+            return sets.filter(set => {
+                return (
+                    __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
+                    __(set.instructions)?.toLowerCase().includes(this.search.toLowerCase()) ||
+                    set.handle.toLowerCase().includes(this.search.toLowerCase())
+                );
+            });
+        }
     },
 };
 </script>
