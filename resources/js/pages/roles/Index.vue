@@ -15,7 +15,7 @@ const reloadPage = () => router.reload();
 <template>
     <Head :title="__('Roles & Permissions')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Roles & Permissions')" icon="permissions">
             <CommandPaletteItem
                 category="Actions"

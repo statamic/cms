@@ -358,7 +358,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="title" />
 
         <Header v-if="mounted" :title="title" icon="navigation">

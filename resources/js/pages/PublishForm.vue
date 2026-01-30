@@ -18,7 +18,7 @@ const props = defineProps({
 <template>
     <Head :title />
 
-    <div :class="{ 'max-w-5xl mx-auto': asConfig }">
+    <div :class="{ 'max-w-page mx-auto': asConfig }">
         <PublishForm
             :icon
             :title
