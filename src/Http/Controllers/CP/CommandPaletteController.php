@@ -47,7 +47,11 @@ class CommandPaletteController extends CpController
     {
         $badge = $result->getCpBadge();
 
-        if (! Arr::has($index->config(), 'sites') && method_exists($result->getSearchable(), 'site')) {
+        if (
+            Site::hasMultiple()
+            && ! Arr::has($index->config(), 'sites')
+            && method_exists($result->getSearchable(), 'site')
+        ) {
             $badge = $result->getSearchable()->site()->name().' - '.$badge;
         }
 
