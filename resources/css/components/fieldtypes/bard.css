@@ -135,7 +135,7 @@
             }
         }
 
-        /* When there's a fixed toolbar the the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
+        /* When there's a fixed toolbar the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
         .bard-fieldtype:has(> &) {
             .bard-editor:focus-within {
                 border-top-left-radius: 0!important;
@@ -174,7 +174,7 @@
         top: -24px;
     }
 
-    /*  Responive Wangjangling */
+    /* Responsive Wangjangling */
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
