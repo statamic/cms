@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <ui-header :title="__('Updates')" icon="updates">
             <template v-if="!gettingChangelog" #actions>
                 <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />

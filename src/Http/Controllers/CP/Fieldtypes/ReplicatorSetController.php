@@ -11,6 +11,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
 
 class ReplicatorSetController extends CpController
 {
@@ -31,9 +32,7 @@ class ReplicatorSetController extends CpController
 
         $field = $this->getReplicatorField($blueprint, $request->field);
 
-        $replicatorSet = collect($field->get('sets'))
-            ->flatMap(fn (array $setGroup) => $setGroup['sets'] ?? [])
-            ->get($request->set);
+        $replicatorSet = $this->flattenSets($field->get('sets'))[$request->set];
 
         if (! $replicatorSet) {
             throw new \Exception("Cannot find Replicator set [$request->set]");
@@ -76,9 +75,7 @@ class ReplicatorSetController extends CpController
         $isReplicator = isset($config['type']) && in_array($config['type'], ['bard', 'replicator']);
 
         if ($isReplicator) {
-            $flattenedSets = collect($config['sets'])
-                ->flatMap(fn (array $setGroup): array => $setGroup['sets'] ?? [])
-                ->all();
+            $flattenedSets = $this->flattenSets($config['sets'] ?? []);
 
             if (count($remainingFieldPathComponents) === 1) {
                 return $config;
@@ -102,6 +99,17 @@ class ReplicatorSetController extends CpController
         array_shift($remainingFieldPathComponents);
 
         return $this->getConfig($fields[$remainingFieldPathComponents[0]]['field'], $remainingFieldPathComponents);
+    }
+
+    private function flattenSets(array $sets): array
+    {
+        if (! Arr::has(Arr::first($sets), 'sets')) {
+            return $sets;
+        }
+
+        return collect($sets)
+            ->flatMap(fn (array $setGroup): array => $setGroup['sets'] ?? [])
+            ->all();
     }
 
     private function resolveFields(array $fields): array

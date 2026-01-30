@@ -15,9 +15,9 @@ function send() {
 </script>
 
 <template>
-    <Head :title="[__('Email'), __('Utilities')]" />
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+        <Head :title="[__('Email'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
         <Header :title="__('Email')" icon="mail-settings" />
 
         <CardPanel :heading="__('Send Test Email')">
