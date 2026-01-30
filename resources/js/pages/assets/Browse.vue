@@ -95,7 +95,6 @@ export default {
 
         <asset-browser
             ref="browser"
-            class="h-full"
             :can-create-containers="canCreateContainers"
             :create-container-url="createContainerUrl"
             :container="container"
