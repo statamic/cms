@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.73.3 (2026-01-30)
+
+### What's fixed
+- Avoid showing large number of assets in listing [#13758](https://github.com/statamic/cms/issues/13758) by @jasonvarga
+- Abort 404 when asset is not found in AssetsController [#13741](https://github.com/statamic/cms/issues/13741) by @mynetx
+
+
+
 ## 5.73.2 (2026-01-26)
 
 ### What's fixed
