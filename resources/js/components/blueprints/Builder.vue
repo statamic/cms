@@ -33,6 +33,7 @@
             :initial-tabs="tabs"
             :errors="errors?.tabs"
             :can-define-localizable="canDefineLocalizable"
+            show-section-collapsible-field
             @updated="tabsUpdated"
         />
     </div>
