@@ -1105,6 +1105,58 @@ class ReplicatorTest extends TestCase
         ], $response->json('new'));
     }
 
+    #[Test]
+    public function it_can_return_set_defaults_when_sets_are_stored_in_legacy_format()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'content',
+                            'field' => [
+                                'type' => 'replicator',
+                                'sets' => [
+                                    'video' => [
+                                        'fields' => [
+                                            ['handle' => 'video_url', 'field' => ['type' => 'text', 'default' => 'https://youtu.be/dQw4w9WgXcQ']],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'content',
+                'set' => 'video',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'video_url' => 'https://youtu.be/dQw4w9WgXcQ',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'video_url' => null,
+        ], $response->json('new'));
+    }
+
     public static function groupedSetsProvider()
     {
         return [
