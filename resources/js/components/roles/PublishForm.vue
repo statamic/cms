@@ -10,11 +10,12 @@
                 v-slot="{ text, action }"
             >
                 <Button
+                    v-if="!isSuper"
                     :icon="areAllCheckedInAllGroups() ? 'checkbox-uncheck' : 'checkbox'"
                     @click="toggleAllInAllGroups()"
                     :text="areAllCheckedInAllGroups() ? __('Uncheck All') : __('Check All')"
                 />
-                <Button v-if="!isSuper" type="submit" variant="primary" @click="action" :text="text" />
+                <Button type="submit" variant="primary" @click="action" :text="text" />
             </CommandPaletteItem>
         </Header>
 
