@@ -14,7 +14,7 @@
                     @click="toggleAllInAllGroups()"
                     :text="areAllCheckedInAllGroups() ? __('Uncheck All') : __('Check All')"
                 />
-                <Button type="submit" variant="primary" @click="action" :text="text" />
+                <Button v-if="!isSuper" type="submit" variant="primary" @click="action" :text="text" />
             </CommandPaletteItem>
         </Header>
 
