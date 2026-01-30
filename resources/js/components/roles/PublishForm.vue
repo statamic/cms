@@ -9,6 +9,11 @@
                 prioritize
                 v-slot="{ text, action }"
             >
+                <Button
+                    :icon="areAllCheckedInAllGroups() ? 'checkbox-uncheck' : 'checkbox'"
+                    @click="toggleAllInAllGroups()"
+                    :text="areAllCheckedInAllGroups() ? __('Uncheck All') : __('Check All')"
+                />
                 <Button type="submit" variant="primary" @click="action" :text="text" />
             </CommandPaletteItem>
         </Header>
@@ -51,7 +56,14 @@
         <div v-if="!isSuper" class="space-y-6 mt-6">
             <Panel :heading="group.label" v-for="group in permissions" :key="group.handle">
                 <template #header-actions>
-                    <Button size="sm" variant="subtle" icon="checkmark" @click="checkAllInGroup(group)">{{ __('Check All') }}</Button>
+                    <Button
+                        size="sm"
+                        variant="subtle"
+                        :icon="areAllChecked(group) ? 'checkbox-uncheck' : 'checkbox'"
+                        @click="toggleAllInGroup(group)"
+                    >
+                        {{ areAllChecked(group) ? __('Uncheck All') : __('Check All') }}
+                    </Button>
                 </template>
                 <Card>
                     <PermissionTree :depth="1" :initial-permissions="group.permissions" />
@@ -145,16 +157,48 @@ export default {
     },
 
     methods: {
-        checkAllInGroup(group) {
+        areAllChecked(group) {
             const checkAll = (permissions) => {
+                return permissions.every(permission => {
+                    const childrenChecked = permission.children && permission.children.length
+                        ? checkAll(permission.children)
+                        : true;
+                    return permission.checked && childrenChecked;
+                });
+            };
+            return checkAll(group.permissions);
+        },
+
+        areAllCheckedInAllGroups() {
+            return this.permissions.every(group => this.areAllChecked(group));
+        },
+
+        toggleAllInGroup(group) {
+            const allChecked = this.areAllChecked(group);
+            const toggle = (permissions, checked) => {
                 permissions.forEach(permission => {
-                    permission.checked = true;
+                    permission.checked = checked;
                     if (permission.children && permission.children.length) {
-                        checkAll(permission.children);
+                        toggle(permission.children, checked);
                     }
                 });
             };
-            checkAll(group.permissions);
+            toggle(group.permissions, !allChecked);
+        },
+
+        toggleAllInAllGroups() {
+            const allChecked = this.areAllCheckedInAllGroups();
+            this.permissions.forEach(group => {
+                const toggle = (permissions, checked) => {
+                    permissions.forEach(permission => {
+                        permission.checked = checked;
+                        if (permission.children && permission.children.length) {
+                            toggle(permission.children, checked);
+                        }
+                    });
+                };
+                toggle(group.permissions, !allChecked);
+            });
         },
 
         clearErrors() {
