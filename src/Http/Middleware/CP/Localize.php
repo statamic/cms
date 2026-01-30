@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Middleware\CP;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Closure;
 use DateTime;
 use Illuminate\Support\Facades\Date;
@@ -24,7 +24,7 @@ class Localize
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
-        Date::setToStringFormat(function (Carbon $date) {
+        Date::setToStringFormat(function (CarbonInterface $date) {
             return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
         });
 
