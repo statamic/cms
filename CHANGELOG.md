@@ -1,5 +1,124 @@
 # Release Notes
 
+## 6.1.0 (2026-01-29)
+
+### What's new
+- Add duration column to asset browser [#13331](https://github.com/statamic/cms/issues/13331) by @daun
+- Search instructions when searching sets [#13727](https://github.com/statamic/cms/issues/13727) by @duncanmcclean
+- Add "mod+s" shortcut to save blueprint order [#13729](https://github.com/statamic/cms/issues/13729) by @heidkaemper
+- Add "mod+s" shortcut to save collection order [#13724](https://github.com/statamic/cms/issues/13724) by @duncanmcclean
+
+### What's fixed
+- Improve the text fieldtype icon and the number icons [#13713](https://github.com/statamic/cms/issues/13713) by @JayGeorge
+- Fix error when searching assets via the Command Palette [#13718](https://github.com/statamic/cms/issues/13718) by @duncanmcclean
+- Fix "Icons" code example for buttons in Storybook [#13719](https://github.com/statamic/cms/issues/13719) by @duncanmcclean
+- Bump tar from 7.5.6 to 7.5.7 [#13721](https://github.com/statamic/cms/issues/13721) by @dependabot
+- Fix `Invalid ISO 8601 date time string` error from Date Fieldtype [#13701](https://github.com/statamic/cms/issues/13701) by Copilot
+- Fix missing Live Preview componentUpdated function [#13733](https://github.com/statamic/cms/issues/13733) by @o1y
+- After creating the assets folder, it keeps the last folder name [#13722](https://github.com/statamic/cms/issues/13722) by @nopticon
+- Floating toolbar pointer improvements [#13712](https://github.com/statamic/cms/issues/13712) by @JayGeorge
+- Fix adding sets to replicators nested inside Grid/Group fields [#13723](https://github.com/statamic/cms/issues/13723) by @duncanmcclean
+- Use `ResolveValues` to resolve values in `EloquentQueryBuilder::pluck()` [#13726](https://github.com/statamic/cms/issues/13726) by @duncanmcclean
+
+
+
+## 6.0.0 (2026-01-28)
+
+### What's new
+- Official 6.0 release! 🎉
+
+### What's fixed
+- Add a custom scrollbar for set pickers [#13686](https://github.com/statamic/cms/issues/13686) by @JayGeorge
+- Prevent force mounting combobox to improve scroll performance [#13691](https://github.com/statamic/cms/issues/13691) by @jasonvarga
+- Improve progress states [#13690](https://github.com/statamic/cms/issues/13690) by @JayGeorge
+- Add pagination to package changelogs [#13692](https://github.com/statamic/cms/issues/13692) by @duncanmcclean
+- Fix adding nested replicator sets [#13694](https://github.com/statamic/cms/issues/13694) by @duncanmcclean
+- Prevent inline bard images from flickering when adding nodes [#13706](https://github.com/statamic/cms/issues/13706) by @duncanmcclean
+- Remove the spinner from the loading bulk actions state [#13709](https://github.com/statamic/cms/issues/13709) by @JayGeorge
+- Update type paths in package.json [#13700](https://github.com/statamic/cms/issues/13700) by @dadaxr
+- Fix `$fakeStacheDirectory` path when running addon tests on Windows [#13710](https://github.com/statamic/cms/issues/13710) by @duncanmcclean
+- Avoid Bard image alt input being focused on page load [#13705](https://github.com/statamic/cms/issues/13705) by @duncanmcclean
+- Display error when `npm install` fails in `setup-cp-vite` command [#13702](https://github.com/statamic/cms/issues/13702) by @duncanmcclean
+- Asset field listing preview improvements [#13708](https://github.com/statamic/cms/issues/13708) by @JayGeorge
+
+
+
+## 6.0.0-beta.6 (2026-01-26)
+
+### What's fixed
+- Remove background blur from many places [#13663](https://github.com/statamic/cms/issues/13663) by @JayGeorge
+- Make the stack hover effect a little less twitchy [#13662](https://github.com/statamic/cms/issues/13662) by @JayGeorge
+- Delay bulk actions until ready [#13450](https://github.com/statamic/cms/issues/13450) by @JayGeorge
+- Fix passkeys differently [#13666](https://github.com/statamic/cms/issues/13666) by @jasonvarga
+- Remove negative assertions from `TestCase` [#13674](https://github.com/statamic/cms/issues/13674) by @duncanmcclean
+- Update `orchestra/testbench` constraint in `make:addon` stub [#13675](https://github.com/statamic/cms/issues/13675) by @duncanmcclean
+- Code gutter improvements [#13677](https://github.com/statamic/cms/issues/13677) by @JayGeorge
+- Revision improvements [#13676](https://github.com/statamic/cms/issues/13676) by @JayGeorge
+- Fix bard graphql test [#13678](https://github.com/statamic/cms/issues/13678) by @jasonvarga
+- Move `resources/lang` directory to project root [#13679](https://github.com/statamic/cms/issues/13679) by @duncanmcclean
+- Fix `default: now` on date fields [#13044](https://github.com/statamic/cms/issues/13044) by @duncanmcclean
+- Reload actions after Publish/Unpublish in entry listing [#13672](https://github.com/statamic/cms/issues/13672) by @heidkaemper
+- Fix adding Bard sets [#13669](https://github.com/statamic/cms/issues/13669) by @duncanmcclean
+- Fix various console warnings [#13671](https://github.com/statamic/cms/issues/13671) by @duncanmcclean
+
+
+
+## 6.0.0-beta.5 (2026-01-23)
+
+### What's fixed
+- Hide actions in entry fieldtype tree view [#13649](https://github.com/statamic/cms/issues/13649) by @duncanmcclean
+- Command Palette: Display site in search result badge [#13650](https://github.com/statamic/cms/issues/13650) by @duncanmcclean
+- Fix Bard Link Toolbar [#13306](https://github.com/statamic/cms/issues/13306) by @duncanmcclean
+- French translations [#13653](https://github.com/statamic/cms/issues/13653) by @ebeauchamps
+- Kill sibling transitions [#13658](https://github.com/statamic/cms/issues/13658) by @JayGeorge
+- Restoring a revision should force a hard-reload of the page [#13656](https://github.com/statamic/cms/issues/13656) by @duncanmcclean
+- Ensure replicator lines show after reaching `max_sets` limit [#13657](https://github.com/statamic/cms/issues/13657) by @duncanmcclean
+- Improve Bard/Replicator performance during page load [#13427](https://github.com/statamic/cms/issues/13427) by @duncanmcclean
+- Bard image button defaults [#13661](https://github.com/statamic/cms/issues/13661) by @jasonvarga
+- Improve Combobox performance [#13625](https://github.com/statamic/cms/issues/13625) by @duncanmcclean
+- Wrap `STATAMIC_REVISIONS_PATH` env value in `base_path()` [#13629](https://github.com/statamic/cms/issues/13629) by @duncanmcclean
+
+
+
+## 6.0.0-beta.4 (2026-01-22)
+
+### What's new
+- Laravel Boost Guidelines [#13587](https://github.com/statamic/cms/issues/13587) by @duncanmcclean
+- Alert component [#13599](https://github.com/statamic/cms/issues/13599) by @JayGeorge
+
+### What's fixed
+- Improve assets without filenames [#13584](https://github.com/statamic/cms/issues/13584) by @JayGeorge
+- Fix `CodeEditor` previews in Storybook [#13588](https://github.com/statamic/cms/issues/13588) by @duncanmcclean
+- Prevent linebreak for selected assets message [#13582](https://github.com/statamic/cms/issues/13582) by @JayGeorge
+- German translations [#13581](https://github.com/statamic/cms/issues/13581) by @helloDanuk
+- Opaque badges [#13586](https://github.com/statamic/cms/issues/13586) by @JayGeorge
+- Run update scripts when updating to `6.0.0-beta.4` [#13594](https://github.com/statamic/cms/issues/13594) by @duncanmcclean
+- Dynamic floating toolbar [#13597](https://github.com/statamic/cms/issues/13597) by @JayGeorge
+- Prevent "Type / to insert a set" clashing with nodes [#13583](https://github.com/statamic/cms/issues/13583) by @duncanmcclean
+- Fix missing preset tab container border under "New View" button [#13603](https://github.com/statamic/cms/issues/13603) by @jackmcdade
+- Fix danger disabled button in dark mode [#13585](https://github.com/statamic/cms/issues/13585) by @JayGeorge
+- Fix error when calculating stack depth for non-existent stack [#13606](https://github.com/statamic/cms/issues/13606) by @duncanmcclean
+- Storybook - closer match Statamic branding [#13612](https://github.com/statamic/cms/issues/13612) by @JayGeorge
+- Make `parent_uri` and other entry data available in static caching invalidation rules [#10233](https://github.com/statamic/cms/issues/10233) by @duncanmcclean
+- Add `default` config option to Date fieldtype [#13546](https://github.com/statamic/cms/issues/13546) by @duncanmcclean
+- Combobox Scrollbar tweaks [#13453](https://github.com/statamic/cms/issues/13453) by @duncanmcclean
+- Fix incorrect index name passed to `InsertMultipleJob` job [#13617](https://github.com/statamic/cms/issues/13617) by @duncanmcclean
+- Fixes UI inconsistencies [#13505](https://github.com/statamic/cms/issues/13505) by @kjetilhole
+- Avoid generating slug for localization when field isn't localizable [#13549](https://github.com/statamic/cms/issues/13549) by @duncanmcclean
+- Fix nested revealer fields [#12362](https://github.com/statamic/cms/issues/12362) by @duncanmcclean
+- Run migration update scripts when updating to `6.0.0-beta.4` [#13631](https://github.com/statamic/cms/issues/13631) by @duncanmcclean
+- Make PreventsSavingStacheItemsToDisk work with Pest PHP [#13640](https://github.com/statamic/cms/issues/13640) by @aerni
+- Focus search input when opening relationship selector [#13642](https://github.com/statamic/cms/issues/13642) by @duncanmcclean
+- Fix error when adding nested replicator set [#13630](https://github.com/statamic/cms/issues/13630) by @duncanmcclean
+- npm audit fix [#13646](https://github.com/statamic/cms/issues/13646) by @jasonvarga
+- Fix error when restoring revision [#13626](https://github.com/statamic/cms/issues/13626) by @duncanmcclean
+- Avoid "Maximum recursive updates exceeded" error from tooltips [#13605](https://github.com/statamic/cms/issues/13605) by @duncanmcclean
+- Hash URLs when saving nocache regions in database [#13152](https://github.com/statamic/cms/issues/13152) by @duncanmcclean
+- Correct recursive form data merging [#13413](https://github.com/statamic/cms/issues/13413) by @mikemartin
+- Group fieldtype gets padding only when border enabled [#13109](https://github.com/statamic/cms/issues/13109) by @martyf
+
+
+
 ## 6.0.0-beta.3 (2026-01-15)
 
 ### What's fixed

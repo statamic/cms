@@ -29,7 +29,6 @@
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                     @update:selections="$emit('selections-updated', $event)"
-                    class="starting-style-transition"
                 >
                     <template #default="{ items }">
                         <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
@@ -122,6 +121,7 @@
                             />
 
                             <Table
+                                ref="table"
                                 v-if="mode === 'table'"
                                 :assets="items"
                                 :folders="folders"
@@ -133,6 +133,7 @@
                             />
 
                             <Grid
+                                ref="grid"
                                 v-if="mode === 'grid'"
                                 :assets="items"
                                 :action-url="actionUrl"

@@ -259,11 +259,19 @@ class Assets extends Fieldtype
             ->defaultVisibility(false)
             ->sortable(true);
 
+        $duration = Column::make('duration')
+            ->label(__('Duration'))
+            ->value('duration_formatted')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
         $columns->put('basename', $basename);
         $columns->put('size', $size);
         $columns->put('last_modified', $lastModified);
         $columns->put('width', $width);
         $columns->put('height', $height);
+        $columns->put('duration', $duration);
 
         $columns->setPreferred("assets.{$this->container()->handle()}.columns");
 
@@ -438,7 +446,16 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        return $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
+        $total = $data === null
+            ? 0
+            : ($this->config('max_files') === 1 ? 1 : count($data));
+
+        // Since we only want to display a handful of thumbnails, we'll slice it up here so we don't perform more
+        // augmentation overhead than necessary. e.g. 5 thumbs then +remainder. If the remainder is 1, we may
+        // as well show all 6 since the +1 would almost take up the same amount of space.
+        $data = collect($data)->take(6)->all();
+
+        $assets = $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
@@ -456,6 +473,8 @@ class Assets extends Fieldtype
 
             return $arr;
         });
+
+        return compact('total', 'assets');
     }
 
     protected function getItemsForPreProcessIndex($values): Collection

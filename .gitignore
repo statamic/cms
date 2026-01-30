@@ -15,5 +15,5 @@ packages/cms/src/ui.css
 composer.lock
 .env
 bundle-stats.html
-.claude
+.claude/settings.local.json
 storybook-static

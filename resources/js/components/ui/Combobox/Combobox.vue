@@ -150,7 +150,7 @@ const selectedOption = computed(() => {
 
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
-const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
+const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
 
 const isOptionDisabled = (option) => {
     if (isSelected(option)) return false;
@@ -196,10 +196,8 @@ const filteredOptions = computed(() => {
         return props.options;
     }
 
-    const options = JSON.parse(JSON.stringify(props.options));
-
     const results = fuzzysort
-        .go(searchQuery.value, options, {
+        .go(searchQuery.value, props.options, {
             all: true,
             key: props.optionLabel,
         })
@@ -229,6 +227,7 @@ function deselect(option) {
 }
 
 const dropdownOpen = ref(false);
+const virtualizerReady = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 const optionWidth = ref(null);
 
@@ -242,16 +241,27 @@ function updateDropdownOpen(open) {
 
     dropdownOpen.value = open;
 
+    if (!open) {
+        virtualizerReady.value = false;
+    }
+
     if (open) {
         nextTick(() => {
             measureOptionWidths();
 	        scrollbarRef.value?.update();
+            virtualizerReady.value = true;
         });
     }
 }
 
 function measureOptionWidths() {
     if (!filteredOptions.value || filteredOptions.value.length === 0) return;
+
+    // Find the options with the longest labels by character count.
+    // We only measure these candidates rather than all options for performance.
+    const candidates = [...filteredOptions.value]
+        .sort((a, b) => (getOptionLabel(b)?.length || 0) - (getOptionLabel(a)?.length || 0))
+        .slice(0, 5);
 
     let maxWidth = 0;
     const measurementCanvas = document.createElement('canvas');
@@ -261,8 +271,7 @@ function measureOptionWidths() {
     // This matches the itemClasses styling
     context.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-    // Measure all options to find the widest
-    filteredOptions.value.forEach(option => {
+    candidates.forEach(option => {
         const label = getOptionLabel(option);
         const metrics = context.measureText(label);
         const textWidth = metrics.width;
@@ -418,11 +427,12 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
+                        :hidden="!dropdownOpen"
                         position="popper"
                         :side-offset="5"
                         align="start"
                         :class="[
-                            'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(-well-z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
                             'overflow-hidden'
                         ]"
@@ -435,7 +445,7 @@ defineExpose({
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
-                                $refs.trigger.$el.focus();
+                                nextTick(() => $refs.trigger?.$el?.focus());
                                 event.preventDefault();
                             }"
                         >
@@ -444,10 +454,10 @@ defineExpose({
                                     ref="viewport"
                                     class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
                                     :class="{
-										'min-h-[2.25px]': options.length === 0,
-										'min-h-[2.5rem]': options.length === 1,
-										'min-h-[5rem]': options.length === 2,
-										'min-h-[7.5rem]': options.length >= 3,
+										'min-h-[2.25px]': filteredOptions.length === 0,
+										'min-h-[2.5rem]': filteredOptions.length === 1,
+										'min-h-[5rem]': filteredOptions.length === 2,
+										'min-h-[7.5rem]': filteredOptions.length >= 3,
                                         'pr-3': scrollbarRef?.isVisible,
                                     }"
                                     data-ui-combobox-viewport
@@ -459,7 +469,7 @@ defineExpose({
                                 </ComboboxEmpty>
 
                                 <ComboboxVirtualizer
-                                    v-if="filteredOptions"
+                                    v-if="virtualizerReady && filteredOptions.length"
                                     v-slot="{ option, virtualItem }"
                                     :options="filteredOptions"
                                     :estimate-size="40"

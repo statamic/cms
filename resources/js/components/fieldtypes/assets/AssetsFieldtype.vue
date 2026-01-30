@@ -20,7 +20,7 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg text-gray-700"
+                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
                     <ui-icon name="upload-cloud" class="size-5" />
                     <span class="text-sm">{{ __('Drop to Upload') }}</span>

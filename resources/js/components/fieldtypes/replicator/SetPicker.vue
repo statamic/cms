@@ -48,14 +48,18 @@
                             v-for="(item, i) in group.items"
                             :key="item.handle"
                             class="cursor-pointer rounded-lg"
-                            :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
+                            :class="{ 
+                                'bg-gray-100 dark:bg-gray-900': selectionIndex === i,
+                                'opacity-50 pointer-events-none': isLoading
+                            }"
                             @mouseover="selectionIndex = i"
                             :title="__(item.instructions)"
                         >
-                            <div @click="addSet(item.handle)" class="p-2.5">
+                            <div @click="!isLoading && addSet(item.handle)" class="p-2.5">
                                 <div class="h-40 w-full flex items-center justify-center">
-                                    <img :src="item.image" class="rounded-lg h-40 object-contain bg-gray-50 dark:bg-gray-850" v-if="item.image" />
-                                    <ui-icon :name="item.icon || 'add-section'" :set="iconSet" class="size-8 text-gray-600 dark:text-gray-300" v-else />
+                                    <ui-icon v-if="isSetLoading(item.handle)" name="loading" class="size-8 text-gray-600 dark:text-gray-300" />
+                                    <img v-else-if="item.image" :src="item.image" class="rounded-lg h-40 object-contain bg-gray-50 dark:bg-gray-850" />
+                                    <ui-icon v-else :name="item.icon || 'add-section'" :set="iconSet" class="size-8 text-gray-600 dark:text-gray-300" />
                                 </div>
                                 <div class="line-clamp-1 text-base mt-1 text-center text-gray-900 dark:text-gray-200">
                                     {{ __(item.display || item.handle) }}
@@ -81,7 +85,7 @@
         :open="isOpen"
         @clicked-away="$emit('clicked-away', $event)"
         @update:open="isOpen = $event"
-        class="set-picker select-none w-72"
+        class="set-picker select-none w-72 rounded-b-lg"
         data-set-picker-popover
         inset
     >
@@ -122,11 +126,11 @@
             </div>
 
             <!-- List Mode -->
-            <div class="max-h-[21rem] overflow-auto p-1.5">
+            <div class="max-h-[21rem] overflow-auto p-1.5 st-custom-scrollbar">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded-lg"
+                    class="cursor-pointer rounded-md"
                     :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
                     :title="__(item.instructions)"
@@ -143,8 +147,14 @@
                         </div>
                         <ui-icon name="chevron-right" class="me-1 size-2" />
                     </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="group flex items-center rounded-xl p-2.5 gap-2 sm:gap-3">
-                        <ui-icon :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
+                    <div 
+                        v-if="item.type === 'set'" 
+                        @click="!isLoading && addSet(item.handle)" 
+                        class="group flex items-center rounded-lg p-2.5 gap-2 sm:gap-3"
+                        :class="{ 'opacity-50 pointer-events-none': isLoading }"
+                    >
+                        <ui-icon v-if="isSetLoading(item.handle)" name="loading" class="size-4 text-gray-600 dark:text-gray-300" />
+                        <ui-icon v-else :name="item.icon || 'plus'" :set="iconSet" class="size-4 text-gray-600 dark:text-gray-300" />
                         <ui-hover-card :delay="0" :open="selectionIndex === i">
                             <template #trigger>
                                 <div class="flex-1">
@@ -177,12 +187,13 @@
 
 <style>
 body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-content-wrapper] {
-	z-index: var(--z-index-portal) !important;
+    z-index: var(--z-index-portal) !important;
 }
 </style>
 
 <script>
 import { Primitive } from 'reka-ui';
+import fuzzysort from 'fuzzysort';
 
 export default {
     emits: ['added', 'clicked-away'],
@@ -195,6 +206,7 @@ export default {
         sets: Array,
         enabled: { type: Boolean, default: true },
         align: { type: String, default: 'start' },
+        loadingSet: { type: String, default: null },
     },
 
     data() {
@@ -252,14 +264,7 @@ export default {
                   }, []);
 
             if (this.search) {
-                return sets
-                    .filter((set) => !set.hide)
-                    .filter((set) => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                sets = this.filterSetsBySearch(sets);
             }
 
             return sets.filter((set) => !set.hide);
@@ -306,12 +311,7 @@ export default {
 
                 // Apply search filter if there's a search term
                 if (this.search) {
-                    filteredSets = filteredSets.filter(set => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                    filteredSets = this.filterSetsBySearch(filteredSets);
                 }
 
                 groups[group.handle] = {
@@ -340,6 +340,10 @@ export default {
             // Modal for grid mode, Popover for list mode
             return this.mode === 'grid';
         },
+
+        isLoading() {
+            return !!this.loadingSet;
+        },
     },
 
     watch: {
@@ -362,14 +366,19 @@ export default {
         mode() {
             this.saveMode();
         },
+        loadingSet(loading, wasLoading) {
+            // Close the picker when loading completes
+            if (wasLoading && !loading) {
+                this.isOpen = false;
+                this.unselectGroup();
+                this.search = null;
+            }
+        },
     },
 
     methods: {
         addSet(handle) {
             this.$emit('added', handle);
-            this.unselectGroup();
-            this.search = null;
-            this.isOpen = false;
         },
 
         selectGroup(handle) {
@@ -431,6 +440,8 @@ export default {
         },
 
         singleButtonClicked() {
+			if (!this.enabled) return;
+
             this.addSet(this.sets[0].sets[0].handle);
         },
 
@@ -453,6 +464,25 @@ export default {
                 // Ignore localStorage errors
             }
         },
+
+        isSetLoading(handle) {
+            return this.loadingSet === handle;
+        },
+
+        filterSetsBySearch(sets) {
+            return fuzzysort
+                .go(this.search, sets, {
+                    all: true,
+                    keys: [(set) => __(set.display), 'handle', (set) => __(set.instructions)],
+                    scoreFn: (scores) => {
+                        const displayScore = scores[0]?.score ?? -Infinity;
+                        const handleScore = scores[1]?.score ?? -Infinity;
+                        const instructionsScore = (scores[2]?.score ?? -Infinity) * 0.5;
+                        return Math.max(displayScore, handleScore, instructionsScore);
+                    },
+                })
+                .map((result) => result.obj);
+        }
     },
 };
 </script>

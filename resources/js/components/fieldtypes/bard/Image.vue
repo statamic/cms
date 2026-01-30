@@ -28,8 +28,8 @@
                 @paste.stop
             >
                 <Input
+	                ref="alt"
                     name="alt"
-                    :focus="showingAltEdit"
                     v-model="alt"
                     :placeholder="assetAlt"
                     :prepend="__('Alt Text')"
@@ -156,6 +156,12 @@ export default {
         alt(alt) {
             this.updateAttributes({ alt });
         },
+
+	    showingAltEdit(showingAltEdit) {
+		    if (showingAltEdit) {
+				this.$nextTick(() => this.$refs.alt.focus());
+		    }
+	    },
     },
 
     methods: {
@@ -170,6 +176,13 @@ export default {
         },
 
         loadAsset(id) {
+            const cache = this.extension.options.bard.assetsCache;
+
+            if (cache[id]) {
+                this.setAsset(cache[id]);
+                return;
+            }
+
             this.$axios
                 .post(cp_url('assets-fieldtype'), {
                     assets: [id],
@@ -180,6 +193,7 @@ export default {
         },
 
         setAsset(asset) {
+            this.extension.options.bard.assetsCache[asset.id] = asset;
             this.editorAsset = asset;
             this.assetId = asset.id;
             this.assetAlt = asset.values.alt;

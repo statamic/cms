@@ -13,7 +13,7 @@
             <div>
                 <div
                     v-show="dragging"
-                    class="absolute inset-0 flex  gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                    class="absolute inset-0 flex  gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg"
                 >
                     <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('Drop to Upload') }}</div>

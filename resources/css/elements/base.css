@@ -23,7 +23,6 @@
 
     /* Used for entry animations */
     --starting-style-transition-duration: 0.125s;
-    --starting-style-sibling-delay: 0.01s;
 }
 
 /* FOCUS STATES

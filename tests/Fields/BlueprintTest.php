@@ -495,6 +495,7 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
+            'fqh' => 'test',
         ], $blueprint->toPublishArray());
     }
 
@@ -615,6 +616,7 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
+            'fqh' => 'test',
         ], $blueprint->toPublishArray());
     }
 

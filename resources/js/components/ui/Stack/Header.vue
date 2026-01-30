@@ -23,7 +23,7 @@ const hasActionsSlot = !!useSlots().actions;
 <template>
     <div
         data-ui-stack-title
-        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 py-2 dark:border-gray-950 dark:bg-gray-800"
+        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 ps-6 pe-4 py-2 dark:border-gray-950 dark:bg-gray-800"
     >
         <div class="flex items-center gap-2">
             <Icon :name="icon" v-if="icon" class="size-4" />

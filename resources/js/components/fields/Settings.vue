@@ -64,6 +64,8 @@ import FieldValidationBuilder from '../field-validation/Builder.vue';
 import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon, StackHeader, StackContent } from '@/components/ui';
 
 export default {
+    emits: ['committed', 'closed'],
+
     components: {
         StackContent,
         StackHeader,
@@ -80,7 +82,7 @@ export default {
     },
 
     props: {
-        id: String,
+        id: [String, Number],
         config: Object,
         overrides: { type: Array, default: () => [] },
         type: String,

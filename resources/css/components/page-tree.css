@@ -10,7 +10,6 @@
         /* We only want to animate tree nodes on page load. We don't want to animate child nodes when toggling them open, less it looks glitchy and feels unresponsive. */
         &:not(.page-tree--ready &) {
             transition: opacity var(--starting-style-transition-duration);
-            transition-delay: calc(sibling-index() * var(--starting-style-sibling-delay));
             @starting-style {
                 opacity: 0;
             }

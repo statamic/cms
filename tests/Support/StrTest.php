@@ -148,6 +148,23 @@ class StrTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_duration_for_humans()
+    {
+        $this->assertEquals('0:00', Str::durationForHumans(0));
+        $this->assertEquals('0:01', Str::durationForHumans(1));
+        $this->assertEquals('0:12', Str::durationForHumans(12));
+        $this->assertEquals('0:59', Str::durationForHumans(59));
+        $this->assertEquals('1:00', Str::durationForHumans(60));
+        $this->assertEquals('2:01', Str::durationForHumans(121));
+        $this->assertEquals('16:40', Str::durationForHumans(1000));
+        $this->assertEquals('59:59', Str::durationForHumans(3599));
+        $this->assertEquals('1:00:00', Str::durationForHumans(3600));
+        $this->assertEquals('1:01:01', Str::durationForHumans(3661));
+        $this->assertEquals('2:10:00', Str::durationForHumans(7800));
+        $this->assertEquals('10:05:30', Str::durationForHumans(36330));
+    }
+
+    #[Test]
     public function it_widonts()
     {
         $this->assertEquals('one two&nbsp;three', Str::widont('one two three'));
