@@ -9,6 +9,12 @@
                 prioritize
                 v-slot="{ text, action }"
             >
+                <Button
+                    v-if="!isSuper"
+                    :icon="areAllCheckedInAllGroups() ? 'checkbox-uncheck' : 'checkbox'"
+                    @click="toggleAllInAllGroups()"
+                    :text="areAllCheckedInAllGroups() ? __('Uncheck All') : __('Check All')"
+                />
                 <Button type="submit" variant="primary" @click="action" :text="text" />
             </CommandPaletteItem>
         </Header>
@@ -49,15 +55,27 @@
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
-            <CardPanel v-for="group in permissions" :key="group.handle" :heading="group.label">
-                <PermissionTree :depth="1" :initial-permissions="group.permissions" />
-            </CardPanel>
+            <Panel :heading="group.label" v-for="group in permissions" :key="group.handle">
+                <template #header-actions>
+                    <Button
+                        size="sm"
+                        variant="subtle"
+                        :icon="areAllChecked(group) ? 'checkbox-uncheck' : 'checkbox'"
+                        @click="toggleAllInGroup(group)"
+                    >
+                        {{ areAllChecked(group) ? __('Uncheck All') : __('Check All') }}
+                    </Button>
+                </template>
+                <Card>
+                    <PermissionTree :depth="1" :initial-permissions="group.permissions" />
+                </Card>
+            </Panel>
         </div>
     </div>
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
+import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
 import { router } from '@inertiajs/vue3';
@@ -74,7 +92,6 @@ export default {
         PermissionTree,
         Header,
         Button,
-        CardPanel,
         Panel,
         PanelHeader,
         Heading,
@@ -141,6 +158,50 @@ export default {
     },
 
     methods: {
+        areAllChecked(group) {
+            const checkAll = (permissions) => {
+                return permissions.every(permission => {
+                    const childrenChecked = permission.children && permission.children.length
+                        ? checkAll(permission.children)
+                        : true;
+                    return permission.checked && childrenChecked;
+                });
+            };
+            return checkAll(group.permissions);
+        },
+
+        areAllCheckedInAllGroups() {
+            return this.permissions.every(group => this.areAllChecked(group));
+        },
+
+        toggleAllInGroup(group) {
+            const allChecked = this.areAllChecked(group);
+            const toggle = (permissions, checked) => {
+                permissions.forEach(permission => {
+                    permission.checked = checked;
+                    if (permission.children && permission.children.length) {
+                        toggle(permission.children, checked);
+                    }
+                });
+            };
+            toggle(group.permissions, !allChecked);
+        },
+
+        toggleAllInAllGroups() {
+            const allChecked = this.areAllCheckedInAllGroups();
+            this.permissions.forEach(group => {
+                const toggle = (permissions, checked) => {
+                    permissions.forEach(permission => {
+                        permission.checked = checked;
+                        if (permission.children && permission.children.length) {
+                            toggle(permission.children, checked);
+                        }
+                    });
+                };
+                toggle(group.permissions, !allChecked);
+            });
+        },
+
         clearErrors() {
             this.error = null;
             this.errors = {};
