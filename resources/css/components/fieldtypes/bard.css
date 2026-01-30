@@ -164,6 +164,17 @@
         }
     }
 
+    /* Where a Bard fieldtype with a fixed toolbar... */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) {
+        /* has a nested Bard fieldtype with a fixed toolbar _with focus_ */
+        &:has(.bard-fieldtype .bard-content:focus) {
+            /* release the sticky positioning so that it doesn't cover the focused Bard toolbar */
+            > .bard-fixed-toolbar {
+                position: unset;
+            }
+        }
+    }
+
     /* Bard > Grid > Bard */
     .bard-content .grid-fieldtype .bard-fixed-toolbar {
         @apply top-16;
