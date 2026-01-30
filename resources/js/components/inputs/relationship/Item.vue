@@ -1,6 +1,6 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-(--z-index-above) flex w-full h-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 [&:has(.cursor-grab)]:px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-gray-700 dark:with-contrast:border-gray-500 dark:bg-gray-900"
+        class="relative z-(--z-index-above) flex w-full h-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 [&:has(.cursor-grab)]:px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 border-t-0 dark:border-white/10 dark:bg-gray-900 inset-shadow-2xs inset-shadow-gray-300 dark:inset-shadow-black"
         :class="{ invalid: item.invalid }"
     >
         <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />
