@@ -49,15 +49,20 @@
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
-            <CardPanel v-for="group in permissions" :key="group.handle" :heading="group.label">
-                <PermissionTree :depth="1" :initial-permissions="group.permissions" />
-            </CardPanel>
+            <Panel :heading="group.label" v-for="group in permissions" :key="group.handle">
+                <template #header-actions>
+                    <Button size="sm" variant="subtle" icon="checkmark" @click="checkAllInGroup(group)">{{ __('Check All') }}</Button>
+                </template>
+                <Card>
+                    <PermissionTree :depth="1" :initial-permissions="group.permissions" />
+                </Card>
+            </Panel>
         </div>
     </div>
 </template>
 
 <script>
-import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
+import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
 import { router } from '@inertiajs/vue3';
@@ -74,7 +79,6 @@ export default {
         PermissionTree,
         Header,
         Button,
-        CardPanel,
         Panel,
         PanelHeader,
         Heading,
@@ -141,6 +145,18 @@ export default {
     },
 
     methods: {
+        checkAllInGroup(group) {
+            const checkAll = (permissions) => {
+                permissions.forEach(permission => {
+                    permission.checked = true;
+                    if (permission.children && permission.children.length) {
+                        checkAll(permission.children);
+                    }
+                });
+            };
+            checkAll(group.permissions);
+        },
+
         clearErrors() {
             this.error = null;
             this.errors = {};
