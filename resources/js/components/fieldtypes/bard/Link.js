@@ -61,6 +61,12 @@ export const Link = Mark.create({
         ];
     },
 
+    addKeyboardShortcuts() {
+        return {
+            'Ctrl-k': () => this.options.vm.events.emit('open-link-toolbar'),
+        };
+    },
+
     addProseMirrorPlugins() {
         const vm = this.options.vm;
         return [
