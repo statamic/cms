@@ -8,6 +8,7 @@
             :add-section-text="addSectionText"
             :edit-section-text="editSectionText"
             :show-section-handle-field="showSectionHandleField"
+            :show-section-collapsible-field="showSectionCollapsibleField"
             :show-section-hide-field="showSectionHideField"
             :can-define-localizable="canDefineLocalizable"
             @updated="sectionsUpdated($event)"
@@ -36,6 +37,10 @@ export default {
             type: Boolean,
             default: false,
         },
+	    showSectionCollapsibleField: {
+			type: Boolean,
+		    default: false,
+	    },
         showSectionHideField: {
             type: Boolean,
             default: false,
