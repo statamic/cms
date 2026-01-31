@@ -6,6 +6,7 @@ use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Stache;
@@ -100,6 +101,8 @@ YAML;
     #[Test]
     public function it_saves_to_disk()
     {
+        Collection::shouldReceive('all')->andReturn(collect());
+
         $taxonomy = TaxonomyAPI::make('new');
 
         $this->store->save($taxonomy);
