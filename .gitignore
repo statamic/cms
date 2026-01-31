@@ -11,6 +11,7 @@ resources/dist
 resources/dist-dev
 resources/dist-frontend
 resources/dist-package
+resources/js/tests/browser/__screenshots__
 packages/cms/src/ui.css
 composer.lock
 .env

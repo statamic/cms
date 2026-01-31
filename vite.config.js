@@ -7,6 +7,7 @@ import svgLoader from 'vite-svg-loader';
 import path from 'path';
 import { playwright } from '@vitest/browser-playwright';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
 export default defineConfig(({ mode, command }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -66,13 +67,31 @@ export default defineConfig(({ mode, command }) => {
                     extends: true,
                     test: {
                         name: 'browser',
-                        setupFiles: 'resources/js/tests/setup.js',
+                        setupFiles: ['resources/js/tests/browser/setup.js', 'vitest-browser-vue'],
                         include: ['resources/js/tests/browser/**/*.test.js'],
                         browser: {
                             enabled: true,
                             provider: playwright(),
                             instances: [{ browser: 'chromium' }],
                         },
+                    },
+                },
+                {
+                    extends: true,
+                    plugins: [
+                        storybookTest({
+                            configDir: '.storybook',
+                        }),
+                    ],
+                    test: {
+                        name: 'storybook',
+                        browser: {
+                            enabled: true,
+                            headless: true,
+                            provider: playwright(),
+                            instances: [{ browser: 'chromium' }],
+                        },
+                        setupFiles: ['.storybook/vitest.setup.ts'],
                     },
                 },
             ],
