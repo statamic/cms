@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use Generator;
 use Illuminate\Support\Collection;
 
 class ItemQueryBuilder extends IteratorBuilder
@@ -18,6 +19,13 @@ class ItemQueryBuilder extends IteratorBuilder
     protected function getBaseItems()
     {
         return $this->items;
+    }
+
+    protected function getBaseItemsLazy(): Generator
+    {
+        foreach ($this->items as $item) {
+            yield $item;
+        }
     }
 
     public function whereStatus($status)
