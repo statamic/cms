@@ -19,7 +19,10 @@ class RegisterController
         $user = User::make()
             ->email($request->email)
             ->password($request->password)
-            ->data($request->processedValues());
+            ->data(array_merge(
+                $request->processedValues()->all(),
+                $request->processedAssets()->all(),
+            ));
 
         if ($roles = config('statamic.users.new_user_roles')) {
             $user->explicitRoles($roles);
