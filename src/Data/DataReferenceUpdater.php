@@ -3,6 +3,7 @@
 namespace Statamic\Data;
 
 use Statamic\Fields\Fields;
+use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
 
@@ -107,7 +108,40 @@ abstract class DataReferenceUpdater
                 $this->{$method}($field, $dottedKey);
             });
 
+        // Handle custom fieldtypes with nested fields
+        $fields
+            ->filter(fn ($field) => in_array(UpdatesReferences::class, class_uses_recursive($field->fieldtype())))
+            ->each(function ($field) use ($dottedPrefix) {
+                $this->updateNestedFieldsInCustomFieldtype($field, $dottedPrefix);
+            });
+
         return $this;
+    }
+
+    /**
+     * Update nested fields in custom fieldtype.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
+     */
+    protected function updateNestedFieldsInCustomFieldtype($field, $dottedPrefix)
+    {
+        $fieldKey = $dottedPrefix.$field->handle();
+        $fieldData = Arr::get($this->item->data()->all(), $fieldKey);
+
+        if (! $fieldData) {
+            return;
+        }
+
+        $fieldtype = $field->fieldtype();
+
+        $fieldtype->processNestedFieldsForReferences(
+            $fieldData,
+            function ($nestedFields, $relativePrefix) use ($fieldKey) {
+                $absolutePrefix = $fieldKey.'.'.$relativePrefix;
+                $this->recursivelyUpdateFields($nestedFields->all(), $absolutePrefix);
+            }
+        );
     }
 
     /**
