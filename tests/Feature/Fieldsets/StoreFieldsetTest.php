@@ -59,7 +59,6 @@ class StoreFieldsetTest extends TestCase
         $fieldset = Facades\Fieldset::find('test');
         $this->assertEquals([
             'title' => 'Test',
-            'fields' => [],
         ], $fieldset->contents());
         $this->assertEquals('test', $fieldset->handle());
     }
