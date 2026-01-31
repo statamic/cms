@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use League\Flysystem\PathTraversalDetected;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -1553,7 +1554,10 @@ class AssetTest extends TestCase
     public function it_passes_the_dimensions_validation()
     {
         $file = UploadedFile::fake()->image('image.jpg', 30, 60);
-        $validDimensions = (new DimensionsRule(['max_width=10']))->passes('Image', [$file]);
+        $validDimensions = Validator::make(
+            ['Image' => $file],
+            ['Image' => [new DimensionsRule(['max_width=10'])]],
+        )->passes();
 
         $this->assertFalse($validDimensions);
     }
