@@ -1315,6 +1315,60 @@ class NavTransformerTest extends TestCase
 
         $this->assertEquals($expected, $transformed);
     }
+
+    #[Test]
+    public function it_preserves_reorder_array_when_moving_custom_section_to_first_position()
+    {
+        // This test reproduces a bug where moving a custom section to the first position
+        // (after "Top Level") results in the reorder array being dropped during the minifying
+        // process, even though it is necessary to maintain the custom section's position.
+
+        $transformed = $this->transform([
+            ['display_original' => 'Top Level'],
+            [
+                'display' => '⭐ Favorites',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'favorites::edit_homepage',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                            'icon' => 'edit',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Content'],
+            ['display_original' => 'Fields'],
+            ['display_original' => 'Tools'],
+            ['display_original' => 'Settings'],
+            ['display_original' => 'Users'],
+        ]);
+
+        $expected = [
+            'reorder' => [
+                'favorites',
+            ],
+            'sections' => [
+                'favorites' => [
+                    'display' => '⭐ Favorites',
+                    'action' => '@create',
+                    'items' => [
+                        'favorites::edit_homepage' => [
+                            'action' => '@create',
+                            'display' => 'Edit homepage',
+                            'url' => '/cp',
+                            'icon' => 'edit',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
 }
 
 class IncrementalIdHasher
