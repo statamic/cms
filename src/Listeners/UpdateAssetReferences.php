@@ -9,6 +9,8 @@ use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Fieldset;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
@@ -92,6 +94,26 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
             ->each(function ($item) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
                 $updated = AssetReferenceUpdater::item($item)
                     ->filterByContainer($container)
+                    ->updateReferences($originalPath, $newPath);
+
+                if ($updated) {
+                    $hasUpdatedItems = true;
+                }
+            });
+
+        Blueprint::all()
+            ->each(function ($blueprint) use ($originalPath, $newPath, &$hasUpdatedItems) {
+                $updated = AssetReferenceUpdater::item($blueprint)
+                    ->updateReferences($originalPath, $newPath);
+
+                if ($updated) {
+                    $hasUpdatedItems = true;
+                }
+            });
+
+        Fieldset::all()
+            ->each(function ($fieldset) use ($originalPath, $newPath, &$hasUpdatedItems) {
+                $updated = AssetReferenceUpdater::item($fieldset)
                     ->updateReferences($originalPath, $newPath);
 
                 if ($updated) {

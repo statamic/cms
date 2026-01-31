@@ -10,10 +10,13 @@ use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
 use Statamic\Support\FileCollection;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class BlueprintRepositoryTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $repo;
 
     public function setUp(): void
@@ -24,6 +27,42 @@ class BlueprintRepositoryTest extends TestCase
             ->setDirectories('/path/to/resources/blueprints');
 
         Facades\Blueprint::swap($this->repo);
+    }
+
+    #[Test]
+    public function it_gets_all_blueprints()
+    {
+        $this->repo->setDirectories($this->fakeStacheDirectory.'/dev-null/blueprints');
+
+        $collection = tap(Facades\Collection::make('test'))->save();
+        $collection->entryBlueprint()->save();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+        $taxonomy->termBlueprint()->save();
+
+        $nav = tap(Facades\Nav::make('test'))->save();
+        $nav->blueprint()->save();
+
+        $assetContainer = tap(Facades\AssetContainer::make('test'))->save();
+        $assetContainer->blueprint()->save();
+
+        Facades\GlobalSet::make('test')->save();
+        $this->repo->make('test')->setNamespace('globals')->save();
+
+        $form = tap(Facades\Form::make('test'))->save();
+        $form->blueprint()->save();
+
+        $all = $this->repo->all();
+
+        $this->assertEveryItemIsInstanceOf(Blueprint::class, $all);
+        $this->assertEquals([
+            'collections.test.test',
+            'taxonomies.test.test',
+            'navigation.test',
+            'assets.test',
+            'globals.test',
+            'forms.test',
+        ], $all->map->fullyQualifiedHandle()->all());
     }
 
     #[Test]
