@@ -53,9 +53,30 @@ abstract class AggregateStore extends Store
 
     public function getItems($keys)
     {
-        return collect($keys)->map(function ($key) {
-            return $this->getItem($key);
+        $keys = collect($keys);
+
+        if ($keys->isEmpty()) {
+            return collect();
+        }
+
+        // Group keys by child store for batch fetching
+        $grouped = $keys->mapWithKeys(function ($key) {
+            [$store, $id] = explode('::', $key, 2);
+
+            return [$key => compact('store', 'id')];
+        })->groupBy('store');
+
+        // Batch fetch from each child store
+        $fetched = $grouped->flatMap(function ($items, $store) {
+            $ids = $items->pluck('id');
+            $storeItems = $this->store($store)->getItems($ids);
+
+            // Re-key with full keys (store::id)
+            return $ids->mapWithKeys(fn ($id, $i) => ["{$store}::{$id}" => $storeItems[$i]]);
         });
+
+        // Return in original order
+        return $keys->map(fn ($key) => $fetched[$key]);
     }
 
     public function getItem($key)
