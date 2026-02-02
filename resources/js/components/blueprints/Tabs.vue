@@ -145,8 +145,6 @@ export default {
 		tabs: {
 			deep: true,
 			handler(tabs) {
-				console.log('deep hello', tabs)
-
 				this.$emit('updated', tabs);
 				this.makeSortable();
 			},
