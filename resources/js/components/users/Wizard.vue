@@ -143,7 +143,7 @@
                         <ui-input
                             readonly
                             copyable
-                            :value="activationUrl"
+                            :model-value="activationUrl"
                             id="activation_url"
                         />
                     </div>
@@ -152,7 +152,7 @@
                         <ui-input
                             readonly
                             copyable
-                            :value="values.email"
+                            :model-value="values.email"
                             id="email"
                         />
                     </div>
