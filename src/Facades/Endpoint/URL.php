@@ -163,7 +163,6 @@ class URL
     {
         $url = URL::makeAbsolute($url);
         $url = Str::removeLeft($url, Site::current()->absoluteUrl());
-        $url = Str::ensureLeft($url, '/');
 
         return self::tidy($url);
     }
