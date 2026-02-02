@@ -76,9 +76,10 @@ const aggregatedItems = computed(() => [
 
 const results = computed(() => {
     let items = aggregatedItems.value.map(item => normalizeItem(item));
+    let filterableItems = items.filter(item => item.category !== 'Content Search');
 
     let filtered = fuzzysort
-        .go(query.value, items, {
+        .go(query.value, filterableItems, {
             all: true,
             keys: ['text'],
             scoreFn: fuzzysortScoringAlgorithm,
@@ -90,6 +91,19 @@ const results = computed(() => {
                 ...result.obj,
             };
         });
+
+	let contentSearchResults = items
+		.filter(item => item.category === 'Content Search')
+		.map(item => {
+			let result = fuzzysort.single(query.value, item.text);
+
+			return {
+				...item,
+				html: result?.highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>') || item.text,
+			};
+		});
+
+    filtered = [...contentSearchResults, ...filtered];
 
     let categoryOrder = query.value
         ? uniq(filtered.map(item => item.category))
