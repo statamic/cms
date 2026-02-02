@@ -292,7 +292,7 @@ abstract class Fieldtype implements Arrayable
         }
 
         if ($this->extraConfigFieldsUseSections()) {
-            $extraFields = $extraFields->flatMap(fn ($section) => $section['fields']);
+            $extraFields = $extraFields->flatMap(fn ($section) => $section['fields'] ?? null);
         }
 
         $fields = $fields
