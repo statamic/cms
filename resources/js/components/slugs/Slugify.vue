@@ -42,7 +42,7 @@ export default {
             handler() {
                 if (!this.shouldSlugify) {
                     this.slug = this.to;
-                } else if (!this.from) {
+                } else if (this.from === null || this.from === undefined || this.from === '') {
                     this.slug = '';
                 } else {
                     this.slugify();
