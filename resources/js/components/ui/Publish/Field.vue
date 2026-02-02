@@ -148,6 +148,7 @@ const shouldShowLabelText = computed(() => !props.config.hide_display);
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
+        props.config.hide_display || // Need label for accessibility (visually hidden)
         isLocked.value || // Need to see the avatar
         isSyncable.value, // Need to see the icon
 );
@@ -238,6 +239,9 @@ const fieldtypeComponentEvents = computed(() => ({
                         <span v-tooltip="config.handle">
                             {{ __(config.display) }}
                         </span>
+                    </template>
+                    <template v-else-if="config.hide_display">
+                        <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
