@@ -128,7 +128,7 @@ export default {
 
     data() {
         return {
-            tabs: this.initialTabs,
+            tabs: clone(this.initialTabs),
             currentTab: this.initialTabs.length ? this.initialTabs[0]._id : null,
             lastInteractedTab: null,
             hiddenTabs: [],
