@@ -201,6 +201,7 @@ return [
     'text.config.prepend' => 'Add text before (to the left of) the input.',
     'text.title' => 'Text',
     'textarea.title' => 'Textarea',
+    'time.config.augment_format' => 'Optionally format the output using [PHP date format](https://www.php.net/manual/en/datetime.format.php) syntax. e.g. `g:ia`.',
     'time.config.seconds_enabled' => 'Show seconds in the timepicker.',
     'time.title' => 'Time',
     'toggle.config.inline_label' => 'Set an inline label to be shown beside the toggle input.',
