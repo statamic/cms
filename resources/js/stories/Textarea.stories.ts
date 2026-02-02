@@ -108,9 +108,9 @@ export const _Placeholder: Story = {
 };
 
 const resizeCode = `
+<Textarea resize="horizontal" rows="1" placeholder="Resize horizontal"/>
 <Textarea resize="vertical" rows="1" placeholder="Resize vertical"/>
 <Textarea resize="both" rows="1" placeholder="Resize both"/>
-<Textarea resize="horizontal" rows="1" placeholder="Resize horizontal"/>
 <Textarea resize="none" rows="1" placeholder="Resize none"/>
 `;
 
