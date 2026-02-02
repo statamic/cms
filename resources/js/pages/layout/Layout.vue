@@ -5,6 +5,7 @@ import { ConfigProvider } from 'reka-ui';
 import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
+import Tooltips from '@/components/Tooltips.vue';
 import { provide, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';

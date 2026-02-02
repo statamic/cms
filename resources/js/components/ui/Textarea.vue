@@ -47,11 +47,17 @@ const classes = cva({
 const textarea = useTemplateRef('textarea');
 
 onMounted(() => {
-    autosize(textarea.value);
-    setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+    if (props.elastic) {
+        autosize(textarea.value);
+        setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+    }
 });
 
-onBeforeUnmount(() => autosize.destroy(textarea.value));
+onBeforeUnmount(() => {
+    if (props.elastic) {
+        autosize.destroy(textarea.value);
+    }
+});
 </script>
 
 <template>

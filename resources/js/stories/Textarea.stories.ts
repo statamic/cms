@@ -57,7 +57,7 @@ export const _Disabled: Story = {
 };
 
 const elasticCode = `
-<Textarea elastic rows="2" model-value="If you catch a chinchilla in Chile, and cut off its beard willy-nilly, you can honestly say, you made on that day, a Chilean chinchilla's chin chilly.">
+<Textarea elastic rows="2" model-value="If you catch a chinchilla in Chile, and cut off its beard willy-nilly, you can honestly say, you made on that day, a Chilean chinchilla's chin chilly." />
 `;
 
 export const _Elastic: Story = {
@@ -108,9 +108,9 @@ export const _Placeholder: Story = {
 };
 
 const resizeCode = `
+<Textarea resize="horizontal" rows="1" placeholder="Resize horizontal"/>
 <Textarea resize="vertical" rows="1" placeholder="Resize vertical"/>
 <Textarea resize="both" rows="1" placeholder="Resize both"/>
-<Textarea resize="horizontal" rows="1" placeholder="Resize horizontal"/>
 <Textarea resize="none" rows="1" placeholder="Resize none"/>
 `;
 
