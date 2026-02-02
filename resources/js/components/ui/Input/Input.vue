@@ -1,10 +1,11 @@
 <script setup>
-import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
+import { computed, useSlots, useAttrs, ref, useId, useTemplateRef, onMounted, nextTick, toRef } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
+import { useCopyable } from '@/composables/copyable.js';
 
 defineOptions({ inheritAttrs: false });
 
@@ -188,15 +189,7 @@ const togglePassword = () => {
     inputType.value = inputType.value === 'password' ? 'text' : 'password';
 };
 
-const copySupported = computed(() => 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function');
-const copyable = computed(() => props.copyable && copySupported.value)
-const copied = ref(false);
-const copy = () => {
-    if (!copyable.value || !props.modelValue) return;
-    navigator.clipboard.writeText(props.modelValue);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 1000);
-};
+const { copyable, copied, copy } = useCopyable(toRef(() => props.modelValue), toRef(() => props.copyable));
 
 const clearable = computed(() => props.clearable && !props.readOnly && !props.disabled && !!props.modelValue);
 
