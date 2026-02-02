@@ -142,10 +142,15 @@ export default {
     },
 
     watch: {
-        tabs(tabs) {
-            this.$emit('updated', tabs);
-            this.makeSortable();
-        },
+		tabs: {
+			deep: true,
+			handler(tabs) {
+				console.log('deep hello', tabs)
+
+				this.$emit('updated', tabs);
+				this.makeSortable();
+			},
+		},
     },
 
     mounted() {
