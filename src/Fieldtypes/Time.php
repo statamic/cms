@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Time\StringableTime;
 use Statamic\Rules\TimeFieldtype as ValidationRule;
 
 class Time extends Fieldtype
@@ -34,6 +35,11 @@ class Time extends Fieldtype
                 ],
             ],
         ];
+    }
+
+    public function augment($value)
+    {
+        return new StringableTime($value);
     }
 
     public function rules(): array

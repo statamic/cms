@@ -28,6 +28,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fieldtypes\Time\StringableTime;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
@@ -3328,11 +3329,13 @@ class CoreModifiers extends Modifier
             return optional();
         }
 
+        $shouldLocalizeDate = config('statamic.system.localize_dates_in_modifiers') && ! $value instanceof StringableTime;
+
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }
 
-        if (config('statamic.system.localize_dates_in_modifiers')) {
+        if ($shouldLocalizeDate) {
             $value->setTimezone(Statamic::displayTimezone());
         }
 
