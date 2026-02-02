@@ -30,8 +30,8 @@ const props = defineProps({
         default: () => ({}),
     },
     submitUrl: {
-        type: String,
-        required: true,
+        type: [String, null],
+        default: null,
     },
     submitMethod: {
         type: String,

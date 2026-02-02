@@ -15,10 +15,10 @@ use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorData;
 use Webauthn\CollectedClientData;
-use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
+use Webauthn\PublicKeyCredentialSource;
 
 #[Group('passkeys')]
 class WebAuthnTest extends TestCase
@@ -195,7 +195,7 @@ class WebAuthnTest extends TestCase
         );
 
         // Mock the passkey
-        $mockPasskeyCredential = Mockery::mock(CredentialRecord::class);
+        $mockPasskeyCredential = Mockery::mock(PublicKeyCredentialSource::class);
         $mockPasskeyCredential->publicKeyCredentialId = 'test-raw-id';
 
         $mockPasskey = Mockery::mock(Passkey::class);
@@ -209,7 +209,7 @@ class WebAuthnTest extends TestCase
         $mockUser->shouldReceive('id')->andReturn('test-user');
         $mockUser->shouldReceive('passkeys->first')->andReturn($mockPasskey);
 
-        $updatedCredentialRecord = Mockery::mock(CredentialRecord::class);
+        $updatedCredentialSource = Mockery::mock(PublicKeyCredentialSource::class);
 
         $this->mockSerializer
             ->shouldReceive('deserialize')
@@ -219,7 +219,7 @@ class WebAuthnTest extends TestCase
         $this->mockAssertionValidator
             ->shouldReceive('check')
             ->once()
-            ->andReturn($updatedCredentialRecord);
+            ->andReturn($updatedCredentialSource);
 
         $result = $this->webauthn->validateAssertion($mockUser, $credentials);
 

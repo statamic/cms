@@ -259,9 +259,18 @@ class Cache
     private function addEtagToResponse($request, $response)
     {
         if (! $response->isRedirect() && $content = $response->getContent()) {
-            $response
-                ->setEtag(md5($content))
-                ->isNotModified($request);
+            // Clear any potentially stale cache-related headers that might interfere
+            $response->headers->remove('ETag');
+            $response->headers->remove('Last-Modified');
+
+            // Set fresh ETag based on current content
+            $response->setEtag(md5($content));
+
+            // Only call isNotModified() if request has cache validation headers
+            // This prevents 304 responses to clients that haven't sent If-None-Match or If-Modified-Since
+            if ($request->headers->has('If-None-Match') || $request->headers->has('If-Modified-Since')) {
+                $response->isNotModified($request);
+            }
         }
 
         return $response;

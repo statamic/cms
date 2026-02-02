@@ -42,6 +42,8 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
+        abort_if(! $asset, 404);
+
         // TODO: Auth
 
         return new AssetResource($asset);
@@ -131,6 +133,8 @@ class AssetsController extends CpController
     public function download($asset)
     {
         $asset = Asset::find(base64_decode($asset));
+
+        abort_if(! $asset, 404);
 
         // TODO: Auth
 

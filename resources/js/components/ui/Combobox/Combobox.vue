@@ -227,6 +227,7 @@ function deselect(option) {
 }
 
 const dropdownOpen = ref(false);
+const virtualizerReady = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 const optionWidth = ref(null);
 
@@ -240,10 +241,15 @@ function updateDropdownOpen(open) {
 
     dropdownOpen.value = open;
 
+    if (!open) {
+        virtualizerReady.value = false;
+    }
+
     if (open) {
         nextTick(() => {
             measureOptionWidths();
 	        scrollbarRef.value?.update();
+            virtualizerReady.value = true;
         });
     }
 }
@@ -421,7 +427,6 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
-                        :force-mount="true"
                         :hidden="!dropdownOpen"
                         position="popper"
                         :side-offset="5"
@@ -440,7 +445,7 @@ defineExpose({
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
-                                $refs.trigger.$el.focus();
+                                nextTick(() => $refs.trigger?.$el?.focus());
                                 event.preventDefault();
                             }"
                         >
@@ -464,7 +469,7 @@ defineExpose({
                                 </ComboboxEmpty>
 
                                 <ComboboxVirtualizer
-                                    v-if="filteredOptions"
+                                    v-if="virtualizerReady && filteredOptions.length"
                                     v-slot="{ option, virtualItem }"
                                     :options="filteredOptions"
                                     :estimate-size="40"

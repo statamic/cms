@@ -53,7 +53,7 @@
                             :is-fullscreen="false"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
-                            class="sticky z-(--z-index-above) -top-2 mb-2 [&~*]:-mt-2"
+                            class="sticky z-(--z-index-portal) top-0 sm:-top-2 mb-2 [&~*]:-mt-2"
                         />
 
                         <div class="drag-notification" v-show="dragging">

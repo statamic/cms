@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Updater;
 
 use Facades\Statamic\Marketplace\Marketplace;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -33,7 +34,7 @@ class UpdateProductController extends CpController
      *
      * @param  string  $slug
      */
-    public function changelog($marketplaceProductSlug)
+    public function changelog(Request $request, $marketplaceProductSlug)
     {
         $this->authorize('view updates');
 
@@ -43,9 +44,15 @@ class UpdateProductController extends CpController
 
         $changelog = $product->changelog();
 
+        $paginated = $changelog->paginate(
+            $request->input('page', 1),
+            $request->input('perPage', 10)
+        );
+
         return [
-            'changelog' => $changelog->get(),
+            'changelog' => $paginated['data'],
             'currentVersion' => $changelog->currentVersion(),
+            'meta' => $paginated['meta'],
         ];
     }
 }

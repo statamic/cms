@@ -110,7 +110,7 @@
     }
 
     .editor {
-        @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white dark:bg-gray-900! px-2 shadow-ui-md md:px-8 md:pt-8;
+        @apply relative mx-auto my-6 max-w-page rounded-lg bg-white dark:bg-gray-900! px-2 shadow-ui-md md:px-8 md:pt-8;
 
         .CodeMirror-scroll {
             @apply m-0;
@@ -126,6 +126,6 @@
     }
 
     .markdown-preview {
-        @apply relative mx-auto max-w-5xl bg-transparent p-8 text-lg;
+        @apply relative mx-auto max-w-page bg-transparent p-8 text-lg;
     }
 }

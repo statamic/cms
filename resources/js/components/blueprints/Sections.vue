@@ -9,6 +9,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-collapsible-field="showSectionCollapsibleField"
                 :show-hide-field="showSectionHideField"
                 :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
@@ -67,6 +68,10 @@ export default {
             type: Boolean,
             default: false,
         },
+	    showSectionCollapsibleField: {
+			type: Boolean,
+		    default: false,
+	    },
         showSectionHideField: {
             type: Boolean,
             default: false,

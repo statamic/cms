@@ -840,6 +840,323 @@ class ReplicatorTest extends TestCase
         ], $response->json('new'));
     }
 
+    /**
+     * We're purposefully naming the sets the same as its nested field to replicate the reported issue.
+     *
+     * @see https://github.com/statamic/cms/issues/13687
+     */
+    #[Test]
+    public function it_can_return_set_defaults_for_nested_sets()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $cards = Fieldset::make('cards')->setContents(['fields' => [
+            ['handle' => 'cards', 'field' => ['type' => 'replicator', 'sets' => [
+                'card' => [
+                    'sets' => [
+                        'card' => [
+                            'fields' => [
+                                ['handle' => 'text_field', 'field' => ['type' => 'text', 'default' => 'the default']],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]],
+        ]]);
+
+        $article = Fieldset::make('article')->setContents(['fields' => [
+            ['handle' => 'bard_field', 'field' => ['type' => 'bard', 'sets' => [
+                'cards' => [
+                    'sets' => [
+                        'cards' => [
+                            'fields' => [
+                                ['import' => 'cards'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]],
+        ]]);
+
+        $pageBuilder = Fieldset::make('page_builder')->setContents(['fields' => [
+            ['handle' => 'page_builder', 'field' => ['type' => 'replicator', 'sets' => [
+                'replicator_set_group' => [
+                    'sets' => [
+                        'article' => [
+                            'fields' => [
+                                ['handle' => 'text_field', 'field' => ['type' => 'text', 'default' => 'the default']],
+                                ['import' => 'article'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]],
+        ]]);
+
+        Fieldset::shouldReceive('find')->with('cards')->andReturn($cards);
+        Fieldset::shouldReceive('find')->with('article')->andReturn($article);
+        Fieldset::shouldReceive('find')->with('page_builder')->andReturn($pageBuilder);
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        ['import' => 'page_builder'],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'page_builder.article.bard_field.cards.cards',
+                'set' => 'card',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'text_field' => 'the default',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'text_field' => null,
+        ], $response->json('new'));
+    }
+
+    /**
+     * We're purposefully naming the sets the same as its nested field to replicate the reported issue.
+     *
+     * @see https://github.com/statamic/cms/issues/13714
+     */
+    #[Test]
+    public function it_can_return_set_defaults_for_replicator_inside_group()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $pageBuilder = Fieldset::make('page_builder')->setContents(['fields' => [
+            ['handle' => 'page_builder', 'field' => ['type' => 'replicator', 'sets' => [
+                'replicator_set_group' => [
+                    'sets' => [
+                        'cards_slider' => [
+                            'fields' => [
+                                [
+                                    'handle' => 'cards_slider',
+                                    'field' => [
+                                        'type' => 'group',
+                                        'fields' => [
+                                            [
+                                                'handle' => 'slider',
+                                                'field' => [
+                                                    'type' => 'group',
+                                                    'fields' => [
+                                                        [
+                                                            'handle' => 'cards',
+                                                            'field' => [
+                                                                'type' => 'replicator',
+                                                                'sets' => [
+                                                                    'replicator_set_group' => [
+                                                                        'sets' => [
+                                                                            'card' => [
+                                                                                'fields' => [
+                                                                                    ['handle' => 'card_content', 'field' => ['type' => 'text', 'default' => 'the default']],
+                                                                                ],
+                                                                            ],
+                                                                        ],
+                                                                    ],
+                                                                ],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]],
+        ]]);
+
+        Fieldset::shouldReceive('find')->with('page_builder')->andReturn($pageBuilder);
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        ['import' => 'page_builder'],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'page_builder.cards_slider.cards_slider.slider.cards',
+                'set' => 'card',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'card_content' => 'the default',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'card_content' => null,
+        ], $response->json('new'));
+    }
+
+    #[Test]
+    public function it_can_return_set_defaults_for_replicator_inside_grid()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $pageBuilder = Fieldset::make('page_builder')->setContents(['fields' => [
+            ['handle' => 'page_builder', 'field' => ['type' => 'replicator', 'sets' => [
+                'replicator_set_group' => [
+                    'sets' => [
+                        'cards_slider' => [
+                            'fields' => [
+                                [
+                                    'handle' => 'cards_slider',
+                                    'field' => [
+                                        'type' => 'grid',
+                                        'fields' => [
+                                            [
+                                                'handle' => 'cards',
+                                                'field' => [
+                                                    'type' => 'replicator',
+                                                    'sets' => [
+                                                        'replicator_set_group' => [
+                                                            'sets' => [
+                                                                'card' => [
+                                                                    'fields' => [
+                                                                        ['handle' => 'card_content', 'field' => ['type' => 'text', 'default' => 'the default']],
+                                                                    ],
+                                                                ],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]],
+        ]]);
+
+        Fieldset::shouldReceive('find')->with('page_builder')->andReturn($pageBuilder);
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        ['import' => 'page_builder'],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'page_builder.cards_slider.cards_slider.cards',
+                'set' => 'card',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'card_content' => 'the default',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'card_content' => null,
+        ], $response->json('new'));
+    }
+
+    #[Test]
+    public function it_can_return_set_defaults_when_sets_are_stored_in_legacy_format()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $blueprint = Facades\Blueprint::make()->setHandle('default')->setNamespace('collections.pages');
+        $blueprint->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => [
+                        [
+                            'handle' => 'content',
+                            'field' => [
+                                'type' => 'replicator',
+                                'sets' => [
+                                    'video' => [
+                                        'fields' => [
+                                            ['handle' => 'video_url', 'field' => ['type' => 'text', 'default' => 'https://youtu.be/dQw4w9WgXcQ']],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        Facades\Blueprint::partialMock();
+        Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
+
+        $response = $this
+            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->postJson(cp_route('replicator-fieldtype.set'), [
+                'blueprint' => 'collections.pages.default',
+                'field' => 'content',
+                'set' => 'video',
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'video_url' => 'https://youtu.be/dQw4w9WgXcQ',
+        ], $response->json('defaults'));
+
+        $this->assertEquals([
+            '_' => '_',
+            'video_url' => null,
+        ], $response->json('new'));
+    }
+
     public static function groupedSetsProvider()
     {
         return [

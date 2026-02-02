@@ -57,10 +57,10 @@
                     <ui-field :label="__('Instructions')">
                         <ui-input type="text" v-model="editingSection.instructions" />
                     </ui-field>
-                    <ui-field :label="__('Collapsible')">
+                    <ui-field :label="__('Collapsible')" v-if="showCollapsibleField">
                         <ui-switch v-model="editingSection.collapsible" />
                     </ui-field>
-                    <ui-field :label="__('Collapsed by default')" v-if="editingSection.collapsible">
+                    <ui-field :label="__('Collapsed by default')" v-if="showCollapsibleField && editingSection.collapsible">
                         <ui-switch v-model="editingSection.collapsed" />
                     </ui-field>
                     <ui-field :label="__('Icon')" v-if="showHandleField">
@@ -143,6 +143,7 @@ export default {
         tabId: { type: String },
         section: { type: Object, required: true },
         showHandleField: { type: Boolean, default: false },
+	    showCollapsibleField: { type: Boolean, default: false },
         showHideField: { type: Boolean, default: false },
         editText: { type: String },
     },

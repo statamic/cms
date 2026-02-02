@@ -38,6 +38,7 @@
                     :tab="tab"
                     v-show="currentTab === tab._id"
                     :show-section-handle-field="showSectionHandleField"
+                    :show-section-collapsible-field="showSectionCollapsibleField"
                     :show-section-hide-field="showSectionHideField"
                     :new-section-text="newSectionText"
                     :edit-section-text="editSectionText"
@@ -112,6 +113,10 @@ export default {
             type: Boolean,
             default: false,
         },
+	    showSectionCollapsibleField: {
+			type: Boolean,
+		    default: false,
+	    },
         showSectionHideField: {
             type: Boolean,
             default: false,

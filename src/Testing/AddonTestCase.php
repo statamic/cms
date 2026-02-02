@@ -7,6 +7,7 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
 use Statamic\Addons\Manifest;
 use Statamic\Console\Processes\Composer;
+use Statamic\Facades\Path;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -26,17 +27,15 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
             $reflector = new ReflectionClass($this->addonServiceProvider);
-            $this->fakeStacheDirectory = dirname($reflector->getFileName()).'/../tests/__fixtures__/dev-null';
+            $this->fakeStacheDirectory = Path::resolve(dirname($reflector->getFileName()).'/../tests/__fixtures__/dev-null');
 
             $this->preventSavingStacheItemsToDisk();
         }
 
-        Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
-        $this->addToAssertionCount(-1);
+        Version::shouldReceive('get')->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
 
-        \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
-        $this->addToAssertionCount(-2); // Dont want to assert this
+        \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
     }
 
     protected function tearDown(): void

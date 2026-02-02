@@ -142,7 +142,7 @@ class Date extends Fieldtype
         }
 
         if ($value === 'now') {
-            return now('UTC')->toIso8601ZuluString('millisecond');
+            return 'now';
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.

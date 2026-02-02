@@ -944,6 +944,7 @@ class DocumentParser
         $this->nodes[] = $node;
         $this->lastAntlersNode = $node;
         $this->startIndex = $this->currentIndex;
+        $this->currentIndex += 1;
     }
 
     private function advanceWhitespace()

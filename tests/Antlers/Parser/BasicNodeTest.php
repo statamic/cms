@@ -200,14 +200,14 @@ class BasicNodeTest extends ParserTestCase
         $template = <<<'EOT'
 {{# A comment #}}
 {{# another comment {{ width }} #}}
-<div class="max-w-6xl mx-auto mb-32">
+<div class="max-w-5xl 3xl:max-w-6xl mx-auto mb-32">
 <p>test</p> {{ subtitle }}
 </div>
 EOT;
 
         $expected = <<<'EOT'
 
-<div class="max-w-6xl mx-auto mb-32">
+<div class="max-w-5xl 3xl:max-w-6xl mx-auto mb-32">
 <p>test</p> test
 </div>
 EOT;

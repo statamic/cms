@@ -149,6 +149,19 @@ class Str
         return trans('statamic::messages.units.B', ['count' => $bytes]);
     }
 
+    public static function durationForHumans($s)
+    {
+        $hours = floor($s / 3600);
+        $mins = floor(($s % 3600) / 60);
+        $secs = $s % 60;
+
+        if ($hours > 0) {
+            return sprintf('%d:%02d:%02d', $hours, $mins, $secs);
+        }
+
+        return sprintf('%d:%02d', $mins, $secs);
+    }
+
     public static function timeForHumans($ms)
     {
         if ($ms < 1000) {

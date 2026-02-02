@@ -36,6 +36,15 @@ export default {
         };
     },
 
+    watch: {
+        initialPermissions: {
+            handler(newPermissions) {
+                this.permissions = newPermissions;
+            },
+            deep: true,
+        },
+    },
+
     methods: {
         updatePermission(permission, checked) {
             permission.checked = checked;
