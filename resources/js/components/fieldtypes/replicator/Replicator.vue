@@ -60,6 +60,7 @@
                                             :index="index"
                                             :enabled="canAddSet"
                                             :is-first="index === 0"
+                                            :show-connector="!(index === 0 && config.hide_display)"
                                             :loading-set="loadingSet"
                                             @added="addSet"
                                         />
