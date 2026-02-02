@@ -57,7 +57,7 @@ export const _Disabled: Story = {
 };
 
 const elasticCode = `
-<Textarea elastic rows="2" model-value="If you catch a chinchilla in Chile, and cut off its beard willy-nilly, you can honestly say, you made on that day, a Chilean chinchilla's chin chilly.">
+<Textarea elastic rows="2" model-value="If you catch a chinchilla in Chile, and cut off its beard willy-nilly, you can honestly say, you made on that day, a Chilean chinchilla's chin chilly." />
 `;
 
 export const _Elastic: Story = {
