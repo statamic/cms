@@ -1,14 +1,18 @@
 <script setup>
 import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
+import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, useTemplateRef, toRef } from 'vue';
+import { useCopyable } from '@/composables/copyable.js';
 
 defineEmits(['update:modelValue']);
 
 const props = defineProps({
     /** When `true`, the textarea will automatically grow/shrink to fit content */
     elastic: { type: Boolean, default: false },
+    /** When `true`, shows a copy button to copy the value to clipboard */
+    copyable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     /** ID attribute for the textarea element */
     id: { type: String, default: null },
@@ -23,6 +27,8 @@ const props = defineProps({
     /** Specify a character limit */
     limit: { type: Number, default: null },
 });
+
+const { copyable: canCopy, copied, copy } = useCopyable(toRef(() => props.modelValue), toRef(() => props.copyable));
 
 const classes = cva({
     base: [
@@ -68,6 +74,16 @@ onBeforeUnmount(() => autosize.destroy(textarea.value));
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />
+        <div class="absolute right-2 top-2" v-if="canCopy">
+            <Button
+                size="sm"
+                :icon="copied ? 'clipboard-check' : 'clipboard'"
+                variant="subtle"
+                @click="copy"
+                class="animate"
+                :class="copied ? 'animate-wiggle' : ''"
+            />
+        </div>
         <div class="absolute right-2 bottom-2" v-if="limit">
             <CharacterCounter :text="modelValue" :limit />
         </div>
