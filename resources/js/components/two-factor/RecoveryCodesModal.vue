@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
-import { Modal, Button, Icon } from '@/components/ui';
+import { Modal, Button, Icon, Textarea } from '@/components/ui';
 
 const emit = defineEmits(['cancel', 'close']);
 
@@ -14,7 +14,10 @@ const props = defineProps({
 const loading = ref(true);
 const confirming = ref(false);
 const recoveryCodes = ref(null);
-const canCopy = !!navigator.clipboard;
+
+const recoveryCodesText = computed(() => {
+    return recoveryCodes.value ? recoveryCodes.value.join('\n') : '';
+});
 
 onMounted(() => getRecoveryCodes());
 
@@ -34,15 +37,6 @@ function regenerate() {
         Statamic.$toast.success(__('Refreshed recovery codes'));
     });
 }
-
-function copyToClipboard() {
-    if (!canCopy) return Statamic.$toast.error(__('Unable to copy to clipboard'));
-
-    navigator.clipboard
-        .writeText(recoveryCodes.value.join('\n'))
-        .then(() => Statamic.$toast.success(__('Copied to clipboard')))
-        .catch((error) => Statamic.$toast.error(__('Unable to copy to clipboard')));
-}
 </script>
 
 <template>
@@ -56,19 +50,16 @@ function copyToClipboard() {
                 <div class="space-y-6">
                     <ui-description>{{ __('statamic::messages.two_factor_recovery_codes') }}</ui-description>
 
-                    <div class="bg-gray-200 dark:bg-gray-800 py-8 rounded-xl">
-                        <ul class="grid gap-2 md:grid-cols-2 text-center justify-center">
-                            <li
-                                v-for="recoveryCode in recoveryCodes"
-                                class="font-mono lg:text-base"
-                                v-text="recoveryCode"
-                            ></li>
-                        </ul>
-                    </div>
+                    <Textarea
+                        :model-value="recoveryCodesText"
+                        readOnly
+                        copyable
+                        :rows="recoveryCodes.length"
+                        resize="none"
+                        class="font-mono text-center"
+                    />
 
                     <div class="flex items-center space-x-4">
-                        <Button v-if="canCopy" @click="copyToClipboard">{{ __('Copy') }}</Button>
-
                         <Button :href="downloadUrl" download>{{ __('Download') }}</Button>
 
                         <Button @click.prevent="confirming = true">
