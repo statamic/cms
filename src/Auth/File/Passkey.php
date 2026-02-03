@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\File;
 
+use Carbon\Carbon;
 use Statamic\Auth\WebAuthn\Passkey as BasePasskey;
 use Statamic\Auth\WebAuthn\Serializer;
 
@@ -28,6 +29,12 @@ class Passkey extends BasePasskey
 
         $user->setPasskeys($passkeys);
 
+        $passkeys->each(function ($passkey) use ($user) {
+            if ($lastLogin = $passkey->lastLogin()) {
+                $user->setMeta('passkey_'.$passkey->id().'_last_login', $lastLogin);
+            }
+        });
+
         $user->save();
 
         return true;
@@ -37,8 +44,16 @@ class Passkey extends BasePasskey
     {
         return [
             'name' => $this->name(),
-            'last_login' => $this->lastLogin()?->timestamp ?? null,
             'credential' => app(Serializer::class)->normalize($this->credential()),
         ];
+    }
+
+    public function lastLogin(): ?Carbon
+    {
+        if (! parent::lastLogin()) {
+            $this->setLastLogin($this->user()->getMeta('passkey_'.$this->id().'_last_login'));
+        }
+
+        return parent::lastLogin();
     }
 }
