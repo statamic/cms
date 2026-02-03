@@ -5,6 +5,7 @@ export default function useCopy() {
     const copiedValue = ref(null);
     const copied = computed(() => copiedValue.value !== null);
     const isCopied = (value) => copiedValue.value === value;
+    let timeout;
 
     const copy = (value) => {
         if (!value) return Promise.resolve();
@@ -13,7 +14,8 @@ export default function useCopy() {
             .writeText(value)
             .then(() => {
                 copiedValue.value = value;
-                setTimeout(() => (copiedValue.value = null), 1000);
+                clearTimeout(timeout);
+                timeout = setTimeout(() => (copiedValue.value = null), 1000);
                 Statamic.$toast.success(__('Copied to clipboard'));
             })
             .catch(() => {
