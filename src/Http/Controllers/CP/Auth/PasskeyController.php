@@ -15,7 +15,7 @@ class PasskeyController
     public function index()
     {
         // redirect if passkeys are disabled
-        if (!config('statamic.webauthn.enable_login_with_passkey')) {
+        if (! config('statamic.webauthn.enable_login_with_passkey')) {
             return redirect(cp_route('users.edit', User::current()->id()));
         }
 

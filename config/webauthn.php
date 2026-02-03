@@ -13,7 +13,6 @@ return [
 
     'enable_login_with_passkey' => env('STATAMIC_PASSKEY_ENABLED', true),
 
-
     /*
     |--------------------------------------------------------------------------
     | Allow password logins to be used when user has a passkey

@@ -54,11 +54,11 @@ class LoginController extends CpController
     {
         $redirect = parse_url(cp_route('index'))['path'];
 
-        return OAuth::providers()->map(fn(Provider $provider) => [
+        return OAuth::providers()->map(fn (Provider $provider) => [
             'name' => $provider->name(),
             'label' => $provider->label(),
-            'icon' => Statamic::svg('oauth/' . $provider->name()),
-            'url' => $provider->loginUrl() . '?redirect=' . $redirect,
+            'icon' => Statamic::svg('oauth/'.$provider->name()),
+            'url' => $provider->loginUrl().'?redirect='.$redirect,
         ])->values();
     }
 
@@ -108,7 +108,7 @@ class LoginController extends CpController
     {
         $cp = cp_route('index');
         $referer = request('referer');
-        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp . '/auth/');
+        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
 
         return $referredFromCp ? $referer : $cp;
     }
