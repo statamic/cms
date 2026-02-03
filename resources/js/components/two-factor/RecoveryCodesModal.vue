@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { Modal, Button, Icon, Textarea } from '@/components/ui';
+import { Modal, Button, Icon } from '@/components/ui';
+import useCopy from '@/composables/copy';
 
 const emit = defineEmits(['cancel', 'close']);
 
@@ -14,10 +15,7 @@ const props = defineProps({
 const loading = ref(true);
 const confirming = ref(false);
 const recoveryCodes = ref(null);
-
-const recoveryCodesText = computed(() => {
-    return recoveryCodes.value ? recoveryCodes.value.join('\n') : '';
-});
+const { isSupported: canCopy, copy } = useCopy();
 
 onMounted(() => getRecoveryCodes());
 
@@ -50,16 +48,19 @@ function regenerate() {
                 <div class="space-y-6">
                     <ui-description>{{ __('statamic::messages.two_factor_recovery_codes') }}</ui-description>
 
-                    <Textarea
-                        :model-value="recoveryCodesText"
-                        readOnly
-                        copyable
-                        :rows="recoveryCodes.length"
-                        resize="none"
-                        class="font-mono text-center"
-                    />
+                    <div class="bg-gray-200 dark:bg-gray-800 py-8 rounded-xl">
+                        <ul class="grid gap-2 md:grid-cols-2 text-center justify-center">
+                            <li
+                                v-for="recoveryCode in recoveryCodes"
+                                class="font-mono lg:text-base"
+                                v-text="recoveryCode"
+                            ></li>
+                        </ul>
+                    </div>
 
                     <div class="flex items-center space-x-4">
+                        <Button v-if="canCopy" @click="copy(recoveryCodes.join('\n'))">{{ __('Copy') }}</Button>
+
                         <Button :href="downloadUrl" download>{{ __('Download') }}</Button>
 
                         <Button @click.prevent="confirming = true">
