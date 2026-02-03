@@ -113,15 +113,15 @@ class UsersController extends CpController
 
         $query->where(function ($query) use ($search) {
             $query
-                ->where('email', 'like', '%'.$search.'%')
+                ->where('email', 'like', '%' . $search . '%')
                 ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
                     foreach (explode(' ', $search) as $word) {
                         $query
-                            ->orWhere('first_name', 'like', '%'.$word.'%')
-                            ->orWhere('last_name', 'like', '%'.$word.'%');
+                            ->orWhere('first_name', 'like', '%' . $word . '%')
+                            ->orWhere('last_name', 'like', '%' . $word . '%');
                     }
                 }, function ($query) use ($search) {
-                    $query->orWhere('name', 'like', '%'.$search.'%');
+                    $query->orWhere('name', 'like', '%' . $search . '%');
                 });
         });
 
@@ -145,18 +145,18 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->preProcess();
 
-        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+        $broker = config('statamic.users.passwords.' . PasswordReset::BROKER_ACTIVATIONS);
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
-            ->reject(fn ($field) => in_array($field->visibility(), ['read_only', 'computed']))
+            ->reject(fn($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->reject(fn($field) => in_array($field->visibility(), ['read_only', 'computed']))
             ->keys();
 
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->all(),
-            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
+            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
@@ -290,6 +290,7 @@ class UsersController extends CpController
                     ],
                 ],
             ] : null,
+            'passkeyEnabled' => config('statamic.webauthn.enable_login_with_passkey'),
         ];
 
         if ($request->wantsJson()) {

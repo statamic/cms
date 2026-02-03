@@ -14,6 +14,11 @@ class PasskeyController
 {
     public function index()
     {
+        // redirect if passkeys are disabled
+        if (!config('statamic.webauthn.enable_login_with_passkey')) {
+            return redirect(cp_route('users.edit', User::current()->id()));
+        }
+
         return Inertia::render('users/Passkeys', [
             'passkeys' => User::current()->passkeys()->map(function (Passkey $passkey) {
                 return [

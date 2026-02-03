@@ -11,6 +11,7 @@ defineOptions({ layout: Outside });
 const props = defineProps([
     'errors',
     'emailLoginEnabled',
+    'passkeyEnabled',
     'passkeyOptionsUrl',
     'passkeyVerifyUrl',
     'oauthEnabled',
@@ -55,7 +56,7 @@ const submit = () => {
 const passkey = usePasskey();
 
 const showPasskeyLogin = computed(() => {
-    return props.emailLoginEnabled && passkey.supported;
+     return props.passkeyEnabled && props.emailLoginEnabled && passkey.supported;
 })
 
 const emailAutocomplete = computed(() => {
@@ -111,7 +112,7 @@ onMounted(() => {
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
-                            class="text-ui-accent-text text-sm hover:text-ui-accent-text/80"
+                            class="text-sm text-ui-accent-text hover:text-ui-accent-text/80"
                             tabindex="6"
                             v-text="__('Forgot password?')"
                         />
@@ -137,7 +138,7 @@ onMounted(() => {
                         />
                         <ErrorMessage v-if="passkey.error.value" :text="passkey.error.value" />
                     </template>
-                    <div v-if="showOAuth" class="flex gap-4 justify-center items-center">
+                    <div v-if="showOAuth" class="flex items-center justify-center gap-4">
                         <Button
                             v-for="provider in providers"
                             :key="provider.name"

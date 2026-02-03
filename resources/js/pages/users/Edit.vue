@@ -15,11 +15,12 @@ defineProps([
     'itemActions',
     'itemActionUrl',
     'twoFactor',
+    'passkeyEnabled'
 ]);
 </script>
 
 <template>
-    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+    <div class="max-w-5xl mx-auto 3xl:max-w-6xl" data-max-width-wrapper>
         <Head :title="__('Edit User')" />
 
         <UserPublishForm
@@ -37,6 +38,7 @@ defineProps([
             :initial-item-actions="itemActions"
             :item-action-url="itemActionUrl"
             :two-factor="twoFactor"
+            :passkey-enabled="passkeyEnabled"
         />
     </div>
 </template>
