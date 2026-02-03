@@ -19,7 +19,7 @@ export function usePasskey() {
             try {
                 startAuthResponse = await startAuthentication({ optionsJSON, useBrowserAutofill });
             } catch (e) {
-                if (e.name === 'AbortError') return;
+                if (e.name === 'AbortError' || e.name === 'NotAllowedError') return;
                 console.error(e);
                 error.value = __('Authentication failed.');
                 if (!useBrowserAutofill) waiting.value = false;
