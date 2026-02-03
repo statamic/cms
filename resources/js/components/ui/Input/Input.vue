@@ -189,7 +189,7 @@ const togglePassword = () => {
     inputType.value = inputType.value === 'password' ? 'text' : 'password';
 };
 
-const { isSupported: copySupported, copied, copy } = useCopy();
+const { copySupported, copied, copy } = useCopy();
 const canCopy = computed(() => props.copyable && copySupported);
 
 const clearable = computed(() => props.clearable && !props.readOnly && !props.disabled && !!props.modelValue);

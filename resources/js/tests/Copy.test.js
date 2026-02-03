@@ -15,8 +15,8 @@ afterEach(() => {
 });
 
 test('it reports clipboard as supported when available', () => {
-    const { isSupported } = useCopy();
-    expect(isSupported).toBe(true);
+    const { copySupported } = useCopy();
+    expect(copySupported).toBe(true);
 });
 
 test('it copies a value to the clipboard', async () => {

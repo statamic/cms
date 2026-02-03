@@ -15,7 +15,7 @@ const props = defineProps({
 const loading = ref(true);
 const confirming = ref(false);
 const recoveryCodes = ref(null);
-const { isSupported: canCopy, copy } = useCopy();
+const { copySupported, copy } = useCopy();
 
 onMounted(() => getRecoveryCodes());
 
@@ -59,7 +59,7 @@ function regenerate() {
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <Button v-if="canCopy" @click="copy(recoveryCodes.join('\n'))">{{ __('Copy') }}</Button>
+                        <Button v-if="copySupported" @click="copy(recoveryCodes.join('\n'))">{{ __('Copy') }}</Button>
 
                         <Button :href="downloadUrl" download>{{ __('Download') }}</Button>
 

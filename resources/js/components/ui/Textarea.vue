@@ -28,7 +28,7 @@ const props = defineProps({
     limit: { type: Number, default: null },
 });
 
-const { isSupported: copySupported, copied, copy } = useCopy();
+const { copySupported, copied, copy } = useCopy();
 const canCopy = computed(() => props.copyable && copySupported.value);
 
 const classes = cva({
