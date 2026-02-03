@@ -216,11 +216,8 @@ abstract class Fieldtype implements Arrayable
             return [];
         }
 
-        if ($this->extraConfigFieldsUseSections()) {
-            $extraSections = collect($extras)->filter(fn ($field) => Arr::has($field, 'fields'));
-
+        if ($extraSections = $this->extraConfigFieldsUseSections($extras)) {
             $fields = collect($fields)->merge($extraSections);
-
             $extras = collect($extras)->diffKeys($extraSections);
         }
 
@@ -269,13 +266,9 @@ abstract class Fieldtype implements Arrayable
         return array_keys($fields)[0] === 0;
     }
 
-    private function extraConfigFieldsUseSections()
+    private function extraConfigFieldsUseSections($extras)
     {
-        if (empty($fields = $this->extraConfigFieldItems())) {
-            return false;
-        }
-
-        return array_keys($fields)[0] === 0;
+        return collect($extras)->filter(fn ($field) => Arr::has($field, 'fields'));
     }
 
     public function configFields(): Fields
@@ -291,13 +284,15 @@ abstract class Fieldtype implements Arrayable
             $fields = $fields->flatMap(fn ($section) => $section['fields']);
         }
 
-        if ($this->extraConfigFieldsUseSections()) {
-            $extraFields = $extraFields->flatMap(fn ($section) => $section['fields'] ?? null);
+        if ($extraSections = $this->extraConfigFieldsUseSections($extraFields)) {
+            $mergeFields = $extraSections->flatMap(fn ($section) => $section['fields'] ?? null);
+
+            $fields = collect($fields)->merge($mergeFields);
+            $extraFields = collect($extraFields)->diffKeys($extraSections);
         }
 
         $fields = $fields
             ->merge($extraFields)
-            ->merge($this->extraConfigFieldItems())
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
