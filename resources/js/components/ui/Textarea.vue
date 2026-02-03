@@ -3,8 +3,8 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { nextTick, onBeforeUnmount, onMounted, useTemplateRef, toRef } from 'vue';
-import { useCopyable } from '@/composables/copyable.js';
+import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import useCopy from '@/composables/copy';
 
 defineEmits(['update:modelValue']);
 
@@ -28,7 +28,8 @@ const props = defineProps({
     limit: { type: Number, default: null },
 });
 
-const { copyable: canCopy, copied, copy } = useCopyable(toRef(() => props.modelValue), toRef(() => props.copyable));
+const { isSupported: copySupported, copied, copy } = useCopy();
+const canCopy = computed(() => props.copyable && copySupported.value);
 
 const classes = cva({
     base: [
@@ -79,7 +80,7 @@ onBeforeUnmount(() => autosize.destroy(textarea.value));
                 size="sm"
                 :icon="copied ? 'clipboard-check' : 'clipboard'"
                 variant="subtle"
-                @click="copy"
+                @click="copy(modelValue)"
                 class="animate"
                 :class="copied ? 'animate-wiggle' : ''"
             />
