@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 
 export default function useCopy() {
-    const copySupported = 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function';
+    const copySupported = computed(() => 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function');
     const copiedValue = ref(null);
     const copied = computed(() => copiedValue.value !== null);
     const isCopied = (value) => copiedValue.value === value;
