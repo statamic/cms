@@ -7,9 +7,9 @@ export default function useCopy() {
     const isCopied = (value) => copiedValue.value === value;
 
     const copy = (value) => {
-        if (!value) return;
+        if (!value) return Promise.resolve();
 
-        navigator.clipboard
+        return navigator.clipboard
             .writeText(value)
             .then(() => {
                 copiedValue.value = value;
