@@ -351,10 +351,6 @@ export default {
         },
     },
 
-    mounted() {
-        if (this.config.collapse) this.collapseAll();
-    },
-
     watch: {
         focused(focused, oldFocused) {
             if (focused === oldFocused) return;

@@ -391,10 +391,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$nextTick(() => {
-            this.mounted = true;
-            if (this.config.collapse) this.collapseAll();
-        });
+		this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
 
