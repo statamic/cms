@@ -218,3 +218,16 @@ const getInputLabel = (part) => {
         </DatePickerRoot>
     </div>
 </template>
+
+<style>
+/**
+	Override the z-index of Reka's popper content wrapper under certain conditions.
+	We can't use a direct descendant selector because the DatePicker is inside a Portal.
+*/
+body:has(
+	[data-ui-modal-content],
+	.stack
+) [data-reka-popper-content-wrapper] {
+	z-index: var(--z-index-portal)!important;
+}
+</style>
