@@ -146,6 +146,18 @@ const selectedOption = computed(() => {
     return selectedOptions.value[0];
 });
 
+const inputPlaceholder = computed(() => {
+    if (props.multiple && selectedOptions.value.length > 0) {
+        return __n(':count item selected|:count items selected', selectedOptions.value.length);
+    }
+
+    if (selectedOption.value) {
+        return getOptionLabel(selectedOption.value);
+    }
+
+    return props.placeholder;
+});
+
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
@@ -334,39 +346,29 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
+                        tabindex="0"
                         :class="triggerClasses"
                         @keydown.enter="openDropdown"
                         @keydown.space="openDropdown"
                         data-ui-combobox-trigger
                     >
                         <div class="flex-1 min-w-0">
-                            <!-- Dropdown open: search input -->
+                            <!-- Input for searching (when searchable and open, or no selection yet) -->
                             <ComboboxInput
                                 v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                                 ref="search"
-                                class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden"
+                                class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden cursor-pointer"
                                 type="search"
                                 :id="id"
                                 v-model="searchQuery"
-                                :placeholder
+                                :placeholder="inputPlaceholder"
                                 autocomplete="off"
                                 @paste.prevent="onPaste"
                                 @keydown.enter.prevent="pushTaggableOption"
                                 @blur="pushTaggableOption"
-                                @keydown.space="openDropdown"
                             />
 
-                            <!-- Dropdown open: placeholder -->
-                            <div
-                                v-else-if="!searchable && (dropdownOpen || !modelValue)"
-                                class="w-full text-start flex items-center gap-2 bg-transparent cursor-pointer focus:outline-none"
-                                data-ui-combobox-placeholder
-                            >
-                                <Icon v-if="icon" :name="icon" class="text-gray-500 dark:text-white dark:opacity-50" />
-                                <span class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
-                            </div>
-
-                            <!-- Dropdown closed: selected option -->
+                            <!-- Selected option display (when closed with selection, or non-searchable) -->
                             <div
                                 v-else
                                 class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
@@ -379,6 +381,7 @@ defineExpose({
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
+                                <span v-else class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="inputPlaceholder" />
                             </div>
                         </div>
 
@@ -423,7 +426,7 @@ defineExpose({
                                 }"
                                 data-ui-combobox-viewport
                             >
-                                <ComboboxEmpty class="px-2 text-sm" data-ui-combobox-empty>
+                                <ComboboxEmpty class="py-1 px-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
