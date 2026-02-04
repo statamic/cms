@@ -47,11 +47,16 @@ import {
 } from '@api';
 
 let bootingCallbacks = [];
+let configuringCallbacks = [];
 let bootedCallbacks = [];
 
 export default {
     booting(callback) {
         bootingCallbacks.push(callback);
+    },
+
+    configuring(callback) {
+        configuringCallbacks.push(callback);
     },
 
     booted(callback) {
@@ -313,6 +318,9 @@ export default {
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
+
+        configuringCallbacks.forEach((callback) => callback(this));
+        configuringCallbacks = [];
 
         return this.$app;
     },
