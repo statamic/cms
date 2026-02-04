@@ -33,6 +33,7 @@ const setToNow = () => {
         :model-value="modelValue"
         @update:model-value="emit('update:modelValue', $event)"
         v-slot="{ segments }"
+        :locale="$date.locale"
         :granularity="granularity"
         :class="[
             'flex items-center w-full bg-white dark:bg-gray-900',
