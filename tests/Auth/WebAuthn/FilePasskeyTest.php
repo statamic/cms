@@ -16,9 +16,14 @@ use Webauthn\TrustPath\EmptyTrustPath;
 #[Group('passkeys')]
 class FilePasskeyTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PasskeyTests, PreventSavingStacheItemsToDisk;
 
-    private function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
+    protected function newPasskey(): \Statamic\Contracts\Auth\Passkey
+    {
+        return new Passkey;
+    }
+
+    protected function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
     {
         return PublicKeyCredentialSource::create(
             publicKeyCredentialId: $id,
