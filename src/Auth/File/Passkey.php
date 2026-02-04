@@ -14,7 +14,11 @@ class Passkey extends BasePasskey
         /** @var User $user */
         $user = $this->user();
 
-        $user->setPasskeys($user->passkeys()->except($this->id()));
+        $remaining = $user->passkeys()->except($this->id());
+
+        $user->setPasskeys($remaining);
+
+        $this->setLastLogins($user, $remaining);
 
         $user->save();
 
