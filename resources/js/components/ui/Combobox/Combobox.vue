@@ -111,7 +111,7 @@ const itemClasses = cva({
     base: [
         'w-full flex items-center gap-2 relative select-none cursor-pointer text-sm',
         'py-1.5 px-2 antialiased rounded-lg',
-        'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden',
+        'data-disabled:text-gray-300 dark:data-disabled:text-gray-500 data-disabled:pointer-events-none data-highlighted:outline-hidden',
     ],
     variants: {
         size: {
