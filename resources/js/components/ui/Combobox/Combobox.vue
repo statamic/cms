@@ -126,6 +126,19 @@ const itemClasses = cva({
     },
 });
 
+const searchQuery = ref('');
+const dropdownOpen = ref(false);
+const triggerRef = useTemplateRef('trigger');
+const viewportRef = useTemplateRef('viewport');
+const searchInputRef = useTemplateRef('search');
+
+watch(searchQuery, (value) => emit('search', value, () => {}));
+
+const getOptionLabel = (option) => option?.[props.optionLabel];
+const getOptionValue = (option) => option?.[props.optionValue];
+const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
+const isDisabled = (option) => !isSelected(option) && props.multiple && limitReached.value;
+
 const selectedOptions = computed(() => {
     let selections = props.modelValue === null ? [] : props.modelValue;
 
@@ -145,29 +158,6 @@ const selectedOption = computed(() => {
 
     return selectedOptions.value[0];
 });
-
-const inputPlaceholder = computed(() => {
-    if (props.multiple && selectedOptions.value.length > 0) {
-        return __n(':count item selected|:count items selected', selectedOptions.value.length);
-    }
-
-    if (selectedOption.value) {
-        return getOptionLabel(selectedOption.value);
-    }
-
-    return props.placeholder;
-});
-
-const getOptionLabel = (option) => option?.[props.optionLabel];
-const getOptionValue = (option) => option?.[props.optionValue];
-const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
-
-const isOptionDisabled = (option) => {
-    if (isSelected(option)) return false;
-    if (props.multiple && limitReached.value) return true;
-
-    return false;
-};
 
 const limitReached = computed(() => {
     if (! props.maxSelections) return false;
@@ -191,13 +181,27 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
-const triggerRef = useTemplateRef('trigger');
-const viewportRef = useTemplateRef('viewport');
-const searchQuery = ref('');
-const searchInputRef = useTemplateRef('search');
+const canClearSelection = computed(() => props.clearable && props.modelValue);
+const shouldCloseOnSelect = computed(() => props.closeOnSelect || !props.multiple);
+const shouldShowOptionsChevron = computed(() => props.options.length > 0 || props.ignoreFilter);
+const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelections && props.maxSelections !== Infinity);
 
-watch(searchQuery, (value) => {
-    emit('search', value, () => {});
+const shouldShowInput = computed(() => {
+	if (!props.searchable) return false;
+
+	return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
+});
+
+const placeholder = computed(() => {
+	if (props.multiple && selectedOptions.value.length > 0) {
+		return __n(':count item selected|:count items selected', selectedOptions.value.length);
+	}
+
+	if (selectedOption.value) {
+		return getOptionLabel(selectedOption.value);
+	}
+
+	return props.placeholder;
 });
 
 const filteredOptions = computed(() => {
@@ -227,102 +231,93 @@ function clear() {
     emit('update:modelValue', null);
 }
 
+function select(option) {
+	dropdownOpen.value = !shouldCloseOnSelect.value;
+	if (shouldCloseOnSelect.value) triggerRef.value.$el.focus();
+}
+
 function deselect(option) {
     emit('update:modelValue', props.modelValue.filter((item) => item !== option));
 }
 
-const dropdownOpen = ref(false);
-const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
+function updateModelValue(value) {
+	let originalValue = props.modelValue || [];
+
+	searchQuery.value = '';
+	emit('update:modelValue', value);
+
+	if (!Array.isArray(value)) value = [value];
+	if (!Array.isArray(originalValue)) originalValue = [originalValue];
+
+	value
+		.filter((option) => !originalValue?.includes(option))
+		.forEach((option) => emit('selected', option));
+}
 
 function updateDropdownOpen(open) {
     if (props.disabled) return;
-
-    // Prevent dropdown from opening when it's a taggable combobox with no options.
-    if (props.taggable && props.options.length === 0) {
-        return;
-    }
+	if (props.taggable && props.options.length === 0) return;
 
     dropdownOpen.value = open;
 
     if (open) {
+	    nextTick(() => searchInputRef?.value?.$el?.focus());
         setTimeout(() => scrollToSelectedOption(), 1);
     }
 }
 
-function scrollToSelectedOption() {
-    if (props.multiple || !props.modelValue) return;
-
-    const index = filteredOptions.value.findIndex(
-        (option) => getOptionValue(option) === props.modelValue
-    );
-
-    if (index >= 0 && viewportRef.value) {
-        const estimatedItemHeight = 40;
-        const viewportHeight = viewportRef.value.clientHeight;
-        const itemPosition = index * estimatedItemHeight;
-        const centeredPosition = itemPosition - (viewportHeight / 2) + (estimatedItemHeight / 2);
-
-        viewportRef.value.scrollTop = Math.max(0, centeredPosition);
-    }
-}
-
-function updateModelValue(value) {
-    let originalValue = props.modelValue || [];
-
-    searchQuery.value = '';
-    emit('update:modelValue', value);
-
-    if (!Array.isArray(value)) value = [value];
-    if (!Array.isArray(originalValue)) originalValue = [originalValue];
-
-    value
-        .filter((option) => !originalValue?.includes(option))
-        .forEach((option) => emit('selected', option));
+function openDropdown(e) {
+	if (dropdownOpen.value) return;
+	updateDropdownOpen(true);
 }
 
 function onPaste(e) {
-    if (!props.taggable) {
-        return;
-    }
+	if (!props.taggable) return;
 
     const pastedValue = e.clipboardData.getData('text');
 
     updateModelValue([...props.modelValue, ...pastedValue.split(',').map((v) => v.trim())]);
 }
 
-// When it's a taggable combobox with no options, we need to push the value here as updateModelValue won't be called.
 function pushTaggableOption(e) {
-    if (props.taggable && props.options.length === 0) {
-        if (e.target.value === '') return;
+	if (!props.taggable || !props.options.length) return;
+	if (e.target.value === '') return;
 
-        if (props.modelValue.includes(e.target.value)) {
-            searchQuery.value = '';
-            return;
-        }
+	if (props.modelValue.includes(e.target.value)) {
+		searchQuery.value = '';
+		return;
+	}
 
-        emit('added', e.target.value);
+	emit('added', e.target.value);
 
-        updateModelValue([...props.modelValue, e.target.value]);
-    }
+	updateModelValue([...props.modelValue, e.target.value]);
 }
 
-function openDropdown(e) {
-    if (dropdownOpen.value) return;
-    if (typeof e.preventDefault === 'function') e.preventDefault();
+function scrollToSelectedOption() {
+	if (props.multiple || !props.modelValue) return;
 
-    updateDropdownOpen(true);
+	const index = filteredOptions.value.findIndex(
+		(option) => getOptionValue(option) === props.modelValue
+	);
 
-    nextTick(() => searchInputRef?.value?.$el?.focus());
+	if (index >= 0 && viewportRef.value) {
+		const estimatedItemHeight = 40;
+		const viewportHeight = viewportRef.value.clientHeight;
+		const itemPosition = index * estimatedItemHeight;
+		const centeredPosition = itemPosition - (viewportHeight / 2) + (estimatedItemHeight / 2);
+
+		viewportRef.value.scrollTop = Math.max(0, centeredPosition);
+	}
 }
 
-function selectOption(option) {
-    dropdownOpen.value = !closeOnSelect.value;
-    if (closeOnSelect.value) triggerRef.value.$el.focus();
+function focus() {
+	triggerRef.value.$el.focus();
 }
 
 defineExpose({
     searchQuery,
     filteredOptions,
+	focus,
 });
 </script>
 
@@ -330,17 +325,17 @@ defineExpose({
     <div :class="wrapperClasses" v-bind="wrapperAttrs">
         <div class="flex w-full min-w-0">
             <ComboboxRoot
+	            class="cursor-pointer flex-1 min-w-0"
+	            :multiple
+	            :open="dropdownOpen"
+	            :model-value="modelValue"
                 :disabled="disabled || readOnly"
-                :model-value="modelValue"
-                :multiple
-                :open="dropdownOpen"
                 :reset-search-term-on-blur="false"
                 :reset-search-term-on-select="false"
-                @update:model-value="updateModelValue"
-                @update:open="updateDropdownOpen"
-                class="cursor-pointer flex-1 min-w-0"
                 data-ui-combobox
                 ignore-filter
+	            @update:open="updateDropdownOpen"
+	            @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor class="block w-full" data-ui-combobox-anchor>
                     <ComboboxTrigger
@@ -348,31 +343,29 @@ defineExpose({
                         ref="trigger"
                         tabindex="0"
                         :class="triggerClasses"
-                        @keydown.enter="openDropdown"
-                        @keydown.space="openDropdown"
                         data-ui-combobox-trigger
+                        @keydown.enter.prevent="openDropdown"
+                        @keydown.space.prevent="openDropdown"
                     >
                         <div class="flex-1 min-w-0">
-                            <!-- Input for searching (when searchable and open, or no selection yet) -->
                             <ComboboxInput
-                                v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
+                                v-if="shouldShowInput"
+                                :id
+                                :placeholder
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden cursor-pointer"
                                 type="search"
-                                :id="id"
-                                v-model="searchQuery"
-                                :placeholder="inputPlaceholder"
                                 autocomplete="off"
+                                v-model="searchQuery"
                                 @paste.prevent="onPaste"
+                                @blur.prevent="pushTaggableOption"
                                 @keydown.enter.prevent="pushTaggableOption"
-                                @blur="pushTaggableOption"
                             />
 
-                            <!-- Selected option display (when closed with selection, or non-searchable) -->
                             <div
-                                v-else
-                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
-                                data-ui-combobox-selected-option
+	                            v-else
+	                            class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
+	                            data-ui-combobox-selected-option
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
@@ -381,20 +374,33 @@ defineExpose({
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
-                                <span v-else class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="inputPlaceholder" />
+                                <span v-else class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
                             </div>
                         </div>
 
-                        <div v-if="(clearable && modelValue) || (options.length || ignoreFilter)" class="flex gap-1.5 items-center ms-1.5 -me-1">
-                            <Button v-if="clearable && modelValue" icon="x" variant="ghost" size="xs" round @click="clear" data-ui-combobox-clear-button />
-                            <Icon v-if="options.length || ignoreFilter" name="chevron-down" class="text-gray-400 dark:text-white/40 size-4" data-ui-combobox-chevron />
+                        <div v-if="canClearSelection || shouldShowOptionsChevron" class="flex gap-1.5 items-center ms-1.5 -me-1">
+                            <Button
+	                            v-if="canClearSelection"
+	                            icon="x"
+	                            variant="ghost"
+	                            size="xs"
+	                            round
+	                            :aria-label="__('Clear selection')"
+	                            data-ui-combobox-clear-button
+	                            @click="clear"
+                            />
+                            <Icon
+	                            v-if="shouldShowOptionsChevron"
+	                            name="chevron-down"
+	                            class="text-gray-400 dark:text-white/40 size-4"
+	                            data-ui-combobox-chevron
+                            />
                         </div>
                     </ComboboxTrigger>
                 </ComboboxAnchor>
 
                 <ComboboxPortal>
                     <ComboboxContent
-                        :hidden="!dropdownOpen"
                         position="popper"
                         :side-offset="5"
                         align="start"
@@ -404,14 +410,14 @@ defineExpose({
                             'overflow-hidden'
                         ]"
                         data-ui-combobox-content
-                        @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
+                        @escape-key-down="focus"
                     >
                         <FocusScope
                             :trapped="!searchable"
                             @mount-auto-focus.prevent
                             @unmount-auto-focus="(event) => {
                                 if (event.defaultPrevented) return;
-                                nextTick(() => $refs.trigger?.$el?.focus());
+                                focus();
                                 event.preventDefault();
                             }"
                         >
@@ -426,7 +432,7 @@ defineExpose({
                                 }"
                                 data-ui-combobox-viewport
                             >
-                                <ComboboxEmpty class="py-1 px-2 text-sm" data-ui-combobox-empty>
+                                <ComboboxEmpty class="py-1 px-4 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
@@ -434,24 +440,24 @@ defineExpose({
 
                                 <ComboboxVirtualizer
                                     v-if="filteredOptions.length"
-                                    v-slot="{ option }"
                                     :key="JSON.stringify(modelValue)"
-                                    :options="filteredOptions"
                                     :estimate-size="40"
+                                    :options="filteredOptions"
                                     :text-content="(opt) => getOptionLabel(opt)"
+                                    v-slot="{ option }"
                                 >
                                     <div class="py-1 px-2 w-full overflow-x-hidden">
                                         <ComboboxItem
+	                                        as="button"
                                             :value="getOptionValue(option)"
                                             :text-value="getOptionLabel(option)"
-                                            :disabled="isOptionDisabled(option)"
+                                            :disabled="isDisabled(option)"
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
-                                            as="button"
                                             :data-ui-combobox-item="getOptionValue(option)"
-                                            @select="selectOption(option)"
+                                            @select="select(option)"
                                         >
                                             <slot name="option" v-bind="option">
-                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
                                                 <span v-if="labelHtml" v-html="getOptionLabel(option)" />
                                                 <span v-else>{{ __(getOptionLabel(option)) }}</span>
                                             </slot>
@@ -464,7 +470,12 @@ defineExpose({
                 </ComboboxPortal>
             </ComboboxRoot>
 
-            <div v-if="maxSelections && maxSelections !== Infinity && multiple" class="ms-2 mt-3 text-xs" :class="limitIndicatorColor" data-ui-combobox-limit-indicator>
+            <div
+	            v-if="shouldShowLimitIndicator"
+	            class="ms-2 mt-3 text-xs"
+	            :class="limitIndicatorColor"
+	            data-ui-combobox-limit-indicator
+            >
                 <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
             </div>
         </div>
