@@ -9,7 +9,6 @@ import {
     ComboboxRoot,
     ComboboxTrigger,
     ComboboxPortal,
-    ComboboxViewport,
     ComboboxVirtualizer,
     FocusScope
 } from 'reka-ui';
@@ -20,7 +19,6 @@ import Icon from '../Icon/Icon.vue';
 import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@/components/sortable/Sortable.js';
-import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
@@ -182,8 +180,6 @@ const limitIndicatorColor = computed(() => {
 });
 
 const triggerRef = useTemplateRef('trigger');
-const viewportRef = useTemplateRef('viewport');
-const scrollbarRef = useTemplateRef('scrollbar');
 const searchQuery = ref('');
 const searchInputRef = useTemplateRef('search');
 
@@ -213,10 +209,6 @@ const filteredOptions = computed(() => {
     return results;
 });
 
-watch(filteredOptions, () => {
-	nextTick(() => scrollbarRef.value?.update());
-});
-
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
@@ -227,9 +219,7 @@ function deselect(option) {
 }
 
 const dropdownOpen = ref(false);
-const virtualizerReady = ref(false);
 const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
-const optionWidth = ref(null);
 
 function updateDropdownOpen(open) {
     if (props.disabled) return;
@@ -240,54 +230,6 @@ function updateDropdownOpen(open) {
     }
 
     dropdownOpen.value = open;
-
-    if (!open) {
-        virtualizerReady.value = false;
-    }
-
-    if (open) {
-        nextTick(() => {
-            measureOptionWidths();
-	        scrollbarRef.value?.update();
-            virtualizerReady.value = true;
-        });
-    }
-}
-
-function measureOptionWidths() {
-    if (!filteredOptions.value || filteredOptions.value.length === 0) return;
-
-    // Find the options with the longest labels by character count.
-    // We only measure these candidates rather than all options for performance.
-    const candidates = [...filteredOptions.value]
-        .sort((a, b) => (getOptionLabel(b)?.length || 0) - (getOptionLabel(a)?.length || 0))
-        .slice(0, 5);
-
-    let maxWidth = 0;
-    const measurementCanvas = document.createElement('canvas');
-    const context = measurementCanvas.getContext('2d');
-
-    // Get computed font from a rendered item or use a reasonable default
-    // This matches the itemClasses styling
-    context.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-    candidates.forEach(option => {
-        const label = getOptionLabel(option);
-        const metrics = context.measureText(label);
-        const textWidth = metrics.width;
-
-        // Add padding and icon space
-        // py-1.5 px-2 = 0.375rem top/bottom, 0.5rem left/right = 8px left/right = 16px total
-        // gap-2 = 0.5rem = 8px for icon/text gap
-        // icon size-4 = 1rem = 16px
-        let totalWidth = textWidth + 32; // Base padding
-
-        if (option.image) totalWidth += 20; // icon (20px) + gap (8px)
-        if (totalWidth > maxWidth) maxWidth = totalWidth;
-    });
-
-    // Add ComboboxContent padding (p-2 = 0.5rem * 2 = 16px on each side = 32px total)
-    optionWidth.value = Math.ceil(maxWidth + 32);
 }
 
 function updateModelValue(value) {
@@ -432,11 +374,10 @@ defineExpose({
                         :side-offset="5"
                         align="start"
                         :class="[
-                            'shadow-ui-sm z-(-well-z-index-above) rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                            'shadow-ui-sm z-(-well-z-index-above) rounded-lg border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-800',
                             'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
                             'overflow-hidden'
                         ]"
-                        :style="optionWidth ? { width: `${optionWidth}px` } : {}"
                         data-ui-combobox-content
                         @escape-key-down="nextTick(() => $refs.trigger.$el.focus())"
                     >
@@ -449,35 +390,32 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <div class="relative">
-                                <ComboboxViewport
-                                    ref="viewport"
-                                    class="max-h-[calc(var(--reka-combobox-content-available-height)-2rem)] overflow-y-scroll"
-                                    :class="{
-										'min-h-[2.25px]': filteredOptions.length === 0,
-										'min-h-[2.5rem]': filteredOptions.length === 1,
-										'min-h-[5rem]': filteredOptions.length === 2,
-										'min-h-[7.5rem]': filteredOptions.length >= 3,
-                                        'pr-3': scrollbarRef?.isVisible,
-                                    }"
-                                    data-ui-combobox-viewport
-                                >
-                                    <ComboboxEmpty class="p-2 text-sm" data-ui-combobox-empty>
+                            <div
+                                class="relative max-h-[300px] overflow-y-auto py-2"
+                                :class="{
+                                    'min-h-[2.25px]': filteredOptions.length === 0,
+                                    'min-h-[2.5rem]': filteredOptions.length === 1,
+                                    'min-h-[5rem]': filteredOptions.length === 2,
+                                    'min-h-[7.5rem]': filteredOptions.length >= 3,
+                                }"
+                                data-ui-combobox-viewport
+                            >
+                                <ComboboxEmpty class="px-2 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
                                 </ComboboxEmpty>
 
                                 <ComboboxVirtualizer
-                                    v-if="virtualizerReady && filteredOptions.length"
-                                    v-slot="{ option, virtualItem }"
+                                    v-if="filteredOptions.length"
+                                    v-slot="{ option }"
+                                    :key="JSON.stringify(modelValue)"
                                     :options="filteredOptions"
                                     :estimate-size="40"
                                     :text-content="(opt) => getOptionLabel(opt)"
                                 >
-                                    <div class="py-1 w-full overflow-x-hidden">
+                                    <div class="py-1 px-2 w-full overflow-x-hidden">
                                         <ComboboxItem
-                                            :key="virtualItem.index + JSON.stringify(modelValue)"
                                             :value="getOptionValue(option)"
                                             :text-value="getOptionLabel(option)"
                                             :disabled="isOptionDisabled(option)"
@@ -494,14 +432,7 @@ defineExpose({
                                         </ComboboxItem>
                                     </div>
                                 </ComboboxVirtualizer>
-                            </ComboboxViewport>
-
-	                        <!--
-	                            Custom Scrollbar
-	                            (we can't use the browser's scrollbar here because of virtualization, so we need to create our own).
-	                        -->
-	                       <Scrollbar ref="scrollbar" :viewport="viewportRef" />
-                        </div>
+                            </div>
                         </FocusScope>
                     </ComboboxContent>
                 </ComboboxPortal>
