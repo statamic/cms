@@ -22,7 +22,8 @@ const mainTabs = computed(() =>
 );
 const visibleMainTabs = computed(() => {
     return mainTabs.value.filter((tab) => {
-        return tab.sections.some((section) => {
+        const sections = Array.isArray(tab.sections) ? tab.sections : [];
+        return sections.some((section) => {
             return section.fields.some((field) => {
                 return new ShowField(
                     visibleValues.value,
@@ -39,7 +40,7 @@ const visibleMainTabs = computed(() => {
 });
 const hasMultipleVisibleMainTabs = computed(() => visibleMainTabs.value.length > 1);
 const shouldShowSidebar = computed(() => (slots.actions || sidebarTab.value) && width.value > 920);
-const activeTab = ref(visibleMainTabs.value[0].handle);
+const activeTab = ref(visibleMainTabs.value[0]?.handle);
 
 onMounted(() => setActiveTabFromHash());
 
@@ -47,7 +48,7 @@ function setActive(tab) {
     if (visibleMainTabs.value.some((t) => t.handle === tab)) {
         activeTab.value = tab;
     } else {
-        activeTab.value = visibleMainTabs.value[0].handle;
+        activeTab.value = visibleMainTabs.value[0]?.handle;
     }
 }
 
@@ -63,7 +64,7 @@ watch(
 	() => shouldShowSidebar.value,
 	() => {
 		if (shouldShowSidebar.value && activeTab.value === 'sidebar') {
-			setActive(visibleMainTabs.value[0].handle);
+			setActive(visibleMainTabs.value[0]?.handle);
 		}
 	}
 );
@@ -79,7 +80,8 @@ const fieldTabMap = computed(() => {
     let map = {};
 
     Object.values(tabs.value).forEach((tab) => {
-        tab.sections.forEach((section) => {
+        const sections = Array.isArray(tab.sections) ? tab.sections : [];
+        sections.forEach((section) => {
             section.fields.forEach((field) => {
                 map[field.handle] = tab.handle;
             });
