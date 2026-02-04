@@ -180,6 +180,7 @@ const limitIndicatorColor = computed(() => {
 });
 
 const triggerRef = useTemplateRef('trigger');
+const viewportRef = useTemplateRef('viewport');
 const searchQuery = ref('');
 const searchInputRef = useTemplateRef('search');
 
@@ -230,6 +231,27 @@ function updateDropdownOpen(open) {
     }
 
     dropdownOpen.value = open;
+
+    if (open) {
+        setTimeout(() => scrollToSelectedOption(), 1);
+    }
+}
+
+function scrollToSelectedOption() {
+    if (props.multiple || !props.modelValue) return;
+
+    const index = filteredOptions.value.findIndex(
+        (option) => getOptionValue(option) === props.modelValue
+    );
+
+    if (index >= 0 && viewportRef.value) {
+        const estimatedItemHeight = 40;
+        const viewportHeight = viewportRef.value.clientHeight;
+        const itemPosition = index * estimatedItemHeight;
+        const centeredPosition = itemPosition - (viewportHeight / 2) + (estimatedItemHeight / 2);
+
+        viewportRef.value.scrollTop = Math.max(0, centeredPosition);
+    }
 }
 
 function updateModelValue(value) {
@@ -391,6 +413,7 @@ defineExpose({
                             }"
                         >
                             <div
+                                ref="viewport"
                                 class="relative max-h-[300px] overflow-y-auto py-2"
                                 :class="{
                                     'min-h-[2.25px]': filteredOptions.length === 0,
