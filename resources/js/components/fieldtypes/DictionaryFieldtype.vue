@@ -42,18 +42,14 @@
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                                :aria-label="__('Deselect option')"
+                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
                                 @click="deselect(option.value)"
                             >
                                 <span>&times;</span>
                             </button>
-                            <button
-                                v-else
-                                type="button"
-                                class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                            >
+                            <span v-else class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700">
                                 <span>&times;</span>
-                            </button>
+                            </span>
                         </Badge>
                     </div>
                 </div>

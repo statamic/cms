@@ -355,7 +355,7 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
-                        tabindex="0"
+                        :tabindex="disabled || readOnly ? -1 : 0"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
@@ -407,6 +407,7 @@ defineExpose({
 	                            v-if="shouldShowOptionsChevron"
 	                            name="chevron-down"
 	                            class="text-gray-400 dark:text-white/40 size-4"
+	                            aria-hidden="true"
 	                            data-ui-combobox-chevron
                             />
                         </div>
@@ -436,7 +437,7 @@ defineExpose({
                             }"
                         >
                             <div ref="viewport" class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
-                                <ComboboxEmpty class="py-1 px-4 text-sm" data-ui-combobox-empty>
+                                <ComboboxEmpty class="py-1 px-4 text-sm" role="status" aria-live="polite" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
                                     </slot>
@@ -458,6 +459,7 @@ defineExpose({
                                             :disabled="isDisabled(option)"
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
+	                                        :title="getOptionLabel(option)"
                                             @select="select(option)"
                                         >
                                             <slot name="option" v-bind="option">
@@ -478,6 +480,8 @@ defineExpose({
 	            v-if="shouldShowLimitIndicator"
 	            class="ms-2 mt-3 text-xs"
 	            :class="limitIndicatorColor"
+	            :aria-label="__(':count of :max selections', { count: selectedOptions.length, max: maxSelections })"
+	            aria-live="polite"
 	            data-ui-combobox-limit-indicator
             >
                 <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
@@ -510,14 +514,14 @@ defineExpose({
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
-                                :aria-label="__('Deselect option')"
+                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
                                 @click="deselect(option.value)"
                             >
                                 &times;
                             </button>
-                            <button v-else type="button" class="opacity-75">
+                            <span v-else class="opacity-75" aria-hidden="true">
                                 &times;
-                            </button>
+                            </span>
                         </Badge>
                     </div>
                 </div>
