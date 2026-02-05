@@ -120,7 +120,7 @@ const itemClasses = cva({
             xs: 'text-xs',
         },
         selected: {
-            false: 'text-gray-900 dark:text-gray-300 data-highlighted:bg-gray-100 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
+            false: 'text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 data-highlighted:bg-gray-100 dark:data-highlighted:bg-gray-700',
             true: 'bg-blue-50 dark:bg-blue-600 text-blue-600! dark:text-blue-50!',
         },
     },
