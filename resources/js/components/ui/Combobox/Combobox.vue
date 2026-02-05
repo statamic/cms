@@ -471,7 +471,7 @@ defineExpose({
         </div>
 
         <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
-            <sortable-list
+            <SortableList
                 v-if="multiple"
                 data-ui-combobox-selected-options
                 item-class="sortable-item"
@@ -507,7 +507,7 @@ defineExpose({
                         </Badge>
                     </div>
                 </div>
-            </sortable-list>
+            </SortableList>
         </slot>
     </div>
 </template>
