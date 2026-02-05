@@ -15,6 +15,11 @@ class Entries extends ResourceCollection
     protected $columns;
     protected $columnPreferenceKey;
 
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+    }
+
     public function blueprint($blueprint)
     {
         $this->blueprint = $blueprint;
@@ -31,6 +36,12 @@ class Entries extends ResourceCollection
 
     protected function setColumns()
     {
+        if (! $this->blueprint) {
+            $this->columns = collect();
+
+            return;
+        }
+
         $columns = $this->blueprint->columns();
 
         $status = Column::make('status')
@@ -54,14 +65,15 @@ class Entries extends ResourceCollection
         $this->setColumns();
 
         return $this->collection->each(function ($entry) {
-            $entry
-                ->blueprint($this->blueprint)
-                ->columns($this->requestedColumns());
+            $entry->blueprint($this->blueprint);
+            $entry->columns($this->requestedColumns());
         });
     }
 
     public function with($request)
     {
+        $this->setColumns();
+
         return [
             'meta' => [
                 'columns' => $this->visibleColumns(),

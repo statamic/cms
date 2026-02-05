@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Statamic\Assets\AssetReferenceFinder;
 use Statamic\Assets\AssetUploader;
 use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
@@ -19,11 +21,14 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Http\Resources\CP\Entries\Entries;
+use Statamic\Listeners\Concerns\GetsItemsContainingData;
 use Statamic\Rules\AllowedFile;
 use Statamic\Rules\UploadableAssetPath;
 
 class AssetsController extends CpController
 {
+    use GetsItemsContainingData;
     use RedirectsToFirstAssetContainer;
 
     public function index()
@@ -142,5 +147,100 @@ class AssetsController extends CpController
         $this->authorize('view', $asset);
 
         return $asset->download();
+    }
+
+    public function references($asset)
+    {
+        $asset = Asset::find(base64_decode($asset));
+
+        abort_if(! $asset, 404);
+
+        $this->authorize('view', $asset);
+
+        $container = $asset->container()->handle();
+        $assetPath = $asset->path();
+
+        $entries = collect();
+
+        $this
+            ->getItemsContainingData()
+            ->filter(function ($item) {
+                return $item instanceof \Statamic\Entries\Entry;
+            })
+            ->each(function ($item) use ($container, $assetPath, &$entries) {
+                $found = AssetReferenceFinder::item($item)
+                    ->filterByContainer($container)
+                    ->findReferences($assetPath);
+
+                if ($found) {
+                    $entries->push($item);
+                }
+            });
+
+        $entries = $entries->filter(function ($entry) {
+            return User::current()->can('view', $entry);
+        });
+
+        if ($entries->isEmpty()) {
+            return (new Entries(collect()))->additional(['meta' => [
+                'columns' => collect([
+                    Column::make('title')
+                        ->label(__('Title'))
+                        ->listable(true)
+                        ->visible(true)
+                        ->defaultVisibility(true)
+                        ->sortable(false),
+                    Column::make('collection')
+                        ->label(__('Collection name'))
+                        ->listable(true)
+                        ->visible(true)
+                        ->defaultVisibility(true)
+                        ->sortable(false),
+                ])->map(fn ($col) => [
+                    'label' => $col->label(),
+                    'field' => $col->field(),
+                    'visible' => $col->visible(),
+                ])->all(),
+            ]]);
+        }
+
+        $perPage = request('perPage', 15);
+        $page = request('page', 1);
+        $total = $entries->count();
+        $entries = $entries->slice(($page - 1) * $perPage, $perPage)->values();
+
+        // Use the first entry's blueprint for processing, but we'll use simple columns
+        $blueprint = $entries->first()->blueprint();
+
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $entries,
+            $total,
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return (new Entries($paginated))
+            ->blueprint($blueprint)
+            ->additional(['meta' => [
+                'columns' => collect([
+                    Column::make('title')
+                        ->label(__('Title'))
+                        ->listable(true)
+                        ->visible(true)
+                        ->defaultVisibility(true)
+                        ->sortable(false),
+                    Column::make('collection')
+                        ->label(__('Collection name'))
+                        ->listable(true)
+                        ->visible(true)
+                        ->defaultVisibility(true)
+                        ->sortable(false),
+                ])->map(fn ($col) => [
+                    'label' => $col->label(),
+                    'field' => $col->field(),
+                    'visible' => $col->visible(),
+                ])->all(),
+            ]]);
     }
 }

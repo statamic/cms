@@ -136,6 +136,9 @@
                             </div>
 
                             <PublishTabs />
+                            <div class="px-2">
+                                <AssetReferences v-if="asset" :asset-id="asset.id" />
+                            </div>
                         </div>
                     </PublishContainer>
                 </div>
@@ -183,6 +186,7 @@
 <script>
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
+import AssetReferences from '../AssetReferences.vue';
 import { pick, flatten } from 'lodash-es';
 import {
     Dropdown,
@@ -205,6 +209,7 @@ export default {
         ItemActions,
         FocalPointEditor,
         PdfViewer,
+        AssetReferences,
         PublishContainer,
         PublishTabs,
         Icon,

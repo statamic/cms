@@ -263,6 +263,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
     Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
+    Route::get('assets/{encoded_asset}/references', [AssetsController::class, 'references'])->name('assets.references');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
     Route::get('pdfs/{encoded_asset}', [PdfController::class, 'show'])->name('assets.pdfs.show');
