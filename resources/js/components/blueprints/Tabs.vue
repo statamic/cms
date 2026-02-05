@@ -53,7 +53,7 @@
 
 <script>
 import { Sortable, Plugins } from '@shopify/draggable';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';

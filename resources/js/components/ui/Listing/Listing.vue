@@ -14,7 +14,7 @@ import {
 } from '@ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import CustomizeColumns from './CustomizeColumns.vue';
 import Presets from './Presets.vue';
 import Search from './Search.vue';
