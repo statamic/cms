@@ -286,6 +286,8 @@ function pushTaggableOption(e) {
 	if (!props.taggable || !props.options.length) return;
 	if (e.target.value === '') return;
 
+	e.preventDefault();
+
 	if (props.modelValue.includes(e.target.value)) {
 		searchQuery.value = '';
 		return;
@@ -349,7 +351,7 @@ defineExpose({
                         tabindex="0"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
-                        @keydown.enter.prevent="openDropdown"
+                        @keydown.enter="openDropdown"
                         @keydown.space="openDropdown"
                     >
                         <div class="flex-1 min-w-0">
@@ -364,7 +366,7 @@ defineExpose({
                                 v-model="searchQuery"
                                 @paste.prevent="onPaste"
                                 @blur.prevent="pushTaggableOption"
-                                @keydown.enter.prevent="pushTaggableOption"
+                                @keydown.enter="pushTaggableOption"
                             />
 
                             <div
