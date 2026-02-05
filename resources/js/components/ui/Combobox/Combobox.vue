@@ -109,7 +109,7 @@ const triggerClasses = cva({
 
 const itemClasses = cva({
     base: [
-        'w-full flex items-center gap-2 relative select-none cursor-pointer text-sm',
+        'w-full flex items-center gap-2 relative select-none cursor-pointer text-sm overflow-hidden',
         'py-1.5 px-2 antialiased rounded-lg',
         'data-disabled:text-gray-300 dark:data-disabled:text-gray-500 data-disabled:pointer-events-none data-highlighted:outline-hidden',
     ],
@@ -455,8 +455,8 @@ defineExpose({
                                         >
                                             <slot name="option" v-bind="option">
                                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
-                                                <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                                <span v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
                                             </slot>
                                         </ComboboxItem>
                                     </div>

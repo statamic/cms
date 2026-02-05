@@ -236,6 +236,8 @@ export default {
             if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
+
+	        this.$nextTick(() => this.$refs.rulesSelect.focus());
         },
 
         add(rule) {
@@ -258,8 +260,6 @@ export default {
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
             this.add(rule);
-
-            this.$nextTick(() => this.$refs.searchInput.blur());
         },
 
         remove(rule) {
