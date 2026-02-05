@@ -314,7 +314,9 @@ function scrollToSelectedOption() {
 }
 
 function focus() {
-	triggerRef.value.$el.focus();
+	shouldShowInput.value
+		? nextTick(() => searchInputRef.value?.$el.focus())
+		: nextTick(() => triggerRef.value?.$el.focus());
 }
 
 defineExpose({
