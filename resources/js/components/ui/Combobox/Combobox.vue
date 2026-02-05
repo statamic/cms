@@ -263,7 +263,7 @@ function updateDropdownOpen(open) {
 
     if (open) {
 	    nextTick(() => searchInputRef?.value?.$el?.focus());
-        setTimeout(() => scrollToSelectedOption(), 1);
+        requestAnimationFrame(() => requestAnimationFrame(() => scrollToSelectedOption()));
     }
 }
 
