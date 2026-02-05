@@ -269,6 +269,8 @@ function updateDropdownOpen(open) {
 
 function openDropdown(e) {
 	if (dropdownOpen.value) return;
+	if (typeof e.preventDefault === 'function') e.preventDefault();
+
 	updateDropdownOpen(true);
 }
 
@@ -346,7 +348,7 @@ defineExpose({
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter.prevent="openDropdown"
-                        @keydown.space.prevent="openDropdown"
+                        @keydown.space="openDropdown"
                     >
                         <div class="flex-1 min-w-0">
                             <ComboboxInput
