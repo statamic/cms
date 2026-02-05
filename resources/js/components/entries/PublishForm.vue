@@ -123,6 +123,7 @@
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
+                                    :disabled="!canManagePublishState"
                                     :read-only="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
                                 />
