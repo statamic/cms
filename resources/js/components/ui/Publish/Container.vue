@@ -5,7 +5,7 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 </script>
 
 <script setup>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';

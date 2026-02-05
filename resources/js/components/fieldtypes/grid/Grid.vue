@@ -54,7 +54,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
