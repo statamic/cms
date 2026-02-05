@@ -24,6 +24,10 @@ const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
 	id: { type: String },
+	/** The preferred alignment against the trigger. May change when collisions occur. */
+	align: { type: String, default: 'start' },
+	/** When `true`, the dropdown will expand to fit longer option labels. */
+	adaptiveWidth: { type: Boolean, default: false },
 	/** When `true`, the selected value will be clearable. */
 	clearable: { type: Boolean, default: false },
 	/** When `true`, the options dropdown will close after selecting an option. */
@@ -416,13 +420,13 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
+	                    :align
+	                    :side-offset="5"
                         position="popper"
-                        :side-offset="5"
-                        align="start"
                         :class="[
                             'shadow-ui-sm z-(-well-z-index-above) rounded-lg border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-800',
-                            'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)]',
-                            'overflow-hidden'
+                            'max-h-[var(--reka-combobox-content-available-height)] min-w-[var(--reka-combobox-trigger-width)] overflow-hidden',
+                            adaptiveWidth && 'w-max max-w-md',
                         ]"
                         data-ui-combobox-content
                         @escape-key-down="focus"
@@ -437,6 +441,13 @@ defineExpose({
                             }"
                         >
                             <div ref="viewport" class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
+                                <!-- Hidden width measurer for wide dropdown mode -->
+                                <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
+                                    <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
+                                        {{ getOptionLabel(option) }}
+                                    </div>
+                                </div>
+
                                 <ComboboxEmpty class="py-1 px-4 text-sm" role="status" aria-live="polite" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}

@@ -10,6 +10,8 @@
             size="sm"
             variant="ghost"
             icon="globe-arrow"
+            align="end"
+            :adaptive-width="true"
             class="[&_[data-ui-combobox-trigger]]:text-white/85"
         />
     </div>
