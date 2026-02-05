@@ -421,17 +421,7 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <div
-                                ref="viewport"
-                                class="relative max-h-[300px] overflow-y-auto py-2"
-                                :class="{
-                                    'min-h-[2.25px]': filteredOptions.length === 0,
-                                    'min-h-[2.5rem]': filteredOptions.length === 1,
-                                    'min-h-[5rem]': filteredOptions.length === 2,
-                                    'min-h-[7.5rem]': filteredOptions.length >= 3,
-                                }"
-                                data-ui-combobox-viewport
-                            >
+                            <div ref="viewport" class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
                                 <ComboboxEmpty class="py-1 px-4 text-sm" data-ui-combobox-empty>
                                     <slot name="no-options" v-bind="{ searchQuery }">
                                         {{ __('No options available.') }}
