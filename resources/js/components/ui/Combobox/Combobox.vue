@@ -128,6 +128,7 @@ const itemClasses = cva({
 
 const searchQuery = ref('');
 const dropdownOpen = ref(false);
+const rootRef = useTemplateRef('root');
 const triggerRef = useTemplateRef('trigger');
 const viewportRef = useTemplateRef('viewport');
 const searchInputRef = useTemplateRef('search');
@@ -298,8 +299,10 @@ function pushTaggableOption(e) {
 	updateModelValue([...props.modelValue, e.target.value]);
 }
 
-function scrollToSelectedOption() {
+async function scrollToSelectedOption() {
 	if (props.multiple || !props.modelValue) return;
+
+	await rootRef.value?.highlightSelected?.();
 
 	const index = filteredOptions.value.findIndex(
 		(option) => getOptionValue(option) === props.modelValue
@@ -311,7 +314,9 @@ function scrollToSelectedOption() {
 		const itemPosition = index * estimatedItemHeight;
 		const centeredPosition = itemPosition - (viewportHeight / 2) + (estimatedItemHeight / 2);
 
-		viewportRef.value.scrollTop = Math.max(0, centeredPosition);
+		requestAnimationFrame(() => {
+			viewportRef.value.scrollTop = Math.max(0, centeredPosition);
+		});
 	}
 }
 
@@ -332,10 +337,12 @@ defineExpose({
     <div :class="wrapperClasses" v-bind="wrapperAttrs">
         <div class="flex w-full min-w-0">
             <ComboboxRoot
+                ref="root"
 	            class="cursor-pointer flex-1 min-w-0"
 	            :multiple
 	            :open="dropdownOpen"
 	            :model-value="modelValue"
+                :by="(option, value) => getOptionValue(option) === value"
                 :disabled="disabled || readOnly"
                 :reset-search-term-on-blur="false"
                 :reset-search-term-on-select="false"
