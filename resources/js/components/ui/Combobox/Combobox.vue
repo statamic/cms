@@ -133,6 +133,7 @@ const viewportRef = useTemplateRef('viewport');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
+watch(dropdownOpen, () => searchQuery.value = '');
 
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
