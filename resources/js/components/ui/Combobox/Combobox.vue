@@ -23,11 +23,10 @@ import { SortableList } from '@/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
-	id: { type: String },
-	/** The preferred alignment against the trigger. May change when collisions occur. */
-	align: { type: String, default: 'start' },
 	/** When `true`, the dropdown will expand to fit longer option labels. */
 	adaptiveWidth: { type: Boolean, default: false },
+	/** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
+	align: { type: String, default: 'start' },
 	/** When `true`, the selected value will be clearable. */
 	clearable: { type: Boolean, default: false },
 	/** When `true`, the options dropdown will close after selecting an option. */
@@ -37,13 +36,15 @@ const props = defineProps({
 	discreteFocusOutline: { type: Boolean, default: false },
 	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
 	icon: { type: String, default: null },
+	/** ID attribute for the input element */
+	id: { type: String },
 	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
 	ignoreFilter: { type: Boolean, default: false },
 	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
 	labelHtml: { type: Boolean, default: false },
 	/** The maximum number of selectable options. */
 	maxSelections: { type: Number, default: null },
-	/** The controlled value of the select. */
+	/** The controlled value of the combobox. */
 	modelValue: { type: [Object, String, Number], default: null },
 	/** When `true`, multiple options are allowed. */
 	multiple: { type: Boolean, default: false },
@@ -57,11 +58,11 @@ const props = defineProps({
 	readOnly: { type: Boolean, default: false },
 	/** When `true`, the options will be searchable. */
 	searchable: { type: Boolean, default: true },
-	/** Controls the size of the select. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
 	size: { type: String, default: 'base' },
 	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
 	taggable: { type: Boolean, default: false },
-	/** Controls the appearance of the select. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
 	variant: { type: String, default: 'default' },
 });
 
