@@ -365,7 +365,7 @@ defineExpose({
 
                             <div
 	                            v-else
-	                            class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none"
+	                            class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none select-none"
 	                            data-ui-combobox-selected-option
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
@@ -375,7 +375,7 @@ defineExpose({
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
                                 </slot>
-                                <span v-else class="block truncate text-gray-500 dark:text-gray-400 select-none" v-text="placeholder" />
+                                <span v-else class="block truncate text-gray-500 dark:text-gray-400" v-text="placeholder" />
                             </div>
                         </div>
 
