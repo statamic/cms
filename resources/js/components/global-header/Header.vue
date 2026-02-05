@@ -1,10 +1,16 @@
 <script setup>
+import { inject } from 'vue';
+import { Icon } from '@ui';
 import Logo from './Logo.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
+
+const layout = inject('layout', {});
+const isMaxWidthEnabled = layout.isMaxWidthEnabled;
+const toggleMaxWidth = layout.toggleMaxWidth;
 </script>
 
 <template>
@@ -27,8 +33,25 @@ import UserDropdown from './UserDropdown.vue';
             <div class="flex items-center">
                 <Search />
             </div>
+            <button
+                @click="toggleMaxWidth"
+                :aria-label="isMaxWidthEnabled ? __('Expand Layout') : __('Constrain Layout')"
+                v-tooltip="isMaxWidthEnabled ? __('Expand Layout') : __('Constrain Layout')"
+                class="hidden [@media(min-width:1800px)]:inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-white/60 dark:disabled:text-white/50 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-gray-200 h-8 text-[0.8125rem] leading-tight rounded-lg px-0 gap-0 w-8 [&_svg]:size-4 -me-2 [&_svg]:text-white/85! will-change-transform"
+                data-expand-layout-control
+            >
+                <Icon :name="isMaxWidthEnabled ? 'zoom-fit-screen' : 'fit-screen'" class="animate-pulse-on-appearance" />
+            </button>
             <ViewSiteButton />
             <UserDropdown />
         </div>
     </header>
 </template>
+
+<style>
+    /* Hide the expand layout control when the content is equal to or smaller than the max-width wrapper, since the button would have no visible effect. */
+    /* [class*="max-["] covers arbitrary max-width classes such as a blank dashboard page with a wizard. */
+    body:has([data-max-width-wrapper] > :is(.max-w-page, .max-w-5xl, .max-w-4xl, .max-w-3xl, [class*="max-["])) [data-expand-layout-control] {
+        display: none;
+    }
+</style>

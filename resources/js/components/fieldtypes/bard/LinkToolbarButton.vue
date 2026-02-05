@@ -74,5 +74,13 @@ export default {
         }
     },
 
+    created() {
+        this.bard.events.on('open-link-toolbar', () => this.showingToolbar = true);
+    },
+
+    beforeUnmount() {
+        this.bard.events.off('open-link-toolbar');
+    },
+
 };
 </script>

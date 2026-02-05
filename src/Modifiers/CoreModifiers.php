@@ -822,6 +822,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Format a time string without timezone conversion.
+     *
+     * @return string
+     */
+    public function formatTime($value, $params)
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        return Date::parse($value)->format(Arr::get($params, 0, 'g:ia'));
+    }
+
+    /**
      * Format a number with grouped thousands and decimal points.
      *
      * @return string

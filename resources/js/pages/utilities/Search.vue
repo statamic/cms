@@ -19,7 +19,7 @@ function updateIndex(index) {
 <template>
     <Head :title="[__('Search'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Search')" icon="magnifying-glass">
             <Button variant="primary" @click="updateAll">
                 {{ __('Update Indexes') }}

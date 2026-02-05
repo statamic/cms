@@ -34,4 +34,23 @@ EXECTED;
 
         $this->renderString('@props ("this isnt()", "done!"');
     }
+
+    public function test_directives_dont_leave_extra_parenthesis()
+    {
+        $template = <<<'EOT'
+@props([
+
+])a
+
+Hellow
+EOT;
+
+        $expected = <<<'EOT'
+a
+
+Hellow
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template));
+    }
 }

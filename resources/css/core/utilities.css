@@ -30,6 +30,30 @@
     }
 }
 
+@utility st-custom-scrollbar {
+    --sb-size: 3px;
+    --sb-thumb-color: var(--color-gray-400);
+    &:where(.dark, .dark *) {
+        --sb-thumb-color: var(--color-gray-500);
+    }
+    --sb-track-color: transparent;
+
+    scrollbar-color: var(--sb-thumb-color), var(--sb-track-color);
+
+    &::-webkit-scrollbar {
+        width: var(--sb-size);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--sb-track-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--sb-thumb-color);
+        border-radius: 2px;
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
 /* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
@@ -354,4 +378,20 @@
 
 @utility shape-squircle {
     corner-shape: squircle;
+}
+
+/* UTILITIES / ANIMATIONS
+=================================================== */
+@keyframes pulse-on-appearance {
+    50% {
+        opacity: 0.85;
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@utility animate-pulse-on-appearance {
+    animation: pulse-on-appearance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

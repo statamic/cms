@@ -209,12 +209,14 @@ export default {
     },
 
     data() {
+        const modePreference = this.$preferences.get('collections.listing_mode')
+
         return {
             initializedRequest: false,
             items: this.initialRows,
             columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
-            mode: this.$preferences.get('collections.listing_mode', 'list'),
+            mode: !modePreference || !['list', 'grid'].includes(modePreference) ? 'list' : modePreference,
             source: null,
         };
     },

@@ -10,7 +10,7 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div>
+            <div class="pb-1">
                 <div class="drag-notification" v-show="dragging">
                     <Icon name="upload-cloud-large" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
@@ -121,6 +121,7 @@
                             />
 
                             <Table
+                                ref="table"
                                 v-if="mode === 'table'"
                                 :assets="items"
                                 :folders="folders"
@@ -132,6 +133,7 @@
                             />
 
                             <Grid
+                                ref="grid"
                                 v-if="mode === 'grid'"
                                 :assets="items"
                                 :action-url="actionUrl"

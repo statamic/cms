@@ -17,7 +17,7 @@
                     type="text"
                     ref="urlInput"
                     autofocus
-                    :placeholder="__('https://')"
+                    placeholder="https://"
                     @keydown.enter.prevent="commit"
                 />
 
@@ -166,6 +166,8 @@ import AssetSelector from '../../assets/Selector.vue';
 import { Icon, Stack, StackContent, StackFooter } from '@/components/ui';
 
 export default {
+    emits: ['updated', 'canceled', 'deselected'],
+
     components: {
         AssetSelector,
         Icon,

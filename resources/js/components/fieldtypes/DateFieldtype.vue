@@ -68,7 +68,7 @@ export default {
         },
 
         datePickerValue() {
-            if (!this.value) {
+            if (!this.value || this.value === 'now') {
                 return null;
             }
 
@@ -119,6 +119,11 @@ export default {
         },
 
         datePickerUpdated(value) {
+	        // Clearing the date on a required Date field should set the date/time to now.
+	        if (!value && !this.isRange && this.config.required) {
+				return this.addDate();
+	        }
+
             if (!value) {
                 return this.update(null);
             }

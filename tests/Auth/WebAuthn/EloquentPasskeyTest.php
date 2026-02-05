@@ -19,7 +19,7 @@ use Webauthn\TrustPath\EmptyTrustPath;
 #[Group('passkeys')]
 class EloquentPasskeyTest extends TestCase
 {
-    use RefreshDatabase;
+    use PasskeyTests, RefreshDatabase;
 
     public static $migrationsGenerated = false;
 
@@ -66,7 +66,12 @@ class EloquentPasskeyTest extends TestCase
         parent::tearDownAfterClass();
     }
 
-    private function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
+    protected function newPasskey(): \Statamic\Contracts\Auth\Passkey
+    {
+        return new Passkey;
+    }
+
+    protected function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
     {
         return PublicKeyCredentialSource::create(
             publicKeyCredentialId: $id,

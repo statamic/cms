@@ -230,7 +230,7 @@ class Replicator extends Fieldtype
 
         return [
             'existing' => $existing,
-            'collapsed' => [],
+            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
         ];
     }
 

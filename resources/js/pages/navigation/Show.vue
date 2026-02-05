@@ -51,6 +51,7 @@ export default {
         canSelectAcrossSites: { type: Boolean, required: true },
         canEditBlueprint: { type: Boolean, required: true },
         entryQueryScopes: { type: Array, default: () => [] },
+	    collectionTree: { type: Object, required: false },
     },
 
     data() {
@@ -357,7 +358,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="title" />
 
         <Header v-if="mounted" :title="title" icon="navigation">
@@ -540,6 +541,7 @@ export default {
             :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
+            :tree="collectionTree"
             @selected="entriesSelected"
         />
 

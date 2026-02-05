@@ -47,6 +47,7 @@ jobs:
             composer.json
             phpunit.xml.dist
             .github/workflows/tests.yml
+            tests/Composer/__fixtures__
             **.php
 
       - name: Determine whether tests should run

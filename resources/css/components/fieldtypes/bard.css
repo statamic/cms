@@ -135,7 +135,7 @@
             }
         }
 
-        /* When there's a fixed toolbar the the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
+        /* When there's a fixed toolbar the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
         .bard-fieldtype:has(> &) {
             .bard-editor:focus-within {
                 border-top-left-radius: 0!important;
@@ -154,7 +154,7 @@
     .bard-fixed-toolbar {
         z-index: var(--z-index-portal);
         position: sticky;
-        @apply -top-2;
+        @apply sm:-top-2;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
         margin-block-end: 8px;
         /* Pull the subsequent element up to compensate for this. The focus ring adjustment here keeps the focus ring from disappearing into the toolbar, which would make the focus ring appear bottom heavy. */
@@ -164,10 +164,17 @@
         }
     }
 
-    /* Bard field with a fixed toolbar > then another fixed toolbar inside this */
-    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content .bard-fixed-toolbar {
-        @apply top-8;
+    /* Where a Bard fieldtype with a fixed toolbar... */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) {
+        /* has a nested Bard fieldtype with a fixed toolbar _with focus_ */
+        &:has(.bard-fieldtype .bard-content:focus) {
+            /* release the sticky positioning so that it doesn't cover the focused Bard toolbar */
+            > .bard-fixed-toolbar {
+                position: unset;
+            }
+        }
     }
+
     /* Bard > Grid > Bard */
     .bard-content .grid-fieldtype .bard-fixed-toolbar {
         @apply top-16;
@@ -178,7 +185,7 @@
         top: -24px;
     }
 
-    /*  Responive Wangjangling */
+    /* Responsive Wangjangling */
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
@@ -255,7 +262,7 @@
         @apply fixed inset-0 min-h-screen overflow-scroll border-none rounded-none bg-gray-100 pt-14 dark:bg-gray-850;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-page rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
         }
         .bard-content {
             @apply dark:bg-gray-925;

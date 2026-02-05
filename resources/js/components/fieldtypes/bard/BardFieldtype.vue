@@ -220,6 +220,7 @@ export default {
             errorsById: {},
             debounceNextUpdate: true,
             setsCache: {},
+            assetsCache: {},
             loadingSet: null,
         };
     },
@@ -390,10 +391,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$nextTick(() => {
-            this.mounted = true;
-            if (this.config.collapse) this.collapseAll();
-        });
+		this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
 
@@ -417,6 +415,9 @@ export default {
             if (!this.mounted) return;
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
+
+            // Temporarily disable debouncing.
+            this.debounceNextUpdate = false;
 
             this.debounceNextUpdate
                 ? this.updateDebounced(json)
@@ -550,6 +551,8 @@ export default {
 
             return this.fieldPathKeys
                 .map((key, index) => {
+	                if (['attrs', 'values'].includes(key)) return;
+
                     if (Number.isInteger(parseInt(key))) {
 	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
 

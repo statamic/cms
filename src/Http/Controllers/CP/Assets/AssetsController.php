@@ -13,6 +13,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
@@ -42,7 +43,9 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
-        // TODO: Auth
+        abort_if(! $asset, 404);
+
+        $this->authorize('view', $asset);
 
         return new AssetResource($asset);
     }
@@ -82,6 +85,8 @@ class AssetsController extends CpController
         ]);
 
         $container = AssetContainer::find($request->container);
+
+        throw_unless($container, NotFoundHttpException::class);
 
         $this->authorize('store', [AssetContract::class, $container]);
 
@@ -132,7 +137,9 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
-        // TODO: Auth
+        abort_if(! $asset, 404);
+
+        $this->authorize('view', $asset);
 
         return $asset->download();
     }
