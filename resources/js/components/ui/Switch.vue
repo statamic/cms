@@ -11,8 +11,8 @@ const props = defineProps({
     modelValue: { type: Boolean, default: false },
     /** Controls the size of the switch. <br><br> Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
-    /** Whether the switch is read-only (not interactive) */
-    readOnly: { type: Boolean, default: false },
+    /** Whether the switch is disabled */
+    disabled: { type: Boolean, default: false },
 });
 
 defineEmits(['update:modelValue']);
@@ -59,7 +59,7 @@ const switchThumbClasses = cva({
         :id="id"
         :model-value="modelValue"
         :class="switchRootClasses"
-        :disabled="readOnly"
+        :disabled="disabled"
         @update:model-value="$emit('update:modelValue', $event)"
         data-ui-switch
     >
