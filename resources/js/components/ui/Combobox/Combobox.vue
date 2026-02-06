@@ -517,7 +517,7 @@ defineExpose({
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="sortable-item mt-2"
+                        class="sortable-item mt-2 cursor-grab active:cursor-grabbing"
                     >
                         <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>

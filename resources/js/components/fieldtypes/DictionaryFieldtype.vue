@@ -32,7 +32,7 @@
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="sortable-item cursor-grab"
+                        class="sortable-item cursor-grab active:cursor-grabbing"
                     >
                         <Badge size="lg" color="white">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
