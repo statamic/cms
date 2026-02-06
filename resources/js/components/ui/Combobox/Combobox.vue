@@ -262,7 +262,7 @@ function updateModelValue(value) {
 }
 
 function updateDropdownOpen(open) {
-    if (props.disabled) return;
+    if (props.disabled || props.readOnly) return;
 	if (props.taggable && props.options.length === 0) return;
 
     dropdownOpen.value = open;
@@ -404,6 +404,7 @@ defineExpose({
 	                            variant="ghost"
 	                            size="xs"
 	                            round
+	                            :disabled="disabled || readOnly"
 	                            :aria-label="__('Clear selection')"
 	                            data-ui-combobox-clear-button
 	                            @click="clear"

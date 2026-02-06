@@ -156,15 +156,7 @@ export const _Clearable: Story = {
 };
 
 const iconCode = `
-<Select
-    icon="money-bag-dollar"
-    label="Currency"
-    :options="[
-        { label: 'U.S. Dollar', value: 'usd' },
-        { label: 'Euro', value: 'euro' },
-        { label: 'Gold Doubloon', value: 'gold_doublon' }
-    ]"
-/>
+<Select icon="money-bag-dollar" placeholder="Select a currency..." :options="options" />
 `;
 
 export const _Icon: Story = {
@@ -176,7 +168,22 @@ export const _Icon: Story = {
     },
     render: () => ({
         components: { Select },
-        template: iconCode,
+        setup() {
+            const value = ref('the_midnight');
+            return { value };
+        },
+        template: `
+	        <Select
+                v-model="value"
+		        icon="money-bag-dollar"
+                placeholder="Select a currency..."
+		        :options="[
+                    { label: 'U.S. Dollar', value: 'usd' },
+                    { label: 'Euro', value: 'euro' },
+                    { label: 'Gold Doubloon', value: 'gold_doublon' }
+                ]"
+	        />
+        `,
     }),
 };
 
