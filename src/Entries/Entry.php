@@ -953,7 +953,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
-            $date = $this->date()->setTimezone(Statamic::displayTimezone());
+            $date = $this->date()->copy()->setTimezone(Statamic::displayTimezone());
 
             $data = $data->merge([
                 'date' => $date,
