@@ -1,5 +1,27 @@
 # Release Notes
 
+## 6.2.4 (2026-02-05)
+
+### What's fixed
+- Starter kit install with dev stability [#13824](https://github.com/statamic/cms/issues/13824) by @jasonvarga
+- Replace uniqid with nanoid [#13833](https://github.com/statamic/cms/issues/13833) by @jasonvarga
+- Switch from browser tests to storybook tests [#13313](https://github.com/statamic/cms/issues/13313) by @duncanmcclean
+- Fix entry date shifting on save [#13837](https://github.com/statamic/cms/issues/13837) by @jasonvarga
+- Fix entry publish permission [#13827](https://github.com/statamic/cms/issues/13827) by @PatrickJunod
+- Russian translations [#13834](https://github.com/statamic/cms/issues/13834) by @dragomano
+
+
+
+## 6.2.3 (2026-02-04)
+
+### What's fixed
+- Fix error when publishing webauthn migration [#13814](https://github.com/statamic/cms/issues/13814) by @duncanmcclean
+- Localize time picker [#13820](https://github.com/statamic/cms/issues/13820) by @jasonvarga
+- Store passkey last login in metadata [#13808](https://github.com/statamic/cms/issues/13808) by @jasonvarga
+- Escape html in command palette [#13825](https://github.com/statamic/cms/issues/13825) by @jasonvarga
+
+
+
 ## 6.2.2 (2026-02-03)
 
 ### What's fixed

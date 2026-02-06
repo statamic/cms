@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';

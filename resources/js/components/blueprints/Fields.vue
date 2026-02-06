@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import RegularField from './RegularField.vue';
 import ImportField from './ImportField.vue';
 import LinkFields from './LinkFields.vue';

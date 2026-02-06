@@ -246,14 +246,21 @@ final class Installer
     {
         spin(
             function () {
-                $package = $this->branch
-                    ? "{$this->package}:{$this->branch}"
+                $version = $this->branch;
+
+                // Allow dev stability when installing from VCS repo without tagged releases
+                if (! $version && $this->url) {
+                    $version = '@dev';
+                }
+
+                $package = $version
+                    ? "{$this->package}:{$version}"
                     : $this->package;
 
                 try {
                     Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
-                    $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
+                    $this->rollbackWithError("Error installing starter kit [{$this->package}].", $exception->getMessage());
                 }
             },
             "Preparing starter kit [{$this->package}]..."
