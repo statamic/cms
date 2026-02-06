@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
+import useCopy from '@/composables/copy';
 
 defineOptions({ inheritAttrs: false });
 
@@ -90,7 +91,7 @@ const inputAttrs = computed(() => {
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
-const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || copyable.value || props.loading);
+const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || canCopy.value || props.loading);
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -188,15 +189,8 @@ const togglePassword = () => {
     inputType.value = inputType.value === 'password' ? 'text' : 'password';
 };
 
-const copySupported = computed(() => 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function');
-const copyable = computed(() => props.copyable && copySupported.value)
-const copied = ref(false);
-const copy = () => {
-    if (!copyable.value || !props.modelValue) return;
-    navigator.clipboard.writeText(props.modelValue);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 1000);
-};
+const { copySupported, copied, copy } = useCopy();
+const canCopy = computed(() => props.copyable && copySupported.value);
 
 const clearable = computed(() => props.clearable && !props.readOnly && !props.disabled && !!props.modelValue);
 
@@ -249,8 +243,8 @@ defineExpose({ focus });
                         size="sm"
                         :icon="copied ? 'clipboard-check' : 'clipboard'"
                         variant="subtle"
-                        v-else-if="copyable"
-                        @click="copy"
+                        v-else-if="canCopy"
+                        @click="copy(modelValue)"
                         class="animate"
                         :class="copied ? 'animate-wiggle' : ''"
                     />

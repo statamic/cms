@@ -555,18 +555,6 @@ defineExpose({
 </template>
 
 <style scoped>
-    /* Override the hardcoded z-index of Reka's popper content wrapper under certain conditions. We can't use a direct descendant selector because the combobox is inside a portal, so instead we'll check to see if certain conditions are present. */
-    body:has(
-        /* A modal is present */
-        [data-ui-modal-content],
-        /* Fullscreen Code Editor fieldtype */
-        .code-fullscreen,
-        .stack,
-        .live-preview
-    ) [data-reka-popper-content-wrapper] {
-        z-index: var(--z-index-portal)!important;
-    }
-
     @supports(text-box: ex alphabetic) {
         [data-ui-badge] {
             padding-block: 0.65rem;

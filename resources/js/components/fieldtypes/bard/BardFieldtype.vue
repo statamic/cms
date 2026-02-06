@@ -134,7 +134,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
@@ -391,10 +391,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$nextTick(() => {
-            this.mounted = true;
-            if (this.config.collapse) this.collapseAll();
-        });
+		this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
 
@@ -418,6 +415,9 @@ export default {
             if (!this.mounted) return;
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
+
+            // Temporarily disable debouncing.
+            this.debounceNextUpdate = false;
 
             this.debounceNextUpdate
                 ? this.updateDebounced(json)

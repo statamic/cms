@@ -88,7 +88,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
@@ -349,10 +349,6 @@ export default {
 
             return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
-    },
-
-    mounted() {
-        if (this.config.collapse) this.collapseAll();
     },
 
     watch: {

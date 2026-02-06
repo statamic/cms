@@ -17,7 +17,7 @@
                 <uploader
                     ref="uploader"
                     :enabled="assetsEnabled"
-                    :container="container.id"
+                    :container="container?.id"
                     :path="folder"
                     @updated="uploadsUpdated"
                     @upload-complete="uploadComplete"

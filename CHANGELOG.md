@@ -1,5 +1,69 @@
 # Release Notes
 
+## 6.2.3 (2026-02-04)
+
+### What's fixed
+- Fix error when publishing webauthn migration [#13814](https://github.com/statamic/cms/issues/13814) by @duncanmcclean
+- Localize time picker [#13820](https://github.com/statamic/cms/issues/13820) by @jasonvarga
+- Store passkey last login in metadata [#13808](https://github.com/statamic/cms/issues/13808) by @jasonvarga
+- Escape html in command palette [#13825](https://github.com/statamic/cms/issues/13825) by @jasonvarga
+
+
+
+## 6.2.2 (2026-02-03)
+
+### What's fixed
+- Add auth to asset routes [#13810](https://github.com/statamic/cms/issues/13810) by @jasonvarga
+
+
+
+## 6.2.1 (2026-02-03)
+
+- Fix markdown fieldtype error when theres no container [#13809](https://github.com/statamic/cms/issues/13809) by @jasonvarga
+
+
+
+## 6.2.0 (2026-02-03)
+
+### What's new
+- Show collection tree in navigation page selector [#13643](https://github.com/statamic/cms/issues/13643) by @duncanmcclean
+- Max width control for the CP (Expand/Constrain Layout) [#13647](https://github.com/statamic/cms/issues/13647) by @JayGeorge
+- Permissions Check/Uncheck All buttons [#13762](https://github.com/statamic/cms/issues/13762) by @jackmcdade
+- Ctrl+k to open bard link stack [#13759](https://github.com/statamic/cms/issues/13759) by @jasonvarga
+- Time field enhancements [#13799](https://github.com/statamic/cms/issues/13799) by @jasonvarga
+- Copy to clipboard improvements and fixes throughout the CP [#13791](https://github.com/statamic/cms/issues/13791) by @joshuablum
+- Support Laravel Debugbar 4 [#13781](https://github.com/statamic/cms/issues/13781) by @duncanmcclean
+
+### What's fixed
+- Fix asset selector padding [#13737](https://github.com/statamic/cms/issues/13737) by @duncanmcclean
+- Fix adding sets stored in the legacy format [#13743](https://github.com/statamic/cms/issues/13743) by @duncanmcclean
+- Nested bard fixed toolbars - remove sticky stacking approach [#13750](https://github.com/statamic/cms/issues/13750) by @JayGeorge
+- Fix the z-index of the sticky markdown toolbar, plus position on mobile [#13751](https://github.com/statamic/cms/issues/13751) by @JayGeorge
+- Improve focus on page load [#13357](https://github.com/statamic/cms/issues/13357) by @JayGeorge
+- Only show site in search result badge when using multiple sites [#13752](https://github.com/statamic/cms/issues/13752) by @jasonvarga
+- Fix asset index fieldtype slice length [#13757](https://github.com/statamic/cms/issues/13757) by @jasonvarga
+- Fix TypeError with CarbonImmutable in Timezone Support [#13760](https://github.com/statamic/cms/issues/13760) by @ajnsn
+- Hide the expand layout control when the content is small and it has no effect [#13761](https://github.com/statamic/cms/issues/13761) by @JayGeorge
+- Hide "Collapsible" option for bard/replicator sets [#13763](https://github.com/statamic/cms/issues/13763) by @duncanmcclean
+- Antlers Blade Components: Correct extra parenthesis in output [#13765](https://github.com/statamic/cms/issues/13765) by @JohnathonKoster
+- Fix webauthn migration created by update script [#13769](https://github.com/statamic/cms/issues/13769) by @duncanmcclean
+- Remove the inset style for relationship fields to make dark mode more consistent [#13784](https://github.com/statamic/cms/issues/13784) by @JayGeorge
+- Fix Textarea component story missing an end tag [#13787](https://github.com/statamic/cms/issues/13787) by @joshuablum
+- Fix Textarea component resize [#13788](https://github.com/statamic/cms/issues/13788) by @joshuablum
+- Add missing tooltips import [#13783](https://github.com/statamic/cms/issues/13783) by @duncanmcclean
+- Fix uploading assets via Markdown fieldtype [#13782](https://github.com/statamic/cms/issues/13782) by @duncanmcclean
+- Avoid searching server results with fuzzysort [#13792](https://github.com/statamic/cms/issues/13792) by @duncanmcclean
+- Clearing a required date field should set the date/time to now [#13794](https://github.com/statamic/cms/issues/13794) by @duncanmcclean
+- Override z-index of DatePicker inside modals [#13802](https://github.com/statamic/cms/issues/13802) by @duncanmcclean
+- Normalize collection listing mode preference [#13798](https://github.com/statamic/cms/issues/13798) by @jasonvarga
+- Update `itemActions` state when switching localization [#13804](https://github.com/statamic/cms/issues/13804) by @duncanmcclean
+- Avoid animation when loading Bard field with `collapse: true` [#13805](https://github.com/statamic/cms/issues/13805) by @duncanmcclean
+- Disable Bard debouncing [#13797](https://github.com/statamic/cms/issues/13797) by @jasonvarga
+- Fix login and passkeys [#13807](https://github.com/statamic/cms/issues/13807) by @jasonvarga
+- French translations [#13738](https://github.com/statamic/cms/issues/13738) by @ebeauchamps
+
+
+
 ## 6.1.0 (2026-01-29)
 
 ### What's new

@@ -1,4 +1,4 @@
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 
 export default class Portal {
     constructor(portals, name, data = {}) {

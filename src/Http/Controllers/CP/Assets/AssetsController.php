@@ -45,7 +45,7 @@ class AssetsController extends CpController
 
         abort_if(! $asset, 404);
 
-        // TODO: Auth
+        $this->authorize('view', $asset);
 
         return new AssetResource($asset);
     }
@@ -139,7 +139,7 @@ class AssetsController extends CpController
 
         abort_if(! $asset, 404);
 
-        // TODO: Auth
+        $this->authorize('view', $asset);
 
         return $asset->download();
     }

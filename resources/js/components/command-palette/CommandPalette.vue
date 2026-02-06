@@ -12,6 +12,7 @@ import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
+import { escapeHtml } from '@/bootstrap/globals.js';
 
 let metaPressed = ref(false);
 let open = ref(false);
@@ -74,10 +75,16 @@ const aggregatedItems = computed(() => [
     ...(searchResults.value || []),
 ]);
 
+function highlightResult(text) {
+    const classes = 'text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45';
+    const safeText = escapeHtml(text);
+    const result = fuzzysort.single(query.value, safeText);
+    return result?.highlight(`<span class="${classes}">`, '</span>') || safeText;
+}
+
 const results = computed(() => {
     let items = aggregatedItems.value.map(item => normalizeItem(item));
-    let filterableItems = items.filter(item => item.category !== 'Content Search');
-    const highlightClasses = 'text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45';
+    let filterableItems = items.filter(item => item.text && item.category !== 'Content Search');
 
     let filtered = fuzzysort
         .go(query.value, filterableItems, {
@@ -85,24 +92,18 @@ const results = computed(() => {
             keys: ['text'],
             scoreFn: fuzzysortScoringAlgorithm,
         })
-        .map(result => {
-            return {
-                score: result._score,
-                html: result[0].highlight(`<span class="${highlightClasses}">`, '</span>'),
-                ...result.obj,
-            };
-        });
+        .map(result => ({
+            score: result._score,
+            html: highlightResult(result.obj.text),
+            ...result.obj,
+        }));
 
 	let contentSearchResults = items
 		.filter(item => item.category === 'Content Search')
-		.map(item => {
-			let result = fuzzysort.single(query.value, item.text);
-
-			return {
-				...item,
-				html: result?.highlight(`<span class="${highlightClasses}">`, '</span>') || item.text,
-			};
-		});
+		.map(item => ({
+			...item,
+			html: highlightResult(item.text),
+		}));
 
     filtered = [...contentSearchResults, ...filtered];
 

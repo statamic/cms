@@ -66,7 +66,7 @@ function complete() {
                         <div class="bg-white" v-html="qrCode"></div>
                         <div class="space-y-6 w-full">
                             <ui-field :label="__('Setup Key')">
-                                <ui-input copyable readonly :value="secretKey" />
+                                <ui-input copyable readonly :model-value="secretKey" />
                             </ui-field>
 
                             <ui-field :label="__('Verification Code')" :error="error">

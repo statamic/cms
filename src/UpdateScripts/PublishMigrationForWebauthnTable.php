@@ -23,7 +23,7 @@ class PublishMigrationForWebauthnTable extends UpdateScript
 
             $contents = str_replace('WEBAUTHN_TABLE', config('statamic.users.tables.webauthn', 'webauthn'), $contents);
 
-            File::put(database_path("migrations/$filename"), File::get($contents));
+            File::put(database_path("migrations/$filename"), $contents);
 
             $this->console->line(sprintf(
                 'Migration <info>database/migrations/%s</info> created successfully.',
