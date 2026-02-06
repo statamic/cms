@@ -305,7 +305,7 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        $published = User::current()->can('publish '.$collection->handle().' entries')
+        $published = User::current()->can('publish', [EntryContract::class, $collection])
             ? $collection->defaultPublishState()
             : false;
 
