@@ -388,7 +388,7 @@ defineExpose({
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
-                                        <Icon :name="icon" class="text-white/85 dark:text-white dark:opacity-50" />
+                                        <Icon :name="icon" class="text-gray-900 dark:text-white dark:opacity-50" />
                                     </div>
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
