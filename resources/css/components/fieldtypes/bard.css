@@ -154,6 +154,8 @@
     .bard-fixed-toolbar {
         z-index: var(--z-index-portal);
         position: sticky;
+        /* Opt out the toolbar of scroll anchoring. Firefox's scroll anchoring adjusts the scroll position to compensate for the perceived layout change, scrolling up to the parent Bard's top. */
+        overflow-anchor: none;
         @apply sm:-top-2;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
         margin-block-end: 8px;
