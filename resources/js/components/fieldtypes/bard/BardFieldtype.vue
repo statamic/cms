@@ -416,14 +416,15 @@ export default {
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
-            // Temporarily disable debouncing.
-            this.debounceNextUpdate = false;
-
-            this.debounceNextUpdate
-                ? this.updateDebounced(json)
-                : this.update(json);
-
+            const shouldDebounce = this.debounceNextUpdate;
             this.debounceNextUpdate = true;
+
+            if (shouldDebounce) {
+                this.updateDebounced(json);
+            } else {
+                this.updateDebounced.cancel();
+                this.update(json);
+            }
         },
 
         value(value, oldValue) {
