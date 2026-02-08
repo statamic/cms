@@ -1,5 +1,5 @@
 <template>
-    <node-view-wrapper class="my-4">
+    <node-view-wrapper class="my-4" contenteditable="true">
         <div
             ref="container"
             class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
@@ -15,6 +15,7 @@
             @copy.stop
             @paste.stop
             @cut.stop
+            @mousedown="handleDrag"
         >
             <div ref="content" hidden />
             <header
@@ -286,6 +287,22 @@ export default {
     },
 
     methods: {
+        handleDrag(event) {
+            // The wrapper has contenteditable="true" to fix Firefox's inability to focus nested
+            // Bard fields. However, Firefox won't initiate a drag on contenteditable="true" elements,
+            // showing a text cursor instead. Temporarily switch to "false" during drag operations.
+            if (event.target.closest('[data-drag-handle]')) {
+                this.$el.contentEditable = 'false';
+                const restore = () => {
+                    this.$el.contentEditable = 'true';
+                    document.removeEventListener('mouseup', restore);
+                    document.removeEventListener('dragend', restore);
+                };
+                document.addEventListener('mouseup', restore);
+                document.addEventListener('dragend', restore);
+            }
+        },
+
         focused() {
             this.extension.options.bard.$emit('focus');
         },
