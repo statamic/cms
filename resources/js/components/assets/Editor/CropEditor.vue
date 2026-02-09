@@ -10,7 +10,30 @@
                     </div>
                 </div>
                 <div class="px-4 pb-4">
-                    <div class="mb-4 flex flex-wrap items-center justify-center gap-2">
+                    <div class="mb-4">
+                        <div class="mb-3 text-center text-sm text-gray-600 dark:text-gray-400">{{ __('Aspect Ratio') }}</div>
+                        <div class="flex items-center justify-center gap-2">
+                            <Select
+                                v-model="selectedRatio"
+                                :options="aspectRatios"
+                                option-label="label"
+                                option-value="value"
+                                :placeholder="__('Aspect ratio')"
+                                size="sm"
+                                class="w-48"
+                                @update:modelValue="setAspectRatio"
+                            />
+                            <Button
+                                v-if="selectedRatio !== null"
+                                icon="flip-vertical"
+                                :variant="isFlipped ? 'pressed' : 'ghost'"
+                                size="sm"
+                                :text="__('Flip Orientation')"
+                                @click="toggleOrientation"
+                            />
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-2">
                         <Button :text="__('Cancel')" @click="close" />
                         <Button :text="__('Reset')" @click="reset" />
                         <Button variant="primary" :text="__('Finish')" @click="crop" />
@@ -29,6 +52,7 @@ import {
     Heading,
     Subheading,
     Button,
+    Select,
 } from '@ui';
 
 export default {
@@ -39,6 +63,7 @@ export default {
         Heading,
         Subheading,
         Button,
+        Select,
     },
 
     props: {
@@ -51,6 +76,16 @@ export default {
     data() {
         return {
             cropper: null,
+            selectedRatio: null,
+            baseRatio: null,
+            isFlipped: false,
+            aspectRatios: [
+                { label: '16:9', value: 16 / 9 },
+                { label: '4:3', value: 4 / 3 },
+                { label: '3:2', value: 3 / 2 },
+                { label: '2:1', value: 2 / 1 },
+                { label: '1:1', value: 1 },
+            ],
         };
     },
 
@@ -89,6 +124,45 @@ export default {
             });
         },
 
+        setAspectRatio(ratio) {
+            if (!this.cropper) return;
+
+            if (ratio === null) {
+                this.cropper.setAspectRatio(NaN);
+                this.baseRatio = null;
+                this.isFlipped = false;
+            } else {
+                this.baseRatio = ratio;
+                this.isFlipped = false;
+                this.applyCurrentRatio();
+            }
+        },
+
+        toggleOrientation() {
+            if (!this.cropper || this.baseRatio === null) return;
+
+            // Toggle the flipped state
+            this.isFlipped = !this.isFlipped;
+            this.applyCurrentRatio();
+        },
+
+        applyCurrentRatio() {
+            if (!this.cropper || this.baseRatio === null) return;
+
+            const ratioToApply = this.isFlipped ? 1 / this.baseRatio : this.baseRatio;
+
+            // Find if the ratio to apply matches one in our list
+            const matchingRatio = this.aspectRatios.find(r => Math.abs(r.value - ratioToApply) < 0.001);
+
+            if (matchingRatio && matchingRatio.value === ratioToApply) {
+                // If the ratio is in our list, update the select to show it
+                this.selectedRatio = matchingRatio.value;
+            }
+
+            // Apply the ratio to the cropper
+            this.cropper.setAspectRatio(ratioToApply);
+        },
+
         crop() {
             if (!this.cropper) return;
 
@@ -116,6 +190,10 @@ export default {
         reset() {
             if (this.cropper) {
                 this.cropper.reset();
+                this.selectedRatio = null;
+                this.baseRatio = null;
+                this.isFlipped = false;
+                this.cropper.setAspectRatio(NaN);
             }
         },
 
