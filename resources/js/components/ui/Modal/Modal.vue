@@ -81,6 +81,10 @@ function close() {
     wait(300).then(() => {
         mounted.value = false;
         updateOpen(false);
+
+        cleanup();
+        modal.value = null;
+        escBinding.value = null;
     });
 }
 
@@ -108,6 +112,11 @@ function runCloseCallback() {
 	return true;
 }
 
+function cleanup() {
+	modal.value?.destroy();
+	escBinding.value?.destroy();
+}
+
 watch(
     () => props.open,
     (value) => value ? open() : close(),
@@ -118,8 +127,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-    modal.value?.destroy();
-    escBinding.value?.destroy();
+    cleanup();
 });
 
 defineExpose({
