@@ -9,7 +9,13 @@ A full-featured data listing component with sorting, searching, pagination, colu
 
 ## Customizing the cells
 Customize how individual cells are rendered using cell slots. Use the pattern `#cell-{fieldName}` to target specific columns.
+
 <Canvas of={ListingStories._CustomCells} sourceState={'shown'} />
+
+Inside the slot, you have access to a few slot props:
+- `row` is the current row's data
+- `value` is the current column's value
+- `isColumnVisible` is a method which allows you to determine if a specific column is visible
 
 ## With Actions
 You can add your own dropdown items via the `prepended-row-actions` slot.
