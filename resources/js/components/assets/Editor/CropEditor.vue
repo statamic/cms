@@ -1,67 +1,67 @@
 <template>
-    <portal name="crop-editor">
-        <div class="crop-editor fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <Card class="crop-editor-toolbox max-w-4xl" inset>
-                <div class="p-6">
-                    <Heading size="xl">{{ __('Crop Image') }}</Heading>
-                    <Subheading>{{ __('Adjust the crop area and click Finish to apply') }}</Subheading>
-                    <div class="crop-editor-image mt-4">
-                        <img ref="image" :src="image" class="max-w-full" />
-                    </div>
+    <Stack size="full" :open="open" inset @update:open="$emit('update:open', $event)" :show-close-button="false">
+        <div class="min-h-0 flex h-full flex-col bg-gray-100 dark:bg-dark-800">
+            <!-- Header -->
+            <header class="relative flex w-full items-center justify-between px-4 py-3 border-b dark:border-gray-700">
+                <Heading size="lg">{{ __('Crop Image') }}</Heading>
+                <ui-button variant="ghost" icon="x" round @click="close" :aria-label="__('Close')" />
+            </header>
+
+            <!-- Content -->
+            <div class="flex flex-1 flex-col overflow-auto bg-gray-800 relative min-h-0 w-full items-center justify-center">
+                <div class="p-3 lg:p-6 min-h-0">
+                    <img ref="image" :src="image" alt="Crop" class="max-w-full max-h-full" />
                 </div>
-                <div class="px-4 pb-4">
-                    <div class="mb-4">
-                        <div class="mb-3 text-center text-sm text-gray-600 dark:text-gray-400">{{ __('Aspect Ratio') }}</div>
-                        <div class="flex items-center justify-center gap-2">
-                            <Select
-                                v-model="selectedRatio"
-                                :options="aspectRatios"
-                                option-label="label"
-                                option-value="value"
-                                :placeholder="__('Aspect ratio')"
-                                size="sm"
-                                class="w-48"
-                                @update:modelValue="setAspectRatio"
-                            />
-                            <Button
-                                v-if="selectedRatio !== null"
-                                icon="flip-vertical"
-                                :variant="isFlipped ? 'pressed' : 'ghost'"
-                                size="sm"
-                                :text="__('Flip Orientation')"
-                                @click="toggleOrientation"
-                            />
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap items-center justify-center gap-2">
-                        <Button :text="__('Cancel')" @click="close" />
-                        <Button :text="__('Reset')" @click="reset" />
-                        <Button variant="primary" :text="__('Finish')" @click="crop" />
-                    </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between gap-3 border-t dark:border-gray-700 px-4 py-3">
+                <div class="flex gap-3">
+                    <Select
+                        v-model="selectedRatio"
+                        :options="aspectRatios"
+                        option-label="label"
+                        option-value="value"
+                        :placeholder="__('Aspect ratio')"
+                        size="sm"
+                        class="w-48"
+                        @update:modelValue="setAspectRatio"
+                    />
+                    <Button
+                        v-if="selectedRatio !== null"
+                        icon="flip-vertical"
+                        :variant="isFlipped ? 'pressed' : 'ghost'"
+                        size="sm"
+                        :text="__('Flip Orientation')"
+                        @click="toggleOrientation"
+                    />
                 </div>
-            </Card>
+                <div class="flex gap-3">
+                    <Button variant="ghost" :text="__('Cancel')" @click="close" />
+                    <Button variant="ghost" :text="__('Reset')" @click="reset" />
+                    <Button variant="primary" :text="__('Finish')" @click="crop" />
+                </div>
+            </div>
         </div>
-    </portal>
+    </Stack>
 </template>
 
 <script>
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {
-    Card,
+    Stack,
     Heading,
-    Subheading,
     Button,
     Select,
 } from '@ui';
 
 export default {
-    emits: ['cropped', 'closed'],
+    emits: ['cropped', 'closed', 'update:open'],
 
     components: {
-        Card,
+        Stack,
         Heading,
-        Subheading,
         Button,
         Select,
     },
@@ -70,6 +70,10 @@ export default {
         image: {
             type: String,
             required: true,
+        },
+        open: {
+            type: Boolean,
+            default: false,
         },
     },
 
@@ -89,9 +93,20 @@ export default {
         };
     },
 
-    async mounted() {
-        await this.$nextTick();
-        this.initCropper();
+    watch: {
+        open(newValue) {
+            if (newValue) {
+                // Wait for Stack to open and image to be visible
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        this.initCropper();
+                    }, 100);
+                });
+            } else if (this.cropper) {
+                this.cropper.destroy();
+                this.cropper = null;
+            }
+        },
     },
 
     beforeUnmount() {
@@ -105,6 +120,23 @@ export default {
             const imageElement = this.$refs.image;
             if (!imageElement) return;
 
+            // Destroy existing cropper if any
+            if (this.cropper) {
+                this.cropper.destroy();
+                this.cropper = null;
+            }
+
+            // Wait for image to load if not already loaded
+            if (imageElement.complete) {
+                this.createCropper(imageElement);
+            } else {
+                imageElement.addEventListener('load', () => {
+                    this.createCropper(imageElement);
+                }, { once: true });
+            }
+        },
+
+        createCropper(imageElement) {
             this.cropper = new Cropper(imageElement, {
                 aspectRatio: NaN,
                 viewMode: 1,
@@ -202,20 +234,9 @@ export default {
                 this.cropper.destroy();
                 this.cropper = null;
             }
+            this.$emit('update:open', false);
             this.$emit('closed');
         },
     },
 };
 </script>
-
-<style scoped>
-.crop-editor-image {
-    max-height: 70vh;
-    overflow: auto;
-}
-
-.crop-editor-image img {
-    display: block;
-    max-width: 100%;
-}
-</style>

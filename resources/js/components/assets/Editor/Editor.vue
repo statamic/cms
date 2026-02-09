@@ -39,7 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="isImage" @click.prevent="openCropEditor" icon="edit-scissors-cut" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
+                                <ui-button inset size="sm" v-if="isImage" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
                                 <ui-button inset size="sm" v-if="isImage && asset && asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
@@ -169,21 +169,13 @@
             />
 
             <crop-editor
-                v-if="showCropEditor && asset"
+                v-if="asset && asset.isImage"
                 :image="asset.preview"
+                :open="showCropEditor"
                 @cropped="handleCropped"
                 @closed="closeCropEditor"
+                @update:open="showCropEditor = $event"
             />
-
-        <confirmation-modal
-            v-model:open="closingWithChanges"
-            :title="__('Unsaved Changes')"
-            :body-text="__('Are you sure? Unsaved changes will be lost.')"
-            :button-text="__('Discard Changes')"
-            :danger="true"
-            @confirm="confirmCloseWithChanges"
-            @cancel="closingWithChanges = false"
-        />
 
         <confirmation-modal
             v-model:open="showCropConfirmation"
@@ -195,6 +187,16 @@
             :busy="uploadingCrop"
             @confirm="uploadCroppedImage(true)"
             @cancel="uploadCroppedImage(false)"
+        />
+
+        <confirmation-modal
+            v-model:open="closingWithChanges"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmCloseWithChanges"
+            @cancel="closingWithChanges = false"
         />
         </div>
     </Stack>
@@ -402,6 +404,12 @@ export default {
             this.showFocalPointEditor = false;
         },
 
+        selectFocalPoint(point) {
+            point = point === '50-50-1' ? null : point;
+            this.values['focus'] = point;
+            this.$dirty.add(this.publishContainer);
+        },
+
         openCropEditor() {
             this.showCropEditor = true;
         },
@@ -413,7 +421,7 @@ export default {
         handleCropped(blob) {
             this.croppedBlob = blob;
             // Close crop editor first, then show confirmation
-            this.showCropEditor = false;
+            this.closeCropEditor();
             this.$nextTick(() => {
                 this.showCropConfirmation = true;
             });
@@ -476,17 +484,6 @@ export default {
             } finally {
                 this.uploadingCrop = false;
             }
-        },
-
-        cancelCropUpload() {
-            this.croppedBlob = null;
-            this.showCropConfirmation = false;
-        },
-
-        selectFocalPoint(point) {
-            point = point === '50-50-1' ? null : point;
-            this.values['focus'] = point;
-            this.$dirty.add(this.publishContainer);
         },
 
         updateValues(values) {
