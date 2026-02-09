@@ -39,6 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="isImage" @click.prevent="openCropEditor" icon="edit-scissors-cut" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
                                 <ui-button inset size="sm" v-if="isImage && asset && asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
@@ -167,6 +168,13 @@
                 @closed="closeFocalPointEditor"
             />
 
+            <crop-editor
+                v-if="showCropEditor && asset"
+                :image="asset.preview"
+                @cropped="handleCropped"
+                @closed="closeCropEditor"
+            />
+
         <confirmation-modal
             v-model:open="closingWithChanges"
             :title="__('Unsaved Changes')"
@@ -176,12 +184,25 @@
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />
+
+        <confirmation-modal
+            v-model:open="showCropConfirmation"
+            :title="__('Save Cropped Image')"
+            body-text="Would you like to save this as a new copy or replace the original image?"
+            :button-text="__('Replace Original')"
+            :cancel-text="__('Save as New Copy')"
+            :danger="false"
+            :busy="uploadingCrop"
+            @confirm="uploadCroppedImage(true)"
+            @cancel="uploadCroppedImage(false)"
+        />
         </div>
     </Stack>
 </template>
 
 <script>
 import FocalPointEditor from './FocalPointEditor.vue';
+import CropEditor from './CropEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
 import {
@@ -204,6 +225,7 @@ export default {
         DropdownItem,
         ItemActions,
         FocalPointEditor,
+        CropEditor,
         PdfViewer,
         PublishContainer,
         PublishTabs,
@@ -239,11 +261,15 @@ export default {
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
+            showCropEditor: false,
             showCheckerboard: true,
             error: null,
             errors: {},
             actions: [],
             closingWithChanges: false,
+            croppedBlob: null,
+            showCropConfirmation: false,
+            uploadingCrop: false,
         };
     },
 
@@ -288,6 +314,7 @@ export default {
     events: {
         'close-child-editor': function () {
             this.closeFocalPointEditor();
+            this.closeCropEditor();
             this.closeImageEditor();
             this.closeRenamer();
         },
@@ -373,6 +400,87 @@ export default {
 
         closeFocalPointEditor() {
             this.showFocalPointEditor = false;
+        },
+
+        openCropEditor() {
+            this.showCropEditor = true;
+        },
+
+        closeCropEditor() {
+            this.showCropEditor = false;
+        },
+
+        handleCropped(blob) {
+            this.croppedBlob = blob;
+            // Close crop editor first, then show confirmation
+            this.showCropEditor = false;
+            this.$nextTick(() => {
+                this.showCropConfirmation = true;
+            });
+        },
+
+        async uploadCroppedImage(replaceOriginal) {
+            if (!this.croppedBlob || !this.asset) return;
+
+            this.uploadingCrop = true;
+
+            try {
+                // Extract container and folder from asset ID (format: container::path)
+                const [containerHandle, assetPath] = this.id.split('::');
+
+                // Extract folder from path (dirname)
+                const pathParts = assetPath.split('/');
+                const filename = pathParts.pop();
+                const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', this.croppedBlob, filename);
+                formData.append('container', containerHandle);
+                formData.append('folder', folder);
+                formData.append('_token', Statamic.$config.get('csrfToken'));
+
+                if (replaceOriginal) {
+                    formData.append('option', 'overwrite');
+                } else {
+                    // Use timestamp option to avoid conflicts when saving as new copy
+                    formData.append('option', 'timestamp');
+                }
+
+                const url = cp_url('assets');
+                const response = await this.$axios.post(url, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                if (response.data && response.data.data) {
+                    this.$toast.success(replaceOriginal ? __('Image replaced successfully') : __('Cropped image saved successfully'));
+
+                    // If replacing, reload the current asset; if new copy, emit action-completed to refresh list
+                    if (replaceOriginal) {
+                        this.load();
+                    } else {
+                        this.$emit('action-completed', true, response);
+                    }
+                }
+
+                this.croppedBlob = null;
+                this.showCropConfirmation = false;
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    this.$toast.error(error.response.data.message || __('Failed to upload cropped image'));
+                } else {
+                    this.$toast.error(__('Failed to upload cropped image'));
+                }
+            } finally {
+                this.uploadingCrop = false;
+            }
+        },
+
+        cancelCropUpload() {
+            this.croppedBlob = null;
+            this.showCropConfirmation = false;
         },
 
         selectFocalPoint(point) {
