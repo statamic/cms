@@ -80,6 +80,12 @@ const preview: Preview = {
         },
 
         docs: {
+            argTypes: {
+                sort: 'alpha',
+            },
+            controls: {
+                sort: 'alpha',
+            },
             theme: createTheme({
                 base: 'light',
                 fontBase: '"Lexend", sans-serif',
