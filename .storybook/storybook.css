@@ -85,6 +85,14 @@
         p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p) {
             font-weight: 300;
         }
+
+        ul {
+            list-style: circle;
+        }
+
+        ol {
+            list-style: decimal;
+        }
     }
 }
 
