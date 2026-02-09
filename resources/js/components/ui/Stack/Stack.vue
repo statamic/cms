@@ -10,7 +10,7 @@ import {
     provide,
     onMounted,
 } from 'vue';
-import { stacks, events, keys, config } from '@/api';
+import { stacks, events, keys, config, portals } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
@@ -85,6 +85,10 @@ const leftOffset = computed(() => {
     }
 
     return offset.value * depth.value;
+});
+
+const isTopPortal = computed(() => {
+	return portals.all()[portals.all().length - 1].id === stack.value.id;
 });
 
 const hasChild = computed(() => stacks.count() > depth.value);
@@ -201,7 +205,9 @@ provide('closeStack', close);
     </Primitive>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
-            <FocusScope trapped loop
+            <FocusScope
+	            :trapped="isTopPortal"
+	            loop
                 class="stack-container"
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
