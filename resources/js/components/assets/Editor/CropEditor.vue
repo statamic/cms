@@ -141,7 +141,7 @@ export default {
                 aspectRatio: NaN,
                 viewMode: 1,
                 dragMode: 'move',
-                autoCropArea: 0.8,
+                autoCropArea: 1,
                 restore: false,
                 guides: true,
                 center: true,
@@ -167,6 +167,8 @@ export default {
                 this.baseRatio = ratio;
                 this.isFlipped = false;
                 this.applyCurrentRatio();
+                // Expand crop box to fill available space
+                this.expandCropBoxToFill();
             }
         },
 
@@ -176,6 +178,8 @@ export default {
             // Toggle the flipped state
             this.isFlipped = !this.isFlipped;
             this.applyCurrentRatio();
+            // Expand crop box to fill available space after flipping
+            this.expandCropBoxToFill();
         },
 
         applyCurrentRatio() {
@@ -193,6 +197,44 @@ export default {
 
             // Apply the ratio to the cropper
             this.cropper.setAspectRatio(ratioToApply);
+        },
+
+        expandCropBoxToFill() {
+            if (!this.cropper) return;
+
+            const canvasData = this.cropper.getCanvasData();
+            const containerData = this.cropper.getContainerData();
+
+            // Calculate the maximum crop box size that fits within the canvas
+            // while maintaining the aspect ratio
+            let cropWidth = canvasData.width;
+            let cropHeight = canvasData.height;
+
+            if (this.baseRatio !== null) {
+                const ratioToApply = this.isFlipped ? 1 / this.baseRatio : this.baseRatio;
+
+                // Calculate dimensions that fit within canvas while maintaining ratio
+                if (canvasData.width / canvasData.height > ratioToApply) {
+                    // Canvas is wider than ratio, fit to height
+                    cropWidth = canvasData.height * ratioToApply;
+                    cropHeight = canvasData.height;
+                } else {
+                    // Canvas is taller than ratio, fit to width
+                    cropWidth = canvasData.width;
+                    cropHeight = canvasData.width / ratioToApply;
+                }
+            }
+
+            // Center the crop box
+            const left = canvasData.left + (canvasData.width - cropWidth) / 2;
+            const top = canvasData.top + (canvasData.height - cropHeight) / 2;
+
+            this.cropper.setCropBoxData({
+                left,
+                top,
+                width: cropWidth,
+                height: cropHeight,
+            });
         },
 
         crop() {
@@ -221,11 +263,18 @@ export default {
 
         reset() {
             if (this.cropper) {
-                this.cropper.reset();
                 this.selectedRatio = null;
                 this.baseRatio = null;
                 this.isFlipped = false;
                 this.cropper.setAspectRatio(NaN);
+                // Reset to full canvas (image) bounds
+                const canvasData = this.cropper.getCanvasData();
+                this.cropper.setCropBoxData({
+                    left: canvasData.left,
+                    top: canvasData.top,
+                    width: canvasData.width,
+                    height: canvasData.height,
+                });
             }
         },
 
