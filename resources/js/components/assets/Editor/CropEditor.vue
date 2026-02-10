@@ -483,14 +483,16 @@ export default {
 
         handleKeyDown(event) {
             // Track Option key (Alt on Windows/Linux, Option on Mac)
-            if (event.key === 'Alt' || event.key === 'Meta' || event.altKey) {
+            // On Mac, Option key produces event.key === 'Alt', not 'Meta'
+            if (event.key === 'Alt' || event.altKey) {
                 this.isOptionKeyPressed = true;
             }
         },
 
         handleKeyUp(event) {
             // Release Option key tracking
-            if (event.key === 'Alt' || event.key === 'Meta') {
+            // On Mac, Option key produces event.key === 'Alt', not 'Meta'
+            if (event.key === 'Alt') {
                 this.isOptionKeyPressed = false;
             }
         },
