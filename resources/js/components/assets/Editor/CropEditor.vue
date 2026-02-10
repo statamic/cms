@@ -153,7 +153,7 @@ export default {
 
             // Set crossOrigin attribute to handle CORS images
             // This allows canvas operations on cross-origin images if CORS headers are present
-            if (imageElement.crossOrigin === '') {
+            if (imageElement.crossOrigin === null) {
                 imageElement.crossOrigin = 'anonymous';
             }
 
