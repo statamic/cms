@@ -134,6 +134,12 @@ export default {
                 this.cropper = null;
             }
 
+            // Set crossOrigin attribute to handle CORS images
+            // This allows canvas operations on cross-origin images if CORS headers are present
+            if (imageElement.crossOrigin === '') {
+                imageElement.crossOrigin = 'anonymous';
+            }
+
             // Wait for image to load if not already loaded
             if (imageElement.complete) {
                 this.createCropper(imageElement);
@@ -145,23 +151,34 @@ export default {
         },
 
         createCropper(imageElement) {
-            this.cropper = new Cropper(imageElement, {
-                aspectRatio: NaN,
-                viewMode: 1,
-                dragMode: 'move',
-                autoCropArea: 1,
-                restore: false,
-                guides: true,
-                center: true,
-                highlight: false,
-                cropBoxMovable: true,
-                cropBoxResizable: true,
-                toggleable: false,
-                zoomable: true,
-                scalable: false,
-                rotatable: false,
-                responsive: true,
-            });
+            try {
+                this.cropper = new Cropper(imageElement, {
+                    aspectRatio: NaN,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleable: false,
+                    zoomable: true,
+                    scalable: false,
+                    rotatable: false,
+                    responsive: true,
+                });
+            } catch (error) {
+                // Handle SecurityError from tainted canvas (cross-origin without CORS)
+                if (error.name === 'SecurityError' || error.message?.includes('tainted') || error.message?.includes('cross-origin')) {
+                    this.$toast.error(__('Unable to crop image from external source. The image must be served with proper CORS headers.'));
+                    this.close();
+                } else {
+                    // Re-throw other errors
+                    throw error;
+                }
+            }
         },
 
         setAspectRatio(ratio) {
@@ -247,48 +264,58 @@ export default {
         crop() {
             if (!this.cropper) return;
 
-            // Get crop box data in natural image coordinates
-            const cropBoxData = this.cropper.getCropBoxData();
-            const imageData = this.cropper.getImageData();
+            try {
+                // Get crop box data in natural image coordinates
+                const cropBoxData = this.cropper.getCropBoxData();
+                const imageData = this.cropper.getImageData();
 
-            // Calculate the crop dimensions in natural image coordinates
-            // Scale from display coordinates to natural coordinates
-            const scaleX = imageData.naturalWidth / imageData.width;
-            const scaleY = imageData.naturalHeight / imageData.height;
+                // Calculate the crop dimensions in natural image coordinates
+                // Scale from display coordinates to natural coordinates
+                const scaleX = imageData.naturalWidth / imageData.width;
+                const scaleY = imageData.naturalHeight / imageData.height;
 
-            const naturalCropWidth = cropBoxData.width * scaleX;
-            const naturalCropHeight = cropBoxData.height * scaleY;
+                const naturalCropWidth = cropBoxData.width * scaleX;
+                const naturalCropHeight = cropBoxData.height * scaleY;
 
-            // Use the calculated dimensions to preserve aspect ratio
-            const canvas = this.cropper.getCroppedCanvas({
-                width: naturalCropWidth,
-                height: naturalCropHeight,
-            });
+                // Use the calculated dimensions to preserve aspect ratio
+                const canvas = this.cropper.getCroppedCanvas({
+                    width: naturalCropWidth,
+                    height: naturalCropHeight,
+                });
 
-            if (!canvas) {
-                this.$toast.error(__('Failed to crop image'));
-                return;
-            }
-
-            // Determine quality based on format (PNG doesn't use quality parameter)
-            // Note: canvas.toBlob() doesn't support GIF - browsers silently fall back to PNG
-            // So we need to convert GIF to PNG to match what's actually produced
-            let outputMimeType = this.mimeType;
-            if (outputMimeType === 'image/gif') {
-                outputMimeType = 'image/png';
-            }
-
-            const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
-
-            canvas.toBlob((blob) => {
-                if (!blob) {
-                    this.$toast.error(__('Failed to create cropped image'));
+                if (!canvas) {
+                    this.$toast.error(__('Failed to crop image'));
                     return;
                 }
 
-                this.$emit('cropped', { blob, mimeType: outputMimeType });
-                this.close();
-            }, outputMimeType, quality);
+                // Determine quality based on format (PNG doesn't use quality parameter)
+                // Note: canvas.toBlob() doesn't support GIF - browsers silently fall back to PNG
+                // So we need to convert GIF to PNG to match what's actually produced
+                let outputMimeType = this.mimeType;
+                if (outputMimeType === 'image/gif') {
+                    outputMimeType = 'image/png';
+                }
+
+                const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
+
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        this.$toast.error(__('Failed to create cropped image'));
+                        return;
+                    }
+
+                    this.$emit('cropped', { blob, mimeType: outputMimeType });
+                    this.close();
+                }, outputMimeType, quality);
+            } catch (error) {
+                // Handle SecurityError from tainted canvas (cross-origin without CORS)
+                if (error.name === 'SecurityError' || error.message?.includes('tainted') || error.message?.includes('cross-origin')) {
+                    this.$toast.error(__('Unable to crop image from external source. The image must be served with proper CORS headers.'));
+                    return;
+                }
+                // Re-throw other errors
+                throw error;
+            }
         },
 
         reset() {
