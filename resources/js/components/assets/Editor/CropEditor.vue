@@ -8,9 +8,9 @@
             </header>
 
             <!-- Content -->
-            <div class="flex flex-1 flex-col overflow-auto bg-black relative min-h-0 w-full items-center justify-center">
+            <div class="flex flex-1 flex-col overflow-auto bg-black relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
                 <div class="px-3 lg:px-6 min-h-0">
-                    <img ref="image" :src="image" alt="Crop" class="max-w-full max-h-full" />
+                    <img ref="image" :src="image" :alt="__('Image to crop')" class="max-w-full max-h-full" />
                 </div>
             </div>
 
@@ -25,6 +25,7 @@
                         :placeholder="__('Aspect ratio')"
                         size="sm"
                         class="w-48"
+                        :aria-label="__('Select aspect ratio')"
                         @update:modelValue="setAspectRatio"
                     />
                     <Button
@@ -33,13 +34,15 @@
                         :variant="isFlipped ? 'pressed' : 'ghost'"
                         size="sm"
                         :text="__('Flip Orientation')"
+                        :aria-label="__('Flip crop orientation')"
+                        :aria-pressed="isFlipped"
                         @click="toggleOrientation"
                     />
                 </div>
                 <div class="flex gap-3">
-                    <Button variant="ghost" :text="__('Cancel')" @click="close" />
-                    <Button variant="ghost" :text="__('Reset')" @click="reset" />
-                    <Button variant="primary" :text="__('Finish')" @click="crop" />
+                    <Button variant="ghost" :text="__('Cancel')" :aria-label="__('Cancel cropping')" @click="close" />
+                    <Button variant="ghost" :text="__('Reset')" :aria-label="__('Reset crop selection')" @click="reset" />
+                    <Button variant="primary" :text="__('Finish')" :aria-label="__('Finish cropping')" :disabled="!cropper" @click="crop" />
                 </div>
             </div>
         </div>
@@ -87,8 +90,8 @@ export default {
             selectedRatio: null,
             baseRatio: null,
             isFlipped: false,
-            imageLoadHandler: null,
-            isMounted: true,
+            escBinding: null,
+            enterBinding: null,
             aspectRatios: [
                 { label: '16:9', value: 16 / 9 },
                 { label: '4:3', value: 4 / 3 },
@@ -102,76 +105,45 @@ export default {
     watch: {
         open(newValue) {
             if (newValue) {
-                // Wait for Stack to open and DOM to update, then initialize cropper
+                // Wait for Stack to open and image to be visible
                 this.$nextTick(() => {
-                    // Double nextTick to ensure Stack animation completes and image is visible
-                    this.$nextTick(() => {
+                    setTimeout(() => {
                         this.initCropper();
-                    });
+                    }, 100);
                 });
+                // Bind keyboard shortcuts when editor opens
+                this.bindKeyboardShortcuts();
             } else {
-                this.cleanup();
+                // Unbind keyboard shortcuts when editor closes
+                this.unbindKeyboardShortcuts();
+                if (this.cropper) {
+                    this.cropper.destroy();
+                    this.cropper = null;
+                    // Reset state to initial values
+                    this.selectedRatio = null;
+                    this.baseRatio = null;
+                    this.isFlipped = false;
+                }
             }
         },
-    },
-
-    mounted() {
-        this.isMounted = true;
     },
 
     beforeUnmount() {
-        this.isMounted = false;
-        this.cleanup();
+        this.unbindKeyboardShortcuts();
+        if (this.cropper) {
+            this.cropper.destroy();
+        }
     },
 
     methods: {
-        cleanup() {
-            // Clean up image load event listener
-            if (this.imageLoadHandler) {
-                const imageElement = this.$refs.image;
-                if (imageElement) {
-                    imageElement.removeEventListener('load', this.imageLoadHandler);
-                }
-                this.imageLoadHandler = null;
-            }
-
-            // Destroy cropper instance
-            if (this.cropper) {
-                this.cropper.destroy();
-                this.cropper = null;
-            }
-
-            // Reset state to initial values
-            this.selectedRatio = null;
-            this.baseRatio = null;
-            this.isFlipped = false;
-        },
-
         initCropper() {
-            // Guard against unmounted component
-            if (!this.isMounted) return;
-
             const imageElement = this.$refs.image;
-            if (!imageElement) {
-                // Image element not yet in DOM, try again on next tick
-                this.$nextTick(() => {
-                    if (this.isMounted && this.open) {
-                        this.initCropper();
-                    }
-                });
-                return;
-            }
+            if (!imageElement) return;
 
             // Destroy existing cropper if any
             if (this.cropper) {
                 this.cropper.destroy();
                 this.cropper = null;
-            }
-
-            // Clean up any existing load listener
-            if (this.imageLoadHandler) {
-                imageElement.removeEventListener('load', this.imageLoadHandler);
-                this.imageLoadHandler = null;
             }
 
             // Set crossOrigin attribute to handle CORS images
@@ -181,45 +153,16 @@ export default {
             }
 
             // Wait for image to load if not already loaded
-            if (imageElement.complete && imageElement.naturalWidth > 0) {
-                // Image is already loaded and has dimensions
+            if (imageElement.complete) {
                 this.createCropper(imageElement);
             } else {
-                // Create load handler that can be cleaned up
-                this.imageLoadHandler = () => {
-                    // Guard against unmounted component
-                    if (!this.isMounted) return;
-                    this.imageLoadHandler = null;
+                imageElement.addEventListener('load', () => {
                     this.createCropper(imageElement);
-                };
-                imageElement.addEventListener('load', this.imageLoadHandler, { once: true });
-
-                // Also handle error case
-                const errorHandler = () => {
-                    if (!this.isMounted) return;
-                    this.$toast.error(__('Failed to load image'));
-                    this.close();
-                };
-                imageElement.addEventListener('error', errorHandler, { once: true });
+                }, { once: true });
             }
         },
 
         createCropper(imageElement) {
-            // Guard against unmounted component
-            if (!this.isMounted) return;
-
-            // Ensure image is actually loaded and has dimensions
-            // If not ready, defer back to initCropper which will set up proper load handling
-            if (!imageElement.complete || imageElement.naturalWidth === 0) {
-                // Image not ready yet, let initCropper handle it
-                this.$nextTick(() => {
-                    if (this.isMounted && this.open) {
-                        this.initCropper();
-                    }
-                });
-                return;
-            }
-
             try {
                 this.cropper = new Cropper(imageElement, {
                     aspectRatio: NaN,
@@ -239,9 +182,6 @@ export default {
                     responsive: true,
                 });
             } catch (error) {
-                // Guard against unmounted component
-                if (!this.isMounted) return;
-
                 // Handle SecurityError from tainted canvas (cross-origin without CORS)
                 if (error.name === 'SecurityError' || error.message?.includes('tainted') || error.message?.includes('cross-origin')) {
                     this.$toast.error(__('Unable to crop image from external source. The image must be served with proper CORS headers.'));
@@ -407,8 +347,51 @@ export default {
             }
         },
 
+        bindKeyboardShortcuts() {
+            // Escape to close
+            this.escBinding = this.$keys.bindGlobal('esc', (e) => {
+                e.preventDefault();
+                this.close();
+            });
+
+            // Enter to finish (only if cropper is ready and not in a form field)
+            this.enterBinding = this.$keys.bindGlobal('enter', (e) => {
+                if (this.cropper && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                    // Check if focus is not in an input/textarea/select
+                    const activeElement = document.activeElement;
+                    const isInFormField = activeElement && (
+                        activeElement.tagName === 'INPUT' ||
+                        activeElement.tagName === 'TEXTAREA' ||
+                        activeElement.tagName === 'SELECT'
+                    );
+                    if (!isInFormField) {
+                        e.preventDefault();
+                        this.crop();
+                    }
+                }
+            });
+        },
+
+        unbindKeyboardShortcuts() {
+            if (this.escBinding) {
+                this.escBinding.destroy();
+                this.escBinding = null;
+            }
+            if (this.enterBinding) {
+                this.enterBinding.destroy();
+                this.enterBinding = null;
+            }
+        },
+
         close() {
-            this.cleanup();
+            if (this.cropper) {
+                this.cropper.destroy();
+                this.cropper = null;
+            }
+            // Reset state to initial values
+            this.selectedRatio = null;
+            this.baseRatio = null;
+            this.isFlipped = false;
             this.$emit('update:open', false);
             this.$emit('closed');
         },

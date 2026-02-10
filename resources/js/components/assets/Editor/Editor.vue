@@ -70,7 +70,7 @@
                         >
                             <!-- Image -->
                             <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100': asset.can_be_transparent && showCheckerboard }">
-                                <img ref="previewImage" :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                                <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                             </div>
 
                             <!-- SVG -->
@@ -171,7 +171,6 @@
             <crop-editor
                 v-if="asset && asset.isImage"
                 :image="asset.preview"
-                :mime-type="asset.mimeType"
                 :open="showCropEditor"
                 @cropped="handleCropped"
                 @closed="closeCropEditor"
@@ -498,19 +497,42 @@ export default {
 
                     // If replacing, reload the current asset and bust browser cache; if new copy, redirect to the new asset
                     if (replaceOriginal) {
-                        // Create timestamp before reload for consistency
-                        const timestamp = Date.now();
+                        // Store original URLs for cache busting
+                        const originalPreview = this.asset?.preview;
+                        const originalThumbnail = this.asset?.thumbnail;
 
-                        try {
-                            // Reload the asset and wait for it to complete
-                            await this.load();
+                        // Reload the asset and wait for it to complete
+                        await this.load();
 
-                            // Bust browser cache for the updated image
-                            this.bustImageCache(timestamp);
-                        } catch (error) {
-                            // If reload fails, still try to bust cache with existing asset data
-                            this.bustImageCache(timestamp);
-                            throw error;
+                        // After reload completes, add cache-busting parameter to force browser to reload images
+                        if (this.asset) {
+                            const timestamp = Date.now();
+
+                            // Update preview URL with cache-busting parameter
+                            if (this.asset.preview) {
+                                const previewUrl = this.asset.preview.split('?')[0];
+                                this.asset.preview = `${previewUrl}?t=${timestamp}`;
+                            }
+
+                            // Update thumbnail URL with cache-busting parameter
+                            if (this.asset.thumbnail) {
+                                const thumbnailUrl = this.asset.thumbnail.split('?')[0];
+                                this.asset.thumbnail = `${thumbnailUrl}?t=${timestamp}`;
+                            }
+
+                            // Also directly update any img elements in the DOM that match the original URLs
+                            if (originalPreview || originalThumbnail) {
+                                document.querySelectorAll('img').forEach((img) => {
+                                    const imgSrc = img.src || img.getAttribute('src') || '';
+                                    const imgSrcBase = imgSrc.split('?')[0];
+
+                                    if (originalPreview && imgSrcBase === originalPreview.split('?')[0]) {
+                                        img.src = `${imgSrcBase}?t=${timestamp}`;
+                                    } else if (originalThumbnail && imgSrcBase === originalThumbnail.split('?')[0]) {
+                                        img.src = `${imgSrcBase}?t=${timestamp}`;
+                                    }
+                                });
+                            }
                         }
                     } else {
                         // Extract container and path from the new asset ID (format: container::path)
@@ -534,39 +556,6 @@ export default {
                 }
             } finally {
                 this.uploadingCrop = false;
-            }
-        },
-
-        bustImageCache(timestamp) {
-            if (!this.asset) return;
-
-            try {
-                // Update preview URL with cache-busting parameter
-                if (this.asset.preview) {
-                    const previewUrl = this.asset.preview.split('?')[0];
-                    this.asset.preview = `${previewUrl}?t=${timestamp}`;
-                }
-
-                // Update thumbnail URL with cache-busting parameter
-                if (this.asset.thumbnail) {
-                    const thumbnailUrl = this.asset.thumbnail.split('?')[0];
-                    this.asset.thumbnail = `${thumbnailUrl}?t=${timestamp}`;
-                }
-
-                // Update the preview image element directly using Vue ref
-                if (this.$refs.previewImage) {
-                    const img = this.$refs.previewImage;
-                    if (img.src && this.asset.preview) {
-                        const imgSrcBase = img.src.split('?')[0];
-                        const previewBase = this.asset.preview.split('?')[0];
-                        if (imgSrcBase === previewBase) {
-                            img.src = this.asset.preview;
-                        }
-                    }
-                }
-            } catch (error) {
-                // Silently fail cache busting - not critical enough to show error to user
-                console.warn('Failed to bust image cache:', error);
             }
         },
 
