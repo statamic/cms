@@ -316,7 +316,20 @@ export default {
                         return;
                     }
 
-                    this.$emit('cropped', { blob, mimeType: outputMimeType });
+                    // Determine file extension from MIME type
+                    const extensionMap = {
+                        'image/jpeg': 'jpg',
+                        'image/png': 'png',
+                        'image/webp': 'webp',
+                        'image/gif': 'gif',
+                    };
+                    const extension = extensionMap[outputMimeType] || 'png';
+
+                    // Convert blob to File object with correct MIME type and extension
+                    // This ensures the server can properly validate the file
+                    const file = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
+
+                    this.$emit('cropped', { blob: file, mimeType: outputMimeType });
                     this.close();
                 }, outputMimeType, quality);
             } catch (error) {

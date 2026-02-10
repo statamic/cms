@@ -171,6 +171,7 @@
             <crop-editor
                 v-if="asset && asset.isImage"
                 :image="asset.preview"
+                :mime-type="asset.mimeType"
                 :open="showCropEditor"
                 @cropped="handleCropped"
                 @closed="closeCropEditor"
@@ -473,7 +474,12 @@ export default {
 
                 // Create FormData
                 const formData = new FormData();
-                formData.append('file', this.croppedBlob, filename);
+                // Use the File object directly - it already has the correct name and MIME type
+                // If we need a different filename, create a new File with that name
+                const fileToUpload = filename !== this.croppedBlob.name
+                    ? new File([this.croppedBlob], filename, { type: this.croppedBlob.type })
+                    : this.croppedBlob;
+                formData.append('file', fileToUpload);
                 formData.append('container', containerHandle);
                 formData.append('folder', folder);
                 formData.append('_token', Statamic.$config.get('csrfToken'));
