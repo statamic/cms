@@ -12,14 +12,40 @@ Customize how individual cells are rendered using cell slots. Use the pattern `#
 
 <Canvas of={ListingStories._CustomCells} sourceState={'shown'} />
 
-Inside the slot, you have access to a few slot props:
-- `row` is the current row's data
-- `value` is the current column's value
-- `isColumnVisible` is a method which allows you to determine if a specific column is visible
+The cell slots expose a few props:
+- `row` - the current row's data
+- `value` - the current column's value
+- `isColumnVisible(column)` - determine whether a column is currently visible
 
 ## With Actions
 You can add your own dropdown items via the `prepended-row-actions` slot.
 <Canvas of={ListingStories._WithActions} sourceState={'shown'} />
+
+## Customizing the layout
+The `Listing` component includes a sensible default layout, but you can fully control the structure by providing your own markup in the default slot.
+
+Inside the slot, you can compose your layout using the provided `Listing` sub-components, which automatically connect to the parent `Listing` via shared context.
+
+If you need to customize table columns or row actions, you can do so inside the `ListingTable` component's slots.
+
+<Canvas of={ListingStories._CustomLayout} sourceState={'shown'} />
+
+### Available components
+You can use the following components to build your own layout:
+
+- `ListingCustomizeColumns`
+- `ListingFilters`
+- `ListingPagination`
+- `ListingPresets`
+- `ListingSearch`
+- `ListingTable`
+
+### Slot props
+The default slot exposes a few props:
+
+- `items` - the items for the current page
+- `isColumnVisible(column)` - determine whether a column is currently visible
+- `loading` - whether results are being fetched from the server
 
 ## Using a JSON endpoint
 The `Listing` component can pull data from a JSON endpoint. It's a little more involved though...
