@@ -249,7 +249,6 @@ export default {
             if (!this.cropper) return;
 
             const canvasData = this.cropper.getCanvasData();
-            const containerData = this.cropper.getContainerData();
 
             // Calculate the maximum crop box size that fits within the canvas
             // while maintaining the aspect ratio
