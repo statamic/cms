@@ -451,8 +451,9 @@ export default {
                 let filename = pathParts.pop();
                 const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
 
-                // Update filename extension to match the blob's MIME type
-                if (this.croppedMimeType) {
+                // Only update filename extension when saving as new copy (not when overwriting)
+                // When overwriting, we must keep the exact original filename/path
+                if (!replaceOriginal && this.croppedMimeType) {
                     const extensionMap = {
                         'image/jpeg': '.jpg',
                         'image/png': '.png',
@@ -491,9 +492,49 @@ export default {
                 if (response.data && response.data.data) {
                     this.$toast.success(replaceOriginal ? __('Image replaced successfully') : __('Cropped image saved successfully'));
 
-                    // If replacing, reload the current asset; if new copy, redirect to the new asset
+                    // If replacing, reload the current asset and bust browser cache; if new copy, redirect to the new asset
                     if (replaceOriginal) {
+                        // Store original URLs for cache busting
+                        const originalPreview = this.asset?.preview;
+                        const originalThumbnail = this.asset?.thumbnail;
+
+                        // Reload the asset first
                         this.load();
+
+                        // After reload completes, add cache-busting parameter to force browser to reload images
+                        this.$nextTick(() => {
+                            setTimeout(() => {
+                                if (this.asset) {
+                                    const timestamp = Date.now();
+
+                                    // Update preview URL with cache-busting parameter
+                                    if (this.asset.preview) {
+                                        const previewUrl = this.asset.preview.split('?')[0];
+                                        this.asset.preview = `${previewUrl}?t=${timestamp}`;
+                                    }
+
+                                    // Update thumbnail URL with cache-busting parameter
+                                    if (this.asset.thumbnail) {
+                                        const thumbnailUrl = this.asset.thumbnail.split('?')[0];
+                                        this.asset.thumbnail = `${thumbnailUrl}?t=${timestamp}`;
+                                    }
+
+                                    // Also directly update any img elements in the DOM that match the original URLs
+                                    if (originalPreview || originalThumbnail) {
+                                        document.querySelectorAll('img').forEach((img) => {
+                                            const imgSrc = img.src || img.getAttribute('src') || '';
+                                            const imgSrcBase = imgSrc.split('?')[0];
+
+                                            if (originalPreview && imgSrcBase === originalPreview.split('?')[0]) {
+                                                img.src = `${imgSrcBase}?t=${timestamp}`;
+                                            } else if (originalThumbnail && imgSrcBase === originalThumbnail.split('?')[0]) {
+                                                img.src = `${imgSrcBase}?t=${timestamp}`;
+                                            }
+                                        });
+                                    }
+                                }
+                            }, 200);
+                        });
                     } else {
                         // Extract container and path from the new asset ID (format: container::path)
                         const newAssetId = response.data.data.id;
