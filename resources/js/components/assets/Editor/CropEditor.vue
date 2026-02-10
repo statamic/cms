@@ -271,8 +271,14 @@ export default {
             }
 
             // Determine quality based on format (PNG doesn't use quality parameter)
-            const mimeType = this.mimeType;
-            const quality = mimeType === 'image/jpeg' || mimeType === 'image/webp' ? 0.95 : undefined;
+            // Note: canvas.toBlob() doesn't support GIF - browsers silently fall back to PNG
+            // So we need to convert GIF to PNG to match what's actually produced
+            let outputMimeType = this.mimeType;
+            if (outputMimeType === 'image/gif') {
+                outputMimeType = 'image/png';
+            }
+
+            const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
 
             canvas.toBlob((blob) => {
                 if (!blob) {
@@ -280,9 +286,9 @@ export default {
                     return;
                 }
 
-                this.$emit('cropped', { blob, mimeType });
+                this.$emit('cropped', { blob, mimeType: outputMimeType });
                 this.close();
-            }, mimeType, quality);
+            }, outputMimeType, quality);
         },
 
         reset() {
