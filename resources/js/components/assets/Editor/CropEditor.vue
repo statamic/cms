@@ -8,8 +8,8 @@
             </header>
 
             <!-- Content -->
-            <div class="flex flex-1 flex-col overflow-auto bg-gray-800 relative min-h-0 w-full items-center justify-center">
-                <div class="p-3 lg:p-6 min-h-0">
+            <div class="flex flex-1 flex-col overflow-auto bg-black relative min-h-0 w-full items-center justify-center">
+                <div class="px-3 lg:px-6 min-h-0">
                     <img ref="image" :src="image" alt="Crop" class="max-w-full max-h-full" />
                 </div>
             </div>
@@ -289,3 +289,9 @@ export default {
     },
 };
 </script>
+
+<style>
+    .cropper-bg {
+        background-image: none !important;
+    }
+</style>
