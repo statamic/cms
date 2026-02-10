@@ -211,6 +211,6 @@ class Group extends Fieldtype
             return;
         }
 
-        $updater->update(new Fields($fieldsConfig), '');
+        $updater->update(new Fields($fieldsConfig));
     }
 }
