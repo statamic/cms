@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache as AppCache;
 use Illuminate\Support\Facades\Log;
+use Statamic\Facades\Blink;
 use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
@@ -85,6 +86,16 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+
+            if ($paginator = Blink::get('tag-paginator')) {
+                if ($paginator->hasMorePages()) {
+                    $response->headers->set('X-Statamic-Pagination', [
+                        'current' => $paginator->currentPage(),
+                        'total' => $paginator->lastPage(),
+                        'name' => $paginator->getPageName(),
+                    ]);
+                }
+            }
         } elseif (! $response->isRedirect()) {
             $this->makeReplacements($response);
         }
@@ -169,6 +180,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -202,6 +217,15 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input(StaticCache::recacheTokenParameter())) {
+            return false;
+        }
+
+        return StaticCache::checkRecacheToken($token);
     }
 
     private function createLock($request): Lock

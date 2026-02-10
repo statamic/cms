@@ -7,6 +7,8 @@ use Statamic\Rules\AvailableAssetFilename;
 
 class RenameAsset extends Action
 {
+    protected $icon = 'rename';
+
     public static function title()
     {
         return __('Rename');

@@ -305,7 +305,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -316,7 +316,7 @@ abstract class Builder extends BaseBuilder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 

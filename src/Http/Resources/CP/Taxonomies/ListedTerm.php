@@ -55,7 +55,7 @@ class ListedTerm extends JsonResource
             $key = $column->field;
             $field = $this->blueprint->field($key);
 
-            if ($key == 'taxonomy') {
+            if ($key == 'type') {
                 return [$key => $this->resource->taxonomy()->title()];
             } else {
                 $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();

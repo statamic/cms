@@ -32,7 +32,17 @@ class Terms extends Provider
             $query->where('site', $site);
         }
 
-        return $query->lazy(100)->filter($this->filter())->values();
+        $this->applyQueryScope($query);
+
+        if ($filter = $this->filter()) {
+            return $query
+                ->lazy(config('statamic.search.chunk_size'))
+                ->filter($filter)
+                ->values()
+                ->map->reference();
+        }
+
+        return $query->pluck('reference');
     }
 
     public function contains($searchable): bool
@@ -49,7 +59,15 @@ class Terms extends Provider
             return false;
         }
 
-        return $this->filter()($searchable);
+        if ($filter = $this->filter()) {
+            return $filter($searchable);
+        }
+
+        $query = Term::query()->where('reference', $searchable->reference());
+
+        $this->applyQueryScope($query);
+
+        return $query->exists();
     }
 
     public function find(array $refs): Collection

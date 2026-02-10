@@ -76,11 +76,11 @@ EOT;
 
         $foundAssetShortUrl = Asset::findByUrl($assetShortUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetShortUrl);
-        $this->assertEquals('test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
+        $this->assertEquals('/test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
 
         $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
-        $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
+        $this->assertEquals('/test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
     }
 
     #[Test]

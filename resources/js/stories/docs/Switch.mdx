@@ -1,0 +1,15 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SwitchStories from '../Switch.stories';
+
+<Meta of={SwitchStories} />
+
+# Switch
+Toggle a setting on or off. Suitable for binary options like enabling or disabling features.
+<Canvas of={SwitchStories._DocsIntro} sourceState={'shown'} />
+
+## Sizes
+Use the `size` prop to change the size of the switch.
+<Canvas of={SwitchStories._Sizes} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={SwitchStories} />

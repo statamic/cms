@@ -6,6 +6,8 @@ use Statamic\Contracts\Assets\Asset;
 
 class CopyAssetUrl extends Action
 {
+    protected $icon = 'clipboard';
+
     protected $confirm = false;
 
     public static function title()

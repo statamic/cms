@@ -18,6 +18,7 @@ class Column
     public $defaultVisibility = true;
     public $visible = true;
     public $sortable = true;
+    public $required = false;
     public $value;
 
     /**
@@ -149,6 +150,17 @@ class Column
     public function numeric($numeric = null)
     {
         return $this->fluentlyGetOrSet('numeric')->value($numeric);
+    }
+
+    /**
+     * Get or set whether the column is required.
+     *
+     * @param  null|bool  $required
+     * @return mixed
+     */
+    public function required($required = null)
+    {
+        return $this->fluentlyGetOrSet('required')->value($required);
     }
 
     /**

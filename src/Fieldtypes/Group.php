@@ -14,6 +14,7 @@ class Group extends Fieldtype
 {
     protected $categories = ['structured'];
     protected $defaultable = false;
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {
@@ -30,19 +31,44 @@ class Group extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Behaviour'),
+                'fields' => [
+                    'collapsible' => [
+                        'display' => __('Collapsible'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsible'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                    ],
+                    'collapsed' => [
+                        'display' => __('Collapsed by default'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsed'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                        'always_save' => false,
+                        'if' => [
+                            'collapsible' => 'equals true',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
                 'fields' => [
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                     'border' => [
                         'display' => __('Border'),
                         'instructions' => __('statamic::fieldtypes.grid.config.border'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -135,6 +161,19 @@ class Group extends Fieldtype
         );
     }
 
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        $field = $this->field();
+
+        $data['fields'] = collect($this->fields()->all())
+            ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
+            ->map(fn ($child) => $recursiveCallback($child))
+            ->values()
+            ->all();
+
+        return $data;
+    }
+
     public function toGqlType()
     {
         return GraphQL::type($this->gqlItemTypeName());
@@ -154,5 +193,10 @@ class Group extends Fieldtype
         return 'Group_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
+    }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return false;
     }
 }

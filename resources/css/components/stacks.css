@@ -3,69 +3,78 @@
    ========================================================================== */
 
 .portal-targets {
-    /* position on top of global header (z-index 3) but ignore clicks */
-    @apply fixed inset-0 pointer-events-none;
-    z-index: 4;
+    /* position on top of global header but ignore clicks */
+    @apply pointer-events-none fixed inset-0;
+    z-index: var(--z-index-portal);
 
     .vue-portal-target {
-        @apply pointer-events-auto; /* allow clicks that we disabled above */
+        @apply pointer-events-auto;
+        /* allow clicks that we disabled above */
         isolation: isolate;
     }
 }
 
 .stacks-on-stacks {
+    body:has(&) {
+        /* Reka poppers should be on top of open stacks. Reka's popper z-index in this case is set to auto and we can't control it through Reka. We also can't use a direct descendant selector because the popper is inside a portal, so instead we'll check to see if certain conditions are present. */
+        [data-reka-popper-content-wrapper] {
+            z-index: var(--z-index-portal)!important;
+        }
+    }
     .stack-container {
         @apply absolute inset-0;
-        transition: left .3s ease;
+        transition: left 200ms ease-out;
 
         [dir='rtl'] & {
-            transition: right .3s ease;
+            transition: right 200ms ease-out;
         }
     }
 
     .stack-overlay {
-        @apply bg-black absolute inset-0;
-        opacity: 0.2;
-        pointer-events: none;
-        transition: all .3s ease;
-
-        &.stack-overlay-fade-enter,
-        &.stack-overlay-fade-leave-to {
-            opacity: 0;
-        }
+        @apply pointer-events-none;
     }
-
 
     .stack-hit-area {
         @apply absolute inset-0 cursor-pointer;
     }
 
     .stack-content {
-        @apply h-full relative shadow-lg;
-        transition: all 0.2s ease;
-
-        &.stack-slide-enter,
-        &.stack-slide-leave-to {
-            transform: translateX(10px);
-            opacity: 0;
-
-            [dir='rtl'] & {
-                transform: translateX(-10px);
-            }
-        }
+        @apply relative h-[calc(100svh-1rem)];
     }
 
+    .stack-overlay-fade-enter-active,
+    .stack-overlay-fade-leave-active {
+        transition: opacity 200ms ease-out;
+        will-change: opacity;
+    }
 
-    .hovering .stack-content {
-        transform: translateX(-16px);
+    .stack-overlay-fade-enter-from,
+    .stack-overlay-fade-leave-to {
+        opacity: 0;
+    }
+
+    .stack-slide-enter-active,
+    .stack-slide-leave-active {
+        transition: transform 200ms ease-out, opacity 200ms ease-out;
+        will-change: transform, opacity;
+    }
+
+    .stack-slide-enter-from {
+        transform: translateX(10%);
+        opacity: 0;
 
         [dir='rtl'] & {
-            transform: translateX(16px);
+            transform: translateX(-10%);
         }
     }
 
-    .breadcrumb svg {
-        display: none !important;
+    .stack-slide-leave-to {
+        transform: translateX(10%);
+        opacity: 0;
+
+        [dir='rtl'] & {
+            transform: translateX(-10%);
+        }
     }
 }
 
