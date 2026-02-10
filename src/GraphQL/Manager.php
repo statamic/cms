@@ -98,6 +98,10 @@ class Manager
 
     public function introspectionEnabled(): bool
     {
+        if (config('graphql.security.disable_introspection')) {
+            return false;
+        }
+
         $config = config('statamic.graphql.introspection', 'auto');
 
         return $config === 'auto' ? app()->isLocal() : (bool) $config;
