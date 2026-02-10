@@ -21,7 +21,7 @@ trait UpdatesReferences
      * @param  mixed  $data  Current field data
      * @param  string|null  $newValue  New asset path (null if removing)
      * @param  string  $oldValue  Old asset path
-     * @return mixed  Modified data (or null to remove field value)
+     * @return mixed Modified data (or null to remove field value)
      */
     public function replaceAssetReferences($data, $newValue, $oldValue)
     {
@@ -35,7 +35,7 @@ trait UpdatesReferences
      * @param  mixed  $data  Current field data
      * @param  string|null  $newValue  New term slug (null if removing)
      * @param  string  $oldValue  Old term slug
-     * @return mixed  Modified data (or null to remove field value)
+     * @return mixed Modified data (or null to remove field value)
      */
     public function replaceTermReferences($data, $newValue, $oldValue)
     {
@@ -58,7 +58,6 @@ trait UpdatesReferences
      * Helper: Process fields for a single (group-like) structure.
      * Resulting prefix: ""
      *
-     * @param  callable  $processFields
      * @param  array|string  $fieldsConfig
      */
     protected function processSingleNestedFields(callable $processFields, $fieldsConfig)
@@ -72,7 +71,6 @@ trait UpdatesReferences
      * Resulting prefix: "0.", "1.", "2."...
      *
      * @param  mixed  $data
-     * @param  callable  $processFields
      * @param  array|string  $fieldsConfig
      */
     protected function processArrayNestedFields($data, callable $processFields, $fieldsConfig)
@@ -89,7 +87,6 @@ trait UpdatesReferences
      * Resulting prefix: "{key}.0.", "{key}.1."...
      *
      * @param  mixed  $data
-     * @param  callable  $processFields
      * @param  string  $key
      * @param  array|string  $fieldsConfig
      */
@@ -107,7 +104,6 @@ trait UpdatesReferences
      * Helper: Process fields for a single structure nested under a key.
      * Resulting prefix: "{key}."
      *
-     * @param  callable  $processFields
      * @param  string  $key
      * @param  array|string  $fieldsConfig
      */
