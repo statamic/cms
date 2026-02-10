@@ -240,9 +240,22 @@ export default {
         crop() {
             if (!this.cropper) return;
 
+            // Get crop box data in natural image coordinates
+            const cropBoxData = this.cropper.getCropBoxData();
+            const imageData = this.cropper.getImageData();
+
+            // Calculate the crop dimensions in natural image coordinates
+            // Scale from display coordinates to natural coordinates
+            const scaleX = imageData.naturalWidth / imageData.width;
+            const scaleY = imageData.naturalHeight / imageData.height;
+
+            const naturalCropWidth = cropBoxData.width * scaleX;
+            const naturalCropHeight = cropBoxData.height * scaleY;
+
+            // Use the calculated dimensions to preserve aspect ratio
             const canvas = this.cropper.getCroppedCanvas({
-                width: this.cropper.getImageData().naturalWidth,
-                height: this.cropper.getImageData().naturalHeight,
+                width: naturalCropWidth,
+                height: naturalCropHeight,
             });
 
             if (!canvas) {
