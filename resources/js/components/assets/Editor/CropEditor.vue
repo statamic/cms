@@ -94,7 +94,6 @@ export default {
             enterBinding: null,
             isOptionKeyPressed: false,
             initialCropBoxCenter: null,
-            initialCropBoxSize: null,
             isAdjustingCropBox: false,
             animationFrameId: null,
             aspectRatios: [
@@ -207,16 +206,12 @@ export default {
             const imageElement = this.$refs.image;
             if (!imageElement) return;
 
-            // Store initial crop box center and size when crop starts
+            // Store initial crop box center when crop starts
             imageElement.addEventListener('cropstart', () => {
                 const cropBoxData = this.cropper.getCropBoxData();
                 this.initialCropBoxCenter = {
                     x: cropBoxData.left + cropBoxData.width / 2,
                     y: cropBoxData.top + cropBoxData.height / 2,
-                };
-                this.initialCropBoxSize = {
-                    width: cropBoxData.width,
-                    height: cropBoxData.height,
                 };
                 this.isAdjustingCropBox = false;
             });
@@ -246,7 +241,6 @@ export default {
                     this.animationFrameId = null;
                 }
                 this.initialCropBoxCenter = null;
-                this.initialCropBoxSize = null;
                 this.isAdjustingCropBox = false;
             });
         },
@@ -534,7 +528,6 @@ export default {
             this.isFlipped = false;
             this.isAdjustingCropBox = false;
             this.initialCropBoxCenter = null;
-            this.initialCropBoxSize = null;
             this.$emit('update:open', false);
             this.$emit('closed');
         },
