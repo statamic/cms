@@ -13,6 +13,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
@@ -849,18 +850,18 @@ class Bard extends Replicator
         return $data;
     }
 
-    public function iterateReferenceFields($data, callable $callback): void
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
     {
         if (! is_array($data)) {
             return;
         }
 
-        collect($data)->each(function ($set, $setKey) use ($callback) {
+        collect($data)->each(function ($set, $setKey) use ($updater) {
             $setHandle = Arr::get($set, 'attrs.values.type');
             $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
 
             if ($setHandle && $fields) {
-                $callback(new Fields($fields), "{$setKey}.attrs.values.");
+                $updater->update(new Fields($fields), "{$setKey}.attrs.values.");
             }
         });
     }

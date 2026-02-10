@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Support\Arr;
 
 /**
@@ -47,9 +48,9 @@ trait UpdatesReferences
      * Override this if your fieldtype contains nested Statamic fields.
      *
      * @param  mixed  $data  Current field data
-     * @param  callable  $callback  fn(Fields $fields, string $relativeDottedPrefix): void
+     * @param  NestedFieldUpdater  $updater  Call $updater->update(Fields $fields, string $relativeDottedPrefix)
      */
-    public function iterateReferenceFields($data, callable $callback): void
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
     {
         // Default: no nested fields to process
     }

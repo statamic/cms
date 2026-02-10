@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -320,18 +321,18 @@ class Replicator extends Fieldtype
         return empty($value) ? null : $value;
     }
 
-    public function iterateReferenceFields($data, callable $callback): void
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
     {
         if (! is_array($data)) {
             return;
         }
 
-        collect($data)->each(function ($set, $setKey) use ($callback) {
+        collect($data)->each(function ($set, $setKey) use ($updater) {
             $setHandle = Arr::get($set, 'type');
             $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
 
             if ($setHandle && $fields) {
-                $callback(new Fields($fields), "{$setKey}.");
+                $updater->update(new Fields($fields), "{$setKey}.");
             }
         });
     }

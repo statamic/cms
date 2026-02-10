@@ -105,6 +105,17 @@ abstract class DataReferenceUpdater
     }
 
     /**
+     * Process nested fields for reference updates at the given dotted prefix.
+     *
+     * @param  \Statamic\Fields\Fields  $fields
+     * @param  string  $dottedPrefix
+     */
+    public function processNestedFields($fields, $dottedPrefix): void
+    {
+        $this->recursivelyUpdateFields($fields->all(), $dottedPrefix);
+    }
+
+    /**
      * Update nested field values by delegating to fieldtype iterateReferenceFields.
      *
      * @param  \Illuminate\Support\Collection  $fields
@@ -124,10 +135,7 @@ abstract class DataReferenceUpdater
 
                 $field->fieldtype()->iterateReferenceFields(
                     $fieldData,
-                    function ($nestedFields, $relativePrefix) use ($fieldKey) {
-                        $absolutePrefix = $fieldKey.'.'.$relativePrefix;
-                        $this->recursivelyUpdateFields($nestedFields->all(), $absolutePrefix);
-                    }
+                    new NestedFieldUpdater($this, $fieldKey)
                 );
             });
 

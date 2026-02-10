@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -202,7 +203,7 @@ class Group extends Fieldtype
         return false;
     }
 
-    public function iterateReferenceFields($data, callable $callback): void
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
     {
         $fieldsConfig = $this->config('fields');
 
@@ -210,6 +211,6 @@ class Group extends Fieldtype
             return;
         }
 
-        $callback(new Fields($fieldsConfig), '');
+        $updater->update(new Fields($fieldsConfig), '');
     }
 }

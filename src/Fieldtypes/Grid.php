@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\GraphQL;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -279,7 +280,7 @@ class Grid extends Fieldtype
         return empty($value) ? null : $value;
     }
 
-    public function iterateReferenceFields($data, callable $callback): void
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
     {
         if (! is_array($data)) {
             return;
@@ -294,7 +295,7 @@ class Grid extends Fieldtype
         $fields = new Fields($fields);
 
         foreach (array_keys($data) as $idx) {
-            $callback($fields, "{$idx}.");
+            $updater->update($fields, "{$idx}.");
         }
     }
 }
