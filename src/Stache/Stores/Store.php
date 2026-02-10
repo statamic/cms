@@ -28,6 +28,15 @@ abstract class Store
     protected $modified;
     protected $keys;
 
+    /**
+     * @return string
+     */
+    abstract public function key();
+
+    /**
+     * @param string|null $directory
+     * @return ($directory is null ? string : static)
+     */
     public function directory($directory = null)
     {
         if (func_num_args() === 0) {
