@@ -498,8 +498,8 @@ export default {
                         window.location = this.createAnotherUrl;
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && (nextAction === null || nextAction === 'listing')) {
                         window.location = this.listingUrl;
                     }
 
