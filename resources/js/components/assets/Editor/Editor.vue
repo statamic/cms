@@ -270,6 +270,7 @@ export default {
             actions: [],
             closingWithChanges: false,
             croppedBlob: null,
+            croppedMimeType: null,
             showCropConfirmation: false,
             uploadingCrop: false,
         };
@@ -418,8 +419,9 @@ export default {
             this.showCropEditor = false;
         },
 
-        handleCropped(blob) {
+        handleCropped({ blob, mimeType }) {
             this.croppedBlob = blob;
+            this.croppedMimeType = mimeType;
             // Close crop editor first, then show confirmation
             this.closeCropEditor();
             this.$nextTick(() => {
@@ -438,8 +440,24 @@ export default {
 
                 // Extract folder from path (dirname)
                 const pathParts = assetPath.split('/');
-                const filename = pathParts.pop();
+                let filename = pathParts.pop();
                 const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
+
+                // Update filename extension to match the blob's MIME type
+                if (this.croppedMimeType) {
+                    const extensionMap = {
+                        'image/jpeg': '.jpg',
+                        'image/png': '.png',
+                        'image/webp': '.webp',
+                        'image/gif': '.gif',
+                    };
+                    const newExtension = extensionMap[this.croppedMimeType];
+                    if (newExtension) {
+                        // Remove old extension and add new one
+                        const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+                        filename = nameWithoutExt + newExtension;
+                    }
+                }
 
                 // Create FormData
                 const formData = new FormData();
@@ -474,6 +492,7 @@ export default {
                 }
 
                 this.croppedBlob = null;
+                this.croppedMimeType = null;
                 this.showCropConfirmation = false;
             } catch (error) {
                 if (error.response && error.response.data) {
