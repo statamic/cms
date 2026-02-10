@@ -432,9 +432,12 @@ export default {
         },
 
         handleCropConfirmationDismissed() {
-            // User dismissed the modal (Escape/click outside) - just clear state
-            this.croppedBlob = null;
-            this.croppedMimeType = null;
+            // User dismissed the modal (Escape/click outside) - only clear state if no upload is in progress
+            // If upload is in progress, the blob should be preserved for retry on failure
+            if (!this.uploadingCrop) {
+                this.croppedBlob = null;
+                this.croppedMimeType = null;
+            }
         },
 
         async uploadCroppedImage(replaceOriginal) {
