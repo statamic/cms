@@ -67,7 +67,7 @@
 
 @layer components {
     .content-card {
-        @apply min-h-full overflow-x-hidden px-2 sm:px-6 md:px-12 pb-6 border dark:border-y-0 dark:border-r-0 border-content-border sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
+        @apply min-h-full px-2 sm:px-6 md:px-12 pb-6 border dark:border-y-0 dark:border-r-0 border-content-border sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
         background: var(--theme-color-content-bg);
         .nav-closed & {
             @apply sm:rounded-xl;
