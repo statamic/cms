@@ -455,9 +455,14 @@ export default {
                 let filename = pathParts.pop();
                 const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
 
-                // Only update filename extension when saving as new copy (not when overwriting)
-                // When overwriting, we must keep the exact original filename/path
-                if (!replaceOriginal && this.croppedMimeType) {
+                // Update filename extension if:
+                // 1. MIME type has changed (e.g., GIF → PNG when cropping) - necessary to avoid extension/content mismatches
+                // 2. Saving as new copy - always update to match cropped MIME type
+                const shouldUpdateExtension = this.croppedMimeType && (
+                    this.croppedMimeType !== this.asset.mimeType || !replaceOriginal
+                );
+
+                if (shouldUpdateExtension) {
                     const extensionMap = {
                         'image/jpeg': '.jpg',
                         'image/png': '.png',
