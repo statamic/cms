@@ -92,6 +92,11 @@ export default {
             isFlipped: false,
             escBinding: null,
             enterBinding: null,
+            isOptionKeyPressed: false,
+            initialCropBoxCenter: null,
+            initialCropBoxSize: null,
+            isAdjustingCropBox: false,
+            animationFrameId: null,
             aspectRatios: [
                 { label: '16:9', value: 16 / 9 },
                 { label: '4:3', value: 4 / 3 },
@@ -181,6 +186,9 @@ export default {
                     rotatable: false,
                     responsive: true,
                 });
+
+                // Add event listeners for center-based resizing with Option/Alt key
+                this.setupCropperEvents();
             } catch (error) {
                 // Handle SecurityError from tainted canvas (cross-origin without CORS)
                 if (error.name === 'SecurityError' || error.message?.includes('tainted') || error.message?.includes('cross-origin')) {
@@ -191,6 +199,90 @@ export default {
                     throw error;
                 }
             }
+        },
+
+        setupCropperEvents() {
+            if (!this.cropper) return;
+
+            const imageElement = this.$refs.image;
+            if (!imageElement) return;
+
+            // Store initial crop box center and size when crop starts
+            imageElement.addEventListener('cropstart', () => {
+                const cropBoxData = this.cropper.getCropBoxData();
+                this.initialCropBoxCenter = {
+                    x: cropBoxData.left + cropBoxData.width / 2,
+                    y: cropBoxData.top + cropBoxData.height / 2,
+                };
+                this.initialCropBoxSize = {
+                    width: cropBoxData.width,
+                    height: cropBoxData.height,
+                };
+                this.isAdjustingCropBox = false;
+            });
+
+            // Adjust crop box position to maintain center when Option/Alt is held during resize
+            // Use requestAnimationFrame to throttle updates and prevent lag
+            imageElement.addEventListener('cropmove', () => {
+                if (!this.isOptionKeyPressed || !this.initialCropBoxCenter || this.isAdjustingCropBox) {
+                    return;
+                }
+
+                // Cancel any pending animation frame
+                if (this.animationFrameId) {
+                    cancelAnimationFrame(this.animationFrameId);
+                }
+
+                // Schedule update on next animation frame to throttle
+                this.animationFrameId = requestAnimationFrame(() => {
+                    this.adjustCropBoxCenter();
+                });
+            });
+
+            // Reset tracking when crop ends
+            imageElement.addEventListener('cropend', () => {
+                if (this.animationFrameId) {
+                    cancelAnimationFrame(this.animationFrameId);
+                    this.animationFrameId = null;
+                }
+                this.initialCropBoxCenter = null;
+                this.initialCropBoxSize = null;
+                this.isAdjustingCropBox = false;
+            });
+        },
+
+        adjustCropBoxCenter() {
+            if (!this.cropper || !this.isOptionKeyPressed || !this.initialCropBoxCenter || this.isAdjustingCropBox) {
+                return;
+            }
+
+            this.isAdjustingCropBox = true;
+
+            const cropBoxData = this.cropper.getCropBoxData();
+            const currentCenter = {
+                x: cropBoxData.left + cropBoxData.width / 2,
+                y: cropBoxData.top + cropBoxData.height / 2,
+            };
+
+            // Calculate how far the center has moved
+            const centerDeltaX = currentCenter.x - this.initialCropBoxCenter.x;
+            const centerDeltaY = currentCenter.y - this.initialCropBoxCenter.y;
+
+            // Only adjust if center has moved significantly (more than 1px)
+            if (Math.abs(centerDeltaX) > 1 || Math.abs(centerDeltaY) > 1) {
+                // Adjust position to maintain the original center
+                const newLeft = this.initialCropBoxCenter.x - cropBoxData.width / 2;
+                const newTop = this.initialCropBoxCenter.y - cropBoxData.height / 2;
+
+                this.cropper.setCropBoxData({
+                    left: newLeft,
+                    top: newTop,
+                    width: cropBoxData.width,
+                    height: cropBoxData.height,
+                });
+            }
+
+            this.isAdjustingCropBox = false;
         },
 
         setAspectRatio(ratio) {
@@ -383,6 +475,24 @@ export default {
                     }
                 }
             });
+
+            // Track Option/Alt key for center-based resizing
+            window.addEventListener('keydown', this.handleKeyDown);
+            window.addEventListener('keyup', this.handleKeyUp);
+        },
+
+        handleKeyDown(event) {
+            // Track Option key (Alt on Windows/Linux, Option on Mac)
+            if (event.key === 'Alt' || event.key === 'Meta' || event.altKey) {
+                this.isOptionKeyPressed = true;
+            }
+        },
+
+        handleKeyUp(event) {
+            // Release Option key tracking
+            if (event.key === 'Alt' || event.key === 'Meta') {
+                this.isOptionKeyPressed = false;
+            }
         },
 
         unbindKeyboardShortcuts() {
@@ -394,9 +504,24 @@ export default {
                 this.enterBinding.destroy();
                 this.enterBinding = null;
             }
+            // Remove Option/Alt key listeners
+            window.removeEventListener('keydown', this.handleKeyDown);
+            window.removeEventListener('keyup', this.handleKeyUp);
+            // Cancel any pending animation frames
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            this.isOptionKeyPressed = false;
+            this.isAdjustingCropBox = false;
         },
 
         close() {
+            // Cancel any pending animation frames
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
             if (this.cropper) {
                 this.cropper.destroy();
                 this.cropper = null;
@@ -405,6 +530,9 @@ export default {
             this.selectedRatio = null;
             this.baseRatio = null;
             this.isFlipped = false;
+            this.isAdjustingCropBox = false;
+            this.initialCropBoxCenter = null;
+            this.initialCropBoxSize = null;
             this.$emit('update:open', false);
             this.$emit('closed');
         },
