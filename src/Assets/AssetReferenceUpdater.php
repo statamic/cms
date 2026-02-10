@@ -59,7 +59,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 $dottedKey = $dottedPrefix.$field->handle();
                 $oldData = Arr::get($data, $dottedKey);
 
-                if (! $oldData) {
+                if ($oldData === null) {
                     return;
                 }
 
@@ -69,7 +69,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                     $this->originalValue
                 );
 
-                if (json_encode($oldData) === json_encode($newData)) {
+                if ($oldData === $newData) {
                     return;
                 }
 

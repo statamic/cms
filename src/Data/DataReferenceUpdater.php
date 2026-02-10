@@ -129,7 +129,7 @@ abstract class DataReferenceUpdater
         $fieldKey = $dottedPrefix.$field->handle();
         $fieldData = Arr::get($this->item->data()->all(), $fieldKey);
 
-        if (! $fieldData) {
+        if ($fieldData === null) {
             return;
         }
 

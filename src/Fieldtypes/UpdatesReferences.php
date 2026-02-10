@@ -60,7 +60,7 @@ trait UpdatesReferences
      *
      * @param  array|string  $fieldsConfig
      */
-    protected function processSingleNestedFields(callable $processFields, $fieldsConfig)
+    protected function processSingleNestedFields($fieldsConfig, callable $processFields)
     {
         $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
         $processFields($fields, '');
@@ -73,11 +73,15 @@ trait UpdatesReferences
      * @param  mixed  $data
      * @param  array|string  $fieldsConfig
      */
-    protected function processArrayNestedFields($data, callable $processFields, $fieldsConfig)
+    protected function processArrayNestedFields($data, $fieldsConfig, callable $processFields)
     {
+        if (! is_array($data)) {
+            return;
+        }
+
         $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
 
-        foreach (array_keys($data ?? []) as $idx) {
+        foreach (array_keys($data) as $idx) {
             $processFields($fields, "{$idx}.");
         }
     }
@@ -90,10 +94,11 @@ trait UpdatesReferences
      * @param  string  $key
      * @param  array|string  $fieldsConfig
      */
-    protected function processArrayNestedFieldsAtKey($data, callable $processFields, $key, $fieldsConfig)
+    protected function processArrayNestedFieldsAtKey($data, $key, $fieldsConfig, callable $processFields)
     {
+        $arrayData = is_array($data) ? ($data[$key] ?? []) : [];
+
         $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
-        $arrayData = $data[$key] ?? [];
 
         foreach (array_keys($arrayData) as $idx) {
             $processFields($fields, "{$key}.{$idx}.");
@@ -107,7 +112,7 @@ trait UpdatesReferences
      * @param  string  $key
      * @param  array|string  $fieldsConfig
      */
-    protected function processSingleNestedFieldsAtKey(callable $processFields, $key, $fieldsConfig)
+    protected function processSingleNestedFieldsAtKey($key, $fieldsConfig, callable $processFields)
     {
         $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
         $processFields($fields, "{$key}.");
