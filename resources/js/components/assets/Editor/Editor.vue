@@ -171,6 +171,7 @@
             <crop-editor
                 v-if="asset && asset.isImage"
                 :image="asset.preview"
+                :mime-type="asset.mimeType"
                 :open="showCropEditor"
                 @cropped="handleCropped"
                 @closed="closeCropEditor"

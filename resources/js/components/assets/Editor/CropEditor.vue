@@ -71,6 +71,10 @@ export default {
             type: String,
             required: true,
         },
+        mimeType: {
+            type: String,
+            required: true,
+        },
         open: {
             type: Boolean,
             default: false,
@@ -83,7 +87,6 @@ export default {
             selectedRatio: null,
             baseRatio: null,
             isFlipped: false,
-            imageMimeType: 'image/png', // Default to PNG to preserve transparency
             aspectRatios: [
                 { label: '16:9', value: 16 / 9 },
                 { label: '4:3', value: 4 / 3 },
@@ -142,7 +145,6 @@ export default {
         },
 
         createCropper(imageElement) {
-            this.detectImageFormat(imageElement);
             this.cropper = new Cropper(imageElement, {
                 aspectRatio: NaN,
                 viewMode: 1,
@@ -160,50 +162,6 @@ export default {
                 rotatable: false,
                 responsive: true,
             });
-        },
-
-        detectImageFormat(imageElement) {
-            // Try to detect format from URL extension first
-            const url = this.image.toLowerCase();
-            const urlWithoutQuery = url.split('?')[0]; // Remove query parameters
-
-            if (urlWithoutQuery.endsWith('.jpg') || urlWithoutQuery.endsWith('.jpeg')) {
-                this.imageMimeType = 'image/jpeg';
-                return;
-            }
-            if (urlWithoutQuery.endsWith('.png')) {
-                this.imageMimeType = 'image/png';
-                return;
-            }
-            if (urlWithoutQuery.endsWith('.webp')) {
-                this.imageMimeType = 'image/webp';
-                return;
-            }
-            if (urlWithoutQuery.endsWith('.gif')) {
-                this.imageMimeType = 'image/gif';
-                return;
-            }
-
-            // Fallback: try to detect from image element's natural format
-            // Check if image has transparency by sampling multiple pixels
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = Math.min(imageElement.naturalWidth, 100);
-            canvas.height = Math.min(imageElement.naturalHeight, 100);
-            ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-            // Check if any pixel has transparency
-            let hasTransparency = false;
-            for (let i = 3; i < imageData.data.length; i += 4) {
-                if (imageData.data[i] < 255) {
-                    hasTransparency = true;
-                    break;
-                }
-            }
-
-            // If image has transparency, use PNG; otherwise default to JPEG
-            this.imageMimeType = hasTransparency ? 'image/png' : 'image/jpeg';
         },
 
         setAspectRatio(ratio) {
@@ -313,7 +271,7 @@ export default {
             }
 
             // Determine quality based on format (PNG doesn't use quality parameter)
-            const mimeType = this.imageMimeType;
+            const mimeType = this.mimeType;
             const quality = mimeType === 'image/jpeg' || mimeType === 'image/webp' ? 0.95 : undefined;
 
             canvas.toBlob((blob) => {
