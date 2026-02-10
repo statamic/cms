@@ -208,6 +208,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import CropEditor from './CropEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
+import { router } from '@inertiajs/vue3';
 import {
     Dropdown,
     DropdownMenu,
@@ -490,11 +491,17 @@ export default {
                 if (response.data && response.data.data) {
                     this.$toast.success(replaceOriginal ? __('Image replaced successfully') : __('Cropped image saved successfully'));
 
-                    // If replacing, reload the current asset; if new copy, emit action-completed to refresh list
+                    // If replacing, reload the current asset; if new copy, redirect to the new asset
                     if (replaceOriginal) {
                         this.load();
                     } else {
-                        this.$emit('action-completed', true, response);
+                        // Extract container and path from the new asset ID (format: container::path)
+                        const newAssetId = response.data.data.id;
+                        const [containerHandle, assetPath] = newAssetId.split('::');
+
+                        // Navigate to the edit URL for the new asset
+                        const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
+                        router.get(editUrl);
                     }
                 }
 
