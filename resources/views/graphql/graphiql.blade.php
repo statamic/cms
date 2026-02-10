@@ -30,6 +30,12 @@
             href="https://esm.sh/@graphiql/plugin-explorer/dist/style.css"
         >
 
+        @if (!$introspection)
+        <style>
+            button[aria-label*="Re-fetch GraphQL schema"] { visibility: hidden; }
+        </style>
+        @endif
+
         <script type="importmap">
             {
               "imports": {
@@ -58,17 +64,22 @@
             import { explorerPlugin } from '@graphiql/plugin-explorer';
             import 'graphiql/setup-workers/esm.sh';
 
+            const introspectionEnabled = {{ \Statamic\Support\Str::bool($introspection) }};
+
             const fetcher = createGraphiQLFetcher({
                 url: '{{ $url }}',
             });
 
-            let plugins = [HISTORY_PLUGIN, explorerPlugin()];
+            let plugins = [HISTORY_PLUGIN];
+            if (introspectionEnabled) plugins.push(explorerPlugin());
 
             function App() {
                 return React.createElement(GraphiQL, {
                     fetcher,
                     plugins,
                     defaultEditorToolsVisibility: true,
+                    referencePlugin: introspectionEnabled ? undefined : null,
+                    schema: introspectionEnabled ? undefined : null,
                 });
             }
 
