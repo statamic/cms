@@ -88,4 +88,19 @@ return [
         'expiry' => 60,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Security
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure security settings for your GraphQL API.
+    | Disabling introspection is recommended in production to prevent
+    | exposing the full schema to potential attackers.
+    |
+    */
+
+    'security' => [
+        'disable_introspection' => env('STATAMIC_GRAPHQL_INTROSPECTION_DISABLED', false),
+    ],
+
 ];

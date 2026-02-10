@@ -32,6 +32,7 @@ class ServiceProvider extends LaravelProvider
 
             $this->disableGraphiql();
             $this->setDefaultSchema();
+            $this->configureIntrospection();
         });
     }
 
@@ -70,5 +71,10 @@ class ServiceProvider extends LaravelProvider
     private function setDefaultSchema()
     {
         config(['graphql.schemas.default' => DefaultSchema::class]);
+    }
+
+    private function configureIntrospection()
+    {
+        config(['graphql.security.disable_introspection' => config('statamic.graphql.security.disable_introspection')]);
     }
 }
