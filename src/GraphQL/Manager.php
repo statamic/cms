@@ -95,4 +95,11 @@ class Manager
     {
         return $this->middleware;
     }
+
+    public function introspectionEnabled(): bool
+    {
+        $config = config('statamic.graphql.introspection', 'auto');
+
+        return $config === 'auto' ? app()->isLocal() : (bool) $config;
+    }
 }
