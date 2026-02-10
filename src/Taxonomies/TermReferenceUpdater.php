@@ -3,7 +3,6 @@
 namespace Statamic\Taxonomies;
 
 use Statamic\Data\DataReferenceUpdater;
-use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Support\Arr;
 
 class TermReferenceUpdater extends DataReferenceUpdater
@@ -12,11 +11,6 @@ class TermReferenceUpdater extends DataReferenceUpdater
      * @var string
      */
     protected $taxonomy;
-
-    /**
-     * @var null|string
-     */
-    protected $scope;
 
     /**
      * Filter by taxonomy.
@@ -38,24 +32,7 @@ class TermReferenceUpdater extends DataReferenceUpdater
      */
     protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
-        $this
-            ->updateCustomFieldtypeValues($fields, $dottedPrefix)
-            ->updateTermsFieldValues($fields, $dottedPrefix)
-            ->updateScopedTermsFieldValues($fields, $dottedPrefix)
-            ->updateNestedFieldValues($fields, $dottedPrefix);
-    }
-
-    /**
-     * Update custom fieldtype values that have term references.
-     *
-     * @param  \Illuminate\Support\Collection  $fields
-     * @param  null|string  $dottedPrefix
-     * @return $this
-     */
-    protected function updateCustomFieldtypeValues($fields, $dottedPrefix)
-    {
-        $fields
-            ->filter(fn ($field) => in_array(UpdatesReferences::class, class_uses_recursive($field->fieldtype())))
+        $this->fieldsWithReferenceUpdates($fields)
             ->each(function ($field) use ($dottedPrefix) {
                 $data = $this->item->data()->all();
                 $dottedKey = $dottedPrefix.$field->handle();
@@ -68,7 +45,8 @@ class TermReferenceUpdater extends DataReferenceUpdater
                 $newData = $field->fieldtype()->replaceTermReferences(
                     $oldData,
                     $this->newValue,
-                    $this->originalValue
+                    $this->originalValue,
+                    $this->taxonomy
                 );
 
                 if ($oldData === $newData) {
@@ -85,76 +63,6 @@ class TermReferenceUpdater extends DataReferenceUpdater
                 $this->updated = true;
             });
 
-        return $this;
-    }
-
-    /**
-     * Update terms field values.
-     *
-     * @param  \Illuminate\Support\Collection  $fields
-     * @param  null|string  $dottedPrefix
-     * @return $this
-     */
-    protected function updateTermsFieldValues($fields, $dottedPrefix)
-    {
-        $this->scope = null;
-
-        $fields
-            ->filter(function ($field) {
-                return $field->type() === 'terms'
-                    && in_array($this->taxonomy, Arr::wrap($field->get('taxonomies')));
-            })
-            ->each(function ($field) use ($dottedPrefix) {
-                $this->hasStringValue($field, $dottedPrefix)
-                    ? $this->updateStringValue($field, $dottedPrefix)
-                    : $this->updateArrayValue($field, $dottedPrefix);
-            });
-
-        return $this;
-    }
-
-    /**
-     * Update scoped terms field values.
-     *
-     * @param  \Illuminate\Support\Collection  $fields
-     * @param  null|string  $dottedPrefix
-     * @return $this
-     */
-    protected function updateScopedTermsFieldValues($fields, $dottedPrefix)
-    {
-        $this->scope = "{$this->taxonomy}::";
-
-        $fields
-            ->filter(function ($field) {
-                return $field->type() === 'terms'
-                    && count(Arr::wrap($field->get('taxonomies'))) === 0;
-            })
-            ->each(function ($field) use ($dottedPrefix) {
-                $this->hasStringValue($field, $dottedPrefix)
-                    ? $this->updateStringValue($field, $dottedPrefix)
-                    : $this->updateArrayValue($field, $dottedPrefix);
-            });
-
-        return $this;
-    }
-
-    /**
-     * Get original value.
-     *
-     * @return mixed
-     */
-    protected function originalValue()
-    {
-        return $this->scope.$this->originalValue;
-    }
-
-    /**
-     * Get new value.
-     *
-     * @return mixed
-     */
-    protected function newValue()
-    {
-        return $this->scope.$this->newValue;
+        $this->updateNestedFieldValues($fields, $dottedPrefix);
     }
 }

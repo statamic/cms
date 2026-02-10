@@ -2,136 +2,112 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Fields\Fields;
+use Statamic\Support\Arr;
 
 /**
- * Trait for custom fieldtypes to participate in reference updates (assets, terms, etc.).
+ * Trait for fieldtypes to participate in reference updates (assets, terms, etc.).
  *
  * Override only the methods you need:
  * - replaceAssetReferences() for direct asset references
  * - replaceTermReferences() for direct term references
- * - processNestedFieldsForReferences() for nested Statamic fields
+ * - iterateReferenceFields() for nested Statamic fields
  */
 trait UpdatesReferences
 {
     /**
      * Replace asset references in the fieldtype's data.
-     * Override this if your fieldtype stores direct asset references.
      *
      * @param  mixed  $data  Current field data
      * @param  string|null  $newValue  New asset path (null if removing)
      * @param  string  $oldValue  Old asset path
+     * @param  string  $container  Asset container handle
      * @return mixed Modified data (or null to remove field value)
      */
-    public function replaceAssetReferences($data, $newValue, $oldValue)
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
     {
         return $data;
     }
 
     /**
      * Replace term references in the fieldtype's data.
-     * Override this if your fieldtype stores direct term references.
      *
      * @param  mixed  $data  Current field data
      * @param  string|null  $newValue  New term slug (null if removing)
      * @param  string  $oldValue  Old term slug
+     * @param  string  $taxonomy  Taxonomy handle
      * @return mixed Modified data (or null to remove field value)
      */
-    public function replaceTermReferences($data, $newValue, $oldValue)
+    public function replaceTermReferences($data, ?string $newValue, string $oldValue, string $taxonomy)
     {
         return $data;
     }
 
     /**
-     * Process nested fields for reference updates.
+     * Iterate nested fields for reference updates.
      * Override this if your fieldtype contains nested Statamic fields.
      *
      * @param  mixed  $data  Current field data
-     * @param  callable  $processFields  fn(Fields $fields, string $relativeDottedPrefix): void
+     * @param  callable  $callback  fn(Fields $fields, string $relativeDottedPrefix): void
      */
-    public function processNestedFieldsForReferences($data, callable $processFields)
+    public function iterateReferenceFields($data, callable $callback): void
     {
         // Default: no nested fields to process
     }
 
     /**
-     * Helper: Process fields for a single (group-like) structure.
-     * Resulting prefix: ""
-     *
-     * @param  array|string  $fieldsConfig
-     */
-    protected function processSingleNestedFields($fieldsConfig, callable $processFields)
-    {
-        $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
-        $processFields($fields, '');
-    }
-
-    /**
-     * Helper: Process fields for an array structure at root level.
-     * Resulting prefix: "0.", "1.", "2."...
+     * Helper: Replace a single value by exact comparison.
      *
      * @param  mixed  $data
-     * @param  array|string  $fieldsConfig
+     * @param  mixed  $newValue
+     * @param  mixed  $oldValue
+     * @return mixed
      */
-    protected function processArrayNestedFields($data, $fieldsConfig, callable $processFields)
+    protected function replaceValue($data, $newValue, $oldValue)
     {
-        if (! is_array($data)) {
-            return;
-        }
-
-        $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
-
-        foreach (array_keys($data) as $idx) {
-            $processFields($fields, "{$idx}.");
-        }
+        return $data === $oldValue ? $newValue : $data;
     }
 
     /**
-     * Helper: Process fields for an array nested under a specific key.
-     * Resulting prefix: "{key}.0.", "{key}.1."...
+     * Helper: Replace values in a flat or nested array.
      *
      * @param  mixed  $data
-     * @param  string  $key
-     * @param  array|string  $fieldsConfig
+     * @param  mixed  $newValue
+     * @param  mixed  $oldValue
+     * @return mixed
      */
-    protected function processArrayNestedFieldsAtKey($data, $key, $fieldsConfig, callable $processFields)
+    protected function replaceValuesInArray($data, $newValue, $oldValue)
     {
-        $arrayData = is_array($data) ? ($data[$key] ?? []) : [];
-
-        $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
-
-        foreach (array_keys($arrayData) as $idx) {
-            $processFields($fields, "{$key}.{$idx}.");
+        if (! is_array($data) || ! $data) {
+            return $data;
         }
+
+        $flat = collect(Arr::dot($data));
+
+        if (! $flat->contains($oldValue)) {
+            return $data;
+        }
+
+        $result = $flat
+            ->map(fn ($value) => $value === $oldValue ? $newValue : $value)
+            ->filter()
+            ->values();
+
+        return $result->isEmpty() ? null : $result->all();
     }
 
     /**
-     * Helper: Process fields for a single structure nested under a key.
-     * Resulting prefix: "{key}."
-     *
-     * @param  string  $key
-     * @param  array|string  $fieldsConfig
+     * Helper: Replace statamic:// URLs in a string.
      */
-    protected function processSingleNestedFieldsAtKey($key, $fieldsConfig, callable $processFields)
+    protected function replaceStatamicUrls(string $data, ?string $newValue, string $oldValue): string
     {
-        $fields = $this->resolveFieldsConfigForReferenceUpdates($fieldsConfig);
-        $processFields($fields, "{$key}.");
-    }
+        return preg_replace_callback('/([("])(statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) use ($newValue, $oldValue) {
+            if ($matches[3] !== $oldValue) {
+                return $matches[0];
+            }
 
-    /**
-     * Resolve fields config to Fields instance.
-     *
-     * @param  array|string  $fieldsConfig
-     * @return \Statamic\Fields\Fields
-     */
-    private function resolveFieldsConfigForReferenceUpdates($fieldsConfig)
-    {
-        if (is_string($fieldsConfig)) {
-            $config = $this->config($fieldsConfig);
-        } else {
-            $config = $fieldsConfig;
-        }
+            $replacement = $newValue === null ? '' : $matches[2].$newValue;
 
-        return new Fields($config ?? []);
+            return $matches[1].$replacement.$matches[4];
+        }, $data);
     }
 }

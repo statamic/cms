@@ -12,6 +12,8 @@ use Statamic\Support\Str;
 
 class Group extends Fieldtype
 {
+    use UpdatesReferences;
+
     protected $categories = ['structured'];
     protected $defaultable = false;
     protected $selectableInForms = true;
@@ -198,5 +200,16 @@ class Group extends Fieldtype
     public function hasJsDriverDataBinding(): bool
     {
         return false;
+    }
+
+    public function iterateReferenceFields($data, callable $callback): void
+    {
+        $fieldsConfig = $this->config('fields');
+
+        if (! $fieldsConfig) {
+            return;
+        }
+
+        $callback(new Fields($fieldsConfig), '');
     }
 }
