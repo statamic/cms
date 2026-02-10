@@ -180,7 +180,7 @@
         <confirmation-modal
             v-model:open="showCropConfirmation"
             :title="__('Save Cropped Image')"
-            body-text="Would you like to save this as a new copy or replace the original image?"
+            :body-text="__('Would you like to save this as a new copy or replace the original image?')"
             :button-text="__('Replace Original')"
             :cancel-text="__('Save as New Copy')"
             :danger="false"
