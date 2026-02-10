@@ -229,7 +229,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::resource('asset-containers', AssetContainersController::class);
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
-    Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
     Route::get('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.blueprint.edit');
     Route::patch('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.blueprint.update');
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
