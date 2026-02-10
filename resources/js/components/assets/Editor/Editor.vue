@@ -186,7 +186,8 @@
             :danger="false"
             :busy="uploadingCrop"
             @confirm="uploadCroppedImage(true)"
-            @cancel="uploadCroppedImage(false)"
+            @cancel-clicked="uploadCroppedImage(false)"
+            @cancel="handleCropConfirmationDismissed"
         />
 
         <confirmation-modal
@@ -427,6 +428,12 @@ export default {
             this.$nextTick(() => {
                 this.showCropConfirmation = true;
             });
+        },
+
+        handleCropConfirmationDismissed() {
+            // User dismissed the modal (Escape/click outside) - just clear state
+            this.croppedBlob = null;
+            this.croppedMimeType = null;
         },
 
         async uploadCroppedImage(replaceOriginal) {
