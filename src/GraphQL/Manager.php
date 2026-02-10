@@ -102,7 +102,7 @@ class Manager
             return false;
         }
 
-        $config = config('statamic.graphql.introspection', 'auto');
+        $config = config('statamic.graphql.introspection') ?? 'auto';
 
         return $config === 'auto' ? app()->isLocal() : (bool) $config;
     }
