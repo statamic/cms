@@ -314,7 +314,6 @@
                 position: absolute;
                 border-block-end: 1px solid black;
                 opacity: 0.06;
-                width: 100vw;
                 top: 50%;
                 transform: translateY(50%);
             }
