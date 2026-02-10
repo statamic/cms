@@ -9,7 +9,8 @@ class NestedFieldUpdater
     public function __construct(
         private DataReferenceUpdater $updater,
         private string $fieldKey
-    ) {}
+    ) {
+    }
 
     /**
      * Process nested fields for reference updates at the given dotted prefix.

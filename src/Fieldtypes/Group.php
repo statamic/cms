@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\GraphQL;
 use Statamic\Data\NestedFieldUpdater;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
