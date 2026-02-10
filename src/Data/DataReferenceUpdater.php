@@ -30,6 +30,11 @@ abstract class DataReferenceUpdater
     protected $updated;
 
     /**
+     * @var bool
+     */
+    protected $shouldSave = true;
+
+    /**
      * Instantiate data reference updater.
      *
      * @param  mixed  $item
@@ -143,6 +148,18 @@ abstract class DataReferenceUpdater
     }
 
     /**
+     * Disable saving after updating references.
+     *
+     * @return $this
+     */
+    public function withoutSaving()
+    {
+        $this->shouldSave = false;
+
+        return $this;
+    }
+
+    /**
      * Check if value is being removed.
      *
      * @return bool
@@ -157,6 +174,10 @@ abstract class DataReferenceUpdater
      */
     protected function saveItem()
     {
+        if (! $this->shouldSave) {
+            return;
+        }
+
         GitSubscriber::withoutListeners(function () {
             $this->item->save();
         });
