@@ -337,7 +337,7 @@ export default {
 
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
-            this.$axios.get(url).then((response) => {
+            return this.$axios.get(url).then((response) => {
                 const data = response.data.data;
                 this.asset = data;
 
@@ -501,43 +501,39 @@ export default {
                         const originalPreview = this.asset?.preview;
                         const originalThumbnail = this.asset?.thumbnail;
 
-                        // Reload the asset first
-                        this.load();
+                        // Reload the asset and wait for it to complete
+                        await this.load();
 
                         // After reload completes, add cache-busting parameter to force browser to reload images
-                        this.$nextTick(() => {
-                            setTimeout(() => {
-                                if (this.asset) {
-                                    const timestamp = Date.now();
+                        if (this.asset) {
+                            const timestamp = Date.now();
 
-                                    // Update preview URL with cache-busting parameter
-                                    if (this.asset.preview) {
-                                        const previewUrl = this.asset.preview.split('?')[0];
-                                        this.asset.preview = `${previewUrl}?t=${timestamp}`;
+                            // Update preview URL with cache-busting parameter
+                            if (this.asset.preview) {
+                                const previewUrl = this.asset.preview.split('?')[0];
+                                this.asset.preview = `${previewUrl}?t=${timestamp}`;
+                            }
+
+                            // Update thumbnail URL with cache-busting parameter
+                            if (this.asset.thumbnail) {
+                                const thumbnailUrl = this.asset.thumbnail.split('?')[0];
+                                this.asset.thumbnail = `${thumbnailUrl}?t=${timestamp}`;
+                            }
+
+                            // Also directly update any img elements in the DOM that match the original URLs
+                            if (originalPreview || originalThumbnail) {
+                                document.querySelectorAll('img').forEach((img) => {
+                                    const imgSrc = img.src || img.getAttribute('src') || '';
+                                    const imgSrcBase = imgSrc.split('?')[0];
+
+                                    if (originalPreview && imgSrcBase === originalPreview.split('?')[0]) {
+                                        img.src = `${imgSrcBase}?t=${timestamp}`;
+                                    } else if (originalThumbnail && imgSrcBase === originalThumbnail.split('?')[0]) {
+                                        img.src = `${imgSrcBase}?t=${timestamp}`;
                                     }
-
-                                    // Update thumbnail URL with cache-busting parameter
-                                    if (this.asset.thumbnail) {
-                                        const thumbnailUrl = this.asset.thumbnail.split('?')[0];
-                                        this.asset.thumbnail = `${thumbnailUrl}?t=${timestamp}`;
-                                    }
-
-                                    // Also directly update any img elements in the DOM that match the original URLs
-                                    if (originalPreview || originalThumbnail) {
-                                        document.querySelectorAll('img').forEach((img) => {
-                                            const imgSrc = img.src || img.getAttribute('src') || '';
-                                            const imgSrcBase = imgSrc.split('?')[0];
-
-                                            if (originalPreview && imgSrcBase === originalPreview.split('?')[0]) {
-                                                img.src = `${imgSrcBase}?t=${timestamp}`;
-                                            } else if (originalThumbnail && imgSrcBase === originalThumbnail.split('?')[0]) {
-                                                img.src = `${imgSrcBase}?t=${timestamp}`;
-                                            }
-                                        });
-                                    }
-                                }
-                            }, 200);
-                        });
+                                });
+                            }
+                        }
                     } else {
                         // Extract container and path from the new asset ID (format: container::path)
                         const newAssetId = response.data.data.id;
