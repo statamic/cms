@@ -75,6 +75,10 @@ class ServiceProvider extends LaravelProvider
 
     private function configureIntrospection()
     {
-        config(['graphql.security.disable_introspection' => config('statamic.graphql.security.disable_introspection')]);
+        $config = config('statamic.graphql.introspection', 'auto');
+
+        $value = $config === 'auto' ? app()->isLocal() : (bool) $config;
+
+        config(['graphql.security.disable_introspection' => ! $value]);
     }
 }

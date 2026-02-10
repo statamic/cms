@@ -90,17 +90,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Security
+    | Introspection
     |--------------------------------------------------------------------------
     |
-    | Here you may configure security settings for your GraphQL API.
-    | Disabling introspection is recommended in production to prevent
-    | exposing the full schema to potential attackers.
+    | Introspection queries allow a user to see the schema and will power
+    | development tools. This is "auto" by default, which will enable
+    | it locally and keep it disabled everywhere else for security.
     |
     */
 
-    'security' => [
-        'disable_introspection' => env('STATAMIC_GRAPHQL_INTROSPECTION_DISABLED', false),
-    ],
+    'introspection' => env('STATAMIC_GRAPHQL_INTROSPECTION_ENABLED', 'auto'),
 
 ];
