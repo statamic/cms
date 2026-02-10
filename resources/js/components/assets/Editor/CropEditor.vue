@@ -106,6 +106,10 @@ export default {
             } else if (this.cropper) {
                 this.cropper.destroy();
                 this.cropper = null;
+                // Reset state to initial values
+                this.selectedRatio = null;
+                this.baseRatio = null;
+                this.isFlipped = false;
             }
         },
     },
@@ -345,6 +349,10 @@ export default {
                 this.cropper.destroy();
                 this.cropper = null;
             }
+            // Reset state to initial values
+            this.selectedRatio = null;
+            this.baseRatio = null;
+            this.isFlipped = false;
             this.$emit('update:open', false);
             this.$emit('closed');
         },
