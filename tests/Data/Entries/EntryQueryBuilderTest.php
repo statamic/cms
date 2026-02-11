@@ -1224,6 +1224,7 @@ class EntryQueryBuilderTest extends TestCase
         ];
     }
 
+    #[Test]
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
