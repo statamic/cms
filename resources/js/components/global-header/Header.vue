@@ -7,6 +7,7 @@ import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
+import SupportButton from "@/components/global-header/SupportButton.vue";
 
 const layout = inject('layout', {});
 const isMaxWidthEnabled = layout.isMaxWidthEnabled;
@@ -33,6 +34,7 @@ const toggleMaxWidth = layout.toggleMaxWidth;
             <div class="flex items-center">
                 <Search />
             </div>
+	        <SupportButton />
             <button
                 @click="toggleMaxWidth"
                 :aria-label="isMaxWidthEnabled ? __('Expand Layout') : __('Constrain Layout')"
