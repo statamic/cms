@@ -504,7 +504,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -623,7 +623,7 @@ export default {
                     }
 
                     // If the user has opted to go to listing, redirect them there.
-                    else if (!this.isInline && (nextAction === null || nextAction === 'listing')) {
+                    else if (!this.isInline && nextAction === 'listing') {
                         window.location = this.listingUrl;
                     }
 
@@ -795,7 +795,7 @@ export default {
             }
 
             // If the user has opted to go to listing, redirect them there.
-            else if (!this.isInline && (nextAction === null || nextAction === 'listing')) {
+            else if (!this.isInline && nextAction === 'listing') {
                 window.location = this.listingUrl;
             }
 
