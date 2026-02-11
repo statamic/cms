@@ -48,7 +48,7 @@ The default slot exposes a few props:
 - `loading` - whether results are being fetched from the server
 
 ## Using a JSON endpoint
-The `Listing` component can pull data from a JSON endpoint. It's a little more involved though...
+The `Listing` component can pull data from a JSON endpoint.
 
 1. You'll need to make a controller to query your data. The Listing component will provide `page`, `perPage`, `sort`, `order`, `search`, `columns` and `filters` as query parameters.
 
@@ -86,8 +86,6 @@ The `Listing` component can pull data from a JSON endpoint. It's a little more i
         ...
     />
     ```
-
-3. Refresh your listing and hope for the best! 🎉
 
 ### Actions
 To enable [actions](https://statamic.dev/backend-apis/actions), you'll need to make another controller. It should extend Statamic's `ActionController`.
