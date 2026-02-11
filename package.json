@@ -58,7 +58,7 @@
     "@tiptap/vue-3": "^3.0.0",
     "alpinejs": "^3.1.1",
     "autosize": "~6.0.1",
-    "axios": "^1.12.1",
+    "axios": "^1.13.5",
     "clsx": "^2.1.1",
     "codemirror": "5.65.12",
     "cookies-js": "^1.2.2",
