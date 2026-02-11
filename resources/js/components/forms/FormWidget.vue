@@ -42,6 +42,8 @@ function formatDate(value) {
         :url="requestUrl"
         :columns="cols"
         :per-page="initialPerPage"
+        sort-column="datestamp"
+        sort-direction="desc"
         :show-pagination-totals="false"
         :show-pagination-page-links="false"
         :show-pagination-per-page-selector="false"
