@@ -788,7 +788,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals(1, Term::query()->min('quantity'));
 
         // Assert only queried values are plucked.
-        $this->assertEqualsassertEquals(3, Term::query()->where('type', 'a')->min('quantity'));
+        $this->assertEquals(3, Term::query()->where('type', 'a')->min('quantity'));
 
         // Assert returns null when there's no results.
         $this->assertNull(Term::query()->where('type', 'c')->min('quantity'));
