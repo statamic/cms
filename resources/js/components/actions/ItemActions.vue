@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, useSlots } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import axios from 'axios';
@@ -28,6 +28,10 @@ watch(
 
 let preparedActions = computed(() => {
     return prepareActions(actions.value, confirmableActions.value);
+});
+
+let preparedPinnedActions = computed(() => {
+	return prepareActions(actions.value?.filter(action => action.pinned), confirmableActions.value);
 });
 
 let errors = ref({});
@@ -68,6 +72,9 @@ function loadActions() {
     actionsLoaded.value = true;
 }
 
+const slots = useSlots();
+const showPinnedActions = computed(() => preparedPinnedActions.value && !!slots.pinned);
+
 defineExpose({
     preparedActions,
 });
@@ -85,4 +92,5 @@ defineExpose({
         @confirmed="runAction"
     />
     <slot :actions="preparedActions" :load-actions="loadActions" />
+	<slot v-if="showPinnedActions" name="pinned" :actions="preparedPinnedActions" />
 </template>
