@@ -178,18 +178,43 @@
                 @update:open="showCropEditor = $event"
             />
 
-        <confirmation-modal
-            v-model:open="showCropConfirmation"
+        <Modal
+            :open="showCropConfirmation"
             :title="__('Save Cropped Image')"
-            :body-text="__('Would you like to save this as a new copy or replace the original image?')"
-            :button-text="__('Replace Original')"
-            :cancel-text="__('Save as New Copy')"
-            :danger="false"
-            :busy="uploadingCrop"
-            @confirm="uploadCroppedImage(true)"
-            @cancel-clicked="uploadCroppedImage(false)"
-            @cancel="handleCropConfirmationDismissed"
-        />
+            :dismissible="!uploadingCrop"
+            @update:open="(open) => { if (!open) handleCropConfirmationDismissed(); }"
+        >
+            <div
+                v-if="uploadingCrop"
+                class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
+            >
+                <Icon name="loading" />
+            </div>
+
+            <p>{{ __('Would you like to save this as a new copy or replace the original image?') }}</p>
+
+            <template #footer>
+                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                    <Button
+                        variant="ghost"
+                        :disabled="uploadingCrop"
+                        :text="__('Cancel')"
+                        @click="handleCropConfirmationDismissed"
+                    />
+                    <Button
+                        :disabled="uploadingCrop"
+                        :text="__('Save as Copy')"
+                        @click="uploadCroppedImage(false)"
+                    />
+                    <Button
+                        variant="primary"
+                        :disabled="uploadingCrop"
+                        :text="__('Replace Original')"
+                        @click="uploadCroppedImage(true)"
+                    />
+                </div>
+            </template>
+        </Modal>
 
         <confirmation-modal
             v-model:open="closingWithChanges"
@@ -211,9 +236,11 @@ import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
 import { router } from '@inertiajs/vue3';
 import {
+    Button,
     Dropdown,
     DropdownMenu,
     DropdownItem,
+    Modal,
     PublishContainer,
     PublishTabs,
     Icon,
@@ -225,12 +252,14 @@ export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
 
     components: {
+        Button,
         Dropdown,
         DropdownMenu,
         DropdownItem,
         ItemActions,
         FocalPointEditor,
         CropEditor,
+        Modal,
         PdfViewer,
         PublishContainer,
         PublishTabs,
@@ -433,12 +462,11 @@ export default {
         },
 
         handleCropConfirmationDismissed() {
-            // User dismissed the modal (Escape/click outside) - only clear state if no upload is in progress
-            // If upload is in progress, the blob should be preserved for retry on failure
-            if (!this.uploadingCrop) {
-                this.croppedBlob = null;
-                this.croppedMimeType = null;
-            }
+            if (this.uploadingCrop) return;
+
+            this.showCropConfirmation = false;
+            this.croppedBlob = null;
+            this.croppedMimeType = null;
         },
 
         async uploadCroppedImage(replaceOriginal) {

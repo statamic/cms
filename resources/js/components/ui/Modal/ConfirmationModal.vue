@@ -1,13 +1,12 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
-import { Modal, Button, Icon } from '@/components/ui';
+import { Modal, ModalClose, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits([
     'update:open',
     'opened',
     'confirm',
-    'cancel',
-    'cancel-clicked'
+    'cancel'
 ]);
 
 const props = defineProps({
@@ -49,8 +48,6 @@ const props = defineProps({
     },
 });
 
-const cancelButtonClicked = ref(false);
-
 function updateModalOpen(open) {
     if (! open && props.busy) {
         return;
@@ -58,18 +55,7 @@ function updateModalOpen(open) {
 
     emit('update:open', open);
 
-    if (! open) {
-        if (cancelButtonClicked.value) {
-            emit('cancel-clicked');
-            cancelButtonClicked.value = false;
-        }
-        emit('cancel');
-    }
-}
-
-function handleCancelClick() {
-    cancelButtonClicked.value = true;
-    updateModalOpen(false);
+    if (! open) emit('cancel');
 }
 
 function submit() {
@@ -111,13 +97,13 @@ const shouldCloseOnSubmit = computed(() => {
 
         <template v-if="cancellable || submittable" #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <Button
-                    v-if="cancellable"
-                    variant="ghost"
-                    :disabled="busy"
-                    :text="__(cancelText)"
-                    @click="handleCancelClick"
-                />
+                <ModalClose asChild v-if="cancellable">
+                    <Button
+                        variant="ghost"
+                        :disabled="busy"
+                        :text="__(cancelText)"
+                    />
+                </ModalClose>
                 <Button
                     v-if="submittable"
                     type="submit"
