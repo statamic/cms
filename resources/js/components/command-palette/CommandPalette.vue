@@ -355,6 +355,7 @@ router.on('start', () => {
                                         :text-value="item.text"
                                         :as-child="true"
                                         :disabled="item.loading"
+                                        @select="item.trackRecent && addToRecentItems(item)"
                                     >
                                         <CommandPaletteLoadingItem class="rounded-lg px-2 py-1.5 w-full opacity-20" v-if="item.loading" />
                                         <CommandPaletteItem
