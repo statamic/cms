@@ -545,35 +545,9 @@ export default {
                         // Reload the asset and wait for it to complete
                         await this.load();
 
-                        // After reload completes, add cache-busting parameter to force browser to reload images
+                        // After reload completes, force browser to reload images
                         if (this.asset) {
-                            const timestamp = Date.now();
-
-                            // Update preview URL with cache-busting parameter
-                            if (this.asset.preview) {
-                                const previewUrl = this.asset.preview.split('?')[0];
-                                this.asset.preview = `${previewUrl}?t=${timestamp}`;
-                            }
-
-                            // Update thumbnail URL with cache-busting parameter
-                            if (this.asset.thumbnail) {
-                                const thumbnailUrl = this.asset.thumbnail.split('?')[0];
-                                this.asset.thumbnail = `${thumbnailUrl}?t=${timestamp}`;
-                            }
-
-                            // Also directly update any img elements in the DOM that match the original URLs
-                            if (originalPreview || originalThumbnail) {
-                                document.querySelectorAll('img').forEach((img) => {
-                                    const imgSrc = img.src || img.getAttribute('src') || '';
-                                    const imgSrcBase = imgSrc.split('?')[0];
-
-                                    if (originalPreview && imgSrcBase === originalPreview.split('?')[0]) {
-                                        img.src = `${imgSrcBase}?t=${timestamp}`;
-                                    } else if (originalThumbnail && imgSrcBase === originalThumbnail.split('?')[0]) {
-                                        img.src = `${imgSrcBase}?t=${timestamp}`;
-                                    }
-                                });
-                            }
+                            Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
                         }
                     } else {
                         // Extract container and path from the new asset ID (format: container::path)
