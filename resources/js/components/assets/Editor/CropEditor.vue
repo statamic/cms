@@ -50,36 +50,39 @@ watch(() => props.open, (newValue) => {
         // Bind keyboard shortcuts when editor opens
         bindKeyboardShortcuts();
     } else {
-        // Unbind keyboard shortcuts when editor closes
-        unbindKeyboardShortcuts();
-        if (cropper.value) {
-            removeCropperEvents();
-            cropper.value.destroy();
-            cropper.value = null;
-            // Reset state to initial values
-            selectedRatio.value = null;
-            baseRatio.value = null;
-            isFlipped.value = false;
-        }
+        cleanup();
     }
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(() => cleanup());
+
+function cleanup() {
     unbindKeyboardShortcuts();
+    destroyCropper();
+    resetState();
+}
+
+function resetState() {
+    selectedRatio.value = null;
+    baseRatio.value = null;
+    isFlipped.value = false;
+    isAdjustingCropBox.value = false;
+    initialCropBoxCenter.value = null;
+}
+
+function destroyCropper() {
     removeCropperEvents();
-    if (cropper.value) cropper.value.destroy();
-});
+    if (cropper.value) {
+        cropper.value.destroy();
+        cropper.value = null;
+    }
+}
 
 function initCropper() {
     const imageElement = imageRef.value;
     if (!imageElement) return;
 
-    // Destroy existing cropper if any
-    if (cropper.value) {
-        removeCropperEvents();
-        cropper.value.destroy();
-        cropper.value = null;
-    }
+    destroyCropper();
 
     // Set crossOrigin attribute to handle CORS images
     // This allows canvas operations on cross-origin images if CORS headers are present
@@ -369,9 +372,7 @@ function crop() {
 
 function reset() {
     if (cropper.value) {
-        selectedRatio.value = null;
-        baseRatio.value = null;
-        isFlipped.value = false;
+        resetState();
         cropper.value.setAspectRatio(NaN);
         // Reset to full canvas (image) bounds
         const canvasData = cropper.value.getCanvasData();
@@ -451,22 +452,6 @@ function unbindKeyboardShortcuts() {
 }
 
 function close() {
-    // Cancel any pending animation frames
-    if (animationFrameId.value) {
-        cancelAnimationFrame(animationFrameId.value);
-        animationFrameId.value = null;
-    }
-    removeCropperEvents();
-    if (cropper.value) {
-        cropper.value.destroy();
-        cropper.value = null;
-    }
-    // Reset state to initial values
-    selectedRatio.value = null;
-    baseRatio.value = null;
-    isFlipped.value = false;
-    isAdjustingCropBox.value = false;
-    initialCropBoxCenter.value = null;
     emit('update:open', false);
     emit('closed');
 }
