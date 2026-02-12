@@ -178,43 +178,43 @@
                 @update:open="showCropEditor = $event"
             />
 
-        <Modal
-            :open="showCropConfirmation"
-            :title="__('Save Cropped Image')"
-            :dismissible="!uploadingCrop"
-            @update:open="(open) => { if (!open) handleCropConfirmationDismissed(); }"
-        >
-            <div
-                v-if="uploadingCrop"
-                class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
+            <Modal
+                :open="showCropConfirmation"
+                :title="__('Save Cropped Image')"
+                :dismissible="!uploadingCrop"
+                @update:open="(open) => { if (!open) handleCropConfirmationDismissed(); }"
             >
-                <Icon name="loading" />
-            </div>
-
-            <p>{{ __('Would you like to save this as a new copy or replace the original image?') }}</p>
-
-            <template #footer>
-                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                    <Button
-                        variant="ghost"
-                        :disabled="uploadingCrop"
-                        :text="__('Cancel')"
-                        @click="handleCropConfirmationDismissed"
-                    />
-                    <Button
-                        :disabled="uploadingCrop"
-                        :text="__('Save as Copy')"
-                        @click="uploadCroppedImage(false)"
-                    />
-                    <Button
-                        variant="primary"
-                        :disabled="uploadingCrop"
-                        :text="__('Replace Original')"
-                        @click="uploadCroppedImage(true)"
-                    />
+                <div
+                    v-if="uploadingCrop"
+                    class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
+                >
+                    <Icon name="loading" />
                 </div>
-            </template>
-        </Modal>
+
+                <p>{{ __('Would you like to save this as a new copy or replace the original image?') }}</p>
+
+                <template #footer>
+                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                        <Button
+                            variant="ghost"
+                            :disabled="uploadingCrop"
+                            :text="__('Cancel')"
+                            @click="handleCropConfirmationDismissed"
+                        />
+                        <Button
+                            :disabled="uploadingCrop"
+                            :text="__('Save as Copy')"
+                            @click="uploadCroppedImage(false)"
+                        />
+                        <Button
+                            variant="primary"
+                            :disabled="uploadingCrop"
+                            :text="__('Replace Original')"
+                            @click="uploadCroppedImage(true)"
+                        />
+                    </div>
+                </template>
+            </Modal>
 
         <confirmation-modal
             v-model:open="closingWithChanges"
