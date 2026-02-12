@@ -303,15 +303,8 @@ function crop() {
 
 function reset() {
     resetState();
+    cropper.value.reset();
     cropper.value.setAspectRatio(NaN);
-    // Reset to full canvas (image) bounds
-    const canvasData = cropper.value.getCanvasData();
-    cropper.value.setCropBoxData({
-        left: canvasData.left,
-        top: canvasData.top,
-        width: canvasData.width,
-        height: canvasData.height,
-    });
 }
 function bindKeyboardShortcuts() {
     // Enter to finish (only if cropper is ready and not in a form field)
