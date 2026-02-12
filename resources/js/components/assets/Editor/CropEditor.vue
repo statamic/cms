@@ -118,11 +118,6 @@ function createCropper(imageElement) {
 }
 
 function setupCropperEvents() {
-    if (!cropper.value) return;
-
-    const imageElement = imageRef.value;
-    if (!imageElement) return;
-
     const onCropStart = () => {
         const cropBoxData = cropper.value.getCropBoxData();
         initialCropBoxCenter.value = {
@@ -159,6 +154,7 @@ function setupCropperEvents() {
         isAdjustingCropBox.value = false;
     };
 
+    const imageElement = imageRef.value;
     imageElement.addEventListener('cropstart', onCropStart);
     imageElement.addEventListener('cropmove', onCropMove);
     imageElement.addEventListener('cropend', onCropEnd);
