@@ -127,7 +127,7 @@ function open() {
 
         nextTick(() => {
             visible.value = true;
-            emit('opened');
+            nextTick(() => emit('opened'));
         });
     });
 }

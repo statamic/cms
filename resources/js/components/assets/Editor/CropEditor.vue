@@ -1,7 +1,7 @@
 <script setup>
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { onBeforeUnmount, ref, useTemplateRef, watch, nextTick } from 'vue';
+import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { Stack, Heading, Button, Select } from '@ui';
 import { toast, keys } from '@api';
 
@@ -45,9 +45,6 @@ const aspectRatios = ref([
 
 watch(() => props.open, (newValue) => {
     if (newValue) {
-        // Wait for Stack to open and image to be visible
-        nextTick(() => setTimeout(() => initCropper(), 100));
-        // Bind keyboard shortcuts when editor opens
         bindKeyboardShortcuts();
     } else {
         cleanup();
@@ -463,7 +460,7 @@ function close() {
 </style>
 
 <template>
-    <Stack size="full" :open="open" inset @update:open="$emit('update:open', $event)" :show-close-button="false">
+    <Stack size="full" :open="open" inset @update:open="$emit('update:open', $event)" @opened="initCropper" :show-close-button="false">
         <div class="min-h-0 flex h-full flex-col bg-gray-100 dark:bg-dark-800">
             <!-- Header -->
             <header class="relative flex w-full items-center justify-between px-4 py-3 border-b dark:border-gray-700">
