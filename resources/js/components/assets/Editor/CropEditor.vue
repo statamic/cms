@@ -387,13 +387,7 @@ export default {
                 }
 
                 // Determine quality based on format (PNG doesn't use quality parameter)
-                // Note: canvas.toBlob() doesn't support GIF - browsers silently fall back to PNG
-                // So we need to convert GIF to PNG to match what's actually produced
-                let outputMimeType = this.mimeType;
-                if (outputMimeType === 'image/gif') {
-                    outputMimeType = 'image/png';
-                }
-
+                const outputMimeType = this.mimeType;
                 const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
 
                 canvas.toBlob((blob) => {
@@ -407,7 +401,6 @@ export default {
                         'image/jpeg': 'jpg',
                         'image/png': 'png',
                         'image/webp': 'webp',
-                        'image/gif': 'gif',
                     };
                     const extension = extensionMap[outputMimeType] || 'png';
 
