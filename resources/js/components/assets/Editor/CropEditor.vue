@@ -159,6 +159,8 @@ function setupCropperEvents() {
 
 function removeCropperEvents() {
     const imageElement = imageRef.value;
+    if (!imageElement) return;
+
     imageElement.removeEventListener('cropstart', onCropStart);
     imageElement.removeEventListener('cropmove', onCropMove);
     imageElement.removeEventListener('cropend', onCropEnd);
