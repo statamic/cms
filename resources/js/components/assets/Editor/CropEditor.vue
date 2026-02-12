@@ -97,19 +97,21 @@ function createCropper(imageElement) {
     cropper.value = new Cropper(imageElement, {
         aspectRatio: NaN,
         viewMode: 1,
-        dragMode: 'move',
-        autoCropArea: 1,
+        dragMode: 'crop',
+        autoCropArea: 0.9,
         restore: false,
         guides: true,
         center: true,
-        highlight: false,
+        highlight: true,
         cropBoxMovable: true,
         cropBoxResizable: true,
-        toggleable: false,
-        zoomable: true,
+        zoomable: false,
+        zoomOnTouch: false,
+        zoomOnWheel: false,
         scalable: false,
         rotatable: false,
         responsive: true,
+        movable: false,
     });
 
     setupCropperEvents();
@@ -387,12 +389,6 @@ function close() {
 }
 </script>
 
-<style>
-.cropper-bg {
-    background-image: none !important;
-}
-</style>
-
 <template>
     <Stack size="full" :open="open" inset @update:open="$emit('update:open', $event)" @opened="initCropper" :show-close-button="false">
         <div class="min-h-0 flex h-full flex-col bg-gray-100 dark:bg-dark-800">
@@ -403,8 +399,8 @@ function close() {
             </header>
 
             <!-- Content -->
-            <div class="flex flex-1 flex-col overflow-auto bg-black relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
-                <div class="px-3 lg:px-6 min-h-0">
+            <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-800 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
+                <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
                     <img ref="image" :src="image" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
             </div>
