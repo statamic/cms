@@ -66,7 +66,6 @@ function resetState() {
 }
 
 function destroyCropper() {
-    removeCropperEvents();
     if (cropper.value) {
         cropper.value.destroy();
         cropper.value = null;
@@ -112,9 +111,10 @@ function createCropper(imageElement) {
         rotatable: false,
         responsive: true,
         movable: false,
+        cropstart: onCropStart,
+        cropmove: onCropMove,
+        cropend: onCropEnd,
     });
-
-    setupCropperEvents();
 }
 
 function onCropStart() {
@@ -151,21 +151,6 @@ function onCropEnd() {
     isAdjustingCropBox.value = false;
 }
 
-function setupCropperEvents() {
-    const imageElement = imageRef.value;
-    imageElement.addEventListener('cropstart', onCropStart);
-    imageElement.addEventListener('cropmove', onCropMove);
-    imageElement.addEventListener('cropend', onCropEnd);
-}
-
-function removeCropperEvents() {
-    const imageElement = imageRef.value;
-    if (!imageElement) return;
-
-    imageElement.removeEventListener('cropstart', onCropStart);
-    imageElement.removeEventListener('cropmove', onCropMove);
-    imageElement.removeEventListener('cropend', onCropEnd);
-}
 
 function adjustCropBoxCenter() {
     if (!isOptionKeyPressed.value || !initialCropBoxCenter.value || isAdjustingCropBox.value) {
