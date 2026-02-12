@@ -1,7 +1,7 @@
 <script setup>
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { Stack, Heading, Button, Select } from '@ui';
 import { toast, keys } from '@api';
 
@@ -75,19 +75,27 @@ function destroyCropper() {
     }
 }
 
+const crossOrigin = computed(() => {
+    try {
+        return new URL(props.image, window.location.href).origin !== window.location.origin ? 'anonymous' : null;
+    } catch {
+        return null;
+    }
+});
+
+function onImageError() {
+    if (crossOrigin.value) {
+        toast.error(__('Unable to crop image from external source. The image must be served with proper CORS headers.'));
+        close();
+    }
+}
+
 function initCropper() {
     const imageElement = imageRef.value;
     if (!imageElement) return;
 
     destroyCropper();
 
-    // Set crossOrigin attribute to handle CORS images
-    // This allows canvas operations on cross-origin images if CORS headers are present
-    if (imageElement.crossOrigin === null) {
-        imageElement.crossOrigin = 'anonymous';
-    }
-
-    // Wait for image to load if not already loaded
     if (imageElement.complete) {
         createCropper(imageElement);
     } else {
@@ -98,37 +106,25 @@ function initCropper() {
 }
 
 function createCropper(imageElement) {
-    try {
-        cropper.value = new Cropper(imageElement, {
-            aspectRatio: NaN,
-            viewMode: 1,
-            dragMode: 'move',
-            autoCropArea: 1,
-            restore: false,
-            guides: true,
-            center: true,
-            highlight: false,
-            cropBoxMovable: true,
-            cropBoxResizable: true,
-            toggleable: false,
-            zoomable: true,
-            scalable: false,
-            rotatable: false,
-            responsive: true,
-        });
+    cropper.value = new Cropper(imageElement, {
+        aspectRatio: NaN,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 1,
+        restore: false,
+        guides: true,
+        center: true,
+        highlight: false,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        toggleable: false,
+        zoomable: true,
+        scalable: false,
+        rotatable: false,
+        responsive: true,
+    });
 
-        // Add event listeners for center-based resizing with Option/Alt key
-        setupCropperEvents();
-    } catch (error) {
-        // Handle SecurityError from tainted canvas (cross-origin without CORS)
-        if (error.name === 'SecurityError' || error.message?.includes('tainted') || error.message?.includes('cross-origin')) {
-            toast.error(__('Unable to crop image from external source. The image must be served with proper CORS headers.'));
-            close();
-        } else {
-            // Re-throw other errors
-            throw error;
-        }
-    }
+    setupCropperEvents();
 }
 
 function setupCropperEvents() {
@@ -307,64 +303,42 @@ function expandCropBoxToFill() {
 function crop() {
     if (!cropper.value) return;
 
-    try {
-        // Get crop box data in natural image coordinates
-        const cropBoxData = cropper.value.getCropBoxData();
-        const imageData = cropper.value.getImageData();
+    const cropBoxData = cropper.value.getCropBoxData();
+    const imageData = cropper.value.getImageData();
 
-        // Calculate the crop dimensions in natural image coordinates
-        // Scale from display coordinates to natural coordinates
-        const scaleX = imageData.naturalWidth / imageData.width;
-        const scaleY = imageData.naturalHeight / imageData.height;
+    const scaleX = imageData.naturalWidth / imageData.width;
+    const scaleY = imageData.naturalHeight / imageData.height;
 
-        const naturalCropWidth = cropBoxData.width * scaleX;
-        const naturalCropHeight = cropBoxData.height * scaleY;
+    const canvas = cropper.value.getCroppedCanvas({
+        width: cropBoxData.width * scaleX,
+        height: cropBoxData.height * scaleY,
+    });
 
-        // Use the calculated dimensions to preserve aspect ratio
-        const canvas = cropper.value.getCroppedCanvas({
-            width: naturalCropWidth,
-            height: naturalCropHeight,
-        });
-
-        if (!canvas) {
-            toast.error(__('Failed to crop image'));
-            return;
-        }
-
-        // Determine quality based on format (PNG doesn't use quality parameter)
-        const outputMimeType = props.mimeType;
-        const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
-
-        canvas.toBlob((blob) => {
-            if (!blob) {
-                toast.error(__('Failed to create cropped image'));
-                return;
-            }
-
-            // Determine file extension from MIME type
-            const extensionMap = {
-                'image/jpeg': 'jpg',
-                'image/png': 'png',
-                'image/webp': 'webp',
-            };
-            const extension = extensionMap[outputMimeType] || 'png';
-
-            // Convert blob to File object with correct MIME type and extension
-            // This ensures the server can properly validate the file
-            const file = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
-
-            emit('cropped', { blob: file, mimeType: outputMimeType });
-            close();
-        }, outputMimeType, quality);
-    } catch (error) {
-        // Handle SecurityError from tainted canvas (cross-origin without CORS)
-        if (error.name === 'SecurityError' || error.message?.includes('tainted') || error.message?.includes('cross-origin')) {
-            toast.error(__('Unable to crop image from external source. The image must be served with proper CORS headers.'));
-            return;
-        }
-        // Re-throw other errors
-        throw error;
+    if (!canvas) {
+        toast.error(__('Failed to crop image'));
+        return;
     }
+
+    const outputMimeType = props.mimeType;
+    const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
+
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            toast.error(__('Failed to create cropped image'));
+            return;
+        }
+
+        const extensionMap = {
+            'image/jpeg': 'jpg',
+            'image/png': 'png',
+            'image/webp': 'webp',
+        };
+        const extension = extensionMap[outputMimeType] || 'png';
+        const file = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
+
+        emit('cropped', { blob: file, mimeType: outputMimeType });
+        close();
+    }, outputMimeType, quality);
 }
 
 function reset() {
@@ -471,7 +445,7 @@ function close() {
             <!-- Content -->
             <div class="flex flex-1 flex-col overflow-auto bg-black relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
                 <div class="px-3 lg:px-6 min-h-0">
-                    <img ref="image" :src="image" :alt="__('Image to crop')" class="max-w-full max-h-full" />
+                    <img ref="image" :src="image" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
             </div>
 
