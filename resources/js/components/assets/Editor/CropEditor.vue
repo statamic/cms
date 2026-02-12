@@ -91,18 +91,8 @@ function onImageError() {
 }
 
 function initCropper() {
-    const imageElement = imageRef.value;
-    if (!imageElement) return;
-
     destroyCropper();
-
-    if (imageElement.complete) {
-        createCropper(imageElement);
-    } else {
-        imageElement.addEventListener('load', () => {
-            createCropper(imageElement);
-        }, { once: true });
-    }
+    imageRef.value.decode().then(() => createCropper(imageRef.value));
 }
 
 function createCropper(imageElement) {
