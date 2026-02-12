@@ -58,6 +58,8 @@ const props = defineProps({
 	readOnly: { type: Boolean, default: false },
 	/** When `true`, the options will be searchable. */
 	searchable: { type: Boolean, default: true },
+	/** Determines if the dropdown should open */
+	shouldOpenDropdown: { type: Function, default: () => true },
 	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
 	size: { type: String, default: 'base' },
 	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
@@ -195,6 +197,7 @@ const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelec
 
 const shouldShowInput = computed(() => {
 	if (!props.searchable) return false;
+	if (props.taggable) return true;
 
 	return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
 });
@@ -262,8 +265,8 @@ function updateModelValue(value) {
 }
 
 function updateDropdownOpen(open) {
+	if (! props.shouldOpenDropdown(open)) return;
     if (props.disabled || props.readOnly) return;
-	if (props.taggable && props.options.length === 0) return;
 
     dropdownOpen.value = open;
 
@@ -289,19 +292,19 @@ function onPaste(e) {
 }
 
 function pushTaggableOption(e) {
-	if (!props.taggable || !props.options.length) return;
+	if (!props.taggable) return;
 	if (e.target.value === '') return;
 
 	e.preventDefault();
 
-	if (props.modelValue.includes(e.target.value)) {
+	if (props.modelValue?.includes(e.target.value)) {
 		searchQuery.value = '';
 		return;
 	}
 
 	emit('added', e.target.value);
 
-	updateModelValue([...props.modelValue, e.target.value]);
+	updateModelValue([...props.modelValue ?? [], e.target.value]);
 }
 
 async function scrollToSelectedOption() {
