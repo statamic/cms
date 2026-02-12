@@ -58,6 +58,7 @@ class HandleAuthenticatedInertiaRequests
         }
 
         return [
+            'supportUrl' => config('statamic.cp.support_url'),
             'selectedSiteUrl' => Site::selected()->url(),
             'licensing' => $this->licensing(),
             'sessionExpiry' => $this->sessionExpiry(),

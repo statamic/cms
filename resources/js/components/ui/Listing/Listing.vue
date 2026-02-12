@@ -143,7 +143,7 @@ const props = defineProps({
     /** Number of items to display per page. */
     perPage: {
         type: Number,
-        default: 15,
+        default: () => Statamic.$config.get('paginationSize', 15),
     },
     /** When `true`, shows the totals in the paginator. e.g. "1-5 of 10" */
     showPaginationTotals: {

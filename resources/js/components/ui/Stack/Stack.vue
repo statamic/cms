@@ -10,7 +10,7 @@ import {
     provide,
     onMounted,
 } from 'vue';
-import { stacks, events, keys, config } from '@/api';
+import { stacks, events, keys, config, portals } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
@@ -59,6 +59,7 @@ const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('op
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
 const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value?.id) + 1);
 const isTopStack = computed(() => stacks.count() === depth.value);
+const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === stack.value.id);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
 const shouldWrapSlot = computed(() => props.wrapSlot && !hasStackContentComponent.value);
@@ -201,7 +202,9 @@ provide('closeStack', close);
     </Primitive>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
-            <FocusScope trapped loop
+            <FocusScope
+	            :trapped="isTopPortal"
+	            loop
                 class="stack-container"
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
