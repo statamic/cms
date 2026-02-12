@@ -26,7 +26,6 @@ const cropper = ref(null);
 const selectedRatio = ref(null);
 const baseRatio = ref(null);
 const isFlipped = ref(false);
-const escBinding = ref(null);
 const enterBinding = ref(null);
 const isOptionKeyPressed = ref(false);
 const initialCropBoxCenter = ref(null);
@@ -337,12 +336,6 @@ function reset() {
 }
 
 function bindKeyboardShortcuts() {
-    // Escape to close
-    escBinding.value = keys.bindGlobal('esc', (e) => {
-        e.preventDefault();
-        close();
-    });
-
     // Enter to finish (only if cropper is ready and not in a form field)
     enterBinding.value = keys.bindGlobal('enter', (e) => {
         if (cropper.value && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
@@ -382,10 +375,6 @@ function handleKeyUp(event) {
 }
 
 function unbindKeyboardShortcuts() {
-    if (escBinding.value) {
-        escBinding.value.destroy();
-        escBinding.value = null;
-    }
     if (enterBinding.value) {
         enterBinding.value.destroy();
         enterBinding.value = null;
