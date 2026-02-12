@@ -28,6 +28,7 @@ const baseRatio = ref(null);
 const isFlipped = ref(false);
 const enterBinding = ref(null);
 const isOptionKeyPressed = ref(false);
+const isSpacePressed = ref(false);
 const initialCropBoxCenter = ref(null);
 const isAdjustingCropBox = ref(false);
 const animationFrameId = ref(null);
@@ -110,7 +111,7 @@ function createCropper(imageElement) {
         scalable: false,
         rotatable: false,
         responsive: true,
-        movable: false,
+        movable: true,
         cropstart: onCropStart,
         cropmove: onCropMove,
         cropend: onCropEnd,
@@ -324,24 +325,31 @@ function bindKeyboardShortcuts() {
         }
     });
 
-    // Track Option/Alt key for center-based resizing
+    // Track Option/Alt key for center-based resizing and space for moving.
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 }
 
 function handleKeyDown(event) {
-    // Track Option key (Alt on Windows/Linux, Option on Mac)
-    // On Mac, Option key produces event.key === 'Alt', not 'Meta'
     if (event.key === 'Alt' || event.altKey) {
         isOptionKeyPressed.value = true;
+    }
+
+    if (event.key === ' ' && !isSpacePressed.value) {
+        event.preventDefault();
+        isSpacePressed.value = true;
+        cropper.value.setDragMode('move');
     }
 }
 
 function handleKeyUp(event) {
-    // Release Option key tracking
-    // On Mac, Option key produces event.key === 'Alt', not 'Meta'
     if (event.key === 'Alt') {
         isOptionKeyPressed.value = false;
+    }
+
+    if (event.key === ' ') {
+        isSpacePressed.value = false;
+        cropper.value.setDragMode('crop');
     }
 }
 
