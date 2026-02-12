@@ -2,18 +2,16 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
-import { Stack, Heading, Button, Select } from '@ui';
-import { toast, keys } from '@api';
+import { Button, Heading, Icon, Modal, Select, Stack } from '@ui';
+import { keys, toast } from '@api';
+import wait from '@/util/wait';
+import axios from 'axios';
 
-const emit = defineEmits(['cropped', 'update:open']);
+const emit = defineEmits(['replaced', 'created', 'update:open']);
 
 const props = defineProps({
-    image: {
-        type: String,
-        required: true,
-    },
-    mimeType: {
-        type: String,
+    asset: {
+        type: Object,
         required: true,
     },
     open: {
@@ -32,6 +30,10 @@ const initialCropBoxCenter = ref(null);
 const isAdjustingCropBox = ref(false);
 const animationFrameId = ref(null);
 const imageRef = useTemplateRef('image');
+const showConfirmation = ref(false);
+const uploading = ref(false);
+const pendingBlob = ref(null);
+const pendingMimeType = ref(null);
 
 const aspectRatios = ref([
     { label: '16:9', value: 16 / 9 },
@@ -63,6 +65,10 @@ function resetState() {
     isFlipped.value = false;
     isAdjustingCropBox.value = false;
     initialCropBoxCenter.value = null;
+    showConfirmation.value = false;
+    uploading.value = false;
+    pendingBlob.value = null;
+    pendingMimeType.value = null;
 }
 
 function destroyCropper() {
@@ -74,7 +80,7 @@ function destroyCropper() {
 
 const crossOrigin = computed(() => {
     try {
-        return new URL(props.image, window.location.href).origin !== window.location.origin ? 'anonymous' : null;
+        return new URL(props.asset.preview, window.location.href).origin !== window.location.origin ? 'anonymous' : null;
     } catch {
         return null;
     }
@@ -279,7 +285,7 @@ function crop() {
         return;
     }
 
-    const outputMimeType = props.mimeType;
+    const outputMimeType = props.asset.mimeType;
     const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
 
     canvas.toBlob((blob) => {
@@ -294,10 +300,9 @@ function crop() {
             'image/webp': 'webp',
         };
         const extension = extensionMap[outputMimeType] || 'png';
-        const file = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
-
-        emit('cropped', { blob: file, mimeType: outputMimeType });
-        close();
+        pendingBlob.value = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
+        pendingMimeType.value = outputMimeType;
+        showConfirmation.value = true;
     }, outputMimeType, quality);
 }
 
@@ -362,6 +367,68 @@ function unbindKeyboardShortcuts() {
     isAdjustingCropBox.value = false;
 }
 
+async function upload(replaceOriginal) {
+    if (!pendingBlob.value) return;
+
+    uploading.value = true;
+
+    try {
+        const [containerHandle, assetPath] = props.asset.id.split('::');
+        const pathParts = assetPath.split('/');
+        let filename = pathParts.pop();
+        const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
+
+        if (!replaceOriginal && pendingMimeType.value && pendingMimeType.value !== props.asset.mimeType) {
+            const extensionMap = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
+            const newExtension = extensionMap[pendingMimeType.value];
+            if (newExtension) {
+                filename = filename.replace(/\.[^/.]+$/, '') + newExtension;
+            }
+        }
+
+        const formData = new FormData();
+        const fileToUpload = filename !== pendingBlob.value.name
+            ? new File([pendingBlob.value], filename, { type: pendingBlob.value.type })
+            : pendingBlob.value;
+        formData.append('file', fileToUpload);
+        formData.append('container', containerHandle);
+        formData.append('folder', folder);
+        formData.append('_token', Statamic.$config.get('csrfToken'));
+        formData.append('option', replaceOriginal ? 'overwrite' : 'timestamp');
+
+        const url = cp_url('assets');
+        const response = await axios.post(url, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (response.data?.data) {
+            showConfirmation.value = false;
+            pendingBlob.value = null;
+            pendingMimeType.value = null;
+            close();
+            await wait(300); // wait for this cropper stack to close.
+
+            if (replaceOriginal) {
+                toast.success(__('Image replaced successfully'));
+                emit('replaced');
+            } else {
+                toast.success(__('Cropped image saved successfully'));
+                emit('created', response.data.data.id);
+            }
+        }
+    } catch (error) {
+        toast.error(error.response?.data?.message || __('Failed to upload cropped image'));
+    } finally {
+        uploading.value = false;
+    }
+}
+
+function dismissConfirmation() {
+    showConfirmation.value = false;
+    pendingBlob.value = null;
+    pendingMimeType.value = null;
+}
+
 function close() {
     emit('update:open', false);
 }
@@ -379,7 +446,7 @@ function close() {
             <!-- Content -->
             <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-800 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
                 <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
-                    <img ref="image" :src="image" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
+                    <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
             </div>
 
@@ -415,6 +482,43 @@ function close() {
                     <Button variant="primary" :text="__('Finish')" :aria-label="__('Finish cropping')" :disabled="!cropper" @click="crop" />
                 </div>
             </div>
+            <Modal
+                :open="showConfirmation"
+                :title="__('Save Cropped Image')"
+                :dismissible="!uploading"
+                @update:open="(open) => { if (!open) dismissConfirmation(); }"
+            >
+                <div
+                    v-if="uploading"
+                    class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
+                >
+                    <Icon name="loading" />
+                </div>
+
+                <p>{{ __('Would you like to save this as a new copy or replace the original image?') }}</p>
+
+                <template #footer>
+                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                        <Button
+                            variant="ghost"
+                            :disabled="uploading"
+                            :text="__('Cancel')"
+                            @click="dismissConfirmation"
+                        />
+                        <Button
+                            :disabled="uploading"
+                            :text="__('Save as Copy')"
+                            @click="upload(false)"
+                        />
+                        <Button
+                            variant="primary"
+                            :disabled="uploading"
+                            :text="__('Replace Original')"
+                            @click="upload(true)"
+                        />
+                    </div>
+                </template>
+            </Modal>
         </div>
     </Stack>
 </template>

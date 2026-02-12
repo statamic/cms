@@ -170,49 +170,11 @@
 
             <crop-editor
                 v-if="isCroppable"
-                :image="asset.preview"
-                :mime-type="asset.mimeType"
+                :asset="asset"
                 v-model:open="showCropEditor"
-                @cropped="handleCropped"
+                @replaced="handleCropReplaced"
+                @created="handleCropCreated"
             />
-
-            <Modal
-                :open="showCropConfirmation"
-                :title="__('Save Cropped Image')"
-                :dismissible="!uploadingCrop"
-                @update:open="(open) => { if (!open) handleCropConfirmationDismissed(); }"
-            >
-                <div
-                    v-if="uploadingCrop"
-                    class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-gray-850"
-                >
-                    <Icon name="loading" />
-                </div>
-
-                <p>{{ __('Would you like to save this as a new copy or replace the original image?') }}</p>
-
-                <template #footer>
-                    <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                        <Button
-                            variant="ghost"
-                            :disabled="uploadingCrop"
-                            :text="__('Cancel')"
-                            @click="handleCropConfirmationDismissed"
-                        />
-                        <Button
-                            :disabled="uploadingCrop"
-                            :text="__('Save as Copy')"
-                            @click="uploadCroppedImage(false)"
-                        />
-                        <Button
-                            variant="primary"
-                            :disabled="uploadingCrop"
-                            :text="__('Replace Original')"
-                            @click="uploadCroppedImage(true)"
-                        />
-                    </div>
-                </template>
-            </Modal>
 
         <confirmation-modal
             v-model:open="closingWithChanges"
@@ -238,7 +200,6 @@ import {
     Dropdown,
     DropdownMenu,
     DropdownItem,
-    Modal,
     PublishContainer,
     PublishTabs,
     Icon,
@@ -257,7 +218,6 @@ export default {
         ItemActions,
         FocalPointEditor,
         CropEditor,
-        Modal,
         PdfViewer,
         PublishContainer,
         PublishTabs,
@@ -299,10 +259,6 @@ export default {
             errors: {},
             actions: [],
             closingWithChanges: false,
-            croppedBlob: null,
-            croppedMimeType: null,
-            showCropConfirmation: false,
-            uploadingCrop: false,
         };
     },
 
@@ -453,123 +409,17 @@ export default {
             this.showCropEditor = false;
         },
 
-        handleCropped({ blob, mimeType }) {
-            this.croppedBlob = blob;
-            this.croppedMimeType = mimeType;
-            // Close crop editor first, then show confirmation
-            this.closeCropEditor();
-            this.$nextTick(() => {
-                this.showCropConfirmation = true;
-            });
+        async handleCropReplaced() {
+            const originalPreview = this.asset?.preview;
+            const originalThumbnail = this.asset?.thumbnail;
+            await this.load();
+            Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
         },
 
-        handleCropConfirmationDismissed() {
-            if (this.uploadingCrop) return;
-
-            this.showCropConfirmation = false;
-            this.croppedBlob = null;
-            this.croppedMimeType = null;
-        },
-
-        async uploadCroppedImage(replaceOriginal) {
-            if (!this.croppedBlob || !this.asset) return;
-
-            this.uploadingCrop = true;
-
-            try {
-                // Extract container and folder from asset ID (format: container::path)
-                const [containerHandle, assetPath] = this.id.split('::');
-
-                // Extract folder from path (dirname)
-                const pathParts = assetPath.split('/');
-                let filename = pathParts.pop();
-                const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
-
-                // Update filename extension only when saving as new copy
-                // When replacing original, keep original filename so server can find it to overwrite
-                const shouldUpdateExtension = !replaceOriginal && this.croppedMimeType && (
-                    this.croppedMimeType !== this.asset.mimeType
-                );
-
-                if (shouldUpdateExtension) {
-                    const extensionMap = {
-                        'image/jpeg': '.jpg',
-                        'image/png': '.png',
-                        'image/webp': '.webp',
-                    };
-                    const newExtension = extensionMap[this.croppedMimeType];
-                    if (newExtension) {
-                        // Remove old extension and add new one
-                        const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
-                        filename = nameWithoutExt + newExtension;
-                    }
-                }
-
-                // Create FormData
-                const formData = new FormData();
-                // Use the File object directly - it already has the correct name and MIME type
-                // If we need a different filename, create a new File with that name
-                const fileToUpload = filename !== this.croppedBlob.name
-                    ? new File([this.croppedBlob], filename, { type: this.croppedBlob.type })
-                    : this.croppedBlob;
-                formData.append('file', fileToUpload);
-                formData.append('container', containerHandle);
-                formData.append('folder', folder);
-                formData.append('_token', Statamic.$config.get('csrfToken'));
-
-                if (replaceOriginal) {
-                    formData.append('option', 'overwrite');
-                } else {
-                    // Use timestamp option to avoid conflicts when saving as new copy
-                    formData.append('option', 'timestamp');
-                }
-
-                const url = cp_url('assets');
-                const response = await this.$axios.post(url, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                if (response.data && response.data.data) {
-                    this.$toast.success(replaceOriginal ? __('Image replaced successfully') : __('Cropped image saved successfully'));
-
-                    // If replacing, reload the current asset and bust browser cache; if new copy, redirect to the new asset
-                    if (replaceOriginal) {
-                        // Store original URLs for cache busting
-                        const originalPreview = this.asset?.preview;
-                        const originalThumbnail = this.asset?.thumbnail;
-
-                        // Reload the asset and wait for it to complete
-                        await this.load();
-
-                        // After reload completes, force browser to reload images
-                        if (this.asset) {
-                            Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
-                        }
-                    } else {
-                        // Extract container and path from the new asset ID (format: container::path)
-                        const newAssetId = response.data.data.id;
-                        const [containerHandle, assetPath] = newAssetId.split('::');
-
-                        // Navigate to the edit URL for the new asset
-                        const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
-                        router.get(editUrl);
-                    }
-                }
-
-                this.croppedBlob = null;
-                this.croppedMimeType = null;
-                this.showCropConfirmation = false;
-            } catch (error) {
-                if (error.response && error.response.data) {
-                    this.$toast.error(error.response.data.message || __('Failed to upload cropped image'));
-                } else {
-                    this.$toast.error(__('Failed to upload cropped image'));
-                }
-            } finally {
-                this.uploadingCrop = false;
-            }
+        handleCropCreated(newAssetId) {
+            const [containerHandle, assetPath] = newAssetId.split('::');
+            const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
+            router.get(editUrl);
         },
 
         updateValues(values) {
