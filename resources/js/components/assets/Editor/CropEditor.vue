@@ -166,7 +166,7 @@ function removeCropperEvents() {
 }
 
 function adjustCropBoxCenter() {
-    if (!cropper.value || !isOptionKeyPressed.value || !initialCropBoxCenter.value || isAdjustingCropBox.value) {
+    if (!isOptionKeyPressed.value || !initialCropBoxCenter.value || isAdjustingCropBox.value) {
         return;
     }
 
@@ -200,8 +200,6 @@ function adjustCropBoxCenter() {
 }
 
 function setAspectRatio(ratio) {
-    if (!cropper.value) return;
-
     if (ratio === null) {
         cropper.value.setAspectRatio(NaN);
         baseRatio.value = null;
@@ -216,7 +214,7 @@ function setAspectRatio(ratio) {
 }
 
 function toggleOrientation() {
-    if (!cropper.value || baseRatio.value === null) return;
+    if (baseRatio.value === null) return;
 
     // Toggle the flipped state
     isFlipped.value = !isFlipped.value;
@@ -226,7 +224,7 @@ function toggleOrientation() {
 }
 
 function applyCurrentRatio() {
-    if (!cropper.value || baseRatio.value === null) return;
+    if (baseRatio.value === null) return;
 
     const ratioToApply = isFlipped.value ? 1 / baseRatio.value : baseRatio.value;
 
@@ -243,8 +241,6 @@ function applyCurrentRatio() {
 }
 
 function expandCropBoxToFill() {
-    if (!cropper.value) return;
-
     const canvasData = cropper.value.getCanvasData();
 
     // Calculate the maximum crop box size that fits within the canvas
@@ -280,8 +276,6 @@ function expandCropBoxToFill() {
 }
 
 function crop() {
-    if (!cropper.value) return;
-
     const cropBoxData = cropper.value.getCropBoxData();
     const imageData = cropper.value.getImageData();
 
@@ -321,20 +315,17 @@ function crop() {
 }
 
 function reset() {
-    if (cropper.value) {
-        resetState();
-        cropper.value.setAspectRatio(NaN);
-        // Reset to full canvas (image) bounds
-        const canvasData = cropper.value.getCanvasData();
-        cropper.value.setCropBoxData({
-            left: canvasData.left,
-            top: canvasData.top,
-            width: canvasData.width,
-            height: canvasData.height,
-        });
-    }
+    resetState();
+    cropper.value.setAspectRatio(NaN);
+    // Reset to full canvas (image) bounds
+    const canvasData = cropper.value.getCanvasData();
+    cropper.value.setCropBoxData({
+        left: canvasData.left,
+        top: canvasData.top,
+        width: canvasData.width,
+        height: canvasData.height,
+    });
 }
-
 function bindKeyboardShortcuts() {
     // Enter to finish (only if cropper is ready and not in a form field)
     enterBinding.value = keys.bindGlobal('enter', (e) => {
