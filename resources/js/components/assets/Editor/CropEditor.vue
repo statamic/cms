@@ -32,7 +32,6 @@ const isOptionKeyPressed = ref(false);
 const initialCropBoxCenter = ref(null);
 const isAdjustingCropBox = ref(false);
 const animationFrameId = ref(null);
-const cropperEventHandlers = ref(null);
 const imageRef = useTemplateRef('image');
 
 const aspectRatios = ref([
@@ -117,59 +116,52 @@ function createCropper(imageElement) {
     setupCropperEvents();
 }
 
+function onCropStart() {
+    const cropBoxData = cropper.value.getCropBoxData();
+    initialCropBoxCenter.value = {
+        x: cropBoxData.left + cropBoxData.width / 2,
+        y: cropBoxData.top + cropBoxData.height / 2,
+    };
+    isAdjustingCropBox.value = false;
+}
+
+// Adjust crop box position to maintain center when Option/Alt is held during resize
+// Use requestAnimationFrame to throttle updates and prevent lag
+function onCropMove() {
+    if (!isOptionKeyPressed.value || !initialCropBoxCenter.value || isAdjustingCropBox.value) {
+        return;
+    }
+
+    if (animationFrameId.value) {
+        cancelAnimationFrame(animationFrameId.value);
+    }
+
+    animationFrameId.value = requestAnimationFrame(() => {
+        adjustCropBoxCenter();
+    });
+}
+
+function onCropEnd() {
+    if (animationFrameId.value) {
+        cancelAnimationFrame(animationFrameId.value);
+        animationFrameId.value = null;
+    }
+    initialCropBoxCenter.value = null;
+    isAdjustingCropBox.value = false;
+}
+
 function setupCropperEvents() {
-    const onCropStart = () => {
-        const cropBoxData = cropper.value.getCropBoxData();
-        initialCropBoxCenter.value = {
-            x: cropBoxData.left + cropBoxData.width / 2,
-            y: cropBoxData.top + cropBoxData.height / 2,
-        };
-        isAdjustingCropBox.value = false;
-    };
-
-    // Adjust crop box position to maintain center when Option/Alt is held during resize
-    // Use requestAnimationFrame to throttle updates and prevent lag
-    const onCropMove = () => {
-        if (!isOptionKeyPressed.value || !initialCropBoxCenter.value || isAdjustingCropBox.value) {
-            return;
-        }
-
-        // Cancel any pending animation frame
-        if (animationFrameId.value) {
-            cancelAnimationFrame(animationFrameId.value);
-        }
-
-        // Schedule update on next animation frame to throttle
-        animationFrameId.value = requestAnimationFrame(() => {
-            adjustCropBoxCenter();
-        });
-    };
-
-    const onCropEnd = () => {
-        if (animationFrameId.value) {
-            cancelAnimationFrame(animationFrameId.value);
-            animationFrameId.value = null;
-        }
-        initialCropBoxCenter.value = null;
-        isAdjustingCropBox.value = false;
-    };
-
     const imageElement = imageRef.value;
     imageElement.addEventListener('cropstart', onCropStart);
     imageElement.addEventListener('cropmove', onCropMove);
     imageElement.addEventListener('cropend', onCropEnd);
-
-    cropperEventHandlers.value = { element: imageElement, onCropStart, onCropMove, onCropEnd };
 }
 
 function removeCropperEvents() {
-    if (!cropperEventHandlers.value) return;
-
-    const { element, onCropStart, onCropMove, onCropEnd } = cropperEventHandlers.value;
-    element.removeEventListener('cropstart', onCropStart);
-    element.removeEventListener('cropmove', onCropMove);
-    element.removeEventListener('cropend', onCropEnd);
-    cropperEventHandlers.value = null;
+    const imageElement = imageRef.value;
+    imageElement.removeEventListener('cropstart', onCropStart);
+    imageElement.removeEventListener('cropmove', onCropMove);
+    imageElement.removeEventListener('cropend', onCropEnd);
 }
 
 function adjustCropBoxCenter() {
