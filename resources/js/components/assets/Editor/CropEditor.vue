@@ -32,6 +32,7 @@ const isOptionKeyPressed = ref(false);
 const initialCropBoxCenter = ref(null);
 const isAdjustingCropBox = ref(false);
 const animationFrameId = ref(null);
+const cropperEventHandlers = ref(null);
 const imageRef = useTemplateRef('image');
 
 const aspectRatios = ref([
@@ -52,6 +53,7 @@ watch(() => props.open, (newValue) => {
         // Unbind keyboard shortcuts when editor closes
         unbindKeyboardShortcuts();
         if (cropper.value) {
+            removeCropperEvents();
             cropper.value.destroy();
             cropper.value = null;
             // Reset state to initial values
@@ -64,6 +66,7 @@ watch(() => props.open, (newValue) => {
 
 onBeforeUnmount(() => {
     unbindKeyboardShortcuts();
+    removeCropperEvents();
     if (cropper.value) cropper.value.destroy();
 });
 
@@ -73,6 +76,7 @@ function initCropper() {
 
     // Destroy existing cropper if any
     if (cropper.value) {
+        removeCropperEvents();
         cropper.value.destroy();
         cropper.value = null;
     }
@@ -133,19 +137,18 @@ function setupCropperEvents() {
     const imageElement = imageRef.value;
     if (!imageElement) return;
 
-    // Store initial crop box center when crop starts
-    imageElement.addEventListener('cropstart', () => {
+    const onCropStart = () => {
         const cropBoxData = cropper.value.getCropBoxData();
         initialCropBoxCenter.value = {
             x: cropBoxData.left + cropBoxData.width / 2,
             y: cropBoxData.top + cropBoxData.height / 2,
         };
         isAdjustingCropBox.value = false;
-    });
+    };
 
     // Adjust crop box position to maintain center when Option/Alt is held during resize
     // Use requestAnimationFrame to throttle updates and prevent lag
-    imageElement.addEventListener('cropmove', () => {
+    const onCropMove = () => {
         if (!isOptionKeyPressed.value || !initialCropBoxCenter.value || isAdjustingCropBox.value) {
             return;
         }
@@ -159,17 +162,32 @@ function setupCropperEvents() {
         animationFrameId.value = requestAnimationFrame(() => {
             adjustCropBoxCenter();
         });
-    });
+    };
 
-    // Reset tracking when crop ends
-    imageElement.addEventListener('cropend', () => {
+    const onCropEnd = () => {
         if (animationFrameId.value) {
             cancelAnimationFrame(animationFrameId.value);
             animationFrameId.value = null;
         }
         initialCropBoxCenter.value = null;
         isAdjustingCropBox.value = false;
-    });
+    };
+
+    imageElement.addEventListener('cropstart', onCropStart);
+    imageElement.addEventListener('cropmove', onCropMove);
+    imageElement.addEventListener('cropend', onCropEnd);
+
+    cropperEventHandlers.value = { element: imageElement, onCropStart, onCropMove, onCropEnd };
+}
+
+function removeCropperEvents() {
+    if (!cropperEventHandlers.value) return;
+
+    const { element, onCropStart, onCropMove, onCropEnd } = cropperEventHandlers.value;
+    element.removeEventListener('cropstart', onCropStart);
+    element.removeEventListener('cropmove', onCropMove);
+    element.removeEventListener('cropend', onCropEnd);
+    cropperEventHandlers.value = null;
 }
 
 function adjustCropBoxCenter() {
@@ -438,6 +456,7 @@ function close() {
         cancelAnimationFrame(animationFrameId.value);
         animationFrameId.value = null;
     }
+    removeCropperEvents();
     if (cropper.value) {
         cropper.value.destroy();
         cropper.value = null;
