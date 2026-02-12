@@ -172,10 +172,8 @@
                 v-if="isCroppable"
                 :image="asset.preview"
                 :mime-type="asset.mimeType"
-                :open="showCropEditor"
+                v-model:open="showCropEditor"
                 @cropped="handleCropped"
-                @closed="closeCropEditor"
-                @update:open="showCropEditor = $event"
             />
 
             <Modal

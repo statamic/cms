@@ -5,7 +5,7 @@ import { onBeforeUnmount, ref, useTemplateRef, watch, nextTick } from 'vue';
 import { Stack, Heading, Button, Select } from '@ui';
 import { toast, keys } from '@api';
 
-const emit = defineEmits(['cropped', 'closed', 'update:open']);
+const emit = defineEmits(['cropped', 'update:open']);
 
 const props = defineProps({
     image: {
@@ -453,7 +453,6 @@ function unbindKeyboardShortcuts() {
 
 function close() {
     emit('update:open', false);
-    emit('closed');
 }
 </script>
 
