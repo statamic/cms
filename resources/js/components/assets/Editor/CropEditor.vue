@@ -406,7 +406,7 @@ function close() {
                         @update:modelValue="setAspectRatio"
                     />
                     <Button
-                        v-if="selectedRatio !== null"
+                        v-if="selectedRatio"
                         icon="flip-vertical"
                         :variant="isFlipped ? 'pressed' : 'ghost'"
                         size="sm"
