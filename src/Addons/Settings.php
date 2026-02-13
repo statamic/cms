@@ -7,6 +7,7 @@ use Statamic\Contracts\Addons\SettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
 use Statamic\Facades\Antlers;
+use Statamic\Support\Arr;
 
 abstract class Settings implements Contract
 {
@@ -38,7 +39,7 @@ abstract class Settings implements Contract
 
     public function get(string $key, $default = null)
     {
-        return data_get($this->settings, $key, $default);
+        return Arr::get($this->settings, $key, $default);
     }
 
     public function set(string|array $key, mixed $value = null): self
@@ -48,8 +49,8 @@ abstract class Settings implements Contract
 
     private function setValue(string $key, mixed $value): self
     {
-        data_set($this->rawSettings, $key, $value);
-        data_set($this->settings, $key, $this->resolveAntlersValue($value));
+        Arr::set($this->rawSettings, $key, $value);
+        Arr::set($this->settings, $key, $this->resolveAntlersValue($value));
 
         return $this;
     }
