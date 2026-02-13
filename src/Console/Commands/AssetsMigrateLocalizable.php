@@ -201,7 +201,7 @@ class AssetsMigrateLocalizable extends Command
             ->whereIn('container', $localizableContainerHandles)
             ->orderBy('id');
 
-        $query->lazy()->each(function ($row) use ($modelClass, $siteOrigins, $rootSite, &$migrated, &$scanned) {
+        $query->lazy()->each(function ($row) use ($modelClass, $siteOrigins, $rootSite, $table, &$migrated, &$scanned) {
             $scanned++;
             $meta = is_array($row->meta) ? $row->meta : (json_decode($row->meta ?? '{}', true) ?: []);
             $normalized = $this->normalizeMeta($meta, $siteOrigins, $rootSite);
@@ -213,7 +213,11 @@ class AssetsMigrateLocalizable extends Command
             $model = $modelClass::find($row->id);
             if ($model) {
                 $model->meta = $normalized;
-                $model->updated_at = now();
+                if (! Schema::hasColumn($table, 'updated_at')) {
+                    $model->timestamps = false;
+                } else {
+                    $model->updated_at = now();
+                }
                 $model->save();
                 $migrated++;
             }
