@@ -87,7 +87,7 @@ JSON);
         "build": "vite build",
         "dev": "vite",
         "watch": "vite",
-        "cp:dev": "vite build --config vite-cp.config.js --watch",
+        "cp:dev": "vite --config vite-cp.config.js",
         "cp:build": "vite build --config vite-cp.config.js"
     }
 JSON, $this->files->get(base_path('package.json')));
