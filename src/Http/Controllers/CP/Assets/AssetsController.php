@@ -49,6 +49,7 @@ class AssetsController extends CpController
         $site = $request->input('site') ?: (Site::multiEnabled() ? Site::selected()->handle() : null);
 
         if ($site) {
+            abort_unless(Site::get($site), 422, __('Invalid site.'));
             $asset = $asset->in($site);
         }
 
@@ -64,6 +65,7 @@ class AssetsController extends CpController
         $site = $request->input('site') ?: (Site::multiEnabled() ? Site::selected()->handle() : null);
 
         if ($site) {
+            abort_unless(Site::get($site), 422, __('Invalid site.'));
             $asset = $asset->in($site);
         }
 

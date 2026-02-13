@@ -440,11 +440,14 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         $siteOrigins = $this->siteOriginsForMeta($meta);
+        $siteHandles = array_keys($siteOrigins);
         $data = Arr::get($meta, 'data', []);
 
         if (! is_array($data)) {
             $data = [];
         }
+
+        $data = collect($data)->filter(fn ($_, $key) => in_array($key, $siteHandles))->all();
 
         if (! $this->isLocalizedMetaData($data, $siteOrigins)) {
             $default = Site::default()->handle();
