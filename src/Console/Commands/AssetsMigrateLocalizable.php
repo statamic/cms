@@ -53,7 +53,13 @@ class AssetsMigrateLocalizable extends Command
             }
         }
 
-        [$dbMigrated, $dbScanned] = $this->migrateEloquentMeta($siteOrigins, $rootSite);
+        $localizableHandles = $containers
+            ->filter(fn ($c) => $c->localizable())
+            ->map(fn ($c) => $c->handle())
+            ->values()
+            ->all();
+
+        [$dbMigrated, $dbScanned] = $this->migrateEloquentMeta($siteOrigins, $rootSite, $localizableHandles);
 
         $this->components->info(__('Migrated :migrated of :scanned asset metadata files.', [
             'migrated' => $fileMigrated,
@@ -161,7 +167,7 @@ class AssetsMigrateLocalizable extends Command
         return $siteOrigins === $this->defaultSiteOrigins();
     }
 
-    protected function migrateEloquentMeta(array $siteOrigins, string $rootSite): array
+    protected function migrateEloquentMeta(array $siteOrigins, string $rootSite, array $localizableContainerHandles): array
     {
         $modelClass = app()->bound('statamic.eloquent.assets.model')
             ? app('statamic.eloquent.assets.model')
@@ -177,10 +183,25 @@ class AssetsMigrateLocalizable extends Command
             return [0, 0];
         }
 
+        if (empty($localizableContainerHandles)) {
+            return [0, 0];
+        }
+
+        if (! Schema::hasColumn($table, 'container')) {
+            $this->components->warn(__('Skipping Eloquent migration: assets table has no container column. Add one to filter by container.'));
+
+            return [0, 0];
+        }
+
         $migrated = 0;
         $scanned = 0;
 
-        DB::table($table)->select('id', 'meta')->orderBy('id')->lazy()->each(function ($row) use ($table, $siteOrigins, $rootSite, &$migrated, &$scanned) {
+        $query = DB::table($table)
+            ->select(['id', 'meta'])
+            ->whereIn('container', $localizableContainerHandles)
+            ->orderBy('id');
+
+        $query->lazy()->each(function ($row) use ($table, $siteOrigins, $rootSite, &$migrated, &$scanned) {
             $scanned++;
             $meta = is_array($row->meta) ? $row->meta : (json_decode($row->meta ?? '{}', true) ?: []);
             $normalized = $this->normalizeMeta($meta, $siteOrigins, $rootSite);
