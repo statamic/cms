@@ -66,8 +66,6 @@ const setGroup = computed(() => {
 const isSetGroupVisible = computed(() => replicatorSets.length > 1 && setGroup.value.display);
 
 const fieldActionPayload = computed(() => ({
-    // vm: this,
-    // fieldVm: this.fieldVm,
     fieldPathPrefix: fieldPathPrefix.value,
     index: props.index,
     values: props.values,

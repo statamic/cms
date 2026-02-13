@@ -84,7 +84,6 @@ export default {
 
         fieldActionPayload() {
             return {
-                vm: this,
                 fieldPathPrefix: this.fieldPathPrefix,
                 handle: this.handle,
                 value: this.value,

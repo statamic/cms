@@ -265,8 +265,6 @@ export default {
 
         fieldActionPayload() {
             return {
-                vm: this,
-                fieldVm: this.fieldVm,
                 fieldPathPrefix: this.fieldPathPrefix,
                 index: this.index,
                 values: this.values,

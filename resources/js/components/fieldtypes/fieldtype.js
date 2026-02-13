@@ -66,7 +66,6 @@ const use = function(emit, props) {
     };
 
     const fieldActionPayload = computed(() => ({
-        // vm: null,
         fieldPathPrefix: props.fieldPathPrefix,
         handle: props.handle,
         value: props.value,
