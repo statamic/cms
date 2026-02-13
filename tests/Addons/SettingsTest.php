@@ -81,6 +81,16 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_dotted_value()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, ['foo' => ['bar' => 'baz']]);
+
+        $this->assertEquals('baz', $settings->get('foo.bar'));
+        $this->assertEquals('default', $settings->get('nonexistent', 'default'));
+    }
+
+    #[Test]
     public function it_sets_a_value()
     {
         config(['test' => ['a' => 'A', 'b' => 'B']]);
@@ -113,6 +123,17 @@ class SettingsTest extends TestCase
             'baz' => '{{ config:app:name }}',
             'qux' => $raw,
         ], $settings->raw());
+    }
+
+    #[Test]
+    public function it_sets_a_dotted_value()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new Settings($addon, []);
+
+        $settings->set('foo.baz', 'dotted');
+
+        $this->assertEquals(['foo' => ['baz' => 'dotted']], $settings->all());
     }
 
     #[Test]

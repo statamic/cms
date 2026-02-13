@@ -38,7 +38,7 @@ abstract class Settings implements Contract
 
     public function get(string $key, $default = null)
     {
-        return $this->settings[$key] ?? $default;
+        return data_get($this->settings, $key, $default);
     }
 
     public function set(string|array $key, mixed $value = null): self
@@ -48,8 +48,8 @@ abstract class Settings implements Contract
 
     private function setValue(string $key, mixed $value): self
     {
-        $this->rawSettings[$key] = $value;
-        $this->settings[$key] = $this->resolveAntlersValue($value);
+        data_set($this->rawSettings, $key, $value);
+        data_set($this->settings, $key, $this->resolveAntlersValue($value));
 
         return $this;
     }
