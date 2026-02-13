@@ -81,16 +81,25 @@ class AssetsController extends CpController
             $localizedHandles = collect($request->input('_localized', []));
             $localizedInput = $values->only($localizedHandles->all());
 
-            $keysToForget = $localizedInput
-                ->filter(fn ($value) => $value === null || $value === '')
-                ->keys();
+            // Remove: (1) fields synced back to origin (in localizedData but not in _localized),
+            // (2) fields in _localized with null/empty values
+            $keysToForget = $asset->localizedData()
+                ->keys()
+                ->diff($localizedHandles)
+                ->merge(
+                    $localizedInput
+                        ->filter(fn ($value) => $value === null || $value === '')
+                        ->keys()
+                )
+                ->unique()
+                ->values();
 
             $keysToUpsert = $localizedInput
                 ->reject(fn ($value) => $value === null || $value === '');
 
             $asset->data(
                 $asset->localizedData()
-                    ->except($keysToForget)
+                    ->except($keysToForget->all())
                     ->merge($keysToUpsert)
                     ->all()
             );
