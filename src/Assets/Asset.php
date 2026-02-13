@@ -544,6 +544,26 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $origin ? $this->in($origin) : null;
     }
 
+    /**
+     * Get merged origin values without following the origin chain (cycle-safe).
+     * Use this instead of origin()->values() when serializing to avoid infinite
+     * recursion with cyclic site origin maps.
+     */
+    public function originValuesData(): \Illuminate\Support\Collection
+    {
+        if (! $this->usesLocalizedData()) {
+            return collect();
+        }
+
+        $originLocale = collect($this->siteOriginsForMeta($this->meta()))->get($this->locale());
+
+        if (! $originLocale) {
+            return collect();
+        }
+
+        return $this->dataForLocale($this->meta(), $originLocale);
+    }
+
     protected function getOriginIdFromObject($origin)
     {
         return $origin->locale();

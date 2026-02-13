@@ -100,7 +100,7 @@ class Asset extends JsonResource
 
         if ($this->hasOrigin()) {
             $fields = $this->blueprint()->fields()
-                ->addValues($this->origin()->values()->all())
+                ->addValues($this->originValuesData()->all())
                 ->preProcess();
 
             $originValues = $fields->values()->all();
