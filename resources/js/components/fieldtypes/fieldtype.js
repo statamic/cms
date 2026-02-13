@@ -5,8 +5,11 @@ import props from './props.js';
 import { computed, ref, watch } from 'vue';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
+import { injectPublishContext } from "@ui";
 
 const use = function(emit, props) {
+    const { container } = injectPublishContext();
+
     const name = computed(() => {
         if (props.namePrefix) {
             return `${props.namePrefix}[${props.handle}]`;
@@ -63,7 +66,7 @@ const use = function(emit, props) {
     };
 
     const fieldActionPayload = computed(() => ({
-        // vm: this,
+        // vm: null,
         fieldPathPrefix: props.fieldPathPrefix,
         handle: props.handle,
         value: props.value,
@@ -72,6 +75,7 @@ const use = function(emit, props) {
         update,
         updateMeta,
         isReadOnly: isReadOnly.value,
+        container,
     }));
 
     const internalFieldActions = ref([]);

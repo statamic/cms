@@ -93,6 +93,7 @@ export default {
                 update: this.update,
                 updateMeta: this.updateMeta,
                 isReadOnly: this.isReadOnly,
+	            container: this.injectedPublishContainer,
             };
         },
     },
