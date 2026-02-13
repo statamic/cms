@@ -232,4 +232,37 @@ EOT;
         $this->assertSame('es', $meta['sites']['en']);
         $this->assertNull($meta['sites']['es']);
     }
+
+    #[Test]
+    public function it_does_not_infinite_loop_when_sites_metadata_has_cycles()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'hello');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'en' => ['alt' => 'English alt'],
+                'fr' => ['alt' => 'French alt'],
+            ],
+            'sites' => [
+                'en' => 'fr',
+                'fr' => 'en',
+            ],
+            'size' => 5,
+            'last_modified' => 123,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        $container = tap(AssetContainer::make('test')->disk('test')->localizable(true))->save();
+        $asset = $container->makeAsset('foo/test.txt')->in('en');
+
+        $this->assertSame('English alt', $asset->get('alt'));
+    }
 }

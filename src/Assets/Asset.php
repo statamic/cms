@@ -508,8 +508,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $data = collect(Arr::get($meta, "data.{$locale}", []));
         $origin = $siteOrigins->get($locale);
+        $visited = [$locale];
 
         while ($origin) {
+            if (in_array($origin, $visited, true)) {
+                break;
+            }
+            $visited[] = $origin;
             $data = collect(Arr::get($meta, "data.{$origin}", []))->merge($data);
             $origin = $siteOrigins->get($origin);
         }
