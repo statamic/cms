@@ -85,6 +85,7 @@ export { default as Textarea } from './Textarea.vue';
 export { default as TimePicker } from './TimePicker/TimePicker.vue';
 export { default as ToggleGroup } from './Toggle/Group.vue';
 export { default as ToggleItem } from './Toggle/Item.vue';
+export { default as TruncatedText } from './TruncatedText.vue';
 
 export { default as Avatar } from "./Avatar.vue";
 export { default as CreateForm } from "./CreateForm.vue";
