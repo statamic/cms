@@ -11,11 +11,10 @@ let cleanup = null;
 
 onMounted(() => {
     const truncateOnResize = createMiddleEllipsisUtils();
-    console.log(props.text, truncated.value.innerText, truncated.value.innerText);
 
     cleanup = truncateOnResize({
         targetElement: truncated.value,
-        originalText: props.text,
+        originalText: truncated.value.innerText,
     });
 });
 
@@ -25,5 +24,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div ref="truncated" v-text="text" :title="text"></div>
+    <div class="relative">
+        <div ref="truncated" v-text="text" v-tooltip="text" :aria-label="text"></div>
+    </div>
 </template>
