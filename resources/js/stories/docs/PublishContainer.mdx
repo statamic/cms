@@ -8,38 +8,6 @@ The `PublishContainer` component powers Publish Forms across the Control Panel. 
 
 > If you're looking to create a publish form, check out the [Publish Forms guide](https://statamic.dev/control-panel/publish-forms). This page covers the JavaScript internals of the `PublishContainer` component.
 
-## Save Pipeline
-The `SavePipeline` handles persisting data from a `PublishContainer`. It sends data through a series of steps, handles validation errors and manages the saving state.
-
-The only required step is `Request`. You can optionally include `BeforeSaveHooks` and `AfterSaveHooks` to allow developers to run custom logic around the save.
-
-Provide the pipeline with a reference to the Publish Container, the `saving` state and `errors`. It'll update them automatically.
-
-```js
-import { Pipeline, BeforeSaveHooks, Request, AfterSaveHooks } from '@statamic/cms/save-pipeline';
-import { ref, useTemplateRef } from 'vue';
-
-const saving = ref(false);
-const errors = ref({});
-const container = useTemplateRef('container');
-
-function save() {
-    new Pipeline()
-        .provide({ container, errors, saving })
-        .through([
-	        new BeforeSaveHooks('thing'),
-            new Request('/cp/things', 'POST'),
-            new AfterSaveHooks('thing'),
-        ])
-        .then((response) => {
-            //
-        })
-        .catch((e) => {
-            //
-        });
-}
-```
-
 ## Context
 The `PublishContainer` exposes state and methods via Vue's provide/inject mechanism. You can inject these into any component nested inside the container.
 
