@@ -79,7 +79,7 @@ By default, the `PublishContainer` component renders a standard publish form wit
 
 Inside the slot, use the `Publish` sub-components, which automatically connect to the parent `PublishContainer` via the shared context.
 
-```vue
+```js
 <script setup>
 import { ref } from 'vue';
 import { PublishContainer, PublishComponents, PublishTabs, Button } from '@statamic/cms/ui';
@@ -94,7 +94,8 @@ const props = defineProps({
 const meta = ref(props.initialMeta);
 const values = ref(props.initialValues);
 </script>
-
+```
+```html
 <template>
     <PublishContainer :meta :blueprint v-model="values">
         <PublishComponents />
