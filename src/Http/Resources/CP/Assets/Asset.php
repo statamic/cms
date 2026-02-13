@@ -79,12 +79,20 @@ class Asset extends JsonResource
 
     protected function publishFormData()
     {
+        $asset = $this->resource;
+        $asset->hydrate();
+
+        // Use $asset->data directly instead of values() to avoid infinite recursion
+        // when sites origin map is cyclic. values() follows origin()->values()
+        // recursively; data is populated by cycle-safe dataForLocale().
+        $values = ($asset->data ?? collect())->all();
+
         $fields = $this->blueprint()->fields()
-            ->addValues($this->values()->all())
+            ->addValues($values)
             ->preProcess();
 
         return [
-            'values' => collect($this->values())->merge($fields->values())->all(),
+            'values' => collect($values)->merge($fields->values())->all(),
             'meta' => $fields->meta()->all(),
         ];
     }
