@@ -8,7 +8,7 @@ import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { injectPublishContext } from "@ui";
 
 const use = function(emit, props) {
-    const { container } = injectPublishContext();
+    const { container } = injectPublishContext() ?? {};
 
     const name = computed(() => {
         if (props.namePrefix) {
