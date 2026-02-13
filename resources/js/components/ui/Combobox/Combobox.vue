@@ -282,6 +282,15 @@ function openDropdown(e) {
 	updateDropdownOpen(true);
 }
 
+function onBlur(e) {
+	if (!props.taggable) return;
+
+	let isInsideDropdown = e.relatedTarget.dataset.hasOwnProperty('rekaCollectionItem');
+	if (isInsideDropdown) return;
+
+	pushTaggableOption(e);
+}
+
 function onPaste(e) {
 	if (!props.taggable) return;
 
@@ -379,8 +388,8 @@ defineExpose({
                                 type="search"
                                 autocomplete="off"
                                 v-model="searchQuery"
+                                @blur.prevent="onBlur"
                                 @paste.prevent="onPaste"
-                                @blur.prevent="pushTaggableOption"
                                 @keydown.enter="pushTaggableOption"
                             />
 

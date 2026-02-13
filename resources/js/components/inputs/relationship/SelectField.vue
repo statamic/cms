@@ -11,6 +11,7 @@
             :placeholder="__(config.placeholder) || __('Choose...')"
             :read-only="readOnly"
             :taggable="isTaggable"
+            :close-on-select="isTaggable"
             option-label="title"
             option-value="id"
             @update:modelValue="itemsSelected"
