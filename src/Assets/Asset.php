@@ -447,11 +447,14 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             $data = [];
         }
 
-        $data = collect($data)->filter(fn ($_, $key) => in_array($key, $siteHandles))->all();
-
+        // Check if already localized before filtering. Pre-migration data has flat
+        // field keys (alt, title, etc.), not site handles. Filtering first would
+        // remove all keys and lose existing asset field data.
         if (! $this->isLocalizedMetaData($data, $siteOrigins)) {
             $default = Site::default()->handle();
             $data = [$default => $data];
+        } else {
+            $data = collect($data)->filter(fn ($_, $key) => in_array($key, $siteHandles))->all();
         }
 
         if ($this->siteOriginsAreDefault($siteOrigins)) {
