@@ -192,6 +192,16 @@
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />
+
+        <confirmation-modal
+            :open="!!pendingSiteSwitch"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchSite"
+            @cancel="pendingSiteSwitch = null"
+        />
         </div>
     </Stack>
 </template>
@@ -267,6 +277,7 @@ export default {
             errors: {},
             actions: [],
             closingWithChanges: false,
+            pendingSiteSwitch: null,
             activeSite: this.site,
             localizations: [],
             localizedFields: [],
@@ -472,6 +483,20 @@ export default {
                 return;
             }
 
+            if (this.$dirty.has(this.publishContainer)) {
+                this.pendingSiteSwitch = site;
+                return;
+            }
+
+            this.activeSite = site;
+            this.load(site);
+        },
+
+        confirmSwitchSite() {
+            const site = this.pendingSiteSwitch;
+            this.pendingSiteSwitch = null;
+            this.$dirty.remove(this.publishContainer);
+            this.$refs.container?.clearDirtyState?.();
             this.activeSite = site;
             this.load(site);
         },
