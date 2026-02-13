@@ -166,6 +166,7 @@ JSON, $this->files->get(base_path('package.json')));
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => 'cp-hot',
             'buildDirectory' => 'vendor/app',
         ]);
 
