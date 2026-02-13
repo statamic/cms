@@ -40,6 +40,7 @@ class AssetsQuery extends Query
             'container' => GraphQL::nonNull(GraphQL::string()),
             'limit' => GraphQL::int(),
             'page' => GraphQL::int(),
+            'site' => GraphQL::string(),
             'filter' => GraphQL::type(JsonArgument::NAME),
             'sort' => GraphQL::listOf(GraphQL::string()),
         ];
@@ -57,7 +58,13 @@ class AssetsQuery extends Query
             $this->sortQuery($query, $sort);
         }
 
-        return $query->paginate($args['limit'] ?? 1000);
+        $assets = $query->paginate($args['limit'] ?? 1000);
+
+        if ($site = $args['site'] ?? null) {
+            $assets->setCollection($assets->getCollection()->map(fn ($asset) => $asset->in($site)));
+        }
+
+        return $assets;
     }
 
     private function sortQuery($query, $sorts)

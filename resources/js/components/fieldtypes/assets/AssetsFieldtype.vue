@@ -113,6 +113,7 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :site="currentSite"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
@@ -149,6 +150,7 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :site="currentSite"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
@@ -367,6 +369,10 @@ export default {
             return this.config.query_scopes || [];
         },
 
+        currentSite() {
+            return this.publishContainer.site || this.publishContainer.locale || null;
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
 
@@ -473,6 +479,7 @@ export default {
             this.$axios
                 .post(cp_url('assets-fieldtype'), {
                     assets,
+                    site: this.currentSite,
                 })
                 .then((response) => {
                     this.assets = response.data;
@@ -646,6 +653,11 @@ export default {
 
         showSelector(selecting) {
             this.$emit(selecting ? 'focus' : 'blur');
+        },
+
+        currentSite(site, previous) {
+            if (!site || site === previous || !this.assets.length) return;
+            this.loadAssets(this.assetIds);
         },
     },
 

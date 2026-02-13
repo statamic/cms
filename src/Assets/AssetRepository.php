@@ -147,7 +147,7 @@ class AssetRepository implements Contract
 
         $store->save($asset);
 
-        $asset->writeMeta($asset->generateMeta());
+        $asset->writeMeta($asset->meta());
     }
 
     public function delete($asset)

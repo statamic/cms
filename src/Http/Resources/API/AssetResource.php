@@ -14,11 +14,17 @@ class AssetResource extends JsonResource
      */
     public function toArray($request)
     {
-        $with = $this->blueprint()
+        $asset = $this->resource;
+
+        if ($site = $request->input('site')) {
+            $asset = $asset->in($site);
+        }
+
+        $with = $asset->blueprint()
             ->fields()->all()
             ->filter->isRelationship()->keys()->all();
 
-        return $this->resource
+        return $asset
             ->toAugmentedCollection()
             ->withRelations($with)
             ->withShallowNesting()

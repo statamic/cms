@@ -16,6 +16,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        site: {
+            type: String,
+            default: null,
+        },
     },
 
     data() {

@@ -19,6 +19,7 @@ use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasDirtyState;
+use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetContainerBlueprintFound;
@@ -37,6 +38,7 @@ use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\GraphQL\ResolvesValues;
@@ -53,7 +55,7 @@ use Symfony\Component\Mime\MimeTypes;
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
-        Hookable, Searchable,
+        HasOrigin, Hookable, Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
@@ -68,6 +70,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected $container;
     protected $path;
     protected $meta;
+    protected $locale;
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
@@ -137,6 +140,39 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return "asset::{$this->id()}";
     }
 
+    public function locale($locale = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('locale')
+            ->setter(function ($locale) {
+                $locale = $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
+
+                if ($this->locale !== $locale) {
+                    $this->meta = null;
+                    $this->data = collect();
+                    $this->removedData = [];
+                }
+
+                return $locale;
+            })
+            ->getter(function ($locale) {
+                return $locale ?? Site::selected()?->handle() ?? Site::default()->handle();
+            })
+            ->args(func_get_args());
+    }
+
+    public function site()
+    {
+        return Site::get($this->locale());
+    }
+
+    public function in($locale)
+    {
+        $asset = clone $this;
+
+        return $asset->locale($locale)->hydrate();
+    }
+
     public function get($key, $fallback = null)
     {
         return $this->hydrate()->traitGet($key, $fallback);
@@ -166,7 +202,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->hydrate();
 
         if (func_get_args()) {
-            $this->removedData = collect($this->meta['data'])
+            $current = $this->usesLocalizedData()
+                ? Arr::get($this->meta, 'data.'.$this->locale(), [])
+                : ($this->meta['data'] ?? []);
+
+            $this->removedData = collect($current)
                 ->diffKeys($data)
                 ->keys()
                 ->merge($this->removedKeys)
@@ -174,6 +214,17 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return call_user_func_array([$this, 'traitData'], func_get_args());
+    }
+
+    public function localizedData()
+    {
+        $this->hydrate();
+
+        if (! $this->usesLocalizedData()) {
+            return collect($this->data->all());
+        }
+
+        return collect(Arr::get($this->meta, 'data.'.$this->locale(), []));
     }
 
     public function hydrate()
@@ -184,7 +235,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->meta = $this->meta();
 
-        $this->data = collect($this->meta['data']);
+        $this->data = $this->usesLocalizedData()
+            ? $this->dataForLocale($this->meta, $this->locale())
+            : collect($this->meta['data'] ?? []);
 
         $this->removedData = [];
 
@@ -237,25 +290,36 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         if (! $this->exists()) {
-            return $this->generateMeta();
+            return $this->normalizeMeta($this->generateMeta());
         }
 
         if (! config('statamic.assets.cache_meta')) {
-            return $this->generateMeta();
+            return $this->normalizeMeta($this->generateMeta());
         }
 
         if ($this->meta) {
-            $meta = $this->meta;
+            $meta = $this->normalizeMeta($this->meta);
 
-            $meta['data'] = collect(Arr::get($meta, 'data', []))
-                ->merge($this->data->all())
-                ->except($this->removedData)
-                ->all();
+            if ($this->usesLocalizedData()) {
+                $locale = $this->locale();
+                $existing = Arr::get($meta, "data.{$locale}", []);
+                $updated = collect($existing)
+                    ->merge($this->data->all())
+                    ->except($this->removedData)
+                    ->all();
+
+                Arr::set($meta, "data.{$locale}", $updated);
+            } else {
+                $meta['data'] = collect(Arr::get($meta, 'data', []))
+                    ->merge($this->data->all())
+                    ->except($this->removedData)
+                    ->all();
+            }
 
             return $meta;
         }
 
-        return $this->meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
+        $meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
             if ($contents = $this->disk()->get($path = $this->metaPath())) {
                 return YAML::file($path)->parse($contents);
             }
@@ -264,10 +328,20 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
             return $meta;
         });
+
+        return $this->meta = $this->normalizeMeta($meta);
     }
 
     private function metaValue($key)
     {
+        if ($key === 'data') {
+            $meta = $this->meta();
+
+            return $this->usesLocalizedData()
+                ? $this->dataForLocale($meta, $this->locale())->all()
+                : Arr::get($meta, 'data', []);
+        }
+
         $value = Arr::get($this->meta(), $key);
 
         if (! is_null($value)) {
@@ -283,7 +357,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function generateMeta()
     {
-        $meta = ['data' => $this->data->all()];
+        $meta = ['data' => $this->usesLocalizedData()
+            ? [$this->locale() => $this->data->all()]
+            : $this->data->all()];
 
         if ($this->exists()) {
             $attributes = Attributes::asset($this)->get();
@@ -315,7 +391,24 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function writeMeta($meta)
     {
-        $meta['data'] = Arr::removeNullValues($meta['data']);
+        $meta = $this->normalizeMeta($meta);
+
+        if ($this->usesLocalizedData()) {
+            $meta['data'] = collect($meta['data'] ?? [])
+                ->map(fn ($localeData) => Arr::removeNullValues($localeData ?? []))
+                ->filter(fn ($localeData) => ! empty($localeData))
+                ->all();
+
+            $siteOrigins = $this->siteOriginsForMeta($meta);
+
+            if ($this->siteOriginsAreDefault($siteOrigins)) {
+                unset($meta['sites']);
+            } else {
+                $meta['sites'] = $siteOrigins;
+            }
+        } else {
+            $meta['data'] = Arr::removeNullValues($meta['data'] ?? []);
+        }
 
         $contents = YAML::dump($meta);
 
@@ -324,7 +417,136 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function metaCacheKey()
     {
-        return 'asset-meta-'.$this->id();
+        $key = 'asset-meta-'.$this->id();
+
+        if ($this->usesLocalizedData()) {
+            $key .= '-'.$this->locale();
+        }
+
+        return $key;
+    }
+
+    protected function usesLocalizedData(): bool
+    {
+        return Site::multiEnabled() && $this->container()?->localizable();
+    }
+
+    protected function normalizeMeta(array $meta): array
+    {
+        if (! $this->usesLocalizedData()) {
+            $meta['data'] = Arr::get($meta, 'data', []);
+
+            return $meta;
+        }
+
+        $siteOrigins = $this->siteOriginsForMeta($meta);
+        $data = Arr::get($meta, 'data', []);
+
+        if (! is_array($data)) {
+            $data = [];
+        }
+
+        if (! $this->isLocalizedMetaData($data, $siteOrigins)) {
+            $default = Site::default()->handle();
+            $data = [$default => $data];
+        }
+
+        if ($this->siteOriginsAreDefault($siteOrigins)) {
+            unset($meta['sites']);
+        } else {
+            $meta['sites'] = $siteOrigins;
+        }
+        $meta['data'] = $data;
+
+        return $meta;
+    }
+
+    protected function isLocalizedMetaData(array $data, array $siteOrigins): bool
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        $siteHandles = array_keys($siteOrigins);
+
+        return collect(array_keys($data))->every(fn ($key) => in_array($key, $siteHandles));
+    }
+
+    protected function defaultSiteOrigins(): array
+    {
+        $default = Site::default()->handle();
+        $sites = Site::all()->mapWithKeys(function ($site) use ($default) {
+            return [$site->handle() => $site->handle() === $default ? null : $default];
+        })->all();
+
+        return empty($sites) ? [$default => null] : $sites;
+    }
+
+    protected function siteOriginsForMeta(array $meta): array
+    {
+        $defaultSiteOrigins = $this->defaultSiteOrigins();
+        $sites = Arr::get($meta, 'sites');
+
+        if (! is_array($sites)) {
+            return $defaultSiteOrigins;
+        }
+
+        return collect($defaultSiteOrigins)->mapWithKeys(function ($origin, $site) use ($sites) {
+            return [$site => array_key_exists($site, $sites) ? $sites[$site] : $origin];
+        })->all();
+    }
+
+    protected function siteOriginsAreDefault(array $siteOrigins): bool
+    {
+        return $siteOrigins === $this->defaultSiteOrigins();
+    }
+
+    protected function dataForLocale(array $meta, $locale)
+    {
+        $meta = $this->normalizeMeta($meta);
+        $siteOrigins = collect($this->siteOriginsForMeta($meta));
+
+        $data = collect(Arr::get($meta, "data.{$locale}", []));
+        $origin = $siteOrigins->get($locale);
+
+        while ($origin) {
+            $data = collect(Arr::get($meta, "data.{$origin}", []))->merge($data);
+            $origin = $siteOrigins->get($origin);
+        }
+
+        return $data;
+    }
+
+    public function origin($origin = null)
+    {
+        if (func_num_args() === 0) {
+            if (! $this->usesLocalizedData()) {
+                return null;
+            }
+
+            $siteOrigins = $this->siteOriginsForMeta($this->meta());
+
+            return $this->getOriginByString(
+                collect($siteOrigins)->get($this->locale())
+            );
+        }
+
+        throw new \Exception('The origin cannot be set directly. It is derived from site configuration.');
+    }
+
+    public function getOriginByString($origin)
+    {
+        return $origin ? $this->in($origin) : null;
+    }
+
+    protected function getOriginIdFromObject($origin)
+    {
+        return $origin->locale();
+    }
+
+    protected function getOriginBlinkKey()
+    {
+        return 'origin-asset-'.$this->id().'-'.$this->locale();
     }
 
     /**
@@ -696,7 +918,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected function clearCaches()
     {
         $this->meta = null;
-        $this->cacheStore()->forget($this->metaCacheKey());
+
+        if ($this->usesLocalizedData()) {
+            Site::all()->each(fn ($site) => $this->cacheStore()->forget('asset-meta-'.$this->id().'-'.$site->handle()));
+            $this->cacheStore()->forget('asset-meta-'.$this->id());
+        } else {
+            $this->cacheStore()->forget($this->metaCacheKey());
+        }
     }
 
     /**

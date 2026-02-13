@@ -45,6 +45,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $sortField;
     protected $sortDirection;
     protected $validation;
+    protected $localizable;
 
     public function id($id = null)
     {
@@ -106,6 +107,14 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return $this
             ->fluentlyGetOrSet('validation')
             ->getter(fn ($rules) => $rules ?? [])
+            ->args(func_get_args());
+    }
+
+    public function localizable($localizable = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('localizable')
+            ->getter(fn ($localizable) => (bool) ($localizable ?? false))
             ->args(func_get_args());
     }
 
@@ -569,6 +578,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
             'validate' => $this->validation,
+            'localizable' => $this->localizable ?: null,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [

@@ -48,6 +48,9 @@ class AssetInterface extends InterfaceType
             'folder' => [
                 'type' => GraphQL::string(),
             ],
+            'locale' => [
+                'type' => GraphQL::string(),
+            ],
             'url' => [
                 'type' => GraphQL::string(),
             ],

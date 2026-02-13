@@ -31,6 +31,7 @@
                         <!-- Toolbar -->
                         <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
+                                v-if="Array.isArray(actions)"
                                 :item="id"
                                 :url="actionUrl"
                                 :actions="actions"
@@ -116,6 +117,7 @@
                         </div>
                     </div>
 
+
                     <!-- Fields Area -->
                     <PublishContainer
                         v-if="fields"
@@ -127,6 +129,11 @@
                         :model-value="values"
                         :extra-values="extraValues"
                         :meta="meta"
+                        :origin-values="originValues"
+                        :origin-meta="originMeta"
+                        :site="activeSite"
+                        v-model:modified-fields="localizedFields"
+                        :sync-field-confirmation-text="syncFieldConfirmationText"
                         :errors="errors"
                         @update:model-value="updateValues"
                     >
@@ -134,6 +141,15 @@
                             <div v-if="saving" class="loading">
                                 <Icon name="loading" />
                             </div>
+                            <ui-panel class="flex items-center justify-between">
+                                <ui-heading size="lg" :text="__('Localizations')" class="ps-2" />
+                                <SiteSelector
+                                    v-if="showLocalizationSelector"
+                                    :sites="localizations"
+                                    :model-value="activeSite"
+                                    @update:modelValue="localizationSelected"
+                                />
+                            </ui-panel>
 
                             <PublishTabs />
                         </div>
@@ -183,6 +199,7 @@
 <script>
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
+import SiteSelector from '../../SiteSelector.vue';
 import { pick, flatten } from 'lodash-es';
 import {
     Dropdown,
@@ -192,6 +209,7 @@ import {
     PublishTabs,
     Icon,
 	Stack,
+    Panel,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
@@ -205,6 +223,7 @@ export default {
         ItemActions,
         FocalPointEditor,
         PdfViewer,
+        SiteSelector,
         PublishContainer,
         PublishTabs,
         Icon,
@@ -225,6 +244,10 @@ export default {
                 return true;
             },
         },
+        site: {
+            type: String,
+            default: null,
+        },
     },
 
     data() {
@@ -244,6 +267,13 @@ export default {
             errors: {},
             actions: [],
             closingWithChanges: false,
+            activeSite: this.site,
+            localizations: [],
+            localizedFields: [],
+            hasOrigin: false,
+            originValues: {},
+            originMeta: {},
+            syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
         };
     },
 
@@ -273,6 +303,10 @@ export default {
         isToolbarVisible() {
             return !this.readOnly && this.showToolbar;
         },
+
+        showLocalizationSelector() {
+            return this.localizations.length > 1;
+        },
     },
 
     mounted() {
@@ -300,22 +334,31 @@ export default {
          * This component is given an asset ID.
          * It needs to get the corresponding data from the server.
          */
-        load() {
+        load(site = null) {
             this.loading = true;
 
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
+            const requestedSite = site ?? this.activeSite ?? this.site;
 
-            this.$axios.get(url).then((response) => {
+            this.$axios.get(url, {
+                params: requestedSite ? { site: requestedSite } : {},
+            }).then((response) => {
                 const data = response.data.data;
                 this.asset = data;
 
                 // If there are no fields, it will be an empty array when PHP encodes
                 // it into JSON on the server. We'll ensure it's always an object.
-                this.values = Array.isArray(data.values) ? {} : data.values;
+                this.values = Array.isArray(data.values) ? {} : (data.values || {});
 
-                this.meta = data.meta;
+                this.meta = data.meta || {};
                 this.actionUrl = data.actionUrl;
-                this.actions = data.actions;
+                this.actions = Array.isArray(data.actions) ? data.actions : [];
+                this.activeSite = data.locale || requestedSite;
+                this.localizations = data.localizations || [];
+                this.localizedFields = data.localizedFields || [];
+                this.hasOrigin = data.hasOrigin || false;
+                this.originValues = data.originValues || {};
+                this.originMeta = data.originMeta || {};
 
                 this.fieldset = data.blueprint;
 
@@ -382,21 +425,23 @@ export default {
         },
 
         updateValues(values) {
-            let updated = { ...event, focus: values.focus };
-
-            if (JSON.stringify(values) === JSON.stringify(updated)) {
-                return
-            }
-
-            values = updated;
+            this.values = values;
         },
 
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
+            const payload = {
+                ...this.$refs.container.visibleValues,
+                site: this.activeSite,
+            };
+
+            if (this.hasOrigin) {
+                payload._localized = this.localizedFields;
+            }
 
             return this.$axios
-                .patch(url, this.$refs.container.visibleValues)
+                .patch(url, payload)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
                     this.$toast.success(__('Saved'));
@@ -420,6 +465,15 @@ export default {
 
                     throw e;
                 });
+        },
+
+        localizationSelected(site) {
+            if (site === this.activeSite) {
+                return;
+            }
+
+            this.activeSite = site;
+            this.load(site);
         },
 
         saveAndClose() {
@@ -459,7 +513,7 @@ export default {
         },
 
         canRunAction(handle) {
-            return this.actions.find((action) => action.handle == handle);
+            return (this.actions || []).find((action) => action.handle == handle);
         },
 
         runAction(actions, handle) {

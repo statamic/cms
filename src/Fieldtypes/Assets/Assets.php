@@ -339,12 +339,14 @@ class Assets extends Fieldtype
         ];
     }
 
-    public function getItemData($items)
+    public function getItemData($items, $site = null)
     {
-        return collect($items)->map(function ($url) {
-            return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()['data']
-                : null;
+        return collect($items)->map(function ($url) use ($site) {
+            if (! $asset = Asset::find($url)) {
+                return null;
+            }
+
+            return (new AssetResource($site ? $asset->in($site) : $asset))->resolve()['data'];
         })->filter()->values();
     }
 

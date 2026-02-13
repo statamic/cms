@@ -98,4 +98,85 @@ class AssetsMetaTest extends TestCase
             'bar'
         );
     }
+
+    #[Test]
+    public function it_migrates_localizable_meta_without_persisting_default_sites_map()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'es' => ['url' => '/es', 'locale' => 'es_ES'],
+        ]);
+
+        Storage::disk('test')->put('foo/bar.txt', 'foobar');
+        Storage::disk('test')->put('foo/.meta/bar.txt.yaml', YAML::dump([
+            'data' => [
+                'en' => ['alt' => 'Bob Ross'],
+                'es' => [],
+            ],
+            'sites' => [
+                'en' => null,
+                'es' => 'en',
+            ],
+            'size' => 6,
+            'last_modified' => 1665086377,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        AssetContainer::make('test_container')
+            ->disk('test')
+            ->localizable(true)
+            ->save();
+
+        $this->artisan('statamic:assets:migrate-localizable test_container')
+            ->expectsOutputToContain('asset metadata files.');
+
+        $meta = YAML::parse(Storage::disk('test')->get('foo/.meta/bar.txt.yaml'));
+
+        $this->assertArrayNotHasKey('sites', $meta);
+        $this->assertSame(['en' => ['alt' => 'Bob Ross']], $meta['data']);
+    }
+
+    #[Test]
+    public function it_migrates_localizable_meta_and_keeps_non_default_sites_map()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'es' => ['url' => '/es', 'locale' => 'es_ES'],
+        ]);
+
+        Storage::disk('test')->put('foo/baz.txt', 'foobar');
+        Storage::disk('test')->put('foo/.meta/baz.txt.yaml', YAML::dump([
+            'data' => [
+                'es' => ['alt' => 'El Bob Rosso'],
+            ],
+            'sites' => [
+                'en' => 'es',
+                'es' => null,
+            ],
+            'size' => 6,
+            'last_modified' => 1665086377,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        AssetContainer::make('test_container')
+            ->disk('test')
+            ->localizable(true)
+            ->save();
+
+        $this->artisan('statamic:assets:migrate-localizable test_container')
+            ->expectsOutputToContain('asset metadata files.');
+
+        $meta = YAML::parse(Storage::disk('test')->get('foo/.meta/baz.txt.yaml'));
+
+        $this->assertArrayHasKey('sites', $meta);
+        $this->assertSame('es', $meta['sites']['en']);
+        $this->assertNull($meta['sites']['es']);
+        $this->assertSame(['es' => ['alt' => 'El Bob Rosso']], $meta['data']);
+    }
 }

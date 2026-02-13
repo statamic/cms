@@ -35,6 +35,7 @@ class AugmentedAsset extends AbstractAugmented
                 'edit_url',
                 'container',
                 'folder',
+                'locale',
                 'url',
                 'permalink',
                 'api_url',
@@ -82,6 +83,11 @@ class AugmentedAsset extends AbstractAugmented
     protected function permalink()
     {
         return $this->data->absoluteUrl();
+    }
+
+    protected function locale()
+    {
+        return $this->data->locale();
     }
 
     protected function size()

@@ -16,6 +16,7 @@ use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
@@ -39,11 +40,17 @@ class AssetsController extends CpController
         throw new AuthorizationException;
     }
 
-    public function show($asset)
+    public function show(Request $request, $asset)
     {
         $asset = Asset::find(base64_decode($asset));
 
         abort_if(! $asset, 404);
+
+        $site = $request->input('site') ?: (Site::multiEnabled() ? Site::selected()->handle() : null);
+
+        if ($site) {
+            $asset = $asset->in($site);
+        }
 
         $this->authorize('view', $asset);
 
@@ -53,6 +60,12 @@ class AssetsController extends CpController
     public function update(Request $request, $asset)
     {
         $asset = Asset::find(base64_decode($asset));
+
+        $site = $request->input('site') ?: (Site::multiEnabled() ? Site::selected()->handle() : null);
+
+        if ($site) {
+            $asset = $asset->in($site);
+        }
 
         $this->authorize('edit', $asset);
 
@@ -64,8 +77,25 @@ class AssetsController extends CpController
             'focus' => $request->focus,
         ]);
 
-        foreach ($values as $key => $value) {
-            $asset->set($key, $value);
+        if ($asset->hasOrigin()) {
+            $localizedHandles = collect($request->input('_localized', []));
+            $localizedInput = $values->only($localizedHandles->all());
+
+            $keysToForget = $localizedInput
+                ->filter(fn ($value) => $value === null || $value === '')
+                ->keys();
+
+            $keysToUpsert = $localizedInput
+                ->reject(fn ($value) => $value === null || $value === '');
+
+            $asset->data(
+                $asset->localizedData()
+                    ->except($keysToForget)
+                    ->merge($keysToUpsert)
+                    ->all()
+            );
+        } else {
+            $asset->merge($values->all());
         }
 
         $asset->save();

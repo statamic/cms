@@ -54,6 +54,7 @@
                 <asset-editor
                     v-if="editing"
                     :id="asset.id"
+                    :site="site"
                     :allow-deleting="false"
                     @closed="closeEditor"
                     @saved="assetSaved"

@@ -7,6 +7,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 
@@ -29,6 +30,7 @@ class AssetContainersController extends CpController
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
             'validation' => $container->validationRules(),
+            'localizable' => $container->localizable(),
         ];
 
         return PublishForm::make($this->formBlueprint($container))
@@ -53,7 +55,8 @@ class AssetContainersController extends CpController
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->validationRules($values['validation'] ?? null);
+            ->validationRules($values['validation'] ?? null)
+            ->localizable($values['localizable'] ?? false);
 
         $container->save();
 
@@ -91,7 +94,8 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->localizable($values['localizable'] ?? false);
 
         $container->save();
 
@@ -186,6 +190,12 @@ class AssetContainersController extends CpController
                         'type' => 'taggable',
                         'display' => __('Validation Rules'),
                         'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
+                    ],
+                    'localizable' => [
+                        'type' => 'toggle',
+                        'display' => __('Localizable Metadata'),
+                        'instructions' => __('When enabled, asset field data like alt text can be translated per site.'),
+                        'if' => Site::multiEnabled(),
                     ],
                 ],
             ],

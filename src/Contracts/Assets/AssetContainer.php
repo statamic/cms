@@ -109,4 +109,12 @@ interface AssetContainer
      * @return array
      */
     public function validationRules($rules = null);
+
+    /**
+     * Whether metadata in this container is localizable.
+     *
+     * @param  bool|null  $localizable
+     * @return bool|self
+     */
+    public function localizable($localizable = null);
 }

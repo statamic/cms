@@ -32,6 +32,7 @@ class AssetQuery extends Query
             'id' => GraphQL::string(),
             'container' => GraphQL::string(),
             'path' => GraphQL::string(),
+            'site' => GraphQL::string(),
         ];
     }
 
@@ -41,6 +42,10 @@ class AssetQuery extends Query
             $asset = Asset::find($id);
         } else {
             $asset = AssetContainer::findByHandle($args['container'])->asset($args['path']);
+        }
+
+        if ($asset && ($site = $args['site'] ?? null)) {
+            $asset = $asset->in($site);
         }
 
         // The middleware will take care of authorization when using `container` arg,

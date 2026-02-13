@@ -11,6 +11,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Exceptions\AssetNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\YAML;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -115,5 +116,120 @@ EOT;
         $this->expectExceptionMessage('Asset [does-not-exist] not found');
 
         $assetRepository->findOrFail('does-not-exist');
+    }
+
+    #[Test]
+    public function it_preserves_other_locales_when_saving_a_localized_asset()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'es' => ['url' => '/es/', 'locale' => 'es'],
+        ]);
+
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'hello');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'en' => ['alt' => 'Bob Ross'],
+            ],
+            'size' => 5,
+            'last_modified' => 123,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        $container = tap(AssetContainer::make('test')->disk('test')->localizable(true))->save();
+        $asset = $container->makeAsset('foo/test.txt')->in('es');
+        $asset->data(['alt' => 'El Bob Rosso']);
+
+        (new AssetRepository)->save($asset);
+
+        $meta = YAML::parse($disk->get('foo/.meta/test.txt.yaml'));
+
+        $this->assertSame('Bob Ross', $meta['data']['en']['alt']);
+        $this->assertSame('El Bob Rosso', $meta['data']['es']['alt']);
+    }
+
+    #[Test]
+    public function it_drops_empty_localized_buckets_and_omits_default_sites_map()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'es' => ['url' => '/es/', 'locale' => 'es'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'hello');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'en' => ['alt' => 'Bob Ross'],
+                'es' => ['alt' => 'El Bob Rosso'],
+            ],
+            'sites' => [
+                'en' => null,
+                'es' => 'en',
+                'fr' => 'en',
+            ],
+            'size' => 5,
+            'last_modified' => 123,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        $container = tap(AssetContainer::make('test')->disk('test')->localizable(true))->save();
+        $asset = $container->makeAsset('foo/test.txt')->in('es');
+        $asset->data([]);
+
+        (new AssetRepository)->save($asset);
+
+        $meta = YAML::parse($disk->get('foo/.meta/test.txt.yaml'));
+
+        $this->assertArrayHasKey('en', $meta['data']);
+        $this->assertArrayNotHasKey('es', $meta['data']);
+        $this->assertArrayNotHasKey('sites', $meta);
+    }
+
+    #[Test]
+    public function it_persists_sites_map_when_it_differs_from_default_site_origins()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'es' => ['url' => '/es/', 'locale' => 'es'],
+        ]);
+
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'hello');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'es' => ['alt' => 'El Bob Rosso'],
+            ],
+            'sites' => [
+                'en' => 'es',
+                'es' => null,
+            ],
+            'size' => 5,
+            'last_modified' => 123,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        $container = tap(AssetContainer::make('test')->disk('test')->localizable(true))->save();
+        $asset = $container->makeAsset('foo/test.txt')->in('en');
+        $asset->data(['more_text' => 'custom']);
+
+        (new AssetRepository)->save($asset);
+
+        $meta = YAML::parse($disk->get('foo/.meta/test.txt.yaml'));
+
+        $this->assertArrayHasKey('sites', $meta);
+        $this->assertSame('es', $meta['sites']['en']);
+        $this->assertNull($meta['sites']['es']);
     }
 }

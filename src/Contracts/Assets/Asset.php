@@ -2,9 +2,11 @@
 
 namespace Statamic\Contracts\Assets;
 
+use Statamic\Contracts\Data\Localizable;
+use Statamic\Sites\Site;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-interface Asset
+interface Asset extends Localizable
 {
     /**
      * Get the filename.
@@ -84,4 +86,27 @@ interface Asset
      * @return mixed
      */
     public function contents();
+
+    /**
+     * Get or set the locale.
+     *
+     * @param  string|Site|null  $locale
+     * @return mixed
+     */
+    public function locale($locale = null);
+
+    /**
+     * Get the asset in a locale.
+     *
+     * @param  string|Site  $locale
+     * @return self
+     */
+    public function in($locale);
+
+    /**
+     * Get the site for the active locale.
+     *
+     * @return Site|null
+     */
+    public function site();
 }

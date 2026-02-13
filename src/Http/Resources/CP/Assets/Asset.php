@@ -4,6 +4,7 @@ namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 
@@ -58,6 +59,10 @@ class Asset extends JsonResource
 
             $this->merge($this->thumbnails()),
             $this->merge($this->publishFormData()),
+            $this->mergeWhen(
+                Site::multiEnabled() && $this->container()->localizable(),
+                fn () => $this->localizationData()
+            ),
 
             'actionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, [
@@ -75,12 +80,49 @@ class Asset extends JsonResource
     protected function publishFormData()
     {
         $fields = $this->blueprint()->fields()
-            ->addValues($this->data()->all())
+            ->addValues($this->values()->all())
             ->preProcess();
 
         return [
-            'values' => $this->data()->merge($fields->values()),
-            'meta' => $fields->meta(),
+            'values' => collect($this->values())->merge($fields->values())->all(),
+            'meta' => $fields->meta()->all(),
+        ];
+    }
+
+    protected function localizationData()
+    {
+        if (! Site::multiEnabled() || ! $this->container()->localizable()) {
+            return [];
+        }
+
+        $originValues = null;
+        $originMeta = null;
+
+        if ($this->hasOrigin()) {
+            $fields = $this->blueprint()->fields()
+                ->addValues($this->origin()->values()->all())
+                ->preProcess();
+
+            $originValues = $fields->values()->all();
+            $originMeta = $fields->meta()->all();
+        }
+
+        return [
+            'locale' => $this->locale(),
+            'localizedFields' => $this->localizedData()->keys()->values()->all(),
+            'hasOrigin' => $this->hasOrigin(),
+            'originValues' => $originValues,
+            'originMeta' => $originMeta,
+            'localizations' => Site::all()->map(function ($site) {
+                $localized = $this->in($site->handle());
+
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                    'active' => $site->handle() === $this->locale(),
+                    'origin' => ! $localized->hasOrigin(),
+                ];
+            })->values()->all(),
         ];
     }
 }
