@@ -2,7 +2,7 @@
 import Container from './Container.vue';
 import Tabs from './Tabs.vue';
 import { Header, Button } from '@ui';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -30,8 +30,8 @@ const props = defineProps({
         default: () => ({}),
     },
     submitUrl: {
-        type: String,
-        required: true,
+        type: [String, null],
+        default: null,
     },
     submitMethod: {
         type: String,
@@ -62,9 +62,7 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new BeforeSaveHooks('entry'),
             new Request(props.submitUrl, props.submitMethod),
-            new AfterSaveHooks('entry'),
         ])
         .then((response) => {
             Statamic.$toast.success(__('Saved'));

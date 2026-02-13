@@ -11,6 +11,9 @@
 
     &.data-table--contained {
         @apply rounded-xl;
+        /* When we have overflow e.g. /cp/assets on mobile with lots of columns */
+        background: inherit;
+        box-shadow: inherit;
     }
 
     thead {
@@ -97,7 +100,7 @@
 
             /* When the row is hovered, change the background of all its cells to a hover state color */
             &:has(:hover) td {
-                @apply bg-gray-50 dark:bg-white/2.5;
+                @apply bg-gray-50 dark:bg-gray-900;
             }
         }
 
@@ -127,7 +130,8 @@
     }
 
     thead th.checkbox-column {
-        @apply sticky z-1 ps-3 w-8;
+        /* We need calc on the padding-start to account for the border of the table */
+        @apply sticky z-1 ps-[calc(0.75rem+1px)] w-8;
         .data-table--contained & {
             @apply sticky ps-4;
         }
@@ -140,7 +144,7 @@
     }
 
     tbody .checkbox-column {
-        @apply px-3 -start-px sticky -left-1.5;
+        @apply px-3 -start-px sticky -left-1.75;
         container-type: scroll-state;
         .data-table--contained & {
             @apply sticky ps-4;
@@ -154,8 +158,8 @@
 
 /* Row Selection */
 .data-table[data-has-selections] {
-    tbody tr[data-row="unselected"] td {
-        @apply text-gray-500! dark:text-gray-400!;
+    tbody tr[data-row="selected"] td {
+        @apply bg-gray-100 dark:bg-gray-925;
     }
 }
 

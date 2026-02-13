@@ -4,7 +4,7 @@
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
                     <TabList class="flex-1">
-                        <div ref="tabs" class="flex-1 flex items-center">
+                        <div ref="tabs" class="flex-1 flex items-center gap-x-2.5">
                             <BlueprintTab
                                 ref="tab"
                                 v-for="tab in tabs"
@@ -38,6 +38,7 @@
                     :tab="tab"
                     v-show="currentTab === tab._id"
                     :show-section-handle-field="showSectionHandleField"
+                    :show-section-collapsible-field="showSectionCollapsibleField"
                     :show-section-hide-field="showSectionHideField"
                     :new-section-text="newSectionText"
                     :edit-section-text="editSectionText"
@@ -52,7 +53,7 @@
 
 <script>
 import { Sortable, Plugins } from '@shopify/draggable';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
@@ -112,6 +113,10 @@ export default {
             type: Boolean,
             default: false,
         },
+	    showSectionCollapsibleField: {
+			type: Boolean,
+		    default: false,
+	    },
         showSectionHideField: {
             type: Boolean,
             default: false,

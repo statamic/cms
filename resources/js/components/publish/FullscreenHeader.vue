@@ -1,5 +1,5 @@
 <template>
-    <header class="fixed h-12 inset-x-0 top-0 z-max flex items-center justify-between bg-gray-50 dark:bg-gray-950 px-4 shadow-ui-lg dark:shadow-none dark:border-b dark:border-white/10">
+    <header class="fixed h-12 inset-x-0 top-0 z-max flex items-center justify-between bg-gray-50 dark:bg-gray-925 px-4 shadow-ui-lg dark:shadow-none dark:border-b dark:border-white/10">
         <ui-heading class="shrink-0" :text="__(title)" />
         <div class="flex min-w-max items-center gap-4">
             <slot />

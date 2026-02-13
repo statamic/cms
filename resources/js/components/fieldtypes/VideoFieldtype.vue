@@ -16,10 +16,12 @@
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
-            :src="embedUrl"
+            ref="iframe"
+            :src="isVisible ? embedUrl : null"
             frameborder="0"
             allow="fullscreen"
             class="aspect-video rounded-lg"
+            loading="lazy"
         ></iframe>
     </div>
 </template>
@@ -29,6 +31,13 @@ import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype],
+
+    data() {
+        return {
+            isVisible: false,
+            observer: null,
+        };
+    },
 
     computed: {
         shouldShowPreview() {
@@ -86,6 +95,30 @@ export default {
             const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
             return !this.isEmbeddable && isVideo;
         },
+    },
+
+    mounted() {
+        this.observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && entry.intersectionRatio > 0) {
+                        this.isVisible = true;
+                        this.observer.disconnect();
+                    }
+                });
+            },
+            { threshold: 0.01 }
+        );
+
+        if (this.$el) {
+            this.observer.observe(this.$el);
+        }
+    },
+
+    beforeUnmount() {
+        if (this.observer) {
+            this.observer.disconnect();
+        }
     },
 };
 </script>

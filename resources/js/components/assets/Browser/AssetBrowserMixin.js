@@ -8,6 +8,7 @@ export default {
         path: String,
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
+        creatingFolderError: Boolean,
     },
 
     data() {
@@ -26,6 +27,10 @@ export default {
         draggingFolder() {
             this.$emit('prevent-dragging', this.draggingFolder !== null);
         },
+
+        newFolderName() {
+            if (this.creatingFolderError) this.$emit('update:creatingFolderError', null);
+        }
     },
 
     methods: {

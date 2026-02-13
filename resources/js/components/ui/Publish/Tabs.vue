@@ -60,6 +60,15 @@ function setActiveTabFromHash() {
 }
 
 watch(
+	() => shouldShowSidebar.value,
+	() => {
+		if (shouldShowSidebar.value && activeTab.value === 'sidebar') {
+			setActive(visibleMainTabs.value[0].handle);
+		}
+	}
+);
+
+watch(
     () => activeTab.value,
     (tab) => {
         if (rememberTab.value) window.location.hash = tab

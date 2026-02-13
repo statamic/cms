@@ -14,7 +14,7 @@ import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Portal from '../components/portals/Portal.vue';
-import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
+import ConfirmationModal from '../components/ui/Modal/ConfirmationModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';

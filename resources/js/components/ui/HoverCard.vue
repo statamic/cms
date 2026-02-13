@@ -10,12 +10,19 @@ defineOptions({
 const emit = defineEmits(['update:open']);
 
 const props = defineProps({
+    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
     align: { type: String, default: 'center' },
+    /** When `true`, an arrow is displayed near the trigger. */
     arrow: { type: Boolean, default: true },
+    /** The delay in milliseconds before the hover card opens. */
     delay: { type: Number, default: 200 },
+    /** When `true`, the internal padding of the hover card is removed. */
     inset: { type: Boolean, default: false },
+    /** The distance in pixels from the trigger. */
     offset: { type: Number, default: 25 },
+    /** The preferred side of the trigger to render against when open. <br><br> Options: `top`, `bottom`, `left`, `right` */
     side: { type: String, default: 'left' },
+    /** The controlled open state of the hover card. */
     open: { type: Boolean, default: false },
 });
 

@@ -6,6 +6,8 @@ import Icon from '../Icon/Icon.vue';
 import Heading from '../Heading.vue';
 import { portals, keys } from '@api';
 import wait from '@/util/wait';
+import { FocusScope } from 'reka-ui';
+import stack from '@ui/Stack/Stack.vue';
 
 defineOptions({
     inheritAttrs: false,
@@ -13,13 +15,20 @@ defineOptions({
 
 const attrs = useAttrs();
 const slots = useSlots();
-const emit = defineEmits(['update:open', 'dismissed']);
+const emit = defineEmits(['update:open', 'opened', 'dismissed']);
 
 const props = defineProps({
+	/** When `true`, the modal's backdrop will be blurred */
     blur: { type: Boolean, default: true },
+	/** Title displayed at the top of the modal */
     title: { type: String, default: '' },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: [String, null], default: null },
+	/** The controlled open state of the modal. */
     open: { type: Boolean, default: false },
+	/** Callback that fires before the modal closes. */
+	beforeClose: { type: Function, default: () => true },
+	/** When `true`, clicking outside the modal will dismiss it. */
     dismissible: { type: Boolean, default: true },
 });
 
@@ -42,17 +51,16 @@ const modalClasses = cva({
     ],
 })({});
 
-const hasModalTitleComponent = hasComponent('ModalTitle');
-const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
-
-const instance = getCurrentInstance();
-
 const modal = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const escBinding = ref(null);
 
+const instance = getCurrentInstance();
+const hasModalTitleComponent = hasComponent('ModalTitle');
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
+const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
 
 function open() {
     if (!modal.value) modal.value = portals.create('modal');
@@ -61,10 +69,12 @@ function open() {
 
     nextTick(() => {
         mounted.value = true;
-
-        nextTick(() => visible.value = true);
-
 	    updateOpen(true);
+
+	    nextTick(() => {
+		    visible.value = true;
+			emit('opened');
+	    });
     });
 }
 
@@ -74,22 +84,40 @@ function close() {
     wait(300).then(() => {
         mounted.value = false;
         updateOpen(false);
+
+        cleanup();
+        modal.value = null;
+        escBinding.value = null;
     });
 }
 
 function dismiss() {
     if (!props.dismissible) return;
+	if (!runCloseCallback()) return;
 
     emit('dismissed');
     close();
 }
 
-provide('closeModal', close);
-
 function updateOpen(value) {
-    if (isUsingOpenProp.value) {
+	if (isUsingOpenProp.value && props.open !== value) {
         emit('update:open', value);
     }
+}
+
+function runCloseCallback() {
+	const shouldClose = props.beforeClose();
+
+	if (!shouldClose) return false;
+
+	close();
+
+	return true;
+}
+
+function cleanup() {
+	modal.value?.destroy();
+	escBinding.value?.destroy();
 }
 
 watch(
@@ -102,14 +130,16 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-    modal.value?.destroy();
-    escBinding.value?.destroy();
+    cleanup();
 });
 
 defineExpose({
     open,
     close,
+	runCloseCallback,
 });
+
+provide('closeModal', close);
 </script>
 
 <template>
@@ -117,7 +147,7 @@ defineExpose({
         <slot name="trigger" />
     </div>
     <teleport :to="portal" v-if="mounted && portal">
-        <div class="vue-portal-target modal">
+        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal">
             <transition
                 enter-active-class="duration-200"
                 enter-from-class="opacity-0"
@@ -147,6 +177,6 @@ defineExpose({
                     <slot name="footer" />
                 </div>
             </transition>
-        </div>
+        </FocusScope>
     </teleport>
 </template>

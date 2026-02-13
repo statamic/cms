@@ -60,7 +60,7 @@
     width: 20px;
 
     &:hover {
-        @apply text-gray-950 dark:text-dark-100;
+        @apply text-gray-925 dark:text-dark-100;
     }
 
     &:focus {

@@ -130,6 +130,10 @@ const update = debounce(() => {
         });
 }, 150);
 
+function componentUpdated(handle, value) {
+    extras.value[handle] = value;
+}
+
 function setIframeAttributes(iframe) {
     iframe.setAttribute('frameborder', '0');
     iframe.setAttribute('class', previewDevice.value ? 'device' : 'responsive');

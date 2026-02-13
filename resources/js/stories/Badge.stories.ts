@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Badge } from '@ui';
-import { computed } from 'vue';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Badge} from '@ui';
+import {computed} from 'vue';
+import {icons} from "@/stories/icons";
 
 const meta = {
     title: 'Components/Badge',
@@ -10,16 +11,18 @@ const meta = {
             control: 'select',
             options: ['default', 'amber', 'black', 'blue', 'cyan', 'emerald', 'fuchsia', 'green', 'indigo', 'lime', 'orange', 'pink', 'purple', 'red', 'rose', 'sky', 'teal', 'violet', 'white', 'yellow'],
         },
+        icon: {
+            control: 'select',
+            options: icons,
+        },
+        iconAppend: {
+            control: 'select',
+            options: icons,
+        },
         size: {
             control: 'select',
             options: ['sm', 'default', 'lg'],
         },
-        text: { control: 'text' },
-        icon: { control: 'text' },
-        iconAppend: { control: 'text' },
-        prepend: { control: 'text' },
-        append: { control: 'text' },
-        pill: { control: 'boolean' },
     },
 } satisfies Meta<typeof Badge>;
 

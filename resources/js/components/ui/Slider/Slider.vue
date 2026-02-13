@@ -4,14 +4,23 @@ import { cva } from 'cva';
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui';
 
 const props = defineProps({
+    /** Description text for the slider. */
     description: { type: String, default: null },
+    /** ID attribute for the slider. */
     id: { type: String, default: () => useId() },
+    /** Label text for the slider. */
     label: { type: String, default: null },
+    /** The controlled value of the slider. */
     modelValue: { type: Number, default: 0 },
+    /** The minimum value of the slider. */
     min: { type: Number, default: 0 },
+    /** The maximum value of the slider. */
     max: { type: Number, default: 100 },
+    /** The step increment for the slider. */
     step: { type: Number, default: 1 },
+    /** Controls the size of the slider. <br><br> Options: `sm`, `base` */
     size: { type: String, default: 'base' },
+    /** Controls the appearance of the slider. <br><br> Options: `default` */
     variant: { type: String, default: 'default' },
 });
 

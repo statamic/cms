@@ -18,7 +18,7 @@ export function setLocale(newLocale) {
  * @param {Object} replacements A key/value set of string replacements
  * @return String
  */
-export const translate = function (key, replacements) {
+export const translate = function (key, replacements = {}) {
     let message = getLine(key);
 
     for (let replace in replacements) {

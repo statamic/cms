@@ -1,9 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Dropdown, DropdownMenu, DropdownItem, DropdownHeader, DropdownFooter, DropdownSeparator, Button } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Dropdown, DropdownFooter, DropdownHeader, DropdownItem, DropdownMenu, DropdownSeparator} from '@ui';
 
 const meta = {
-    title: 'Components/Dropdown',
+    title: 'Overlays/Dropdown',
     component: Dropdown,
+    subcomponents: {
+        DropdownMenu,
+        DropdownItem,
+        DropdownHeader,
+        DropdownFooter,
+        DropdownSeparator,
+    },
     argTypes: {
         align: {
             control: 'select',
@@ -13,7 +20,6 @@ const meta = {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
         },
-        offset: { control: 'number' },
     },
 } satisfies Meta<typeof Dropdown>;
 

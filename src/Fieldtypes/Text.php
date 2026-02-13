@@ -166,8 +166,10 @@ class Text extends Fieldtype
 
     public function preProcessIndex($value)
     {
-        if ($value) {
-            return $this->config('prepend').$value.$this->config('append');
+        if (is_null($value)) {
+            return null;
         }
+
+        return $this->config('prepend').$value.$this->config('append');
     }
 }

@@ -9,11 +9,17 @@ import { computed } from 'vue';
 const emit = defineEmits(['page-selected', 'per-page-changed']);
 
 const props = defineProps({
+    /** When `true`, shows the totals (eg. 1-10 of 50) */
     showTotals: { type: Boolean, default: true },
+    /** The number of items per page */
     perPage: { type: Number },
+    /** The `meta` object from a Laravel API resource */
     resourceMeta: { type: Object, required: true },
+    /** When `true`, scrolls to the top when changing pages */
     scrollToTop: { type: Boolean, default: true },
+    /** When `true`, shows individual page number buttons */
     showPageLinks: { type: Boolean, default: true },
+    /** When `true`, shows the "per page" dropdown */
     showPerPageSelector: { type: Boolean, default: true },
 });
 

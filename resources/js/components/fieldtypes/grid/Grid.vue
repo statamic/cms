@@ -41,7 +41,7 @@
         </element-container>
 
         <confirmation-modal
-            v-if="deletingRow !== null"
+            :open="deletingRow !== null"
             :title="__('Delete Row')"
             :body-text="__('Are you sure?')"
             :button-text="__('Delete')"
@@ -54,7 +54,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';

@@ -72,7 +72,7 @@ class Tags extends BaseTags
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
         $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
-            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
@@ -84,7 +84,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
             $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
-            $data = array_merge($data, $jsDriver->addToFormData($form, $data));
+            $data = array_merge($data, $jsDriver->addToFormData($data));
         }
 
         $this->addToDebugBar($data, $formHandle);
@@ -389,7 +389,7 @@ class Tags extends BaseTags
      */
     protected function addToDebugBar($data, $formHandle)
     {
-        if (! function_exists('debugbar') || ! class_exists(ConfigCollector::class)) {
+        if (! function_exists('debugbar') || ! debugbar()->isEnabled() || ! class_exists(ConfigCollector::class)) {
             return;
         }
 

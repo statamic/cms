@@ -3,14 +3,23 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, getCurrentInstance } 
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
+    /** The title displayed at the top of the form. */
     title: { type: String, required: true },
+    /** Optional subtitle displayed below the title. */
     subtitle: { type: String, default: null },
+    /** Icon name to display next to the title. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** Text for the submit button. Defaults to the title if not provided. */
     submitText: { type: String, default: null },
+    /** When `true`, the submit button shows a loading state. */
     loading: { type: Boolean, default: false },
+    /** The URL for form data to be submitted to. */
     route: { type: String, required: true },
+    /** Instructions for the title field. */
     titleInstructions: { type: String, default: null },
+    /** Instructions for the handle field. */
     handleInstructions: { type: String, default: null },
+    /** When `true`, the handle field is not displayed. */
     withoutHandle: { type: Boolean, default: false },
 });
 

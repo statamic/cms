@@ -5,6 +5,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 
 const props = defineProps({
+    /** The error message to display */
     text: { type: [String, Number, Boolean, null], default: null },
 });
 </script>

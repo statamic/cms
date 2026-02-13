@@ -1,0 +1,55 @@
+:root {
+    --color-purple-light-1: hsl(256deg 60% 85%);
+    --color-purple: hsl(256deg 70% 55%);
+}
+
+/* GROUP SIDEBAR
+=================================================== */
+.sidebar-container {
+    .sidebar-item {
+        --tree-node-background-hover: hsl(256deg 60% 90%)!important;
+    }
+    [data-selected="true"],
+    [data-selected="true"] *,
+    [data-selected="true"] *:hover {
+        background: var(--color-purple-light-1)!important;
+        background: var(--color-purple)!important;
+        box-shadow: none!important;
+        outline: none;
+    }
+    [data-selected="true"] {
+        border-radius: 10px;
+        @supports (corner-shape: squircle) {
+            border-radius: 50px;
+            corner-shape: squircle;
+        }
+    }
+}
+
+/* GROUP TOPBAR
+=================================================== */
+.sb-bar {
+    /* Theme Selector */
+    [id*="select-"] {
+        background: hsl(256deg 60% 96%);
+        color: var(--color-purple);
+    }
+    button {
+        &:hover {
+            color: var(--color-purple);
+            background: hsl(256deg 60% 93%);
+        }
+    }
+}
+/* This is the best we can do, there are no other hooks */
+[aria-label="Theme selector"] {
+    [role="option"] {
+        &[aria-selected="true"] {
+            color: var(--color-purple);
+        }
+        &:hover {
+            color: var(--color-purple);
+            background: hsl(256deg 60% 96%);
+        }
+    }
+}

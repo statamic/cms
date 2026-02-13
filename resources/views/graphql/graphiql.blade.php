@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>GraphiQL ‹ Statamic</title>
         <style>
             body {
@@ -25,11 +25,11 @@
         <link
             rel="stylesheet"
             href="https://esm.sh/graphiql@4.0.0/dist/style.css"
-        />
+        >
         <link
             rel="stylesheet"
             href="https://esm.sh/@graphiql/plugin-explorer@4.0.0/dist/style.css"
-        />
+        >
         <!-- Note: the ?standalone flag bundles the module along with all of its `dependencies`, excluding `peerDependencies`, into a single JavaScript file. -->
         <script type="importmap">
             {

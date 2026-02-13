@@ -2,7 +2,9 @@
 import { cva } from 'cva';
 
 const props = defineProps({
+	/** Row index */
     index: { type: Number, required: true },
+	/** Total number of rows */
     total: { type: Number, required: true },
 });
 

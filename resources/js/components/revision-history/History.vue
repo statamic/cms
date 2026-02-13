@@ -1,13 +1,6 @@
 <template>
-    <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
-        <header
-            class="flex items-center justify-between rounded-t-xl border-b border-gray-300 px-4 mb-3 py-2 dark:border-gray-950 dark:bg-gray-800"
-        >
-            <Heading size="lg">{{ __('Revision History') }}</Heading>
-            <Button icon="x" variant="ghost" class="-me-2" @click="close" />
-        </header>
-
-        <div class="flex-1 overflow-auto">
+    <div class="">
+        <div class="">
             <div class="loading flex h-full items-center justify-center" v-if="loading">
                 <Icon name="loading" />
             </div>
@@ -42,6 +35,8 @@ import DateFormatter from '@/components/DateFormatter.js';
 import { Heading, Button, Icon } from '@/components/ui';
 
 export default {
+	emits: ['closed'],
+
     components: {
         Revision,
         Heading,

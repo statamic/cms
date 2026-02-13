@@ -2,6 +2,7 @@
 import Heading from '../Heading.vue';
 
 const props = defineProps({
+    /** Heading text for the panel */
     title: { type: String, default: null },
 });
 </script>

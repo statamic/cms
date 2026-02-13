@@ -1,0 +1,39 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as AlertStories from '../Alert.stories';
+
+<Meta of={AlertStories} />
+
+# Alert
+Alerts are used to display important messages, notifications, and feedback to users. They come in multiple variants to convey different types of information.
+
+<Canvas of={AlertStories._DocsIntro} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to change the appearance and semantic meaning of the alert. Available variants are `default`, `warning`, `error`, and `success`.
+
+<Canvas of={AlertStories.Variants} sourceState={'shown'} />
+
+## Custom Icons
+You can override the default icon by passing a custom `icon` prop with the name of any available icon.
+
+<Canvas of={AlertStories.CustomIcons} sourceState={'shown'} />
+
+## Headings
+You can use the `heading` prop to prepend a heading.
+
+<Canvas of={AlertStories.Headings} sourceState={'shown'} />
+
+## Slot Content
+Instead of using the `text` and `heading` props, you can use the default slot to provide custom content with HTML formatting.
+
+<Canvas of={AlertStories.SlotContent} sourceState={'shown'} />
+
+## Rich Content
+Alerts support rich content including headings, paragraphs, and code snippets, making them ideal for detailed messages and instructions. You can use either native HTML elements (h1–h6, p) or the Heading/Description components—both approaches receive consistent styling and color inheritance.
+
+All heading levels (h1–h6) are styled identically, so choose the heading level that's semantically appropriate for your content. If you want to adjust the size of the headings, you can use the Heading component and specify a size (`base`, `lg`, `xl`, or `2xl`). The Alert component automatically adjusts spacing for larger headings.
+
+<Canvas of={AlertStories.RichContent} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={AlertStories} />

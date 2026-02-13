@@ -3,7 +3,9 @@ import { CommandPaletteItem, Badge } from '@ui';
 import { computed } from 'vue';
 
 const props = defineProps({
+    /** Topic of the documentation you're linking to */
     topic: { type: String, required: true },
+    /** The URL to link to. Can be a full URL or a relative path that will be prepended with `https://statamic.dev/` */
     url: { type: String, required: true },
 });
 
@@ -13,7 +15,7 @@ const url = computed(() => props.url.startsWith('http') ? props.url : `https://s
 
 <template>
 
-    <div v-if="linkToDocs" class="mt-12 mb-2 flex justify-center text-center starting-style-transition">
+    <div v-if="linkToDocs" class="mt-12 mb-10 flex justify-center text-center starting-style-transition">
         <CommandPaletteItem
             :text="[__('Statamic Documentation'), topic]"
             icon="book-next-page"

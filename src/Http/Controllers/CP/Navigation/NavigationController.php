@@ -11,9 +11,11 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
@@ -61,6 +63,7 @@ class NavigationController extends CpController
             'title' => $nav->title(),
             'handle' => $nav->handle(),
             'collections' => $nav->collections()->map->handle()->all(),
+            'collections_query_scopes' => $nav->collectionsQueryScopes(),
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
             'max_depth' => $nav->maxDepth(),
@@ -90,6 +93,30 @@ class NavigationController extends CpController
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
+        $collectionTree = null;
+
+        if ($nav->collections()->count() === 1 && $nav->collections()->first()->hasStructure()) {
+            $collection = $nav->collections()->first();
+
+            $collectionBlueprints = $collection
+                ->entryBlueprints()
+                ->reject->hidden()
+                ->map(function ($blueprint) {
+                    return [
+                        'handle' => $blueprint->handle(),
+                        'title' => $blueprint->title(),
+                    ];
+                })->values();
+
+            $collectionTree = [
+                'title' => $collection->title(),
+                'url' => cp_route('collections.tree.index', $collection),
+                'showSlugs' => $collection->structure()->showSlugs(),
+                'expectsRoot' => $collection->structure()->expectsRoot(),
+                'blueprints' => $collectionBlueprints,
+            ];
+        }
+
         return Inertia::render('navigation/Show', [
             'title' => $nav->title(),
             'handle' => $nav->handle(),
@@ -106,6 +133,7 @@ class NavigationController extends CpController
                 ];
             })->values()->all(),
             'collections' => $nav->collections()->map->handle()->all(),
+            'entryQueryScopes' => $nav->collectionsQueryScopes(),
             'initialMaxDepth' => $nav->maxDepth(),
             'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
@@ -114,6 +142,7 @@ class NavigationController extends CpController
             'canEdit' => User::current()->can('edit', $nav),
             'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
             'canEditBlueprint' => User::current()->can('configure fields'),
+            'collectionTree' => $collectionTree,
         ]);
     }
 
@@ -140,6 +169,7 @@ class NavigationController extends CpController
             ->title($values['title'])
             ->expectsRoot($values['root'])
             ->collections($values['collections'])
+            ->collectionsQueryScopes(Arr::get($values, 'collections_query_scopes', []))
             ->maxDepth($values['max_depth']);
 
         $existingSites = $nav->trees()->keys()->all();
@@ -237,6 +267,16 @@ class NavigationController extends CpController
                         'instructions' => __('statamic::messages.navigation_configure_collections_instructions'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'collections_query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                     'root' => [
                         'display' => __('Expect a root page'),

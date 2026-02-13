@@ -19,7 +19,7 @@ function updateIndex(index) {
 <template>
     <Head :title="[__('Search'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__('Search')" icon="magnifying-glass">
             <Button variant="primary" @click="updateAll">
                 {{ __('Update Indexes') }}
@@ -41,7 +41,7 @@ function updateIndex(index) {
                     <TableRow v-for="index in indexes" :key="`${index.name}::${index.locale}`">
                         <TableCell>
                             <div class="flex items-start">
-                                <div class="-mt-0.5 flex size-6 shrink-0 me-2 text-black dark:text-gray-200 [&_.icon-background]:fill-gray-100 dark:[&_.icon-background]:fill-gray-900" v-html="index.driverIcon" />
+                                <div class="-mt-0.5 flex size-6 shrink-0 me-2 text-gray-925 dark:text-gray-200 [&_.icon-background]:fill-gray-100 dark:[&_.icon-background]:fill-gray-900" v-html="index.driverIcon" />
                                 <span class="text-gray-900 dark:text-gray-200" v-text="index.title" />
                             </div>
                         </TableCell>

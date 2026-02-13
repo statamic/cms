@@ -2,7 +2,7 @@ import * as Vue from 'vue';
 
 export default function() {
     const RESOLVED_VIRTUAL_MODULE_ID = '\0vue-external';
-    const vueExports = Object.keys(Vue).filter(key => key !== 'default');
+    const vueExports = Object.keys(Vue).filter(key => key !== 'default' && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key));
 
     return {
         name: 'statamic-externals',

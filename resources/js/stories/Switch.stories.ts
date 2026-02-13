@@ -1,16 +1,22 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Switch } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Switch} from '@ui';
+import {ref} from 'vue';
 
 const meta = {
-    title: 'Components/Switch',
+    title: 'Forms/Switch',
     component: Switch,
     argTypes: {
         size: {
             control: 'select',
-            options: ['lg', 'default', 'sm', 'xs'],
+            options: ['xs', 'sm', 'base', 'lg'],
         },
-        disabled: { control: 'boolean' },
-        checked: { control: 'boolean' },
+        'update:modelValue': {
+            description: 'Event handler called when the value changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Switch>;
 
@@ -18,7 +24,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultCode = `
-<Switch />
+<Switch v-model="enabled" />
 `;
 
 export const _DocsIntro: Story = {
@@ -30,16 +36,20 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Switch },
+        setup() {
+            const enabled = ref(false);
+            return { enabled };
+        },
         template: defaultCode,
     }),
 };
 
 const sizesCode = `
-<div class="flex items-center">
-    <Switch size="lg" />
-    <Switch />
-    <Switch size="sm" />
-    <Switch size="xs" />
+<div class="flex items-center gap-2">
+    <Switch v-model="lg" size="lg" />
+    <Switch v-model="base" />
+    <Switch v-model="sm" size="sm" />
+    <Switch v-model="xs" size="xs" />
 </div>
 `;
 
@@ -52,6 +62,13 @@ export const _Sizes: Story = {
     },
     render: () => ({
         components: { Switch },
+        setup() {
+            const lg = ref(false);
+            const base = ref(false);
+            const sm = ref(false);
+            const xs = ref(false);
+            return { lg, base, sm, xs };
+        },
         template: sizesCode,
     }),
 };

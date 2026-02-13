@@ -1,5 +1,5 @@
 <script setup>
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage, router } from '@inertiajs/vue3';
 import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -10,15 +10,33 @@ const localStorageKey = 'statamic.nav';
 const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
 const navRef = ref(null);
 const isMobile = ref(false);
+const collapsedByViewport = ref(false);
 let clickListenerActive = false;
+let navigateEventListener = null;
 
 onMounted(() => {
     // Check if screen is less than lg breakpoint (1024px)
     const mediaQuery = window.matchMedia('(width < 1024px)');
     isMobile.value = mediaQuery.matches;
-    
+
     const handleMediaChange = (e) => {
         isMobile.value = e.matches;
+        // Collapse nav when viewport shrinks to mobile size
+        if (e.matches && isOpen.value) {
+            isOpen.value = false;
+            collapsedByViewport.value = true;
+            localStorage.setItem(localStorageKey, 'closed');
+        }
+        // Expand nav when viewport grows back to desktop size (only if it was collapsed by viewport. If the user explicitly set the nav to collapse, we don't want to expand it.)
+        if (!e.matches && !isOpen.value && collapsedByViewport.value) {
+            isOpen.value = true;
+            collapsedByViewport.value = false;
+            localStorage.setItem(localStorageKey, 'open');
+        }
+        // Reset the flag if we're on desktop
+        if (!e.matches) {
+            collapsedByViewport.value = false;
+        }
     };
     
     mediaQuery.addEventListener('change', handleMediaChange);
@@ -52,9 +70,20 @@ onMounted(() => {
     // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
     
+    // Close nav on mobile when navigating to a different page
+    navigateEventListener = router.on('navigate', () => {
+        if (isMobile.value && isOpen.value) {
+            isOpen.value = false;
+            localStorage.setItem(localStorageKey, 'closed');
+        }
+    });
+    
     onUnmounted(() => {
         document.removeEventListener('click', handleClickOutside);
         mediaQuery.removeEventListener('change', handleMediaChange);
+        if (navigateEventListener) {
+            navigateEventListener();
+        }
     });
 });
 
@@ -69,6 +98,9 @@ function handleClickOutside(event) {
 
 function toggle() {
     isOpen.value = !isOpen.value;
+    // Reset viewport flag since user is explicitly toggling, so we should respect their preference
+    // even when viewport size changes (don't auto-expand if user manually closed it)
+    collapsedByViewport.value = false;
     localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
 }
 

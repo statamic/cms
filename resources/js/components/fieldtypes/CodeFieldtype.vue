@@ -1,7 +1,7 @@
 <template>
     <CodeEditor
         ref="codeEditor"
-        :theme="config.theme"
+        :color-mode="config.color_mode"
         :rulers="config.rulers"
         :disabled="config.disabled"
         :read-only="config.read_only"

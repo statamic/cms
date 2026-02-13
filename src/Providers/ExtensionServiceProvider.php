@@ -115,6 +115,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\TemplateFolder::class,
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
+        Fieldtypes\Theme::class,
         Fieldtypes\Time::class,
         Fieldtypes\Toggle::class,
         Fieldtypes\UserGroups::class,

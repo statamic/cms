@@ -106,20 +106,36 @@ export const Set = Node.create({
             new Plugin({
                 key: new PluginKey('setPastedTransformer'),
                 props: {
-                    transformPasted: (slice) => {
-                        const { content } = slice.content;
-                        return new Slice(
-                            Fragment.fromArray(
-                                content.map((node) => {
-                                    if (node.type === type) {
-                                        return node.type.create(bard.pasteSet(node.attrs));
-                                    }
-                                    return node.copy(node.content);
-                                }),
-                            ),
-                            slice.openStart,
-                            slice.openEnd,
-                        );
+                    handlePaste: (view, event, slice) => {
+                        let hasSetNodes = false;
+                        slice.content.forEach((node) => {
+                            if (node.type === type) hasSetNodes = true;
+                        });
+
+                        if (!hasSetNodes) return false;
+
+                        (async () => {
+                            const content = [];
+                            for (const node of slice.content.content) {
+                                if (node.type === type) {
+                                    const newAttrs = await bard.pasteSet(node.attrs);
+                                    content.push(node.type.create(newAttrs));
+                                } else {
+                                    content.push(node);
+                                }
+                            }
+
+                            const newSlice = new Slice(
+                                Fragment.fromArray(content),
+                                slice.openStart,
+                                slice.openEnd,
+                            );
+
+                            const tr = view.state.tr.replaceSelection(newSlice);
+                            view.dispatch(tr);
+                        })();
+
+                        return true;
                     },
                 },
             }),

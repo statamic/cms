@@ -3,11 +3,13 @@
 namespace Statamic\Http\Controllers\CP\Preferences;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Jobs\ReportThemeUsage;
 use Statamic\Statamic;
 
 trait ManagesPreferences
@@ -30,11 +32,20 @@ trait ManagesPreferences
 
     protected function updatePreferences(Request $request, $item)
     {
+        $previousTheme = $item->getPreference('theme');
+
         $fields = $this->blueprint()->fields()->addValues($request->all())->process();
 
         $fields->validate();
 
         $fields->all()->each(function ($field) use ($item) {
+            // Theme-specific workaround for lack of fallback logic.
+            if ($field->handle() === 'theme') {
+                $item->setPreference('theme', $field->value());
+
+                return;
+            }
+
             if ($field->value() === $field->defaultValue()) {
                 $item->removePreference($field->handle());
             } else {
@@ -43,6 +54,8 @@ trait ManagesPreferences
         });
 
         $item->save();
+
+        $this->trackTheme($previousTheme, $item->getPreference('theme'));
 
         $this->success(__('Saved'));
     }
@@ -85,5 +98,16 @@ trait ManagesPreferences
         $options->forget($this->ignoreSaveAsOption());
 
         return $options;
+    }
+
+    private function trackTheme($oldTheme, $newTheme)
+    {
+        try {
+            ReportThemeUsage::dispatch($oldTheme, $newTheme);
+        } catch (\Throwable $e) {
+            Log::error('Failed to report theme usage: '.$e->getMessage());
+
+            return;
+        }
     }
 }

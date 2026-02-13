@@ -133,7 +133,7 @@ const extraValues = computed(() => {
 
 const shouldShowField = computed(() => {
     return new ShowField(
-        visibleValues.value,
+        values.value,
         extraValues.value,
         containerVisibleValues.value,
         revealerValues.value,
@@ -228,7 +228,7 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :variant="config.variant"
+            :inline="asConfig"
             :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >

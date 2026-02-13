@@ -13,6 +13,10 @@ export default class ColorMode {
         this.#registerCommands();
     }
 
+    get mode() {
+        return this.#mode;
+    }
+
     get preference() {
         return this.#preference;
     }

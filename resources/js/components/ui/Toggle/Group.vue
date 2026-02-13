@@ -5,9 +5,13 @@ import { cva } from 'cva';
 
 const props = defineProps({
     required: { type: Boolean, default: false },
+    /** The controlled value of the toggle group. */
     modelValue: { type: [String, Array], default: null },
+    /** Controls the size of the toggle items. <br><br> Options: `xs`, `sm`, `base` */
     size: { type: String, default: 'base' },
+    /** Controls the appearance of the toggle items. <br><br> Options: `default`, `primary`, `filled`, `ghost` */
     variant: { type: String, default: 'default' },
+    /** When `true`, multiple items can be selected */
     multiple: { type: Boolean, default: false },
 });
 

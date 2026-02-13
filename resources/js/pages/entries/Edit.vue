@@ -5,7 +5,6 @@ import Head from '@/pages/layout/Head.vue';
 defineProps([
     'actions',
     'collection',
-    'collectionHasRoutes',
     'title',
     'reference',
     'blueprint',
@@ -42,7 +41,6 @@ defineProps([
         :initial-actions="actions"
         method="patch"
         :collection-handle="collection"
-        :collection-has-routes="collectionHasRoutes"
         :initial-title="title"
         :initial-reference="reference"
         :initial-fieldset="blueprint"

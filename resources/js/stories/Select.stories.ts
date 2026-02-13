@@ -1,22 +1,30 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Select } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Select} from '@ui';
+import {icons} from "@/stories/icons";
 
 const meta = {
-    title: 'Components/Select',
+    title: 'Forms/Select',
     component: Select,
     argTypes: {
-        label: { control: 'text' },
+        icon: {
+            control: 'select',
+            options: icons,
+        },
         size: {
             control: 'select',
-            options: ['default', 'sm', 'xs'],
+            options: ['xs', 'sm', 'base', 'lg', 'xl'],
         },
         variant: {
             control: 'select',
             options: ['default', 'filled', 'ghost', 'subtle'],
         },
-        clearable: { control: 'boolean' },
-        icon: { control: 'text' },
-        disabled: { control: 'boolean' },
+        'update:modelValue': {
+            description: 'Event handler called when the selected option changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Select>;
 

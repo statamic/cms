@@ -1,32 +1,24 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import { Calendar, Card } from '@ui';
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Calendar, Card} from '@ui';
 
 const meta = {
-    title: 'Components/Calendar',
+    title: 'Forms/Calendar',
     component: Calendar,
     argTypes: {
-        min: { control: 'text' },
-        max: { control: 'text' },
-        numberOfMonths: { control: 'number' },
-        weekStartsOn: { control: 'number' },
-        weekdayFormat: {
-            control: 'select',
-            options: ['narrow', 'short', 'long'],
-        },
-        preventDeselect: { control: 'boolean' },
-        disabled: { control: 'boolean' },
-        inline: { control: 'boolean' },
+        'update:modelValue': {
+            description: 'Event handler called when a date is selected. Returns the date as an ISO 8601 date and time string.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
     },
 } satisfies Meta<typeof Calendar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Card>
-    <Calendar />
-</Card>
-`;
+const defaultCode = `<Calendar />`;
 
 export const _DocsIntro: Story = {
     tags: ['!dev'],
@@ -37,15 +29,11 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: defaultCode,
+        template: `<Card>${defaultCode}</Card>`,
     }),
 };
 
-const multipleMonthsCode = `
-<Card>
-    <Calendar :number-of-months="2" />
-</Card>
-`;
+const multipleMonthsCode = `<Calendar :number-of-months="2" />`;
 
 export const _MultipleMonths: Story = {
     tags: ['!dev'],
@@ -56,15 +44,11 @@ export const _MultipleMonths: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: multipleMonthsCode,
+        template: `<Card>${multipleMonthsCode}</Card>`,
     }),
 };
 
-const weekStartsOnCode = `
-<Card>
-    <Calendar week-starts-on="1" />
-</Card>
-`;
+const weekStartsOnCode = `<Calendar week-starts-on="1" />`;
 
 export const _WeekStartsOn: Story = {
     tags: ['!dev'],
@@ -75,25 +59,6 @@ export const _WeekStartsOn: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: weekStartsOnCode,
-    }),
-};
-
-const weekdayFormatCode = `
-<Card>
-    <Calendar weekday-format="short" />
-</Card>
-`;
-
-export const _WeekdayFormat: Story = {
-    tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: weekdayFormatCode }
-        }
-    },
-    render: () => ({
-        components: { Calendar, Card },
-        template: weekdayFormatCode,
+        template: `<Card>${weekStartsOnCode}</Card>`,
     }),
 };
