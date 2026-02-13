@@ -168,7 +168,9 @@
                         </ContextMenu>
                     </Context>
                 </ItemActions>
-                <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
+                <div class="asset-filename">
+                    <TruncatedText :text="asset.basename" />
+                </div>
             </div>
         </section>
 
@@ -193,7 +195,8 @@ import {
     DropdownMenu,
     DropdownLabel,
     DropdownItem,
-    DropdownSeparator
+    DropdownSeparator,
+    TruncatedText
 } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -217,6 +220,7 @@ export default {
         DropdownSeparator,
         ItemActions,
         FolderSvg,
+        TruncatedText,
     },
 
     props: {
