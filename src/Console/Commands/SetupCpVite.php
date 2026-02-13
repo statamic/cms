@@ -163,6 +163,7 @@ class SetupCpVite extends Command
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => 'cp-hot',
             'buildDirectory' => 'vendor/app',
         ]);
 PHP);
