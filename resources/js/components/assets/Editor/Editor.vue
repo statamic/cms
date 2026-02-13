@@ -285,6 +285,7 @@ export default {
             originValues: {},
             originMeta: {},
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            loadId: 0,
         };
     },
 
@@ -347,6 +348,7 @@ export default {
          */
         load(site = null) {
             this.loading = true;
+            const loadId = ++this.loadId;
 
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
             const requestedSite = site ?? this.activeSite ?? this.site;
@@ -354,6 +356,8 @@ export default {
             this.$axios.get(url, {
                 params: requestedSite ? { site: requestedSite } : {},
             }).then((response) => {
+                if (loadId !== this.loadId) return;
+
                 const data = response.data.data;
                 this.asset = data;
 
@@ -392,6 +396,10 @@ export default {
                 ]);
 
                 this.loading = false;
+            }).catch(() => {
+                if (loadId === this.loadId) {
+                    this.loading = false;
+                }
             });
         },
 
