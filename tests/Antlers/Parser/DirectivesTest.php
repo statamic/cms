@@ -268,4 +268,13 @@ EOT;
             $this->renderString($template, ['title' => 'The Title'])
         );
     }
+
+    public function test_directive_in_no_parse_is_correctly_escaped()
+    {
+        $template = <<<'EOT'
+{{ noparse }}@cascade{{ /noparse }}
+EOT;
+
+        $this->assertSame('@cascade', $this->renderString($template));
+    }
 }
