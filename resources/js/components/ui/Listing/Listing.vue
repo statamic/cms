@@ -6,7 +6,6 @@ export const [injectListingContext, provideListingContext] = createContext('List
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-
 import useSkeletonDelay from '@/composables/skeleton-delay.js';
 import {
     Icon,
