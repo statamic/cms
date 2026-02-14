@@ -144,14 +144,15 @@ return Interia::render('team-members/Index', [
 ]);
 ```
 
-```vue
+```js
 <script setup>
 defineProps({
     filters: Object,
     // ...
 });
 </script>
-
+```
+```html
 <template>
     <Listing
         :url="cp_url('team-members/json')"
