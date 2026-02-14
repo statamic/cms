@@ -62,6 +62,8 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
+        abort_if(! $asset, 404);
+
         $site = $request->input('site') ?: (Site::multiEnabled() ? Site::selected()->handle() : null);
 
         if ($site) {
