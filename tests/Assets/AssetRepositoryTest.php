@@ -298,4 +298,44 @@ EOT;
 
         $this->assertSame('English alt', $asset->get('alt'));
     }
+
+    #[Test]
+    public function focal_points_are_not_localized()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'es' => ['url' => '/es/', 'locale' => 'es'],
+        ]);
+
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'hello');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'en' => [
+                    'alt' => 'Bob Ross',
+                    'focus' => '10-20',
+                ],
+                'es' => [
+                    'alt' => 'El Bob Rosso',
+                ],
+            ],
+            'size' => 5,
+            'last_modified' => 123,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        $container = tap(AssetContainer::make('test')->disk('test')->localizable(true))->save();
+        $asset = $container->makeAsset('foo/test.txt')->in('es');
+        $asset->set('focus', '75-25');
+
+        (new AssetRepository)->save($asset);
+
+        $meta = YAML::parse($disk->get('foo/.meta/test.txt.yaml'));
+
+        $this->assertSame('75-25', $meta['data']['en']['focus']);
+        $this->assertArrayNotHasKey('focus', $meta['data']['es']);
+    }
 }

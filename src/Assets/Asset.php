@@ -305,6 +305,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 $updated = $this->localizedDataForPersistence($meta);
 
                 Arr::set($meta, "data.{$locale}", $updated);
+                $this->syncFocusToDefaultLocale($meta, $locale);
             } else {
                 $meta['data'] = collect(Arr::get($meta, 'data', []))
                     ->merge($this->data->all())
@@ -530,6 +531,14 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             $origin = $siteOrigins->get($origin);
         }
 
+        if ($this->usesLocalizedData() && ! array_key_exists('focus', $data->all())) {
+            $focus = Arr::get($meta, 'data.'.Site::default()->handle().'.focus');
+
+            if (! is_null($focus)) {
+                $data->put('focus', $focus);
+            }
+        }
+
         return $data;
     }
 
@@ -550,6 +559,36 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->merge($this->data->all())
             ->except($this->removedData)
             ->all();
+    }
+
+    protected function syncFocusToDefaultLocale(array &$meta, string $locale): void
+    {
+        $default = Site::default()->handle();
+
+        if (in_array('focus', $this->removedData, true)) {
+            $data = Arr::get($meta, 'data', []);
+
+            foreach ($data as $site => $siteData) {
+                unset($siteData['focus']);
+                $data[$site] = $siteData;
+            }
+
+            $meta['data'] = $data;
+
+            return;
+        }
+
+        $focus = Arr::get($meta, "data.{$locale}.focus", Arr::get($meta, "data.{$default}.focus"));
+
+        if (is_null($focus)) {
+            return;
+        }
+
+        Arr::set($meta, "data.{$default}.focus", $focus);
+
+        if ($locale !== $default) {
+            Arr::forget($meta, "data.{$locale}.focus");
+        }
     }
 
     public function origin($origin = null)
