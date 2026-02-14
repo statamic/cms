@@ -5,11 +5,8 @@ export const [injectListingContext, provideListingContext] = createContext('List
 </script>
 
 <script setup>
-import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots, useAttrs } from 'vue';
+import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
 
-defineOptions({ inheritAttrs: false });
-
-const attrs = useAttrs();
 import useSkeletonDelay from '@/composables/skeleton-delay.js';
 import {
     Icon,
@@ -705,7 +702,7 @@ autoApplyState();
 </script>
 
 <template>
-    <div v-bind="attrs">
+    <div>
         <slot name="initializing" v-if="shouldShowSkeleton">
             <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
                 <ui-skeleton class="h-5 w-48" />
@@ -748,6 +745,6 @@ autoApplyState();
                 </PanelFooter>
             </Panel>
         </slot>
+        <BulkActions v-if="showBulkActions" />
     </div>
-	<BulkActions v-if="showBulkActions" />
 </template>
