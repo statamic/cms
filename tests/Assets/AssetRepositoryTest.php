@@ -153,6 +153,39 @@ EOT;
     }
 
     #[Test]
+    public function it_does_not_materialize_inherited_values_when_saving_without_localized_changes()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'es' => ['url' => '/es/', 'locale' => 'es'],
+        ]);
+
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'hello');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'en' => ['alt' => 'Bob Ross'],
+            ],
+            'size' => 5,
+            'last_modified' => 123,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'text/plain',
+            'duration' => null,
+        ]));
+
+        $container = tap(AssetContainer::make('test')->disk('test')->localizable(true))->save();
+        $asset = $container->makeAsset('foo/test.txt')->in('es');
+
+        (new AssetRepository)->save($asset);
+
+        $meta = YAML::parse($disk->get('foo/.meta/test.txt.yaml'));
+
+        $this->assertArrayHasKey('en', $meta['data']);
+        $this->assertArrayNotHasKey('es', $meta['data']);
+    }
+
+    #[Test]
     public function it_drops_empty_localized_buckets_and_omits_default_sites_map()
     {
         $this->setSites([

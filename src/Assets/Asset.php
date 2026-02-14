@@ -302,11 +302,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
             if ($this->usesLocalizedData()) {
                 $locale = $this->locale();
-                $existing = Arr::get($meta, "data.{$locale}", []);
-                $updated = collect($existing)
-                    ->merge($this->data->all())
-                    ->except($this->removedData)
-                    ->all();
+                $updated = $this->localizedDataForPersistence($meta);
 
                 Arr::set($meta, "data.{$locale}", $updated);
             } else {
@@ -357,9 +353,18 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function generateMeta()
     {
+        $rawMeta = $this->meta;
+        if (! $rawMeta && $this->exists() && $contents = $this->disk()->get($path = $this->metaPath())) {
+            $rawMeta = YAML::file($path)->parse($contents);
+        }
+
+        $data = $this->usesLocalizedData() && $rawMeta
+            ? $this->localizedDataForPersistence($this->normalizeMeta($rawMeta))
+            : $this->data->all();
+
         $meta = ['data' => $this->usesLocalizedData()
-            ? [$this->locale() => $this->data->all()]
-            : $this->data->all()];
+            ? [$this->locale() => $data]
+            : $data];
 
         if ($this->exists()) {
             $attributes = Attributes::asset($this)->get();
@@ -526,6 +531,25 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $data;
+    }
+
+    protected function localizedDataForPersistence(array $meta): array
+    {
+        $locale = $this->locale();
+        $existing = collect(Arr::get($meta, "data.{$locale}", []));
+        $hydrated = $this->dataForLocale($meta, $locale);
+
+        // If nothing has touched asset data, keep explicit localized values as-is.
+        // This prevents save operations like move/rename from persisting inherited
+        // origin values into the localized override bucket.
+        if ($this->removedData === [] && $this->data->all() === $hydrated->all()) {
+            return $existing->all();
+        }
+
+        return $existing
+            ->merge($this->data->all())
+            ->except($this->removedData)
+            ->all();
     }
 
     public function origin($origin = null)
