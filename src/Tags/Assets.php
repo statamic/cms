@@ -2,16 +2,27 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Facades\Log;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Pattern;
+use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Assets extends Tags
 {
+    use Concerns\GetsQueryResults,
+        Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes;
+
     /**
      * @var AssetCollection
      */
@@ -40,7 +51,7 @@ class Assets extends Tags
 
             $this->assets = (new AssetCollection([$value]))->flatten();
 
-            return $this->output();
+            return $this->outputCollection($this->assets);
         }
 
         if ($value instanceof Value) {
@@ -66,21 +77,24 @@ class Assets extends Tags
         $path = $this->params->get('path');
         $collection = $this->params->get('collection');
 
-        $this->assets = $collection
-            ? $this->assetsFromCollection($collection)
-            : $this->assetsFromContainer($id, $path);
+        if ($collection) {
+            return $this->outputCollection($this->assetsFromCollection($collection));
+        }
 
-        if ($this->assets->isEmpty()) {
+        $results = $this->assetsFromContainer($id, $path);
+        $results = $this->applyPostQueryFilters($results);
+
+        if ($results instanceof \Illuminate\Support\Collection && $results->isEmpty()) {
             return $this->parseNoResults();
         }
 
-        return $this->output();
+        return $this->output($results);
     }
 
     protected function assetsFromContainer($id, $path)
     {
         if (! $id && ! $path) {
-            \Log::debug('No asset container ID or path was specified.');
+            Log::debug('No asset container ID or path was specified.');
 
             return collect();
         }
@@ -95,9 +109,78 @@ class Assets extends Tags
             return collect();
         }
 
-        $assets = $container->assets($this->params->get('folder'), $this->params->get('recursive', false));
+        $query = $container->queryAssets();
 
-        return $this->filterByType($assets);
+        $this->queryFolder($query);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $this->results($query);
+    }
+
+    protected function queryConditions($query)
+    {
+        $this->queryableConditionParams()->each(function ($value, $param) use ($query) {
+            $field = explode(':', $param)[0];
+            $condition = explode(':', $param)[1] ?? false;
+            $value = $this->getQueryConditionValue($value, $field);
+            $fields = $this->queryConditionFields($field);
+
+            if (count($fields) === 1) {
+                $this->queryCondition($query, $fields[0], $condition, $value);
+
+                return;
+            }
+
+            $query->where(function ($query) use ($fields, $condition, $value) {
+                $this->queryCondition($query, Arr::pull($fields, 0), $condition, $value);
+
+                foreach ($fields as $field) {
+                    $query->orWhere(function ($query) use ($field, $condition, $value) {
+                        $this->queryCondition($query, $field, $condition, $value);
+                    });
+                }
+            });
+        });
+    }
+
+    protected function queryConditionFields($field): array
+    {
+        if (Str::contains($field, ['.', '->']) || $this->isNativeAssetConditionField($field)) {
+            return [$field];
+        }
+
+        if (! Site::hasMultiple()) {
+            return [$field, "data->{$field}"];
+        }
+
+        $site = Site::current()->handle();
+
+        return [$field, "data->{$field}", "data->{$site}->{$field}"];
+    }
+
+    protected function isNativeAssetConditionField(string $field): bool
+    {
+        return in_array($field, [
+            'id',
+            'container',
+            'path',
+            'basename',
+            'folder',
+            'filename',
+            'extension',
+            'is_image',
+            'is_video',
+            'is_audio',
+            'size',
+            'last_modified',
+            'height',
+            'width',
+            'mime_type',
+            'duration',
+            'ratio',
+        ]);
     }
 
     protected function assetsFromCollection($collection)
@@ -160,22 +243,6 @@ class Assets extends Tags
     }
 
     /**
-     * Filter out assets from a requested folder.
-     *
-     * @return void
-     */
-    private function filterNotIn()
-    {
-        if ($not_in = $this->params->get('not_in')) {
-            $regex = '#^('.$not_in.')#';
-
-            $this->assets = $this->assets->reject(function ($path) use ($regex) {
-                return preg_match($regex, $path);
-            });
-        }
-    }
-
-    /**
      * Perform the asset lookups.
      *
      * @param  string|array  $urls  One URL, or array of URLs.
@@ -204,20 +271,24 @@ class Assets extends Tags
             ];
         });
 
-        return $this->output();
+        return $this->outputCollection($this->assets);
     }
 
-    private function output()
+    private function outputCollection($assets)
     {
-        $this->filterNotIn();
+        $this->assets = $this->applyPostCollectionFilters($assets);
 
-        $this->sort();
-        $this->limit();
+        $this->sortCollection();
+        $this->limitCollection();
+
+        if ($this->assets->isEmpty()) {
+            return $this->parseNoResults();
+        }
 
         return $this->assets;
     }
 
-    private function sort()
+    private function sortCollection()
     {
         if ($sort = $this->params->get('sort')) {
             $this->assets = $this->assets->multisort($sort);
@@ -227,7 +298,7 @@ class Assets extends Tags
     /**
      * Limit and offset the asset collection.
      */
-    private function limit()
+    private function limitCollection()
     {
         $limit = $this->params->int('limit');
         $limit = ($limit == 0) ? $this->assets->count() : $limit;
@@ -236,9 +307,77 @@ class Assets extends Tags
         $this->assets = $this->assets->splice($offset, $limit);
     }
 
+    protected function queryFolder($query)
+    {
+        $folder = $this->params->get('folder');
+        $recursive = $this->params->get('recursive', false);
+
+        if ($folder === '/' && $recursive) {
+            $folder = null;
+        }
+
+        if ($folder === null) {
+            return;
+        }
+
+        if ($recursive) {
+            $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
+
+            return;
+        }
+
+        $query->where('folder', $folder);
+    }
+
+    protected function applyPostQueryFilters($results)
+    {
+        if ($results instanceof AbstractPaginator) {
+            $results->setCollection($this->applyPostCollectionFilters($results->getCollection())->values());
+
+            return $results;
+        }
+
+        if ($results instanceof Chunks) {
+            return $results->map(function ($chunk) {
+                return $this->applyPostCollectionFilters($chunk)->values();
+            });
+        }
+
+        if ($results instanceof \Illuminate\Support\Collection) {
+            return $this->applyPostCollectionFilters($results);
+        }
+
+        return $results;
+    }
+
+    protected function applyPostCollectionFilters($assets)
+    {
+        return $this->filterNotIn($this->filterByType($assets));
+    }
+
     private function isAssetsFieldValue($value)
     {
         return $value instanceof Value
             && optional($value->fieldtype())->handle() === 'assets';
+    }
+
+    /**
+     * Filter out assets from a requested folder.
+     */
+    private function filterNotIn($assets)
+    {
+        if (! $not_in = $this->params->get('not_in')) {
+            return $assets;
+        }
+
+        $regex = '#^('.$not_in.')#';
+
+        return $assets->reject(function ($asset) use ($regex) {
+            $path = method_exists($asset, 'path')
+                ? $asset->path()
+                : (string) $asset;
+
+            return preg_match($regex, $path);
+        });
     }
 }
