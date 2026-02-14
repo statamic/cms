@@ -195,11 +195,14 @@ class AssetContainersController extends CpController
                         'type' => 'toggle',
                         'display' => __('Localizable Metadata'),
                         'instructions' => __('When enabled, asset field data like alt text can be translated per site.'),
-                        'if' => Site::multiEnabled(),
                     ],
                 ],
             ],
         ]);
+
+        if (! Site::multiEnabled()) {
+            unset($fields['settings']['fields']['localizable']);
+        }
 
         $fields = array_merge($fields, [
             'image_manipulation' => [

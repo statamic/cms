@@ -3,12 +3,14 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 
 class AssetsMigrateLocalizable extends Command
 {
@@ -49,6 +51,10 @@ class AssetsMigrateLocalizable extends Command
                 }
 
                 $container->disk()->put($metaPath, YAML::dump($normalized));
+                $this->clearAssetMetaCache(
+                    $container->handle(),
+                    $this->assetPathFromMetaPath($metaPath)
+                );
                 $fileMigrated++;
             }
         }
@@ -197,7 +203,7 @@ class AssetsMigrateLocalizable extends Command
         $scanned = 0;
 
         $query = DB::table($table)
-            ->select(['id', 'meta'])
+            ->select(['id', 'meta', 'container', 'path'])
             ->whereIn('container', $localizableContainerHandles)
             ->orderBy('id');
 
@@ -219,10 +225,36 @@ class AssetsMigrateLocalizable extends Command
                     $model->updated_at = now();
                 }
                 $model->save();
+                $this->clearAssetMetaCache($row->container, $row->path);
                 $migrated++;
             }
         });
 
         return [$migrated, $scanned];
+    }
+
+    protected function assetPathFromMetaPath(string $metaPath): string
+    {
+        return Str::of($metaPath)
+            ->replace('/.meta/', '/')
+            ->replace('.meta/', '')
+            ->replaceEnd('.yaml', '')
+            ->trim('/')
+            ->toString();
+    }
+
+    protected function clearAssetMetaCache(string $container, string $path): void
+    {
+        if (! config('statamic.assets.cache_meta') || blank($container) || blank($path)) {
+            return;
+        }
+
+        $assetId = "{$container}::{$path}";
+        $cacheStore = Cache::store(config()->has('cache.stores.asset_meta') ? 'asset_meta' : null);
+
+        $cacheStore->forget('asset-meta-'.$assetId);
+        Site::all()->each(function ($site) use ($cacheStore, $assetId) {
+            $cacheStore->forget('asset-meta-'.$assetId.'-'.$site->handle());
+        });
     }
 }
