@@ -82,10 +82,10 @@ class Asset extends JsonResource
         $asset = $this->resource;
         $asset->hydrate();
 
-        // Use $asset->data directly instead of values() to avoid infinite recursion
-        // when sites origin map is cyclic. values() follows origin()->values()
-        // recursively; data is populated by cycle-safe dataForLocale().
-        $values = ($asset->data ?? collect())->all();
+        // Use data() instead of values() to avoid infinite recursion when sites
+        // origin map is cyclic. values() follows origin()->values() recursively;
+        // data() returns the cycle-safe collection populated by dataForLocale().
+        $values = ($asset->data() ?? collect())->all();
 
         $fields = $this->blueprint()->fields()
             ->addValues($values)
