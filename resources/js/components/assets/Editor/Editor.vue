@@ -404,6 +404,15 @@ export default {
         },
 
         keydown(event) {
+            const target = event.target;
+            const isFormField = target instanceof HTMLElement && (
+                target.matches('input, textarea, select') || target.isContentEditable
+            );
+
+            if (isFormField) {
+                return;
+            }
+
             if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowLeft') {
                 this.navigateToPreviousAsset();
             }
