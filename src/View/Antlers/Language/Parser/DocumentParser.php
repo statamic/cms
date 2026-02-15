@@ -373,7 +373,6 @@ class DocumentParser
                         }
                     }
 
-
                     if (in_array($antlersRegion, ['@props', '@aware'])) {
                         $hasArgs = false;
 
