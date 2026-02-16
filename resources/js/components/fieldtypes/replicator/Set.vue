@@ -212,7 +212,6 @@ function onAnimationComplete() {
             </header>
 
             <Motion
-                class="motion"
                 :class="{ 'overflow-clip': shouldClipOverflow }"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
