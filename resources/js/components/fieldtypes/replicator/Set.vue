@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import {
     Icon,
     Switch,
@@ -122,16 +122,14 @@ function destroy() {
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
 
-const shouldClipOverflow = ref(false);
+const shouldClipOverflow = ref(props.collapsed);
 
-function onAnimationStart() {
+watch(() => props.collapsed, () => {
     shouldClipOverflow.value = true;
-}
+});
 
 function onAnimationComplete() {
-    if (!props.collapsed) {
-        shouldClipOverflow.value = false;
-    }
+    shouldClipOverflow.value = props.collapsed;
 }
 </script>
 
@@ -214,11 +212,11 @@ function onAnimationComplete() {
             </header>
 
             <Motion
+                class="motion"
                 :class="{ 'overflow-clip': shouldClipOverflow }"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
-                @animation-start="onAnimationStart"
                 @animation-complete="onAnimationComplete"
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
