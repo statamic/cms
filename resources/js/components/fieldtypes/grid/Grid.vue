@@ -174,9 +174,10 @@ export default {
     methods: {
         addRow() {
             const id = uniqid();
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
 
             const row = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             row._id = id;
@@ -192,8 +193,9 @@ export default {
         removed(index) {
             // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
             const row = this.value[index];
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
             const emptyRow = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             // Check if the row has been modified from its default state
