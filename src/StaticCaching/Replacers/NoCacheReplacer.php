@@ -23,7 +23,12 @@ class NoCacheReplacer implements Replacer
 
     public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
     {
-        $this->replaceInResponse($initialResponse);
+        if (config('statamic.static_caching.nocache_replace_in_initial_response', true)) {
+            $this->replaceInResponse($initialResponse);
+        } else {
+            $this->includeJsIfNeeded($initialResponse);
+            $this->modifyFullMeasureResponse($initialResponse);
+        }
 
         $this->modifyFullMeasureResponse($responseToBeCached);
     }
@@ -39,13 +44,22 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
+        $this->includeJsIfNeeded($response);
+
+        $response->setContent($this->replace($content));
+    }
+
+    private function includeJsIfNeeded(Response $response)
+    {
+        if (! $content = $response->getContent()) {
+            return;
+        }
+
         if (preg_match(self::PATTERN, $content)) {
             $this->session->restore();
 
             StaticCache::includeJs();
         }
-
-        $response->setContent($this->replace($content));
     }
 
     public function replace(string $content)

@@ -131,6 +131,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Replace Nocache Regions In Initial Response
+    |--------------------------------------------------------------------------
+    |
+    | Nocache regions are usually replaced server-side for the initial request,
+    | while the cached file stores placeholders with JS to fetch them via
+    | AJAX. You may wish to disable this behavior when using a CDN,
+    | so the initial response always includes the placeholders.
+    |
+    | Only applies to full-measure static caching.
+    |
+    */
+
+    'nocache_replace_in_initial_response' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Replacers
     |--------------------------------------------------------------------------
     |
