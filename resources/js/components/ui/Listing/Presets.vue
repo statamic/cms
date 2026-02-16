@@ -12,6 +12,7 @@ import {
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
+import clone from '@/util/clone.js';
 
 const { preferencesPrefix, activeFilters, searchQuery, setFilters, clearFilters, setSearchQuery, clearSearchQuery } =
     injectListingContext();
@@ -19,13 +20,22 @@ const preferencesKey = ref(`${preferencesPrefix.value}.filters`);
 const presets = ref(getPresets());
 const activePreset = ref(getPresetFromActiveFilters());
 const activePresetPayload = computed(() => presets.value[activePreset.value]);
+const selectedPreset = ref(activePreset.value);
+const selectedPresetPayload = computed(() => presets.value[selectedPreset.value]);
 const savingPresetName = ref(null);
 const savingPresetHandle = computed(() => snake_case(savingPresetName.value));
 const isCreating = ref(false);
 const isRenaming = ref(false);
 const isConfirmingDeletion = ref(false);
 
-watch([activeFilters, searchQuery], () => (activePreset.value = getPresetFromActiveFilters()), { deep: true });
+watch(
+    [activeFilters, searchQuery],
+    () => {
+        activePreset.value = getPresetFromActiveFilters();
+        selectedPreset.value ??= activePreset.value;
+    },
+    { deep: true },
+);
 
 function getPresets() {
     return Statamic.$preferences.get(preferencesKey.value, {});
@@ -37,13 +47,15 @@ function refreshPresets() {
 
 function viewAll() {
     activePreset.value = null;
+    selectedPreset.value = null;
     clearFilters();
     clearSearchQuery();
 }
 
 function selectPreset(handle) {
     activePreset.value = handle;
-    setFilters(activePresetPayload.value.filters);
+    selectedPreset.value = handle;
+    setFilters(clone(activePresetPayload.value.filters ?? {}));
     setSearchQuery(activePresetPayload.value.query);
 }
 
@@ -66,8 +78,57 @@ function renamePreset() {
 }
 
 const canSaveNewPreset = computed(() => {
-    return !activePreset.value && (Object.keys(activeFilters.value).length > 0 || (searchQuery.value ?? '') !== '');
+    return !activePreset.value && !selectedPreset.value && (Object.keys(activeFilters.value).length > 0 || (searchQuery.value ?? '') !== '');
 });
+
+const isDirty = computed(() => {
+    if (!selectedPreset.value || !selectedPresetPayload.value) return false;
+
+    const savedFilters = selectedPresetPayload.value.filters ?? {};
+    const savedQuery = selectedPresetPayload.value.query ?? '';
+    const currentQuery = searchQuery.value ?? '';
+
+    if (savedQuery !== currentQuery) return true;
+
+    const savedKeys = Object.keys(savedFilters);
+    const currentKeys = Object.keys(activeFilters.value);
+
+    if (savedKeys.length !== currentKeys.length) return true;
+
+    for (const key of savedKeys) {
+        if (JSON.stringify(savedFilters[key]) !== JSON.stringify(activeFilters.value[key])) {
+            return true;
+        }
+    }
+
+    return false;
+});
+
+function canSavePreset(handle) {
+    return !Statamic.$preferences.hasDefault(`${preferencesKey.value}.${handle}`);
+}
+
+function savePreset() {
+    const payload = { display: selectedPresetPayload.value.display };
+
+    if (searchQuery.value) payload.query = searchQuery.value;
+    if (Object.entries(activeFilters.value).length) payload.filters = activeFilters.value;
+
+    Statamic.$preferences
+        .set(`${preferencesKey.value}.${selectedPreset.value}`, payload)
+        .then(() => {
+            Statamic.$toast.success(__('View saved'));
+            refreshPresets();
+        })
+        .catch(() => {
+            Statamic.$toast.error(__('Unable to save view'));
+        });
+}
+
+function resetPreset() {
+    setFilters(clone(selectedPresetPayload.value.filters ?? {}));
+    setSearchQuery(selectedPresetPayload.value.query ?? '');
+}
 
 function getPresetFromActiveFilters() {
     for (const [handle, preset] of Object.entries(presets.value)) {
@@ -88,7 +149,7 @@ function getPresetFromActiveFilters() {
 }
 
 const currentTab = computed({
-    get: () => activePreset.value || 'all',
+    get: () => selectedPreset.value || 'all',
     set: (value) => {
         if (value === 'all') {
             viewAll();
@@ -182,7 +243,7 @@ function deletePreset() {
                     :name="handle"
                 >
                     {{ preset.display }}
-                    <template v-if="handle === activePreset">
+                    <template v-if="handle === selectedPreset">
                         <Dropdown class="w-48!">
                             <template #trigger>
                                 <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" />
@@ -208,7 +269,26 @@ function deletePreset() {
                     </template>
                 </PresetTrigger>
             </TabList>
-            <div v-if="canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
+            <div v-if="isDirty" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2 flex gap-1">
+                <Button
+                    v-if="canSavePreset(selectedPreset)"
+                    @click="savePreset"
+                    variant="ghost"
+                    size="sm"
+                    :text="__('Save')"
+                    icon="save"
+                    class="[&_svg]:size-4"
+                />
+                <Button
+                    @click="resetPreset"
+                    variant="ghost"
+                    size="sm"
+                    :text="__('Reset')"
+                    icon="sync"
+                    class="[&_svg]:size-4"
+                />
+            </div>
+            <div v-else-if="canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
                 <Button
                     @click="createPreset"
                     variant="ghost"
