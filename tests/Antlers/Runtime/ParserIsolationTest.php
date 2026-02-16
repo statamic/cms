@@ -276,7 +276,7 @@ EXPECTED;
         $this->assertSame($expectedTwo, $contentTwo);
     }
 
-    public function test_php_nodes_do_overwrite_parent_scope_needlessly()
+    public function test_php_nodes_dont_overwrite_parent_scope_needlessly()
     {
         $this->createBlueprintsAndData();
         $this->withFakeViews();
