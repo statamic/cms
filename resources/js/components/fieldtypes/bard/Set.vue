@@ -76,12 +76,13 @@
             </header>
 
             <Motion
-                layout
                 v-if="index !== undefined"
-                class="contain-paint"
+                :class="{ 'overflow-clip': shouldClipOverflow }"
                 :initial="{ height: collapsed ? '0px' : 'auto' }"
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
+                @animation-start="onAnimationStart"
+                @animation-complete="onAnimationComplete"
             >
                 <FieldsProvider
                     :fields="fields"
@@ -143,6 +144,12 @@ export default {
         bard: {},
         bardSets: {},
         publishContainer: { from: containerContextKey },
+    },
+
+    data() {
+        return {
+            shouldClipOverflow: false,
+        };
     },
 
     computed: {
@@ -324,6 +331,16 @@ export default {
                 this.node.attrs,
                 this.getPos,
             );
+        },
+
+        onAnimationStart() {
+            this.shouldClipOverflow = true;
+        },
+
+        onAnimationComplete() {
+            if (!this.collapsed) {
+                this.shouldClipOverflow = false;
+            }
         },
     },
 
