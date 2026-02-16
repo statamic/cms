@@ -196,6 +196,10 @@ const clearable = computed(() => props.clearable && !props.readOnly && !props.di
 
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
+const select = () => {
+    input.value.focus();
+    input.value.select();
+};
 
 onMounted(() => {
     if (props.focus) {
@@ -203,7 +207,7 @@ onMounted(() => {
     }
 })
 
-defineExpose({ focus });
+defineExpose({ focus, select });
 </script>
 
 <template>
