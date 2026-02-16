@@ -300,7 +300,7 @@ const parameters = computed(() => {
 });
 
 const shouldRequestFirstPage = computed(() => {
-    if (currentPage.value > 1 && items.value.length === 0 && !meta.value?.total) {
+    if (currentPage.value > 1 && currentPage.value > (meta.value?.last_page ?? 1)) {
         currentPage.value = 1;
         return true;
     }
