@@ -141,6 +141,7 @@ const viewportRef = useTemplateRef('viewport');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
+watch(dropdownOpen, () => searchQuery.value = '');
 
 const getOptionLabel = (option) => option?.[props.optionLabel];
 const getOptionValue = (option) => option?.[props.optionValue];
@@ -360,6 +361,8 @@ defineExpose({
 	            :model-value="modelValue"
                 :by="(option, value) => getOptionValue(option) === value"
                 :disabled="disabled || readOnly"
+                :reset-search-term-on-blur="false"
+                :reset-search-term-on-select="false"
                 data-ui-combobox
                 ignore-filter
 	            @update:open="updateDropdownOpen"
