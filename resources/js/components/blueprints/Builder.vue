@@ -82,9 +82,7 @@ export default {
         // Listen for root-form-save events from child components
         // This also happens on the fieldset builder.
         this.$events.$on('root-form-save', () => {
-            this.$nextTick(() => {
-                this.save();
-            });
+            this.$nextTick(() => this.save());
         });
 
         if (this.isFormBlueprint) {
