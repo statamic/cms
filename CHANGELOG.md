@@ -1,5 +1,41 @@
 # Release Notes
 
+## 6.3.0 (2026-02-14)
+
+### What's new
+- GraphQL introspection config [#13880](https://github.com/statamic/cms/issues/13880) by @TimHaerkens
+- Add support link to header [#13889](https://github.com/statamic/cms/issues/13889) by @duncanmcclean
+- Dotted settings [#13929](https://github.com/statamic/cms/issues/13929) by @edalzell
+- Add inputs to edit focal points [#13935](https://github.com/statamic/cms/issues/13935) by @jackmcdade
+
+### What's fixed
+- Apply default pagination size in control panel listings [#13893](https://github.com/statamic/cms/issues/13893) by @daun
+- Ensure sets in imported fields can be overridden [#13790](https://github.com/statamic/cms/issues/13790) by @duncanmcclean
+- Sort form widget submissions by most recent first [#13890](https://github.com/statamic/cms/issues/13890) by @duncanmcclean
+- Use separate hot file for Control Panel Vite [#13920](https://github.com/statamic/cms/issues/13920) by @duncanmcclean
+- Fix error when closing stacks [#13926](https://github.com/statamic/cms/issues/13926) by @duncanmcclean
+- Use tinted blacks for filled variants [#13919](https://github.com/statamic/cms/issues/13919) by @daun
+- Fix error in relationship select field [#13925](https://github.com/statamic/cms/issues/13925) by @duncanmcclean
+- Ensure cache store is empty AFTER files have been removed [#13907](https://github.com/statamic/cms/issues/13907) by @indykoning
+- Improve Publish Container docs [#13912](https://github.com/statamic/cms/issues/13912) by @duncanmcclean
+- Fix Command Palette recents not updating when navigating [#13908](https://github.com/statamic/cms/issues/13908) by @duncanmcclean
+- Fix base css overriding addons [#13885](https://github.com/statamic/cms/issues/13885) by @jasonvarga
+- Make `RunsUpdateScripts` trait usable in addon tests [#13898](https://github.com/statamic/cms/issues/13898) by @duncanmcclean
+- Wire up allow fullscreen configs [#13932](https://github.com/statamic/cms/issues/13932) by @jasonvarga
+- Prevent layout change when reordering grid rows [#13862](https://github.com/statamic/cms/issues/13862) by @duncanmcclean
+- Stack config publish fields on mobile [#13847](https://github.com/statamic/cms/issues/13847) by @duncanmcclean
+- Update docblock comment for `system.date_format` option [#13838](https://github.com/statamic/cms/issues/13838) by @duncanmcclean
+- Focus input when creating/renaming filter views [#13848](https://github.com/statamic/cms/issues/13848) by @duncanmcclean
+- Revert etags [#13933](https://github.com/statamic/cms/issues/13933) by @jasonvarga
+- Improve Listing docs [#13867](https://github.com/statamic/cms/issues/13867) by @duncanmcclean
+- Dutch translations [#13897](https://github.com/statamic/cms/issues/13897) by @Casb02
+- French translations [#13903](https://github.com/statamic/cms/issues/13903) by @ebeauchamps
+- Bump axios from 1.12.1 to 1.13.5 [#13899](https://github.com/statamic/cms/issues/13899) by @dependabot
+- Bump markdown-it from 14.1.0 to 14.1.1 [#13930](https://github.com/statamic/cms/issues/13930) by @dependabot
+- Bump qs from 6.14.1 to 6.14.2 [#13931](https://github.com/statamic/cms/issues/13931) by @dependabot
+
+
+
 ## 6.2.5 (2026-02-11)
 
 ### What's fixed

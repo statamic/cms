@@ -328,7 +328,7 @@
         ul {
             margin-top: 0;
             margin-bottom: 0.85em;
-            table &:last-child {
+            table &:where(:last-child, :nth-last-child(2):has(+ .column-resize-handle)) {
                 /* If you type a single line of text in a table fieldtype cell you don't want it to have a bottom margin */
                 margin-block-end: 0;
             }

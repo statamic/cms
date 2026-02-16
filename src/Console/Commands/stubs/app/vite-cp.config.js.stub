@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/css/cp.css',
                 'resources/js/cp.js',
             ],
+            hotFile: 'public/cp-hot',
             buildDirectory: 'vendor/app',
         }),
     ],

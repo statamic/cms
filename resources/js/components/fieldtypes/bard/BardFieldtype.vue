@@ -838,7 +838,8 @@ export default {
                     setTimeout(() => {
                         const isInsideBard = this.$refs.container.contains(document.activeElement);
                         const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
-                        if (!isInsideBard && !isSetPickerSearch) {
+                        const isSetPickerOpen = !!this.$refs.setPicker?.isOpen;
+                        if (!isInsideBard && !isSetPickerSearch && !isSetPickerOpen) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }
