@@ -117,7 +117,7 @@ export default {
 
     methods: {
         request(params = {}) {
-			if (!params.length && loaders.value[this.cacheKey]) return;
+			if (!Object.keys(params).length && loaders.value[this.cacheKey]) return Promise.resolve();
 
             params = { ...this.parameters, ...params };
 

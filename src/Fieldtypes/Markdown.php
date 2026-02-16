@@ -118,6 +118,13 @@ class Markdown extends Fieldtype
                         'default' => false,
                         'width' => 50,
                     ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
+                    ],
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),

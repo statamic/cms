@@ -12,10 +12,10 @@ const meta = {
             options: ['day', 'hour', 'minute', 'second'],
         },
         'update:modelValue': {
-            description: 'Event handler called when the date range value changes. <br><br> Returns an object with `start` and `end` properties, each as an ISO 8601 date and time string.',
+            description: 'Event handler called when the date range value changes. <br><br> Returns a [`DateRange` object](https://reka-ui.com/docs/guides/dates).',
             table: {
                 category: 'events',
-                type: { summary: '(value: { start: string, end: string }) => void' }
+                type: { summary: '(value: DateRange) => void' }
             }
         }
     },

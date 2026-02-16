@@ -6,6 +6,8 @@ import Icon from '../Icon/Icon.vue';
 import Heading from '../Heading.vue';
 import { portals, keys } from '@api';
 import wait from '@/util/wait';
+import { FocusScope } from 'reka-ui';
+import stack from '@ui/Stack/Stack.vue';
 
 defineOptions({
     inheritAttrs: false,
@@ -58,6 +60,7 @@ const instance = getCurrentInstance();
 const hasModalTitleComponent = hasComponent('ModalTitle');
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
+const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
 
 function open() {
     if (!modal.value) modal.value = portals.create('modal');
@@ -81,6 +84,10 @@ function close() {
     wait(300).then(() => {
         mounted.value = false;
         updateOpen(false);
+
+        cleanup();
+        modal.value = null;
+        escBinding.value = null;
     });
 }
 
@@ -108,6 +115,11 @@ function runCloseCallback() {
 	return true;
 }
 
+function cleanup() {
+	modal.value?.destroy();
+	escBinding.value?.destroy();
+}
+
 watch(
     () => props.open,
     (value) => value ? open() : close(),
@@ -118,8 +130,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-    modal.value?.destroy();
-    escBinding.value?.destroy();
+    cleanup();
 });
 
 defineExpose({
@@ -136,7 +147,7 @@ provide('closeModal', close);
         <slot name="trigger" />
     </div>
     <teleport :to="portal" v-if="mounted && portal">
-        <div class="vue-portal-target modal">
+        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal">
             <transition
                 enter-active-class="duration-200"
                 enter-from-class="opacity-0"
@@ -166,6 +177,6 @@ provide('closeModal', close);
                     <slot name="footer" />
                 </div>
             </transition>
-        </div>
+        </FocusScope>
     </teleport>
 </template>

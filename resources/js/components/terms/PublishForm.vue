@@ -301,7 +301,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         direction() {
@@ -368,8 +368,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
