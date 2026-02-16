@@ -8,7 +8,14 @@
                 <Icon name="loading" />
             </div>
 
-            <template v-if="!loading">
+            <template v-else-if="!loading && !asset">
+                <div class="flex flex-1 flex-col items-center justify-center gap-4 p-8">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ loadError || __('Unable to load asset') }}</p>
+                    <ui-button variant="primary" @click="load(activeSite)" :text="__('Retry')" />
+                </div>
+            </template>
+
+            <template v-if="!loading && asset">
                 <!-- Header -->
                 <header id="asset-editor-header" class="relative flex w-full justify-between px-2">
                     <button
@@ -176,7 +183,7 @@
             </template>
 
             <focal-point-editor
-                v-if="showFocalPointEditor && isFocalPointEditorEnabled"
+                v-if="asset && showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
                 :image="asset.preview"
                 @selected="selectFocalPoint"
@@ -286,12 +293,13 @@ export default {
             originMeta: {},
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             loadId: 0,
+            loadError: null,
         };
     },
 
     computed: {
         readOnly() {
-            return !this.asset.isEditable;
+            return this.asset ? !this.asset.isEditable : true;
         },
 
         isImage() {
@@ -348,6 +356,7 @@ export default {
          */
         load(site = null) {
             this.loading = true;
+            this.loadError = null;
             const loadId = ++this.loadId;
 
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
@@ -396,9 +405,10 @@ export default {
                 ]);
 
                 this.loading = false;
-            }).catch(() => {
+            }).catch((err) => {
                 if (loadId === this.loadId) {
                     this.loading = false;
+                    this.loadError = err?.response?.data?.message || __('Unable to load asset');
                 }
             });
         },
