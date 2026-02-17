@@ -24,7 +24,7 @@ class NoCacheReplacer implements Replacer
     public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
     {
         if (app(Cacher::class) instanceof FileCacher) {
-            $this->includeJsIfNeeded($initialResponse);
+            $this->includeJs($initialResponse);
             $this->modifyFullMeasureResponse($initialResponse);
         } else {
             $this->replaceInResponse($initialResponse);
@@ -44,12 +44,12 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
-        $this->includeJsIfNeeded($response);
+        $this->includeJs($response);
 
         $response->setContent($this->replace($content));
     }
 
-    private function includeJsIfNeeded(Response $response)
+    private function includeJs(Response $response)
     {
         if (! $content = $response->getContent()) {
             return;
