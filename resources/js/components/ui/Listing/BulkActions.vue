@@ -63,7 +63,7 @@ function actionFailed(response) {
             :transition="{ duration: 0.2, ease: 'easeInOut' }"
         >
             <div class="pointer-events-auto space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
-            <ButtonGroup gap="auto" justify="center">
+            <ButtonGroup overflow="gap" justify="center">
                 <Button
                     class="text-blue-500!"
                     :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"

@@ -1,5 +1,5 @@
 <template>
-    <ButtonGroup orientation="auto" ref="buttonGroup">
+    <ButtonGroup overflow="stack" ref="buttonGroup">
         <Button
             v-for="(option, $index) in options"
             ref="button"

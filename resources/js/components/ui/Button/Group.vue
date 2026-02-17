@@ -13,6 +13,12 @@ import { cva } from 'cva';
 import debounce from '@/util/debounce';
 
 const props = defineProps({
+    /* When 'stack', switch to vertical layout when overflowing. When 'gap', switch to normal buttons with gaps when overflowing. */
+    overflow: {
+        type: String,
+        default: null,
+        validator: (v) => [null, 'stack', 'gap'].includes(v),
+    },
     orientation: {
         type: String,
         default: 'horizontal',
@@ -28,8 +34,8 @@ const props = defineProps({
 });
 
 const hasOverflow = ref(false);
-const needsOverflowObserver = props.orientation === 'auto' || props.gap === 'auto';
-const measuringOverflow = ref(needsOverflowObserver);
+const needsOverflowObserver = computed(() => props.overflow === 'stack' || props.overflow === 'gap');
+const measuringOverflow = ref(false);
 
 const groupClasses = computed(() => {
     const collapseHorizontally = [
@@ -53,8 +59,8 @@ const groupClasses = computed(() => {
         '[&>:first-child:not(:last-child)_[data-ui-group-target]]:rounded-b-none',
         '[&>[data-ui-group-target]:last-child:not(:first-child)]:rounded-t-none',
         '[&>:last-child:not(:first-child)_[data-ui-group-target]]:rounded-t-none',
-        '[&>[data-ui-group-target]:not(:first-child)]:border-t-0',
-        '[&>:not(:first-child)_[data-ui-group-target]]:border-t-0',
+        '[&>[data-ui-group-target]:not(:last-child)]:border-b-0',
+        '[&>:not(:last-child)_[data-ui-group-target]]:border-b-0',
     ];
 
     return cva({
@@ -71,16 +77,17 @@ const groupClasses = computed(() => {
             },
         },
         compoundVariants: [
-            { orientation: 'auto', hasOverflow: false, class: collapseHorizontally },
-            { orientation: 'auto', hasOverflow: true, class: collapseVertically },
-            { orientation: 'horizontal', gap: false, class: collapseHorizontally },
-            { orientation: 'horizontal', gap: 'auto', hasOverflow: true, class: 'gap-1' },
-            { orientation: 'horizontal', gap: 'auto', hasOverflow: false, class: collapseHorizontally },
+            { overflow: 'stack', hasOverflow: false, class: collapseHorizontally },
+            { overflow: 'stack', hasOverflow: true, class: collapseVertically },
+            { overflow: 'gap', hasOverflow: true, class: 'gap-1' },
+            { overflow: 'gap', hasOverflow: false, class: collapseHorizontally },
+            { overflow: null, orientation: 'horizontal', gap: false, class: collapseHorizontally },
         ],
     })({
         gap: props.gap,
         justify: props.justify,
         orientation: props.orientation,
+        overflow: props.overflow,
         hasOverflow: hasOverflow.value,
     });
 });
@@ -107,7 +114,7 @@ async function checkOverflow() {
 }
 
 onMounted(() => {
-    if (needsOverflowObserver) {
+    if (needsOverflowObserver.value) {
         checkOverflow();
         resizeObserver = new ResizeObserver(debounce(checkOverflow, 50));
         resizeObserver.observe(wrapper.value);
