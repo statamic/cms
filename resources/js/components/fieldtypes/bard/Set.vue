@@ -93,7 +93,6 @@
 import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Motion } from 'motion-v';
 import {
     Badge,
     Button,
@@ -127,7 +126,6 @@ export default {
         Badge,
         Icon,
         NodeViewWrapper,
-        Motion,
     },
 
     mixins: [ManagesPreviewText, HasFieldActions],

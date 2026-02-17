@@ -14,7 +14,6 @@ import {
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
-import { Motion } from 'motion-v';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
