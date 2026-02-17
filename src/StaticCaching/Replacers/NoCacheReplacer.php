@@ -56,14 +56,16 @@ class NoCacheReplacer implements Replacer
         }
 
         if (preg_match(self::PATTERN, $content)) {
-            $this->session->restore();
-
             StaticCache::includeJs();
         }
     }
 
     public function replace(string $content)
     {
+        if (preg_match(self::PATTERN, $content)) {
+            $this->session->restore();
+        }
+
         while (preg_match(self::PATTERN, $content)) {
             $content = $this->performReplacement($content);
         }
