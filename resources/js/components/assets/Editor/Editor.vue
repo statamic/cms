@@ -66,14 +66,17 @@
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
+                            :class="imageTone && (asset.isImage || asset.isSvg) ? (imageTone === 'light' ? 'dark' : 'light') : ''"
                         >
-                            <!-- Image -->
-                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100': asset.can_be_transparent && showCheckerboard }">
-                                <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
-                            </div>
+                            <!-- Image: delay until tone analyzed to avoid checkerboard/background flicker -->
+                            <template v-if="!(asset.isImage || asset.isSvg) || imageToneReady">
+                                <!-- Image -->
+                                <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100': asset.can_be_transparent && showCheckerboard }">
+                                    <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                                </div>
 
-                            <!-- SVG -->
-                            <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
+                                <!-- SVG -->
+                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
                                     <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
@@ -90,16 +93,20 @@
                                 </div>
                             </div>
 
-                            <!-- Audio -->
-                            <div class="w-full shadow-none" v-else-if="asset.isAudio">
-                                <audio :src="asset.url" class="w-full" controls preload="auto" />
+                                <!-- Audio -->
+                                <div class="w-full shadow-none" v-else-if="asset.isAudio">
+                                    <audio :src="asset.url" class="w-full" controls preload="auto" />
+                                </div>
+
+                                <!-- Video -->
+                                <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+
+                                <!-- Other thumbnail -->
+                                <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            </template>
+                            <div v-else class="flex flex-1 items-center justify-center min-h-0">
+                                <Icon name="loading" />
                             </div>
-
-                            <!-- Video -->
-                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
-
-                            <!-- Other thumbnail -->
-                            <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                         </div>
 
 
@@ -244,6 +251,8 @@ export default {
             errors: {},
             actions: [],
             closingWithChanges: false,
+            imageTone: null, // 'dark' | 'light' - detected dominant tone for images/SVG
+            imageToneReady: false, // true once tone is set or not applicable (avoids checkerboard flicker)
         };
     },
 
@@ -325,6 +334,20 @@ export default {
                 fields = fields.map((section) => section.fields);
                 fields = flatten(fields);
                 this.fields = fields;
+
+                this.imageTone = null;
+                if (data.isImage || data.isSvg) {
+                    this.imageToneReady = false;
+                    this.detectImageTone(data.isImage ? data.preview : data.url)
+                        .then((tone) => {
+                            this.imageTone = tone;
+                        })
+                        .finally(() => {
+                            this.imageToneReady = true;
+                        });
+                } else {
+                    this.imageToneReady = true;
+                }
 
                 this.extraValues = pick(this.asset, [
                     'filename',
@@ -494,7 +517,61 @@ export default {
             ];
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
-        }
+        },
+
+        /**
+         * Detect if an image/SVG is predominantly dark or light by sampling pixels and
+         * computing relative luminance. Useful e.g. to adapt preview background for logos.
+         *
+         * @param {string} src - Image or SVG URL (same-origin to avoid CORS tainting)
+         * @returns {Promise<'dark'|'light'|null>}
+         */
+        detectImageTone(src) {
+            const maxSize = 64;
+            const luminanceThreshold = 0.4; // 0–1; above = light, below = dark
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+
+                img.onerror = () => resolve(null);
+                img.onload = () => {
+                    try {
+                        const w = img.naturalWidth;
+                        const h = img.naturalHeight;
+                        const scale = Math.min(1, maxSize / Math.max(w, h));
+                        const cw = Math.max(1, Math.round(w * scale));
+                        const ch = Math.max(1, Math.round(h * scale));
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = cw;
+                        canvas.height = ch;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, cw, ch);
+                        const data = ctx.getImageData(0, 0, cw, ch).data;
+
+                        let sum = 0;
+                        let count = 0;
+                        for (let i = 0; i < data.length; i += 4) {
+                            const a = data[i + 3] / 255;
+                            if (a < 0.1) continue;
+                            const r = data[i] / 255;
+                            const g = data[i + 1] / 255;
+                            const b = data[i + 2] / 255;
+                            const l = 0.299 * r + 0.587 * g + 0.114 * b;
+                            sum += l * a;
+                            count += a;
+                        }
+                        const avgLuminance = count > 0 ? sum / count : 0.5;
+                        resolve(avgLuminance >= luminanceThreshold ? 'light' : 'dark');
+                    } catch {
+                        resolve(null);
+                    }
+                };
+
+                img.src = src;
+            });
+        },
     },
 };
 </script>
