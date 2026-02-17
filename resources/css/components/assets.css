@@ -181,6 +181,23 @@
         @apply grid grid-cols-none!;
         --grid-columns: none !important;
     }
+
+    /* For the asset editor checkerboard, override the CP theme and use image tone (bright image → .dark container, dark image → .light) */
+    .light .bg-checkerboard {
+        background-color: #fff;
+
+        &::before {
+            background-image: var(--checkerboard-light);
+        }
+    }
+
+    .dark .bg-checkerboard {
+        background-color: var(--color-gray-850);
+
+        &::before {
+            background-image: var(--checkerboard-dark);
+        }
+    }
 }
 
 /* Lazyloading
