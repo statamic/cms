@@ -164,11 +164,11 @@
         }
     }
 
-    /* Where a Bard fieldtype with a fixed toolbar... */
+    /* [1] Where a Bard fieldtype with a fixed toolbar... */
     .bard-fieldtype:has(> .bard-fixed-toolbar) {
-        /* has a nested Bard fieldtype with focus */
-        &:has(.bard-fieldtype.form-group:focus-within) {
-            /* release the sticky positioning so that it doesn't cover the focused Bard toolbar */
+        /* [2] has a any nested fieldtype with focus, e.g. a Markdown toolbar or another Bard toolbar */
+        &:has(.publish-fields:focus-within) {
+            /* [/3] release the sticky positioning so that it doesn't cover other UI elements */
             > .bard-fixed-toolbar {
                 position: unset;
             }
