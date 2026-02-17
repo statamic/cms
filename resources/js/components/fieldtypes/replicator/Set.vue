@@ -210,7 +210,7 @@ function onAnimationComplete() {
                 </div>
             </header>
 
-            <div v-show="!collapsed" class="contain-paint">
+            <div v-show="!collapsed" class="contain-paint" :class="{ 'overflow-clip': shouldClipOverflow }">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
