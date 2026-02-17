@@ -2,7 +2,7 @@ export default function (func, timeFrame) {
     let lastTime = 0;
     let timeoutId = null;
 
-    return function (...args) {
+    const throttled = function (...args) {
         const now = Date.now();
 
         clearTimeout(timeoutId);
@@ -18,4 +18,11 @@ export default function (func, timeFrame) {
             }, timeFrame - (now - lastTime));
         }
     };
+
+    throttled.cancel = function () {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+    };
+
+    return throttled;
 }
