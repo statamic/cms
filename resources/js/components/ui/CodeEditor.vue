@@ -260,6 +260,7 @@ watch(
                     v-if="allowModeSelection"
                     :options="modes"
                     :disabled="disabled"
+                    :adaptive-width="true"
                     :model-value="mode"
                     @update:modelValue="$emit('update:mode', $event)"
                 />
@@ -277,6 +278,7 @@ watch(
                         v-if="allowModeSelection"
                         :options="modes"
                         :disabled="disabled"
+                        :adaptive-width="true"
                         :model-value="mode"
                         searchable
                         @update:modelValue="$emit('update:mode', $event)"
