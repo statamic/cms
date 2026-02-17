@@ -131,20 +131,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Replace Nocache Regions In Initial Response
-    |--------------------------------------------------------------------------
-    |
-    | When using full-measure, nocache regions are replaced for the initial
-    | request to avoid needing to immediately re-request nocache regions
-    | via AJAX. You may wish to disable this behavior when using a CDN,
-    | so the initial response always includes the placeholders.
-    |
-    */
-
-    'nocache_replace_in_initial_response' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | Replacers
     |--------------------------------------------------------------------------
     |

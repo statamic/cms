@@ -23,11 +23,11 @@ class NoCacheReplacer implements Replacer
 
     public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
     {
-        if (config('statamic.static_caching.nocache_replace_in_initial_response', true)) {
-            $this->replaceInResponse($initialResponse);
-        } else {
+        if (app(Cacher::class) instanceof FileCacher) {
             $this->includeJsIfNeeded($initialResponse);
             $this->modifyFullMeasureResponse($initialResponse);
+        } else {
+            $this->replaceInResponse($initialResponse);
         }
 
         $this->modifyFullMeasureResponse($responseToBeCached);
