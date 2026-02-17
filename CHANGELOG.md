@@ -1,5 +1,27 @@
 # Release Notes
 
+## 6.3.1 (2026-02-16)
+
+### What's fixed
+- Fix full width setting field widths [#13937](https://github.com/statamic/cms/issues/13937) by @jasonvarga
+- Fix Bard grid set picker closing on reopen [#13941](https://github.com/statamic/cms/issues/13941) by @jackmcdade
+- Fix table height changes on grid line hover in Bard [#13943](https://github.com/statamic/cms/issues/13943) by @jackmcdade
+- Disambiguate toggles [#13942](https://github.com/statamic/cms/issues/13942) by @efc
+- Tweak `modelValue` descriptions for DatePicker components [#13860](https://github.com/statamic/cms/issues/13860) by @duncanmcclean
+- Fix dotted lines on Prefs screen [#13944](https://github.com/statamic/cms/issues/13944) by @jackmcdade
+- Fix StackFooter dark mode [#13947](https://github.com/statamic/cms/issues/13947) by @jackmcdade
+- Correct issues with Directive Node parsing [#13938](https://github.com/statamic/cms/issues/13938) by @JohnathonKoster
+- Fix race condition in blueprint Apply & Save [#13950](https://github.com/statamic/cms/issues/13950) by @jackmcdade
+- Fix asset Windows path issue [#13945](https://github.com/statamic/cms/issues/13945) by @jackmcdade
+- Select display input when adding tabs/sections to blueprint [#13957](https://github.com/statamic/cms/issues/13957) by @duncanmcclean
+- Fix issue with PHP tag and assignments [#13939](https://github.com/statamic/cms/issues/13939) by @JohnathonKoster
+- Improve file upload handling when `max_files: 1` [#13962](https://github.com/statamic/cms/issues/13962) by @duncanmcclean
+- Fix asset pagination when first page only contains folders [#13961](https://github.com/statamic/cms/issues/13961) by @duncanmcclean
+- Prevent replicator restyle loop [#13963](https://github.com/statamic/cms/issues/13963) by @jasonvarga
+- Fix `whereIn()`/`whereNotIn()` error for booleans [#13952](https://github.com/statamic/cms/issues/13952) by @duncanmcclean
+
+
+
 ## 6.3.0 (2026-02-14)
 
 ### What's new

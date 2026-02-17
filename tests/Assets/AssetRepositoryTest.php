@@ -107,6 +107,21 @@ EOT;
     }
 
     #[Test]
+    public function it_finds_assets_by_id_when_the_path_contains_windows_separators()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/bar.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/bar.jpg'))->save();
+
+        $found = (new AssetRepository)->find('test_container::foo\\bar.jpg');
+
+        $this->assertInstanceOf(AssetContract::class, $found);
+        $this->assertEquals($asset->id(), $found->id());
+    }
+
+    #[Test]
     public function test_find_or_fail_throws_exception_when_asset_does_not_exist()
     {
         $assetRepository = new AssetRepository;
