@@ -211,13 +211,7 @@ function onAnimationComplete() {
                 </div>
             </header>
 
-            <Motion
-                :class="{ 'overflow-clip': shouldClipOverflow }"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
-                @animation-complete="onAnimationComplete"
-            >
+            <div v-show="!collapsed" class="contain-paint">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
@@ -228,7 +222,7 @@ function onAnimationComplete() {
                         <Fields class="p-4" />
                     </FieldsProvider>
                 </div>
-            </Motion>
+            </div>
         </div>
 
         <confirmation-modal

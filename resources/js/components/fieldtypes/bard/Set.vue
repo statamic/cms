@@ -75,14 +75,7 @@
                 </div>
             </header>
 
-            <Motion
-                layout
-                v-if="index !== undefined"
-                class="contain-paint"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
-            >
+            <div v-if="index !== undefined" v-show="!collapsed" class="contain-paint">
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
@@ -91,7 +84,7 @@
                 >
                     <Fields class="p-4" />
                 </FieldsProvider>
-            </Motion>
+            </div>
         </div>
     </node-view-wrapper>
 </template>
