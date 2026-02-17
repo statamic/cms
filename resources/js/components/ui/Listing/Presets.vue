@@ -228,7 +228,7 @@ function deletePreset() {
         @cancel="isCreating = false"
         @confirm="saveNew"
     >
-        <Input v-model="savingPresetName" @keydown.enter="saveNew" />
+        <Input focus v-model="savingPresetName" @keydown.enter="saveNew" />
 
         <ui-error-message
             v-if="presets && Object.keys(presets).includes(savingPresetHandle)"
@@ -243,7 +243,7 @@ function deletePreset() {
         @cancel="isRenaming = false"
         @confirm="saveExisting"
     >
-        <Input v-model="savingPresetName" @keydown.enter="saveExisting" />
+        <Input focus v-model="savingPresetName" @keydown.enter="saveExisting" />
 
         <div
             v-if="

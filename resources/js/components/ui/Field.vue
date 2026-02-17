@@ -51,10 +51,10 @@ const rootClasses = computed(() =>
                 true: 'opacity-50',
             },
             inline: {
-                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
+                true: 'grid md:grid-cols-2 items-start px-4.5 py-4 gap-y-3 md:gap-y-0 md:gap-x-5!',
             },
             fullWidthSetting: {
-                true: 'grid-cols-1',
+                true: 'md:grid-cols-1',
             },
         },
     })({

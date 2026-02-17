@@ -43,6 +43,13 @@ class Code extends Fieldtype
                         'default' => true,
                         'width' => '50',
                     ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
+                    ],
                 ],
             ],
             [

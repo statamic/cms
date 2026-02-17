@@ -416,17 +416,20 @@ export default {
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
-            // Temporarily disable debouncing.
-            this.debounceNextUpdate = false;
-
-            this.debounceNextUpdate
-                ? this.updateDebounced(json)
-                : this.update(json);
-
+            const shouldDebounce = this.debounceNextUpdate;
             this.debounceNextUpdate = true;
+
+            if (shouldDebounce) {
+                this.updateDebounced(json);
+            } else {
+                this.updateDebounced.cancel();
+                this.update(json);
+            }
         },
 
         value(value, oldValue) {
+            if (!this.editor) return;
+
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -838,7 +841,8 @@ export default {
                     setTimeout(() => {
                         const isInsideBard = this.$refs.container.contains(document.activeElement);
                         const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
-                        if (!isInsideBard && !isSetPickerSearch) {
+                        const isSetPickerOpen = !!this.$refs.setPicker?.isOpen;
+                        if (!isInsideBard && !isSetPickerSearch && !isSetPickerOpen) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }

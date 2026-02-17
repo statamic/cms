@@ -87,7 +87,7 @@ class SetupCpVite extends Command
 
         $contents['scripts'] = [
             ...$contents['scripts'] ?? [],
-            'cp:dev' => 'vite build --config vite-cp.config.js --watch',
+            'cp:dev' => 'vite --config vite-cp.config.js',
             'cp:build' => 'vite build --config vite-cp.config.js',
         ];
 
@@ -163,6 +163,7 @@ class SetupCpVite extends Command
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => public_path('cp-hot'),
             'buildDirectory' => 'vendor/app',
         ]);
 PHP);

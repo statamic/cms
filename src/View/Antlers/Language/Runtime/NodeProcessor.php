@@ -2557,7 +2557,10 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $___varKey => $___varValue) {
-                    if (str_starts_with($___varKey, '___')) {
+                    if (
+                        str_starts_with($___varKey, '___') ||
+                        (isset($___antlersVarBefore[$___varKey]) && $___antlersVarBefore[$___varKey] === $___varValue)
+                    ) {
                         continue;
                     }
 

@@ -128,7 +128,7 @@ export default {
 
     data() {
         return {
-            tabs: this.initialTabs,
+            tabs: clone(this.initialTabs),
             currentTab: this.initialTabs.length ? this.initialTabs[0]._id : null,
             lastInteractedTab: null,
             hiddenTabs: [],
@@ -142,10 +142,13 @@ export default {
     },
 
     watch: {
-        tabs(tabs) {
-            this.$emit('updated', tabs);
-            this.makeSortable();
-        },
+		tabs: {
+			deep: true,
+			handler(tabs) {
+				this.$emit('updated', tabs);
+				this.makeSortable();
+			},
+		},
     },
 
     mounted() {

@@ -142,6 +142,11 @@ en:
 YAML);
     }
 
+    protected function getPackage(): string
+    {
+        return 'statamic/cms';
+    }
+
     protected function setSites($sites)
     {
         Site::setSites($sites);
