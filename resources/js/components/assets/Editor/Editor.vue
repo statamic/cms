@@ -71,24 +71,24 @@
                             <!-- Image: delay until tone analyzed to avoid checkerboard/background flicker -->
                             <template v-if="!(asset.isImage || asset.isSvg) || imageToneReady">
                                 <!-- Image -->
-                                <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100': asset.can_be_transparent && showCheckerboard }">
+                                <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100 rounded-md': asset.can_be_transparent && showCheckerboard }">
                                     <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                                 </div>
 
                                 <!-- SVG -->
                                 <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
-                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                    <div class="bg-checkerboard rounded-ss-md flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                     </div>
                                     <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
                                     </div>
-                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                    <div class="bg-checkerboard rounded-se-md flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                     </div>
                                 </div>
-                                <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                <div class="bg-checkerboard rounded-b-md h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
                                     <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
                             </div>
