@@ -137,6 +137,7 @@ jobs:
         env:
           CI: true
           LARAVEL_BYPASS_ENV_CHECK: 1
+          LANG: en_US.UTF-8
 
       - name: Verify build succeeds
         if: steps.should-run-tests.outputs.result == 'true'

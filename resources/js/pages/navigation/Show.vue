@@ -1,7 +1,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Head from '@/pages/layout/Head.vue';
 import PageEditor from '@/components/structures/PageEditor.vue';
 import PageSelector from '@/components/structures/PageSelector.vue';

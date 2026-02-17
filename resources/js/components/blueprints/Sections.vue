@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import BlueprintSection from './Section.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 

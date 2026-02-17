@@ -22,7 +22,7 @@
         <Stack
 	        size="narrow"
             :open="editing"
-            @opened="() => $nextTick(() => $refs.title.focus())"
+            @opened="() => $nextTick(() => $refs.title.select())"
             @update:open="editCancelled"
             :title="editText"
         >

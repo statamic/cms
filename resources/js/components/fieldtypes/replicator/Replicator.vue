@@ -89,7 +89,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
@@ -242,6 +242,14 @@ export default {
                 const reference = this.publishContainer.reference;
                 const blueprint = this.publishContainer.blueprint.fqh;
 
+				if (this.meta.new?.hasOwnProperty(set)) {
+					let meta = this.meta.new[set];
+					let defaults = this.meta.defaults[set];
+
+					resolve({ new: meta, defaults });
+					return;
+				}
+
                 if (this.setsCache[setCacheKey]) {
                     resolve(this.setsCache[setCacheKey]);
                     return;
@@ -350,10 +358,6 @@ export default {
 
             return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
-    },
-
-    mounted() {
-        if (this.config.collapse) this.collapseAll();
     },
 
     watch: {

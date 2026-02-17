@@ -123,7 +123,7 @@
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
-                                    :read-only="!canManagePublishState"
+                                    :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
                                 />
                             </Panel>
@@ -507,7 +507,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -591,8 +591,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
@@ -682,6 +682,7 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
@@ -759,8 +760,8 @@ export default {
                 this.redirectTo(this.createAnotherUrl);
             }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (!this.isInline && nextAction === null) {
+            // If the user has opted to go to listing, redirect them there.
+            else if (!this.isInline && nextAction === 'listing') {
                 this.redirectTo(this.listingUrl);
             }
 

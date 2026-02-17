@@ -1,5 +1,160 @@
 # Release Notes
 
+## 6.3.1 (2026-02-16)
+
+### What's fixed
+- Fix full width setting field widths [#13937](https://github.com/statamic/cms/issues/13937) by @jasonvarga
+- Fix Bard grid set picker closing on reopen [#13941](https://github.com/statamic/cms/issues/13941) by @jackmcdade
+- Fix table height changes on grid line hover in Bard [#13943](https://github.com/statamic/cms/issues/13943) by @jackmcdade
+- Disambiguate toggles [#13942](https://github.com/statamic/cms/issues/13942) by @efc
+- Tweak `modelValue` descriptions for DatePicker components [#13860](https://github.com/statamic/cms/issues/13860) by @duncanmcclean
+- Fix dotted lines on Prefs screen [#13944](https://github.com/statamic/cms/issues/13944) by @jackmcdade
+- Fix StackFooter dark mode [#13947](https://github.com/statamic/cms/issues/13947) by @jackmcdade
+- Correct issues with Directive Node parsing [#13938](https://github.com/statamic/cms/issues/13938) by @JohnathonKoster
+- Fix race condition in blueprint Apply & Save [#13950](https://github.com/statamic/cms/issues/13950) by @jackmcdade
+- Fix asset Windows path issue [#13945](https://github.com/statamic/cms/issues/13945) by @jackmcdade
+- Select display input when adding tabs/sections to blueprint [#13957](https://github.com/statamic/cms/issues/13957) by @duncanmcclean
+- Fix issue with PHP tag and assignments [#13939](https://github.com/statamic/cms/issues/13939) by @JohnathonKoster
+- Improve file upload handling when `max_files: 1` [#13962](https://github.com/statamic/cms/issues/13962) by @duncanmcclean
+- Fix asset pagination when first page only contains folders [#13961](https://github.com/statamic/cms/issues/13961) by @duncanmcclean
+- Prevent replicator restyle loop [#13963](https://github.com/statamic/cms/issues/13963) by @jasonvarga
+- Fix `whereIn()`/`whereNotIn()` error for booleans [#13952](https://github.com/statamic/cms/issues/13952) by @duncanmcclean
+
+
+
+## 6.3.0 (2026-02-14)
+
+### What's new
+- GraphQL introspection config [#13880](https://github.com/statamic/cms/issues/13880) by @TimHaerkens
+- Add support link to header [#13889](https://github.com/statamic/cms/issues/13889) by @duncanmcclean
+- Dotted settings [#13929](https://github.com/statamic/cms/issues/13929) by @edalzell
+- Add inputs to edit focal points [#13935](https://github.com/statamic/cms/issues/13935) by @jackmcdade
+
+### What's fixed
+- Apply default pagination size in control panel listings [#13893](https://github.com/statamic/cms/issues/13893) by @daun
+- Ensure sets in imported fields can be overridden [#13790](https://github.com/statamic/cms/issues/13790) by @duncanmcclean
+- Sort form widget submissions by most recent first [#13890](https://github.com/statamic/cms/issues/13890) by @duncanmcclean
+- Use separate hot file for Control Panel Vite [#13920](https://github.com/statamic/cms/issues/13920) by @duncanmcclean
+- Fix error when closing stacks [#13926](https://github.com/statamic/cms/issues/13926) by @duncanmcclean
+- Use tinted blacks for filled variants [#13919](https://github.com/statamic/cms/issues/13919) by @daun
+- Fix error in relationship select field [#13925](https://github.com/statamic/cms/issues/13925) by @duncanmcclean
+- Ensure cache store is empty AFTER files have been removed [#13907](https://github.com/statamic/cms/issues/13907) by @indykoning
+- Improve Publish Container docs [#13912](https://github.com/statamic/cms/issues/13912) by @duncanmcclean
+- Fix Command Palette recents not updating when navigating [#13908](https://github.com/statamic/cms/issues/13908) by @duncanmcclean
+- Fix base css overriding addons [#13885](https://github.com/statamic/cms/issues/13885) by @jasonvarga
+- Make `RunsUpdateScripts` trait usable in addon tests [#13898](https://github.com/statamic/cms/issues/13898) by @duncanmcclean
+- Wire up allow fullscreen configs [#13932](https://github.com/statamic/cms/issues/13932) by @jasonvarga
+- Prevent layout change when reordering grid rows [#13862](https://github.com/statamic/cms/issues/13862) by @duncanmcclean
+- Stack config publish fields on mobile [#13847](https://github.com/statamic/cms/issues/13847) by @duncanmcclean
+- Update docblock comment for `system.date_format` option [#13838](https://github.com/statamic/cms/issues/13838) by @duncanmcclean
+- Focus input when creating/renaming filter views [#13848](https://github.com/statamic/cms/issues/13848) by @duncanmcclean
+- Revert etags [#13933](https://github.com/statamic/cms/issues/13933) by @jasonvarga
+- Improve Listing docs [#13867](https://github.com/statamic/cms/issues/13867) by @duncanmcclean
+- Dutch translations [#13897](https://github.com/statamic/cms/issues/13897) by @Casb02
+- French translations [#13903](https://github.com/statamic/cms/issues/13903) by @ebeauchamps
+- Bump axios from 1.12.1 to 1.13.5 [#13899](https://github.com/statamic/cms/issues/13899) by @dependabot
+- Bump markdown-it from 14.1.0 to 14.1.1 [#13930](https://github.com/statamic/cms/issues/13930) by @dependabot
+- Bump qs from 6.14.1 to 6.14.2 [#13931](https://github.com/statamic/cms/issues/13931) by @dependabot
+
+
+
+## 6.2.5 (2026-02-11)
+
+### What's fixed
+- Fix typo in static_caching.php [#13857](https://github.com/statamic/cms/issues/13857) by @duncanmcclean
+- Update instructions for `Heading` component's `level` prop [#13868](https://github.com/statamic/cms/issues/13868) by @duncanmcclean
+- Add docblocks for some store, stache and permission methods [#13877](https://github.com/statamic/cms/issues/13877) by @NeoIsRecursive
+- Arguments should be ordered alphabetically in Storybook [#13871](https://github.com/statamic/cms/issues/13871) by @duncanmcclean
+- Handle trailing slashes in CP Nav [#13846](https://github.com/statamic/cms/issues/13846) by @duncanmcclean
+- Only trap stack's focus when its the top portal [#13858](https://github.com/statamic/cms/issues/13858) by @duncanmcclean
+- Fix debugbar helper binding [#13873](https://github.com/statamic/cms/issues/13873) by @martyf
+- Correct name of PayPal icon [#13891](https://github.com/statamic/cms/issues/13891) by @duncanmcclean
+- Convert PHPUnit metadata to attributes [#13895](https://github.com/statamic/cms/issues/13895) by @duncanmcclean
+- Fix after_save preference not persisting when default preferences override 'listing' [#13879](https://github.com/statamic/cms/issues/13879) by @el-schneider
+- Asset auth fix [#13883](https://github.com/statamic/cms/issues/13883) by @duncanmcclean
+- Account for custom fields when checking if entry URIs should be updated [#13859](https://github.com/statamic/cms/issues/13859) by @duncanmcclean
+- German translations [#13864](https://github.com/statamic/cms/issues/13864) by @helloDanuk
+- French translations [#13840](https://github.com/statamic/cms/issues/13840) by @ebeauchamps
+- Dutch translations [#13841](https://github.com/statamic/cms/issues/13841) by @JasperWelsing
+
+
+
+## 6.2.4 (2026-02-05)
+
+### What's fixed
+- Starter kit install with dev stability [#13824](https://github.com/statamic/cms/issues/13824) by @jasonvarga
+- Replace uniqid with nanoid [#13833](https://github.com/statamic/cms/issues/13833) by @jasonvarga
+- Switch from browser tests to storybook tests [#13313](https://github.com/statamic/cms/issues/13313) by @duncanmcclean
+- Fix entry date shifting on save [#13837](https://github.com/statamic/cms/issues/13837) by @jasonvarga
+- Fix entry publish permission [#13827](https://github.com/statamic/cms/issues/13827) by @PatrickJunod
+- Russian translations [#13834](https://github.com/statamic/cms/issues/13834) by @dragomano
+
+
+
+## 6.2.3 (2026-02-04)
+
+### What's fixed
+- Fix error when publishing webauthn migration [#13814](https://github.com/statamic/cms/issues/13814) by @duncanmcclean
+- Localize time picker [#13820](https://github.com/statamic/cms/issues/13820) by @jasonvarga
+- Store passkey last login in metadata [#13808](https://github.com/statamic/cms/issues/13808) by @jasonvarga
+- Escape html in command palette [#13825](https://github.com/statamic/cms/issues/13825) by @jasonvarga
+
+
+
+## 6.2.2 (2026-02-03)
+
+### What's fixed
+- Add auth to asset routes [#13810](https://github.com/statamic/cms/issues/13810) by @jasonvarga
+
+
+
+## 6.2.1 (2026-02-03)
+
+- Fix markdown fieldtype error when theres no container [#13809](https://github.com/statamic/cms/issues/13809) by @jasonvarga
+
+
+
+## 6.2.0 (2026-02-03)
+
+### What's new
+- Show collection tree in navigation page selector [#13643](https://github.com/statamic/cms/issues/13643) by @duncanmcclean
+- Max width control for the CP (Expand/Constrain Layout) [#13647](https://github.com/statamic/cms/issues/13647) by @JayGeorge
+- Permissions Check/Uncheck All buttons [#13762](https://github.com/statamic/cms/issues/13762) by @jackmcdade
+- Ctrl+k to open bard link stack [#13759](https://github.com/statamic/cms/issues/13759) by @jasonvarga
+- Time field enhancements [#13799](https://github.com/statamic/cms/issues/13799) by @jasonvarga
+- Copy to clipboard improvements and fixes throughout the CP [#13791](https://github.com/statamic/cms/issues/13791) by @joshuablum
+- Support Laravel Debugbar 4 [#13781](https://github.com/statamic/cms/issues/13781) by @duncanmcclean
+
+### What's fixed
+- Fix asset selector padding [#13737](https://github.com/statamic/cms/issues/13737) by @duncanmcclean
+- Fix adding sets stored in the legacy format [#13743](https://github.com/statamic/cms/issues/13743) by @duncanmcclean
+- Nested bard fixed toolbars - remove sticky stacking approach [#13750](https://github.com/statamic/cms/issues/13750) by @JayGeorge
+- Fix the z-index of the sticky markdown toolbar, plus position on mobile [#13751](https://github.com/statamic/cms/issues/13751) by @JayGeorge
+- Improve focus on page load [#13357](https://github.com/statamic/cms/issues/13357) by @JayGeorge
+- Only show site in search result badge when using multiple sites [#13752](https://github.com/statamic/cms/issues/13752) by @jasonvarga
+- Fix asset index fieldtype slice length [#13757](https://github.com/statamic/cms/issues/13757) by @jasonvarga
+- Fix TypeError with CarbonImmutable in Timezone Support [#13760](https://github.com/statamic/cms/issues/13760) by @ajnsn
+- Hide the expand layout control when the content is small and it has no effect [#13761](https://github.com/statamic/cms/issues/13761) by @JayGeorge
+- Hide "Collapsible" option for bard/replicator sets [#13763](https://github.com/statamic/cms/issues/13763) by @duncanmcclean
+- Antlers Blade Components: Correct extra parenthesis in output [#13765](https://github.com/statamic/cms/issues/13765) by @JohnathonKoster
+- Fix webauthn migration created by update script [#13769](https://github.com/statamic/cms/issues/13769) by @duncanmcclean
+- Remove the inset style for relationship fields to make dark mode more consistent [#13784](https://github.com/statamic/cms/issues/13784) by @JayGeorge
+- Fix Textarea component story missing an end tag [#13787](https://github.com/statamic/cms/issues/13787) by @joshuablum
+- Fix Textarea component resize [#13788](https://github.com/statamic/cms/issues/13788) by @joshuablum
+- Add missing tooltips import [#13783](https://github.com/statamic/cms/issues/13783) by @duncanmcclean
+- Fix uploading assets via Markdown fieldtype [#13782](https://github.com/statamic/cms/issues/13782) by @duncanmcclean
+- Avoid searching server results with fuzzysort [#13792](https://github.com/statamic/cms/issues/13792) by @duncanmcclean
+- Clearing a required date field should set the date/time to now [#13794](https://github.com/statamic/cms/issues/13794) by @duncanmcclean
+- Override z-index of DatePicker inside modals [#13802](https://github.com/statamic/cms/issues/13802) by @duncanmcclean
+- Normalize collection listing mode preference [#13798](https://github.com/statamic/cms/issues/13798) by @jasonvarga
+- Update `itemActions` state when switching localization [#13804](https://github.com/statamic/cms/issues/13804) by @duncanmcclean
+- Avoid animation when loading Bard field with `collapse: true` [#13805](https://github.com/statamic/cms/issues/13805) by @duncanmcclean
+- Disable Bard debouncing [#13797](https://github.com/statamic/cms/issues/13797) by @jasonvarga
+- Fix login and passkeys [#13807](https://github.com/statamic/cms/issues/13807) by @jasonvarga
+- French translations [#13738](https://github.com/statamic/cms/issues/13738) by @ebeauchamps
+
+
+
 ## 6.1.0 (2026-01-29)
 
 ### What's new

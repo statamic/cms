@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { Combobox, Button, Input, Heading, Field, Stack, StackClose } from '@/components/ui';
 import { usePage } from '@inertiajs/vue3';
 

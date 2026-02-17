@@ -3,7 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { usePasskey } from '@/composables/passkey';
 
 defineOptions({ layout: Outside });
@@ -86,6 +86,8 @@ async function loginWithPasskey(useBrowserAutofill = false) {
 onMounted(() => {
     if (showPasskeyLogin.value) loginWithPasskey(true);
 });
+
+onUnmounted(() => passkey.cancel());
 </script>
 
 <template>
@@ -133,7 +135,7 @@ onMounted(() => {
                             :icon="passkey.waiting.value ? null : 'key'"
                             :disabled="passkey.waiting.value"
                             :loading="passkey.waiting.value"
-                            @click="loginWithPasskey"
+                            @click="loginWithPasskey()"
                         />
                         <ErrorMessage v-if="passkey.error.value" :text="passkey.error.value" />
                     </template>

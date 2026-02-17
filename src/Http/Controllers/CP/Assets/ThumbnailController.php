@@ -65,6 +65,8 @@ class ThumbnailController extends Controller
         $this->orientation = $orientation;
         $this->asset = $this->asset($asset);
 
+        $this->authorize('view', $this->asset);
+
         if ($placeholder = $this->getPlaceholderResponse()) {
             return $placeholder;
         }

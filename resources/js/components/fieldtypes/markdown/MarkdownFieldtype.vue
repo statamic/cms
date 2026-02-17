@@ -17,7 +17,7 @@
                 <uploader
                     ref="uploader"
                     :enabled="assetsEnabled"
-                    :container="container"
+                    :container="container?.id"
                     :path="folder"
                     @updated="uploadsUpdated"
                     @upload-complete="uploadComplete"
@@ -812,6 +812,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },

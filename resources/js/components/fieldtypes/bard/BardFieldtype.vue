@@ -134,7 +134,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
@@ -391,10 +391,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$nextTick(() => {
-            this.mounted = true;
-            if (this.config.collapse) this.collapseAll();
-        });
+		this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
 
@@ -419,14 +416,20 @@ export default {
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
-            this.debounceNextUpdate
-                ? this.updateDebounced(json)
-                : this.update(json);
-
+            const shouldDebounce = this.debounceNextUpdate;
             this.debounceNextUpdate = true;
+
+            if (shouldDebounce) {
+                this.updateDebounced(json);
+            } else {
+                this.updateDebounced.cancel();
+                this.update(json);
+            }
         },
 
         value(value, oldValue) {
+            if (!this.editor) return;
+
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -526,6 +529,14 @@ export default {
                 const setCacheKey = `${field}.${set}`;
                 const reference = this.publishContainer.reference;
                 const blueprint = this.publishContainer.blueprint.fqh;
+
+	            if (this.meta.new?.hasOwnProperty(set)) {
+		            let meta = this.meta.new[set];
+		            let defaults = this.meta.defaults[set];
+
+		            resolve({ new: meta, defaults });
+		            return;
+	            }
 
                 if (this.setsCache[setCacheKey]) {
                     resolve(this.setsCache[setCacheKey]);
@@ -838,7 +849,8 @@ export default {
                     setTimeout(() => {
                         const isInsideBard = this.$refs.container.contains(document.activeElement);
                         const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
-                        if (!isInsideBard && !isSetPickerSearch) {
+                        const isSetPickerOpen = !!this.$refs.setPicker?.isOpen;
+                        if (!isInsideBard && !isSetPickerSearch && !isSetPickerOpen) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }
