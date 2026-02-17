@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useTemplateRef, watch, ref, inject } from 'vue';
+import { computed, onMounted, onUnmounted, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import {
@@ -112,11 +112,14 @@ watch(
 );
 
 function focused() {
-    // todo
+    if (fieldPathPrefix.value) return;
+    Statamic.$events.$emit('field:focused', { containerName: container.name.value, handle });
 }
 
-function blurred() {
-    // todo
+function blurred(event) {
+    if (fieldPathPrefix.value) return;
+    if (event?.currentTarget?.contains(event.relatedTarget)) return;
+    Statamic.$events.$emit('field:blurred', { containerName: container.name.value, handle });
 }
 
 const values = computed(() => {
@@ -169,7 +172,30 @@ const isReadOnly = computed(() => {
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
-const isLocked = computed(() => false); // todo
+const lockedBy = ref(null);
+const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
+
+function _onFieldLock({ containerName, handle: lockedHandle, user }) {
+    if (containerName === container.name.value && lockedHandle === handle) {
+        lockedBy.value = user;
+    }
+}
+function _onFieldUnlock({ containerName, handle: unlockedHandle }) {
+    if (containerName === container.name.value && unlockedHandle === handle) {
+        lockedBy.value = null;
+    }
+}
+
+onMounted(() => {
+    Statamic.$events.$on('field:lock', _onFieldLock);
+    Statamic.$events.$on('field:unlock', _onFieldUnlock);
+});
+
+onUnmounted(() => {
+    Statamic.$events.$off('field:lock', _onFieldLock);
+    Statamic.$events.$off('field:unlock', _onFieldUnlock);
+});
+
 
 const isSyncable = computed(() => {
     // Only top-level fields can be synced.
@@ -239,6 +265,7 @@ const fieldtypeComponentEvents = computed(() => ({
                             {{ __(config.display) }}
                         </span>
                     </template>
+                    <ui-avatar v-if="isLocked" :user="lockedBy" class="rounded-full w-4 h-4 text-2xs" v-tooltip="lockedBy.name" />
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                 </Label>
@@ -249,7 +276,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction">
+            <div :dir="direction" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
