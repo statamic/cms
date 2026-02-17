@@ -211,6 +211,7 @@ function searchContent() {
 
 function select(selected) {
     let item = findSelectedItem(selected);
+	if (!item) return;
 
     if (item.trackRecent) {
         addToRecentItems(item);
@@ -287,10 +288,7 @@ const modalClasses = cva({
     ],
 })({});
 
-router.on('start', () => {
-    Statamic.$commandPalette.clear();
-    open.value = false;
-});
+router.on('start', () => Statamic.$commandPalette.clear());
 </script>
 
 <template>

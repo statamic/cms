@@ -40,6 +40,18 @@ class Table extends Fieldtype
                     ],
                 ],
             ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
+                    ],
+                ],
+            ],
         ];
     }
 

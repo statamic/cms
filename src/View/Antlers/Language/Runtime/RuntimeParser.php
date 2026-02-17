@@ -275,7 +275,7 @@ class RuntimeParser implements Parser
             return true;
         }
 
-        if (Str::contains($text, [DocumentParser::LeftBrace, '@props', '@aware'])) {
+        if (Str::contains($text, [DocumentParser::LeftBrace, '@props', '@aware', '@cascade'])) {
             return true;
         }
 
