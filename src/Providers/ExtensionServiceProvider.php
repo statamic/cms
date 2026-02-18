@@ -156,6 +156,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $scopes = [
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
+        Scopes\Filters\Filesize::class,
         Scopes\Filters\Status::class,
         Scopes\Filters\Site::class,
         Scopes\Filters\UserRole::class,
