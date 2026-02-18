@@ -15,6 +15,13 @@
     .form-group {
         grid-column: span var(--col-span, var(--grid-columns));
     }
+
+    @variant @max-lg/panel {
+        /* Hide the spacer field when we have a stacked layout because it doesn't serve a purpose here. */
+        .spacer-fieldtype {
+            display: none;
+        }
+    }
 }
 
 @variant @lg/panel {
