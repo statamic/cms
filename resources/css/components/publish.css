@@ -16,9 +16,12 @@
         grid-column: span var(--col-span, var(--grid-columns));
     }
 
-    @variant @max-lg/panel {
-        /* Hide the spacer field when we have a stacked layout because it doesn't serve a purpose here. */
-        .spacer-fieldtype {
+    .spacer-fieldtype {
+        /** It should be hidden so we dont see it, but we want it to take up space. */
+        visibility: hidden;
+
+        @variant @max-lg/panel {
+            /* When stacked we don't want it to take up space. */
             display: none;
         }
     }
