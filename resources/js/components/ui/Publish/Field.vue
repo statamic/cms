@@ -251,7 +251,7 @@ const fieldtypeComponentEvents = computed(() => ({
                 <FieldActions :actions="fieldActions" />
             </template>
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
-                <code v-text="fieldtypeComponent"></code> does not exist.
+                <code v-text="fieldtypeComponent"></code>
             </div>
             <div :dir="direction">
                 <Component
