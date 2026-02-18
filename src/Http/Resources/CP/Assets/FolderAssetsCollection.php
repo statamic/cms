@@ -104,7 +104,7 @@ class FolderAssetsCollection extends ResourceCollection
     {
         return [
             'meta' => [
-                'columns' => $this->visibleColumns(),
+                // 'columns' => $this->visibleColumns(),
             ],
         ];
     }
