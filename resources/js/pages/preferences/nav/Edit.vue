@@ -184,7 +184,6 @@
             :bodyText="__('Are you sure you want to reset nav customizations?')"
             :buttonText="__('Reset')"
             :danger="true"
-            :blur="true"
             @confirm="reset"
             @cancel="confirmingReset = false"
         />

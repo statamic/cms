@@ -227,7 +227,6 @@
             :open="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
-            :blur="true"
             @cancel="cancelLocalization()"
             @confirm="createLocalization(localizing)"
         >
@@ -244,7 +243,6 @@
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"
             :danger="true"
-            :blur="true"
             @confirm="confirmSwitchLocalization"
             @cancel="pendingLocalization = null"
         />

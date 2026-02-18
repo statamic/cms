@@ -5,7 +5,6 @@
             :title="title"
             :danger="dangerous"
             :buttonText="buttonText"
-            :blur="true"
             :busy="resolving || processing"
             @confirm="confirm"
             @cancel="cancel"
