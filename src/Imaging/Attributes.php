@@ -112,14 +112,66 @@ class Attributes
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
             && is_numeric((string) $svg['height'])) {
-            return ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
+            $attrs = ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
         } elseif ($svg['viewBox']) {
             [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
-
-            return compact('width', 'height');
+            $attrs = compact('width', 'height');
+        } else {
+            $attrs = $this->defaultSvgAttributes();
         }
 
-        return $this->defaultSvgAttributes();
+        $attrs['tone'] = $this->detectSvgTone($this->prefixPath($path));
+
+        return $attrs;
+    }
+
+    private function detectSvgTone(string $fullPath): ?string
+    {
+        if (! extension_loaded('imagick')) {
+            return null;
+        }
+
+        try {
+            $im = new \Imagick();
+            $im->setBackgroundColor(new \ImagickPixel('transparent'));
+            $im->readImage($fullPath);
+            $im->scaleImage(64, 64, true);
+            $w = $im->getImageWidth();
+            $h = $im->getImageHeight();
+
+            $sum = 0;
+            $count = 0;
+            $step = max(1, (int) ceil(($w * $h) / 256));
+            $i = 0;
+
+            for ($y = 0; $y < $h; $y++) {
+                for ($x = 0; $x < $w; $x++) {
+                    if ($i++ % $step !== 0) {
+                        continue;
+                    }
+                    $pixel = $im->getImagePixelColor($x, $y);
+                    $c = $pixel->getColor(true);
+                    if ($c['a'] < 0.1) {
+                        continue;
+                    }
+                    $l = 0.299 * $c['r'] + 0.587 * $c['g'] + 0.114 * $c['b'];
+                    $sum += $l;
+                    $count++;
+                }
+            }
+
+            $im->destroy();
+
+            if ($count === 0) {
+                return null;
+            }
+
+            $avg = $sum / $count;
+
+            return $avg >= 0.4 ? 'light' : 'dark';
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     private function defaultSvgAttributes()
