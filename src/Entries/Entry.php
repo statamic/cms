@@ -454,7 +454,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return false;
         }
 
-        $antlersRoute = preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+        $antlersRoute = preg_replace_callback('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', function ($match) {
             return "{{ {$match[1]} }}";
         }, $this->route());
 
