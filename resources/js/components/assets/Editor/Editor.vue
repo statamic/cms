@@ -335,10 +335,12 @@ export default {
                 fields = flatten(fields);
                 this.fields = fields;
 
-                this.imageTone = null;
-                if (data.isImage || data.isSvg) {
+                if (data.tone) {
+                    this.imageTone = data.tone;
+                    this.imageToneReady = true;
+                } else if (data.isSvg) {
                     this.imageToneReady = false;
-                    this.detectImageTone(data.isImage ? data.preview : data.url)
+                    this.detectImageTone(data.url)
                         .then((tone) => {
                             this.imageTone = tone;
                         })
@@ -346,6 +348,7 @@ export default {
                             this.imageToneReady = true;
                         });
                 } else {
+                    this.imageTone = null;
                     this.imageToneReady = true;
                 }
 
@@ -519,13 +522,7 @@ export default {
             return actions.filter((action) => !buttonActions.includes(action.handle));
         },
 
-        /**
-         * Detect if an image/SVG is predominantly dark or light by sampling pixels and
-         * computing relative luminance. Useful e.g. to adapt preview background for logos.
-         *
-         * @param {string} src - Image or SVG URL (same-origin to avoid CORS tainting)
-         * @returns {Promise<'dark'|'light'|null>}
-         */
+        /** SVG-only fallback: raster images get tone from server meta. */
         detectImageTone(src) {
             const maxSize = 64;
             const luminanceThreshold = 0.4; // 0–1; above = light, below = dark

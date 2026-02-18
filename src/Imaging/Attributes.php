@@ -4,6 +4,7 @@ namespace Statamic\Imaging;
 
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\MountManager;
 use Statamic\Support\Str;
@@ -44,18 +45,64 @@ class Attributes
         $fullPath = $this->prefixPath($path);
 
         if (! file_exists($fullPath)) {
-            return ['width' => 0, 'height' => 0];
+            return ['width' => 0, 'height' => 0, 'tone' => null];
         }
 
         $size = @getimagesize($fullPath);
 
         if ($size === false) {
-            return ['width' => 0, 'height' => 0];
+            return ['width' => 0, 'height' => 0, 'tone' => null];
         }
 
         [$width, $height] = $size;
 
-        return compact('width', 'height');
+        $tone = $this->detectTone($fullPath);
+
+        return compact('width', 'height', 'tone');
+    }
+
+    private function detectTone(string $fullPath): ?string
+    {
+        try {
+            $driver = config('statamic.assets.image_manipulation.driver', 'gd');
+
+            $manager = match ($driver) {
+                'gd' => ImageManager::gd(),
+                'imagick' => ImageManager::imagick(),
+                default => ImageManager::withDriver($driver),
+            };
+
+            $image = $manager->read($fullPath);
+            $image->scaleDown(64, 64);
+            $w = $image->width();
+            $h = $image->height();
+
+            $sum = 0;
+            $count = 0;
+            $step = max(1, (int) ceil(($w * $h) / 256));
+            $i = 0;
+
+            for ($y = 0; $y < $h; $y++) {
+                for ($x = 0; $x < $w; $x++) {
+                    if ($i++ % $step !== 0) {
+                        continue;
+                    }
+                    $color = $image->pickColor($x, $y);
+                    $r = $color->red()->toInt() / 255;
+                    $g = $color->green()->toInt() / 255;
+                    $b = $color->blue()->toInt() / 255;
+                    $l = 0.299 * $r + 0.587 * $g + 0.114 * $b;
+                    $sum += $l;
+                    $count++;
+                }
+            }
+
+            $avg = $count > 0 ? $sum / $count : 0.5;
+
+            return $avg >= 0.4 ? 'light' : 'dark';
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     private function svgAttributes(string $path)

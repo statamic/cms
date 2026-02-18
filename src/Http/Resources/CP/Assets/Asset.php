@@ -50,6 +50,8 @@ class Asset extends JsonResource
                 ];
             }),
 
+            'tone' => $this->resource->tone(),
+
             $this->mergeWhen($this->isPdf(), function () {
                 return [
                     'pdfUrl' => $this->pdfUrl(),
