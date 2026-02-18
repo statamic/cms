@@ -158,7 +158,8 @@
 }
 
 .asset-filename {
-    @apply text-xs text-gray-500 dark:text-gray-300 mt-2 whitespace-nowrap text-center;
+    @apply text-xs text-gray-500 dark:text-gray-300 mt-2 whitespace-nowrap text-center st-text-legibility;
+    font-variant: tabular-nums; /* Disable common-ligatures from body default */
     .selected & {
         @apply text-blue-500;
         .dark & {
