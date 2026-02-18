@@ -1,106 +1,114 @@
-import fontWidthMap from './TruncateTextCharacterMap.js';
+import characterWidths from './TruncateTextCharacterMap.js';
 
-export default function truncateOnResize (targetElement, originalText, { ellipsisSymbol = "..." } = {}) {
-    if (!targetElement.offsetParent || !originalText) {
-        return () => { };
+const BASE_FONT_SIZE = 16;
+
+/**
+ * Observes the parent element for resize events and truncates the text
+ * with a middle ellipsis when it overflows.
+ *
+ * Returns a cleanup function to disconnect the observer.
+ */
+export default function truncateOnResize(element, text, { ellipsis = '...' } = {}) {
+    if (!element.offsetParent || !text) {
+        return () => {};
     }
 
     const observer = new ResizeObserver(() => {
-        targetElement.textContent = truncateText(targetElement, originalText, { ellipsisSymbol });
+        element.textContent = middleTruncate(element, text, ellipsis);
     });
 
-    observer.observe(targetElement.offsetParent);
+    observer.observe(element.offsetParent);
 
     return () => observer.disconnect();
-};
+}
 
-function truncateText (targetElement, originalText, { ellipsisSymbol = "..." } = {}) {
-    const { fontSize, fontFamily } = getElementProperties(targetElement);
+/**
+ * Truncates text from the middle when it's too wide for the element,
+ * preserving the start and end of the string for readability.
+ */
+function middleTruncate(element, text, ellipsis) {
+    const style = window.getComputedStyle(element);
+    const fontSize = Number.parseFloat(style.fontSize);
+    const fontFamily = style.fontFamily.split(',')[0];
 
-    const availableWidth = getAvailableWidth(targetElement);
-    const maxTextWidth = getStringWidth(originalText, fontSize, fontFamily);
-    if (maxTextWidth <= availableWidth) {
-        return originalText;
+    const availableWidth = measureAvailableWidth(element);
+
+    if (measureTextWidth(text, fontFamily, fontSize) <= availableWidth) {
+        return text;
     }
 
-    const middleEllipsisWidth = getStringWidth(ellipsisSymbol, fontSize, fontFamily);
-    const originalTextLength = originalText.length;
+    let remainingWidth = availableWidth - measureTextWidth(ellipsis, fontFamily, fontSize);
+    let start = '';
+    let end = '';
 
-    let remainingWidth = availableWidth - middleEllipsisWidth;
-    let firstHalf = "";
-    let secondHalf = "";
+    // Build the truncated string from both ends, one character at a time,
+    // until we run out of space.
+    for (let i = 0; i < Math.floor(text.length / 2); i++) {
+        const startChar = text[i];
+        remainingWidth -= measureCharWidth(startChar, fontFamily, fontSize);
+        if (remainingWidth < 0) break;
+        start += startChar;
 
-    for (let i = 0; i < Math.floor(originalTextLength / 2); i++) {
-        remainingWidth -= getCharacterWidth(originalText[i], fontFamily, fontSize);
-        if (remainingWidth < 0) {
-            break;
-        }
-
-        firstHalf += originalText[i];
-        remainingWidth -= getCharacterWidth(originalText[originalTextLength - i - 1], fontFamily, fontSize);
-        if (remainingWidth < 0) {
-            break;
-        }
-
-        secondHalf = originalText[originalTextLength - i - 1] + secondHalf;
+        const endChar = text[text.length - i - 1];
+        remainingWidth -= measureCharWidth(endChar, fontFamily, fontSize);
+        if (remainingWidth < 0) break;
+        end = endChar + end;
     }
 
-    return firstHalf + ellipsisSymbol + secondHalf;
-};
+    return start + ellipsis + end;
+}
 
-function getCharacterWidth (character, fontFamily, fontSize = 16) {
-    const characterWidthMap = fontWidthMap[fontFamily] ?? {};
+// -- Text width estimation ------------------------------------------------
+// Uses a precomputed character width map (at 16px base size) to estimate
+// text width without triggering DOM layout. Unmapped characters fall back
+// to 'W' width (the widest common character) for a safe overestimate.
 
-    // If character is not present in widthMap, return width of 'W' character (widest character)
-    const characterWidth = characterWidthMap[character] ?? characterWidthMap.W ?? fontSize;
+function measureCharWidth(char, fontFamily, fontSize) {
+    const widths = characterWidths[fontFamily] ?? {};
+    const baseWidth = widths[char] ?? widths.W ?? BASE_FONT_SIZE;
+    return baseWidth * (fontSize / BASE_FONT_SIZE);
+}
 
-    return characterWidth * (fontSize / 16); // scale the width according to fontSize
-};
-
-function getStringWidth (originalText, fontSize, fontFamily) {
+function measureTextWidth(text, fontFamily, fontSize) {
     let width = 0;
-    for (const c of originalText) {
-        width += getCharacterWidth(c, fontFamily, fontSize);
+    for (const char of text) {
+        width += measureCharWidth(char, fontFamily, fontSize);
     }
     return width;
-};
+}
 
-function getElementProperties (targetElement) {
-    const style = window.getComputedStyle(targetElement);
-    return {
-        fontSize: Number.parseFloat(style.fontSize),
-        fontFamily: style.fontFamily.split(",")[0],
-        width: Number.parseFloat(style.width),
-    };
-};
+// -- Available width calculation ------------------------------------------
+// Walks up from the target element to its offsetParent, subtracting the
+// width of all sibling elements at each level, to determine how much
+// horizontal space remains for the text.
 
-function getSiblingWidth (targetElement) {
-    if (!targetElement.parentNode) {
-        return 0;
+function measureAvailableWidth(element) {
+    const container = element.offsetParent;
+    if (!container) return 0;
+
+    let consumed = 0;
+    let current = element;
+
+    while (current && current !== container) {
+        consumed += measureSiblingsWidth(current);
+        current = current.parentElement;
     }
+
+    return getComputedWidth(container) - consumed;
+}
+
+function measureSiblingsWidth(element) {
+    if (!element.parentNode) return 0;
 
     let width = 0;
-    for (const child of targetElement.parentNode.children) {
-        if (child !== targetElement) {
-            width += getElementProperties(child).width;
+    for (const sibling of element.parentNode.children) {
+        if (sibling !== element) {
+            width += getComputedWidth(sibling);
         }
     }
-
     return width;
-};
+}
 
-function getAvailableWidth (targetElement) {
-    const offsetParentElement = targetElement.offsetParent;
-    if (!offsetParentElement) {
-        return 0;
-    }
-
-    let takenWidth = 0;
-    let tempElement = targetElement;
-    while (tempElement && tempElement !== offsetParentElement) {
-        takenWidth += getSiblingWidth(tempElement);
-        tempElement = tempElement.parentElement;
-    }
-
-    return getElementProperties(offsetParentElement).width - takenWidth;
-};
+function getComputedWidth(element) {
+    return Number.parseFloat(window.getComputedStyle(element).width);
+}
