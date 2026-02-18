@@ -6,6 +6,7 @@
             :open="confirming"
             :title="__('Restore Revision')"
             :buttonText="__('Restore')"
+            :blur="true"
             @confirm="restore"
             @cancel="confirming = false"
         >

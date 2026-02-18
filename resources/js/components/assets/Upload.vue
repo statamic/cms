@@ -34,6 +34,7 @@
         <confirmation-modal
             :open="showNewFilenameModal"
             :title="__('New Filename')"
+            :blur="true"
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"
         >

@@ -105,6 +105,7 @@ onUnmounted(() => {
             :cancellable="false"
             :button-text="__('OK')"
             :title="__('Copy to clipboard')"
+            :blur="true"
             @confirm="$root.copyToClipboardModalUrl = null"
         >
             <div class="prose">

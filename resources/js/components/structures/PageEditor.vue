@@ -60,6 +60,7 @@
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Discard Changes')"
             :danger="true"
+            :blur="true"
             @confirm="confirmCloseWithChanges"
             @cancel="closingWithChanges = false"
         />

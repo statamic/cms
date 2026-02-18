@@ -90,6 +90,7 @@
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"
             :danger="true"
+            :blur="true"
             @confirm="confirmSwitchLocalization"
             @cancel="pendingLocalization = null"
         />

@@ -136,12 +136,14 @@ function handleAxiosError(e) {
         :body-text="error"
         :cancellable="false"
         :button-text="__('OK')"
+        :blur="true"
         @update:open="error = null"
     />
 
     <Modal
         :title="__('Create a Passkey')"
         v-model:open="showCreateModal"
+        :blur="true"
     >
         <Field :label="__('Name')">
             <Input

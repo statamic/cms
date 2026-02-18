@@ -82,6 +82,7 @@
             :body-text="__('Are you sure?')"
             :button-text="__('Discard Changes')"
             :danger="true"
+            :blur="true"
             @confirm="confirmDiscard"
             @cancel="discardingChanges = false"
         />
