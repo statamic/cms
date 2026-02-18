@@ -291,6 +291,8 @@ export default {
 
     computed: {
         requestUrl() {
+            return cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
+
             return this.searchQuery
                 ? cp_url(
                       `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
