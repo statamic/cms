@@ -77,38 +77,9 @@ function measureTextWidth(text, fontFamily, fontSize) {
     return width;
 }
 
-// -- Available width calculation ------------------------------------------
-// Walks up from the target element to its offsetParent, subtracting the
-// width of all sibling elements at each level, to determine how much
-// horizontal space remains for the text.
-
 function measureAvailableWidth(element) {
-    const container = element.offsetParent;
-    if (!container) return 0;
+    const parent = element.parentElement;
+    if (!parent) return 0;
 
-    let consumed = 0;
-    let current = element;
-
-    while (current && current !== container) {
-        consumed += measureSiblingsWidth(current);
-        current = current.parentElement;
-    }
-
-    return getComputedWidth(container) - consumed;
-}
-
-function measureSiblingsWidth(element) {
-    if (!element.parentNode) return 0;
-
-    let width = 0;
-    for (const sibling of element.parentNode.children) {
-        if (sibling !== element) {
-            width += getComputedWidth(sibling);
-        }
-    }
-    return width;
-}
-
-function getComputedWidth(element) {
-    return Number.parseFloat(window.getComputedStyle(element).width);
+    return Number.parseFloat(window.getComputedStyle(parent).width);
 }
