@@ -152,13 +152,11 @@ class FullMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk();
 
-        // Initial response should have the CSRF token and the javascript.
-        $this->assertEquals('<html><body>'.csrf_token().'<script>js here</script></body></html>', $response->getContent());
+        // Initial response should have the placeholder and the javascript, NOT the real token.
+        $this->assertEquals('<html><body>STATAMIC_CSRF_TOKEN<script>js here</script></body></html>', $response->getContent());
 
-        // The cached response should have the token placeholder, and the javascript.
+        // The cached response should be the same as the initial response.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
-        $this->assertEquals(vsprintf('<html><body>STATAMIC_CSRF_TOKEN%s</body></html>', [
-            '<script>js here</script>',
-        ]), file_get_contents($this->dir.'/about_.html'));
+        $this->assertEquals('<html><body>STATAMIC_CSRF_TOKEN<script>js here</script></body></html>', file_get_contents($this->dir.'/about_.html'));
     }
 }

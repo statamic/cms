@@ -4,6 +4,8 @@ namespace Statamic\StaticCaching\Replacers;
 
 use Illuminate\Http\Response;
 use Statamic\Facades\StaticCache;
+use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Replacer;
 use Statamic\Support\Str;
 
@@ -32,6 +34,14 @@ class CsrfTokenReplacer implements Replacer
             self::REPLACEMENT,
             $content
         ));
+
+        if (app(Cacher::class) instanceof FileCacher) {
+            $initial->setContent(str_replace(
+                $token,
+                self::REPLACEMENT,
+                $initial->getContent()
+            ));
+        }
     }
 
     public function replaceInCachedResponse(Response $response)
