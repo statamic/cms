@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 import {
     Icon,
     Switch,
@@ -120,16 +120,6 @@ function destroy() {
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
-
-const shouldClipOverflow = ref(props.collapsed);
-
-watch(() => props.collapsed, () => {
-    shouldClipOverflow.value = true;
-});
-
-function onAnimationComplete() {
-    shouldClipOverflow.value = props.collapsed;
-}
 </script>
 
 <template>
@@ -210,7 +200,7 @@ function onAnimationComplete() {
                 </div>
             </header>
 
-            <div v-show="!collapsed" class="contain-paint" :class="{ 'overflow-clip': shouldClipOverflow }">
+            <div v-show="!collapsed" class="contain-paint">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
