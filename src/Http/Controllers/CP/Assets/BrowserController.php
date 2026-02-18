@@ -85,6 +85,7 @@ class BrowserController extends CpController
             ],
             'folder' => $path,
             'columns' => $this->columns,
+            'filters' => Scope::filters('assets', ['container' => $container->handle(), 'folder' => $path]),
             'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
             'createContainerUrl' => cp_route('asset-containers.create'),
         ];

@@ -20,6 +20,7 @@
                     ref="listing"
                     :url="requestUrl"
                     :columns="columns"
+                    :filters="filters"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
@@ -81,6 +82,7 @@
                             <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
+                                    <ListingFilters />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
@@ -190,6 +192,7 @@ import {
     Listing,
     ListingTable,
     ListingPagination,
+    ListingFilters,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
@@ -223,6 +226,7 @@ export default {
         ListingTable,
         ListingPagination,
         ListingSearch,
+        ListingFilters,
         ListingCustomizeColumns,
         Breadcrumbs,
         Slider,
@@ -247,6 +251,7 @@ export default {
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
+        filters: Array,
         initialColumns: {
             type: Array,
             default: () => [],
