@@ -15,6 +15,16 @@
     .form-group {
         grid-column: span var(--col-span, var(--grid-columns));
     }
+
+    .spacer-fieldtype {
+        /** It should be hidden so we dont see it, but we want it to take up space. */
+        visibility: hidden;
+
+        @variant @max-lg/panel {
+            /* When stacked we don't want it to take up space. */
+            display: none;
+        }
+    }
 }
 
 @variant @lg/panel {

@@ -251,7 +251,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::resource('asset-containers', AssetContainersController::class)->except('index');
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
-    Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
     Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
     Route::get('assets/browse', [BrowserController::class, 'index'])->name('assets.browse.index');
