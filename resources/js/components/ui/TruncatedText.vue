@@ -1,20 +1,21 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import createMiddleEllipsisUtils from '@dynamic-middle-ellipsis/core';
+import customFontWidthMap from './TruncatedTextCharacterMap.js';
 
 const props = defineProps({
     text: { type: String, required: true },
 });
 
-const truncated = ref(null);
+const truncatedRef = ref(null);
 let cleanup = null;
 
 onMounted(() => {
-    const truncateOnResize = createMiddleEllipsisUtils();
+    const truncateOnResize = createMiddleEllipsisUtils({ customFontWidthMap });
 
     cleanup = truncateOnResize({
-        targetElement: truncated.value,
-        originalText: truncated.value.innerText,
+        targetElement: truncatedRef.value,
+        originalText: truncatedRef.value.innerText,
     });
 });
 
@@ -25,6 +26,6 @@ onUnmounted(() => {
 
 <template>
     <div class="relative">
-        <div ref="truncated" v-text="text" v-tooltip="text" :aria-label="text"></div>
+        <div ref="truncatedRef" v-text="text" title="text" :aria-label="text"></div>
     </div>
 </template>
