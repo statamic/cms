@@ -3,13 +3,13 @@
 </template>
 
 <script>
-import Dompurify from 'dompurify';
+import DOMPurify from 'dompurify';
 
 export default {
     mixins: [Fieldtype],
     computed: {
         html() {
-            return Dompurify.sanitize(this.config.html);
+            return DOMPurify.sanitize(this.config.html);
         }
     }
 };
