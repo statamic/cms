@@ -47,6 +47,7 @@ export { default as InputGroup } from './Input/Group.vue';
 export { default as InputGroupAppend } from './Input/GroupAppend.vue';
 export { default as InputGroupPrepend } from './Input/GroupPrepend.vue';
 export { default as Label } from './Label.vue';
+export { default as MiddleEllipsis } from './MiddleEllipsis/MiddleEllipsis.vue';
 export { default as Modal } from './Modal/Modal.vue';
 export { default as ModalClose } from './Modal/Close.vue';
 export { default as ModalTitle } from './Modal/Title.vue';
@@ -85,7 +86,6 @@ export { default as Textarea } from './Textarea.vue';
 export { default as TimePicker } from './TimePicker/TimePicker.vue';
 export { default as ToggleGroup } from './Toggle/Group.vue';
 export { default as ToggleItem } from './Toggle/Item.vue';
-export { default as TruncatedText } from './TruncatedText.vue';
 
 export { default as Avatar } from "./Avatar.vue";
 export { default as CreateForm } from "./CreateForm.vue";

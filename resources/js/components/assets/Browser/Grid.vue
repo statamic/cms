@@ -169,7 +169,7 @@
                     </Context>
                 </ItemActions>
                 <div class="asset-filename">
-                    <TruncatedText :text="asset.basename" />
+                    <MiddleEllipsis :text="asset.basename" />
                 </div>
             </div>
         </section>
@@ -196,7 +196,7 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-    TruncatedText
+    MiddleEllipsis
 } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -220,7 +220,7 @@ export default {
         DropdownSeparator,
         ItemActions,
         FolderSvg,
-        TruncatedText,
+        MiddleEllipsis,
     },
 
     props: {
