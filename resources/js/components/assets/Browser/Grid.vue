@@ -249,17 +249,6 @@ export default {
     },
 
     methods: {
-        truncateFilename(filename) {
-            const maxLength = Math.floor(this.thumbnailSize / 7);
-            if (filename.length <= maxLength) return filename;
-
-            const extension = filename.split('.').pop();
-            const name = filename.slice(0, -(extension.length + 1));
-            const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
-
-            return `${name.slice(0, charsToKeep)}…${name.slice(-charsToKeep)}.${extension}`;
-        },
-
         isSelected(id) {
             return this.selectedAssets.includes(id);
         },
