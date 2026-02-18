@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 
 const props = defineProps(Fieldtype.props);
 
-const html = computed(() => DOMPurify.sanitize(props.config.html));
+const html = computed(() => props.config.sanitize ? DOMPurify.sanitize(props.config.html) : props.config.html);
 </script>
 
 <template>
