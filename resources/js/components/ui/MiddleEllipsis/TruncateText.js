@@ -67,24 +67,10 @@ function getStringWidth (originalText, fontSize, fontFamily) {
 
 function getElementProperties (targetElement) {
     const style = window.getComputedStyle(targetElement);
-    const fontSize = Number.parseFloat(style.fontSize);
-    const fontFamily = style.fontFamily.split(",")[0];
-    const marginXWidth = Number.parseFloat(style.marginLeft) + Number.parseFloat(style.marginRight);
-    const borderXWidth = Number.parseFloat(style.borderLeftWidth) +
-        Number.parseFloat(style.borderRightWidth);
-    const paddingXWidth = Number.parseFloat(style.paddingLeft) +
-        Number.parseFloat(style.paddingRight);
-    const width = Number.parseFloat(style.width);
-    const totalWidth = width + marginXWidth;
-    const innerWidth = width - paddingXWidth - borderXWidth;
     return {
-        fontSize,
-        fontFamily,
-        totalWidth,
-        borderXWidth,
-        paddingXWidth,
-        marginXWidth,
-        innerWidth,
+        fontSize: Number.parseFloat(style.fontSize),
+        fontFamily: style.fontFamily.split(",")[0],
+        width: Number.parseFloat(style.width),
     };
 };
 
@@ -95,11 +81,8 @@ function getSiblingWidth (targetElement) {
 
     let width = 0;
     for (const child of targetElement.parentNode.children) {
-        if (child === targetElement) {
-            const { paddingXWidth, borderXWidth } = getElementProperties(targetElement);
-            width += paddingXWidth + borderXWidth;
-        } else {
-            width += getElementProperties(child).totalWidth;
+        if (child !== targetElement) {
+            width += getElementProperties(child).width;
         }
     }
 
@@ -116,11 +99,8 @@ function getAvailableWidth (targetElement) {
     let tempElement = targetElement;
     while (tempElement && tempElement !== offsetParentElement) {
         takenWidth += getSiblingWidth(tempElement);
-        // if (!tempElement.parentElement) {
-        //     break;
-        // }
         tempElement = tempElement.parentElement;
     }
 
-    return getElementProperties(offsetParentElement).innerWidth - takenWidth;
+    return getElementProperties(offsetParentElement).width - takenWidth;
 };
