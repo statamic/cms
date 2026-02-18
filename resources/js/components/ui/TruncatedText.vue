@@ -26,6 +26,6 @@ onUnmounted(() => {
 
 <template>
     <div class="relative">
-        <div ref="truncatedRef" v-text="text" title="text" :aria-label="text"></div>
+        <div ref="truncatedRef" v-text="text" :title="text" :aria-label="text"></div>
     </div>
 </template>
