@@ -39,7 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="isImage && asset && asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
+                                <ui-button inset size="sm" v-if="(isImage || asset?.isSvg) && asset?.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
@@ -62,6 +62,22 @@
                             </ItemActions>
                         </div>
 
+                        <!-- Transparency toggle (always visible when toolbar is hidden, for transparent images/SVGs) -->
+                        <div
+                            v-if="showTransparencyToggle"
+                            class="flex flex-wrap items-center justify-center gap-2 px-2 py-2"
+                        >
+                            <ui-button
+                                inset
+                                size="sm"
+                                @click="showCheckerboard = !showCheckerboard"
+                                icon="eye"
+                                variant="ghost"
+                                :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']"
+                                :text="__('Transparency')"
+                            />
+                        </div>
+
                         <!-- Asset Preview Area -->
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
@@ -78,17 +94,17 @@
                                 <!-- SVG -->
                                 <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
-                                    <div class="bg-checkerboard rounded-ss-md flex items-center justify-center p-3 aspect-square">
+                                    <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="rounded-ss-md flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                     </div>
-                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                    <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
                                     </div>
-                                    <div class="bg-checkerboard rounded-se-md flex items-center justify-center p-3 aspect-square">
+                                    <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="rounded-se-md flex items-center justify-center p-3 aspect-square">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                     </div>
                                 </div>
-                                <div class="bg-checkerboard rounded-b-md h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="rounded-b-md h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
                                     <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
                             </div>
@@ -282,6 +298,11 @@ export default {
 
         isToolbarVisible() {
             return !this.readOnly && this.showToolbar;
+        },
+
+        /** Show standalone Transparency button when toolbar is hidden but asset supports transparency (e.g. from assets field) */
+        showTransparencyToggle() {
+            return !this.isToolbarVisible && this.asset && (this.asset.isImage || this.asset.isSvg) && this.asset.can_be_transparent;
         },
     },
 
