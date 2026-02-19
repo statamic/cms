@@ -159,6 +159,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
+import DOMPurify from 'dompurify';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@/util/throttle.js';
 import { Button, Stack } from '@/components/ui';
@@ -640,7 +641,7 @@ export default {
         updateMarkdownPreview() {
             this.$axios
                 .post(this.meta.previewUrl, { value: this.data, config: this.config })
-                .then((response) => (this.markdownPreviewText = response.data))
+                .then((response) => (this.markdownPreviewText = DOMPurify.sanitize(response.data)))
                 .catch((e) => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
         },
 
