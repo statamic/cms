@@ -358,13 +358,7 @@
         position: absolute;
         inset: 0;
         background-image: var(--checkerboard-light);
-        opacity: 0;
-        transition: opacity 0.2s ease-in-out;
         pointer-events: none;
-    }
-
-    &:hover::before {
-        opacity: 1;
     }
 
     .dark & {
