@@ -307,17 +307,6 @@
             }
         }
         footer {
-            position: relative;
-            &::before {
-                content: '';
-                pointer-events: none;
-                position: absolute;
-                border-block-end: 1px solid black;
-                opacity: 0.06;
-                width: 100vw;
-                top: 50%;
-                transform: translateY(50%);
-            }
             button:only-child {
                 position: relative;
                 &::before, &::after {

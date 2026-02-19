@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 import {
     Icon,
     Switch,
@@ -14,7 +14,6 @@ import {
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
-import { Motion } from 'motion-v';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
@@ -121,16 +120,6 @@ function destroy() {
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
-
-const shouldClipOverflow = ref(props.collapsed);
-
-watch(() => props.collapsed, () => {
-    shouldClipOverflow.value = true;
-});
-
-function onAnimationComplete() {
-    shouldClipOverflow.value = props.collapsed;
-}
 </script>
 
 <template>
@@ -211,13 +200,7 @@ function onAnimationComplete() {
                 </div>
             </header>
 
-            <Motion
-                :class="{ 'overflow-clip': shouldClipOverflow }"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
-                @animation-complete="onAnimationComplete"
-            >
+            <div v-show="!collapsed" class="contain-paint">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
@@ -228,7 +211,7 @@ function onAnimationComplete() {
                         <Fields class="p-4" />
                     </FieldsProvider>
                 </div>
-            </Motion>
+            </div>
         </div>
 
         <confirmation-modal

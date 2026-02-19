@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Assets;
+namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\Test;

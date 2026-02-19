@@ -39,7 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="isImage && asset && asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
+                                <ui-button inset size="sm" v-if="asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
@@ -75,17 +75,17 @@
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
-                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                     </div>
-                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
                                     </div>
-                                    <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                     </div>
                                 </div>
-                                <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                <div class="h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                     <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
                             </div>
