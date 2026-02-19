@@ -50,7 +50,7 @@
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^10.8 || ^11.0",
         "phpunit/phpunit": "^11.5.3",
-        "spatie/laravel-ray": "^1.42"
+        "spatie/laravel-ray": "^1.43.6"
     },
     "conflict": {
         "algolia/algoliasearch-client-php": "<4.32"
