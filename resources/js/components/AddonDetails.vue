@@ -50,6 +50,7 @@
 
 <script>
 import AddonEditions from './addons/Editions.vue';
+import DOMPurify from 'dompurify';
 
     export default {
         components: {
@@ -74,7 +75,7 @@ import AddonEditions from './addons/Editions.vue';
             },
 
             description() {
-                return this.addon.description;
+                return DOMPurify.sanitize(this.addon.description);
             },
 
             priceRange() {
