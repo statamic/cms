@@ -357,6 +357,7 @@ export default {
                 fields = flatten(fields);
                 this.fields = fields;
 
+                // Tone from server meta (PHP DetectsTone) when available; otherwise client-side fallback below.
                 if (data.tone) {
                     this.imageTone = data.tone;
                     this.imageToneReady = true;
@@ -543,8 +544,10 @@ export default {
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
         },
-
-        /** SVG-only fallback: raster images get tone from server meta. */
+        // Client-side tone detection for the Asset Editor only.
+        // Used when tone isn't in server meta yet (e.g. SVG without cached meta).
+        // Raster images normally get tone from PHP (DetectsTone trait) when meta is generated.
+        // Same luminance formula and threshold (0.4) as server generation for consistent "light" / "dark" result.
         detectImageTone(src) {
             const maxSize = 64;
             const luminanceThreshold = 0.4; // 0–1; above = light, below = dark
