@@ -18,21 +18,23 @@ const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setF
 const open = ref(false);
 const filtersButtonWrapperRef = ref(null);
 
-const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
-const fieldFilters = computed(() => filters.value.filter((filter) => filter.is_fields));
-const fieldFilterHandle = computed(() => fieldFilter.value?.handle);
-const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
 const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
+const standardFilterHandles = computed(() => standardFilters.value.map(filter => filter.handle));
+const standardBadges = computed(() => Object.fromEntries(
+    Object.entries(activeFilterBadges.value).filter(([handle]) => standardFilterHandles.value.includes(handle))
+));
 
-const standardBadges = computed(() => {
-    const { [fieldFilterHandle.value]: fields, ...badges } = activeFilterBadges.value;
-    return badges;
-});
+const fieldFilters = computed(() => filters.value.filter((filter) => filter.is_fields));
+const fieldFilterHandles = computed(() => fieldFilters.value.map(filter => filter.handle));
+const fieldFilterBadges = computed(() => Object.entries(activeFilterBadges.value)
+    .filter(([filter]) => fieldFilterHandles.value.includes(filter))
+    .flatMap(([filter, badges]) => Object.entries(badges).map(([handle, badge]) => ({ filter, handle, badge })))
+);
 
-function removeFieldFilter(handle) {
-    const fields = { ...activeFilters.value[fieldFilterHandle.value] };
-    delete fields[handle];
-    setFilter(fieldFilterHandle.value, fields);
+function removeFieldFilter(filterHandle, fieldHandle) {
+    const fields = { ...activeFilters.value[filterHandle] };
+    delete fields[fieldHandle];
+    setFilter(filterHandle, fields);
 }
 
 function isActive(handle) {
@@ -164,13 +166,13 @@ function handleStackClosed() {
         </Stack>
 
         <Button
-            v-for="(badge, handle, index) in fieldFilterBadges"
-            :key="handle"
+            v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
+            :key="`${filter}-${handle}`"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
             :disabled="reorderable"
             class="last:me-12"
-            @click="removeFieldFilter(handle)"
+            @click="removeFieldFilter(filter, handle)"
         >
             <template v-if="handle == 'date'">
                 {{ badge.field }}
