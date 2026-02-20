@@ -162,5 +162,5 @@ defineExpose({
         />
     </div>
 
-    <div v-else v-text="__('No available filters')"></div>
+    <div v-else-if="!rows.length" v-text="__('No available filters')" class="text-gray-500 dark:text-gray-400"></div>
 </template>
