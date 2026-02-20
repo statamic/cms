@@ -10,7 +10,6 @@ use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
-use Statamic\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
@@ -35,10 +34,18 @@ class ForgotPasswordController extends Controller
         if ($url = $request->_reset_url) {
             $url = URL::makeAbsolute($url);
 
-            $isExternal = Site::all()
-                ->map(fn ($site) => $site->absoluteUrl())
-                ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
-                ->isEmpty();
+            $urlDomain = parse_url($url, PHP_URL_HOST);
+            $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
+
+            $isExternal = $urlDomain
+                ? Site::all()
+                    ->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST))
+                    ->push($currentRequestDomain)
+                    ->filter(fn ($siteDomain) => ! is_null($siteDomain))
+                    ->unique()
+                    ->filter(fn ($siteDomain) => $siteDomain === $urlDomain)
+                    ->isEmpty()
+                : false;
 
             throw_if($isExternal, ValidationException::withMessages([
                 '_reset_url' => trans('validation.url', ['attribute' => '_reset_url']),
