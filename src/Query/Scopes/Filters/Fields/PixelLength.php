@@ -24,7 +24,7 @@ class PixelLength extends Integer
         $field = $this->fieldtype->field()->display();
         $operator = $values['operator'];
         $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
-        $value = number_format($values['value'], 0).' px';
+        $value = round($values['value'], 0).' px';
 
         return $field.' '.strtolower($translatedOperator).' '.$value;
     }
