@@ -1,0 +1,88 @@
+<script setup>
+import { Motion } from 'motion-v';
+import { computed, onMounted, onUnmounted } from 'vue';
+import { Button, ButtonGroup } from '@ui';
+
+const DESELECT_SHORTCUT_KEY = 'd';
+
+const handleToShortcutKey = {
+    unpublish: 'u',
+    publish: 'p',
+    delete: 'x',
+};
+
+const props = defineProps({
+    actions: { type: Array, default: () => [] },
+    visible: { type: Boolean, default: false },
+    selections: { type: Array, default: () => [] },
+    clearSelections: { type: Function, default: null },
+});
+
+const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
+
+const actionsWithShortcuts = computed(() => {
+    const used = new Set([DESELECT_SHORTCUT_KEY]);
+    return (props.actions || []).map((action) => {
+        let key = handleToShortcutKey[action.handle] ?? (action.title?.[0]?.toLowerCase() || '').replace(/[^a-z]/, '');
+        if (!key || used.has(key)) {
+            for (const c of 'abcdefghijklmnopqrstuvwxyz') {
+                if (!used.has(c)) {
+                    key = c;
+                    break;
+                }
+            }
+        }
+        if (key) used.add(key);
+        return { ...action, shortcutKey: key };
+    });
+});
+
+function onKeydown(event) {
+    if (!props.visible || !hasSelections.value) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
+    if (!key) return;
+    if (key === DESELECT_SHORTCUT_KEY) {
+        props.clearSelections?.();
+        event.preventDefault();
+        return;
+    }
+    const action = actionsWithShortcuts.value.find((a) => a.shortcutKey === key);
+    if (action?.run) {
+        action.run();
+        event.preventDefault();
+    }
+}
+
+onMounted(() => document.addEventListener('keydown', onKeydown));
+onUnmounted(() => document.removeEventListener('keydown', onKeydown));
+</script>
+
+<template>
+    <Motion
+        v-if="visible"
+        layout
+        data-floating-toolbar
+        class="pointer-events-none sticky inset-x-0 bottom-1 sm:bottom-6 z-(--z-index-above) flex w-full max-w-[95vw] mx-auto justify-center"
+        :initial="{ y: 100, opacity: 0 }"
+        :animate="{ y: 0, opacity: 1 }"
+        :transition="{ duration: 0.2, ease: 'easeInOut' }"
+    >
+        <div class="pointer-events-auto space-y-3 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 bg-gray-200/55 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+            <ButtonGroup>
+                <Button
+                    class="text-blue-500!"
+                    :text="__n(`Deselect :count item|Deselect all :count items`, selections.length) + ` ${DESELECT_SHORTCUT_KEY}`"
+                    @click="clearSelections?.()"
+                />
+                <Button
+                    v-for="action in actionsWithShortcuts"
+                    :key="action.handle"
+                    :text="__(action.title) + ` ${action.shortcutKey}`"
+                    :variant="action.dangerous ? 'danger' : 'default'"
+                    @click="action.run"
+                />
+            </ButtonGroup>
+        </div>
+    </Motion>
+</template>
