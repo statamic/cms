@@ -26,10 +26,20 @@ let selected = ref(null);
 let recentItems = ref(getRecentItems());
 let keyboardBindings = ref([]);
 
-Statamic.$keys.bindGlobal(['mod+k'], (e) => {
+Statamic.$keys.bindGlobal(['ctrl+k'], (e) => {
+    if (! shouldOpenViaKeyBinding()) return;
     e.preventDefault();
     open.value = true;
 });
+
+function shouldOpenViaKeyBinding() {
+    const selection = window.getSelection();
+    const selectionNode = selection?.anchorNode;
+    const focusedInBardField = selectionNode?.parentElement?.closest('.bard-editor') !== null;
+    const hasSelectedText = selection?.toString().length > 0;
+
+	return !focusedInBardField || (focusedInBardField && !hasSelectedText);
+}
 
 function bindKeyboardShortcuts() {
     each({
