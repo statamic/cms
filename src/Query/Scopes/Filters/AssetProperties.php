@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Fields\Field;
+use Statamic\Query\Scopes\Filters\Fields\Duration;
 use Statamic\Query\Scopes\Filters\Fields\Filesize;
 
 class AssetProperties extends Fields
@@ -23,6 +24,15 @@ class AssetProperties extends Fields
             'width' => [
                 'display' => __('Width'),
                 'type' => 'integer',
+            ],
+            'height' => [
+                'display' => __('Height'),
+                'type' => 'integer',
+            ],
+            'duration' => [
+                'display' => __('Duration'),
+                'type' => 'integer',
+                'filter' => Duration::class,
             ],
         ];
     }
@@ -80,6 +90,7 @@ class AssetProperties extends Fields
                 return $filter->badge($values);
             })
             ->filter()
+            ->values()
             ->all();
     }
 
