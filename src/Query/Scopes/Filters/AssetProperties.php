@@ -4,7 +4,8 @@ namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filters\Fields\Duration;
-use Statamic\Query\Scopes\Filters\Fields\Filesize;
+use Statamic\Query\Scopes\Filters\Fields\FileSize;
+use Statamic\Query\Scopes\Filters\Fields\FileType;
 use Statamic\Query\Scopes\Filters\Fields\PixelLength;
 
 class AssetProperties extends Fields
@@ -17,10 +18,19 @@ class AssetProperties extends Fields
     protected function propertyItems(): array
     {
         return [
+            'type' => [
+                'display' => __('Type'),
+                'type' => 'text',
+                'filter' => FileType::class,
+            ],
+            'extension' => [
+                'display' => __('Extension'),
+                'type' => 'text',
+            ],
             'size' => [
                 'display' => __('Size'),
                 'type' => 'integer',
-                'filter' => Filesize::class,
+                'filter' => FileSize::class,
             ],
             'width' => [
                 'display' => __('Width'),
