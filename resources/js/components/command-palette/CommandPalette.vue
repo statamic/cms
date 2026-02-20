@@ -26,7 +26,7 @@ let selected = ref(null);
 let recentItems = ref(getRecentItems());
 let keyboardBindings = ref([]);
 
-Statamic.$keys.bindGlobal(['ctrl+k'], (e) => {
+Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     if (! shouldOpenViaKeyBinding()) return;
     e.preventDefault();
     open.value = true;
