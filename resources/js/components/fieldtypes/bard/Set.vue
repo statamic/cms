@@ -330,12 +330,25 @@ export default {
         );
 
         reveal.mount(this.$refs.container, this.expand);
+
+        // Firefox bug 739071: text selection doesn't work inside elements with a
+        // draggable ancestor. ProseMirror sets draggable=true on the node-view-wrapper
+        // because the Set node spec has draggable:true. We must keep it false.
+        this.$el.setAttribute('draggable', false);
+        this._draggableObserver = new MutationObserver(() => {
+            if (this.$el.getAttribute('draggable') !== 'false') {
+                this.$el.setAttribute('draggable', false);
+            }
+        });
+        this._draggableObserver.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
     },
 
     updated() {
-        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
-        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
         this.$el.setAttribute('draggable', false);
+    },
+
+    beforeUnmount() {
+        this._draggableObserver?.disconnect();
     },
 };
 </script>
