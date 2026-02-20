@@ -140,7 +140,6 @@ defineExpose({
 </script>
 
 <template>
-    <div v-if="hasAvailableFieldFilters">
         <FieldFilterRow
             v-for="filter in rows"
             :key="filter.handle"
@@ -154,6 +153,7 @@ defineExpose({
             @enter-pressed="handleEnterPressed"
         />
 
+    <div v-if="hasAvailableFieldFilters">
         <Combobox
             ref="fieldSelect"
             :placeholder="__('Add Field')"
