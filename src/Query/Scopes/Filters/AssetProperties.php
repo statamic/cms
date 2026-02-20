@@ -93,7 +93,6 @@ class AssetProperties extends Fields
                 return $filter->badge($values);
             })
             ->filter()
-            ->values()
             ->all();
     }
 
