@@ -140,18 +140,18 @@ defineExpose({
 </script>
 
 <template>
-        <FieldFilterRow
-            v-for="filter in rows"
-            :key="filter.handle"
-            :ref="(el) => { if (el) rowRefs[filter.handle] = el }"
-            :display="filter.display"
-            :fields="filter.fields"
-            :meta="filter.meta"
-            :values="filter.values"
-            @update:values="rowUpdated(filter.handle, $event)"
-            @removed="removeRow(filter.handle)"
-            @enter-pressed="handleEnterPressed"
-        />
+    <FieldFilterRow
+        v-for="filter in rows"
+        :key="filter.handle"
+        :ref="(el) => { if (el) rowRefs[filter.handle] = el }"
+        :display="filter.display"
+        :fields="filter.fields"
+        :meta="filter.meta"
+        :values="filter.values"
+        @update:values="rowUpdated(filter.handle, $event)"
+        @removed="removeRow(filter.handle)"
+        @enter-pressed="handleEnterPressed"
+    />
 
     <div v-if="hasAvailableFieldFilters">
         <Combobox
