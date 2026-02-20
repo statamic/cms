@@ -41,12 +41,11 @@ class Filesize extends Filter
 
     public function apply($query, $values)
     {
-        match ($values['operator']) {
-            '>' => $query->where('filesize', '>', $values['value'] * 1024),
-            '>=' => $query->where('filesize', '>=', $values['value'] * 1024),
-            '<' => $query->where('filesize', '<', $values['value'] * 1024),
-            '<=' => $query->where('filesize', '<=', $values['value'] * 1024),
-        };
+        if (empty($values['value'])) {
+            return;
+        }
+
+        $query->where('size', $values['operator'], $values['value'] * 1024);
     }
 
     public function badge($values)
