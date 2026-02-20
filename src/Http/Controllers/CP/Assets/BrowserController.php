@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
@@ -14,6 +13,7 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
@@ -91,7 +91,7 @@ class BrowserController extends CpController
         ];
     }
 
-    public function folder(Request $request, $container, $path = '/')
+    public function folder(FilteredRequest $request, $container, $path = '/')
     {
         $this->authorize('view', $container);
 
