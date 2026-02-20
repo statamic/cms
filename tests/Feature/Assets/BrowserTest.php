@@ -149,6 +149,35 @@ class BrowserTest extends TestCase
     }
 
     #[Test]
+    public function it_searches_assets_in_the_root_folder()
+    {
+        $this->withoutExceptionHandling();
+        $containerOne = AssetContainer::make('one')->disk('test')->save();
+        $containerTwo = AssetContainer::make('two')->disk('test')->save();
+
+        $containerOne
+            ->makeAsset('no-match.txt')
+            ->upload(UploadedFile::fake()->create('no-match.txt'));
+        $containerTwo
+            ->makeAsset('other-container.txt')
+            ->upload(UploadedFile::fake()->create('other-container.txt'));
+        $containerOne
+            ->makeAsset('asset-one.txt')
+            ->upload(UploadedFile::fake()->create('asset-one.txt'));
+        $containerOne
+            ->makeAsset('nested/asset-two.txt')
+            ->upload(UploadedFile::fake()->create('asset-two.txt'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/folders/one?search=asset')
+            ->assertSuccessful()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-two.txt');
+    }
+
+    #[Test]
     public function it_lists_assets_in_a_subfolder()
     {
         $container = AssetContainer::make('test')->disk('test')->save();
