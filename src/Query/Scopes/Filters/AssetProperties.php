@@ -5,11 +5,11 @@ namespace Statamic\Query\Scopes\Filters;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Str;
 
-class Filesize extends Filter
+class AssetProperties extends Filter
 {
     public static function title()
     {
-        return __('Size');
+        return __('Properties');
     }
 
     public function fieldItems()
@@ -39,6 +39,22 @@ class Filesize extends Filter
             ],
         ];
     }
+
+    // protected function getFields()
+    // {
+    //     return [
+    //         'size' => [
+    //             'handle' => 'size',
+    //             'display' => __('Size'),
+    //             'type' => new \Statamic\Fieldtypes\Integer,
+    //         ],
+    //         'size' => [
+    //             'handle' => 'size',
+    //             'display' => __('Size'),
+    //             'type' => ,
+    //         ],
+    //     ];
+    // }
 
     public function apply($query, $values)
     {
