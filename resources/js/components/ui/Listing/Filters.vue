@@ -19,6 +19,7 @@ const open = ref(false);
 const filtersButtonWrapperRef = ref(null);
 
 const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
+const fieldFilters = computed(() => filters.value.filter((filter) => filter.is_fields));
 const fieldFilterHandle = computed(() => fieldFilter.value?.handle);
 const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
 const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
@@ -124,16 +125,19 @@ function handleStackClosed() {
         >
             <div ref="stackContentRef" class="">
                 <div class="space-y-4">
-                    <Panel v-if="fieldFilter">
+                    <Panel
+                        v-for="filter in fieldFilters"
+                        :key="filter.handle"
+                    >
                         <PanelHeader class="flex items-center justify-between">
-                            <Heading :text="__('Fields')" />
-                            <Button v-if="isActive(fieldFilterHandle)" size="sm" :text="__('Clear')" @click="setFilter(fieldFilterHandle, null)" />
+                            <Heading :text="filter.title" />
+                            <Button v-if="isActive(filter.handle)" size="sm" :text="__('Clear')" @click="setFilter(filter.handle, null)" />
                         </PanelHeader>
                         <Card>
                             <FieldFilter
-                                :config="fieldFilter"
-                                :values="activeFilters.fields || {}"
-                                @changed="setFilter(fieldFilterHandle, $event)"
+                                :config="filter"
+                                :values="activeFilters[filter.handle] || {}"
+                                @changed="setFilter(filter.handle, $event)"
                             />
                         </Card>
                     </Panel>

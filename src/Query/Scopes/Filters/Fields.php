@@ -19,7 +19,7 @@ class Fields extends Filter
 
     public static function title()
     {
-        return __('Field');
+        return __('Fields');
     }
 
     public function extra()
