@@ -1,7 +1,7 @@
 <template>
     <Stack size="full" open inset ref="stack" :before-close="shouldClose" @update:open="$emit('closed')" :show-close-button="false">
         <div
-            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
+            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-gray-850"
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
