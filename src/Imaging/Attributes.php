@@ -65,11 +65,11 @@ class Attributes
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
             && is_numeric((string) $svg['height'])) {
-            return ['width' => (int) $svg['width'], 'height' => (int) $svg['height']];
+            return ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
         } elseif ($svg['viewBox']) {
             [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
 
-            return ['width' => (int) $width, 'height' => (int) $height];
+            return ['width' => (float) $width, 'height' => (float) $height];
         }
 
         return $this->defaultSvgAttributes();
