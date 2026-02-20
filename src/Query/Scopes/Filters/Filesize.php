@@ -51,7 +51,7 @@ class Filesize extends Filter
 
     public function badge($values)
     {
-        return vsprintf(
+        return sprintf(
             __('Size %s %s kB'),
             $values['operator'],
             $values['value']
