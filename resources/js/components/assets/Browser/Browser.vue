@@ -291,13 +291,8 @@ export default {
 
     computed: {
         requestUrl() {
-            return cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
-
-            return this.searchQuery
-                ? cp_url(
-                      `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
-                  ).replace(/\/$/, '')
-                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
+            const path = this.searchQuery && !this.restrictFolderNavigation ? '' : this.path;
+            return cp_url(`assets/browse/folders/${this.container.id}/${path || ''}`).replace(/\/$/, '');
         },
 
         actionContext() {
