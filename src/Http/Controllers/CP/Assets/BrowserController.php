@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
@@ -191,6 +192,14 @@ class BrowserController extends CpController
                     ]),
                 ],
             ]);
+    }
+
+    /**
+     * No longer used in the control panel, but left in for backward compatiblity
+     */
+    public function search(Request $request, $container, $path = null)
+    {
+        return $this->folder($request, $container, $path);
     }
 
     protected function applyQueryScopes($query, $params)
