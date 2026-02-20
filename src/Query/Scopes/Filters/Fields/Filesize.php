@@ -9,24 +9,13 @@ class Filesize extends Integer
 {
     public function fieldItems()
     {
+        $fields = parent::fieldItems();
+
         return [
-            'operator' => [
-                'type' => 'select',
-                'placeholder' => __('Select Operator'),
-                'options' => [
-                    '>' => __('Greater than'),
-                    '>=' => __('Greater than or equals'),
-                    '<' => __('Less than'),
-                    '<=' => __('Less than or equals'),
-                ],
-                'default' => '>',
-            ],
+            ...$fields,
             'value' => [
-                'type' => $this->valueFieldtype(),
-                'placeholder' => __('Size') . ' (KB)',
-                'if' => [
-                    'operator' => 'contains_any <>, >, >=, <, <=, =',
-                ],
+                ...$fields['value'],
+                'append' => trim(__('statamic::messages.units.KB', ['count' => ''])),
             ],
         ];
     }
