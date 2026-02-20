@@ -2,80 +2,85 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\Query\Scopes\Filter;
-use Statamic\Support\Str;
+use Statamic\Fields\Field;
+use Statamic\Query\Scopes\Filters\Fields\Filesize;
 
-class AssetProperties extends Filter
+class AssetProperties extends Fields
 {
     public static function title()
     {
         return __('Properties');
     }
 
-    public function fieldItems()
+    protected function propertyItems(): array
     {
         return [
-            'operator' => [
-                'type' => 'select',
-                'display' => __('Operator'),
-                'placeholder' => __('Select Operator'),
-                'hide_display' => true,
-                'width' => 50,
-                'options' => [
-                    '>' => __('Greater than'),
-                    '<' => __('Less than'),
-                ],
-                'default' => '>',
-            ],
-            'value' => [
+            'size' => [
+                'display' => __('Size'),
                 'type' => 'integer',
-                'display' => __('Size') . ' (kB)',
-                'placeholder' => __('Size') . ' (kB)',
-                'hide_display' => true,
-                'width' => 50,
-                'if' => [
-                    'operator' => 'contains_any >, >=, <, <=',
-                ],
+                'filter' => Filesize::class,
+            ],
+            'width' => [
+                'display' => __('Width'),
+                'type' => 'integer',
             ],
         ];
     }
 
-    // protected function getFields()
-    // {
-    //     return [
-    //         'size' => [
-    //             'handle' => 'size',
-    //             'display' => __('Size'),
-    //             'type' => new \Statamic\Fieldtypes\Integer,
-    //         ],
-    //         'size' => [
-    //             'handle' => 'size',
-    //             'display' => __('Size'),
-    //             'type' => ,
-    //         ],
-    //     ];
-    // }
+    public function extra()
+    {
+        return $this->getFilters()
+            ->map(function ($filter) {
+                return [
+                    'handle' => $filter->handle(),
+                    'display' => __($filter->display()),
+                    'fields' => ($fields = $filter->fields())->toPublishArray(),
+                    'meta' => $fields->meta(),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    protected function getFilters()
+    {
+        return collect($this->propertyItems())
+            ->map(function ($config, $handle) {
+                $field = (new Field($handle, $config));
+
+                if ($config['filter'] ?? null) {
+                    return app()->make($config['filter'], ['fieldtype' => $field->fieldtype()]);
+                } else {
+                    return $field->fieldtype()->filter();
+                }
+            });
+    }
 
     public function apply($query, $values)
     {
-        if (empty($values['value'])) {
-            return;
-        }
-
-        $query->where('size', $values['operator'], $values['value'] * 1024);
+        $this->getFilters()
+            ->each(function ($filter, $handle) use ($query, $values) {
+                if (! isset($values[$handle]) || ! $filter->isComplete($values[$handle])) {
+                    return null;
+                }
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+                $filter->apply($query, $handle, $values);
+            });
     }
 
     public function badge($values)
     {
-        if (empty($values['value'])) {
-            return;
-        }
+        return $this->getFilters()
+            ->map(function ($filter, $handle) use ($values) {
+                if (! isset($values[$handle]) || ! $filter->isComplete($values[$handle])) {
+                    return null;
+                }
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
 
-        return sprintf(
-            __('Size %s %s'),
-            $values['operator'],
-            Str::fileSizeForHumans($values['value'] * 1024, 0)
-        );
+                return $filter->badge($values);
+            })
+            ->filter()
+            ->all();
     }
 
     public function visibleTo($key)
