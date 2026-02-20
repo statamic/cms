@@ -5,6 +5,7 @@ namespace Statamic\Query\Scopes\Filters;
 use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filters\Fields\Duration;
 use Statamic\Query\Scopes\Filters\Fields\Filesize;
+use Statamic\Query\Scopes\Filters\Fields\PixelLength;
 
 class AssetProperties extends Fields
 {
@@ -24,10 +25,12 @@ class AssetProperties extends Fields
             'width' => [
                 'display' => __('Width'),
                 'type' => 'integer',
+                'filter' => PixelLength::class,
             ],
             'height' => [
                 'display' => __('Height'),
                 'type' => 'integer',
+                'filter' => PixelLength::class,
             ],
             'duration' => [
                 'display' => __('Duration'),
