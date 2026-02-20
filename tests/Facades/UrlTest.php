@@ -233,7 +233,8 @@ class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_determines_if_external_url_to_application()
+    #[DataProvider('externalProvider')]
+    public function it_determines_if_external_url_to_application($url, $expected)
     {
         $this->setSites([
             'first' => ['name' => 'First', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
@@ -241,25 +242,38 @@ class UrlTest extends TestCase
             'second' => ['name' => 'Second', 'locale' => 'fr_FR', 'url' => '/fr/'],
         ]);
 
-        $this->assertTrue(URL::isExternalToApplication('http://that-site.com'));
-        $this->assertTrue(URL::isExternalToApplication('http://that-site.com/'));
-        $this->assertTrue(URL::isExternalToApplication('http://that-site.com/some-slug'));
-        $this->assertTrue(URL::isExternalToApplication('http://that-site.com/some-slug?foo'));
-        $this->assertTrue(URL::isExternalToApplication('http://that-site.com/some-slug#anchor'));
+        $this->assertEquals($expected, URL::isExternalToApplication($url));
+    }
 
-        $this->assertFalse(URL::isExternalToApplication('http://subdomain.this-site.com'));
-        $this->assertFalse(URL::isExternalToApplication('http://subdomain.this-site.com/'));
-        $this->assertFalse(URL::isExternalToApplication('http://subdomain.this-site.com/some-slug'));
-        $this->assertFalse(URL::isExternalToApplication('http://subdomain.this-site.com/some-slug?foo'));
-        $this->assertFalse(URL::isExternalToApplication('http://subdomain.this-site.com/some-slug#anchor'));
+    public static function externalProvider()
+    {
+        return [
+            ['http://that-site.com', true],
+            ['http://that-site.com/', true],
+            ['http://that-site.com/some-slug', true],
+            ['http://that-site.com/some-slug?foo', true],
+            ['http://that-site.com/some-slug#anchor', true],
 
-        $this->assertFalse(URL::isExternalToApplication('http://absolute-url-resolved-from-request.com'));
-        $this->assertFalse(URL::isExternalToApplication('http://absolute-url-resolved-from-request.com/'));
-        $this->assertFalse(URL::isExternalToApplication('http://absolute-url-resolved-from-request.com/some-slug'));
-        $this->assertFalse(URL::isExternalToApplication('/foo'));
-        $this->assertFalse(URL::isExternalToApplication('#anchor'));
-        $this->assertFalse(URL::isExternalToApplication(''));
-        $this->assertFalse(URL::isExternalToApplication(null));
+            ['http://subdomain.this-site.com', false],
+            ['http://subdomain.this-site.com/', false],
+            ['http://subdomain.this-site.com/some-slug', false],
+            ['http://subdomain.this-site.com/some-slug?foo', false],
+            ['http://subdomain.this-site.com/some-slug#anchor', false],
+
+            ['http://absolute-url-resolved-from-request.com', false],
+            ['http://absolute-url-resolved-from-request.com/', false],
+            ['http://absolute-url-resolved-from-request.com/some-slug', false],
+            ['/foo', false],
+            ['#anchor', false],
+            ['', false],
+            [null, false],
+
+            // External domain that starts with a valid domain
+            ['http://this-site.com.au', true],
+            ['http://this-site.com.au/', true],
+            ['http://subdomain.this-site.com.au', true],
+            ['http://subdomain.this-site.com.au/', true],
+        ];
     }
 
     #[Test]

@@ -264,7 +264,7 @@ class URL
         }
 
         $isExternalToSites = self::getAbsoluteSiteUrls()
-            ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
+            ->filter(fn ($siteUrl) => Str::startsWith($url.'/', $siteUrl.'/'))
             ->isEmpty();
 
         $isExternalToCurrentRequestDomain = ! Str::startsWith($url, self::getDomainFromAbsolute(url()->to('/')));
