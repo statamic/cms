@@ -22,7 +22,7 @@ class FileSize extends Integer
 
     public function apply($query, $handle, $values)
     {
-        $query->where($handle, $values['operator'], $values['value'] * 1024);
+        $query->where('size', $values['operator'], $values['value'] * 1024);
     }
 
     public function badge($values)
