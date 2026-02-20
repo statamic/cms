@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Str;
 
 class Filesize extends Filter
 {
@@ -50,10 +51,14 @@ class Filesize extends Filter
 
     public function badge($values)
     {
+        if (empty($values['value'])) {
+            return;
+        }
+
         return sprintf(
-            __('Size %s %s kB'),
+            __('Size %s %s'),
             $values['operator'],
-            $values['value']
+            Str::fileSizeForHumans($values['value'] * 1024, 0)
         );
     }
 
