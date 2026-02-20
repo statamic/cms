@@ -5,7 +5,7 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Arr;
 use Statamic\Support\Str;
 
-class Filesize extends Integer
+class FileSize extends Integer
 {
     public function fieldItems()
     {
