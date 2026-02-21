@@ -195,7 +195,8 @@ class BrowserController extends CpController
     }
 
     /**
-     * No longer used in the control panel, but left in for backward compatiblity
+     * Search and filter through all assets in the container, ignoring folders.
+     * This is used for the global search and when listing filters are applied.
      */
     public function search(Request $request, $container, $path = null)
     {
