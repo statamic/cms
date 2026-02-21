@@ -15,6 +15,8 @@ import DataListFilter from './Filter.vue';
 
 const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
 
+const emit = defineEmits(['filters-updated']);
+
 const open = ref(false);
 const filtersButtonWrapperRef = ref(null);
 
@@ -82,6 +84,10 @@ watch(open, async (isOpen) => {
     await nextTick();
     focusComboboxWhenReady();
 });
+
+watch(activeFilters, () => {
+    emit('filters-updated', activeFilters.value);
+}, { deep: true });
 
 function handleStackClosed() {
     // Clean up observer if active

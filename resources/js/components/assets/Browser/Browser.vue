@@ -82,7 +82,7 @@
                             <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
-                                    <ListingFilters />
+                                    <ListingFilters @filters-updated="filtersUpdated" />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
@@ -270,6 +270,7 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
+            activeFilters: {},
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
             creatingFolderError: false,
@@ -328,8 +329,19 @@ export default {
             return this.selectedAssets.length > 0;
         },
 
+        hasActiveFilters() {
+            return Object.entries(this.activeFilters).some(([key, value]) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
+                } else if (typeof value === 'object' && value !== null) {
+                    return Object.keys(value).length > 0;
+                }
+                return Boolean(value);
+            });
+        },
+
         isSearching() {
-            return !! this.searchQuery;
+            return this.searchQuery || this.hasActiveFilters;
         },
 
         parameters() {
@@ -439,6 +451,13 @@ export default {
             this.page = 1;
         },
 
+        activeFilters: {
+            deep: true,
+            handler() {
+                this.page = 1;
+            },
+        },
+
         selectedPath: {
             immediate: true,
             handler(newPath) {
@@ -456,6 +475,10 @@ export default {
     },
 
     methods: {
+        filtersUpdated(filters) {
+            this.activeFilters = filters;
+        },
+
         modeChanged(mode) {
             this.mode = mode;
         },
