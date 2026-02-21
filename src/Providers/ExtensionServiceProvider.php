@@ -154,6 +154,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $scopes = [
+        Scopes\Filters\AssetProperties::class,
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
@@ -161,7 +162,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Scopes\Filters\UserRole::class,
         Scopes\Filters\UserGroup::class,
         Scopes\Filters\Collection::class,
-        Scopes\Filters\AssetProperties::class,
     ];
 
     protected $tags = [
