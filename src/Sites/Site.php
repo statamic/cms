@@ -79,7 +79,9 @@ class Site implements Augmentable
 
     public function relativePath($url)
     {
-        return URL::makeRelative(Str::removeLeft($url, $this->absoluteUrl()));
+        $absoluteUrl = Str::removeRight($this->absoluteUrl(), '/');
+
+        return URL::makeRelative(Str::removeLeft($url, $absoluteUrl));
     }
 
     public function isDefault()
