@@ -53,12 +53,12 @@ class Dimensions extends Integer
         $value = $values['value'];
 
         match ($dimension) {
-             'width' => $query->where('width', $operator, $value),
-             'height' => $query->where('height', $operator, $value),
-             'longest' => $query->where(fn ($q) =>  $q
+            'width' => $query->where('width', $operator, $value),
+            'height' => $query->where('height', $operator, $value),
+            'longest' => $query->where(fn ($q) => $q
                 ->where(fn ($qq) => $qq->whereIn('orientation', ['landscape', 'square'])->where('width', $operator, $value))
                 ->orWhere(fn ($qq) => $qq->where('orientation', 'portrait')->where('height', $operator, $value))),
-             'shortest' => $query->where(fn ($q) =>  $q
+            'shortest' => $query->where(fn ($q) => $q
                 ->where(fn ($qq) => $qq->whereIn('orientation', ['landscape', 'square'])->where('height', $operator, $value))
                 ->orWhere(fn ($qq) => $qq->where('orientation', 'portrait')->where('width', $operator, $value))),
         };
