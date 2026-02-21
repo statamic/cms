@@ -5,18 +5,19 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * Special integer field that takes input in KB, queries in bytes, and displays a human-readable badge.
+ */
 class FileSize extends Integer
 {
     public function fieldItems()
     {
         $fields = parent::fieldItems();
+        $append = trim(__('statamic::messages.units.KB', ['count' => '']));
 
         return [
             ...$fields,
-            'value' => [
-                ...$fields['value'],
-                'append' => trim(__('statamic::messages.units.KB', ['count' => ''])),
-            ],
+            'value' => [...$fields['value'], 'append' => $append],
         ];
     }
 

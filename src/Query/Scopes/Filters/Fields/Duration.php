@@ -10,13 +10,11 @@ class Duration extends Integer
     public function fieldItems()
     {
         $fields = parent::fieldItems();
+        $append = trim(__('statamic::messages.units.s', ['count' => '']));
 
         return [
             ...$fields,
-            'value' => [
-                ...$fields['value'],
-                'append' => trim(__('statamic::messages.units.s', ['count' => ''])),
-            ],
+            'value' => [...$fields['value'], 'append' => $append],
         ];
     }
 
