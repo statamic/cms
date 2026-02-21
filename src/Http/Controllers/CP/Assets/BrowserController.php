@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
@@ -198,9 +197,48 @@ class BrowserController extends CpController
      * Search and filter through all assets in the container, ignoring folders.
      * This is used for the global search and when listing filters are applied.
      */
-    public function search(Request $request, $container, $path = null)
+    public function search(FilteredRequest $request, $container, $path = null)
     {
-        return $this->folder($request, $container, $path);
+        $this->authorize('view', $container);
+
+        if ($request->search && $container->hasSearchIndex()) {
+            $query = $container->searchIndex()->ensureExists()->search($request->search);
+        } else if ($request->search) {
+            $query = $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+        } else {
+            $query = $container->queryAssets();
+        }
+
+        if ($path) {
+            $query->where('folder', $path);
+        }
+
+        if ($request->sort) {
+            $query->orderBy($request->sort, $request->order ?? 'asc');
+        }
+
+        $this->applyQueryScopes($query, $request->all());
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'container' => $container->handle(),
+            'folder' => $path,
+        ]);
+
+        $assets = $query->paginate(request('perPage'));
+
+        if ($request->search && $container->hasSearchIndex()) {
+            $assets->setCollection($assets->getCollection()->map->getSearchable());
+        }
+
+        return (new SearchedAssetsCollection($assets))
+            ->blueprint($container->blueprint())
+            ->columnPreferenceKey("assets.{$container->handle()}.columns")
+            ->additional([
+                'meta' => [
+                    // 'columns' => $columns,
+                    'activeFilterBadges' => $activeFilterBadges,
+                ],
+            ]);
     }
 
     protected function applyQueryScopes($query, $params)
