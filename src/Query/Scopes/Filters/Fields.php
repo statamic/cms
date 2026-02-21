@@ -33,8 +33,8 @@ class Fields extends Filter
                     'meta' => $fields->meta(),
                 ];
             })
-            ->values()
             ->sortBy('display')
+            ->values()
             ->all();
     }
 
