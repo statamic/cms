@@ -34,6 +34,7 @@ class Fields extends Filter
                 ];
             })
             ->values()
+            ->sortBy('display')
             ->all();
     }
 
