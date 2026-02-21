@@ -3,9 +3,11 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Fields\Field;
+use Statamic\Query\Scopes\Filters\Fields\Dimensions;
 use Statamic\Query\Scopes\Filters\Fields\Duration;
 use Statamic\Query\Scopes\Filters\Fields\FileSize;
 use Statamic\Query\Scopes\Filters\Fields\FileType;
+use Statamic\Query\Scopes\Filters\Fields\Orientation;
 
 class AssetProperties extends Fields
 {
@@ -31,13 +33,15 @@ class AssetProperties extends Fields
                 'type' => 'integer',
                 'filter' => FileSize::class,
             ],
-            'width' => [
-                'display' => __('Width'),
+            'dimensions' => [
+                'display' => __('Dimensions'),
                 'type' => 'integer',
+                'filter' => Dimensions::class,
             ],
-            'height' => [
-                'display' => __('Height'),
-                'type' => 'integer',
+            'orientation' => [
+                'display' => __('Orientation'),
+                'type' => 'text',
+                'filter' => Orientation::class,
             ],
             'duration' => [
                 'display' => __('Duration'),

@@ -3,9 +3,11 @@
 namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Illuminate\Support\Arr;
-use Statamic\Support\FileTypes;
 
-class FileType extends FieldtypeFilter
+/**
+ * Landscape, portrait, square orientation queries.
+ */
+class Orientation extends FieldtypeFilter
 {
     public function fieldItems()
     {
@@ -22,14 +24,9 @@ class FileType extends FieldtypeFilter
             'value' => [
                 'type' => 'select',
                 'options' => [
-                    'image' => __('Image'),
-                    'image-vector' => __('Vector image'),
-                    'image-pixel' => __('Pixel image'),
-                    'video' => __('Video'),
-                    'audio' => __('Audio'),
-                    'media' => __('Media'),
-                    'document' => __('Document'),
-                    'archive' => __('Archive'),
+                    'landscape' => __('Landscape'),
+                    'portrait' => __('Portrait'),
+                    'square' => __('Square'),
                 ],
             ],
         ];
@@ -37,21 +34,10 @@ class FileType extends FieldtypeFilter
 
     public function apply($query, $handle, $values)
     {
-        $extensions = match ($values['value']) {
-            'image' => FileTypes::image(),
-            'image-vector' => FileTypes::vectorImage(),
-            'image-pixel' => FileTypes::pixelImage(),
-            'video' => FileTypes::video(),
-            'audio' => FileTypes::audio(),
-            'media' => FileTypes::media(),
-            'document' => FileTypes::document(),
-            'archive' => FileTypes::archive(),
-        };
-
-        match ($values['operator']) {
-            '=' => $query->whereIn('extension', $extensions),
-            '<>' => $query->whereNotIn('extension', $extensions),
-        };
+        $query
+            ->whereNotNull('width')
+            ->whereNotNull('height')
+            ->where('orientation', $values['operator'], $values['value']);
     }
 
     public function badge($values)
