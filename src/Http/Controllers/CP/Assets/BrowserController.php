@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
@@ -15,6 +16,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
+use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -91,7 +93,7 @@ class BrowserController extends CpController
         ];
     }
 
-    public function folder(FilteredRequest $request, $container, $path = '/')
+    public function folder(Request $request, $container, $path = '/')
     {
         $this->authorize('view', $container);
 
@@ -99,37 +101,11 @@ class BrowserController extends CpController
         $perPage = $request->perPage ?? config('statamic.cp.pagination_size');
         $page = Paginator::resolveCurrentPage();
 
-        $showFolders = ! $request->search && ! $request->filters;
-
-        if ($request->search && $container->hasSearchIndex()) {
-            $query = $container->searchIndex()->ensureExists()->search($request->search);
-        } else if ($request->search) {
-            $query = $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
-        } else {
-            $query = $container->queryAssets();
-        }
-
-        if ($path) {
-            $query->where('folder', $path);
-        }
-
-        $this->applyQueryScopes($query, $request->all());
-
-        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
-            'container' => $container->handle(),
-            'folder' => $path,
-        ]);
-
-        if ($showFolders) {
-            $folders = $folder->assetFolders();
-        } else {
-            $folders = collect();
-        }
-
+        $folders = $folder->assetFolders();
         $totalFolders = $folders->count();
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
-        $totalAssets = $query->count();
+        $totalAssets = $folder->queryAssets()->count();
         $totalItems = $totalAssets + $totalFolders;
 
         if ($request->sort) {
@@ -149,7 +125,9 @@ class BrowserController extends CpController
         $folders = $folders->slice(($page - 1) * $perPage, $perPage);
 
         if ($page >= $lastFolderPage) {
+            $query = $folder->queryAssets();
             $query->orderBy($sort, $order);
+            $this->applyQueryScopes($query, $request->all());
 
             $offset = $page === $lastFolderPage
                 ? 0
@@ -159,38 +137,37 @@ class BrowserController extends CpController
                 ->offset($offset)
                 ->limit($perPage - $folders->count())
                 ->get();
-
-            if ($request->search && $container->hasSearchIndex()) {
-                $assets->setCollection($assets->getCollection()->map->getSearchable());
-            }
         }
 
         $this->setColumns($container);
         $columns = $this->visibleColumns();
 
-        return (new SearchedAssetsCollection($assets ?? []))
-            ->blueprint($container->blueprint())
-            ->columnPreferenceKey("assets.{$container->handle()}.columns")
-            ->additional([
-                'links' => [
-                    'asset_action' => cp_route('assets.actions.run'),
-                    'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
-                ],
-                'meta' => [
-                    'current_page' => $page,
-                    'from' => $totalItems > 0 ? ($page - 1) * $perPage + 1 : null,
-                    'last_page' => $totalItems > 0 ? max((int) ceil($totalItems / $perPage), 1) : null,
-                    'path' => Paginator::resolveCurrentPath(),
-                    'per_page' => $perPage,
-                    'to' => $totalItems > 0 ? $page * $perPage : null,
-                    'total' => $totalItems,
-                    'columns' => $columns,
-                    'activeFilterBadges' => $activeFilterBadges,
-                    'folder' => array_merge((new Folder($folder))->resolve(), [
-                        'folders' => Folder::collection($folders->values()),
-                    ]),
-                ],
-            ]);
+        return [
+            'data' => collect($assets ?? [])
+                ->map(fn ($asset) => (new FolderAsset($asset))
+                    ->blueprint($container->blueprint())
+                    ->columns($columns)
+                    ->resolve()
+                )
+                ->all(),
+            'links' => [
+                'asset_action' => cp_route('assets.actions.run'),
+                'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
+            ],
+            'meta' => [
+                'current_page' => $page,
+                'from' => $totalItems > 0 ? ($page - 1) * $perPage + 1 : null,
+                'last_page' => $totalItems > 0 ? max((int) ceil($totalItems / $perPage), 1) : null,
+                'path' => Paginator::resolveCurrentPath(),
+                'per_page' => $perPage,
+                'to' => $totalItems > 0 ? $page * $perPage : null,
+                'total' => $totalItems,
+                'columns' => $columns,
+                'folder' => array_merge((new Folder($folder))->resolve(), [
+                    'folders' => Folder::collection($folders->values()),
+                ]),
+            ],
+        ];
     }
 
     /**
