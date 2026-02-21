@@ -212,7 +212,6 @@ class BrowserController extends CpController
             ->columnPreferenceKey("assets.{$container->handle()}.columns")
             ->additional([
                 'meta' => [
-                    // 'columns' => $columns,
                     'activeFilterBadges' => $activeFilterBadges,
                 ],
             ]);
