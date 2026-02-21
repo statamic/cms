@@ -6,6 +6,7 @@ use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filters\Fields\Duration;
 use Statamic\Query\Scopes\Filters\Fields\FileSize;
 use Statamic\Query\Scopes\Filters\Fields\FileType;
+use Statamic\Query\Scopes\Filters\Fields\Orientation;
 
 class AssetProperties extends Fields
 {
@@ -38,6 +39,11 @@ class AssetProperties extends Fields
             'height' => [
                 'display' => __('Height'),
                 'type' => 'integer',
+            ],
+            'orientation' => [
+                'display' => __('Orientation'),
+                'type' => 'text',
+                'filter' => Orientation::class,
             ],
             'duration' => [
                 'display' => __('Duration'),
