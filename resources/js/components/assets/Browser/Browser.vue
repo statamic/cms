@@ -129,7 +129,7 @@
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
-                                :is-searching="!!searchQuery"
+                                :is-searching="isSearching"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -291,8 +291,11 @@ export default {
 
     computed: {
         requestUrl() {
-            const path = this.searchQuery && !this.restrictFolderNavigation ? '' : this.path;
-            return cp_url(`assets/browse/folders/${this.container.id}/${path || ''}`).replace(/\/$/, '');
+            return this.isSearching
+                ? cp_url(
+                      `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
+                  ).replace(/\/$/, '')
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
         },
 
         actionContext() {
@@ -323,6 +326,10 @@ export default {
 
         hasSelections() {
             return this.selectedAssets.length > 0;
+        },
+
+        isSearching() {
+            return !! this.searchQuery;
         },
 
         parameters() {
@@ -461,7 +468,7 @@ export default {
         listingRequestCompleted({ response }) {
             this.assets = response.data.data;
 
-            if (this.searchQuery) {
+            if (this.isSearching) {
                 this.folder = null;
                 this.folders = [];
             } else {
