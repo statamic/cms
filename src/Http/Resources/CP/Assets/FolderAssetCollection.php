@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
-class FolderAssetsCollection extends ResourceCollection
+class FolderAssetCollection extends ResourceCollection
 {
     use HasRequestedColumns;
 
