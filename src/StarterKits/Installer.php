@@ -460,7 +460,7 @@ final class Installer
         }
 
         if (confirm('Create a super user?', false)) {
-            $this->console->call('make:user', ['--super' => true]);
+            $this->console->call('statamic:make:user', ['--super' => true]);
         }
 
         return $this;

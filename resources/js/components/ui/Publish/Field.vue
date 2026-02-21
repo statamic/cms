@@ -250,10 +250,10 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
-            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
+            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction">
+            <div :dir="direction" v-if="fieldtypeComponentExists">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"

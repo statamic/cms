@@ -115,7 +115,7 @@
                             </set-picker>
                         </floating-menu>
 
-                        <div class="bard-error" v-if="initError" v-html="initError"></div>
+                        <div class="bard-error" v-if="initError" v-text="initError"></div>
                         <editor-content :editor="editor" :id="fieldId" />
                     </div>
                     <div

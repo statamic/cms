@@ -75,10 +75,14 @@ class FullMeasureStaticCachingTest extends TestCase
 
         $region = app(Session::class)->regions()->first();
 
-        // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><body>1 2</body></html>', $response->getContent());
+        // Initial response should have the placeholder and javascript, NOT the rendered content.
+        $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
+            $region->key(),
+            '<svg>Loading...</svg>',
+            '<script>js here</script>',
+        ]), $response->getContent());
 
-        // The cached response should have the nocache placeholder, and the javascript.
+        // The cached response should be the same as the initial response.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $region->key(),
@@ -150,10 +154,12 @@ class FullMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk();
 
-        // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><head></head><body>'.csrf_token().'</body></html>', $response->getContent());
+        // Initial response should have the placeholder and the javascript, NOT the real token.
+        $this->assertEquals(vsprintf("<html><head>{$csrfTokenScript}</head><body>STATAMIC_CSRF_TOKEN%s</body></html>", [
+            $nocacheScript,
+        ]), $response->getContent());
 
-        // The cached response should have the token placeholder, and the javascript.
+        // The cached response should be the same as the initial response.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf("<html><head>{$csrfTokenScript}</head><body>STATAMIC_CSRF_TOKEN%s</body></html>", [
             $nocacheScript,
