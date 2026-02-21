@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
-class FolderAssetCollection extends ResourceCollection
+class SearchedAssetsCollection extends ResourceCollection
 {
     use HasRequestedColumns;
 
@@ -104,7 +104,7 @@ class FolderAssetCollection extends ResourceCollection
     {
         return [
             'meta' => [
-                // 'columns' => $this->visibleColumns(),
+                'columns' => $this->visibleColumns(),
             ],
         ];
     }

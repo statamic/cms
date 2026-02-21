@@ -16,7 +16,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
-use Statamic\Http\Resources\CP\Assets\FolderAssetCollection;
+use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
@@ -169,7 +169,7 @@ class BrowserController extends CpController
         $this->setColumns($container);
         $columns = $this->visibleColumns();
 
-        return (new FolderAssetCollection($assets ?? []))
+        return (new SearchedAssetsCollection($assets ?? []))
             ->blueprint($container->blueprint())
             ->columnPreferenceKey("assets.{$container->handle()}.columns")
             ->additional([
