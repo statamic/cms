@@ -275,7 +275,7 @@ class BrowserTest extends TestCase
 
         $txtFilter = ['asset_properties' => ['extension' => ['operator' => '=', 'value' => 'txt']]];
         $imageFilter = ['asset_properties' => ['type' => ['operator' => '=', 'value' => 'image']]];
-        $widthFilter = ['asset_properties' => ['width' => ['operator' => '>', 'value' => 100]]];
+        $widthFilter = ['asset_properties' => ['dimensions' => ['dimension' => 'width', 'operator' => '>', 'value' => 100]]];
         $altFilter = ['fields' => ['alt' => ['operator' => 'like', 'value' => 'image']]];
 
         $this
