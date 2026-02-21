@@ -23,8 +23,8 @@ class FileType extends FieldtypeFilter
                 'type' => 'select',
                 'options' => [
                     'image' => __('Image'),
-                    'image-vector' => __('Vector Image'),
-                    'image-pixel' => __('Pixel Image'),
+                    'image-vector' => __('Vector image'),
+                    'image-pixel' => __('Pixel image'),
                     'video' => __('Video'),
                     'audio' => __('Audio'),
                     'media' => __('Media'),
