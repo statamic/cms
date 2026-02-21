@@ -24,7 +24,7 @@ use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
-    use HasRequestedColumns, RedirectsToFirstAssetContainer, QueriesFilters;
+    use HasRequestedColumns, QueriesFilters, RedirectsToFirstAssetContainer;
 
     private $columns;
 
@@ -180,7 +180,7 @@ class BrowserController extends CpController
 
         if ($request->search && $container->hasSearchIndex()) {
             $query = $container->searchIndex()->ensureExists()->search($request->search);
-        } else if ($request->search) {
+        } elseif ($request->search) {
             $query = $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
         } else {
             $query = $container->queryAssets();

@@ -280,14 +280,14 @@ class BrowserTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/one?filters=' . base64_encode(json_encode($txtFilter)))
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($txtFilter)))
             ->assertSuccessful()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', 'one::asset-one.txt');
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/one?filters=' . base64_encode(json_encode($imageFilter)))
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($imageFilter)))
             ->assertSuccessful()
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('data.0.id', 'one::asset-two.jpg')
@@ -295,21 +295,21 @@ class BrowserTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/one?filters=' . base64_encode(json_encode($widthFilter)))
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($widthFilter)))
             ->assertSuccessful()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/one/nested?filters=' . base64_encode(json_encode($imageFilter)))
+            ->getJson('/cp/assets/browse/search/one/nested?filters='.base64_encode(json_encode($imageFilter)))
             ->assertSuccessful()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/two?filters=' . base64_encode(json_encode($altFilter)))
+            ->getJson('/cp/assets/browse/search/two?filters='.base64_encode(json_encode($altFilter)))
             ->assertSuccessful()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', 'two::nested/asset-five.jpg');
