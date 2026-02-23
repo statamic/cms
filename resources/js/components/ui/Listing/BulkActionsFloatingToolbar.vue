@@ -41,11 +41,26 @@ const actionsWithShortcuts = computed(() => {
     });
 });
 
+function hasOpenOverlay() {
+    return !!document.querySelector(
+        '[data-ui-modal-content], .stack-content, [role="dialog"]'
+    );
+}
+
+function isInsideFormControl(event) {
+    const el = event.target;
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+}
+
 function onKeydown(event) {
     if (!props.visible || !hasSelections.value) return;
+    if (hasOpenOverlay() || isInsideFormControl(event)) return;
     if (event.key === DESELECT_SHORTCUT_KEY) {
         props.clearSelections?.();
         event.preventDefault();
+        event.stopPropagation();
         return;
     }
     if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -58,8 +73,8 @@ function onKeydown(event) {
     }
 }
 
-onMounted(() => document.addEventListener('keydown', onKeydown));
-onUnmounted(() => document.removeEventListener('keydown', onKeydown));
+onMounted(() => document.addEventListener('keydown', onKeydown, true));
+onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
 </script>
 
 <template>
