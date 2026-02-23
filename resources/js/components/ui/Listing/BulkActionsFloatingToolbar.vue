@@ -141,7 +141,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                             shortcutKeyClasses,
                             'inline-flex items-center',
                             isDeleteAction(action) && 'ms-0.25!',
-                            action.dangerous && '[&_svg]:text-red-600! dark:[&_svg]:text-red-500! [&_svg]:size-4! dark:[&_svg]:opacity-80 bg-transparent dark:bg-transparent',
+                            action.dangerous && '[&_svg]:text-red-600! dark:[&_svg]:text-red-500! [&_svg]:size-4! [&_svg]:opacity-70 dark:[&_svg]:opacity-80 bg-transparent dark:bg-transparent',
                         ]"
                     >
                         <Icon v-if="isDeleteAction(action)" name="backspace" class="size-3" />
