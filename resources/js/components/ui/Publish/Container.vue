@@ -181,6 +181,7 @@ watch(
 
 const avoidTrackingDirtyState = ref(false);
 const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
+const isDirty = computed(() => Statamic.$dirty.has(props.name));
 
 function dirty() {
     if (trackingDirtyState.value) Statamic.$dirty.add(props.name);
@@ -277,6 +278,7 @@ const provided = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    isDirty,
     withoutDirtying,
     ...additionalProvides,
 };
