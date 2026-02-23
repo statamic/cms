@@ -86,7 +86,7 @@
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             :remember-tab="!isInline"
-            :provide="{ isWorkingCopy }"
+            :provide="{ isWorkingCopy, revisionsEnabled }"
         >
             <LivePreview
                 :enabled="isPreviewing"
