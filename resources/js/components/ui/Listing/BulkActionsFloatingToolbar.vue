@@ -7,6 +7,9 @@ const DESELECT_SHORTCUT_KEY = 'd';
 
 const BACKSPACE_SYMBOL = '⌫';
 
+const shortcutKeyClasses =
+    'ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border border-gray-300 bg-gray-200 px-1 font-mono text-[0.6875rem] font-semibold leading-none tracking-wide text-gray-600 shadow-[0_1px_0_0_rgb(212_212_216)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:shadow-[0_1px_0_0_rgb(39_39_42)]';
+
 const handleToShortcutKey = {
     unpublish: 'u',
     publish: 'p',
@@ -84,7 +87,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                     class="text-blue-500!"
                     @click="clearSelections?.()"
                 >
-                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }} <span class="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border border-gray-300 bg-gray-200 px-1 font-mono text-[0.6875rem] font-semibold leading-none tracking-wide text-gray-600 shadow-[0_1px_0_0_rgb(212_212_216)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:shadow-[0_1px_0_0_rgb(39_39_42)]">{{ DESELECT_SHORTCUT_KEY }}</span>
+                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }} <span :class="shortcutKeyClasses">{{ DESELECT_SHORTCUT_KEY }}</span>
                 </Button>
                 <Button
                     v-for="action in actionsWithShortcuts"
@@ -92,7 +95,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                     :variant="action.dangerous ? 'danger' : 'default'"
                     @click="action.run"
                 >
-                    {{ __(action.title) }} <span class="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border border-gray-300 bg-gray-200 px-1 font-mono text-[0.6875rem] font-semibold leading-none tracking-wide text-gray-600 shadow-[0_1px_0_0_rgb(212_212_216)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:shadow-[0_1px_0_0_rgb(39_39_42)]">{{ action.shortcutKey }}</span>
+                    {{ __(action.title) }} <span :class="shortcutKeyClasses">{{ action.shortcutKey }}</span>
                 </Button>
             </ButtonGroup>
         </div>
