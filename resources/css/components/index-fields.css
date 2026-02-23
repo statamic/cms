@@ -9,9 +9,12 @@
 }
 
 .title-index-field {
-    @apply text-sm line-clamp-2 inline-flex items-center gap-2 hover:text-gray-925 dark:hover:text-white;
-    min-width: 15vw;
-    max-width: 30vw;
+    /* [1] This class is typically set on a link. We want it to be inline, otherwise it creates invisible clickable "link" space that could be accidentally clicked */
+    @apply text-sm inline line-clamp-2 hover:text-gray-925 dark:hover:text-white;
+    /* [/2] Where we have more than one child we need to use flexbox, e.g. /users. We want to avoid flexbox if it's not needed, else it creates invisible link space (explained above) */
+    &:has(> :nth-child(2)) {
+        @apply inline-flex items-center gap-2;
+    }
 }
 
 .date-index-field {
