@@ -246,7 +246,7 @@ const additionalProvides = Object.fromEntries(
     Object.entries(props.provide).map(([key]) => [key, toRef(() => props.provide[key])])
 );
 
-const provided = {
+const builtInProvides = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -280,8 +280,17 @@ const provided = {
     setHiddenField,
     isDirty,
     withoutDirtying,
-    ...additionalProvides,
 };
+
+if (import.meta.env.DEV) {
+    for (const key of Object.keys(additionalProvides)) {
+        if (key in builtInProvides) {
+            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key and will be ignored.`);
+        }
+    }
+}
+
+const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
 
