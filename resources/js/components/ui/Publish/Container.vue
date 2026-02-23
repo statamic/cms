@@ -92,7 +92,7 @@ const props = defineProps({
     provide: {
         type: Object,
         default: () => ({})
-    }
+    },
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -285,7 +285,7 @@ const builtInProvides = {
 if (import.meta.env.DEV) {
     for (const key of Object.keys(additionalProvides)) {
         if (key in builtInProvides) {
-            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key and will be ignored.`);
+            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key, which takes precedence.`);
         }
     }
 }
