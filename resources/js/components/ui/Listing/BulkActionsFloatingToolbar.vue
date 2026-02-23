@@ -11,16 +11,12 @@ const DESELECT_SHORTCUT_LABEL = 'Esc';
 const shortcutKeyClasses =
     'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
 
-// Delete uses the Delete/Backspace key; we show an icon, but still need the key for the handler.
+// Delete/Backspace key triggers the delete action (handled separately in onKeydown).
 const DELETE_SHORTCUT_KEY = 'Delete';
-const DELETE_SHORTCUT_LABEL = 'Del';
 
-// Built-in actions get a fixed shortcut. Custom actions fall back to a letter from their title.
-const handleToShortcutKey = {
-    unpublish: 'u',
-    publish: 'p',
-    delete: DELETE_SHORTCUT_KEY,
-};
+function isDeleteAction(action) {
+    return action?.handle?.toLowerCase() === 'delete' || action?.icon === 'trash';
+}
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
@@ -31,19 +27,11 @@ const props = defineProps({
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
 
-// Non-letter keys (e.g. "Delete") need a short label for display; letters use the key as-is.
-const specialKeyLabels = {
-    [DELETE_SHORTCUT_KEY]: DELETE_SHORTCUT_LABEL,
-};
-
 /**
- * Picks a shortcut key for an action. Built-in actions use handleToShortcutKey.
- * Custom actions use the first unused a–z letter from the action title (e.g. "Upload" → "u", or "p" if "u" is taken).
+ * Picks a shortcut key from the action's (localized) title: first unused a–z letter in order.
+ * e.g. "Unpublish" → u, "Veröffentlichung aufheben" → v. Resolves to the same letters in English.
  */
 function findShortcutKey(action, used) {
-    const explicit = handleToShortcutKey[action.handle];
-    if (explicit) return explicit;
-
     const title = (action.title || '').toLowerCase();
     for (const char of title) {
         if (/[a-z]/.test(char) && !used.has(char)) return char;
@@ -55,11 +43,13 @@ function findShortcutKey(action, used) {
 const actionsWithShortcuts = computed(() => {
     const used = new Set();
     return (props.actions || []).map((action) => {
+        // Delete always shows the backspace icon and is triggered by Delete/Backspace only; no letter.
+        if (isDeleteAction(action)) {
+            return { ...action, shortcutKey: null, shortcutLabel: null };
+        }
         const key = findShortcutKey(action, used);
-        // Only reserve single-letter keys; Delete doesn't consume a letter.
         if (key && key.length === 1) used.add(key);
-        const label = specialKeyLabels[key] ?? key;
-        return { ...action, shortcutKey: key, shortcutLabel: label };
+        return { ...action, shortcutKey: key, shortcutLabel: key };
     });
 });
 
@@ -89,7 +79,7 @@ function onKeydown(event) {
         return;
     }
     if (event.key === DELETE_SHORTCUT_KEY || event.key === 'Backspace') {
-        const deleteAction = actionsWithShortcuts.value.find((a) => a.handle === 'delete');
+        const deleteAction = actionsWithShortcuts.value.find(isDeleteAction);
         if (deleteAction?.run) {
             deleteAction.run();
             event.preventDefault();
@@ -138,16 +128,16 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     @click="action.run"
                 >
                     {{ __(action.title) }}
-                    <!-- Delete shows backspace icon; other actions show their shortcut letter. -->
+                    <!-- Delete always shows backspace icon; other actions show their shortcut letter. -->
                     <span
                         :class="[
                             shortcutKeyClasses,
                             'inline-flex items-center',
-                            action.handle === 'delete' && 'ms-0.25!',
+                            isDeleteAction(action) && 'ms-0.25!',
                             action.dangerous && '[&_svg]:text-red-600! [&_svg]:size-4! bg-transparent dark:text-red-400 dark:bg-red-900',
                         ]"
                     >
-                        <Icon v-if="action.handle === 'delete'" name="backspace" class="size-3" />
+                        <Icon v-if="isDeleteAction(action)" name="backspace" class="size-3" />
                         <template v-else>{{ action.shortcutLabel }}</template>
                     </span>
                 </Button>
