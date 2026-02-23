@@ -8,7 +8,7 @@ const DESELECT_SHORTCUT_KEY = 'd';
 const BACKSPACE_SYMBOL = '⌫';
 
 const shortcutKeyClasses =
-    'ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border border-gray-300 bg-gray-200 px-1 font-mono text-[0.6875rem] font-semibold leading-none tracking-wide text-gray-600 shadow-[0_1px_0_0_rgb(212_212_216)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:shadow-[0_1px_0_0_rgb(39_39_42)]';
+    'ml-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200 px-1 uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
 
 const handleToShortcutKey = {
     unpublish: 'u',
