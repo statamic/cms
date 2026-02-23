@@ -1,13 +1,13 @@
 <script setup>
 import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted } from 'vue';
-import { Button, ButtonGroup } from '@ui';
+import { Button, ButtonGroup, Icon } from '@ui';
 
 const DESELECT_SHORTCUT_KEY = 'Escape';
 const DESELECT_SHORTCUT_LABEL = 'Esc';
 
 const shortcutKeyClasses =
-    'ml-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
 
 const DELETE_SHORTCUT_KEY = 'Delete';
 const DELETE_SHORTCUT_LABEL = 'Del';
@@ -117,7 +117,18 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     :variant="action.dangerous ? 'danger' : 'default'"
                     @click="action.run"
                 >
-                    {{ __(action.title) }} <span :class="[shortcutKeyClasses, action.dangerous && 'text-red-600 bg-red-100/80! dark:text-red-400 dark:bg-red-900']">{{ action.shortcutLabel }}</span>
+                    {{ __(action.title) }}
+                    <span
+                        :class="[
+                            shortcutKeyClasses,
+                            'inline-flex items-center',
+                            action.handle === 'delete' && 'ms-0.25!',
+                            action.dangerous && '[&_svg]:text-red-600! [&_svg]:size-4! bg-transparent dark:text-red-400 dark:bg-red-900',
+                        ]"
+                    >
+                        <Icon v-if="action.handle === 'delete'" name="backspace" class="size-3" />
+                        <template v-else>{{ action.shortcutLabel }}</template>
+                    </span>
                 </Button>
             </ButtonGroup>
         </div>
