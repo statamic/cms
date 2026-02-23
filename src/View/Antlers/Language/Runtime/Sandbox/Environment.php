@@ -1391,6 +1391,7 @@ class Environment
     private function checkForFieldValue($value, $hasModifiers = false, $modifierChain = null)
     {
         if ($value instanceof Value) {
+            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
                 if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
@@ -1398,15 +1399,18 @@ class Environment
                         $value,
                         $this->nodeProcessor->getActiveNode(),
                     ];
-                    $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                    GlobalRuntimeState::$userContentEvalState = null;
+                    try {
+                        $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                    } finally {
+                        GlobalRuntimeState::$userContentEvalState = null;
+                    }
                 }
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
                 }
             }
-            GlobalRuntimeState::$isEvaluatingUserData = false;
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
         }
 
         return $value;

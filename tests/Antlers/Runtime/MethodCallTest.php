@@ -342,6 +342,40 @@ ANTLERS;
             'object' => $object,
         ]));
     }
+
+    public function test_nested_value_does_not_reset_user_data_flag()
+    {
+        $textFieldtype = new Text();
+
+        $nestedField = new Field('nested_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($nestedField);
+        $nestedValue = new Value('Hello', 'nested_field', $textFieldtype);
+
+        $outerField = new Field('outer_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($outerField);
+        $object = new ClassOne();
+        $outerValue = new Value('{{ nested_field }}{{ object:method("hello") }}', 'outer_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Method call evaluated in user content.', \Mockery::type('array'));
+
+        $result = $this->renderString('{{ outer_field }}', [
+            'outer_field' => $outerValue,
+            'nested_field' => $nestedValue,
+            'object' => $object,
+        ]);
+
+        $this->assertSame('Hello', $result);
+    }
 }
 
 class TestDateTime

@@ -271,6 +271,9 @@ class GlobalRuntimeState
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         self::$abandonedNodes = [];
+        self::$isEvaluatingUserData = false;
+        self::$isEvaluatingData = false;
+        self::$userContentEvalState = null;
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();
