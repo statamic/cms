@@ -5,10 +5,12 @@ import { Button, ButtonGroup } from '@ui';
 
 const DESELECT_SHORTCUT_KEY = 'd';
 
+const BACKSPACE_SYMBOL = '⌫';
+
 const handleToShortcutKey = {
     unpublish: 'u',
     publish: 'p',
-    delete: 'x',
+    delete: BACKSPACE_SYMBOL,
 };
 
 const props = defineProps({
@@ -40,6 +42,14 @@ const actionsWithShortcuts = computed(() => {
 function onKeydown(event) {
     if (!props.visible || !hasSelections.value) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key === 'Backspace') {
+        const deleteAction = actionsWithShortcuts.value.find((a) => a.handle === 'delete');
+        if (deleteAction?.run) {
+            deleteAction.run();
+            event.preventDefault();
+        }
+        return;
+    }
     const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
     if (!key) return;
     if (key === DESELECT_SHORTCUT_KEY) {
@@ -72,16 +82,18 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
             <ButtonGroup>
                 <Button
                     class="text-blue-500!"
-                    :text="__n(`Deselect :count item|Deselect all :count items`, selections.length) + ` ${DESELECT_SHORTCUT_KEY}`"
                     @click="clearSelections?.()"
-                />
+                >
+                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }} <span class="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border border-gray-300 bg-gray-200 px-1 font-mono text-[0.6875rem] font-semibold leading-none tracking-wide text-gray-600 shadow-[0_1px_0_0_rgb(212_212_216)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:shadow-[0_1px_0_0_rgb(39_39_42)]">{{ DESELECT_SHORTCUT_KEY }}</span>
+                </Button>
                 <Button
                     v-for="action in actionsWithShortcuts"
                     :key="action.handle"
-                    :text="__(action.title) + ` ${action.shortcutKey}`"
                     :variant="action.dangerous ? 'danger' : 'default'"
                     @click="action.run"
-                />
+                >
+                    {{ __(action.title) }} <span class="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border border-gray-300 bg-gray-200 px-1 font-mono text-[0.6875rem] font-semibold leading-none tracking-wide text-gray-600 shadow-[0_1px_0_0_rgb(212_212_216)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:shadow-[0_1px_0_0_rgb(39_39_42)]">{{ action.shortcutKey }}</span>
+                </Button>
             </ButtonGroup>
         </div>
     </Motion>
