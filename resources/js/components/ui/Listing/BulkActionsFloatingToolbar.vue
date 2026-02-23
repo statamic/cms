@@ -3,15 +3,19 @@ import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted } from 'vue';
 import { Button, ButtonGroup, Icon } from '@ui';
 
+// Deselect uses Escape; we show "Esc" in the UI.
 const DESELECT_SHORTCUT_KEY = 'Escape';
 const DESELECT_SHORTCUT_LABEL = 'Esc';
 
+// Shared styles for the keyboard shortcut badges next to each action.
 const shortcutKeyClasses =
     'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
 
+// Delete uses the Delete/Backspace key; we show an icon, but still need the key for the handler.
 const DELETE_SHORTCUT_KEY = 'Delete';
 const DELETE_SHORTCUT_LABEL = 'Del';
 
+// Built-in actions get a fixed shortcut. Custom actions fall back to a letter from their title.
 const handleToShortcutKey = {
     unpublish: 'u',
     publish: 'p',
@@ -27,34 +31,46 @@ const props = defineProps({
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
 
+// Non-letter keys (e.g. "Delete") need a short label for display; letters use the key as-is.
 const specialKeyLabels = {
     [DELETE_SHORTCUT_KEY]: DELETE_SHORTCUT_LABEL,
 };
 
+/**
+ * Picks a shortcut key for an action. Built-in actions use handleToShortcutKey.
+ * Custom actions use the first unused a–z letter from the action title (e.g. "Upload" → "u", or "p" if "u" is taken).
+ */
+function findShortcutKey(action, used) {
+    const explicit = handleToShortcutKey[action.handle];
+    if (explicit) return explicit;
+
+    const title = (action.title || '').toLowerCase();
+    for (const char of title) {
+        if (/[a-z]/.test(char) && !used.has(char)) return char;
+    }
+
+    return null;
+}
+
 const actionsWithShortcuts = computed(() => {
     const used = new Set();
     return (props.actions || []).map((action) => {
-        let key = handleToShortcutKey[action.handle] ?? (action.title?.[0]?.toLowerCase() || '').replace(/[^a-z]/, '');
-        if (key?.length === 1 && (!key || used.has(key))) {
-            for (const c of 'abcdefghijklmnopqrstuvwxyz') {
-                if (!used.has(c)) {
-                    key = c;
-                    break;
-                }
-            }
-        }
-        if (key) used.add(key);
+        const key = findShortcutKey(action, used);
+        // Only reserve single-letter keys; Delete doesn't consume a letter.
+        if (key && key.length === 1) used.add(key);
         const label = specialKeyLabels[key] ?? key;
         return { ...action, shortcutKey: key, shortcutLabel: label };
     });
 });
 
+// Don't trigger toolbar shortcuts when a modal, stack, or dialog is open.
 function hasOpenOverlay() {
     return !!document.querySelector(
         '[data-ui-modal-content], .stack-content, [role="dialog"]'
     );
 }
 
+// Don't trigger when the user is typing in an input, textarea, select, or contenteditable.
 function isInsideFormControl(event) {
     const el = event.target;
     if (!el) return false;
@@ -65,6 +81,7 @@ function isInsideFormControl(event) {
 function onKeydown(event) {
     if (!props.visible || !hasSelections.value) return;
     if (hasOpenOverlay() || isInsideFormControl(event)) return;
+
     if (event.key === DESELECT_SHORTCUT_KEY) {
         props.clearSelections?.();
         event.preventDefault();
@@ -79,6 +96,8 @@ function onKeydown(event) {
         }
         return;
     }
+
+    // Single-letter shortcuts: ignore when a modifier is held.
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
     if (!key) return;
@@ -89,6 +108,7 @@ function onKeydown(event) {
     }
 }
 
+// Capture phase so we can handle Escape before other listeners (e.g. command palette).
 onMounted(() => document.addEventListener('keydown', onKeydown, true));
 onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
 </script>
@@ -118,6 +138,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     @click="action.run"
                 >
                     {{ __(action.title) }}
+                    <!-- Delete shows backspace icon; other actions show their shortcut letter. -->
                     <span
                         :class="[
                             shortcutKeyClasses,
