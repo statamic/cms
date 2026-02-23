@@ -6,6 +6,7 @@ use ArrayAccess;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Query\Builder;
@@ -890,6 +891,27 @@ class Environment
 
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
+                if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent) {
+                    array_pop($stack);
+
+                    if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                        throw ErrorFactory::makeRuntimeError(
+                            AntlersErrorCodes::RUNTIME_METHOD_CALL_USER_CONTENT,
+                            $currentNode,
+                            'Method invocation in user content.'
+                        );
+                    } else {
+                        Log::warning('Method call evaluated in user content.', [
+                            'file' => GlobalRuntimeState::$currentExecutionFile,
+                            'trace' => GlobalRuntimeState::$templateFileStack,
+                        ]);
+                    }
+
+                    $stack[] = null;
+
+                    continue;
+                }
+
                 $leftNode = array_pop($stack);
 
                 if ($leftNode == null) {
