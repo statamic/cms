@@ -88,6 +88,11 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    /** Extra values to be provided through the context. */
+    provide: {
+        type: Object,
+        default: () => ({})
+    }
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -236,6 +241,10 @@ function pushComponent(name, { props }) {
     return component;
 }
 
+const additionalProvides = Object.fromEntries(
+    Object.entries(props.provide).map(([key]) => [key, toRef(() => props.provide[key])])
+);
+
 const provided = {
     name: toRef(() => props.name),
     parentContainer,
@@ -269,6 +278,7 @@ const provided = {
     unsetRevealerField,
     setHiddenField,
     withoutDirtying,
+    ...additionalProvides,
 };
 
 provideContainerContext({ ...provided, container: provided });
