@@ -16,7 +16,7 @@ const DESELECT_SHORTCUT_LABEL = 'Esc';
 const DELETE_SHORTCUT_KEY = 'Delete';
 
 const shortcutKeyClasses =
-    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
@@ -141,7 +141,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                             shortcutKeyClasses,
                             'inline-flex items-center',
                             isDeleteAction(action) && 'ms-0.25!',
-                            action.dangerous && '[&_svg]:text-red-600! dark:[&_svg]:text-red-500! [&_svg]:size-4! [&_svg]:opacity-70 dark:[&_svg]:opacity-80 bg-transparent dark:bg-transparent',
+                            action.dangerous && '[&_svg]:text-red-600! dark:[&_svg]:text-red-500! [&_svg]:size-3.75! [&_svg]:opacity-70 dark:[&_svg]:opacity-80 bg-transparent dark:bg-transparent',
                         ]"
                     >
                         <Icon v-if="isDeleteAction(action)" name="backspace" class="size-3" />
