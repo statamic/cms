@@ -9,10 +9,13 @@ const DESELECT_SHORTCUT_LABEL = 'Esc';
 const shortcutKeyClasses =
     'ml-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
 
+const DELETE_SHORTCUT_KEY = 'Delete';
+const DELETE_SHORTCUT_LABEL = 'Del';
+
 const handleToShortcutKey = {
     unpublish: 'u',
     publish: 'p',
-    delete: 'x',
+    delete: DELETE_SHORTCUT_KEY,
 };
 
 const props = defineProps({
@@ -24,11 +27,15 @@ const props = defineProps({
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
 
+const specialKeyLabels = {
+    [DELETE_SHORTCUT_KEY]: DELETE_SHORTCUT_LABEL,
+};
+
 const actionsWithShortcuts = computed(() => {
     const used = new Set();
     return (props.actions || []).map((action) => {
         let key = handleToShortcutKey[action.handle] ?? (action.title?.[0]?.toLowerCase() || '').replace(/[^a-z]/, '');
-        if (!key || used.has(key)) {
+        if (key?.length === 1 && (!key || used.has(key))) {
             for (const c of 'abcdefghijklmnopqrstuvwxyz') {
                 if (!used.has(c)) {
                     key = c;
@@ -37,7 +44,8 @@ const actionsWithShortcuts = computed(() => {
             }
         }
         if (key) used.add(key);
-        return { ...action, shortcutKey: key };
+        const label = specialKeyLabels[key] ?? key;
+        return { ...action, shortcutKey: key, shortcutLabel: label };
     });
 });
 
@@ -61,6 +69,14 @@ function onKeydown(event) {
         props.clearSelections?.();
         event.preventDefault();
         event.stopPropagation();
+        return;
+    }
+    if (event.key === DELETE_SHORTCUT_KEY || event.key === 'Backspace') {
+        const deleteAction = actionsWithShortcuts.value.find((a) => a.handle === 'delete');
+        if (deleteAction?.run) {
+            deleteAction.run();
+            event.preventDefault();
+        }
         return;
     }
     if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -101,7 +117,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     :variant="action.dangerous ? 'danger' : 'default'"
                     @click="action.run"
                 >
-                    {{ __(action.title) }} <span :class="[shortcutKeyClasses, action.dangerous && 'text-red-600 bg-red-100/80! dark:text-red-400 dark:bg-red-900']">{{ action.shortcutKey }}</span>
+                    {{ __(action.title) }} <span :class="[shortcutKeyClasses, action.dangerous && 'text-red-600 bg-red-100/80! dark:text-red-400 dark:bg-red-900']">{{ action.shortcutLabel }}</span>
                 </Button>
             </ButtonGroup>
         </div>
