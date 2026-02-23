@@ -1,22 +1,22 @@
 <script setup>
+/**
+ * Bulk Actions Floating Toolbar
+ *
+ * Renders the floating toolbar when items are selected in a listing, with keyboard shortcuts
+ * for each action. Shortcuts are derived from the localized action title (first unused letter).
+ * Delete uses the backspace icon and is triggered by Delete/Backspace only.
+ */
 import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted } from 'vue';
 import { Button, ButtonGroup, Icon } from '@ui';
 
-// Deselect uses Escape; we show "Esc" in the UI.
+// ——— Keyboard shortcut constants ———
 const DESELECT_SHORTCUT_KEY = 'Escape';
 const DESELECT_SHORTCUT_LABEL = 'Esc';
-
-// Shared styles for the keyboard shortcut badges next to each action.
-const shortcutKeyClasses =
-    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
-
-// Delete/Backspace key triggers the delete action (handled separately in onKeydown).
 const DELETE_SHORTCUT_KEY = 'Delete';
 
-function isDeleteAction(action) {
-    return action?.handle?.toLowerCase() === 'delete' || action?.icon === 'trash';
-}
+const shortcutKeyClasses =
+    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
@@ -27,9 +27,14 @@ const props = defineProps({
 
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
 
+/** True if this action is the built-in delete (by handle or trash icon). */
+function isDeleteAction(action) {
+    return action?.handle?.toLowerCase() === 'delete' || action?.icon === 'trash';
+}
+
 /**
- * Picks a shortcut key from the action's (localized) title: first unused a–z letter in order.
- * e.g. "Unpublish" → u, "Veröffentlichung aufheben" → v. Resolves to the same letters in English.
+ * First unused a–z letter from the action's (localized) title.
+ * e.g. "Unpublish" → u, "Veröffentlichung aufheben" → v.
  */
 function findShortcutKey(action, used) {
     const title = (action.title || '').toLowerCase();
@@ -53,14 +58,13 @@ const actionsWithShortcuts = computed(() => {
     });
 });
 
-// Don't trigger toolbar shortcuts when a modal, stack, or dialog is open.
+// ——— Keyboard handler: skip when overlays or form controls have focus ———
 function hasOpenOverlay() {
     return !!document.querySelector(
         '[data-ui-modal-content], .stack-content, [role="dialog"]'
     );
 }
 
-// Don't trigger when the user is typing in an input, textarea, select, or contenteditable.
 function isInsideFormControl(event) {
     const el = event.target;
     if (!el) return false;
@@ -98,7 +102,7 @@ function onKeydown(event) {
     }
 }
 
-// Capture phase so we can handle Escape before other listeners (e.g. command palette).
+// Capture phase so Escape is handled before other listeners (e.g. command palette).
 onMounted(() => document.addEventListener('keydown', onKeydown, true));
 onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
 </script>
@@ -119,7 +123,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     class="text-blue-500!"
                     @click="clearSelections?.()"
                 >
-                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }} <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400 dark:bg-blue-900']">{{ DESELECT_SHORTCUT_LABEL }}</span>
+                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }}
+                    <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400 dark:bg-blue-900']">
+                        {{ DESELECT_SHORTCUT_LABEL }}
+                    </span>
                 </Button>
                 <Button
                     v-for="action in actionsWithShortcuts"
