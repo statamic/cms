@@ -3,7 +3,8 @@ import { Motion } from 'motion-v';
 import { computed, onMounted, onUnmounted } from 'vue';
 import { Button, ButtonGroup } from '@ui';
 
-const DESELECT_SHORTCUT_KEY = 'x';
+const DESELECT_SHORTCUT_KEY = 'Escape';
+const DESELECT_SHORTCUT_LABEL = 'Esc';
 
 const shortcutKeyClasses =
     'ml-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
@@ -11,7 +12,7 @@ const shortcutKeyClasses =
 const handleToShortcutKey = {
     unpublish: 'u',
     publish: 'p',
-    delete: 'e',
+    delete: 'x',
 };
 
 const props = defineProps({
@@ -24,7 +25,7 @@ const props = defineProps({
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
 
 const actionsWithShortcuts = computed(() => {
-    const used = new Set([DESELECT_SHORTCUT_KEY]);
+    const used = new Set();
     return (props.actions || []).map((action) => {
         let key = handleToShortcutKey[action.handle] ?? (action.title?.[0]?.toLowerCase() || '').replace(/[^a-z]/, '');
         if (!key || used.has(key)) {
@@ -42,14 +43,14 @@ const actionsWithShortcuts = computed(() => {
 
 function onKeydown(event) {
     if (!props.visible || !hasSelections.value) return;
-    if (event.metaKey || event.ctrlKey || event.altKey) return;
-    const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
-    if (!key) return;
-    if (key === DESELECT_SHORTCUT_KEY) {
+    if (event.key === DESELECT_SHORTCUT_KEY) {
         props.clearSelections?.();
         event.preventDefault();
         return;
     }
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const key = event.key?.length === 1 ? event.key.toLowerCase() : null;
+    if (!key) return;
     const action = actionsWithShortcuts.value.find((a) => a.shortcutKey === key);
     if (action?.run) {
         action.run();
@@ -77,7 +78,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                     class="text-blue-500!"
                     @click="clearSelections?.()"
                 >
-                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }} <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400 dark:bg-blue-900']">{{ DESELECT_SHORTCUT_KEY }}</span>
+                    {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }} <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400 dark:bg-blue-900']">{{ DESELECT_SHORTCUT_LABEL }}</span>
                 </Button>
                 <Button
                     v-for="action in actionsWithShortcuts"
