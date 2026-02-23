@@ -16,7 +16,7 @@ const DESELECT_SHORTCUT_LABEL = 'Esc';
 const DELETE_SHORTCUT_KEY = 'Delete';
 
 const shortcutKeyClasses =
-    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-2xs text-gray-600 dark:bg-gray-800 dark:text-gray-400';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
@@ -124,7 +124,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                     @click="clearSelections?.()"
                 >
                     {{ __n(`Deselect :count item|Deselect all :count items`, selections.length) }}
-                    <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400 dark:bg-blue-900']">
+                    <span :class="[shortcutKeyClasses, 'text-blue-600! bg-blue-100/80! dark:text-blue-400! dark:bg-blue-950!']">
                         {{ DESELECT_SHORTCUT_LABEL }}
                     </span>
                 </Button>
@@ -141,7 +141,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
                             shortcutKeyClasses,
                             'inline-flex items-center',
                             isDeleteAction(action) && 'ms-0.25!',
-                            action.dangerous && '[&_svg]:text-red-600! [&_svg]:size-4! bg-transparent dark:text-red-400 dark:bg-red-900',
+                            action.dangerous && '[&_svg]:text-red-600! dark:[&_svg]:text-red-500! [&_svg]:size-4! dark:[&_svg]:opacity-80 bg-transparent dark:bg-transparent',
                         ]"
                     >
                         <Icon v-if="isDeleteAction(action)" name="backspace" class="size-3" />
