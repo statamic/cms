@@ -165,7 +165,7 @@ class ApiController extends Controller
             ]);
         }
 
-        if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published') && !request()->isLivePreview()) {
+        if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published') && ! request()->isLivePreview()) {
             $filters->put('status:is', 'published');
         }
 
