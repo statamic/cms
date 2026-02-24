@@ -1,9 +1,15 @@
 <template>
-    <div id="pdfViewer" class="h-full text-white text-center flex flex-col justify-center items-center"></div>
+    <div class="h-full">
+        <loading-graphic v-if="isLoading"  :text="null" class="h-full flex items-center justify-center" />
+
+        <div ref="pages" class="pdf-pages h-full overflow-auto" />
+    </div>
 </template>
 
 <script>
-import PDFObject from 'pdfobject';
+import 'pdfjs-dist/web/pdf_viewer.css';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+import { AnnotationLayerBuilder, EventBus, PDFLinkService } from 'pdfjs-dist/web/pdf_viewer';
 
 export default {
 
@@ -13,13 +19,205 @@ export default {
         }
     },
 
+    data() {
+        return {
+            isLoading: true,
+            currentRenderId: 0,
+            loadingTask: null,
+            pdfDocument: null,
+            pageElements: [],
+            parentInlineStyles: null,
+        };
+    },
+
+    watch: {
+        src() {
+            this.renderPdf();
+        },
+    },
+
     mounted() {
-        PDFObject.embed(this.src, "#pdfViewer", {
-            customAttribute: {
-                key: 'sandbox',
-                value: 'allow-scripts allow-same-origin',
-            },
-        });
+        this.applyParentSizingFix();
+        this.renderPdf();
+    },
+
+    beforeDestroy() {
+        this.cleanup();
+        this.restoreParentSizingFix();
+    },
+
+    methods: {
+        async renderPdf() {
+            const renderId = ++this.currentRenderId;
+
+            this.cleanup({ invalidateRender: false });
+            this.isLoading = true;
+
+            if (!this.src) {
+                this.isLoading = false;
+                return;
+            }
+
+            try {
+                const pdf = await this.loadDocumentWithFallback();
+
+                if (renderId !== this.currentRenderId) return;
+
+                this.pdfDocument = pdf;
+                const linkService = this.createLinkService(pdf);
+                const pages = this.$refs.pages;
+
+                for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+                    const page = await pdf.getPage(pageNumber);
+
+                    if (renderId !== this.currentRenderId) return;
+
+                    const viewport = page.getViewport({ scale: 1.25 });
+                    const pageContainer = document.createElement('div');
+                    pageContainer.className = 'pdf-page';
+                    pageContainer.dataset.pageNumber = pageNumber;
+                    pageContainer.style.width = `${viewport.width}px`;
+                    pageContainer.style.height = `${viewport.height}px`;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page-canvas';
+                    canvas.width = Math.floor(viewport.width);
+                    canvas.height = Math.floor(viewport.height);
+                    canvas.style.width = `${viewport.width}px`;
+                    canvas.style.height = `${viewport.height}px`;
+                    pageContainer.appendChild(canvas);
+
+                    pages.appendChild(pageContainer);
+                    this.pageElements.push(pageContainer);
+
+                    const canvasContext = canvas.getContext('2d');
+                    if (!canvasContext) continue;
+
+                    await page.render({
+                        canvasContext,
+                        viewport,
+                    }).promise;
+
+                    const annotationLayerBuilder = new AnnotationLayerBuilder({
+                        pageDiv: pageContainer,
+                        pdfPage: page,
+                        linkService,
+                        renderForms: true,
+                    });
+                    await annotationLayerBuilder.render(viewport);
+                }
+            } catch (error) {
+                if (renderId === this.currentRenderId) {
+                    console.error(error);
+                }
+            } finally {
+                if (renderId === this.currentRenderId) {
+                    this.isLoading = false;
+                }
+            }
+        },
+
+        async loadDocumentWithFallback() {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+                'pdfjs-dist/build/pdf.worker.min.js',
+                import.meta.url
+            ).href;
+
+            this.loadingTask = pdfjsLib.getDocument({
+                url: this.src,
+                verbosity: pdfjsLib.VerbosityLevel.ERRORS,
+            });
+
+            return await this.loadingTask.promise;
+        },
+
+        createLinkService(pdfDocument) {
+            const eventBus = new EventBus();
+            const linkService = new PDFLinkService({ eventBus });
+
+            linkService.externalLinkEnabled = false;
+            linkService.setViewer({
+                currentPageNumber: 1,
+                pagesRotation: 0,
+                isInPresentationMode: false,
+                pageLabelToPageNumber: () => null,
+                scrollPageIntoView: ({ pageNumber }) => {
+                    const pageElement = this.pageElements[pageNumber - 1];
+
+                    if (pageElement) {
+                        pageElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                    }
+                },
+            });
+            linkService.setDocument(pdfDocument, null);
+
+            return linkService;
+        },
+
+        applyParentSizingFix() {
+            const parent = this.$el?.parentElement;
+            if (!parent) return;
+
+            this.parentInlineStyles = {
+                height: parent.style.height,
+                flex: parent.style.flex,
+                minHeight: parent.style.minHeight,
+            };
+
+            // This component lives under a wrapper with `h-full` inside a flex column.
+            // Make that wrapper a flex item so it uses remaining space under the toolbar.
+            parent.style.height = 'auto';
+            parent.style.flex = '1 1 auto';
+            parent.style.minHeight = '0';
+        },
+
+        restoreParentSizingFix() {
+            const parent = this.$el?.parentElement;
+            if (!parent || !this.parentInlineStyles) return;
+
+            parent.style.height = this.parentInlineStyles.height;
+            parent.style.flex = this.parentInlineStyles.flex;
+            parent.style.minHeight = this.parentInlineStyles.minHeight;
+            this.parentInlineStyles = null;
+        },
+
+        cleanup({ invalidateRender = true } = {}) {
+            if (invalidateRender) {
+                this.currentRenderId++;
+            }
+
+            if (this.loadingTask) {
+                this.loadingTask.destroy();
+                this.loadingTask = null;
+            }
+
+            if (this.pdfDocument) {
+                this.pdfDocument.destroy();
+                this.pdfDocument = null;
+            }
+
+            this.pageElements = [];
+
+            if (this.$refs.pages) {
+                this.$refs.pages.replaceChildren();
+            }
+        },
     },
 }
 </script>
+
+<style>
+.pdf-page {
+    position: relative;
+    margin: 0 auto 1rem;
+}
+
+.pdf-page .annotationLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+</style>
