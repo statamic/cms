@@ -2166,6 +2166,8 @@ class NodeProcessor
 
                                     if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
+                                            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             GlobalRuntimeState::$userContentEvalState = [
@@ -2173,14 +2175,18 @@ class NodeProcessor
                                                 $node,
                                             ];
 
-                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
-                                            GlobalRuntimeState::$userContentEvalState = null;
-                                            GlobalRuntimeState::$isEvaluatingUserData = false;
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            try {
+                                                $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            } finally {
+                                                GlobalRuntimeState::$userContentEvalState = null;
+                                                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+                                                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+                                            }
                                         } else {
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
                                         }
                                     }
 
@@ -2630,9 +2636,13 @@ class NodeProcessor
             return $data->value();
         }
 
+        $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
-        $value = $data->antlersValue($this->antlersParser, $context);
-        GlobalRuntimeState::$isEvaluatingUserData = false;
+        try {
+            $value = $data->antlersValue($this->antlersParser, $context);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+        }
 
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
