@@ -73,6 +73,7 @@ export default {
 - `unsetRevealerField()` — Unmark a field as a revealer.
 - `setHiddenField()` — Mark field as hidden.
 - `withoutDirtying()` — Run a callback without marking the form as dirty.
+- Any other keys provided by the publish form (eg. entry publish form provides `isWorkingCopy` and `revisionsEnabled`)
 
 ## Customizing the layout
 By default, the `PublishContainer` component renders a standard publish form with tabs and sections. If you need a custom layout - for example: to add extra actions, or avoid rendering sections, you may provide your markup in the default slot.
