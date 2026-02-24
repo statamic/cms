@@ -75,7 +75,7 @@
                 </div>
             </header>
 
-            <div v-if="index !== undefined" v-show="!collapsed" class="contain-paint">
+            <div v-if="index !== undefined" v-show="!collapsed" :class="{ 'contain-paint': collapsed }">
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"

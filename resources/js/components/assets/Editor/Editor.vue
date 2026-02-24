@@ -1,7 +1,7 @@
 <template>
     <Stack size="full" open inset ref="stack" :before-close="shouldClose" @update:open="$emit('closed')" :show-close-button="false">
         <div
-            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
+            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-gray-850"
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
@@ -142,7 +142,7 @@
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
-                        <ui-badge pill v-if="asset.width && asset.height" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
+                        <ui-badge pill v-if="asset.width && asset.height" icon="assets" :text="__('messages.width_x_height', { width: Math.round(asset.width), height: Math.round(asset.height) })" />
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
                             <time

@@ -124,6 +124,23 @@ class DateTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_a_range_in_a_positive_offset_timezone()
+    {
+        config()->set('app.timezone', 'Europe/Berlin');
+
+        $augmented = $this->fieldtype(['mode' => 'range'])->augment([
+            'start' => '2026-02-02',
+            'end' => '2026-02-05',
+        ]);
+
+        $this->assertIsArray($augmented);
+        $this->assertInstanceOf(Carbon::class, $augmented['start']);
+        $this->assertInstanceOf(Carbon::class, $augmented['end']);
+        $this->assertEquals('2026 Feb 02', $augmented['start']->setTimezone('Europe/Berlin')->format('Y M d'));
+        $this->assertEquals('2026 Feb 05', $augmented['end']->setTimezone('Europe/Berlin')->format('Y M d'));
+    }
+
+    #[Test]
     public function it_augments_a_null_range()
     {
         $augmented = $this->fieldtype(['mode' => 'range'])->augment(null);

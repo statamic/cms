@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Password;
 use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\SendsPasswordResetEmails;
+use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
@@ -32,7 +33,13 @@ class ForgotPasswordController extends Controller
     public function sendResetLinkEmail(Request $request)
     {
         if ($url = $request->_reset_url) {
-            PasswordReset::resetFormUrl(URL::makeAbsolute($url));
+            $url = URL::makeAbsolute($url);
+
+            throw_if(URL::isExternalToApplication($url), ValidationException::withMessages([
+                '_reset_url' => trans('validation.url', ['attribute' => '_reset_url']),
+            ]));
+
+            PasswordReset::resetFormUrl($url);
         }
 
         return $this->traitSendResetLinkEmail($request);
