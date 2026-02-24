@@ -10,6 +10,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\UnableToReadFile;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -83,6 +84,22 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_throws_unable_to_read_file_when_asset_is_not_a_valid_image()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->create('foo/hoff.jpg', 100);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnFalse();
+
+        $this->expectException(UnableToReadFile::class);
+
+        $this->makeGenerator()->generateByAsset($asset, ['w' => 100]);
     }
 
     #[Test]
