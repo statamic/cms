@@ -177,7 +177,7 @@ class Cascade
 
     public static function config(): array
     {
-        $defaultAllowlist = [
+        $defaults = [
             'app.name',
             'app.env',
             'app.debug',
@@ -200,24 +200,20 @@ class Cascade
             'session.driver',
             'statamic',
         ];
-        $allowlist = (array) config('statamic.system.view_config_allowlist', $defaultAllowlist);
 
-        if (($index = array_search('@default', $allowlist)) !== false) {
-            array_splice($allowlist, $index, 1, $defaultAllowlist);
-            $allowlist = array_values(array_unique($allowlist));
-        }
+        $allowed = collect((array) config('statamic.system.view_config_allowlist', $defaults))
+            ->flatMap(fn ($key) => $key === '@default' ? $defaults : [$key])
+            ->unique()->values()->all();
 
-        $config = [];
-
-        foreach ($allowlist as $key) {
+        return array_reduce($allowed, function ($config, $key) {
             $value = config($key);
 
             if (! is_null($value)) {
                 Arr::set($config, $key, $value);
             }
-        }
 
-        return $config;
+            return $config;
+        }, []);
     }
 
     private function contextualVariables()
