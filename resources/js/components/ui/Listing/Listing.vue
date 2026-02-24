@@ -684,7 +684,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-    Statamic.$progress.loading(id, false);
+    Statamic.$progress.remove(id);
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
