@@ -145,7 +145,7 @@
                         :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
                     />
                 </template>
-	            <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
+                <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
                 <template v-if="branch.can_delete">
                     <DropdownItem
                         :text="__('Delete')"
