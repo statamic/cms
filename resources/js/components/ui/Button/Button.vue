@@ -8,6 +8,7 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     /** The element or component this component should render as */
     as: { type: String, default: null },
+	disabled: { type: Boolean, default: false },
     /** The URL to link to */
     href: { type: String, default: null },
     /** When `href` is provided, this prop controls the link's `target` attribute */
@@ -38,7 +39,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
     if (props.as) return props.as;
-    if (props.href) {
+    if (props.href && !props.disabled && !props.loading) {
         return props.target === '_blank' ? 'a' : Link;
     }
     return 'button';
@@ -116,7 +117,7 @@ const buttonClasses = computed(() => {
     <component
         :is="tag"
         :class="buttonClasses"
-        :disabled="loading"
+        :disabled="disabled || loading"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
         :href
         :target
