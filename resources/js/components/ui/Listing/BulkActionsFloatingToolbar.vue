@@ -16,7 +16,7 @@ const DESELECT_SHORTCUT_LABEL = 'Esc';
 const DELETE_SHORTCUT_KEY = 'Delete';
 
 const shortcutKeyClasses =
-    'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+    'ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/75 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-800 dark:text-gray-400';
 
 const props = defineProps({
     actions: { type: Array, default: () => [] },
