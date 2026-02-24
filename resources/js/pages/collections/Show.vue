@@ -9,7 +9,7 @@
                 :item="handle"
                 v-slot="{ actions }"
             >
-                <Dropdown placement="left-start">
+                <Dropdown v-if="canEdit || canEditBlueprints || actions.length" placement="left-start">
                     <DropdownMenu>
                         <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
                         <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
@@ -145,8 +145,8 @@
                         :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
                     />
                 </template>
+	            <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
                 <template v-if="branch.can_delete">
-                    <DropdownSeparator />
                     <DropdownItem
                         :text="__('Delete')"
                         icon="trash"
