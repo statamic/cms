@@ -185,6 +185,13 @@ class GlobalRuntimeState
     public static $allowPhpInContent = false;
 
     /**
+     * Controls if method invocations are evaluated in user content.
+     *
+     * @var bool
+     */
+    public static $allowMethodsInContent = false;
+
+    /**
      * Maintains a list of all field prefixes that have been encountered.
      *
      * @var array
@@ -226,6 +233,9 @@ class GlobalRuntimeState
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         self::$abandonedNodes = [];
+        self::$isEvaluatingUserData = false;
+        self::$isEvaluatingData = false;
+        self::$userContentEvalState = null;
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();
