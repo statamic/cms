@@ -15,6 +15,7 @@ use Statamic\Facades\Parse;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\View\Cascade;
 
 use function Statamic\trans as __;
 
@@ -170,7 +171,7 @@ class Email extends Mailable
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'form_config' => $formConfig,
             'email_config' => $this->config,
-            'config' => config()->all(),
+            'config' => Cascade::config(),
             'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
@@ -245,7 +246,7 @@ class Email extends Mailable
             $value = Parse::env($value); // deprecated
 
             return (string) Antlers::parse($value, array_merge(
-                ['config' => config()->all()],
+                ['config' => Cascade::config()],
                 $this->getGlobalsData(),
                 $this->submissionData,
             ));

@@ -52,6 +52,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\View\Cascade;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
@@ -1065,7 +1066,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
-            'config' => config()->all(),
+            'config' => Cascade::config(),
             'site' => $this->site(),
             'uri' => $this->uri(),
             'url' => $this->url(),
