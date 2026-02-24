@@ -146,14 +146,13 @@
                     />
                 </template>
                 <DropdownSeparator v-if="depth < structureMaxDepth && branch.can_delete" />
-                <template v-if="branch.can_delete">
-                    <DropdownItem
-                        :text="__('Delete')"
-                        icon="trash"
-                        variant="destructive"
-                        @click="deleteTreeBranch(branch, removeBranch)"
-                    />
-                </template>
+                <DropdownItem
+                    v-if="branch.can_delete"
+                    :text="__('Delete')"
+                    icon="trash"
+                    variant="destructive"
+                    @click="deleteTreeBranch(branch, removeBranch)"
+                />
             </template>
         </page-tree>
 
