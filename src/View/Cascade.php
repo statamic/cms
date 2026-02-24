@@ -175,6 +175,79 @@ class Cascade
         return $this;
     }
 
+    private function contextualVariables()
+    {
+        return [
+            // Constants
+            'environment' => app()->environment(),
+            'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>', // @TODO remove and document new best practice
+            'csrf_token' => csrf_token(),
+            'csrf_field' => csrf_field(),
+            'config' => static::config(),
+            'response_code' => 200,
+
+            // Auth
+            'logged_in' => $loggedIn = auth(config('statamic.users.guards.web', 'web'))->check(),
+            'logged_out' => ! $loggedIn,
+            'current_user' => User::current(),
+
+            // Date
+            'current_date' => $now = now(),
+            'now' => $now,
+            'today' => $now,
+
+            // Request
+            'current_url' => $this->request->url(),
+            'current_full_url' => $this->request->fullUrl(),
+            'current_uri' => URL::tidy($this->request->path()),
+            'get_post' => Arr::sanitize($this->request->all()),
+            'get' => Arr::sanitize($this->request->query->all()),
+            'post' => $this->request->isMethod('post') ? Arr::sanitize($this->request->request->all()) : [],
+            'old' => Arr::sanitize(old(null, [])),
+
+            'site' => $this->site,
+            'sites' => Facades\Site::all()->values(),
+            'homepage' => $this->site->url(),
+            'is_homepage' => $this->site->absoluteUrl() == $this->request->url(),
+            'cp_url' => cp_route('index'),
+        ];
+    }
+
+    protected function hydrateViewModel()
+    {
+        if ($class = optional($this->get('view_model'))->value()) {
+            $viewModel = new $class($this);
+            $this->data = array_merge($this->data, $viewModel->data());
+        }
+
+        return $this;
+    }
+
+    public function getViewData($view)
+    {
+        $all = $this->get('views') ?? [];
+
+        return collect($all)
+            ->reverse()
+            ->reduce(function ($carry, $data) {
+                return $carry->merge($data);
+            }, collect())
+            ->merge($all[$view])
+            ->all();
+    }
+
+    public function sections()
+    {
+        return $this->sections;
+    }
+
+    public function clearSections()
+    {
+        $this->sections = collect();
+
+        return $this;
+    }
+
     public static function config(): array
     {
         $defaults = [
@@ -310,78 +383,5 @@ class Cascade
 
             return $config;
         }, []);
-    }
-
-    private function contextualVariables()
-    {
-        return [
-            // Constants
-            'environment' => app()->environment(),
-            'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>', // @TODO remove and document new best practice
-            'csrf_token' => csrf_token(),
-            'csrf_field' => csrf_field(),
-            'config' => static::config(),
-            'response_code' => 200,
-
-            // Auth
-            'logged_in' => $loggedIn = auth(config('statamic.users.guards.web', 'web'))->check(),
-            'logged_out' => ! $loggedIn,
-            'current_user' => User::current(),
-
-            // Date
-            'current_date' => $now = now(),
-            'now' => $now,
-            'today' => $now,
-
-            // Request
-            'current_url' => $this->request->url(),
-            'current_full_url' => $this->request->fullUrl(),
-            'current_uri' => URL::tidy($this->request->path()),
-            'get_post' => Arr::sanitize($this->request->all()),
-            'get' => Arr::sanitize($this->request->query->all()),
-            'post' => $this->request->isMethod('post') ? Arr::sanitize($this->request->request->all()) : [],
-            'old' => Arr::sanitize(old(null, [])),
-
-            'site' => $this->site,
-            'sites' => Facades\Site::all()->values(),
-            'homepage' => $this->site->url(),
-            'is_homepage' => $this->site->absoluteUrl() == $this->request->url(),
-            'cp_url' => cp_route('index'),
-        ];
-    }
-
-    protected function hydrateViewModel()
-    {
-        if ($class = optional($this->get('view_model'))->value()) {
-            $viewModel = new $class($this);
-            $this->data = array_merge($this->data, $viewModel->data());
-        }
-
-        return $this;
-    }
-
-    public function getViewData($view)
-    {
-        $all = $this->get('views') ?? [];
-
-        return collect($all)
-            ->reverse()
-            ->reduce(function ($carry, $data) {
-                return $carry->merge($data);
-            }, collect())
-            ->merge($all[$view])
-            ->all();
-    }
-
-    public function sections()
-    {
-        return $this->sections;
-    }
-
-    public function clearSections()
-    {
-        $this->sections = collect();
-
-        return $this;
     }
 }
