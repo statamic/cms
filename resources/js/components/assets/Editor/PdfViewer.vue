@@ -15,10 +15,10 @@ export default {
 
     mounted() {
         PDFObject.embed(this.src, "#pdfViewer", {
-	        customAttribute: {
-		        key: 'sandbox',
-		        value: 'allow-scripts allow-same-origin',
-	        },
+            customAttribute: {
+                key: 'sandbox',
+                value: 'allow-scripts allow-same-origin',
+            },
         });
     },
 }
