@@ -200,9 +200,16 @@ class Cascade
             'session.driver',
             'statamic',
         ];
+        $allowlist = (array) config('statamic.system.view_config_allowlist', $defaultAllowlist);
+
+        if (($index = array_search('@default', $allowlist)) !== false) {
+            array_splice($allowlist, $index, 1, $defaultAllowlist);
+            $allowlist = array_values(array_unique($allowlist));
+        }
+
         $config = [];
 
-        foreach ((array) config('statamic.system.view_config_allowlist', $defaultAllowlist) as $key) {
+        foreach ($allowlist as $key) {
             $value = config($key);
 
             if (! is_null($value)) {

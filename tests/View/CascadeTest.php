@@ -123,6 +123,20 @@ class CascadeTest extends TestCase
     }
 
     #[Test]
+    public function default_allowlist_can_be_extended_with_default_spread_syntax()
+    {
+        config([
+            'app.foo' => 'bar',
+            'statamic.system.view_config_allowlist' => ['@default', 'app.foo'],
+        ]);
+
+        $config = Cascade::config();
+
+        $this->assertTrue(Arr::has($config, 'app.name'));
+        $this->assertTrue(Arr::has($config, 'app.foo'));
+    }
+
+    #[Test]
     public function it_hydrates_auth_when_logged_in()
     {
         $user = User::make();
