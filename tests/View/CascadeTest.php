@@ -127,6 +127,7 @@ class CascadeTest extends TestCase
     {
         config([
             'app.foo' => 'bar',
+            'statamic.system.license_key' => 'test-license-key',
             'statamic.system.view_config_allowlist' => ['@default', 'app.foo'],
         ]);
 
@@ -134,6 +135,7 @@ class CascadeTest extends TestCase
 
         $this->assertTrue(Arr::has($config, 'app.name'));
         $this->assertTrue(Arr::has($config, 'app.foo'));
+        $this->assertFalse(Arr::has($config, 'statamic.system.license_key'));
     }
 
     #[Test]
