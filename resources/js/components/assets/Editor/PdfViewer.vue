@@ -14,7 +14,12 @@ export default {
     },
 
     mounted() {
-        PDFObject.embed(this.src, "#pdfViewer");
+        PDFObject.embed(this.src, "#pdfViewer", {
+	        customAttribute: {
+		        key: 'sandbox',
+		        value: 'allow-scripts allow-same-origin',
+	        },
+        });
     },
 }
 </script>
