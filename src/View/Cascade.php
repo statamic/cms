@@ -175,6 +175,44 @@ class Cascade
         return $this;
     }
 
+    public static function config(): array
+    {
+        $defaultAllowlist = [
+            'app.name',
+            'app.env',
+            'app.debug',
+            'app.url',
+            'app.asset_url',
+            'app.locale',
+            'app.fallback_locale',
+            'app.timezone',
+            'auth.defaults',
+            'auth.guards',
+            'auth.passwords',
+            'broadcasting.default',
+            'cache.default',
+            'filesystems.default',
+            'mail.default',
+            'mail.from',
+            'queue.default',
+            'session.lifetime',
+            'session.expire_on_close',
+            'session.driver',
+            'statamic',
+        ];
+        $config = [];
+
+        foreach ((array) config('statamic.system.view_config_allowlist', $defaultAllowlist) as $key) {
+            $value = config($key);
+
+            if (! is_null($value)) {
+                Arr::set($config, $key, $value);
+            }
+        }
+
+        return $config;
+    }
+
     private function contextualVariables()
     {
         return [
@@ -183,7 +221,7 @@ class Cascade
             'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>', // @TODO remove and document new best practice
             'csrf_token' => csrf_token(),
             'csrf_field' => csrf_field(),
-            'config' => config()->all(),
+            'config' => static::config(),
             'response_code' => 200,
 
             // Auth
