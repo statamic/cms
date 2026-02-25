@@ -92,6 +92,7 @@ async function renderPdf() {
         }
     } catch (error) {
         if (renderId === currentRenderId) {
+            Statamic.$toast.error(__('There was an error loading the PDF.'));
             console.error(error);
         }
     } finally {
