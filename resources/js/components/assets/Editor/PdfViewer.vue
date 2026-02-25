@@ -1,8 +1,4 @@
 <script setup>
-import 'pdfjs-dist/web/pdf_viewer.css';
-import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
-import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?worker&url';
-import { AnnotationLayerBuilder, EventBus, PDFLinkService } from 'pdfjs-dist/web/pdf_viewer.mjs';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Icon } from '@ui';
 
@@ -48,7 +44,7 @@ async function renderPdf() {
         if (renderId !== currentRenderId) return;
 
         pdfDocument = pdf;
-        const linkService = createLinkService(pdf);
+        const { linkService, AnnotationLayerBuilder } = await initViewer(pdf);
 
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
             const page = await pdf.getPage(pageNumber);
@@ -68,7 +64,7 @@ async function renderPdf() {
 
             pages.value?.appendChild(pageContainer);
             pageElements.push(pageContainer);
-            
+
             const canvasContext = canvas.getContext('2d');
             if (!canvasContext) continue;
 
@@ -104,6 +100,12 @@ async function renderPdf() {
 }
 
 async function loadDocument() {
+    const [pdfjsLib, { default: pdfjsWorkerUrl }] = await Promise.all([
+        import('pdfjs-dist/build/pdf.mjs'),
+        import('pdfjs-dist/build/pdf.worker.min.mjs?worker&url'),
+        import('pdfjs-dist/web/pdf_viewer.css'),
+    ]);
+
     pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
     loadingTask = pdfjsLib.getDocument({
@@ -114,7 +116,8 @@ async function loadDocument() {
     return await loadingTask.promise;
 }
 
-function createLinkService(pdf) {
+async function initViewer(pdf) {
+    const { AnnotationLayerBuilder, EventBus, PDFLinkService } = await import('pdfjs-dist/web/pdf_viewer.mjs');
     const eventBus = new EventBus();
     const linkService = new PDFLinkService({ eventBus });
 
@@ -138,7 +141,7 @@ function createLinkService(pdf) {
     });
     linkService.setDocument(pdf, null);
 
-    return linkService;
+    return { linkService, AnnotationLayerBuilder };
 }
 
 function cleanup({ invalidateRender = true } = {}) {
