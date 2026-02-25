@@ -29,10 +29,10 @@
                             >
                                 <template #trigger>
                                     <Button
-                                        icon="chevron-vertical"
+                                        icon="dots"
                                         variant="ghost"
                                         size="sm"
-                                        :aria-label="__('More tabs')"
+                                        :aria-label="__('Open dropdown menu')"
                                     />
                                 </template>
                                 <DropdownMenu>
