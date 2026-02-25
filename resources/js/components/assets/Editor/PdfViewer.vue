@@ -8,8 +8,9 @@
 
 <script>
 import 'pdfjs-dist/web/pdf_viewer.css';
-import * as pdfjsLib from 'pdfjs-dist/build/pdf';
-import { AnnotationLayerBuilder, EventBus, PDFLinkService } from 'pdfjs-dist/web/pdf_viewer';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
+import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?worker&url';
+import { AnnotationLayerBuilder, EventBus, PDFLinkService } from 'pdfjs-dist/web/pdf_viewer.mjs';
 
 export default {
 
@@ -99,12 +100,12 @@ export default {
                     }).promise;
 
                     const annotationLayerBuilder = new AnnotationLayerBuilder({
-                        pageDiv: pageContainer,
                         pdfPage: page,
                         linkService,
                         renderForms: true,
+                        onAppend: (div) => pageContainer.appendChild(div),
                     });
-                    await annotationLayerBuilder.render(viewport);
+                    await annotationLayerBuilder.render({ viewport });
                 }
             } catch (error) {
                 if (renderId === this.currentRenderId) {
@@ -118,10 +119,7 @@ export default {
         },
 
         async loadDocumentWithFallback() {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-                'pdfjs-dist/build/pdf.worker.min.js',
-                import.meta.url
-            ).href;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
             this.loadingTask = pdfjsLib.getDocument({
                 url: this.src,
