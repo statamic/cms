@@ -73,19 +73,15 @@ export default {
 
                     if (renderId !== this.currentRenderId) return;
 
-                    const viewport = page.getViewport({ scale: 1.25 });
+                    const viewport = page.getViewport({ scale: 2 });
                     const pageContainer = document.createElement('div');
                     pageContainer.className = 'pdf-page';
-                    pageContainer.dataset.pageNumber = pageNumber;
-                    pageContainer.style.width = `${viewport.width}px`;
-                    pageContainer.style.height = `${viewport.height}px`;
+                    pageContainer.dataset.pageNumber = String(pageNumber);
 
                     const canvas = document.createElement('canvas');
                     canvas.className = 'pdf-page-canvas';
                     canvas.width = Math.floor(viewport.width);
                     canvas.height = Math.floor(viewport.height);
-                    canvas.style.width = `${viewport.width}px`;
-                    canvas.style.height = `${viewport.height}px`;
                     pageContainer.appendChild(canvas);
 
                     pages.appendChild(pageContainer);
@@ -210,7 +206,14 @@ export default {
 <style>
 .pdf-page {
     position: relative;
+    max-width: 900px;
     margin: 0 auto 1rem;
+}
+
+.pdf-page-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .pdf-page .annotationLayer {
