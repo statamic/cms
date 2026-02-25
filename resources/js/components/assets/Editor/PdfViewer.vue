@@ -68,7 +68,7 @@ async function renderPdf() {
 
             pages.value?.appendChild(pageContainer);
             pageElements.push(pageContainer);
-
+            
             const canvasContext = canvas.getContext('2d');
             if (!canvasContext) continue;
 
