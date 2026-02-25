@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\Passkey;
@@ -181,124 +182,87 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
-    public function it_cannot_start_elevated_session_with_string_zero_password()
+    #[DataProvider('invalidPasswordPayloads')]
+    public function it_rejects_invalid_password_payloads(array $payload): void
     {
         $this
             ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['password' => '0'])
-            ->assertSessionHasErrors('password')
-            ->assertSessionMissing('statamic_elevated_session');
-    }
-
-    #[Test]
-    public function it_cannot_start_elevated_session_with_integer_zero_password()
-    {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['password' => 0])
-            ->assertSessionHasErrors('password')
-            ->assertSessionMissing('statamic_elevated_session');
-    }
-
-    #[Test]
-    public function it_cannot_start_elevated_session_with_false_password()
-    {
-        $this
-            ->actingAs($this->user)
-            ->postJson('/cp/elevated-session', ['password' => false])
+            ->postJson('/cp/elevated-session', $payload)
             ->assertStatus(422)
             ->assertJsonValidationErrors('password')
             ->assertSessionMissing('statamic_elevated_session');
     }
 
-    #[Test]
-    public function it_cannot_start_elevated_session_with_empty_string_password()
+    public static function invalidPasswordPayloads(): array
     {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['password' => ''])
-            ->assertSessionHasErrors('password')
-            ->assertSessionMissing('statamic_elevated_session');
+        return [
+            'no fields' => [[]],
+            'string zero' => [['password' => '0']],
+            'integer zero' => [['password' => 0]],
+            'false' => [['password' => false]],
+            'empty string' => [['password' => '']],
+            'null' => [['password' => null]],
+        ];
     }
 
     #[Test]
-    public function it_cannot_start_elevated_session_with_null_password()
+    #[DataProvider('invalidVerificationCodePayloads')]
+    public function it_rejects_invalid_verification_code_payloads(array $payload): void
     {
         $this
             ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['password' => null])
-            ->assertSessionHasErrors('password')
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('verification_code')
             ->assertSessionMissing('statamic_elevated_session');
     }
 
-    #[Test]
-    public function it_cannot_start_elevated_session_with_no_fields()
+    public static function invalidVerificationCodePayloads(): array
     {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', [])
-            ->assertSessionHasErrors('password')
-            ->assertSessionMissing('statamic_elevated_session');
+        return [
+            'no fields' => [[]],
+            'string zero' => [['verification_code' => '0']],
+            'integer zero' => [['verification_code' => 0]],
+            'false' => [['verification_code' => false]],
+            'empty string' => [['verification_code' => '']],
+            'null' => [['verification_code' => null]],
+        ];
     }
 
     #[Test]
-    public function it_cannot_start_elevated_session_with_empty_string_passkey_id()
+    #[DataProvider('invalidPasskeyPayloads')]
+    public function it_handles_invalid_passkey_payloads(array $payload, bool $expectsValidationError): void
     {
+        if ($expectsValidationError) {
+            $this
+                ->actingAs($this->user)
+                ->postJson('/cp/elevated-session', $payload)
+                ->assertStatus(422)
+                ->assertJsonValidationErrors('id')
+                ->assertSessionMissing('statamic_elevated_session');
+
+            return;
+        }
+
+        WebAuthn::shouldReceive('validateAssertion')->once()->andThrow(new \RuntimeException('Invalid assertion'));
+
         $this
             ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['id' => ''])
-            ->assertSessionHasErrors('id')
+            ->postJson('/cp/elevated-session', array_merge($payload, ['rawId' => 'raw-id', 'response' => [], 'type' => 'public-key']))
+            ->assertStatus(500)
             ->assertSessionMissing('statamic_elevated_session');
     }
 
-    #[Test]
-    public function it_cannot_start_elevated_session_with_null_passkey_id()
+    public static function invalidPasskeyPayloads(): array
     {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['id' => null])
-            ->assertSessionHasErrors('id')
-            ->assertSessionMissing('statamic_elevated_session');
-    }
-
-    #[Test]
-    public function it_cannot_start_elevated_session_with_empty_string_verification_code()
-    {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['verification_code' => ''])
-            ->assertSessionHasErrors('verification_code')
-            ->assertSessionMissing('statamic_elevated_session');
-    }
-
-    #[Test]
-    public function it_cannot_start_elevated_session_with_null_verification_code()
-    {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['verification_code' => null])
-            ->assertSessionHasErrors('verification_code')
-            ->assertSessionMissing('statamic_elevated_session');
-    }
-
-    #[Test]
-    public function it_cannot_start_elevated_session_with_string_zero_verification_code()
-    {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['verification_code' => '0'])
-            ->assertSessionHasErrors('verification_code')
-            ->assertSessionMissing('statamic_elevated_session');
-    }
-
-    #[Test]
-    public function it_cannot_start_elevated_session_with_integer_zero_verification_code()
-    {
-        $this
-            ->actingAs($this->user)
-            ->post('/cp/elevated-session', ['verification_code' => 0])
-            ->assertSessionHasErrors('verification_code')
-            ->assertSessionMissing('statamic_elevated_session');
+        return [
+            'no fields' => [[], true],
+            'string zero' => [['id' => '0'], false],
+            'integer zero' => [['id' => 0], false],
+            'false' => [['id' => false], false],
+            'empty string' => [['id' => ''], true],
+            'null' => [['id' => null], true],
+        ];
     }
 
     #[Test]
