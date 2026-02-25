@@ -74,7 +74,10 @@ class ElevatedSessionController
             ]);
         }
 
-        if ($request->filled('verification_code') && $request->verification_code !== $request->getElevatedSessionVerificationCode()) {
+        if (
+            $request->filled('verification_code')
+            && ! hash_equals((string) $request->getElevatedSessionVerificationCode(), (string) $request->verification_code)
+        ) {
             throw ValidationException::withMessages([
                 'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
             ]);
