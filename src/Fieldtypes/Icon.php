@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\Icon as Icons;
 use Statamic\Fields\Fieldtype;
 use Statamic\Icons\IconSet;
+use Statamic\Rules\IconFieldtype as ValidationRule;
 
 class Icon extends Fieldtype
 {
@@ -57,6 +58,11 @@ class Icon extends Fieldtype
         }
 
         return $this->iconSet()->get($value);
+    }
+
+    public function rules(): array
+    {
+        return [new ValidationRule($this)];
     }
 
     private function iconSet(): IconSet
