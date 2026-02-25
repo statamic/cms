@@ -3,20 +3,49 @@
         <div>
             <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
-                    <TabList class="flex-1">
-                        <div ref="tabs" class="flex-1 flex items-center gap-x-2.5">
-                            <BlueprintTab
-                                ref="tab"
-                                v-for="tab in tabs"
-                                :key="tab._id"
-                                :tab="tab"
-                                :current-tab="currentTab"
-                                :show-instructions="showTabInstructionsField"
-                                :edit-text="editTabText"
-                                @removed="removeTab(tab._id)"
-                                @updated="updateTab(tab._id, $event)"
-                                @mouseenter="mouseEnteredTab(tab._id)"
-                            />
+                    <TabList class="flex-1 min-w-0">
+                        <div ref="tabs" class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                            <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-hidden">
+                                <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
+                                    <BlueprintTab
+                                        ref="tab"
+                                        v-for="tab in tabs"
+                                        :key="tab._id"
+                                        :tab="tab"
+                                        :current-tab="currentTab"
+                                        :show-instructions="showTabInstructionsField"
+                                        :edit-text="editTabText"
+                                        @removed="removeTab(tab._id)"
+                                        @updated="updateTab(tab._id, $event)"
+                                        @mouseenter="mouseEnteredTab(tab._id)"
+                                    />
+                                </div>
+                            </div>
+                            <Dropdown
+                                v-if="hasOverflow"
+                                align="end"
+                                side="bottom"
+                                class="shrink-0"
+                            >
+                                <template #trigger>
+                                    <Button
+                                        icon="chevron-vertical"
+                                        variant="ghost"
+                                        size="sm"
+                                        :aria-label="__('More tabs')"
+                                    />
+                                </template>
+                                <DropdownMenu>
+                                    <DropdownItem
+                                        v-for="tab in tabs"
+                                        :key="tab._id"
+                                        :text="__(tab.display)"
+                                        :icon="tab.icon"
+                                        :class="{ 'bg-gray-100 dark:bg-gray-800': currentTab === tab._id }"
+                                        @click="selectTab(tab._id)"
+                                    />
+                                </DropdownMenu>
+                            </Dropdown>
                         </div>
                     </TabList>
 
@@ -54,10 +83,11 @@
 <script>
 import { Sortable, Plugins } from '@shopify/draggable';
 import { nanoid as uniqid } from 'nanoid';
+import throttle from '@/util/throttle.js';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Tabs, TabList, Button, Description } from '@/components/ui';
+import { Tabs, TabList, Button, Description, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -69,6 +99,9 @@ export default {
         TabList,
         Button,
         Description,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
     },
 
     props: {
@@ -138,6 +171,7 @@ export default {
             sortableTabs: null,
             sortableSections: null,
             sortableFields: null,
+            hasOverflow: false,
         };
     },
 
@@ -147,6 +181,7 @@ export default {
 			handler(tabs) {
 				this.$emit('updated', tabs);
 				this.makeSortable();
+				this.$nextTick(this.checkOverflow);
 			},
 		},
     },
@@ -154,15 +189,32 @@ export default {
     mounted() {
         this.ensureTab();
         this.makeSortable();
+        this.throttledCheckOverflow = throttle(() => this.$nextTick(this.checkOverflow), 100);
+        this.resizeObserver = new ResizeObserver(this.throttledCheckOverflow);
+        const wrapper = this.$refs.tabWrapper;
+        if (wrapper) this.resizeObserver.observe(wrapper);
+        this.$nextTick(this.checkOverflow);
     },
 
     unmounted() {
         if (this.sortableTabs) this.sortableTabs.destroy();
         if (this.sortableSections) this.sortableSections.destroy();
         if (this.sortableFields) this.sortableFields.destroy();
+        if (this.resizeObserver) this.resizeObserver.disconnect();
+        if (this.throttledCheckOverflow?.cancel) this.throttledCheckOverflow.cancel();
     },
 
     methods: {
+        checkOverflow() {
+            const wrapper = this.$refs.tabWrapper;
+            const inner = this.$refs.tabInner;
+            if (!wrapper || !inner || !this.tabs.length) {
+                this.hasOverflow = false;
+                return;
+            }
+            this.hasOverflow = inner.scrollWidth > wrapper.clientWidth;
+        },
+
         ensureTab() {
             if (this.requireSection && this.tabs.length === 0) {
                 this.addTab();
@@ -180,7 +232,10 @@ export default {
         makeTabsSortable() {
             if (this.sortableTabs) this.sortableTabs.destroy();
 
-            this.sortableTabs = new Sortable(this.$refs.tabs, {
+            const container = this.$refs.tabInner || this.$refs.tabs;
+            if (!container) return;
+
+            this.sortableTabs = new Sortable(container, {
                 draggable: '.blueprint-tab',
                 mirror: { constrainDimensions: true },
                 swapAnimation: { horizontal: true },
