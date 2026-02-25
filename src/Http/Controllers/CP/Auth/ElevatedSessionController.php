@@ -76,7 +76,11 @@ class ElevatedSessionController
 
         if (
             $request->filled('verification_code')
-            && ! hash_equals((string) $request->getElevatedSessionVerificationCode(), (string) $request->verification_code)
+            && (
+                ! is_string($request->verification_code)
+                || ! is_string($request->getElevatedSessionVerificationCode())
+                || ! hash_equals($request->getElevatedSessionVerificationCode(), $request->verification_code)
+            )
         ) {
             throw ValidationException::withMessages([
                 'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
