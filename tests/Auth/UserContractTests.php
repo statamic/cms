@@ -66,7 +66,7 @@ trait UserContractTests
         $this->assertEquals('John Smith', $this->makeUser()->set('name', 'John Smith')->name());
         $this->assertEquals('John', $this->makeUser()->data(['name' => null, 'first_name' => 'John'])->name());
         $this->assertEquals('John Smith', $this->makeUser()->data(['name' => null, 'first_name' => 'John', 'last_name' => 'Smith'])->name());
-        $this->assertEquals('john@example.com', $this->makeUser()->remove('name')->email('john@example.com')->name());
+        $this->assertNull($this->makeUser()->remove('name')->email('john@example.com')->name());
     }
 
     #[Test]
@@ -324,11 +324,11 @@ trait UserContractTests
     }
 
     #[Test]
-    public function it_gets_initials_from_email_if_name_doesnt_exist()
+    public function it_gets_question_mark_initials_if_name_doesnt_exist()
     {
         $user = $this->user()->remove('name');
 
-        $this->assertEquals('J', $user->initials());
+        $this->assertEquals('?', $user->initials());
     }
 
     #[Test]
