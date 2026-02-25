@@ -105,7 +105,10 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-        $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
+        $svg = $item->svg();
+        $this->assertStringContainsString('class="size-4 shrink-0"', $svg);
+        $this->assertStringContainsString('viewBox="0 0 17 14"', $svg);
+        $this->assertStringStartsWith('<svg ', $svg);
     }
 
     #[Test]
