@@ -39,11 +39,14 @@
                                     <DropdownItem
                                         v-for="tab in tabs"
                                         :key="tab._id"
-                                        :text="__(tab.display)"
                                         :icon="tab.icon"
                                         :class="{ 'bg-gray-100 dark:bg-gray-800': currentTab === tab._id }"
                                         @click="selectTab(tab._id)"
-                                    />
+                                    >
+                                        <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
+                                            {{ __(tab.display) }}
+                                        </span>
+                                    </DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                         </div>
