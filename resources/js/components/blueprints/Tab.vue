@@ -7,7 +7,7 @@
             class="h-4 w-4 me-1"
         />
 
-        {{ __(tab.display) }}
+        <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">{{ __(tab.display) }}</span>
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
