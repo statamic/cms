@@ -4,13 +4,18 @@ import {
     TabList,
     TabTrigger,
     TabProvider,
+    Button,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
 } from '@ui';
 import TabContent from './TabContent.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from './Sections.vue';
-import { ref, computed, useSlots, onMounted, watch } from 'vue';
+import { ref, computed, useSlots, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import throttle from '@/util/throttle.js';
 
 const slots = useSlots();
 const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, rememberTab } = injectContainerContext();
@@ -103,21 +108,89 @@ const tabsWithErrors = computed(() => {
 function tabHasError(tab) {
     return tabsWithErrors.value.includes(tab.handle);
 }
+
+const tabWrapper = ref(null);
+const tabInner = ref(null);
+const hasOverflow = ref(false);
+
+function checkOverflow() {
+    if (!tabWrapper.value || !tabInner.value) {
+        hasOverflow.value = false;
+        return;
+    }
+    hasOverflow.value = tabInner.value.scrollWidth > tabWrapper.value.clientWidth;
+}
+
+const throttledCheckOverflow = throttle(() => nextTick(checkOverflow), 100);
+let resizeObserver = null;
+
+watch(tabWrapper, (el, oldEl) => {
+    if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+    }
+    if (el) {
+        resizeObserver = new ResizeObserver(throttledCheckOverflow);
+        resizeObserver.observe(el);
+        nextTick(checkOverflow);
+    }
+});
+
+onUnmounted(() => {
+    if (resizeObserver) resizeObserver.disconnect();
+    if (throttledCheckOverflow?.cancel) throttledCheckOverflow.cancel();
+});
 </script>
 
 <template>
     <ElementContainer @resized="width = $event.width">
         <div>
             <Tabs v-if="width" v-model:modelValue="activeTab">
-                <TabList v-if="hasMultipleVisibleMainTabs" class="-mt-2 mb-6">
-                    <TabTrigger
-                        v-for="tab in visibleMainTabs"
-                        :key="tab.handle"
-                        :name="tab.handle"
-                        :text="__(tab.display)"
-                        :class="{ '!text-red-600': tabHasError(tab) }"
-                    />
-                </TabList>
+                <div v-if="hasMultipleVisibleMainTabs" class="flex items-center gap-x-2 -mt-2 mb-6">
+                    <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
+                        <div class="flex-1 flex items-center gap-x-2.5 min-w-0">
+                            <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip">
+                                <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
+                                    <TabTrigger
+                                        v-for="tab in visibleMainTabs"
+                                        :key="tab.handle"
+                                        :name="tab.handle"
+                                        :class="{ '!text-red-600': tabHasError(tab) }"
+                                    >
+                                        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap">{{ __(tab.display) }}</span>
+                                    </TabTrigger>
+                                </div>
+                            </div>
+                            <Dropdown
+                                v-if="hasOverflow"
+                                align="end"
+                                side="bottom"
+                                class="shrink-0"
+                            >
+                                <template #trigger>
+                                    <Button
+                                        icon="dots"
+                                        variant="ghost"
+                                        size="sm"
+                                        :aria-label="__('Open dropdown menu')"
+                                    />
+                                </template>
+                                <DropdownMenu>
+                                    <DropdownItem
+                                        v-for="tab in visibleMainTabs"
+                                        :key="tab.handle"
+                                        :class="{ 'bg-gray-100 dark:bg-gray-800': activeTab === tab.handle }"
+                                        @click="setActive(tab.handle)"
+                                    >
+                                        <span class="block max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
+                                            {{ __(tab.display) }}
+                                        </span>
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        </div>
+                    </TabList>
+                </div>
 
                 <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
                     <component
