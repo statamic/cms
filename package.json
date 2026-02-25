@@ -75,7 +75,7 @@
     "mousetrap": "~1.6.5",
     "nanoid": "^5.1.6",
     "nprogress": "^0.2.0",
-    "pdfobject": "^2.2.7",
+    "pdfjs-dist": "^5.4.624",
     "pinia": "^3.0.0",
     "portal-vue": "^3.0.0",
     "pretty": "^2.0.0",

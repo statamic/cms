@@ -59,20 +59,21 @@ export default {
 - `errors` — Validation errors.
 - `readOnly`
 - `previews` — Bard/Replicator set previews.
-- `syncField()` — Sync a field with its origin value.
-- `desyncField()` — Desync a field from its origin value.
+- `syncField(path)` — Sync a field with its origin value.
+- `desyncField(path)` — Desync a field from its origin value.
 - `components` — Components pushed by addons (eg. the Collaboration addon displays a list of collaborators).
 - `asConfig` — Returns `true` when it's a config publish form, which renders slightly differently.
 - `rememberTab` — Returns `true` when the active tab should be remembered in the URL hash.
 - `isTrackingOriginValues` — Returns `true` when editing a localization.
-- `setValues()` — Replace all values.
-- `setFieldValue()` — Update a field's value.
-- `setFieldMeta()` — Update a field's metadata.
-- `setFieldPreviewValue()` — Update a field's Bard/Replicator preview.
-- `setRevealerField()` — Mark field as a revealer.
-- `unsetRevealerField()` — Unmark a field as a revealer.
-- `setHiddenField()` — Mark field as hidden.
+- `setValues(newValues)` — Replace all values.
+- `setFieldValue(path, value)` — Update a field's value.
+- `setFieldMeta(path, value)` — Update a field's metadata.
+- `setFieldPreviewValue(path, value)` — Update a field's Bard/Replicator preview.
+- `setRevealerField(path)` — Mark field as a revealer.
+- `unsetRevealerField(path)` — Unmark a field as a revealer.
+- `setHiddenField(field)` — Mark field as hidden.
 - `withoutDirtying()` — Run a callback without marking the form as dirty.
+- Any other keys provided by the publish form (eg. entry publish form provides `isWorkingCopy` and `revisionsEnabled`)
 
 ## Customizing the layout
 By default, the `PublishContainer` component renders a standard publish form with tabs and sections. If you need a custom layout - for example: to add extra actions, or avoid rendering sections, you may provide your markup in the default slot.
