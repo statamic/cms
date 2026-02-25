@@ -83,35 +83,49 @@ class ElevatedSessionController
 
     private function validatePasswordConfirmation(Request $request, $user): void
     {
-        if ($request->filled('password') && ! Hash::check($request->password, $user->password())) {
-            throw ValidationException::withMessages([
-                'password' => [__('statamic::validation.current_password')],
-            ]);
+        if (! $request->filled('password')) {
+            return;
         }
+
+        if (Hash::check($request->password, $user->password())) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'password' => [__('statamic::validation.current_password')],
+        ]);
     }
 
     private function validateVerificationCodeConfirmation(Request $request): void
     {
-        if (
-            $request->filled('verification_code')
-            && (
-                ! is_string($request->verification_code)
-                || ! is_string($request->getElevatedSessionVerificationCode())
-                || ! hash_equals($request->getElevatedSessionVerificationCode(), $request->verification_code)
-            )
-        ) {
-            throw ValidationException::withMessages([
-                'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
-            ]);
+        if (! $request->filled('verification_code')) {
+            return;
         }
+
+        $verificationCode = $request->verification_code;
+        $storedVerificationCode = $request->getElevatedSessionVerificationCode();
+
+        if (
+            is_string($verificationCode)
+            && is_string($storedVerificationCode)
+            && hash_equals($storedVerificationCode, $verificationCode)
+        ) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
+        ]);
     }
 
     private function validatePasskeyConfirmation(Request $request, $user): void
     {
-        if ($request->filled('id')) {
-            $credentials = $request->only(['id', 'rawId', 'response', 'type']);
-            WebAuthn::validateAssertion($user, $credentials);
+        if (! $request->filled('id')) {
+            return;
         }
+
+        $credentials = $request->only(['id', 'rawId', 'response', 'type']);
+        WebAuthn::validateAssertion($user, $credentials);
     }
 
     public function resendCode()
