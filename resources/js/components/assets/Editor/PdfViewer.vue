@@ -23,6 +23,7 @@ export default {
     data() {
         return {
             isLoading: true,
+            isRendering: false,
             currentRenderId: 0,
             loadingTask: null,
             pdfDocument: null,
@@ -34,6 +35,12 @@ export default {
     watch: {
         src() {
             this.renderPdf();
+        },
+        isRendering: {
+            handler(value) {
+                Statamic.$progress.loading('pdf', value);
+            },
+            flush: 'sync',
         },
     },
 
@@ -53,9 +60,11 @@ export default {
 
             this.cleanup({ invalidateRender: false });
             this.isLoading = true;
+            this.isRendering = true;
 
             if (!this.src) {
                 this.isLoading = false;
+                this.isRendering = false;
                 return;
             }
 
@@ -102,6 +111,10 @@ export default {
                         onAppend: (div) => pageContainer.appendChild(div),
                     });
                     await annotationLayerBuilder.render({ viewport });
+
+                    if (pageNumber === 1 && renderId === this.currentRenderId) {
+                        this.isLoading = false;
+                    }
                 }
             } catch (error) {
                 if (renderId === this.currentRenderId) {
@@ -110,6 +123,7 @@ export default {
             } finally {
                 if (renderId === this.currentRenderId) {
                     this.isLoading = false;
+                    this.isRendering = false;
                 }
             }
         },
@@ -182,6 +196,8 @@ export default {
             if (invalidateRender) {
                 this.currentRenderId++;
             }
+
+            this.isRendering = false;
 
             if (this.loadingTask) {
                 this.loadingTask.destroy();
