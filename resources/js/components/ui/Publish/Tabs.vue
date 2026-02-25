@@ -149,7 +149,7 @@ onUnmounted(() => {
                 <div v-if="hasMultipleVisibleMainTabs" class="flex items-center gap-x-2 -mt-2 mb-6">
                     <TabList class="flex-1 min-w-0 overflow-x-clip overflow-y-visible pe-0.25">
                         <div class="flex-1 flex items-center gap-x-2.5 min-w-0">
-                            <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip">
+                            <div ref="tabWrapper" class="min-w-0 flex-1 flex overflow-clip px-0.25">
                                 <div ref="tabInner" class="flex items-center gap-x-2.5 shrink-0">
                                     <TabTrigger
                                         v-for="tab in visibleMainTabs"
