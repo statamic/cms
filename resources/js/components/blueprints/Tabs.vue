@@ -47,6 +47,11 @@
                                             {{ __(tab.display) }}
                                         </span>
                                     </DropdownItem>
+                                    <template v-if="activeTabIsOverflowed">
+                                        <DropdownSeparator />
+                                        <DropdownItem :text="__('Edit')" icon="edit" @click="editActiveOverflowedTab" />
+                                        <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="removeActiveOverflowedTab" />
+                                    </template>
                                 </DropdownMenu>
                             </Dropdown>
                         </div>
@@ -90,7 +95,7 @@ import throttle from '@/util/throttle.js';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Tabs, TabList, Button, Description, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Tabs, TabList, Button, Description, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -105,6 +110,8 @@ export default {
         Dropdown,
         DropdownMenu,
         DropdownItem,
+        DropdownSeparator,
+        Icon,
     },
 
     props: {
@@ -177,6 +184,12 @@ export default {
             hasOverflow: false,
             overflowedTabs: [],
         };
+    },
+
+    computed: {
+        activeTabIsOverflowed() {
+            return this.overflowedTabs.some((t) => t._id === this.currentTab);
+        },
     },
 
     watch: {
@@ -364,6 +377,22 @@ export default {
 
         selectTab(tabId) {
             this.currentTab = tabId;
+        },
+
+        editOverflowedTab(tab) {
+            if (!tab) return;
+            const refs = this.$refs.tab;
+            const tabRef = Array.isArray(refs) ? refs.find((c) => c.tab?._id === tab._id) : refs;
+            tabRef?.edit();
+        },
+
+        editActiveOverflowedTab() {
+            const tab = this.overflowedTabs.find((t) => t._id === this.currentTab);
+            if (tab) this.editOverflowedTab(tab);
+        },
+
+        removeActiveOverflowedTab() {
+            this.removeTab(this.currentTab);
         },
 
         mouseEnteredTab(tabId) {
