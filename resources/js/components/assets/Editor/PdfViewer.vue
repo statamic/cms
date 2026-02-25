@@ -1,6 +1,9 @@
 <template>
     <div class="h-full">
-        <loading-graphic v-if="isLoading"  :text="null" class="h-full flex items-center justify-center" />
+        <div v-if="isLoading || hasError" class="h-full flex items-center justify-center">
+            <loading-graphic v-if="isLoading" :text="null" />
+            <div v-if="hasError" class="text-gray-500 flex gap-2" v-text="__('Something went wrong')" />
+        </div>
 
         <div ref="pages" class="pdf-pages h-full overflow-auto" />
     </div>
@@ -24,6 +27,7 @@ export default {
         return {
             isLoading: true,
             isRendering: false,
+            hasError: false,
             currentRenderId: 0,
             loadingTask: null,
             pdfDocument: null,
@@ -61,6 +65,7 @@ export default {
             this.cleanup({ invalidateRender: false });
             this.isLoading = true;
             this.isRendering = true;
+            this.hasError = false;
 
             if (!this.src) {
                 this.isLoading = false;
@@ -118,6 +123,7 @@ export default {
                 }
             } catch (error) {
                 if (renderId === this.currentRenderId) {
+                    this.hasError = true;
                     console.error(error);
                 }
             } finally {
