@@ -232,7 +232,15 @@ class User extends BaseUser
 
     public function hasPermission($permission)
     {
-        return $this->permissions()->contains($permission);
+        $permissions = $this->permissions();
+
+        if ($permissions->contains($permission)) {
+            return true;
+        }
+
+        return $permissions->contains(function ($userPermission) use ($permission) {
+            return $this->matchesWildcard($userPermission, $permission);
+        });
     }
 
     public function makeSuper()
@@ -410,5 +418,18 @@ class User extends BaseUser
             ->get()
             ->map(fn ($model) => app(Passkey::class)->setModel($model))
             ->keyBy(fn ($passkey) => $passkey->id());
+    }
+
+    protected function matchesWildcard(string $wildcardPermission, string $requestedPermission): bool
+    {
+        if (! str_contains($wildcardPermission, '*')) {
+            return false;
+        }
+
+        $pattern = preg_quote($wildcardPermission, '/');
+        $pattern = str_replace('\*', '.*', $pattern);
+        $pattern = '/^'.$pattern.'$/';
+
+        return (bool) preg_match($pattern, $requestedPermission);
     }
 }

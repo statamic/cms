@@ -98,12 +98,31 @@ class Role extends BaseRole
 
     public function hasPermission(string $permission): bool
     {
-        return $this->permissions->contains($permission);
+        if ($this->permissions->contains($permission)) {
+            return true;
+        }
+
+        return $this->permissions->contains(function ($rolePermission) use ($permission) {
+            return $this->matchesWildcard($rolePermission, $permission);
+        });
     }
 
     public function isSuper(): bool
     {
         return $this->hasPermission('super');
+    }
+
+    protected function matchesWildcard(string $wildcardPermission, string $requestedPermission): bool
+    {
+        if (! str_contains($wildcardPermission, '*')) {
+            return false;
+        }
+
+        $pattern = preg_quote($wildcardPermission, '/');
+        $pattern = str_replace('\*', '.*', $pattern);
+        $pattern = '/^'.$pattern.'$/';
+
+        return (bool) preg_match($pattern, $requestedPermission);
     }
 
     public function save()
