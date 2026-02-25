@@ -83,7 +83,8 @@ const previewText = computed(() => {
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle) || {};
+            const config = props.config.fields.find((f) => f.handle === handle);
+            if (!config) return false;
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
