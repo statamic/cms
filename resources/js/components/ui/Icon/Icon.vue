@@ -15,8 +15,8 @@ const iconComponent = computed(() => ({ template: svgContent.value }));
 
 const loadIcon = async () => {
     if (props.name.startsWith('<svg')) {
-	    svgContent.value = DOMPurify.sanitize(props.name);
-	    return;
+        svgContent.value = DOMPurify.sanitize(props.name);
+        return;
     }
 
     const iconSet = getIconSet(props.set);
