@@ -15,6 +15,7 @@ const props = defineProps({
 
 const pages = ref(null);
 const isLoading = ref(true);
+const isRendering = ref(false);
 
 let currentRenderId = 0;
 let loadingTask = null;
@@ -26,15 +27,18 @@ onMounted(() => renderPdf());
 onBeforeUnmount(() => cleanup());
 
 watch(() => props.src, () => renderPdf());
+watch(isRendering, (value) => Statamic.$progress.loading('pdf', value), { flush: 'sync' });
 
 async function renderPdf() {
     const renderId = ++currentRenderId;
 
     cleanup({ invalidateRender: false });
     isLoading.value = true;
+    isRendering.value = true;
 
     if (!props.src) {
         isLoading.value = false;
+        isRendering.value = false;
         return;
     }
 
@@ -81,6 +85,10 @@ async function renderPdf() {
             });
 
             await annotationLayerBuilder.render({ viewport });
+
+            if (pageNumber === 1 && renderId === currentRenderId) {
+                isLoading.value = false;
+            }
         }
     } catch (error) {
         if (renderId === currentRenderId) {
@@ -89,6 +97,7 @@ async function renderPdf() {
     } finally {
         if (renderId === currentRenderId) {
             isLoading.value = false;
+            isRendering.value = false;
         }
     }
 }
@@ -135,6 +144,8 @@ function cleanup({ invalidateRender = true } = {}) {
     if (invalidateRender) {
         currentRenderId++;
     }
+
+    isRendering.value = false;
 
     if (loadingTask) {
         loadingTask.destroy();
