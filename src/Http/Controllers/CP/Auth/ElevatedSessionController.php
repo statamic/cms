@@ -68,19 +68,19 @@ class ElevatedSessionController
             'id.required_without_all' => __('statamic::validation.required'),
         ]);
 
-        if ($request->password && ! Hash::check($request->password, $user->password())) {
+        if ($request->filled('password') && ! Hash::check($request->password, $user->password())) {
             throw ValidationException::withMessages([
                 'password' => [__('statamic::validation.current_password')],
             ]);
         }
 
-        if ($request->verification_code && $request->verification_code !== $request->getElevatedSessionVerificationCode()) {
+        if ($request->filled('verification_code') && $request->verification_code !== $request->getElevatedSessionVerificationCode()) {
             throw ValidationException::withMessages([
                 'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
             ]);
         }
 
-        if ($request->id) {
+        if ($request->filled('id')) {
             $credentials = $request->only(['id', 'rawId', 'response', 'type']);
             WebAuthn::validateAssertion($user, $credentials);
         }

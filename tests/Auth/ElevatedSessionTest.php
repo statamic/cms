@@ -181,6 +181,37 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_start_elevated_session_with_string_zero_password()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['password' => '0'])
+            ->assertSessionHasErrors('password')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_integer_zero_password()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['password' => 0])
+            ->assertSessionHasErrors('password')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_false_password()
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', ['password' => false])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('password')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
     public function middleware_allows_request()
     {
         $this->actingAs($this->user);
