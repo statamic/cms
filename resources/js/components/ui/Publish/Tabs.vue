@@ -157,7 +157,7 @@ onUnmounted(() => {
                                         :name="tab.handle"
                                         :class="{ '!text-red-600': tabHasError(tab) }"
                                     >
-                                        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap">{{ __(tab.display) }}</span>
+                                        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
                                     </TabTrigger>
                                 </div>
                             </div>
