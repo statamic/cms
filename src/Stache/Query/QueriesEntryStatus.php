@@ -45,7 +45,7 @@ trait QueriesEntryStatus
             return;
         }
 
-        if ($collection->futureDateBehavior() === 'private') {
+        if ($collection->futureDateBehavior() === 'private' || $collection->futureDateBehavior() === 'unlisted') {
             $status === 'scheduled'
                 ? $query->where('date', '>', now())
                 : $query->where('date', '<', now());
@@ -55,7 +55,7 @@ trait QueriesEntryStatus
             }
         }
 
-        if ($collection->pastDateBehavior() === 'private') {
+        if ($collection->pastDateBehavior() === 'private' || $collection->pastDateBehavior() === 'unlisted') {
             $status === 'expired'
                 ? $query->where('date', '<', now())
                 : $query->where('date', '>', now());

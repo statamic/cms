@@ -791,11 +791,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return 'published';
         }
 
-        if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
+        if (($collection->futureDateBehavior() === 'private' || $collection->futureDateBehavior() === 'unlisted') && $this->date()->isFuture()) {
             return 'scheduled';
         }
 
-        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+        if (($collection->pastDateBehavior() === 'private' || $collection->pastDateBehavior() === 'unlisted') && $this->date()->isPast()) {
             return 'expired';
         }
 
