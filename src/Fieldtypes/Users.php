@@ -3,8 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Illuminate\Support\Collection;
-use Statamic\CP\Column;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
