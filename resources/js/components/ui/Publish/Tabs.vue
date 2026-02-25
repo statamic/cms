@@ -112,13 +112,29 @@ function tabHasError(tab) {
 const tabWrapper = ref(null);
 const tabInner = ref(null);
 const hasOverflow = ref(false);
+const overflowedTabs = ref([]);
 
 function checkOverflow() {
     if (!tabWrapper.value || !tabInner.value) {
         hasOverflow.value = false;
+        overflowedTabs.value = [];
         return;
     }
-    hasOverflow.value = tabInner.value.scrollWidth > tabWrapper.value.clientWidth;
+    const wrapper = tabWrapper.value;
+    const inner = tabInner.value;
+    hasOverflow.value = inner.scrollWidth > wrapper.clientWidth;
+    if (!hasOverflow.value) {
+        overflowedTabs.value = [];
+        return;
+    }
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const buttons = inner.querySelectorAll('[role="tab"]');
+    overflowedTabs.value = visibleMainTabs.value.filter((tab, i) => {
+        const el = buttons[i];
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.right > wrapperRect.right || rect.left < wrapperRect.left;
+    });
 }
 
 const throttledCheckOverflow = throttle(() => nextTick(checkOverflow), 100);
@@ -162,7 +178,7 @@ onUnmounted(() => {
                                 </div>
                             </div>
                             <Dropdown
-                                v-if="hasOverflow"
+                                v-if="overflowedTabs.length"
                                 align="end"
                                 side="bottom"
                                 class="shrink-0"
@@ -177,7 +193,7 @@ onUnmounted(() => {
                                 </template>
                                 <DropdownMenu>
                                     <DropdownItem
-                                        v-for="tab in visibleMainTabs"
+                                        v-for="tab in overflowedTabs"
                                         :key="tab.handle"
                                         :icon="tab.icon"
                                         :class="{ 'bg-gray-100 dark:bg-gray-800': activeTab === tab.handle }"

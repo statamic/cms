@@ -22,7 +22,7 @@
                                 </div>
                             </div>
                             <Dropdown
-                                v-if="hasOverflow"
+                                v-if="overflowedTabs.length"
                                 align="end"
                                 side="bottom"
                                 class="shrink-0"
@@ -37,7 +37,7 @@
                                 </template>
                                 <DropdownMenu>
                                     <DropdownItem
-                                        v-for="tab in tabs"
+                                        v-for="tab in overflowedTabs"
                                         :key="tab._id"
                                         :icon="tab.icon"
                                         :class="{ 'bg-gray-100 dark:bg-gray-800': currentTab === tab._id }"
@@ -175,6 +175,7 @@ export default {
             sortableSections: null,
             sortableFields: null,
             hasOverflow: false,
+            overflowedTabs: [],
         };
     },
 
@@ -213,9 +214,22 @@ export default {
             const inner = this.$refs.tabInner;
             if (!wrapper || !inner || !this.tabs.length) {
                 this.hasOverflow = false;
+                this.overflowedTabs = [];
                 return;
             }
             this.hasOverflow = inner.scrollWidth > wrapper.clientWidth;
+            if (!this.hasOverflow) {
+                this.overflowedTabs = [];
+                return;
+            }
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const buttons = inner.querySelectorAll('[role="tab"]');
+            this.overflowedTabs = this.tabs.filter((tab, i) => {
+                const el = buttons[i];
+                if (!el) return false;
+                const rect = el.getBoundingClientRect();
+                return rect.right > wrapperRect.right || rect.left < wrapperRect.left;
+            });
         },
 
         ensureTab() {
