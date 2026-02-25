@@ -124,7 +124,7 @@ function checkOverflow() {
 const throttledCheckOverflow = throttle(() => nextTick(checkOverflow), 100);
 let resizeObserver = null;
 
-watch(tabWrapper, (el, oldEl) => {
+watch(tabWrapper, (el) => {
     if (resizeObserver) {
         resizeObserver.disconnect();
         resizeObserver = null;
@@ -179,6 +179,7 @@ onUnmounted(() => {
                                     <DropdownItem
                                         v-for="tab in visibleMainTabs"
                                         :key="tab.handle"
+                                        :icon="tab.icon"
                                         :class="{ 'bg-gray-100 dark:bg-gray-800': activeTab === tab.handle }"
                                         @click="setActive(tab.handle)"
                                     >
