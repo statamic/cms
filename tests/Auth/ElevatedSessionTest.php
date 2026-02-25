@@ -242,6 +242,66 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_start_elevated_session_with_empty_string_passkey_id()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['id' => ''])
+            ->assertSessionHasErrors('id')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_null_passkey_id()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['id' => null])
+            ->assertSessionHasErrors('id')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_empty_string_verification_code()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['verification_code' => ''])
+            ->assertSessionHasErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_null_verification_code()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['verification_code' => null])
+            ->assertSessionHasErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_string_zero_verification_code()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['verification_code' => '0'])
+            ->assertSessionHasErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function it_cannot_start_elevated_session_with_integer_zero_verification_code()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/cp/elevated-session', ['verification_code' => 0])
+            ->assertSessionHasErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
     public function middleware_allows_request()
     {
         $this->actingAs($this->user);
