@@ -68,12 +68,30 @@ class ElevatedSessionController
             'id.required_without_all' => __('statamic::validation.required'),
         ]);
 
+        $this->validatePasswordConfirmation($request, $user);
+        $this->validateVerificationCodeConfirmation($request);
+        $this->validatePasskeyConfirmation($request, $user);
+
+        session()->elevate();
+
+        $redirect = redirect()->intended(cp_route('index'));
+
+        return $request->wantsJson()
+            ? array_merge($this->status($request), ['redirect' => $redirect->getTargetUrl()])
+            : $redirect->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
+    }
+
+    private function validatePasswordConfirmation(Request $request, $user): void
+    {
         if ($request->filled('password') && ! Hash::check($request->password, $user->password())) {
             throw ValidationException::withMessages([
                 'password' => [__('statamic::validation.current_password')],
             ]);
         }
+    }
 
+    private function validateVerificationCodeConfirmation(Request $request): void
+    {
         if (
             $request->filled('verification_code')
             && (
@@ -86,19 +104,14 @@ class ElevatedSessionController
                 'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
             ]);
         }
+    }
 
+    private function validatePasskeyConfirmation(Request $request, $user): void
+    {
         if ($request->filled('id')) {
             $credentials = $request->only(['id', 'rawId', 'response', 'type']);
             WebAuthn::validateAssertion($user, $credentials);
         }
-
-        session()->elevate();
-
-        $redirect = redirect()->intended(cp_route('index'));
-
-        return $request->wantsJson()
-            ? array_merge($this->status($request), ['redirect' => $redirect->getTargetUrl()])
-            : $redirect->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
     }
 
     public function resendCode()
