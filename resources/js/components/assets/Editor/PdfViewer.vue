@@ -171,10 +171,7 @@ function cleanup({ invalidateRender = true } = {}) {
 }
 
 .pdf-page .annotationLayer {
-    position: absolute;
     inset: 0;
-    z-index: 2;
-    pointer-events: none;
 }
 </style>
 
