@@ -12,6 +12,7 @@ const props = defineProps({
 const pages = ref(null);
 const isLoading = ref(true);
 const isRendering = ref(false);
+const hasError = ref(false);
 
 let currentRenderId = 0;
 let loadingTask = null;
@@ -31,6 +32,7 @@ async function renderPdf() {
     cleanup({ invalidateRender: false });
     isLoading.value = true;
     isRendering.value = true;
+    hasError.value = false;
 
     if (!props.src) {
         isLoading.value = false;
@@ -88,7 +90,7 @@ async function renderPdf() {
         }
     } catch (error) {
         if (renderId === currentRenderId) {
-            Statamic.$toast.error(__('There was an error loading the PDF.'));
+            hasError.value = true;
             console.error(error);
         }
     } finally {
@@ -189,8 +191,9 @@ function cleanup({ invalidateRender = true } = {}) {
 
 <template>
     <div class="relative h-full min-h-0">
-        <div v-if="isLoading" class="h-full flex items-center justify-center text-gray-50">
-            <Icon name="loading" />
+        <div v-if="isLoading || hasError" class="h-full flex items-center justify-center">
+            <Icon v-if="isLoading" name="loading" class="text-gray-50" />
+            <div v-if="hasError" class="text-gray-500 flex gap-2" v-text="__('Something went wrong')" />
         </div>
 
         <div ref="pages" class="pdf-pages h-full min-h-0 overflow-auto"></div>
