@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Facades\User;
 use Statamic\Facades\WebAuthn;
+use Statamic\Http\Requests\CP\Auth\ElevatedSessionConfirmationRequest;
 
 class ElevatedSessionController
 {
@@ -54,19 +55,9 @@ class ElevatedSessionController
         ]);
     }
 
-    public function confirm(Request $request)
+    public function confirm(ElevatedSessionConfirmationRequest $request)
     {
         $user = User::current();
-
-        $request->validate([
-            'password' => 'required_without_all:verification_code,id',
-            'verification_code' => 'required_without_all:password,id',
-            'id' => 'required_without_all:password,verification_code',
-        ], [
-            'password.required_without_all' => __('statamic::validation.required'),
-            'verification_code.required_without_all' => __('statamic::validation.required'),
-            'id.required_without_all' => __('statamic::validation.required'),
-        ]);
 
         $this->validatePasswordConfirmation($request, $user);
         $this->validateVerificationCodeConfirmation($request);
