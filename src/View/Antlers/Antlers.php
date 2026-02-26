@@ -27,9 +27,17 @@ class Antlers
         return $contents;
     }
 
-    public function parse($str, $variables = [])
+    public function parse($str, $variables = [], $php = false)
     {
-        return $this->parser()->parse($str, $variables);
+        $parser = $this->parser();
+        $previousState = GlobalRuntimeState::$isPhpEnabled;
+        GlobalRuntimeState::$isPhpEnabled = $php;
+
+        try {
+            return $parser->parse($str, $variables);
+        } finally {
+            GlobalRuntimeState::$isPhpEnabled = $previousState;
+        }
     }
 
     public function parseUserContent($str, $variables = [])

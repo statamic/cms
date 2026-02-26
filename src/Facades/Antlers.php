@@ -9,7 +9,7 @@ use Statamic\View\Antlers\AntlersString;
 /**
  * @method static Parser parser()
  * @method static mixed usingParser(Parser $parser, \Closure $callback)
- * @method static AntlersString parse(string $str, array $variables = [])
+ * @method static AntlersString parse(string $str, array $variables = [], bool $php = false)
  * @method static AntlersString parseUserContent(string $str, array $variables = [])
  * @method static string parseLoop(string $content, array $data, bool $supplement = true, array $context = [])
  * @method static array identifiers(string $content)
