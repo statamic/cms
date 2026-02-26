@@ -39,7 +39,7 @@ class PhpDisabledTest extends TestCase
     {
         $result = (string) Antlers::parse('Before {{$ "hello" $}} After', [], true);
 
-        $this->assertSame('Before hello  After', $result);
+        $this->assertSame('Before hello After', $result);
     }
 
     public function test_it_allow_inline_php_blocks_when_enabled()
