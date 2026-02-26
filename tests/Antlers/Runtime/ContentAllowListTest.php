@@ -6,11 +6,9 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Text;
-use Statamic\Tags\Loader;
+use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
-use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
-use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Tests\Antlers\ParserTestCase;
 
 class ContentAllowListTest extends ParserTestCase
@@ -114,50 +112,71 @@ class ContentAllowListTest extends ParserTestCase
     }
 
     #[Test]
-    public function allowed_tag_pattern_passes_user_content_guard()
+    public function allowed_tag_pattern_can_be_used_in_user_content()
     {
-        GlobalRuntimeState::$isEvaluatingUserData = true;
-        GlobalRuntimeState::$allowedContentTagPaths = ['collection:*'];
+        $this->registerRuntimeTestTag();
+        GlobalRuntimeState::$allowedContentTagPaths = ['runtime_test_tag:*'];
 
-        $this->assertTrue($this->makeNodeProcessor()->guardRuntimeTag('collection:blog'));
+        $value = $this->makeAntlersTextValue('{{ runtime_test_tag }}');
+        $result = $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+        ], true, true);
+
+        $this->assertSame('tag-ok', $result);
     }
 
     #[Test]
-    public function disallowed_tag_pattern_fails_user_content_guard()
+    public function disallowed_tag_pattern_is_blocked_in_user_content()
     {
-        GlobalRuntimeState::$isEvaluatingUserData = true;
-        GlobalRuntimeState::$allowedContentTagPaths = ['collection:*'];
+        $this->registerRuntimeTestTag();
+        GlobalRuntimeState::$allowedContentTagPaths = ['other_tag'];
 
-        $this->assertFalse($this->makeNodeProcessor()->guardRuntimeTag('form:create'));
+        $value = $this->makeAntlersTextValue('{{ runtime_test_tag }}');
+        $result = $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+        ], true, true);
+
+        $this->assertSame('', $result);
     }
 
     #[Test]
-    public function empty_tag_allow_list_blocks_all_tags_in_user_content_guard()
+    public function empty_tag_allow_list_blocks_all_tags_in_user_content()
     {
-        GlobalRuntimeState::$isEvaluatingUserData = true;
+        $this->registerRuntimeTestTag();
         GlobalRuntimeState::$allowedContentTagPaths = [];
 
-        $this->assertFalse($this->makeNodeProcessor()->guardRuntimeTag('collection:blog'));
+        $value = $this->makeAntlersTextValue('{{ runtime_test_tag }}');
+        $result = $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+        ], true, true);
+
+        $this->assertSame('', $result);
     }
 
     #[Test]
-    public function tag_block_list_overrides_tag_allow_list_in_user_content_guard()
+    public function tag_block_list_overrides_tag_allow_list_in_user_content()
     {
-        GlobalRuntimeState::$isEvaluatingUserData = true;
-        GlobalRuntimeState::$allowedContentTagPaths = ['collection:*'];
-        GlobalRuntimeState::$bannedContentTagPaths = ['collection:*'];
+        $this->registerRuntimeTestTag();
+        GlobalRuntimeState::$allowedContentTagPaths = ['runtime_test_tag:*'];
+        GlobalRuntimeState::$bannedContentTagPaths = ['runtime_test_tag:*'];
 
-        $this->assertFalse($this->makeNodeProcessor()->guardRuntimeTag('collection:blog'));
+        $value = $this->makeAntlersTextValue('{{ runtime_test_tag }}');
+        $result = $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+        ], true, true);
+
+        $this->assertSame('', $result);
     }
 
     #[Test]
     public function allow_list_does_not_affect_tag_usage_in_trusted_templates()
     {
-        GlobalRuntimeState::$isEvaluatingUserData = false;
+        $this->registerRuntimeTestTag();
         GlobalRuntimeState::$allowedContentTagPaths = [];
-        GlobalRuntimeState::$bannedTagPaths = [];
+        GlobalRuntimeState::$bannedTagPaths = ['another_tag'];
 
-        $this->assertTrue($this->makeNodeProcessor()->guardRuntimeTag('form:create'));
+        $result = $this->renderString('{{ runtime_test_tag }}', [], true, true);
+        $this->assertSame('tag-ok', $result);
     }
 
     private function makeAntlersTextValue(string $template): Value
@@ -173,8 +192,16 @@ class ContentAllowListTest extends ParserTestCase
         return new Value($template, 'text_field', $textFieldtype);
     }
 
-    private function makeNodeProcessor(): NodeProcessor
+    private function registerRuntimeTestTag(): void
     {
-        return new NodeProcessor(new Loader(), new EnvironmentDetails());
+        (new class extends Tags
+        {
+            public static $handle = 'runtime_test_tag';
+
+            public function index()
+            {
+                return 'tag-ok';
+            }
+        })::register();
     }
 }
