@@ -40,18 +40,6 @@ class Antlers
         }
     }
 
-    public function parseUserContent($str, $variables = [])
-    {
-        $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
-        GlobalRuntimeState::$isEvaluatingUserData = true;
-
-        try {
-            return $this->parser()->parse($str, $variables);
-        } finally {
-            GlobalRuntimeState::$isEvaluatingUserData = $isEvaluatingUserData;
-        }
-    }
-
     /**
      * Iterate over an array and parse the string/template for each.
      *
