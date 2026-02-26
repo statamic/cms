@@ -349,6 +349,19 @@ EOT
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
+    #[Test]
+    public function it_does_not_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->id('1')->email('san@holo.com')->save());
+
+        $this
+            ->post('/!/auth/profile', [
+                'email' => 'san@holo.com',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
     private function useCustomBlueprint()
     {
         $blueprint = Blueprint::make()->setContents([

@@ -343,6 +343,29 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_redirect_to_external_url()
+    {
+        $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_error()
+    {
+        $this
+            ->post('/!/auth/register', [
+                '_error_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
     public function it_ensures_some_fields_arent_saved()
     {
         UserGroup::make('client')->title('Client')->save();
