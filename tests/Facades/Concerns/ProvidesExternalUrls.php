@@ -46,6 +46,12 @@ trait ProvidesExternalUrls
             ['', false],
             [null, false],
 
+            // Protocol-relative URLs are external
+            ['//evil.com', true],
+            ['//evil.com/', true],
+            ['//evil.com/path', true],
+            ['//this-site.com', true], // Even matching domain with // prefix is treated as external
+
             // External domain that starts with a valid domain.
             ['http://this-site.com.au', true],
             ['http://this-site.com.au/', true],
