@@ -15,7 +15,7 @@ import Sections from './Sections.vue';
 import { ref, computed, useSlots, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
-import throttle from '@/util/throttle.js';
+import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
 
 const slots = useSlots();
 const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, rememberTab } = injectContainerContext();
@@ -113,48 +113,33 @@ const tabWrapper = ref(null);
 const tabInner = ref(null);
 const hasOverflow = ref(false);
 const overflowedTabs = ref([]);
+const overflowTracker = createTabsOverflowTracker({
+    getWrapper: () => tabWrapper.value,
+    getInner: () => tabInner.value,
+    getItems: () => visibleMainTabs.value,
+    onUpdate: ({ hasOverflow: nextHasOverflow, overflowedItems }) => {
+        hasOverflow.value = nextHasOverflow;
+        overflowedTabs.value = overflowedItems;
+    },
+});
 
 function checkOverflow() {
-    if (!tabWrapper.value || !tabInner.value) {
-        hasOverflow.value = false;
-        overflowedTabs.value = [];
-        return;
-    }
-    const wrapper = tabWrapper.value;
-    const inner = tabInner.value;
-    hasOverflow.value = inner.scrollWidth > wrapper.clientWidth;
-    if (!hasOverflow.value) {
-        overflowedTabs.value = [];
-        return;
-    }
-    const wrapperRect = wrapper.getBoundingClientRect();
-    const buttons = inner.querySelectorAll('[role="tab"]');
-    overflowedTabs.value = visibleMainTabs.value.filter((tab, i) => {
-        const el = buttons[i];
-        if (!el) return false;
-        const rect = el.getBoundingClientRect();
-        return rect.right > wrapperRect.right || rect.left < wrapperRect.left;
-    });
+    overflowTracker.checkOverflow();
 }
 
-const throttledCheckOverflow = throttle(() => nextTick(checkOverflow), 100);
-let resizeObserver = null;
-
 watch(tabWrapper, (el) => {
-    if (resizeObserver) {
-        resizeObserver.disconnect();
-        resizeObserver = null;
-    }
     if (el) {
-        resizeObserver = new ResizeObserver(throttledCheckOverflow);
-        resizeObserver.observe(el);
+        overflowTracker.observe();
         nextTick(checkOverflow);
     }
 });
 
+watch(visibleMainTabs, () => {
+    nextTick(checkOverflow);
+}, { deep: true });
+
 onUnmounted(() => {
-    if (resizeObserver) resizeObserver.disconnect();
-    if (throttledCheckOverflow?.cancel) throttledCheckOverflow.cancel();
+    overflowTracker.disconnect();
 });
 </script>
 

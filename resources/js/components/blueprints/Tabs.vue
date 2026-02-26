@@ -91,7 +91,7 @@
 <script>
 import { Sortable, Plugins } from '@shopify/draggable';
 import { nanoid as uniqid } from 'nanoid';
-import throttle from '@/util/throttle.js';
+import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
@@ -206,43 +206,31 @@ export default {
     mounted() {
         this.ensureTab();
         this.makeSortable();
-        this.throttledCheckOverflow = throttle(() => this.$nextTick(this.checkOverflow), 100);
-        this.resizeObserver = new ResizeObserver(this.throttledCheckOverflow);
-        const wrapper = this.$refs.tabWrapper;
-        if (wrapper) this.resizeObserver.observe(wrapper);
-        this.$nextTick(this.checkOverflow);
+        this.overflowTracker = createTabsOverflowTracker({
+            getWrapper: () => this.$refs.tabWrapper,
+            getInner: () => this.$refs.tabInner,
+            getItems: () => this.tabs,
+            onUpdate: ({ hasOverflow, overflowedItems }) => {
+                this.hasOverflow = hasOverflow;
+                this.overflowedTabs = overflowedItems;
+            },
+        });
+        this.$nextTick(() => {
+            this.overflowTracker.observe();
+            this.overflowTracker.checkOverflow();
+        });
     },
 
     unmounted() {
         if (this.sortableTabs) this.sortableTabs.destroy();
         if (this.sortableSections) this.sortableSections.destroy();
         if (this.sortableFields) this.sortableFields.destroy();
-        if (this.resizeObserver) this.resizeObserver.disconnect();
-        if (this.throttledCheckOverflow?.cancel) this.throttledCheckOverflow.cancel();
+        this.overflowTracker?.disconnect();
     },
 
     methods: {
         checkOverflow() {
-            const wrapper = this.$refs.tabWrapper;
-            const inner = this.$refs.tabInner;
-            if (!wrapper || !inner || !this.tabs.length) {
-                this.hasOverflow = false;
-                this.overflowedTabs = [];
-                return;
-            }
-            this.hasOverflow = inner.scrollWidth > wrapper.clientWidth;
-            if (!this.hasOverflow) {
-                this.overflowedTabs = [];
-                return;
-            }
-            const wrapperRect = wrapper.getBoundingClientRect();
-            const buttons = inner.querySelectorAll('[role="tab"]');
-            this.overflowedTabs = this.tabs.filter((tab, i) => {
-                const el = buttons[i];
-                if (!el) return false;
-                const rect = el.getBoundingClientRect();
-                return rect.right > wrapperRect.right || rect.left < wrapperRect.left;
-            });
+            this.overflowTracker?.checkOverflow();
         },
 
         ensureTab() {
