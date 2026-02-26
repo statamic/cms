@@ -29,7 +29,7 @@ export default function truncateOnResize(element, text, { ellipsis = '...' } = {
 function middleTruncate(element, text, ellipsis) {
     const style = window.getComputedStyle(element);
     const fontSize = Number.parseFloat(style.fontSize);
-    const fontFamily = style.fontFamily.split(',')[0];
+    const fontFamily = normalizeFontFamily(style.fontFamily.split(',')[0]);
 
     const availableWidth = measureAvailableWidth(element);
 
@@ -67,6 +67,10 @@ function measureCharWidth(char, fontFamily, fontSize) {
     const widths = characterWidths[fontFamily] ?? {};
     const baseWidth = widths[char] ?? widths.W ?? BASE_FONT_SIZE;
     return baseWidth * (fontSize / BASE_FONT_SIZE);
+}
+
+function normalizeFontFamily(fontFamily) {
+    return fontFamily.replaceAll('"', '').replaceAll("'", '').trim().toLowerCase();
 }
 
 function measureTextWidth(text, fontFamily, fontSize) {
