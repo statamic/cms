@@ -133,7 +133,6 @@ class RuntimeParser implements Parser
      */
     public function setRuntimeConfiguration(RuntimeConfiguration $configuration)
     {
-        GlobalRuntimeState::$isPhpEnabled = $configuration->isPhpEnabled;
         GlobalRuntimeState::$allowPhpInContent = $configuration->allowPhpInUserContent;
         GlobalRuntimeState::$allowMethodsInContent = $configuration->allowMethodsInUserContent;
         GlobalRuntimeState::$throwErrorOnAccessViolation = $configuration->throwErrorOnAccessViolation;
@@ -689,10 +688,11 @@ INFO;
             $this->antlersLexer, $this->antlersParser
         ))->allowPhp($this->allowPhp);
 
-        // If we are evaluating a tag's scope, we still
-        // want the overall parser instances to be
-        // isolated, but we also need the Cascade.
-        if (GlobalRuntimeState::$evaulatingTagContents) {
+        foreach ($this->preParsers as $preParser) {
+            $parser->preparse($preParser);
+        }
+
+        if ($this->cascade != null) {
             $parser->cascade($this->cascade);
         }
 
@@ -759,33 +759,35 @@ INFO;
 
     public function parseView($view, $text, $data = [])
     {
+        $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
         $existingView = $this->view;
-        $this->view = $view;
-        GlobalRuntimeState::$templateFileStack[] = [$view, null];
+        try {
+            $this->view = $view;
+            GlobalRuntimeState::$templateFileStack[] = [$view, null];
 
-        if (count(GlobalRuntimeState::$templateFileStack) > 1) {
-            GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 2][1] = GlobalRuntimeState::$lastNode;
+            if (count(GlobalRuntimeState::$templateFileStack) > 1) {
+                GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 2][1] = GlobalRuntimeState::$lastNode;
+            }
+
+            GlobalRuntimeState::$currentExecutionFile = $this->view;
+
+            if (GlobalDebugManager::$isConnected) {
+                GlobalDebugManager::registerPathLocator($this->view);
+            }
+
+            $data = array_merge($data, [
+                'view' => $this->cascade->getViewData($view),
+            ]);
+
+            return $this->renderText($text, $data);
+        } finally {
+            $this->view = $existingView;
+            array_pop(GlobalRuntimeState::$templateFileStack);
+            GlobalRuntimeState::$currentExecutionFile = $this->view;
+            GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
         }
-
-        GlobalRuntimeState::$currentExecutionFile = $this->view;
-
-        if (GlobalDebugManager::$isConnected) {
-            GlobalDebugManager::registerPathLocator($this->view);
-        }
-
-        $data = array_merge($data, [
-            'view' => $this->cascade->getViewData($view),
-        ]);
-
-        $parsed = $this->renderText($text, $data);
-
-        $this->view = $existingView;
-
-        array_pop(GlobalRuntimeState::$templateFileStack);
-
-        GlobalRuntimeState::$currentExecutionFile = $this->view;
-
-        return $parsed;
     }
 
     public function injectNoparse($text)

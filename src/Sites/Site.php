@@ -131,13 +131,13 @@ class Site implements Augmentable
                 ->all();
         }
 
-        $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
 
         try {
             return (string) app(RuntimeParser::class)->parse($value, ['config' => Cascade::config()]);
         } finally {
-            GlobalRuntimeState::$isEvaluatingUserData = $isEvaluatingUserData;
+            GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
         }
     }
 

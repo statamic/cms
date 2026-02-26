@@ -1210,10 +1210,6 @@ class NodeProcessor
                 }
 
                 if ($node instanceof PhpExecutionNode) {
-                    if (! GlobalRuntimeState::$isPhpEnabled) {
-                        continue;
-                    }
-
                     if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowPhpInContent) {
                         if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
                             throw ErrorFactory::makeRuntimeError(
@@ -2427,7 +2423,7 @@ class NodeProcessor
         // one last time to make sure we didn't miss anything.
         $this->stopMeasuringTag();
 
-        if ($this->allowPhp && GlobalRuntimeState::$isPhpEnabled) {
+        if ($this->allowPhp) {
             $buffer = $this->evaluatePhp($buffer);
         }
 
@@ -2442,10 +2438,6 @@ class NodeProcessor
      */
     protected function evaluatePhp($buffer)
     {
-        if (! GlobalRuntimeState::$isPhpEnabled) {
-            return is_array($buffer) ? $buffer : StringUtilities::sanitizePhp($buffer);
-        }
-
         if (is_array($buffer) || $this->isLoopable($buffer)) {
             return $buffer;
         }
@@ -2472,10 +2464,6 @@ class NodeProcessor
 
     protected function evaluateAntlersPhpNode(PhpExecutionNode $node)
     {
-        if (! GlobalRuntimeState::$isPhpEnabled) {
-            return '';
-        }
-
         if (! GlobalRuntimeState::$allowPhpInContent && GlobalRuntimeState::$isEvaluatingUserData) {
             return StringUtilities::sanitizePhp($node->content);
         }

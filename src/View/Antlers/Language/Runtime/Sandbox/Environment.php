@@ -891,8 +891,7 @@ class Environment
 
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
-                $isMethodCallDisabled = ! GlobalRuntimeState::$isPhpEnabled
-                    || (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent);
+                $isMethodCallDisabled = GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent;
 
                 if ($isMethodCallDisabled) {
                     array_pop($stack);
