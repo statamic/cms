@@ -110,7 +110,9 @@ class Users extends Relationship
             } else {
                 $query->where(function ($query) use ($search) {
                     $query
-                        ->where('email', 'like', '%'.$search.'%')
+                        ->when($this->canViewUsers(), function ($query) use ($search) {
+                            $query->where('email', 'like', '%'.$search.'%');
+                        })
                         ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
                             foreach (explode(' ', $search) as $word) {
                                 $query
