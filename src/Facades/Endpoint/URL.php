@@ -2,7 +2,6 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use Illuminate\Support\Collection;
 use Statamic\Data\Services\ContentService;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
@@ -16,8 +15,6 @@ use Statamic\Support\Str;
 class URL
 {
     private static $externalUriCache = [];
-    private static $absoluteSiteUrlsCache;
-    private static $externalAppUrlsCache;
 
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol)
@@ -219,14 +216,6 @@ class URL
     }
 
     /**
-     * Check whether a URL is absolute.
-     */
-    public function isAbsolute(?string $url): bool
-    {
-        return Str::startsWith($url, ['http:', 'https:']);
-    }
-
-    /**
      * Checks whether a URL is external or not.
      *
      * @param  string  $url
@@ -261,64 +250,27 @@ class URL
      */
     public function isExternalToApplication(?string $url): bool
     {
-        if (isset(self::$externalAppUrlsCache[$url])) {
-            return self::$externalAppUrlsCache[$url];
-        }
-
-        if (! $url) {
-            return false;
-        }
-
-        $url = Str::ensureRight($url, '/');
-
         if (Str::startsWith($url, '//')) {
-            return self::$externalAppUrlsCache[$url] = true;
+            return true;
         }
 
-        if (Str::startsWith($url, ['/', '?', '#'])) {
-            return self::$externalAppUrlsCache[$url] = false;
-        }
+        $urlDomain = parse_url($url, PHP_URL_HOST);
+        $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
 
-        $urlWithoutQuery = Str::of($url)->before('?')->before('#');
-        $urlDomain = self::getDomainFromAbsolute($urlWithoutQuery);
-
-        $isExternalToSites = self::getAbsoluteSiteUrls()
-            ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
-            ->isEmpty();
-
-        $isExternalToCurrentRequestDomain = ! Str::startsWith($url, self::getDomainFromAbsolute(url()->to('/')));
-
-        return self::$externalAppUrlsCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
+        return $urlDomain
+            ? Site::all()
+                ->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST))
+                ->push($currentRequestDomain)
+                ->filter(fn ($siteDomain) => ! is_null($siteDomain))
+                ->unique()
+                ->filter(fn ($siteDomain) => $siteDomain === $urlDomain)
+                ->isEmpty()
+            : false;
     }
 
     public function clearExternalUrlCache()
     {
         self::$externalUriCache = [];
-        self::$absoluteSiteUrlsCache = null;
-        self::$externalAppUrlsCache = null;
-    }
-
-    /**
-     * Get and cache absolute site URLs for external checks.
-     */
-    private function getAbsoluteSiteUrls(): Collection
-    {
-        if (self::$absoluteSiteUrlsCache) {
-            return self::$absoluteSiteUrlsCache;
-        }
-
-        return self::$absoluteSiteUrlsCache = Site::all()
-            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
-            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
-            ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
-    }
-
-    /**
-     * Get the domain of an absolute URL for external checks.
-     */
-    private function getDomainFromAbsolute(string $url): string
-    {
-        return preg_replace('/(https*:\/\/[^\/]+)(.*)/', '$1', $url);
     }
 
     /**
