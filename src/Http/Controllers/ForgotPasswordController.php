@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\SendsPasswordResetEmails;
 use Statamic\Exceptions\ValidationException;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
