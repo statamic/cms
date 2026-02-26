@@ -164,6 +164,13 @@ class GlobalRuntimeState
     public static $bannedContentTagPaths = [];
 
     /**
+     * A list of all allowed content tag paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentTagPaths = [];
+
+    /**
      * A list of all invalid modifier paths.
      *
      * @var string[]
@@ -176,6 +183,13 @@ class GlobalRuntimeState
      * @var string[]
      */
     public static $bannedContentModifierPaths = [];
+
+    /**
+     * A list of all allowed content modifier paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentModifierPaths = [];
 
     /**
      * Controls if PHP is evaluated in user content.

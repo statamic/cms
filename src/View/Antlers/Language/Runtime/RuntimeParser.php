@@ -140,8 +140,10 @@ class RuntimeParser implements Parser
         GlobalRuntimeState::$bannedContentVarPaths = $configuration->guardedContentVariablePatterns;
         GlobalRuntimeState::$bannedTagPaths = $configuration->guardedTagPatterns;
         GlobalRuntimeState::$bannedContentTagPaths = $configuration->guardedContentTagPatterns;
+        GlobalRuntimeState::$allowedContentTagPaths = $configuration->allowedContentTagPatterns;
         GlobalRuntimeState::$bannedModifierPaths = $configuration->guardedModifiers;
         GlobalRuntimeState::$bannedContentModifierPaths = $configuration->guardedContentModifiers;
+        GlobalRuntimeState::$allowedContentModifierPaths = $configuration->allowedContentModifiers;
 
         $this->nodeProcessor->setRuntimeConfiguration($configuration);
 

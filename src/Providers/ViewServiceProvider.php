@@ -102,6 +102,11 @@ class ViewServiceProvider extends ServiceProvider
             $runtimeConfig->guardedContentVariablePatterns = config('statamic.antlers.guardedContentVariables', []);
             $runtimeConfig->guardedContentTagPatterns = config('statamic.antlers.guardedContentTags', []);
             $runtimeConfig->guardedContentModifiers = config('statamic.antlers.guardedContentModifiers', []);
+            $runtimeConfig->allowedContentTagPatterns = config('statamic.antlers.allowedContentTags', []);
+            $runtimeConfig->allowedContentModifiers = config('statamic.antlers.allowedContentModifiers', [
+                'upper',
+                'lower',
+            ]);
             $runtimeConfig->allowPhpInUserContent = config('statamic.antlers.allowPhpInContent', false);
             $runtimeConfig->allowMethodsInUserContent = config('statamic.antlers.allowMethodsInContent', false);
 
