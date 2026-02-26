@@ -28,35 +28,40 @@ class AntlersLoop extends AntlersString
         $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = ! $this->trusted;
 
-        $total = count($this->variables);
-        $i = 0;
-
         try {
-            $contents = collect($this->variables)->reduce(function ($carry, $item) use (&$i, $total) {
-                if ($this->supplement) {
-                    $item = array_merge($item, [
-                        'index' => $i,
-                        'count' => $i + 1,
-                        'total_results' => $total,
-                        'first' => ($i === 0),
-                        'last' => ($i === $total - 1),
-                    ]);
-                }
-
-                $i++;
-
-                $parsed = $this->parser
-                    ->parse($this->string, array_merge($this->context, $item))
-                    ->withoutExtractions();
-
-                return $carry.$parsed;
-            }, '');
-
-            $string = new AntlersString($contents, $this->parser);
-
-            return (string) ($this->injectExtractions ? $string : $string->withoutExtractions());
+            return $this->renderLoopContent();
         } finally {
             GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
         }
+    }
+
+    private function renderLoopContent()
+    {
+        $total = count($this->variables);
+        $i = 0;
+
+        $contents = collect($this->variables)->reduce(function ($carry, $item) use (&$i, $total) {
+            if ($this->supplement) {
+                $item = array_merge($item, [
+                    'index' => $i,
+                    'count' => $i + 1,
+                    'total_results' => $total,
+                    'first' => ($i === 0),
+                    'last' => ($i === $total - 1),
+                ]);
+            }
+
+            $i++;
+
+            $parsed = $this->parser
+                ->parse($this->string, array_merge($this->context, $item))
+                ->withoutExtractions();
+
+            return $carry.$parsed;
+        }, '');
+
+        $string = new AntlersString($contents, $this->parser);
+
+        return (string) ($this->injectExtractions ? $string : $string->withoutExtractions());
     }
 }
