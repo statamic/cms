@@ -117,7 +117,5 @@
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/Fixtures/Addon"
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
