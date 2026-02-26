@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import truncateOnResize from './TruncateText.js';
 
 const props = defineProps({
@@ -9,9 +9,18 @@ const props = defineProps({
 const truncatedRef = ref(null);
 let cleanup = null;
 
-onMounted(() => {
+const bindTruncation = () => {
+    if (!truncatedRef.value) {
+        return;
+    }
+
+    cleanup?.();
     cleanup = truncateOnResize(truncatedRef.value, props.text);
-});
+};
+
+onMounted(bindTruncation);
+
+watch(() => props.text, bindTruncation);
 
 onUnmounted(() => {
     cleanup?.();
