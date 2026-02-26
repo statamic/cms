@@ -764,30 +764,35 @@ INFO;
 
         $existingView = $this->view;
         try {
-            $this->view = $view;
-            GlobalRuntimeState::$templateFileStack[] = [$view, null];
-
-            if (count(GlobalRuntimeState::$templateFileStack) > 1) {
-                GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 2][1] = GlobalRuntimeState::$lastNode;
-            }
-
-            GlobalRuntimeState::$currentExecutionFile = $this->view;
-
-            if (GlobalDebugManager::$isConnected) {
-                GlobalDebugManager::registerPathLocator($this->view);
-            }
-
-            $data = array_merge($data, [
-                'view' => $this->cascade->getViewData($view),
-            ]);
-
-            return $this->renderText($text, $data);
+            return $this->renderViewContent($view, $text, $data);
         } finally {
             $this->view = $existingView;
             array_pop(GlobalRuntimeState::$templateFileStack);
             GlobalRuntimeState::$currentExecutionFile = $this->view;
             GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
         }
+    }
+
+    private function renderViewContent($view, $text, $data = [])
+    {
+        $this->view = $view;
+        GlobalRuntimeState::$templateFileStack[] = [$view, null];
+
+        if (count(GlobalRuntimeState::$templateFileStack) > 1) {
+            GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 2][1] = GlobalRuntimeState::$lastNode;
+        }
+
+        GlobalRuntimeState::$currentExecutionFile = $this->view;
+
+        if (GlobalDebugManager::$isConnected) {
+            GlobalDebugManager::registerPathLocator($this->view);
+        }
+
+        $data = array_merge($data, [
+            'view' => $this->cascade->getViewData($view),
+        ]);
+
+        return $this->renderText($text, $data);
     }
 
     public function injectNoparse($text)
