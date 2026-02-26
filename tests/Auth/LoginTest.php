@@ -2,9 +2,6 @@
 
 namespace Tests\Auth;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
