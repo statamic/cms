@@ -257,6 +257,18 @@ class ParserTestCase extends TestCase
 
     protected function getBoolResult($text, $data)
     {
+        $previousState = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
+        try {
+            return $this->_getBoolResult($text, $data);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $previousState;
+        }
+    }
+
+    private function _getBoolResult($text, $data)
+    {
         // Create a wrapper region we can get a node from.
         $nodeText = '{{ '.$text.' }}';
         /** @var AntlersNode $antlersNode */
@@ -275,6 +287,18 @@ class ParserTestCase extends TestCase
     }
 
     protected function evaluateRaw($text, $data = [])
+    {
+        $previousState = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
+        try {
+            return $this->_evaluateRaw($text, $data);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $previousState;
+        }
+    }
+
+    private function _evaluateRaw($text, $data = [])
     {
         $text = StringUtilities::normalizeLineEndings($text);
 
@@ -303,6 +327,18 @@ class ParserTestCase extends TestCase
 
     protected function evaluateBoth($text, $data = [])
     {
+        $previousState = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
+        try {
+            return $this->_evaluateBoth($text, $data);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $previousState;
+        }
+    }
+
+    private function _evaluateBoth($text, $data = [])
+    {
         // Create a wrapper region we can get a node from.
         $nodeText = '{{ '.$text.' }}';
         /** @var AntlersNode $antlersNode */
@@ -327,6 +363,18 @@ class ParserTestCase extends TestCase
     }
 
     protected function evaluate($text, $data = [])
+    {
+        $previousState = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
+        try {
+            return $this->_evaluate($text, $data);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $previousState;
+        }
+    }
+
+    private function _evaluate($text, $data = [])
     {
         // Create a wrapper region we can get a node from.
         $nodeText = '{{ '.$text.' }}';

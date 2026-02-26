@@ -22,7 +22,7 @@ class ScratchTest extends TestCase
         $template = '{{ title }} {{ collection:test }}{{ title }} {{ /collection:test }} {{ title }}';
         $expected = 'Outside One Two  Outside';
 
-        $parsed = (string) Antlers::parse($template, ['title' => 'Outside']);
+        $parsed = (string) Antlers::parse($template, ['title' => 'Outside'], true);
 
         $this->assertEquals($expected, $parsed);
     }
@@ -40,9 +40,9 @@ class ScratchTest extends TestCase
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
 
-        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{bar }" }}', ['bar' => 'baz']));
-        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar}" }}', ['bar' => 'baz']));
-        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar }" }}', ['bar' => 'baz']));
+        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{bar }" }}', ['bar' => 'baz'], true));
+        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar}" }}', ['bar' => 'baz'], true));
+        $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar }" }}', ['bar' => 'baz'], true));
     }
 
     public function test_runtime_can_parse_expanded_ascii_characters()
