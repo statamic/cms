@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Support\Facades\Auth;
 use Statamic\Auth\ThrottlesLogins;
+use Statamic\Facades\URL;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
@@ -20,12 +21,18 @@ class LoginController extends Controller
         }
 
         if (Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
-            return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
+            $redirect = $request->input('_redirect', '/');
+
+            return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect)->withSuccess(__('Login successful.'));
         }
 
         $this->incrementLoginAttempts($request);
 
-        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+        $errorRedirect = $request->input('_error_redirect');
+
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
 
         return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
     }
@@ -34,7 +41,9 @@ class LoginController extends Controller
     {
         Auth::logout();
 
-        return redirect(request()->get('redirect', '/'));
+        $redirect = request()->get('redirect', '/');
+
+        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
     }
 
     protected function username()
