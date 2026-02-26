@@ -204,26 +204,7 @@ EOT
     }
 
     #[Test]
-    public function it_will_use_redirect_query_param_off_url()
-    {
-        $this->get('/?redirect=login-successful&error_redirect=login-failure');
-
-        $expectedRedirect = '<input type="hidden" name="_redirect" value="login-successful" />';
-        $expectedErrorRedirect = '<input type="hidden" name="_error_redirect" value="login-failure" />';
-
-        $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
-
-        $this->assertStringNotContainsString($expectedRedirect, $output);
-        $this->assertStringNotContainsString($expectedErrorRedirect, $output);
-
-        $output = $this->tag('{{ user:login_form allow_request_redirect="true" }}{{ /user:login_form }}');
-
-        $this->assertStringContainsString($expectedRedirect, $output);
-        $this->assertStringContainsString($expectedErrorRedirect, $output);
-    }
-
-    #[Test]
-    public function it_does_not_redirect_to_external_url()
+    public function it_wont_follow_redirect_to_external_url()
     {
         User::make()
             ->email('san@holo.com')
@@ -241,7 +222,7 @@ EOT
     }
 
     #[Test]
-    public function it_does_not_redirect_to_external_url_on_error()
+    public function it_wont_follow_redirect_to_external_url_on_error()
     {
         User::make()
             ->email('san@holo.com')
@@ -256,6 +237,25 @@ EOT
                 '_error_redirect' => 'https://evil.com',
             ])
             ->assertLocation('/'); // Falls back to back() which is /
+    }
+
+    #[Test]
+    public function it_will_use_redirect_query_param_off_url()
+    {
+        $this->get('/?redirect=login-successful&error_redirect=login-failure');
+
+        $expectedRedirect = '<input type="hidden" name="_redirect" value="login-successful" />';
+        $expectedErrorRedirect = '<input type="hidden" name="_error_redirect" value="login-failure" />';
+
+        $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
+
+        $this->assertStringNotContainsString($expectedRedirect, $output);
+        $this->assertStringNotContainsString($expectedErrorRedirect, $output);
+
+        $output = $this->tag('{{ user:login_form allow_request_redirect="true" }}{{ /user:login_form }}');
+
+        $this->assertStringContainsString($expectedRedirect, $output);
+        $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
     #[Test]

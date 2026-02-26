@@ -276,6 +276,21 @@ EOT
     }
 
     #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->password('mypassword')->save());
+
+        $this
+            ->post('/!/auth/password', [
+                'current_password' => 'mypassword',
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=password-successful&error_redirect=registration-failure');
@@ -292,21 +307,6 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
-    }
-
-    #[Test]
-    public function it_does_not_redirect_to_external_url()
-    {
-        $this->actingAs(User::make()->password('mypassword')->save());
-
-        $this
-            ->post('/!/auth/password', [
-                'current_password' => 'mypassword',
-                'password' => 'newpassword',
-                'password_confirmation' => 'newpassword',
-                '_redirect' => 'https://evil.com',
-            ])
-            ->assertLocation('/');
     }
 
     #[Test]

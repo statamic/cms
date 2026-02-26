@@ -331,6 +331,19 @@ EOT
     }
 
     #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->id('1')->email('san@holo.com')->save());
+
+        $this
+            ->post('/!/auth/profile', [
+                'email' => 'san@holo.com',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=profile-successful&error_redirect=registration-failure');
@@ -347,19 +360,6 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
-    }
-
-    #[Test]
-    public function it_does_not_redirect_to_external_url()
-    {
-        $this->actingAs(User::make()->id('1')->email('san@holo.com')->save());
-
-        $this
-            ->post('/!/auth/profile', [
-                'email' => 'san@holo.com',
-                '_redirect' => 'https://evil.com',
-            ])
-            ->assertLocation('/');
     }
 
     private function useCustomBlueprint()
