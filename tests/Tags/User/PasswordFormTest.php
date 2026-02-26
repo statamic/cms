@@ -295,6 +295,21 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->password('mypassword')->save());
+
+        $this
+            ->post('/!/auth/password', [
+                'current_password' => 'mypassword',
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
     public function it_handles_precognitive_requests()
     {
         if (! method_exists($this, 'withPrecognition')) {
