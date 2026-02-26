@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\ResetsPasswords;
 use Statamic\Contracts\Auth\User;
+use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
 class ResetPasswordController extends Controller
@@ -41,7 +42,11 @@ class ResetPasswordController extends Controller
 
     public function redirectPath()
     {
-        return request('redirect') ?? route('statamic.site');
+        $redirect = request('redirect');
+
+        return $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
     }
 
     protected function setUserPassword($user, $password)
