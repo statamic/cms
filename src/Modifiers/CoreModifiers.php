@@ -1872,7 +1872,7 @@ class CoreModifiers extends Modifier
 
         $partial = 'partials/'.$name.'.html';
 
-        return Parse::template(File::disk('resources')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value, trusted: true);
     }
 
     /**
