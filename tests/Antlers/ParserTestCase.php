@@ -163,9 +163,10 @@ class ParserTestCase extends TestCase
         return $documentParser->getRenderNodes();
     }
 
-    protected function parser($data = [], $withCoreTagsAndModifiers = false)
+    protected function parser($data = [], $withCoreTagsAndModifiers = false, $trusted = true)
     {
         GlobalRuntimeState::resetGlobalState();
+        GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
@@ -184,9 +185,10 @@ class ParserTestCase extends TestCase
         return new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
     }
 
-    protected function renderStringWithConfiguration($text, RuntimeConfiguration $config, $data = [], $withCoreTagsAndModifiers = false)
+    protected function renderStringWithConfiguration($text, RuntimeConfiguration $config, $data = [], $withCoreTagsAndModifiers = false, $trusted = true)
     {
         GlobalRuntimeState::resetGlobalState();
+        GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
@@ -212,10 +214,11 @@ class ParserTestCase extends TestCase
         return (string) $runtimeParser->parse($text, $data);
     }
 
-    protected function renderString($text, $data = [], $withCoreTagsAndModifiers = false)
+    protected function renderString($text, $data = [], $withCoreTagsAndModifiers = false, $trusted = true)
     {
         ModifierManager::$statamicModifiers = null;
         GlobalRuntimeState::resetGlobalState();
+        GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
 
         $documentParser = new DocumentParser();
         $loader = new Loader();
