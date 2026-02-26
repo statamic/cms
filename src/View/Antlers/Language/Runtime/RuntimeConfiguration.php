@@ -99,6 +99,13 @@ class RuntimeConfiguration
     public $guardedContentModifiers = [];
 
     /**
+     * Controls whether PHP execution is globally enabled.
+     *
+     * @var bool
+     */
+    public $isPhpEnabled = true;
+
+    /**
      * Indicates if PHP Code should be evaluated in user content.
      *
      * When disabled, *antlers.php templates will be allowed,

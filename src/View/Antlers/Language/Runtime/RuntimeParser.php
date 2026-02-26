@@ -138,6 +138,7 @@ class RuntimeParser implements Parser
      */
     public function setRuntimeConfiguration(RuntimeConfiguration $configuration)
     {
+        GlobalRuntimeState::$isPhpEnabled = $configuration->isPhpEnabled;
         GlobalRuntimeState::$allowPhpInContent = $configuration->allowPhpInUserContent;
         GlobalRuntimeState::$allowMethodsInContent = $configuration->allowMethodsInUserContent;
         GlobalRuntimeState::$throwErrorOnAccessViolation = $configuration->throwErrorOnAccessViolation;

@@ -22,7 +22,7 @@ class Parse
      */
     public function template($str, $variables = [], $context = [], $php = false)
     {
-        return Antlers::parse($str, $variables, $context, $php);
+        return Antlers::parse($str, array_merge($variables, $context), $php);
     }
 
     /**

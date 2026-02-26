@@ -185,6 +185,13 @@ class GlobalRuntimeState
     public static $allowPhpInContent = false;
 
     /**
+     * Controls whether PHP execution is globally enabled.
+     *
+     * @var bool
+     */
+    public static $isPhpEnabled = true;
+
+    /**
      * Controls if method invocations are evaluated in user content.
      *
      * @var bool
@@ -273,6 +280,7 @@ class GlobalRuntimeState
         self::$abandonedNodes = [];
         self::$isEvaluatingUserData = false;
         self::$isEvaluatingData = false;
+        self::$isPhpEnabled = true;
         self::$userContentEvalState = null;
 
         StackReplacementManager::clearStackState();
