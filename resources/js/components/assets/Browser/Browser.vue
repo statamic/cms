@@ -20,6 +20,8 @@
                     ref="listing"
                     :url="requestUrl"
                     :columns="columns"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"

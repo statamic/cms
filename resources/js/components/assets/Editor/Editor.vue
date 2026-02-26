@@ -102,10 +102,7 @@
                             <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                         </div>
 
-
-                        <div class="h-full" v-else-if="asset.isPdf">
-                            <pdf-viewer :src="asset.pdfUrl" />
-                        </div>
+                        <pdf-viewer v-else-if="asset.isPdf" :src="asset.pdfUrl" />
 
                         <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
                             <iframe

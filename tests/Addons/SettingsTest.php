@@ -93,7 +93,10 @@ class SettingsTest extends TestCase
     #[Test]
     public function it_sets_a_value()
     {
-        config(['test' => ['a' => 'A', 'b' => 'B']]);
+        config([
+            'test' => ['a' => 'A', 'b' => 'B'],
+            'statamic.system.view_config_allowlist' => ['@default', 'test.a', 'test.b'],
+        ]);
         $addon = $this->makeFromPackage();
         $settings = new Settings($addon, ['foo' => 'bar']);
 
@@ -139,7 +142,10 @@ class SettingsTest extends TestCase
     #[Test]
     public function it_sets_all_values()
     {
-        config(['test' => ['a' => 'A', 'b' => 'B']]);
+        config([
+            'test' => ['a' => 'A', 'b' => 'B'],
+            'statamic.system.view_config_allowlist' => ['@default', 'test.a', 'test.b'],
+        ]);
         $addon = $this->makeFromPackage();
         $settings = new Settings($addon, ['foo' => 'bar']);
 

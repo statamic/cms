@@ -145,7 +145,7 @@ class WebAuthn
         $userEntity = PublicKeyCredentialUserEntity::create(
             $user->email(),
             $user->id(),
-            $user->name()
+            $user->name() ?? $user->email()
         );
 
         return PublicKeyCredentialCreationOptions::create(

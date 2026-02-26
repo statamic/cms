@@ -8,6 +8,7 @@ use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\AddonSettingsSaving;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
+use Statamic\View\Cascade;
 
 abstract class Settings implements Contract
 {
@@ -96,6 +97,6 @@ abstract class Settings implements Contract
                 ->all();
         }
 
-        return (string) Antlers::parse($value, ['config' => config()->all()]);
+        return (string) Antlers::parseUserContent($value, ['config' => Cascade::config()]);
     }
 }

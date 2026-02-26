@@ -37,7 +37,7 @@
                             <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
                                 <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
+                                    class="overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />
@@ -67,7 +67,7 @@
                         submit-mode="enter"
                         :placeholder="__('Name')"
                         :class="[
-                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
+                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
                             { 'st-has-error': creatingFolderError }
                         ]"
                         @submit="$emit('create-folder', newFolderName)"
@@ -168,7 +168,9 @@
                         </ContextMenu>
                     </Context>
                 </ItemActions>
-                <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
+                <div class="asset-filename">
+                    <MiddleEllipsis :text="asset.basename" />
+                </div>
             </div>
         </section>
 
@@ -193,7 +195,8 @@ import {
     DropdownMenu,
     DropdownLabel,
     DropdownItem,
-    DropdownSeparator
+    DropdownSeparator,
+    MiddleEllipsis
 } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -217,6 +220,7 @@ export default {
         DropdownSeparator,
         ItemActions,
         FolderSvg,
+        MiddleEllipsis,
     },
 
     props: {
@@ -245,17 +249,6 @@ export default {
     },
 
     methods: {
-        truncateFilename(filename) {
-            const maxLength = Math.floor(this.thumbnailSize / 7);
-            if (filename.length <= maxLength) return filename;
-
-            const extension = filename.split('.').pop();
-            const name = filename.slice(0, -(extension.length + 1));
-            const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
-
-            return `${name.slice(0, charsToKeep)}…${name.slice(-charsToKeep)}.${extension}`;
-        },
-
         isSelected(id) {
             return this.selectedAssets.includes(id);
         },
