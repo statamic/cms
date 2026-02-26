@@ -27,16 +27,16 @@ class Antlers
         return $contents;
     }
 
-    public function parse($str, $variables = [], $php = false)
+    public function parse($str, $variables = [], $trusted = false)
     {
         $parser = $this->parser();
-        $previousState = GlobalRuntimeState::$isPhpEnabled;
-        GlobalRuntimeState::$isPhpEnabled = $php;
+        $previousState = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
 
         try {
             return $parser->parse($str, $variables);
         } finally {
-            GlobalRuntimeState::$isPhpEnabled = $previousState;
+            GlobalRuntimeState::$isEvaluatingUserData = $previousState;
         }
     }
 
@@ -47,11 +47,12 @@ class Antlers
      * @param  array  $data
      * @param  bool  $supplement
      * @param  array  $context
+     * @param  bool  $trusted
      * @return string
      */
-    public function parseLoop($content, $data, $supplement = true, $context = [])
+    public function parseLoop($content, $data, $supplement = true, $context = [], $trusted = false)
     {
-        return new AntlersLoop($this->parser(), $content, $data, $supplement, $context);
+        return new AntlersLoop($this->parser(), $content, $data, $supplement, $context, $trusted);
     }
 
     public function identifiers(string $content): array

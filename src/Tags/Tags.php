@@ -208,7 +208,7 @@ abstract class Tags
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
             return $antlers
-                ->parse($this->content, array_merge($this->context->all(), $data))
+                ->parse($this->content, array_merge($this->context->all(), $data), true)
                 ->withoutExtractions();
         });
     }
@@ -245,7 +245,7 @@ abstract class Tags
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
             return $antlers
-                ->parseLoop($this->content, $data, $supplement, $this->context->all())
+                ->parseLoop($this->content, $data, $supplement, $this->context->all(), true)
                 ->withoutExtractions();
         });
     }
