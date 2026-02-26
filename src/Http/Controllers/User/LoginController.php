@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Facades\URL;
 use Statamic\Http\Requests\UserLoginRequest;
 
 class LoginController extends Controller
@@ -27,7 +28,9 @@ class LoginController extends Controller
 
         $this->authenticate($request, $user);
 
-        return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
+        $redirect = $request->input('_redirect', '/');
+
+        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect)->withSuccess(__('Login successful.'));
     }
 
     protected function twoFactorChallengeRedirect(): string
@@ -44,7 +47,10 @@ class LoginController extends Controller
      */
     protected function throwFailedAuthenticationException(Request $request)
     {
-        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+        $errorRedirect = $request->input('_error_redirect');
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
 
         throw new HttpResponseException($errorResponse->withInput()->withErrors(__('Invalid credentials.')));
     }
@@ -68,7 +74,9 @@ class LoginController extends Controller
     {
         Auth::logout();
 
-        return redirect(request()->get('redirect', '/'));
+        $redirect = request()->get('redirect', '/');
+
+        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
     }
 
     protected function username()
