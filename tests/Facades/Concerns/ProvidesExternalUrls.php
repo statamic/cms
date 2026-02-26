@@ -50,7 +50,7 @@ trait ProvidesExternalUrls
             ['//evil.com', true],
             ['//evil.com/', true],
             ['//evil.com/path', true],
-            ['//this-site.com', true], // Even matching domain with // prefix is treated as external
+            ['//this-site.com', true],
 
             // External domain that starts with a valid domain.
             ['http://this-site.com.au', true],

@@ -229,7 +229,7 @@ EOT
                 'password' => 'wrong',
                 '_error_redirect' => 'https://evil.com',
             ])
-            ->assertLocation('/'); // Falls back to back() which is /
+            ->assertLocation('/');
     }
 
     #[Test]
