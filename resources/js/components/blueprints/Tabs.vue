@@ -95,7 +95,7 @@ import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
 import BlueprintTab from './Tab.vue';
 import BlueprintTabContent from './TabContent.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
-import { Tabs, TabList, Button, Description, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon } from '@/components/ui';
+import { Tabs, TabList, Button, Description, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@/components/ui';
 
 export default {
     mixins: [CanDefineLocalizable],
@@ -111,7 +111,6 @@ export default {
         DropdownMenu,
         DropdownItem,
         DropdownSeparator,
-        Icon,
     },
 
     props: {
@@ -181,7 +180,6 @@ export default {
             sortableTabs: null,
             sortableSections: null,
             sortableFields: null,
-            hasOverflow: false,
             overflowedTabs: [],
         };
     },
@@ -193,6 +191,9 @@ export default {
     },
 
     watch: {
+        currentTab() {
+            this.$nextTick(this.checkOverflow);
+        },
 		tabs: {
 			deep: true,
 			handler(tabs) {
@@ -210,8 +211,7 @@ export default {
             getWrapper: () => this.$refs.tabWrapper,
             getInner: () => this.$refs.tabInner,
             getItems: () => this.tabs,
-            onUpdate: ({ hasOverflow, overflowedItems }) => {
-                this.hasOverflow = hasOverflow;
+            onUpdate: ({ overflowedItems }) => {
                 this.overflowedTabs = overflowedItems;
             },
         });
