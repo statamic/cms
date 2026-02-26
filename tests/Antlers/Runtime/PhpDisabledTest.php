@@ -48,4 +48,92 @@ class PhpDisabledTest extends TestCase
 
         $this->assertSame('Before hello After', $result);
     }
+
+    public function test_method_calls_are_not_evaluated_when_php_is_disabled()
+    {
+        $helper = new class()
+        {
+            public $wasCalled = false;
+
+            public function mutate()
+            {
+                $this->wasCalled = true;
+
+                return 'changed';
+            }
+        };
+
+        $result = (string) Antlers::parse('{{ helper:mutate() }}', [
+            'helper' => $helper,
+        ], false);
+
+        $this->assertSame('', $result);
+        $this->assertFalse($helper->wasCalled);
+    }
+
+    public function test_method_calls_are_evaluated_when_php_is_enabled()
+    {
+        $helper = new class()
+        {
+            public $wasCalled = false;
+
+            public function mutate()
+            {
+                $this->wasCalled = true;
+
+                return 'changed';
+            }
+        };
+
+        $result = (string) Antlers::parse('{{ helper:mutate() }}', [
+            'helper' => $helper,
+        ], true);
+
+        $this->assertSame('changed', $result);
+        $this->assertTrue($helper->wasCalled);
+    }
+
+    public function test_strict_variable_method_calls_are_not_evaluated_when_php_is_disabled()
+    {
+        $helper = new class()
+        {
+            public $wasCalled = false;
+
+            public function mutate()
+            {
+                $this->wasCalled = true;
+
+                return 'changed';
+            }
+        };
+
+        $result = (string) Antlers::parse('{{ $helper->mutate() }}', [
+            'helper' => $helper,
+        ], false);
+
+        $this->assertSame('', $result);
+        $this->assertFalse($helper->wasCalled);
+    }
+
+    public function test_strict_variable_method_calls_are_evaluated_when_php_is_enabled()
+    {
+        $helper = new class()
+        {
+            public $wasCalled = false;
+
+            public function mutate()
+            {
+                $this->wasCalled = true;
+
+                return 'changed';
+            }
+        };
+
+        $result = (string) Antlers::parse('{{ $helper->mutate() }}', [
+            'helper' => $helper,
+        ], true);
+
+        $this->assertSame('changed', $result);
+        $this->assertTrue($helper->wasCalled);
+    }
 }

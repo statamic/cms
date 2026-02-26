@@ -58,6 +58,23 @@ class ParseUserContentTest extends TestCase
     }
 
     #[Test]
+    public function it_blocks_method_calls_when_php_is_disabled_even_if_methods_are_enabled()
+    {
+        GlobalRuntimeState::$allowMethodsInContent = true;
+        GlobalRuntimeState::$isPhpEnabled = false;
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Method call evaluated in user content.', \Mockery::type('array'));
+
+        $result = (string) Antlers::parseUserContent('{{ object:method("hello") }}', [
+            'object' => new ClassOne(),
+        ]);
+
+        $this->assertSame('', $result);
+    }
+
+    #[Test]
     public function it_restores_user_data_flag_after_successful_parse()
     {
         GlobalRuntimeState::$isEvaluatingUserData = false;
