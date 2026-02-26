@@ -4,10 +4,10 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Statamic\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 

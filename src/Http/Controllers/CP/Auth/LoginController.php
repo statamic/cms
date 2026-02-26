@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\OAuth\Provider;
 use Statamic\Statamic;
-use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;

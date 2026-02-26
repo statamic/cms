@@ -6,10 +6,10 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
-use Statamic\Facades\URL;
 use Statamic\Http\Requests\UserLoginRequest;
 
 class LoginController extends Controller
