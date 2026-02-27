@@ -50,7 +50,6 @@ class Localize
         $reflection = new ReflectionClass($date = Date::now());
 
         $factory = $reflection->getMethod('getFactory');
-        $factory->setAccessible(true);
 
         return Arr::get($factory->invoke($date)->getSettings(), 'toStringFormat');
     }

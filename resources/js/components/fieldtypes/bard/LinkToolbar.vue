@@ -130,6 +130,7 @@
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
                 :max-files="1"
+                :columns="bard.meta.assets.columns"
                 @selected="assetSelected"
                 @closed="showAssetSelector = false"
             />

@@ -302,8 +302,8 @@ class Date extends Fieldtype
 
         if ($this->config('mode') === 'range') {
             return [
-                'start' => $this->parseSaved($value['start'])->startOfDay(),
-                'end' => $this->parseSaved($value['end'])->startOfDay(),
+                'start' => $this->parseSaved($value['start']),
+                'end' => $this->parseSaved($value['end']),
             ];
         }
 

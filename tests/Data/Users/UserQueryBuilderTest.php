@@ -483,7 +483,7 @@ class UserQueryBuilderTest extends TestCase
         ], User::query()->where('type', 'b')->pluck('name')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_scopes()
     {
         CustomScope::register();

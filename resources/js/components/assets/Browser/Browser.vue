@@ -20,6 +20,8 @@
                     ref="listing"
                     :url="requestUrl"
                     :columns="columns"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
@@ -665,7 +667,11 @@ export default {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
 
-                this.selectedAssets.push(asset.id);
+                if (this.maxFiles === 1) {
+                    this.selectedAssets.splice(0, this.selectedAssets.length, asset.id);
+                } else if (!this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset.id);
+                }
                 this.$emit('selections-updated', this.selectedAssets);
             }
 

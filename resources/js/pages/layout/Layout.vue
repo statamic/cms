@@ -85,7 +85,7 @@ onUnmounted(() => {
             <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
-                    <div class="w-full mx-auto max-w-page" data-max-width-wrapper>
+                    <div class="w-full min-w-0 mx-auto max-w-page" data-max-width-wrapper>
                         <slot />
                     </div>
                 </div>

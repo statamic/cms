@@ -39,7 +39,7 @@
             :open="editingSection !== false"
             :title="editText"
             @closed="editCancelled"
-            @opened="() => $nextTick(() => $refs.displayInput.focus())"
+            @opened="() => $nextTick(() => $refs.displayInput.select())"
         >
             <div class="">
                 <div class="space-y-6">

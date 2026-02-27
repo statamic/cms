@@ -102,7 +102,7 @@ export default {
             if (!this.showFieldPreviews) return;
 
             return this.value
-                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.value}"></span>`)
+                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${escapeHtml(this.value)}"></span>`)
                 : null;
         },
     },

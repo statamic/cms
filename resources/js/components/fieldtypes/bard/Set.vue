@@ -75,14 +75,7 @@
                 </div>
             </header>
 
-            <Motion
-                layout
-                v-if="index !== undefined"
-                class="contain-paint"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
-            >
+            <div v-if="index !== undefined" v-show="!collapsed" :class="{ 'contain-paint': collapsed }">
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
@@ -91,7 +84,7 @@
                 >
                     <Fields class="p-4" />
                 </FieldsProvider>
-            </Motion>
+            </div>
         </div>
     </node-view-wrapper>
 </template>
@@ -100,7 +93,6 @@
 import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Motion } from 'motion-v';
 import {
     Badge,
     Button,
@@ -134,7 +126,6 @@ export default {
         Badge,
         Icon,
         NodeViewWrapper,
-        Motion,
     },
 
     mixins: [ManagesPreviewText, HasFieldActions],
@@ -339,12 +330,25 @@ export default {
         );
 
         reveal.mount(this.$refs.container, this.expand);
+
+        // Firefox bug 739071: text selection doesn't work inside elements with a
+        // draggable ancestor. ProseMirror sets draggable=true on the node-view-wrapper
+        // because the Set node spec has draggable:true. We must keep it false.
+        this.$el.setAttribute('draggable', false);
+        this._draggableObserver = new MutationObserver(() => {
+            if (this.$el.getAttribute('draggable') !== 'false') {
+                this.$el.setAttribute('draggable', false);
+            }
+        });
+        this._draggableObserver.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
     },
 
     updated() {
-        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
-        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
         this.$el.setAttribute('draggable', false);
+    },
+
+    beforeUnmount() {
+        this._draggableObserver?.disconnect();
     },
 };
 </script>

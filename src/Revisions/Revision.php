@@ -115,7 +115,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
             $user = [
                 'id' => $user->id(),
                 'email' => $user->email(),
-                'name' => $user->name(),
+                'name' => $user->name() ?? $user->email(),
                 'avatar' => $user->avatar(),
                 'initials' => $user->initials(),
             ];
