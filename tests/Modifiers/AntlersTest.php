@@ -29,11 +29,6 @@ class AntlersTest extends TestCase
     {
         GlobalRuntimeState::$isEvaluatingUserData = true;
 
-        //        AntlersFacade::shouldReceive('parse')
-        //            ->once()
-        //            ->with('{{ foo }}', ['foo' => 'bar'], false)
-        //            ->andReturn('parsed');
-
         $this->assertSame('foo bar ', $this->modify('foo {{ foo }} {{$ "hello" $}}', ['foo' => 'bar'], ['trusted']));
     }
 
@@ -41,11 +36,6 @@ class AntlersTest extends TestCase
     public function trusted_argument_parses_in_trusted_mode_when_current_runtime_is_already_trusted(): void
     {
         GlobalRuntimeState::$isEvaluatingUserData = false;
-
-        //        AntlersFacade::shouldReceive('parse')
-        //            ->once()
-        //            ->with('{{ foo }}', ['foo' => 'bar'], true)
-        //            ->andReturn('parsed');
 
         $this->assertSame('foo bar hello', $this->modify('foo {{ foo }} {{$ "hello" $}}', ['foo' => 'bar'], ['trusted']));
     }
