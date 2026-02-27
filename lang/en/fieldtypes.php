@@ -110,6 +110,7 @@ return [
     'group.title' => 'Group',
     'hidden.title' => 'Hidden',
     'html.config.html_instruct' => 'Manage the HTML to be displayed in the publish form. This is for display purposes only, the HTML will not be saved.',
+    'html.config.sanitize_instruct' => 'Whether the HTML should be sanitized before being displayed. Only disable this if you have a good reason.',
     'html.title' => 'HTML',
     'icon.config.set' => 'The name of a custom icon set.',
     'icon.title' => 'Icon',

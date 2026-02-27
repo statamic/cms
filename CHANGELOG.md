@@ -1,5 +1,51 @@
 # Release Notes
 
+## 6.3.3 (2026-02-20)
+
+### What's fixed
+- Fix `shouldUpdateUris` regex adding additional brackets to Antlers [#13995](https://github.com/statamic/cms/issues/13995) by @martyf
+- Increase inline padding of badges [#14002](https://github.com/statamic/cms/issues/14002) by @jaygeorge
+- Avoid stretching images to 100% height [#14003](https://github.com/statamic/cms/issues/14003) by @jaygeorge
+- Adjust SVG dimensions [#14005](https://github.com/statamic/cms/issues/14005) by @jaygeorge
+- Fix clipped floating bard toolbar in replicators [#14007](https://github.com/statamic/cms/issues/14007) by @jaygeorge
+- Fix Starter Kit make:user command [#14000](https://github.com/statamic/cms/issues/14000) by @joshuablum
+- Fix some field filters not being applied [#14015](https://github.com/statamic/cms/issues/14015) by @daun
+- Fix external url logic [#14016](https://github.com/statamic/cms/issues/14016) by @jasonvarga
+- Validate password reset url [#14023](https://github.com/statamic/cms/issues/14023) [#14008](https://github.com/statamic/cms/issues/14008) by @jasonvarga
+- Harden html rendering [#14011](https://github.com/statamic/cms/issues/14011) by @jasonvarga
+- Fix saving nested Bard fields [#14017](https://github.com/statamic/cms/issues/14017) by @duncanmcclean
+- Fix hidden field filters when applying to all fields [#14020](https://github.com/statamic/cms/issues/14020) by @daun
+- Avoid calling `->startOfDay()` on date range dates [#13865](https://github.com/statamic/cms/issues/13865) by @duncanmcclean
+- French translations [#14004](https://github.com/statamic/cms/issues/14004) by @ebeauchamps
+
+
+
+## 6.3.2 (2026-02-18)
+
+### What's fixed
+- Grid child fields should never use inline config style [#13964](https://github.com/statamic/cms/issues/13964) by @jackmcdade
+- Remove deprecated errors [#13971](https://github.com/statamic/cms/issues/13971) by @martinoak
+- Fix sidebar not showing after quick resize [#13969](https://github.com/statamic/cms/issues/13969) by @duncanmcclean
+- Fix `emojis: false` not persisting on countries dictionary field [#13968](https://github.com/statamic/cms/issues/13968) by @duncanmcclean
+- Fix Bard debounce race condition, Set move error, and Firefox scroll jumps [#13849](https://github.com/statamic/cms/issues/13849) by @o1y
+- Fix new grid rows shared reference of previous row [#13955](https://github.com/statamic/cms/issues/13955) by @morhi
+- Bard toolbar interactions [#13970](https://github.com/statamic/cms/issues/13970) by @JayGeorge
+- Preload replicator meta/defaults when blueprint doesn't have a FQH [#13951](https://github.com/statamic/cms/issues/13951) by @duncanmcclean
+- Prevent nested Bard Sets from being dropped outside their instance [#13851](https://github.com/statamic/cms/issues/13851) by @o1y
+- Replicator Display Fixes [#13670](https://github.com/statamic/cms/issues/13670) by @JayGeorge
+- Backdrop blur for modals [#13984](https://github.com/statamic/cms/issues/13984) by @JayGeorge
+- Fix Spacer fieldtype collapse behaviour [#13985](https://github.com/statamic/cms/issues/13985) by @JayGeorge
+- Fix folders not displaying in Bard link stack selector [#13986](https://github.com/statamic/cms/issues/13986) by @duncanmcclean
+- Fix toasts from asset folder actions [#13988](https://github.com/statamic/cms/issues/13988) by @duncanmcclean
+- Sanitize html in html fieldtype [#13990](https://github.com/statamic/cms/issues/13990) by @jasonvarga
+- Don't use `motion-vue` for bard/replicator set animations [#13973](https://github.com/statamic/cms/issues/13973) by @duncanmcclean
+- Prevent horizontal overflow on create form pages [#13866](https://github.com/statamic/cms/issues/13866) by @duncanmcclean
+- Add always-on checkerboard for SVGs, and transparency button [#13982](https://github.com/statamic/cms/issues/13982) by @JayGeorge
+- French translations [#13977](https://github.com/statamic/cms/issues/13977) by @ebeauchamps
+- Bump tar from 7.5.7 to 7.5.9 [#13978](https://github.com/statamic/cms/issues/13978) by @dependabot
+
+
+
 ## 6.3.1 (2026-02-16)
 
 ### What's fixed

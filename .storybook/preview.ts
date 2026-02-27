@@ -50,7 +50,10 @@ setup(async (app) => {
       $progress: {
           loading(name, loading) {
               //
-          }
+          },
+          complete(name) {
+              //
+          },
       }
   };
 

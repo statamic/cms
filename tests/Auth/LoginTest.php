@@ -133,7 +133,29 @@ class LoginTest extends TestCase
         $this
             ->actingAs($this->user())
             ->get(cp_route('logout'))
-            ->assertRedirect();
+            ->assertRedirect('/');
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_can_logout_with_redirect()
+    {
+        $this
+            ->actingAs($this->user())
+            ->get(cp_route('logout').'?redirect=/cp')
+            ->assertRedirect('/cp');
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_logout()
+    {
+        $this
+            ->actingAs($this->user())
+            ->get(cp_route('logout').'?redirect=https://evil.com')
+            ->assertRedirect('/');
 
         $this->assertGuest();
     }

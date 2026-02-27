@@ -19,7 +19,7 @@ const emit = defineEmits(['update:open', 'opened', 'dismissed']);
 
 const props = defineProps({
 	/** When `true`, the modal's backdrop will be blurred */
-    blur: { type: Boolean, default: true },
+    blur: { type: Boolean, default: false },
 	/** Title displayed at the top of the modal */
     title: { type: String, default: '' },
 	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */

@@ -4,7 +4,6 @@ namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
@@ -106,7 +105,10 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-        $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
+        $svg = $item->svg();
+        $this->assertStringContainsString('class="size-4 shrink-0"', $svg);
+        $this->assertStringContainsString('viewBox="0 0 17 14"', $svg);
+        $this->assertStringStartsWith('<svg ', $svg);
     }
 
     #[Test]
@@ -115,17 +117,17 @@ class NavTest extends TestCase
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::utilities('Test')
-            ->icon('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
+            ->icon('<svg onerror="foo"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
 
         $item = $this->build()->get('Utilities')->last();
 
-        $expected = '<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
-
         // ->icon() should return the raw SVG we passed in
-        $this->assertEquals($expected, $item->icon());
+        $expectedIcon = '<svg onerror="foo"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
+        $this->assertEquals($expectedIcon, $item->icon());
 
-        // ->svg() should return the SVG wrapped in classes for styling
-        $this->assertEquals(Str::replace('<svg>', '<svg class="size-4 shrink-0">', $expected), $item->svg());
+        // ->svg() should return the sanitized SVG with classes for styling
+        $expectedSvg = '<svg class="size-4 shrink-0"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/></svg>';
+        $this->assertEquals($expectedSvg, $item->svg());
     }
 
     #[Test]

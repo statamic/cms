@@ -45,7 +45,7 @@
                         <Button variant="primary" :text="__('Finish')" @click="select" />
                     </div>
                 </div>
-                <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-dark-800">
+                <h6 class="rounded-b bg-gray-100  p-4 text-center  dark:bg-gray-850">
                     {{ __('messages.focal_point_previews_are_examples') }}
                 </h6>
             </Card>
