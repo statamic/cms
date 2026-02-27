@@ -91,7 +91,6 @@ defineExpose({
         :title="action.title"
         :danger="action.dangerous"
         :submittable="action.runnable"
-        :submit-shortcut="true"
         :buttonText="runButtonText"
         :busy="running"
         @confirm="confirmed"

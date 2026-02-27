@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
 import { Modal, ModalClose, Button, Icon } from '@/components/ui';
 
 const emit = defineEmits([
@@ -12,8 +12,6 @@ const emit = defineEmits([
 const props = defineProps({
     /** The controlled open state of the modal. */
     open: { type: Boolean, default: false },
-    /** Enables Cmd/Ctrl+Enter submit shortcut and keycap badge on submit button. */
-    submitShortcut: { type: Boolean, default: false },
     title: {
         type: String,
     },
@@ -52,8 +50,6 @@ const props = defineProps({
     blur: { type: Boolean, default: false },
 });
 
-const isSubmitModifierPressed = ref(false);
-
 function updateModalOpen(open) {
     if (! open && props.busy) {
         return;
@@ -74,50 +70,9 @@ function submit() {
     }
 }
 
-function onKeydown(event) {
-    isSubmitModifierPressed.value = event.metaKey || event.ctrlKey;
-
-    if (!props.open || !props.submittable || !props.submitShortcut) return;
-    if (props.disabled || props.busy) return;
-    if (event.isComposing) return;
-
-    const isSubmitShortcut = event.key === 'Enter' && (event.metaKey || event.ctrlKey);
-    if (!isSubmitShortcut) return;
-
-    submit();
-    event.preventDefault();
-    event.stopPropagation();
-}
-
-function onKeyup(event) {
-    isSubmitModifierPressed.value = event.metaKey || event.ctrlKey;
-}
-
-function onWindowBlur() {
-    isSubmitModifierPressed.value = false;
-}
-
-const submitShortcutLabel = computed(() => {
-    if (typeof navigator === 'undefined') return '⌘↵';
-
-    return /(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) ? '⌘↵' : 'Ctrl↵';
-});
-
 const shouldCloseOnSubmit = computed(() => {
     // If the busy prop is provided, we will assume they will handle the open state externally.
     return props.busy === undefined;
-});
-
-onMounted(() => {
-    document.addEventListener('keydown', onKeydown, true);
-    document.addEventListener('keyup', onKeyup, true);
-    window.addEventListener('blur', onWindowBlur);
-});
-
-onUnmounted(() => {
-    document.removeEventListener('keydown', onKeydown, true);
-    document.removeEventListener('keyup', onKeyup, true);
-    window.removeEventListener('blur', onWindowBlur);
 });
 </script>
 
@@ -157,21 +112,9 @@ onUnmounted(() => {
                     type="submit"
                     :variant="danger ? 'danger' : 'primary'"
                     :disabled="disabled || busy"
+                    :text="__(buttonText)"
                     @click="submit"
-                >
-                    <span class="inline-flex items-center">
-                        {{ __(buttonText) }}
-                        <span
-                            v-if="submitShortcut"
-                            :class="[
-                                'ms-2 inline-flex h-4 min-w-4 items-center justify-center rounded bg-white/25 px-1 font-semibold text-[0.625rem] text-white/90 ring-1 ring-white/20 transition-opacity opacity-60',
-                                isSubmitModifierPressed && 'opacity-100',
-                            ]"
-                        >
-                            {{ submitShortcutLabel }}
-                        </span>
-                    </span>
-                </Button>
+                />
             </div>
         </template>
     </Modal>
