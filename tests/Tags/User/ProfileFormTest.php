@@ -237,10 +237,12 @@ EOT
         $this->actingAs(User::make()->save());
 
         $this
+            ->from('/profile-form')
             ->post('/!/auth/profile', [
                 'email' => 'san@holo.com',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/profile-form');
 
         $output = $this->tag(<<<'EOT'
 {{ user:profile_form }}

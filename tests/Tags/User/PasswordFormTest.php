@@ -174,12 +174,14 @@ EOT
         $this->actingAs(User::make()->password('mypassword')->save());
 
         $this
+            ->from('/password-form')
             ->post('/!/auth/password', [
                 'current_password' => 'mypassword',
                 'password' => 'newpassword',
                 'password_confirmation' => 'newpassword',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/password-form');
 
         $output = $this->tag(<<<'EOT'
 {{ user:password_form }}

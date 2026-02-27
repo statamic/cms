@@ -23,7 +23,7 @@ class PasswordController
     private function successfulResponse()
     {
         $redirect = request()->get('_redirect');
-        $response = ! URL::isExternalToApplication($redirect) ? redirect($redirect) : back();
+        $response = $redirect && ! URL::isExternalToApplication($redirect) ? redirect($redirect) : back();
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
