@@ -51,7 +51,7 @@ class AssetsMetaClean extends Command
                 $this->line("[{$metaFile['container']}] {$metaFile['path']}");
             });
 
-            return 0;
+            return self::SUCCESS;
         }
 
         progress(
