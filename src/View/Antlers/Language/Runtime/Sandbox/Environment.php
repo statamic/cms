@@ -891,20 +891,16 @@ class Environment
 
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
-                $isMethodCallDisabled = GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent;
-
-                if ($isMethodCallDisabled) {
+                if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent) {
                     array_pop($stack);
 
-                    if (GlobalRuntimeState::$isEvaluatingUserData
-                        && ! GlobalRuntimeState::$allowMethodsInContent
-                        && GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
                         throw ErrorFactory::makeRuntimeError(
                             AntlersErrorCodes::RUNTIME_METHOD_CALL_USER_CONTENT,
                             $currentNode,
                             'Method invocation in user content.'
                         );
-                    } elseif (GlobalRuntimeState::$isEvaluatingUserData) {
+                    } else {
                         Log::warning('Method call evaluated in user content.', [
                             'file' => GlobalRuntimeState::$currentExecutionFile,
                             'trace' => GlobalRuntimeState::$templateFileStack,
