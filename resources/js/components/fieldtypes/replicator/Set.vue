@@ -200,7 +200,7 @@ reveal.use(rootEl, () => emit('expanded'));
                 </div>
             </header>
 
-            <div v-show="!collapsed" class="contain-paint">
+            <div v-show="!collapsed" :class="{ 'contain-paint': collapsed }">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"

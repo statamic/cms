@@ -1,5 +1,25 @@
 # Release Notes
 
+## 6.3.3 (2026-02-20)
+
+### What's fixed
+- Fix `shouldUpdateUris` regex adding additional brackets to Antlers [#13995](https://github.com/statamic/cms/issues/13995) by @martyf
+- Increase inline padding of badges [#14002](https://github.com/statamic/cms/issues/14002) by @jaygeorge
+- Avoid stretching images to 100% height [#14003](https://github.com/statamic/cms/issues/14003) by @jaygeorge
+- Adjust SVG dimensions [#14005](https://github.com/statamic/cms/issues/14005) by @jaygeorge
+- Fix clipped floating bard toolbar in replicators [#14007](https://github.com/statamic/cms/issues/14007) by @jaygeorge
+- Fix Starter Kit make:user command [#14000](https://github.com/statamic/cms/issues/14000) by @joshuablum
+- Fix some field filters not being applied [#14015](https://github.com/statamic/cms/issues/14015) by @daun
+- Fix external url logic [#14016](https://github.com/statamic/cms/issues/14016) by @jasonvarga
+- Validate password reset url [#14023](https://github.com/statamic/cms/issues/14023) [#14008](https://github.com/statamic/cms/issues/14008) by @jasonvarga
+- Harden html rendering [#14011](https://github.com/statamic/cms/issues/14011) by @jasonvarga
+- Fix saving nested Bard fields [#14017](https://github.com/statamic/cms/issues/14017) by @duncanmcclean
+- Fix hidden field filters when applying to all fields [#14020](https://github.com/statamic/cms/issues/14020) by @daun
+- Avoid calling `->startOfDay()` on date range dates [#13865](https://github.com/statamic/cms/issues/13865) by @duncanmcclean
+- French translations [#14004](https://github.com/statamic/cms/issues/14004) by @ebeauchamps
+
+
+
 ## 6.3.2 (2026-02-18)
 
 ### What's fixed

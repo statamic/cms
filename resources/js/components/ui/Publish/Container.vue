@@ -88,6 +88,11 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    /** Extra values to be provided through the context. */
+    provide: {
+        type: Object,
+        default: () => ({})
+    },
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -176,6 +181,7 @@ watch(
 
 const avoidTrackingDirtyState = ref(false);
 const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
+const isDirty = computed(() => Statamic.$dirty.has(props.name));
 
 function dirty() {
     if (trackingDirtyState.value) Statamic.$dirty.add(props.name);
@@ -236,7 +242,11 @@ function pushComponent(name, { props }) {
     return component;
 }
 
-const provided = {
+const additionalProvides = Object.fromEntries(
+    Object.entries(props.provide).map(([key]) => [key, toRef(() => props.provide[key])])
+);
+
+const builtInProvides = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -268,8 +278,19 @@ const provided = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    isDirty,
     withoutDirtying,
 };
+
+if (import.meta.env.DEV) {
+    for (const key of Object.keys(additionalProvides)) {
+        if (key in builtInProvides) {
+            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key, which takes precedence.`);
+        }
+    }
+}
+
+const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
 

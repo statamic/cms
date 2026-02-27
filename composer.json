@@ -25,7 +25,7 @@
         "michelf/php-smartypants": "^1.8.1",
         "nesbot/carbon": "^3.0",
         "pixelfear/composer-dist-plugin": "^0.1.4",
-        "pragmarx/google2fa": "^8.0",
+        "pragmarx/google2fa": "^8.0 || ^9.0",
         "rebing/graphql-laravel": "^9.8",
         "rhukster/dom-sanitizer": "^1.0.7",
         "spatie/blink": "^1.3",

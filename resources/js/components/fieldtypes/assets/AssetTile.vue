@@ -26,7 +26,7 @@
                 </template>
 
                 <template v-else>
-                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 size-full relative" />
+                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 w-full relative" />
 
                     <template v-else>
                         <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />
