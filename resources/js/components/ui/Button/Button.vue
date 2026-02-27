@@ -126,7 +126,7 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
+        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center items-center">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>
