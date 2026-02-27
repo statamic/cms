@@ -329,7 +329,7 @@ class ImageGenerator
         }
 
         if (! ImageValidator::isValidImage($extension, $mime)) {
-            throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
+            throw UnableToReadFile::fromLocation($path, "Image [{$path}] does not actually appear to be a valid image.");
         }
     }
 

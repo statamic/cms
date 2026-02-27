@@ -6,6 +6,7 @@ use ArrayAccess;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Query\Builder;
@@ -890,6 +891,27 @@ class Environment
 
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
+                if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent) {
+                    array_pop($stack);
+
+                    if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                        throw ErrorFactory::makeRuntimeError(
+                            AntlersErrorCodes::RUNTIME_METHOD_CALL_USER_CONTENT,
+                            $currentNode,
+                            'Method invocation in user content.'
+                        );
+                    } else {
+                        Log::warning('Method call evaluated in user content.', [
+                            'file' => GlobalRuntimeState::$currentExecutionFile,
+                            'trace' => GlobalRuntimeState::$templateFileStack,
+                        ]);
+                    }
+
+                    $stack[] = null;
+
+                    continue;
+                }
+
                 $leftNode = array_pop($stack);
 
                 if ($leftNode == null) {
@@ -1369,6 +1391,7 @@ class Environment
     private function checkForFieldValue($value, $hasModifiers = false, $modifierChain = null)
     {
         if ($value instanceof Value) {
+            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
                 if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
@@ -1376,15 +1399,18 @@ class Environment
                         $value,
                         $this->nodeProcessor->getActiveNode(),
                     ];
-                    $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                    GlobalRuntimeState::$userContentEvalState = null;
+                    try {
+                        $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                    } finally {
+                        GlobalRuntimeState::$userContentEvalState = null;
+                    }
                 }
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
                 }
             }
-            GlobalRuntimeState::$isEvaluatingUserData = false;
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
         }
 
         return $value;

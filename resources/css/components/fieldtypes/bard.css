@@ -471,7 +471,7 @@
             .tableWrapper &,
             blockquote > .tableWrapper &,
             :is(ol, ul) li > .tableWrapper & {
-                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500 border-collapse table-fixed;
+                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-600 border-collapse table-fixed;
 
                 th {
                     @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;

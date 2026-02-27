@@ -257,6 +257,10 @@ class URL
             return false;
         }
 
+        if (Str::startsWith($url, '//')) {
+            return self::$externalAppUrlsCache[$url] = true;
+        }
+
         $url = Str::ensureRight($url, '/');
 
         if (Str::startsWith($url, ['/', '?', '#'])) {

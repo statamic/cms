@@ -33,13 +33,11 @@ class ForgotPasswordController extends Controller
     public function sendResetLinkEmail(Request $request)
     {
         if ($url = $request->_reset_url) {
-            $url = URL::makeAbsolute($url);
-
             throw_if(URL::isExternalToApplication($url), ValidationException::withMessages([
                 '_reset_url' => trans('validation.url', ['attribute' => '_reset_url']),
             ]));
 
-            PasswordReset::resetFormUrl($url);
+            PasswordReset::resetFormUrl(URL::makeAbsolute($url));
         }
 
         return $this->traitSendResetLinkEmail($request);

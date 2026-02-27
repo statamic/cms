@@ -1,7 +1,7 @@
 <template>
     <Stack size="full" open inset ref="stack" :before-close="shouldClose" @update:open="$emit('closed')" :show-close-button="false">
         <div
-            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
+            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-gray-850"
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
@@ -102,10 +102,7 @@
                             <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                         </div>
 
-
-                        <div class="h-full" v-else-if="asset.isPdf">
-                            <pdf-viewer :src="asset.pdfUrl" />
-                        </div>
+                        <pdf-viewer v-else-if="asset.isPdf" :src="asset.pdfUrl" />
 
                         <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
                             <iframe
