@@ -89,6 +89,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Delete replaced profile form assets
+    |--------------------------------------------------------------------------
+    |
+    | When uploading replacement assets through the user:profile_form
+    | should existing assets be deleted from the container. If false
+    | they will be unlinked from the user but left in the container.
+    |
+    */
+
+    'delete_replaced_profile_form_assets' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | User Wizard Invitation Email
     |--------------------------------------------------------------------------
     |
