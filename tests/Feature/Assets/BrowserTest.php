@@ -317,8 +317,8 @@ class BrowserTest extends TestCase
         return [
             'links' => ['folder_action', 'asset_action'],
             'data' => [
-                ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
+                ['id', 'size_formatted', 'last_modified_relative'],
+                ['id', 'size_formatted', 'last_modified_relative', 'thumbnail'],
             ],
             'meta' => [
                 'folder' => [
