@@ -17,34 +17,34 @@ class AssetsMetaClean extends Command
 
     protected $signature = 'statamic:assets:meta-clean
         { container? : Handle of a container }
-        {--dry-run : List orphaned files without deleting}';
+        { --dry-run : List orphaned files without deleting }';
 
     protected $description = 'Clean orphaned asset metadata files';
 
     public function handle(): int
     {
-        $orphanedMetaFilesByContainer = $this->getContainers()
-            ->mapWithKeys(fn ($container) => [$container->handle() => $this->orphanedMetaFiles($container)]);
+        $containers = $this->getContainers()->keyBy->handle();
 
-        $totalOrphanedMetaFiles = $orphanedMetaFilesByContainer->sum->count();
+        $orphanedMetaFilesByContainer = $containers->map(fn ($container) => $this->orphanedMetaFiles($container));
+        $orphanedMetaFilesCount = $orphanedMetaFilesByContainer->sum->count();
 
-        if ($totalOrphanedMetaFiles === 0) {
+        if ($orphanedMetaFilesCount === 0) {
             $this->components->info(__('No orphaned metadata files were found.'));
 
             return self::SUCCESS;
         }
 
         $flatOrphanedMetaFiles = $orphanedMetaFilesByContainer
-            ->flatMap(fn ($paths, $containerHandle) => $paths->map(fn ($path) => [
-                'container' => $containerHandle,
+            ->flatMap(fn ($paths, $container) => $paths->map(fn ($path) => [
+                'container' => $container,
                 'path' => $path,
             ]))
             ->values();
 
         if ($this->option('dry-run')) {
             $this->components->warn(__('Found :count orphaned metadata :files.', [
-                'count' => $totalOrphanedMetaFiles,
-                'files' => Str::plural('file', $totalOrphanedMetaFiles),
+                'count' => $orphanedMetaFilesCount,
+                'files' => Str::plural('file', $orphanedMetaFilesCount),
             ]));
 
             $flatOrphanedMetaFiles->each(function ($metaFile) {
@@ -57,29 +57,19 @@ class AssetsMetaClean extends Command
         progress(
             label: __('Deleting orphaned asset metadata...'),
             steps: $flatOrphanedMetaFiles,
-            callback: function ($metaFile, $progress) {
-                /** @var AssetsContainer|null $container */
-                $container = AssetContainer::find($metaFile['container']);
-
-                if ($container) {
-                    $container->disk()->delete($metaFile['path']);
-                }
-
+            callback: function ($metaFile, $progress) use ($containers) {
+                $containers->get($metaFile['container'])->disk()->delete($metaFile['path']);
                 $progress->advance();
             }
         );
 
-        $orphanedMetaFilesByContainer->each(function ($metaFiles, $containerHandle) {
-            if (! $container = AssetContainer::find($containerHandle)) {
-                return;
-            }
-
-            $this->deleteEmptyMetaDirectories($container, $metaFiles);
+        $orphanedMetaFilesByContainer->each(function ($metaFiles, $containerHandle) use ($containers) {
+            $this->deleteEmptyMetaDirectories($containers->get($containerHandle), $metaFiles);
         });
 
         $this->components->info(__('Deleted :count orphaned metadata :files.', [
-            'count' => $totalOrphanedMetaFiles,
-            'files' => Str::plural('file', $totalOrphanedMetaFiles),
+            'count' => $orphanedMetaFilesCount,
+            'files' => Str::plural('file', $orphanedMetaFilesCount),
         ]));
 
         return self::SUCCESS;
