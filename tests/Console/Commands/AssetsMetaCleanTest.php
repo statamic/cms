@@ -21,6 +21,20 @@ class AssetsMetaCleanTest extends TestCase
     }
 
     #[Test]
+    public function dry_run_lists_orphaned_files_without_deleting_them()
+    {
+        AssetContainer::make('test')->disk('test')->save();
+
+        Storage::disk('test')->put('.meta/root.txt.yaml', 'size: 123');
+
+        $this->artisan('statamic:assets:meta-clean test --dry-run')
+            ->expectsOutputToContain('Found 1 orphaned metadata file.')
+            ->expectsOutputToContain('[test] .meta/root.txt.yaml');
+
+        $this->assertTrue(Storage::disk('test')->exists('.meta/root.txt.yaml'));
+    }
+
+    #[Test]
     public function it_deletes_orphaned_meta_files_and_cleans_up_empty_meta_directories()
     {
         AssetContainer::make('test')->disk('test')->save();
@@ -49,20 +63,6 @@ class AssetsMetaCleanTest extends TestCase
             ->expectsOutputToContain('No orphaned metadata files were found.');
 
         $this->assertTrue(Storage::disk('test')->exists('foo/.meta/bar.txt.yaml'));
-    }
-
-    #[Test]
-    public function dry_run_lists_orphaned_files_without_deleting_them()
-    {
-        AssetContainer::make('test')->disk('test')->save();
-
-        Storage::disk('test')->put('.meta/root.txt.yaml', 'size: 123');
-
-        $this->artisan('statamic:assets:meta-clean test --dry-run')
-            ->expectsOutputToContain('Found 1 orphaned metadata file.')
-            ->expectsOutputToContain('[test] .meta/root.txt.yaml');
-
-        $this->assertTrue(Storage::disk('test')->exists('.meta/root.txt.yaml'));
     }
 
     #[Test]
