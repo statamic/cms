@@ -36,7 +36,7 @@
 	                </Dropdown>
 	            </template>
 
-	            <template #pinned="{ actions }">
+	            <template #quick="{ actions }">
 		            <Button
 			            v-for="action in actions"
 			            :key="action.handle"

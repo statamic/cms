@@ -48,7 +48,7 @@
                                 <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
 
 	                            <ui-button
-		                            v-for="action in pinnedActions(actions)"
+		                            v-for="action in quickActions(actions)"
 		                            inset
 		                            size="sm"
 		                            @click="action.run"
@@ -504,8 +504,8 @@ export default {
             return actions.filter((action) => !buttonActions.includes(action.handle));
         },
 
-	    pinnedActions(actions) {
-		    return actions.filter((action) => action.pinned);
+	    quickActions(actions) {
+		    return actions.filter((action) => action.quick);
 	    },
     },
 };

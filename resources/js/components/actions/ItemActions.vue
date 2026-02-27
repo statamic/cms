@@ -30,8 +30,8 @@ let preparedActions = computed(() => {
     return prepareActions(actions.value, confirmableActions.value);
 });
 
-let preparedPinnedActions = computed(() => {
-	return prepareActions(actions.value?.filter(action => action.pinned), confirmableActions.value);
+let preparedQuickActions = computed(() => {
+	return prepareActions(actions.value?.filter(action => action.quick), confirmableActions.value);
 });
 
 let errors = ref({});
@@ -73,7 +73,7 @@ function loadActions() {
 }
 
 const slots = useSlots();
-const showPinnedActions = computed(() => preparedPinnedActions.value && !!slots.pinned);
+const showQuickActions = computed(() => preparedQuickActions.value && !!slots.quick);
 
 defineExpose({
     preparedActions,
@@ -92,5 +92,5 @@ defineExpose({
         @confirmed="runAction"
     />
     <slot :actions="preparedActions" :load-actions="loadActions" />
-	<slot v-if="showPinnedActions" name="pinned" :actions="preparedPinnedActions" />
+	<slot v-if="showQuickActions" name="quick" :actions="preparedQuickActions" />
 </template>

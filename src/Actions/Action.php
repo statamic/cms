@@ -17,7 +17,7 @@ abstract class Action implements Arrayable
     protected $items;
     protected $confirm = true;
     protected $dangerous = false;
-    protected $pinned = false;
+    protected $quick = false;
     protected $fields = [];
     protected $context = [];
     protected $runnable = true;
@@ -163,7 +163,7 @@ abstract class Action implements Arrayable
             'bypassesDirtyWarning' => $this->bypassesDirtyWarning(),
             'requiresElevatedSession' => $this->requiresElevatedSession(),
             'dangerous' => $this->dangerous,
-            'pinned' => $this->pinned,
+            'quick' => $this->quick,
             'fields' => $this->fields()->toPublishArray(),
             'values' => $this->fields()->preProcess()->values(),
             'meta' => $this->fields()->meta(),
