@@ -29,7 +29,7 @@ class AssetsMetaClean extends Command
         $orphanedMetaFilesCount = $orphanedMetaFilesByContainer->sum->count();
 
         if ($orphanedMetaFilesCount === 0) {
-            $this->components->info(__('No orphaned metadata files were found.'));
+            $this->components->info('No orphaned metadata files were found.');
 
             return self::SUCCESS;
         }
@@ -42,10 +42,7 @@ class AssetsMetaClean extends Command
             ->values();
 
         if ($this->option('dry-run')) {
-            $this->components->warn(__('Found :count orphaned metadata :files.', [
-                'count' => $orphanedMetaFilesCount,
-                'files' => Str::plural('file', $orphanedMetaFilesCount),
-            ]));
+            $this->components->warn("Found {$orphanedMetaFilesCount} orphaned metadata ".Str::plural('file', $orphanedMetaFilesCount));
 
             $flatOrphanedMetaFiles->each(function (array $metaFile) {
                 $this->line("[{$metaFile['container']}] {$metaFile['path']}");
@@ -55,7 +52,7 @@ class AssetsMetaClean extends Command
         }
 
         progress(
-            label: __('Deleting orphaned asset metadata...'),
+            label: 'Deleting orphaned asset metadata...',
             steps: $flatOrphanedMetaFiles,
             callback: function (array $metaFile, $progress) use ($containers) {
                 $containers->get($metaFile['container'])->disk()->delete($metaFile['path']);
@@ -67,10 +64,7 @@ class AssetsMetaClean extends Command
             $this->deleteEmptyMetaDirectories($containers->get($container), $metaFiles);
         });
 
-        $this->components->info(__('Deleted :count orphaned metadata :files.', [
-            'count' => $orphanedMetaFilesCount,
-            'files' => Str::plural('file', $orphanedMetaFilesCount),
-        ]));
+        $this->components->warn("Deleted {$orphanedMetaFilesCount} orphaned metadata ".Str::plural('file', $orphanedMetaFilesCount));
 
         return self::SUCCESS;
     }
