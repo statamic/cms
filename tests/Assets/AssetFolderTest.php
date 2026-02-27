@@ -1151,6 +1151,24 @@ class AssetFolderTest extends TestCase
         ], $folder->toArray());
     }
 
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_container_contents' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-container-contents'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = Facades\AssetContainer::make('test')->disk('local')->contents()->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-container-contents', $store->getStore()->getDirectory());
+    }
+
     private function containerWithDisk()
     {
         Storage::fake('local');

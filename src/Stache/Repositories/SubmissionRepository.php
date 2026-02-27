@@ -31,6 +31,10 @@ class SubmissionRepository implements RepositoryContract
 
     public function whereInForm(array $handles): Collection
     {
+        if (empty($handles)) {
+            return collect();
+        }
+
         return $this->query()->whereIn('form', $handles)->get();
     }
 

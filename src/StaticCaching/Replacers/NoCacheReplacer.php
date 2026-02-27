@@ -23,7 +23,12 @@ class NoCacheReplacer implements Replacer
 
     public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
     {
-        $this->replaceInResponse($initialResponse);
+        if (app(Cacher::class) instanceof FileCacher) {
+            $this->includeJs($initialResponse);
+            $this->modifyFullMeasureResponse($initialResponse);
+        } else {
+            $this->replaceInResponse($initialResponse);
+        }
 
         $this->modifyFullMeasureResponse($responseToBeCached);
     }
@@ -39,17 +44,28 @@ class NoCacheReplacer implements Replacer
             return;
         }
 
-        if (preg_match(self::PATTERN, $content)) {
-            $this->session->restore();
-
-            StaticCache::includeJs();
-        }
+        $this->includeJs($response);
 
         $response->setContent($this->replace($content));
     }
 
+    private function includeJs(Response $response)
+    {
+        if (! $content = $response->getContent()) {
+            return;
+        }
+
+        if (preg_match(self::PATTERN, $content)) {
+            StaticCache::includeJs();
+        }
+    }
+
     public function replace(string $content)
     {
+        if (preg_match(self::PATTERN, $content)) {
+            $this->session->restore();
+        }
+
         while (preg_match(self::PATTERN, $content)) {
             $content = $this->performReplacement($content);
         }
@@ -104,7 +120,7 @@ class NoCacheReplacer implements Replacer
             Str::position($contents, '</head>'),
         ])->filter()->min();
 
-        $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</script>";
+        $js = "<script>{$cacher->getNocacheJs()}</script>";
 
         return Str::substrReplace($contents, $js, $insertBefore, 0);
     }
@@ -113,6 +129,6 @@ class NoCacheReplacer implements Replacer
     {
         $js = $cacher->getNocacheJs();
 
-        return str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $contents);
+        return str_replace('</body>', '<script>'.$js.'</script></body>', $contents);
     }
 }

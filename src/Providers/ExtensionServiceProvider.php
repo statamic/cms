@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
@@ -259,10 +260,16 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected function registerAddonManifest()
     {
+        $cachePath = $this->app->bootstrapPath().'/cache/addons.php';
+
+        if (! is_null($env = Env::get('STATAMIC_ADDONS_CACHE'))) {
+            $cachePath = Str::startsWith($env, ['/', '\\']) ? $env : $this->app->basePath($env);
+        }
+
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
-            $this->app->bootstrapPath().'/cache/addons.php'
+            $cachePath
         ));
     }
 
@@ -337,7 +344,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->app['files']->allFiles($path) as $file) {
-            $relativePathOfFolder = str_replace(app_path('/'), '', $file->getPath());
+            $relativePathOfFolder = str_replace(app_path(DIRECTORY_SEPARATOR), '', $file->getPath());
             $namespace = str_replace('/', '\\', $relativePathOfFolder);
             $class = $file->getBasename('.php');
 

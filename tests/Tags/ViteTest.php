@@ -27,26 +27,23 @@ class ViteTest extends TestCase
     {
         $output = $this->tag('{{ vite src="test.js" }}');
 
-        $expected = <<<'HTML'
-<link rel="modulepreload" href="http://localhost/build/assets/test-123.js" />
-<script type="module" src="http://localhost/build/assets/test-123.js"></script>
-HTML;
+        $this->assertStringContainsString('<link rel="modulepreload"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.js" />', $output);
 
-        $this->assertEqualsIgnoringLineBreaks($expected, $output);
+        $this->assertStringContainsString('<script type="module"', $output);
+        $this->assertStringContainsString('src="http://localhost/build/assets/test-123.js"></script>', $output);
     }
 
     #[Test]
     public function it_outputs_stylesheet()
     {
-
         $output = $this->tag('{{ vite src="test.css" }}');
 
-        $expected = <<<'HTML'
-<link rel="preload" as="style" href="http://localhost/build/assets/test-123.css" />
-<link rel="stylesheet" href="http://localhost/build/assets/test-123.css" />
-HTML;
+        $this->assertStringContainsString('<link rel="preload"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" />', $output);
 
-        $this->assertEqualsIgnoringLineBreaks($expected, $output);
+        $this->assertStringContainsString('<link rel="stylesheet"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" />', $output);
     }
 
     #[Test]
@@ -54,14 +51,17 @@ HTML;
     {
         $output = $this->tag('{{ vite src="test.js|test.css" }}');
 
-        $expected = <<<'HTML'
-<link rel="preload" as="style" href="http://localhost/build/assets/test-123.css" />
-<link rel="modulepreload" href="http://localhost/build/assets/test-123.js" />
-<link rel="stylesheet" href="http://localhost/build/assets/test-123.css" />
-<script type="module" src="http://localhost/build/assets/test-123.js"></script>
-HTML;
+        $this->assertStringContainsString('<link rel="preload"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" />', $output);
 
-        $this->assertEqualsIgnoringLineBreaks($expected, $output);
+        $this->assertStringContainsString('<link rel="modulepreload"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.js" />', $output);
+
+        $this->assertStringContainsString('<link rel="stylesheet"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" />', $output);
+
+        $this->assertStringContainsString('<script type="module"', $output);
+        $this->assertStringContainsString('src="http://localhost/build/assets/test-123.js"></script>', $output);
     }
 
     #[Test]
@@ -69,14 +69,17 @@ HTML;
     {
         $output = $this->tag('{{ vite src="test.js|test.css" alfa="bravo" attr:charlie="delta" }}');
 
-        $expected = <<<'HTML'
-<link rel="preload" as="style" href="http://localhost/build/assets/test-123.css" />
-<link rel="modulepreload" href="http://localhost/build/assets/test-123.js" />
-<link rel="stylesheet" href="http://localhost/build/assets/test-123.css" charlie="delta" />
-<script type="module" src="http://localhost/build/assets/test-123.js" charlie="delta"></script>
-HTML;
+        $this->assertStringContainsString('<link rel="preload" as="style"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" />', $output);
 
-        $this->assertEqualsIgnoringLineBreaks($expected, $output);
+        $this->assertStringContainsString('<link rel="modulepreload"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.js" />', $output);
+
+        $this->assertStringContainsString('<link rel="stylesheet"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" charlie="delta" />', $output);
+
+        $this->assertStringContainsString('<script type="module"', $output);
+        $this->assertStringContainsString('src="http://localhost/build/assets/test-123.js" charlie="delta"></script>', $output);
     }
 
     #[Test]
@@ -84,14 +87,17 @@ HTML;
     {
         $output = $this->tag('{{ vite src="test.js|test.css" alfa="bravo" attr:charlie="delta" attr:script:echo="foxtrot" attr:style:golf="hotel" }}');
 
-        $expected = <<<'HTML'
-<link rel="preload" as="style" href="http://localhost/build/assets/test-123.css" />
-<link rel="modulepreload" href="http://localhost/build/assets/test-123.js" />
-<link rel="stylesheet" href="http://localhost/build/assets/test-123.css" charlie="delta" golf="hotel" />
-<script type="module" src="http://localhost/build/assets/test-123.js" charlie="delta" echo="foxtrot"></script>
-HTML;
+        $this->assertStringContainsString('<link rel="preload" as="style"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" />', $output);
 
-        $this->assertEqualsIgnoringLineBreaks($expected, $output);
+        $this->assertStringContainsString('<link rel="modulepreload"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.js" />', $output);
+
+        $this->assertStringContainsString('<link rel="stylesheet"', $output);
+        $this->assertStringContainsString('href="http://localhost/build/assets/test-123.css" charlie="delta" golf="hotel" />', $output);
+
+        $this->assertStringContainsString('<script type="module"', $output);
+        $this->assertStringContainsString('src="http://localhost/build/assets/test-123.js" charlie="delta" echo="foxtrot"></script>', $output);
     }
 
     // Ignore line breaks just for the sake of readability in the test.

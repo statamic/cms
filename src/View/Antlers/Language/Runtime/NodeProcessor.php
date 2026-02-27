@@ -1218,7 +1218,9 @@ class NodeProcessor
                                 'User content Antlers PHP tag.'
                             );
                         } else {
-                            Log::warning('PHP Node evaluated in user content: '.$node->name->name, [
+                            $logContent = $node->rawStart.$node->innerContent().$node->rawEnd;
+
+                            Log::warning('PHP Node evaluated in user content: '.$logContent, [
                                 'file' => GlobalRuntimeState::$currentExecutionFile,
                                 'trace' => GlobalRuntimeState::$templateFileStack,
                                 'content' => $node->innerContent(),
@@ -2164,6 +2166,8 @@ class NodeProcessor
 
                                     if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
+                                            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             GlobalRuntimeState::$userContentEvalState = [
@@ -2171,14 +2175,18 @@ class NodeProcessor
                                                 $node,
                                             ];
 
-                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
-                                            GlobalRuntimeState::$userContentEvalState = null;
-                                            GlobalRuntimeState::$isEvaluatingUserData = false;
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            try {
+                                                $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            } finally {
+                                                GlobalRuntimeState::$userContentEvalState = null;
+                                                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+                                                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+                                            }
                                         } else {
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
                                         }
                                     }
 
@@ -2456,7 +2464,7 @@ class NodeProcessor
 
     protected function evaluateAntlersPhpNode(PhpExecutionNode $node)
     {
-        if (! GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
+        if (! GlobalRuntimeState::$allowPhpInContent && GlobalRuntimeState::$isEvaluatingUserData) {
             return StringUtilities::sanitizePhp($node->content);
         }
 
@@ -2550,6 +2558,7 @@ class NodeProcessor
             $value['count'] = $index + 1;
             $value['index'] = $index;
             $value['total_results'] = $total;
+            $value['no_results'] = false;
             $value['first'] = $index === 0;
             $value['last'] = $index === $lastIndex;
 
@@ -2627,9 +2636,13 @@ class NodeProcessor
             return $data->value();
         }
 
+        $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
-        $value = $data->antlersValue($this->antlersParser, $context);
-        GlobalRuntimeState::$isEvaluatingUserData = false;
+        try {
+            $value = $data->antlersValue($this->antlersParser, $context);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+        }
 
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();

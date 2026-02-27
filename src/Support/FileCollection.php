@@ -212,7 +212,7 @@ class FileCollection extends Collection
                 'size_mb' => $kb,
                 'size_gb' => $kb,
                 'is_file' => File::isImage($path),
-                'last_modified' => Carbon::createFromTimestamp(File::lastModified($path)),
+                'last_modified' => Carbon::createFromTimestamp(File::lastModified($path), config('app.timezone')),
             ];
         }
 

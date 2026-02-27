@@ -57,7 +57,8 @@ class PasswordProtector extends Protector
         }
 
         if (
-            ($password = session("statamic:protect:password.passwords.ref.{$this->data->reference()}"))
+            $this->data
+            && ($password = session("statamic:protect:password.passwords.ref.{$this->data->reference()}"))
             && $this->isValidLocalPassword($password)
         ) {
             return true;
@@ -105,7 +106,7 @@ class PasswordProtector extends Protector
         session()->put("statamic:protect:password.tokens.$token", [
             'scheme' => $this->scheme,
             'url' => $this->url,
-            'reference' => $this->data->reference(),
+            'reference' => $this->data?->reference(),
         ]);
 
         return $token;

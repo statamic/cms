@@ -76,7 +76,7 @@ class CacheServiceProvider extends ServiceProvider
 
             $keyValuePair = $callback();
             $value = reset($keyValuePair);
-            $expiration = Carbon::now()->addMinutes(key($keyValuePair));
+            $expiration = Carbon::now()->addMinutes((int) key($keyValuePair));
 
             return Cache::remember($cacheKey, $expiration, function () use ($value) {
                 return $value;

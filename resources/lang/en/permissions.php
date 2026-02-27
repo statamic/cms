@@ -65,6 +65,11 @@ return [
     'move_{container}_assets' => 'Move assets',
     'rename_{container}_assets' => 'Rename assets',
     'delete_{container}_assets' => 'Delete assets',
+    'edit_{container}_folders' => 'Edit folders',
+    'create_{container}_folders' => 'Create folders',
+    'move_{container}_folders' => 'Move folders',
+    'rename_{container}_folders' => 'Rename folders',
+    'delete_{container}_folders' => 'Delete folders',
 
     'group_forms' => 'Forms',
     'configure_forms' => 'Configure forms',

@@ -5,8 +5,10 @@ namespace Statamic\Http\Controllers\API;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Statamic\Exceptions\ApiValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
 
@@ -80,12 +82,26 @@ class ApiController extends Controller
      *
      * @param  \Statamic\Query\Builder  $query
      * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
+     *
+     * @deprecated
      */
     protected function filterSortAndPaginate($query)
+    {
+        return $this->updateAndPaginate($query);
+    }
+
+    /**
+     * Filter, sort, scope, and paginate query for API resource output.
+     *
+     * @param  \Statamic\Query\Builder  $query
+     * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
+     */
+    protected function updateAndPaginate($query)
     {
         return $this
             ->filter($query)
             ->sort($query)
+            ->scope($query)
             ->paginate($query);
     }
 
@@ -169,6 +185,52 @@ class ApiController extends Controller
                 return explode(':', $param)[0];
             })
             ->contains($field);
+    }
+
+    /**
+     * Apply query scopes a query based on conditions in the query_scope parameter.
+     *
+     * /endpoint?query_scope[scope_handle]=foo&query_scope[another_scope]=bar
+     *
+     * @param  \Statamic\Query\Builder  $query
+     * @return $this
+     */
+    protected function scope($query)
+    {
+        $this->getScopes()
+            ->each(function ($value, $handle) use ($query) {
+                Scope::find($handle)?->apply($query, Arr::wrap($value));
+            });
+
+        return $this;
+    }
+
+    /**
+     * Get scopes for querying.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getScopes()
+    {
+        if (! method_exists($this, 'allowedQueryScopes')) {
+            return collect();
+        }
+
+        $scopes = collect(request()->query_scope ?? []);
+
+        $allowedScopes = collect($this->allowedQueryScopes());
+
+        $forbidden = $scopes
+            ->keys()
+            ->filter(fn ($handle) => ! Scope::find($handle) || ! $allowedScopes->contains($handle));
+
+        if ($forbidden->isNotEmpty()) {
+            throw ApiValidationException::withMessages([
+                'query_scope' => Str::plural('Forbidden query scope', $forbidden).': '.$forbidden->join(', '),
+            ]);
+        }
+
+        return $scopes;
     }
 
     /**

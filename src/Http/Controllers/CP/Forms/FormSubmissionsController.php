@@ -48,15 +48,17 @@ class FormSubmissionsController extends CpController
         $query = $form->querySubmissions();
 
         if ($search = request('search')) {
-            $query->where('date', 'like', '%'.$search.'%');
+            $query->where(function ($query) use ($form, $search) {
+                $query->where('date', 'like', '%'.$search.'%');
 
-            $form->blueprint()->fields()->all()
-                ->filter(function (Field $field): bool {
-                    return in_array($field->type(), ['text', 'textarea', 'integer']);
-                })
-                ->each(function (Field $field) use ($query, $search): void {
-                    $query->orWhere($field->handle(), 'like', '%'.$search.'%');
-                });
+                $form->blueprint()->fields()->all()
+                    ->filter(function (Field $field): bool {
+                        return in_array($field->type(), ['text', 'textarea', 'integer']);
+                    })
+                    ->each(function (Field $field) use ($query, $search): void {
+                        $query->orWhere($field->handle(), 'like', '%'.$search.'%');
+                    });
+            });
         }
 
         return $query;

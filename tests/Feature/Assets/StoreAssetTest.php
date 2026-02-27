@@ -171,7 +171,7 @@ class StoreAssetTest extends TestCase
     #[Test]
     public function it_can_upload_and_append_timestamp()
     {
-        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288, config('app.timezone')));
         Storage::disk('test')->put('path/to/test.jpg', 'contents');
         Storage::disk('test')->assertExists('path/to/test.jpg');
         $this->assertCount(1, Storage::disk('test')->files('path/to'));

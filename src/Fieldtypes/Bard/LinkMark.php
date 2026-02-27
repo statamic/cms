@@ -25,13 +25,12 @@ class LinkMark extends Link
         return [
             'href' => [
                 'renderHTML' => function ($attributes) {
-                    $href = $attributes->href;
-                    if (! isset($href)) {
+                    if (! isset($attributes->href)) {
                         return null;
                     }
 
                     return [
-                        'href' => $this->convertHref($href) ?? '',
+                        'href' => $this->convertHref($attributes->href) ?? '',
                     ];
                 },
             ],
@@ -65,11 +64,13 @@ class LinkMark extends Link
             return '';
         }
 
-        if (! $this->isApi() && $item instanceof Entry) {
+        $selectAcrossSites = Augmentor::$currentBardConfig['select_across_sites'] ?? false;
+
+        if (! $selectAcrossSites && ! $this->isApi() && $item instanceof Entry) {
             return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
-        return $item->url();
+        return $selectAcrossSites ? $item->absoluteUrl() : $item->url();
     }
 
     private function isApi()

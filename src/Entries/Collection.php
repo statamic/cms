@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasDirtyState;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
@@ -32,9 +33,11 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
 
     protected $handle;
     protected $routes = [];
@@ -265,6 +268,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return cp_route('collections.show', $this->handle());
     }
 
+    public function breadcrumbUrl()
+    {
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
+
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
+    }
+
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());
@@ -471,6 +482,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
+        Blink::forget("collection-{$this->id()}-structure");
+
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
@@ -486,6 +499,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::save($this);
 
+        if ($this->isDirty('route')) {
+            Facades\Entry::updateUris($this);
+        }
+
         Blink::forget('collection-handles');
         Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
@@ -497,6 +514,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
             CollectionSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return $this;
     }
@@ -927,5 +946,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return $this->fileData();
     }
 }

@@ -31,6 +31,7 @@ trait ExtractsFromEntryFields
         }
 
         $fields = $blueprint
+            ->setParent($entry)
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -43,6 +44,7 @@ trait ExtractsFromEntryFields
 
         $extraValues = [
             'depth' => $entry->page()?->depth(),
+            'children' => $entry->page()?->flattenedPages()->pluck('id')->all(),
         ];
 
         return [$values->all(), $fields->meta(), $extraValues];

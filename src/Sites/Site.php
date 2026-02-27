@@ -7,7 +7,9 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\TextDirection;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
+use Statamic\View\Cascade;
 
 class Site implements Augmentable
 {
@@ -16,12 +18,14 @@ class Site implements Augmentable
     protected $handle;
     protected $config;
     protected $rawConfig;
+    protected $isDefault;
 
-    public function __construct($handle, $config)
+    public function __construct($handle, $config, $isDefault = false)
     {
         $this->handle = $handle;
         $this->config = $this->resolveAntlers($config);
         $this->rawConfig = $config;
+        $this->isDefault = $isDefault;
     }
 
     public function handle()
@@ -95,6 +99,11 @@ class Site implements Augmentable
         return $path === '' ? '/' : $path;
     }
 
+    public function isDefault()
+    {
+        return $this->isDefault;
+    }
+
     public function set($key, $value)
     {
         $this->config[$key] = $this->resolveAntlersValue($value);
@@ -122,7 +131,14 @@ class Site implements Augmentable
                 ->all();
         }
 
-        return (string) app(RuntimeParser::class)->parse($value, ['config' => config()->all()]);
+        $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = true;
+
+        try {
+            return (string) app(RuntimeParser::class)->parse($value, ['config' => Cascade::config()]);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $isEvaluatingUserData;
+        }
     }
 
     private function removePath($url)

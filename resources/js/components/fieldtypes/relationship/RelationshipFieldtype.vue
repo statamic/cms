@@ -19,6 +19,7 @@
         :creatables="creatables"
         :form-component="formComponent"
         :form-component-props="formComponentProps"
+        :form-stack-size="formStackSize"
         :status-icons="statusIcons"
         :columns="columns"
         :search="canSearch"
@@ -131,6 +132,10 @@ export default {
             return this.meta.formComponentProps;
         },
 
+        formStackSize() {
+            return this.meta.formStackSize;
+        },
+
         taggable() {
             return this.meta.taggable;
         },
@@ -142,7 +147,18 @@ export default {
                 const item = _.findWhere(this.meta.data, { id });
                 return item ? item.title : id;
             });
-        }
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Unlink All'),
+                    dangerous: true,
+                    run: this.unlinkAll,
+                    visible: this.value.length > 0,
+                },
+            ];
+        },
 
     },
 
@@ -157,7 +173,15 @@ export default {
 
         linkExistingItem() {
             this.$refs.input.$refs.existing.click();
-        }
+        },
+
+        unlinkAll() {
+            this.update([]);
+            this.updateMeta({
+                ...this.meta,
+                data: [], 
+            });
+        },
 
     }
 

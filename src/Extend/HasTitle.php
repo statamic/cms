@@ -4,6 +4,8 @@ namespace Statamic\Extend;
 
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 trait HasTitle
 {
     protected static $title;

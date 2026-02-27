@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class NavTreeSaved extends Event implements ProvidesCommitMessage
 {
-    public $tree;
-
-    public function __construct($tree)
+    public function __construct(public $tree)
     {
-        $this->tree = $tree;
     }
 
     public function commitMessage()

@@ -31,9 +31,6 @@
                         :config="config"
                         :bard="_self"
                         :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
                 </div>
             </div>
         </publish-field-fullscreen-header>
@@ -49,9 +46,6 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                    <svg-icon name="show-source" class="w-4 h-4 "/>
-                </button>
             </div>
         </div>
 
@@ -370,6 +364,12 @@ export default {
                     visibleWhenReadOnly: true,
                     visible: this.config.fullscreen,
                 },
+                {
+                    title: __('Show HTML Source'),
+                    run: () => this.showSource = !this.showSource,
+                    visibleWhenReadOnly: true,
+                    visible: this.allowSource,
+                },
             ];
         },
 
@@ -411,7 +411,7 @@ export default {
         json(json, oldJson) {
             if (!this.mounted) return;
                         
-            if (json === oldJson) return;
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
             this.updateDebounced(json);
         },
@@ -457,8 +457,8 @@ export default {
     methods: {
         addSet(handle) {
             const id = uniqid();
-            const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-
+            const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
+            const values = Object.assign({}, { type: handle }, deepCopy);
             let previews = {};
             Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
             this.previews = Object.assign({}, this.previews, { [id]: previews });
@@ -481,7 +481,8 @@ export default {
         duplicateSet(old_id, attrs, pos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
+            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
+            const values = Object.assign({}, deepCopy);
 
             let previews = Object.assign({}, this.previews[old_id]);
             this.previews = Object.assign({}, this.previews, { [id]: previews });

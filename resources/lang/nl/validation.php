@@ -118,6 +118,7 @@ return [
     'uuid' => 'Moet een geldige UUID zijn.',
     'arr_fieldtype' => 'Dit is ongeldig.',
     'handle' => 'Mag alleen kleine letters en getallen bevatten met lage strepen als scheidingstekens.',
+    'handle_starts_with_number' => 'Mag niet beginnen met een getal.',
     'slug' => 'Mag alleen kleine letters en getallen bevatten met lage of gewone strepen als scheidingstekens.',
     'code_fieldtype_rulers' => 'Dit is ongeldig.',
     'composer_package' => 'Moet een geldige composer package naam zijn (bijv. hasselhoff/kung-fury).',

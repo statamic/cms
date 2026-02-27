@@ -54,12 +54,12 @@ class Tags extends BaseTags
 
     protected function querySite($query)
     {
-        $site = $this->params->get(['site', 'locale'], Site::current()->handle());
+        $sites = $this->params->explode(['site', 'locale'], [Site::current()->handle()]);
 
-        if ($site === '*' || ! Site::hasMultiple()) {
+        if (in_array('*', $sites) || ! Site::hasMultiple()) {
             return;
         }
 
-        return $query->where('site', $site);
+        return $query->whereIn('site', $sites);
     }
 }

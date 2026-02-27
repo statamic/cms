@@ -47,6 +47,10 @@ class TermRepository implements RepositoryContract
 
     public function whereInTaxonomy(array $handles): TermCollection
     {
+        if (empty($handles)) {
+            return TermCollection::make();
+        }
+
         collect($handles)
             ->reject(fn ($taxonomy) => Taxonomy::find($taxonomy))
             ->each(fn ($taxonomy) => throw new TaxonomyNotFoundException($taxonomy));
@@ -99,6 +103,10 @@ class TermRepository implements RepositoryContract
             ->first();
 
         if (! $term) {
+            return null;
+        }
+
+        if ($term->uri() !== '/'.$uri) {
             return null;
         }
 
@@ -195,6 +203,10 @@ class TermRepository implements RepositoryContract
 
     public function applySubstitutions($items)
     {
+        if (empty($this->substitutionsById)) {
+            return $items;
+        }
+
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });

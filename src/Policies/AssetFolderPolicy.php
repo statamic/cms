@@ -8,11 +8,24 @@ use Statamic\Facades\User;
 
 class AssetFolderPolicy
 {
+    public function before($user)
+    {
+        $user = User::fromUser($user);
+
+        if ($user->hasPermission('configure asset containers')) {
+            return true;
+        }
+    }
+
     public function create($user, $assetContainer)
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
+        $permission = config('statamic.assets.v6_permissions')
+            ? "edit {$assetContainer->handle()} folders"
+            : "upload {$assetContainer->handle()} assets";
+
+        if (! $user->hasPermission($permission)) {
             return false;
         }
 
@@ -23,7 +36,12 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("move {$assetFolder->container()->handle()} assets")) {
+        $hasPermission = config('statamic.assets.v6_permissions')
+            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+                && $user->hasPermission("move {$assetFolder->container()->handle()} assets"))
+            : $user->hasPermission("move {$assetFolder->container()->handle()} assets");
+
+        if (! $hasPermission) {
             return false;
         }
 
@@ -41,7 +59,12 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("rename {$assetFolder->container()->handle()} assets")) {
+        $hasPermission = config('statamic.assets.v6_permissions')
+            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+                && $user->hasPermission("rename {$assetFolder->container()->handle()} assets"))
+            : $user->hasPermission("rename {$assetFolder->container()->handle()} assets");
+
+        if (! $hasPermission) {
             return false;
         }
 
@@ -59,7 +82,12 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $user->hasPermission("delete {$assetFolder->container()->handle()} assets")) {
+        $hasPermission = config('statamic.assets.v6_permissions')
+            ? ($user->hasPermission("edit {$assetFolder->container()->handle()} folders")
+                && $user->hasPermission("delete {$assetFolder->container()->handle()} assets"))
+            : $user->hasPermission("delete {$assetFolder->container()->handle()} assets");
+
+        if (! $hasPermission) {
             return false;
         }
 

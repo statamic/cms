@@ -3,6 +3,9 @@
     <div>
     <stack name="inline-editor"
         :before-close="shouldClose"
+        :narrow="stackSize === 'narrow'"
+        :half="stackSize === 'half'"
+        :full="stackSize === 'full'"
         @closed="close"
     >
     <div class="h-full overflow-scroll overflow-x-auto p-6 bg-gray-300 dark:bg-dark-800">
@@ -44,6 +47,7 @@ export default {
     props: {
         component: String,
         componentProps: Object,
+        stackSize: String,
     },
 
     data() {

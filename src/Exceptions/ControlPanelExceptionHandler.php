@@ -8,6 +8,8 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\ValidationException as StatamicValidationException;
 use Throwable;
 
+use function Statamic\trans as __;
+
 class ControlPanelExceptionHandler extends Handler
 {
     use Concerns\RendersControlPanelExceptions;

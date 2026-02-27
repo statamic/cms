@@ -252,7 +252,7 @@ return [
     'user_wizard_invitation_share_before' => 'Después de crear el usuario, se te darán detalles para compartir <code>:email</code> través de tu método preferido.',
     'user_wizard_invitation_subject' => 'Activa tu nueva cuenta de Statamic en :site',
     'user_wizard_roles_groups_intro' => 'Los usuarios pueden ser asignados a roles que personalizan sus permisos, acceso y habilidades en todo el Panel de Control.',
-    'user_wizard_super_admin_instructions' => 'Los superadministradores tienen control y acceso completos a todo en el Panel de Control. Concede este rol sabiamente.',
+    'user_wizard_super_admin_instructions' => 'Los super-administradores tienen control y acceso completos a todo en el Panel de Control. Concede este rol sabiamente.',
     'view_more_count' => 'Ver :count más',
     'width_x_height' => ':width x :height',
 ];

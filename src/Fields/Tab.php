@@ -5,6 +5,8 @@ namespace Statamic\Fields;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Tab
 {
     protected $handle;

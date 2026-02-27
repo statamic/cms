@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class AssetContainerDeleting extends Event
 {
-    public $container;
-
-    public function __construct($container)
+    public function __construct(public $container)
     {
-        $this->container = $container;
     }
 
     /**

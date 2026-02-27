@@ -39,6 +39,12 @@ class User extends BaseUser
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function data($data = null)
     {
         if (func_num_args() === 0) {
@@ -116,7 +122,7 @@ class User extends BaseUser
             ? File::disk('users')->lastModified($path)
             : time();
 
-        return Carbon::createFromTimestamp($timestamp);
+        return Carbon::createFromTimestamp($timestamp, config('app.timezone'));
     }
 
     /**
@@ -171,11 +177,14 @@ class User extends BaseUser
 
     public function assignRole($role)
     {
-        $roles = collect(Arr::wrap($role))->map(function ($role) {
-            return is_string($role) ? $role : $role->handle();
-        })->all();
+        $roles = collect($this->get('roles', []))
+            ->merge(Arr::wrap($role))
+            ->map(fn ($role) => is_string($role) ? $role : $role->handle())
+            ->unique()
+            ->values()
+            ->all();
 
-        $this->set('roles', array_merge($this->get('roles', []), $roles));
+        $this->set('roles', $roles);
 
         return $this;
     }
@@ -198,11 +207,14 @@ class User extends BaseUser
 
     public function addToGroup($group)
     {
-        $groups = collect(Arr::wrap($group))->map(function ($group) {
-            return is_string($group) ? $group : $group->handle();
-        })->all();
+        $groups = collect($this->get('groups', []))
+            ->merge(Arr::wrap($group))
+            ->map(fn ($group) => is_string($group) ? $group : $group->handle())
+            ->unique()
+            ->values()
+            ->all();
 
-        $this->set('groups', array_merge($this->get('groups', []), $groups));
+        $this->set('groups', $groups);
 
         return $this;
     }
@@ -292,7 +304,7 @@ class User extends BaseUser
     {
         $last_login = $this->getMeta('last_login');
 
-        return $last_login ? Carbon::createFromTimestamp($last_login) : $last_login;
+        return $last_login ? Carbon::createFromTimestamp($last_login, config('app.timezone')) : $last_login;
     }
 
     public function setLastLogin($carbon)

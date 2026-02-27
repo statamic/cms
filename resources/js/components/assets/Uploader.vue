@@ -68,6 +68,15 @@ export default {
     },
 
 
+    computed: {
+
+        activeUploads() {
+            return this.uploads.filter(u => u.instance.state === 'started');
+        }
+
+    },
+
+
     methods: {
 
         browse() {
@@ -230,6 +239,9 @@ export default {
         },
 
         processUploadQueue() {
+            // If we're already uploading, don't start another
+            if (this.activeUploads.length) return;
+
             // Make sure we're not grabbing a running or failed upload
             const upload = this.uploads.find(u => u.instance.state === 'new' && !u.errorMessage);
             if (!upload) return;
@@ -248,12 +260,16 @@ export default {
                 response.status === 200
                     ? this.handleUploadSuccess(id, json)
                     : this.handleUploadError(id, response.status, json);
+
+                this.processUploadQueue();
             });
         },
 
         handleUploadSuccess(id, response) {
             this.$emit('upload-complete', response.data, this.uploads);
             this.uploads.splice(this.findUploadIndex(id), 1);
+
+            this.handleToasts(response._toasts ?? []);
         },
 
         handleUploadError(id, status, response) {
@@ -270,10 +286,17 @@ export default {
                     msg = Object.values(response.errors)[0][0]; // Get first validation message.
                 }
             }
+
+            this.handleToasts(response?._toasts ?? []);
+
             upload.errorMessage = msg;
             upload.errorStatus = status;
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
+        },
+
+        handleToasts(toasts) {
+            toasts.forEach(toast => Statamic.$toast[toast.type](toast.message, {duration: toast.duration}));
         },
 
         retry(id, args) {

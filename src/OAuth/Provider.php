@@ -46,14 +46,30 @@ class Provider
 
     public function findOrCreateUser($socialite): StatamicUser
     {
+        if ($user = $this->findUser($socialite)) {
+            return config('statamic.oauth.merge_user_data', true)
+                ? $this->mergeUser($user, $socialite)
+                : $user;
+        }
+
+        return $this->createUser($socialite);
+    }
+
+    /**
+     * Find a Statamic user by a Socialite user.
+     *
+     * @param  SocialiteUser  $socialite
+     */
+    public function findUser($socialite): ?StatamicUser
+    {
         if (
             ($user = User::findByOAuthId($this, $socialite->getId())) ||
             ($user = User::findByEmail($socialite->getEmail()))
         ) {
-            return $this->mergeUser($user, $socialite);
+            return $user;
         }
 
-        return $this->createUser($socialite);
+        return null;
     }
 
     /**

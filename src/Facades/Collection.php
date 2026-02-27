@@ -18,11 +18,11 @@ use Statamic\Contracts\Entries\CollectionRepository;
  * @method static void delete(\Statamic\Entries\Collection $collection)
  * @method static \Illuminate\Support\Collection whereStructured()
  * @method static \Illuminate\Support\Collection additionalPreviewTargets(string $handle)
- * @method static void computed(string|array $scopes, string $field, \Closure $callback)
+ * @method static void computed(string|array $scopes, string|array $field, ?\Closure $callback = null)
  * @method static \Illuminate\Support\Collection getComputedCallbacks($collection)
  *
  * @see CollectionRepository
- * @see \Statamic\Entries\Collection
+ * @link \Statamic\Entries\Collection
  */
 class Collection extends Facade
 {

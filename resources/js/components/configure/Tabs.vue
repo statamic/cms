@@ -4,7 +4,7 @@
             <div v-for="tab in mainTabs" :key="tab.handle">
                 <div class="mb-2 content">
                     <h2 v-text="tab.display" class="text-base" />
-                    <p v-html="tab.instructions" />
+                    <p v-html="sanitize(tab.instructions)" />
                 </div>
                 <div class="">
                     <publish-sections
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import DOMPurify from 'dompurify';
+
 export default {
 
     inject: ['storeName'],
@@ -69,6 +71,12 @@ export default {
             return `publish-actions-${this.storeName}`;
         }
 
+    },
+
+    methods: {
+        sanitize(value) {
+            return DOMPurify.sanitize(value);
+        }
     }
 
 }

@@ -14,14 +14,14 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntryScheduleReached;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
-use Statamic\Events\GlobalSetDeleted;
-use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesSaved;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
-use Statamic\Events\TermDeleted;
-use Statamic\Events\TermSaved;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
@@ -34,10 +34,10 @@ class Invalidate implements ShouldQueue
         EntrySaved::class => 'invalidateEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
-        TermSaved::class => 'invalidateTerm',
-        TermDeleted::class => 'invalidateTerm',
-        GlobalSetSaved::class => 'invalidateGlobalSet',
-        GlobalSetDeleted::class => 'invalidateGlobalSet',
+        LocalizedTermSaved::class => 'invalidateTerm',
+        LocalizedTermDeleted::class => 'invalidateTerm',
+        GlobalVariablesSaved::class => 'invalidateGlobalSet',
+        GlobalVariablesDeleted::class => 'invalidateGlobalSet',
         NavSaved::class => 'invalidateNav',
         NavDeleted::class => 'invalidateNav',
         FormSaved::class => 'invalidateForm',
@@ -79,7 +79,7 @@ class Invalidate implements ShouldQueue
 
     public function invalidateGlobalSet($event)
     {
-        $this->invalidator->invalidate($event->globals);
+        $this->invalidator->invalidate($event->variables);
     }
 
     public function invalidateNav($event)
@@ -94,12 +94,12 @@ class Invalidate implements ShouldQueue
 
     public function invalidateCollectionByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->collection());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateNavByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->structure());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateByBlueprint($event)

@@ -55,7 +55,8 @@ Route::name('statamic.')->group(function () {
     Route::prefix(config('statamic.routes.action'))
         ->post('nocache', NoCacheController::class)
         ->middleware(NoCacheLocalize::class)
-        ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
+        ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
+        ->name('nocache');
 
     if (OAuth::enabled()) {
         Route::get(config('statamic.oauth.routes.login'), [OAuthController::class, 'redirectToProvider'])->name('oauth.login');

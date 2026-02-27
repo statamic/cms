@@ -61,6 +61,7 @@ class CorePreferences
             'de_CH' => 'German (Switzerland)',
             'en' => 'English',
             'es' => 'Spanish',
+            'et' => 'Estonian',
             'fa' => 'Persian',
             'fr' => 'French',
             'hu' => 'Hungarian',

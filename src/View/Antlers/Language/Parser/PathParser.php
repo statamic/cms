@@ -211,7 +211,15 @@ class PathParser
                 }
             }
 
-            if ($this->isParsingString == false && $this->cur == self::LeftBracket) {
+            if (
+                $this->isParsingString == false && $this->cur == self::LeftBracket &&
+                (
+                    ctype_alnum($this->prev) ||
+                    $this->prev == DocumentParser::LeftBrace ||
+                    $this->prev == DocumentParser::RightBracket ||
+                    $this->prev == DocumentParser::Punctuation_FullStop
+                )
+            ) {
                 if (! empty($currentChars)) {
                     $pathNode = new PathNode();
                     $pathNode->name = implode($currentChars);

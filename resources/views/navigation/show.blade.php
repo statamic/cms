@@ -14,6 +14,7 @@
         site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
         :collections="{{ json_encode($collections) }}"
+        :entry-query-scopes='@json($collections_query_scopes)'
         :max-depth="{{ $nav->maxDepth() ?? 'Infinity' }}"
         :expects-root="{{ $str::bool($expectsRoot) }}"
         :blueprint="{{ json_encode($blueprint) }}"

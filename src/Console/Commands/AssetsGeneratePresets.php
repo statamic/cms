@@ -24,7 +24,9 @@ class AssetsGeneratePresets extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:assets:generate-presets {--queue : Queue the image generation.}';
+    protected $signature = 'statamic:assets:generate-presets
+        {--queue : Queue the image generation.}
+        {--excluded-containers= : Comma separated list of container handles to exclude.}';
 
     /**
      * The console command description.
@@ -55,7 +57,15 @@ class AssetsGeneratePresets extends Command
             $this->shouldQueue = false;
         }
 
-        AssetContainer::all()->sortBy('title')->each(function ($container) {
+        $excludedContainers = $this->option('excluded-containers');
+
+        if ($excludedContainers) {
+            $excludedContainers = explode(',', $excludedContainers);
+        }
+
+        AssetContainer::all()->filter(function ($container) use ($excludedContainers) {
+            return ! in_array($container->handle(), $excludedContainers ?? []);
+        })->sortBy('title')->each(function ($container) {
             note('Generating presets for <comment>'.$container->title().'</comment>...');
             $this->generatePresets($container);
             $this->newLine();
@@ -116,7 +126,7 @@ class AssetsGeneratePresets extends Command
         if (property_exists($this, 'components')) {
             $errors = Arr::pull($counts, 'errors');
             collect($counts)
-                ->put('errors', $errors)
+                ->when($errors, fn ($counts) => $counts->put('errors', $errors))
                 ->each(function ($count, $preset) {
                     $preset = $preset === 'errors' ? '<fg=red>errors</>' : $preset;
                     $this->components->twoColumnDetail($preset, $count);

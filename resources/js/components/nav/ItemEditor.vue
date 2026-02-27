@@ -41,9 +41,9 @@
                                 <publish-field-meta
                                     :config="{ handle: 'icon', type: 'icon', folder: 'light' }"
                                     :initial-value="config.icon"
-                                    v-slot="{ meta, value, loading }"
+                                    v-slot="{ meta, value, loading, config: fieldtypeConfig }"
                                 >
-                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="config.icon = $event" />
+                                    <icon-fieldtype v-if="!loading" handle="icon" :config="fieldtypeConfig" :meta="meta" :value="value" @input="config.icon = $event" />
                                 </publish-field-meta>
                             </div>
                         </div>

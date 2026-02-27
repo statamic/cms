@@ -3,7 +3,7 @@
 return [
 
     'cheatsheet' => '
-<p>Markdown is een text-naar-HTML markup syntax for webredacteuren. Met Markdown kun je leesbare en eenvoudige platte tekst schrijven welke geconverteerd wordt naar semantische, valide HTML.</p>
+<p>Markdown is een text-naar-HTML markup syntax voor webredacteuren. Met Markdown kun je leesbare en eenvoudige platte tekst schrijven welke geconverteerd wordt naar semantische, valide HTML.</p>
 
 <h3>Headers</h3>
 <pre class="language-markdown"><code># Dit is een h1
@@ -12,7 +12,7 @@ return [
 </code></pre>
 
 <h3>Bold &amp; Italic</h3>
-<pre class="language-markdown"><code>Je kunt dingen *benadrukken*, **bold maken**, or _**beide**_.</code></pre>
+<pre class="language-markdown"><code>Je kunt dingen *benadrukken*, **bold maken**, of _**beide**_.</code></pre>
 
 <h3>Links</h3>
 <pre class="language-markdown"><code>Dit is een [voorbeeldlink](https://voorbeeld.nl).</code></pre>

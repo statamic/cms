@@ -104,7 +104,7 @@ trait RendersForms
     {
         return collect($meta)
             ->map(function ($value, $key) {
-                return sprintf('<input type="hidden" name="_%s" value="%s" />', $key, $value);
+                return sprintf('<input type="hidden" name="_%s" value="%s" />', $key, e($value));
             })
             ->implode("\n");
     }
@@ -141,7 +141,9 @@ trait RendersForms
             ->map->get('default')
             ->filter()->all();
 
+        $formHandle = $field->form()?->handle() ?? Str::slug($errorBag);
         $data = array_merge($configDefaults, $field->toArray(), [
+            'id' => $this->generateFieldId($field->handle(), $formHandle),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
@@ -173,5 +175,13 @@ trait RendersForms
         $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
 
         return $html;
+    }
+
+    /**
+     * Generate a field id to associate input with label.
+     */
+    private function generateFieldId(string $fieldHandle, ?string $formName = null): string
+    {
+        return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
     }
 }

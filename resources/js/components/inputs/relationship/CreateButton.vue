@@ -26,6 +26,7 @@
             :item-url="creatable.url"
             :component="component"
             :component-props="componentProps"
+            :stack-size="stackSize"
             @created="itemCreated"
             @closed="stopCreating"
         />
@@ -47,6 +48,7 @@ export default {
         creatables: Array,
         component: String,
         componentProps: Object,
+        stackSize: String,
     },
 
     data() {

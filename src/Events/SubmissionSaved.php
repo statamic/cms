@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class SubmissionSaved extends Event implements ProvidesCommitMessage
 {
-    public $submission;
-
-    public function __construct($submission)
+    public function __construct(public $submission)
     {
-        $this->submission = $submission;
     }
 
     public function commitMessage()

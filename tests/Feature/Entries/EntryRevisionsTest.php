@@ -283,7 +283,7 @@ class EntryRevisionsTest extends TestCase
 
         $revision = tap((new Revision)
             ->key('collections/blog/en/123')
-            ->date(Carbon::createFromTimestamp('1553546421'))
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
             ->attributes([
                 'published' => false,
                 'slug' => 'existing-slug',
@@ -345,7 +345,7 @@ class EntryRevisionsTest extends TestCase
 
         $revision = tap((new Revision)
             ->key('collections/blog/en/123')
-            ->date(Carbon::createFromTimestamp('1553546421'))
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
             ->attributes([
                 'published' => true,
                 'slug' => 'existing-slug',

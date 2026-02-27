@@ -69,4 +69,9 @@ class Toggle extends Fieldtype
     {
         return new ToggleFilter($this);
     }
+
+    public function toQueryableValue($value)
+    {
+        return (bool) $value;
+    }
 }

@@ -5,7 +5,6 @@ namespace Statamic\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
@@ -104,6 +103,7 @@ class ViewServiceProvider extends ServiceProvider
             $runtimeConfig->guardedContentTagPatterns = config('statamic.antlers.guardedContentTags', []);
             $runtimeConfig->guardedContentModifiers = config('statamic.antlers.guardedContentModifiers', []);
             $runtimeConfig->allowPhpInUserContent = config('statamic.antlers.allowPhpInContent', false);
+            $runtimeConfig->allowMethodsInUserContent = config('statamic.antlers.allowMethodsInContent', false);
 
             $runtimeConfig->guardedContentVariablePatterns = array_merge(
                 $runtimeConfig->guardedVariablePatterns,
@@ -178,18 +178,17 @@ if (! isset(\$view)) { \$view = []; }
                 $nested = '$children';
             }
 
-            $recursiveChildren = <<<'PHP'
-@include('compiled__views::'.$__currentStatamicNavView, array_merge(get_defined_vars(), [
-    'depth' => ($depth ?? 0) + 1,
-    '__statamicOverrideTagResultValue' => #varName#,
-]))
+            return <<<PHP
+<?php
+    echo \$___statamicNavCallback(
+        array_merge(get_defined_vars(), [
+            'depth' => (\$depth ?? 0) + 1,
+            '__statamicOverrideTagResultValue' => $nested,
+        ]),
+        \$___statamicNavCallback
+    );
+?>
 PHP;
-
-            $recursiveChildren = Str::swap([
-                '#varName#' => $nested,
-            ], $recursiveChildren);
-
-            return Blade::compileString($recursiveChildren);
         });
 
     }

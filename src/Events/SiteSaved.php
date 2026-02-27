@@ -9,7 +9,6 @@ class SiteSaved extends Event implements ProvidesCommitMessage
 {
     public function __construct(public Site $site)
     {
-        //
     }
 
     public function commitMessage()

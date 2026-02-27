@@ -12,6 +12,8 @@ use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 
+use function Statamic\trans as __;
+
 class Fieldtype extends Relationship
 {
     protected static $handle = 'form';

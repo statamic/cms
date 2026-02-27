@@ -10,7 +10,11 @@
     <div class="outside-shadow absolute inset-0"></div>
     <div class="card auth-card">
         <div class="mb-6">{{ __('Unauthorized') }}</div>
-        <a class="btn-primary" href="{{ cp_route('logout') }}?redirect={{ $redirect }}">{{ __('Log out') }}</a>
+        @auth
+            <a class="btn-primary" href="{{ cp_route('logout') }}?redirect={{ $redirect }}">{{ __('Log out') }}</a>
+        @else
+            <a class="btn-primary" href="{{ cp_route('login') }}">{{ __('Log in') }}</a>
+        @endauth
     </div>
 </div>
 

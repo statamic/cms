@@ -19,6 +19,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
+use Statamic\Support\Traits\Hookable;
 use Wilderborn\Partyline\Facade as Partyline;
 
 use function Laravel\Prompts\confirm;
@@ -26,7 +27,7 @@ use function Laravel\Prompts\text;
 
 class Multisite extends Command
 {
-    use ConfirmableTrait, EnhancesCommands, RunsInPlease, ValidatesInput;
+    use ConfirmableTrait, EnhancesCommands, Hookable, RunsInPlease, ValidatesInput;
 
     protected $signature = 'statamic:multisite';
 
@@ -55,6 +56,8 @@ class Multisite extends Command
             ->convertNavs()
             ->addPermissions()
             ->clearCache();
+
+        $this->runHooks('after');
 
         $this->components->info('Successfully converted from single to multisite installation!');
 

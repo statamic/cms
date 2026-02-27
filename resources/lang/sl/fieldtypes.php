@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Vnesite in pritisnite ↩ Enter',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
-    'template.config.blueprint' => 'Doda možnost »preslikava v načrt«. Več o tem v [dokumentaciji](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Doda možnost »preslikava v načrt«. Več o tem v [dokumentaciji](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Pokaži samo predloge v tej mapi.',
     'template.config.hide_partials' => 'Udeleženci so redko namenjeni uporabi kot predloge.',
     'template.title' => 'Template',

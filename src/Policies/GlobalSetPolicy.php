@@ -36,6 +36,11 @@ class GlobalSetPolicy
         // handled by before()
     }
 
+    public function store($user)
+    {
+        // handled by before()
+    }
+
     public function view($user, $set)
     {
         $user = User::fromUser($user);

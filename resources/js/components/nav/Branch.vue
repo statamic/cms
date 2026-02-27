@@ -5,8 +5,10 @@
         <div class="flex items-center flex-1 p-2 rtl:mr-2 ltr:ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="! isSection && ! isChild">
-                    <i v-if="isAlreadySvg" class="w-4 h-4 rtl:ml-2 ltr:mr-2" v-html="icon"></i>
-                    <svg-icon v-else class="w-4 h-4 rtl:ml-2 ltr:mr-2" :name="'light/'+icon" />
+                    <svg-icon
+                        class="w-4 h-4 rtl:ml-2 ltr:mr-2"
+                        :name="isAlreadySvg ? icon : 'light/'+icon"
+                    />
                 </template>
 
                 <a

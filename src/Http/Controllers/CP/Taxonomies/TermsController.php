@@ -168,6 +168,8 @@ class TermsController extends CpController
 
         $term = $term->fromWorkingCopy();
 
+        $term->term()->syncOriginal();
+
         $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
         $fields->validate([
@@ -243,6 +245,7 @@ class TermsController extends CpController
             'title' => $taxonomy->createLabel(),
             'actions' => [
                 'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -295,7 +298,7 @@ class TermsController extends CpController
 
         $slug = $request->slug;
         $published = $request->get('published'); // TODO
-        $defaultSite = Site::default()->handle();
+        $defaultSite = $term->taxonomy()->sites()->first();
 
         // If the term is *not* being created in the default site, we'll copy all the
         // appropriate values into the default localization since it needs to exist.
@@ -354,7 +357,7 @@ class TermsController extends CpController
             ],
             [
                 'text' => $taxonomy->title(),
-                'url' => $taxonomy->showUrl(),
+                'url' => $taxonomy->breadcrumbUrl(),
             ],
         ]);
     }

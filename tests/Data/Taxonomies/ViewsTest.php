@@ -88,6 +88,14 @@ class ViewsTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_load_the_term_url_if_there_are_additional_segments()
+    {
+        $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
+
+        $this->get('/tags/test/extra/segments')->assertNotFound();
+    }
+
+    #[Test]
     public function it_loads_the_localized_term_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
@@ -140,6 +148,18 @@ class ViewsTest extends TestCase
     }
 
     #[Test]
+    public function the_collection_specific_taxonomy_url_404s_if_the_collection_is_not_configured()
+    {
+        $this->mountBlogPageToBlogCollection();
+
+        $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
+
+        $this->blogCollection->taxonomies([])->save();
+
+        $this->get('/the-blog/tags')->assertNotFound();
+    }
+
+    #[Test]
     public function it_loads_the_collection_specific_taxonomy_url_if_the_view_exists()
     {
         $this->mountBlogPageToBlogCollection();
@@ -153,6 +173,18 @@ class ViewsTest extends TestCase
     public function the_collection_specific_term_url_404s_if_the_view_doesnt_exist()
     {
         $this->mountBlogPageToBlogCollection();
+
+        $this->get('/the-blog/tags/test')->assertNotFound();
+    }
+
+    #[Test]
+    public function the_collection_specific_term_url_404s_if_the_collection_is_not_assigned_to_the_taxonomy()
+    {
+        $this->mountBlogPageToBlogCollection();
+
+        $this->viewShouldReturnRaw('blog.tags.show', 'showing {{ title }}');
+
+        $this->blogCollection->taxonomies([])->save();
 
         $this->get('/the-blog/tags/test')->assertNotFound();
     }

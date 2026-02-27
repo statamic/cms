@@ -36,12 +36,24 @@ class Increment extends Tags implements ResetsState
         return '';
     }
 
-    public function wildcard($tag)
+    public function index()
     {
-        if (! isset(self::$arr[$tag])) {
-            return self::$arr[$tag] = $this->params->get('from', 0);
+        $counter = $this->params->get('counter', null);
+
+        return $this->increment($counter);
+    }
+
+    public function wildcard($counter)
+    {
+        return $this->increment($counter);
+    }
+
+    protected function increment($counter)
+    {
+        if (! isset(self::$arr[$counter])) {
+            return self::$arr[$counter] = $this->params->get('from', 0);
         }
 
-        return self::$arr[$tag] = self::$arr[$tag] + $this->params->get('by', 1);
+        return self::$arr[$counter] = self::$arr[$counter] + $this->params->get('by', 1);
     }
 }

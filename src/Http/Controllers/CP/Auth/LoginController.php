@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\URL;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class LoginController extends CpController
 {
@@ -134,7 +137,9 @@ class LoginController extends CpController
 
         $request->session()->regenerateToken();
 
-        return redirect($request->redirect ?? '/');
+        $redirect = $request->redirect ?? '/';
+
+        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
     }
 
     protected function getReferrer()

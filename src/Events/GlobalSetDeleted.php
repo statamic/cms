@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class GlobalSetDeleted extends Event implements ProvidesCommitMessage
 {
-    public $globals;
-
-    public function __construct($globals)
+    public function __construct(public $globals)
     {
-        $this->globals = $globals;
     }
 
     public function commitMessage()

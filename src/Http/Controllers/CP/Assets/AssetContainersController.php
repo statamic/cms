@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -25,11 +27,8 @@ class AssetContainersController extends CpController
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
-                'allow_downloading' => $container->allowDownloading(),
-                'allow_moving' => $container->allowMoving(),
-                'allow_renaming' => $container->allowRenaming(),
-                'allow_uploads' => $container->allowUploads(),
-                'create_folders' => $container->createFolders(),
+                'allow_uploads' => User::current()->can('store', [Asset::class, $container]),
+                'create_folders' => User::current()->can('create', [AssetFolder::class, $container]),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
                 'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),

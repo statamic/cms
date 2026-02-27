@@ -245,6 +245,29 @@ class URL
         return $isExternal;
     }
 
+    /**
+     * Check whether a URL is external to whole Statamic application.
+     */
+    public function isExternalToApplication(?string $url): bool
+    {
+        if (Str::startsWith($url, '//')) {
+            return true;
+        }
+
+        $urlDomain = parse_url($url, PHP_URL_HOST);
+        $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
+
+        return $urlDomain
+            ? Site::all()
+                ->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST))
+                ->push($currentRequestDomain)
+                ->filter(fn ($siteDomain) => ! is_null($siteDomain))
+                ->unique()
+                ->filter(fn ($siteDomain) => $siteDomain === $urlDomain)
+                ->isEmpty()
+            : false;
+    }
+
     public function clearExternalUrlCache()
     {
         self::$externalUriCache = [];

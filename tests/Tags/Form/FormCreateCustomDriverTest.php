@@ -81,7 +81,7 @@ EOT
 EOT
         ));
 
-        $expected = '<input type="email" name="email" value="" z-unless="Statamic.$conditions.showField(\'email\', __zData)" z-gnarley="true" required>';
+        $expected = '<input id="contact-form-email-field" type="email" name="email" value="" z-unless="Statamic.$conditions.showField(\'email\', __zData)" z-gnarley="true" required>';
         $this->assertStringContainsString($expected, $output);
     }
 

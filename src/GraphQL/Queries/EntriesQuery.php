@@ -3,14 +3,17 @@
 namespace Statamic\GraphQL\Queries;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
+use Statamic\GraphQL\Middleware\AuthorizeQueryScopes;
 use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
+use Statamic\GraphQL\Queries\Concerns\ScopesQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Support\Str;
@@ -21,6 +24,8 @@ class EntriesQuery extends Query
         filterQuery as traitFilterQuery;
     }
 
+    use ScopesQuery;
+
     protected $attributes = [
         'name' => 'entries',
     ];
@@ -29,6 +34,7 @@ class EntriesQuery extends Query
         AuthorizeSubResources::class,
         ResolvePage::class,
         AuthorizeFilters::class,
+        AuthorizeQueryScopes::class,
     ];
 
     public function type(): Type
@@ -43,6 +49,7 @@ class EntriesQuery extends Query
             'limit' => GraphQL::int(),
             'page' => GraphQL::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
+            'query_scope' => GraphQL::type(JsonArgument::NAME),
             'sort' => GraphQL::listOf(GraphQL::string()),
             'site' => GraphQL::string(),
         ];
@@ -59,6 +66,8 @@ class EntriesQuery extends Query
         }
 
         $this->filterQuery($query, $args['filter'] ?? []);
+
+        $this->scopeQuery($query, $args['query_scope'] ?? []);
 
         $this->sortQuery($query, $args['sort'] ?? []);
 
@@ -104,5 +113,10 @@ class EntriesQuery extends Query
     public function allowedFilters($args)
     {
         return FilterAuthorizer::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
+    }
+
+    public function allowedScopes($args)
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
     }
 }

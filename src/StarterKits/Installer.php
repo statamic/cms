@@ -631,14 +631,14 @@ EOT;
      */
     public function rollbackWithError(string $error, ?string $output = null): void
     {
+        if ($output) {
+            $this->console->line($this->tidyComposerErrorOutput($output));
+        }
+
         $this
             ->removeStarterKit()
             ->restoreComposerJson()
             ->removeComposerJsonBackup();
-
-        if ($output) {
-            $this->console->line($this->tidyComposerErrorOutput($output));
-        }
 
         throw new StarterKitException($error);
     }

@@ -60,6 +60,16 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function gets_is_default()
+    {
+        $withoutDefault = new Site('en', ['locale' => 'en_US']);
+        $withDefault = new Site('en', ['locale' => 'en_US'], true);
+
+        $this->assertFalse($withoutDefault->isDefault());
+        $this->assertTrue($withDefault->isDefault());
+    }
+
+    #[Test]
     public function gets_url_when_given_a_trailing_slash()
     {
         $site = new Site('en', ['url' => 'http://test.com/']);

@@ -118,16 +118,16 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex flex-wrap items-center gap-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
-                                            class="flex items-center justify-center btn w-full"
+                                            class="flex flex-1 items-center justify-center btn px-2"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn w-full"
+                                            class="flex flex-1 items-center justify-center btn px-2"
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
@@ -504,7 +504,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -610,7 +610,7 @@ export default {
                         this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -622,8 +622,8 @@ export default {
                         window.location = this.createAnotherUrl;
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         window.location = this.listingUrl;
                     }
 
@@ -635,7 +635,7 @@ export default {
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -724,7 +724,7 @@ export default {
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
 
-                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 500); // after any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 750); // after any fieldtypes do a debounced update
             })
         },
 
@@ -794,8 +794,8 @@ export default {
                 window.location = this.createAnotherUrl;
             }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (!this.isInline && nextAction === null) {
+            // If the user has opted to go to listing, redirect them there.
+            else if (!this.isInline && nextAction === 'listing') {
                 window.location = this.listingUrl;
             }
 
@@ -807,7 +807,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.data.values);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
                 this.activeLocalization.status = response.data.data.status;
@@ -864,7 +864,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.values);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
                 this.activeLocalization.status = response.data.status;

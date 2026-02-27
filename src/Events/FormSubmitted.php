@@ -6,11 +6,8 @@ use Statamic\Contracts\Forms\Submission;
 
 class FormSubmitted extends Event
 {
-    public $submission;
-
-    public function __construct(Submission $submission)
+    public function __construct(public Submission $submission)
     {
-        $this->submission = $submission;
     }
 
     /**

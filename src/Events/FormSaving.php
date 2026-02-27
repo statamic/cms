@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class FormSaving extends Event
 {
-    public $form;
-
-    public function __construct($form)
+    public function __construct(public $form)
     {
-        $this->form = $form;
     }
 
     /**

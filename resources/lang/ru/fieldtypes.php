@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Введите и нажмите ↩ Enter',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Таксономии',
-    'template.config.blueprint' => 'Добавляет опцию «Сопоставить с чертежом». Узнайте больше в [документации](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Добавляет опцию «Сопоставить с чертежом». Узнайте больше в [документации](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Показывать только шаблоны в этой папке.',
     'template.config.hide_partials' => 'Части редко предназначены для использования в качестве шаблонов.',
     'template.title' => 'Шаблон',

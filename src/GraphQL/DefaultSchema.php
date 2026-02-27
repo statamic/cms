@@ -93,4 +93,9 @@ class DefaultSchema implements ConfigConvertible
             GraphQL::getExtraMiddleware()
         );
     }
+
+    private function getMutations()
+    {
+        return config('statamic.graphql.mutations', []);
+    }
 }

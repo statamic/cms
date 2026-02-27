@@ -4,12 +4,7 @@ namespace Statamic\Events;
 
 class AssetReplaced extends Event
 {
-    public $originalAsset;
-    public $newAsset;
-
-    public function __construct($originalAsset, $newAsset)
+    public function __construct(public $originalAsset, public $newAsset)
     {
-        $this->originalAsset = $originalAsset;
-        $this->newAsset = $newAsset;
     }
 }

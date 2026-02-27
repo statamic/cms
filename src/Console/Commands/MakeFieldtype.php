@@ -78,7 +78,7 @@ class MakeFieldtype extends GeneratorCommand
             $this->components->info("Fieldtype Vue component [{$relativePath}] created successfully.");
 
             $this->components->bulletList([
-                "Don't forget to import and register your fieldtype's Vue component in resources/js/addon.js",
+                "Don't forget to import and register your fieldtype's Vue component in resources/js/cp.js",
                 'For more information, see the documentation: <comment>https://statamic.dev/fieldtypes#vue-components</comment>',
             ]);
 

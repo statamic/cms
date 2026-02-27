@@ -173,7 +173,7 @@ return [
     'taggable.config.placeholder' => 'Skriv og tryk på ↩ Enter',
     'taggable.title' => 'Tagbar',
     'taxonomies.title' => 'Taksonomier',
-    'template.config.blueprint' => 'Tilføjer en &quot;kort til blueprint&quot; mulighed. Få flere oplysninger i [dokumentationen](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
+    'template.config.blueprint' => 'Tilføjer en &quot;kort til blueprint&quot; mulighed. Få flere oplysninger i [dokumentationen](https://statamic.dev/views#map-templates-to-entry-blueprints).',
     'template.config.folder' => 'Vis kun skabeloner i denne mappe.',
     'template.config.hide_partials' => 'Partials er sjældent beregnet til at blive brugt som templates.',
     'template.title' => 'Skabelon',

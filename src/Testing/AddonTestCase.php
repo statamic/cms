@@ -27,7 +27,7 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
             $reflection = new ReflectionClass($this);
-            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), '/tests').'/tests/__fixtures__/dev-null';
+            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), DIRECTORY_SEPARATOR.'tests').'/tests/__fixtures__/dev-null';
 
             $this->preventSavingStacheItemsToDisk();
         }
@@ -36,7 +36,8 @@ abstract class AddonTestCase extends OrchestraTestCase
         $this->addToAssertionCount(-1);
 
         \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-        $this->addToAssertionCount(-1); // Dont want to assert this
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
+        $this->addToAssertionCount(-2); // Dont want to assert this
     }
 
     protected function tearDown(): void

@@ -4,10 +4,7 @@ namespace Statamic\Events;
 
 class CollectionCreated extends Event
 {
-    public $collection;
-
-    public function __construct($collection)
+    public function __construct(public $collection)
     {
-        $this->collection = $collection;
     }
 }
