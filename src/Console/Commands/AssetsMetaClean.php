@@ -25,7 +25,7 @@ class AssetsMetaClean extends Command
     {
         $containers = $this->getContainers()->keyBy->handle();
 
-        $orphanedMetaFilesByContainer = $containers->map(fn ($container) => $this->orphanedMetaFiles($container));
+        $orphanedMetaFilesByContainer = $containers->map(fn ($container) => $this->getOrphanedMetaFiles($container));
         $orphanedMetaFilesCount = $orphanedMetaFilesByContainer->sum->count();
 
         if ($orphanedMetaFilesCount === 0) {
@@ -35,7 +35,7 @@ class AssetsMetaClean extends Command
         }
 
         $flatOrphanedMetaFiles = $orphanedMetaFilesByContainer
-            ->flatMap(fn ($paths, $container) => $paths->map(fn ($path) => [
+            ->flatMap(fn (Collection $paths, string $container) => $paths->map(fn ($path) => [
                 'container' => $container,
                 'path' => $path,
             ]))
@@ -47,7 +47,7 @@ class AssetsMetaClean extends Command
                 'files' => Str::plural('file', $orphanedMetaFilesCount),
             ]));
 
-            $flatOrphanedMetaFiles->each(function ($metaFile) {
+            $flatOrphanedMetaFiles->each(function (array $metaFile) {
                 $this->line("[{$metaFile['container']}] {$metaFile['path']}");
             });
 
@@ -57,14 +57,14 @@ class AssetsMetaClean extends Command
         progress(
             label: __('Deleting orphaned asset metadata...'),
             steps: $flatOrphanedMetaFiles,
-            callback: function ($metaFile, $progress) use ($containers) {
+            callback: function (array $metaFile, $progress) use ($containers) {
                 $containers->get($metaFile['container'])->disk()->delete($metaFile['path']);
                 $progress->advance();
             }
         );
 
-        $orphanedMetaFilesByContainer->each(function ($metaFiles, $containerHandle) use ($containers) {
-            $this->deleteEmptyMetaDirectories($containers->get($containerHandle), $metaFiles);
+        $orphanedMetaFilesByContainer->each(function (Collection $metaFiles, string $container) use ($containers) {
+            $this->deleteEmptyMetaDirectories($containers->get($container), $metaFiles);
         });
 
         $this->components->info(__('Deleted :count orphaned metadata :files.', [
@@ -84,13 +84,13 @@ class AssetsMetaClean extends Command
         return collect([AssetContainer::findOrFail($container)]);
     }
 
-    private function orphanedMetaFiles(AssetsContainer $container): Collection
+    private function getOrphanedMetaFiles(AssetsContainer $container): Collection
     {
         $assetPaths = $container->files()->flip();
 
         return $container->metaFiles()
-            ->filter(fn ($path) => Str::endsWith($path, '.yaml'))
-            ->filter(fn ($metaPath) => ! $assetPaths->has($this->metaPathToAssetPath($metaPath)))
+            ->filter(fn (string $path) => Str::endsWith($path, '.yaml'))
+            ->reject(fn (string $path) => $assetPaths->has($this->metaPathToAssetPath($path)))
             ->values();
     }
 
@@ -99,6 +99,7 @@ class AssetsMetaClean extends Command
         $pathWithoutYamlExtension = Str::endsWith($metaPath, '.yaml')
             ? substr($metaPath, 0, -5)
             : $metaPath;
+
         $pathWithoutMetaDirectory = str_replace('/.meta/', '/', $pathWithoutYamlExtension);
 
         if (Str::startsWith($pathWithoutMetaDirectory, '.meta/')) {
@@ -111,11 +112,11 @@ class AssetsMetaClean extends Command
     private function deleteEmptyMetaDirectories(AssetsContainer $container, Collection $metaFiles): void
     {
         $metaDirectories = $metaFiles
-            ->map(fn ($metaFile) => dirname($metaFile))
+            ->map(fn (string $metaFile) => dirname($metaFile))
             ->unique()
-            ->sortByDesc(fn ($dir) => substr_count($dir, '/'));
+            ->sortByDesc(fn (string $directory) => substr_count($directory, '/'));
 
-        $metaDirectories->each(function ($metaDirectory) use ($container) {
+        $metaDirectories->each(function (string $metaDirectory) use ($container) {
             $disk = $container->disk();
 
             if (! $disk->exists($metaDirectory)) {
