@@ -149,6 +149,7 @@ class ViewServiceProvider extends ServiceProvider
                 'is_numeric',
                 'is_uppercase',
                 'is_url',
+                'join',
                 'kebab',
                 'lcfirst',
                 'localize',
