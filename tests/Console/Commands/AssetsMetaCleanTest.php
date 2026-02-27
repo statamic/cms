@@ -4,8 +4,7 @@ namespace Tests\Console\Commands;
 
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Assets\AssetContainer;
-use Statamic\Facades\AssetContainer as AssetContainerFacade;
+use Statamic\Facades\AssetContainer;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -24,8 +23,7 @@ class AssetsMetaCleanTest extends TestCase
     #[Test]
     public function it_deletes_orphaned_meta_files_and_cleans_up_empty_meta_directories()
     {
-        $container = $this->containerWithDisk('test', 'test');
-        $this->mockContainers($container);
+        AssetContainer::make('test')->disk('test')->save();
 
         Storage::disk('test')->put('foo/.meta/bar.txt.yaml', 'size: 123');
 
@@ -42,8 +40,7 @@ class AssetsMetaCleanTest extends TestCase
     #[Test]
     public function it_preserves_meta_files_with_matching_assets()
     {
-        $container = $this->containerWithDisk('test', 'test');
-        $this->mockContainers($container);
+        AssetContainer::make('test')->disk('test')->save();
 
         Storage::disk('test')->put('foo/bar.txt', 'bar');
         Storage::disk('test')->put('foo/.meta/bar.txt.yaml', 'size: 123');
@@ -57,8 +54,7 @@ class AssetsMetaCleanTest extends TestCase
     #[Test]
     public function dry_run_lists_orphaned_files_without_deleting_them()
     {
-        $container = $this->containerWithDisk('test', 'test');
-        $this->mockContainers($container);
+        AssetContainer::make('test')->disk('test')->save();
 
         Storage::disk('test')->put('.meta/root.txt.yaml', 'size: 123');
 
@@ -72,9 +68,8 @@ class AssetsMetaCleanTest extends TestCase
     #[Test]
     public function it_only_cleans_the_requested_container()
     {
-        $one = $this->containerWithDisk('one', 'test');
-        $two = $this->containerWithDisk('two', 'test_two');
-        $this->mockContainers($one, $two);
+        AssetContainer::make('one')->disk('test')->save();
+        AssetContainer::make('two')->disk('test_two')->save();
 
         Storage::disk('test')->put('foo/.meta/one.jpg.yaml', 'size: 1');
         Storage::disk('test_two')->put('foo/.meta/two.jpg.yaml', 'size: 2');
@@ -89,9 +84,8 @@ class AssetsMetaCleanTest extends TestCase
     #[Test]
     public function it_cleans_all_containers_when_no_container_argument_is_provided()
     {
-        $one = $this->containerWithDisk('one', 'test');
-        $two = $this->containerWithDisk('two', 'test_two');
-        $this->mockContainers($one, $two);
+        AssetContainer::make('one')->disk('test')->save();
+        AssetContainer::make('two')->disk('test_two')->save();
 
         Storage::disk('test')->put('foo/.meta/one.jpg.yaml', 'size: 1');
         Storage::disk('test_two')->put('foo/.meta/two.jpg.yaml', 'size: 2');
@@ -106,8 +100,7 @@ class AssetsMetaCleanTest extends TestCase
     #[Test]
     public function it_detects_orphaned_meta_files_in_root_and_nested_meta_directories()
     {
-        $container = $this->containerWithDisk('test', 'test');
-        $this->mockContainers($container);
+        AssetContainer::make('test')->disk('test')->save();
 
         Storage::disk('test')->put('.meta/root.jpg.yaml', 'size: 1');
         Storage::disk('test')->put('foo/.meta/nested.jpg.yaml', 'size: 2');
@@ -117,25 +110,5 @@ class AssetsMetaCleanTest extends TestCase
 
         $this->assertFalse(Storage::disk('test')->exists('.meta/root.jpg.yaml'));
         $this->assertFalse(Storage::disk('test')->exists('foo/.meta/nested.jpg.yaml'));
-    }
-
-    private function containerWithDisk(string $handle, string $disk): AssetContainer
-    {
-        return (new AssetContainer)->handle($handle)->disk($disk);
-    }
-
-    private function mockContainers(AssetContainer ...$containers): void
-    {
-        $containersByHandle = collect($containers)->mapWithKeys(fn ($container) => [
-            $container->handle() => $container,
-        ]);
-
-        AssetContainerFacade::partialMock()
-            ->shouldReceive('all')
-            ->andReturn(collect($containers));
-
-        AssetContainerFacade::partialMock()
-            ->shouldReceive('findByHandle')
-            ->andReturnUsing(fn ($handle) => $containersByHandle->get($handle));
     }
 }
