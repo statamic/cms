@@ -91,11 +91,7 @@ class AssetsMetaClean extends Command
             return AssetContainer::all();
         }
 
-        if (! $container = AssetContainer::find($container)) {
-            throw new \InvalidArgumentException('Invalid container');
-        }
-
-        return collect([$container]);
+        return collect([AssetContainer::findOrFail($container)]);
     }
 
     private function orphanedMetaFiles(AssetsContainer $container): Collection
