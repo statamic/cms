@@ -296,7 +296,7 @@ export default {
         },
 
         actionContext() {
-            return { container: this.container.id };
+            return { container: this.container.id, folder: this.path || '/' };
         },
 
         canCreateFolders() {
