@@ -46,6 +46,9 @@ class ParserTestCase extends TestCase
         parent::setUp();
 
         GlobalRuntimeState::resetGlobalState();
+        GlobalRuntimeState::$throwErrorOnAccessViolation = false;
+        GlobalRuntimeState::$allowPhpInContent = false;
+        GlobalRuntimeState::$allowMethodsInContent = false;
 
         $this->setupTestBlueprintAndFields();
 

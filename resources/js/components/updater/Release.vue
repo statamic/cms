@@ -5,7 +5,7 @@
                 <ui-heading :text="release.version" />
                 <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>
-            <ui-modal :title="__('Update to :version', { version: release.version })">
+            <ui-modal :title="__('Update to :version', { version: release.version })" blur>
                 <template #trigger>
                     <ui-button
                         ref="getCommandButton"

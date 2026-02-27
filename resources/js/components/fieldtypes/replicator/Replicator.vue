@@ -60,6 +60,7 @@
                                             :index="index"
                                             :enabled="canAddSet"
                                             :is-first="index === 0"
+                                            :show-connector="!(index === 0 && config.hide_display)"
                                             :loading-set="loadingSet"
                                             @added="addSet"
                                         />
@@ -240,6 +241,14 @@ export default {
                 const setCacheKey = `${field}.${set}`;
                 const reference = this.publishContainer.reference;
                 const blueprint = this.publishContainer.blueprint.fqh;
+
+				if (this.meta.new?.hasOwnProperty(set)) {
+					let meta = this.meta.new[set];
+					let defaults = this.meta.defaults[set];
+
+					resolve({ new: meta, defaults });
+					return;
+				}
 
                 if (this.setsCache[setCacheKey]) {
                     resolve(this.setsCache[setCacheKey]);

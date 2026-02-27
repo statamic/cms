@@ -42,6 +42,8 @@ function formatDate(value) {
         :url="requestUrl"
         :columns="cols"
         :per-page="initialPerPage"
+        sort-column="datestamp"
+        sort-direction="desc"
         :show-pagination-totals="false"
         :show-pagination-page-links="false"
         :show-pagination-per-page-selector="false"
@@ -73,7 +75,7 @@ function formatDate(value) {
                             <template #cell-datestamp="{ row: submission }">
                                 <div
                                     class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
-                                    v-html="formatDate(submission.datestamp)"
+                                    v-text="formatDate(submission.datestamp)"
                                 />
                             </template>
                         </TableBody>

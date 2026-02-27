@@ -139,6 +139,7 @@ class RuntimeParser implements Parser
     public function setRuntimeConfiguration(RuntimeConfiguration $configuration)
     {
         GlobalRuntimeState::$allowPhpInContent = $configuration->allowPhpInUserContent;
+        GlobalRuntimeState::$allowMethodsInContent = $configuration->allowMethodsInUserContent;
         GlobalRuntimeState::$throwErrorOnAccessViolation = $configuration->throwErrorOnAccessViolation;
         GlobalRuntimeState::$bannedVarPaths = $configuration->guardedVariablePatterns;
         GlobalRuntimeState::$bannedContentVarPaths = $configuration->guardedContentVariablePatterns;
@@ -275,7 +276,7 @@ class RuntimeParser implements Parser
             return true;
         }
 
-        if (Str::contains($text, [DocumentParser::LeftBrace, '@props', '@aware'])) {
+        if (Str::contains($text, [DocumentParser::LeftBrace, '@props', '@aware', '@cascade'])) {
             return true;
         }
 

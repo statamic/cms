@@ -46,6 +46,8 @@ const props = defineProps({
         type: [Boolean, undefined],
         default: undefined,
     },
+    /** When `true`, the modal's backdrop will be blurred */
+    blur: { type: Boolean, default: false },
 });
 
 function updateModalOpen(open) {
@@ -79,6 +81,7 @@ const shouldCloseOnSubmit = computed(() => {
         ref="modal"
         :title="__(title)"
         :open="open"
+        :blur="blur"
         :dismissible="cancellable"
         @update:open="updateModalOpen"
         @opened="emit('opened')"

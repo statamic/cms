@@ -3,7 +3,13 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
+use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Tests\Antlers\Fixtures\MethodClasses\CallCounter;
 use Tests\Antlers\Fixtures\MethodClasses\ClassOne;
 use Tests\Antlers\Fixtures\MethodClasses\StringLengthObject;
@@ -11,6 +17,16 @@ use Tests\Antlers\ParserTestCase;
 
 class MethodCallTest extends ParserTestCase
 {
+    public function tearDown(): void
+    {
+        GlobalRuntimeState::$throwErrorOnAccessViolation = false;
+        GlobalRuntimeState::$allowMethodsInContent = false;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+        GlobalRuntimeState::$isEvaluatingData = false;
+
+        parent::tearDown();
+    }
+
     public function test_methods_can_be_called()
     {
         $object = new ClassOne();
@@ -244,6 +260,121 @@ ANTLERS;
         $result = $this->renderString($template, ['datetime' => new TestDateTime]);
 
         $this->assertSame('2001-10-22T00:00:00+00:00', $result);
+    }
+
+    public function test_method_calls_blocked_in_user_content()
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($field);
+        $object = new ClassOne();
+        $value = new Value('{{ object:method("hello") }}', 'text_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Method call evaluated in user content.', \Mockery::type('array'));
+
+        $result = $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+            'object' => $object,
+        ]);
+
+        $this->assertSame('', $result);
+    }
+
+    public function test_method_calls_allowed_in_user_content_when_configured()
+    {
+        GlobalRuntimeState::$allowMethodsInContent = true;
+
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($field);
+        $object = new ClassOne();
+        $value = new Value('{{ object:method("hello") }}', 'text_field', $textFieldtype);
+
+        $result = $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+            'object' => $object,
+        ]);
+
+        $this->assertSame('String: hello', $result);
+
+        GlobalRuntimeState::$allowMethodsInContent = false;
+    }
+
+    public function test_method_calls_in_user_content_throw_when_configured()
+    {
+        GlobalRuntimeState::$throwErrorOnAccessViolation = true;
+
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($field);
+        $object = new ClassOne();
+        $value = new Value('{{ object:method("hello") }}', 'text_field', $textFieldtype);
+
+        $this->expectException(RuntimeException::class);
+
+        $this->renderString('{{ text_field }}', [
+            'text_field' => $value,
+            'object' => $object,
+        ]);
+
+        GlobalRuntimeState::$throwErrorOnAccessViolation = false;
+    }
+
+    public function test_method_calls_still_work_in_templates()
+    {
+        $object = new ClassOne();
+
+        $this->assertSame('String: hello', $this->renderString('{{ object:method("hello") }}', [
+            'object' => $object,
+        ]));
+    }
+
+    public function test_nested_value_does_not_reset_user_data_flag()
+    {
+        $textFieldtype = new Text();
+
+        $nestedField = new Field('nested_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($nestedField);
+        $nestedValue = new Value('Hello', 'nested_field', $textFieldtype);
+
+        $outerField = new Field('outer_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textFieldtype->setField($outerField);
+        $object = new ClassOne();
+        $outerValue = new Value('{{ nested_field }}{{ object:method("hello") }}', 'outer_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Method call evaluated in user content.', \Mockery::type('array'));
+
+        $result = $this->renderString('{{ outer_field }}', [
+            'outer_field' => $outerValue,
+            'nested_field' => $nestedValue,
+            'object' => $object,
+        ]);
+
+        $this->assertSame('Hello', $result);
     }
 }
 

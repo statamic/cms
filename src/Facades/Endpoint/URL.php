@@ -257,14 +257,21 @@ class URL
             return false;
         }
 
+        if (Str::startsWith($url, '//')) {
+            return self::$externalAppUrlsCache[$url] = true;
+        }
+
         $url = Str::ensureRight($url, '/');
 
         if (Str::startsWith($url, ['/', '?', '#'])) {
             return self::$externalAppUrlsCache[$url] = false;
         }
 
+        $urlWithoutQuery = Str::of($url)->before('?')->before('#');
+        $urlDomain = self::getDomainFromAbsolute($urlWithoutQuery);
+
         $isExternalToSites = self::getAbsoluteSiteUrls()
-            ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
+            ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
             ->isEmpty();
 
         $isExternalToCurrentRequestDomain = ! Str::startsWith($url, self::getDomainFromAbsolute(url()->to('/')));

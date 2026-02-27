@@ -59,7 +59,7 @@ const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('op
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
 const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value?.id) + 1);
 const isTopStack = computed(() => stacks.count() === depth.value);
-const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === stack.value.id);
+const isTopPortal = computed(() => portals.all()[portals.all().length - 1]?.id === stack.value.id);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
 const shouldWrapSlot = computed(() => props.wrapSlot && !hasStackContentComponent.value);

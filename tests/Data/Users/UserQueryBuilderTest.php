@@ -547,7 +547,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertNull(User::query()->where('type', 'c')->average('quantity'));
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_scopes()
     {
         CustomScope::register();

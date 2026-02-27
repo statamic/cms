@@ -110,6 +110,16 @@ class RuntimeConfiguration
     public $allowPhpInUserContent = false;
 
     /**
+     * Indicates if method invocations should be evaluated in user content.
+     *
+     * When disabled, method calls like object:method() within
+     * fields with antlers:true will be blocked.
+     *
+     * @var bool
+     */
+    public $allowMethodsInUserContent = false;
+
+    /**
      * Registers a new Antlers preparser callback.
      *
      * @param  callable  $callable  The preparser callback.
