@@ -11,7 +11,7 @@ abstract class Index
     protected $name;
     protected $items = [];
     protected $loaded = false;
-    private static ?string $currentlyLoading = null;
+    private static array $loadingStack = [];
 
     public function __construct($store, $name)
     {
@@ -66,9 +66,9 @@ abstract class Index
         }
 
         $loadingKey = $this->store->key().'/'.$this->name;
-        $currentlyLoadingThis = static::$currentlyLoading === $loadingKey;
+        $currentlyLoadingThis = in_array($loadingKey, static::$loadingStack);
 
-        static::$currentlyLoading = $loadingKey;
+        static::$loadingStack[] = $loadingKey;
 
         $this->loaded = true;
 
@@ -86,7 +86,7 @@ abstract class Index
 
         $this->store->cacheIndexUsage($this);
 
-        static::$currentlyLoading = null;
+        array_pop(static::$loadingStack);
 
         return $this;
     }
@@ -163,6 +163,11 @@ abstract class Index
 
     public static function currentlyLoading()
     {
-        return static::$currentlyLoading;
+        return end(static::$loadingStack) ?: null;
+    }
+
+    public static function isLoading(): bool
+    {
+        return ! empty(static::$loadingStack);
     }
 }
