@@ -61,7 +61,7 @@ const actionsWithShortcuts = computed(() => {
 // ——— Keyboard handler: skip when overlays or form controls have focus ———
 function hasOpenOverlay() {
     return !!document.querySelector(
-        '[data-ui-modal-content], .stack-content, [role="dialog"]'
+        '[data-ui-modal-content], [data-ui-dropdown-menu], .stack-content, [role="dialog"]'
     );
 }
 
@@ -152,4 +152,3 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
         </div>
     </Motion>
 </template>
-
