@@ -76,13 +76,13 @@
                             <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
                                     <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
+                                        <img :src="asset.url" class="asset-thumb relative z-10 w-4" />
                                     </div>
                                     <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
+                                        <img :src="asset.url" class="asset-thumb relative z-10 w-12" />
                                     </div>
                                     <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
+                                        <img :src="asset.url" class="asset-thumb relative z-10 w-24" />
                                     </div>
                                 </div>
                                 <div class="h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
