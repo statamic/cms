@@ -111,7 +111,7 @@
     "knip": "^5.43.6",
     "laravel-vite-plugin": "^2.0.0",
     "rollup-plugin-visualizer": "^5.14.0",
-    "storybook": "^10.1.11",
+    "storybook": "^10.2.10",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.0.4",
