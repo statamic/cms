@@ -115,4 +115,14 @@ abstract class AddonTestCase extends OrchestraTestCase
         $app['config']->set('statamic.stache.stores.form-submissions.directory', $directory.'/../tests/__fixtures__/content/submissions');
         $app['config']->set('statamic.stache.stores.users.directory', $directory.'/../tests/__fixtures__/users');
     }
+
+    protected function getPackage(): string
+    {
+        $reflector = new ReflectionClass($this->addonServiceProvider);
+        $directory = dirname($reflector->getFileName());
+
+        $json = json_decode($this->app['files']->get($directory.'/../composer.json'), true);
+
+        return $json['name'];
+    }
 }

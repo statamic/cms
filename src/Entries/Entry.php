@@ -52,6 +52,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\View\Cascade;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
@@ -445,7 +446,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->taxonomize();
 
-        if ($this->isDirty('slug')) {
+        if ($this->shouldUpdateUris()) {
             optional(Collection::findByMount($this))->updateEntryUris();
             $this->updateChildPageUris();
         }
@@ -475,6 +476,21 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         $this->syncOriginal();
 
         return true;
+    }
+
+    private function shouldUpdateUris(): bool
+    {
+        if (! $this->route()) {
+            return false;
+        }
+
+        $antlersRoute = preg_replace_callback('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $this->route());
+
+        return collect(Antlers::identifiers($antlersRoute))
+            ->filter(fn (string $identifier) => $this->isDirty($identifier))
+            ->isNotEmpty();
     }
 
     private function updateChildPageUris()
@@ -1091,7 +1107,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
-            'config' => config()->all(),
+            'config' => Cascade::config(),
             'site' => $this->site(),
             'uri' => $this->uri(),
             'url' => $this->url(),

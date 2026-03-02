@@ -49,7 +49,10 @@ setup(async (app) => {
       $progress: {
           loading(name, loading) {
               //
-          }
+          },
+          complete(name) {
+              //
+          },
       }
   };
 
@@ -80,6 +83,12 @@ const preview: Preview = {
         },
 
         docs: {
+            argTypes: {
+                sort: 'alpha',
+            },
+            controls: {
+                sort: 'alpha',
+            },
             theme: createTheme({
                 base: 'light',
                 fontBase: '"Lexend", sans-serif',

@@ -2394,14 +2394,14 @@ class AssetTest extends TestCase
         $container->shouldReceive('url')->andReturn('/container');
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
-        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset]));
+        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset], true));
 
-        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset]));
+        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset], true));
 
-        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset]));
+        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset], true));
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
-        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset], true));
     }
 
     #[Test]

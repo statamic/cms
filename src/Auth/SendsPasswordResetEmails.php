@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Statamic\Facades\URL;
 
 /**
  * A copy of Illuminate\Auth\SendsPasswordResetEmails.
@@ -85,8 +86,10 @@ trait SendsPasswordResetEmails
     {
         session()->flash('user.forgot_password.success', __(Password::RESET_LINK_SENT));
 
-        $redirect = $request->has('_redirect')
-            ? redirect($request->input('_redirect'))
+        $successRedirect = $request->input('_redirect');
+
+        $redirect = $successRedirect && ! URL::isExternalToApplication($successRedirect)
+            ? redirect($successRedirect)
             : back();
 
         return $request->wantsJson()
@@ -102,8 +105,10 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
-        $redirect = $request->has('_error_redirect')
-            ? redirect($request->input('_error_redirect'))
+        $errorRedirect = $request->input('_error_redirect');
+
+        $redirect = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
             : back();
 
         if ($request->wantsJson()) {

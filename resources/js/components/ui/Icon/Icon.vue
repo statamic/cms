@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { getIconSet } from './registry.js';
+import DOMPurify from 'dompurify';
 
 const props = defineProps({
     /** Icon name */
@@ -14,7 +15,7 @@ const iconComponent = computed(() => ({ template: svgContent.value }));
 
 const loadIcon = async () => {
     if (props.name.startsWith('<svg')) {
-        svgContent.value = props.name;
+        svgContent.value = DOMPurify.sanitize(props.name);
         return;
     }
 

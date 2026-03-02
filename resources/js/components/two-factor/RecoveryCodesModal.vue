@@ -38,7 +38,7 @@ function regenerate() {
 </script>
 
 <template>
-    <Modal :title="__('Recovery Codes')" open @update:open="$emit('cancel')">
+    <Modal :title="__('Recovery Codes')" blur open @update:open="$emit('cancel')">
         <div>
             <div v-if="loading" class="flex items-center justify-center text-center">
                 <Icon name="loading" />
@@ -82,6 +82,7 @@ function regenerate() {
         :open="confirming"
         :danger="true"
         :title="__('Are you sure?')"
+        blur
         @cancel="confirming = false"
         @confirm="regenerate"
     >

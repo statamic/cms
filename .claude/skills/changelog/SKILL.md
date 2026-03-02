@@ -39,6 +39,7 @@ Format: `- Description [#NUMBER](https://github.com/statamic/cms/issues/NUMBER) 
 - Reverse the list so earliest commits come first (git log shows newest first)
 - Within each category, maintain chronological order
 - Translation PRs get moved to the bottom of the list
+- Dependabot PRs get moved to the bottom, after translations
 
 ## 7. Determine version number
 
