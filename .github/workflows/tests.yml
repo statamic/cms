@@ -76,12 +76,6 @@ jobs:
           ini-values: short_open_tag=on
           coverage: none
 
-      - name: Allow dev for Laravel 13
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.laravel == '13.*'
-        run: |
-          composer config minimum-stability dev
-          composer config prefer-stable true
-
       - name: Install dependencies
         uses: nick-invision/retry@v3
         if: steps.should-run-tests.outputs.result == 'true'
