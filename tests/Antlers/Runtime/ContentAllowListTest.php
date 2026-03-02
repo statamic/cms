@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Text;
@@ -177,6 +178,26 @@ class ContentAllowListTest extends ParserTestCase
 
         $result = $this->renderString('{{ runtime_test_tag }}', [], true, true);
         $this->assertSame('tag-ok', $result);
+    }
+
+    #[Test]
+    public function app_tags_from_app_directory_are_included_in_default_allowed_content_tags()
+    {
+        \App\Tags\AppTestTag::register();
+
+        $result = (string) Antlers::parse('{{ app_test_tag }}', [], false);
+
+        $this->assertSame('app-tag-ok', $result, 'Tags in App\Tags should be auto-allowed in user content when using default config.');
+    }
+
+    #[Test]
+    public function app_modifiers_from_app_directory_are_included_in_default_allowed_content_modifiers()
+    {
+        \App\Modifiers\AppTestModifier::register();
+
+        $result = (string) Antlers::parse('{{ value | app_test_modifier }}', ['value' => 'hello'], false);
+
+        $this->assertSame('HELLO-app-modifier', $result, 'Modifiers in App\Modifiers should be auto-allowed in user content when using default config.');
     }
 
     private function makeAntlersTextValue(string $template): Value

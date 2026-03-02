@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
@@ -107,7 +108,9 @@ class ViewServiceProvider extends ServiceProvider
                 'trans:*',
                 'trans_choice:*',
                 'widont:*',
+                ...$this->getAppTagPatternsForContentAllowlist($app),
             ]);
+
             $runtimeConfig->allowedContentModifiers = config('statamic.antlers.allowedContentModifiers', [
                 'add_query_param',
                 'add_slashes',
@@ -194,6 +197,7 @@ class ViewServiceProvider extends ServiceProvider
                 'urldecode',
                 'urlencode',
                 'widont',
+                ...$this->getAppModifierHandlesForContentAllowlist($app),
             ]);
             $runtimeConfig->allowPhpInUserContent = config('statamic.antlers.allowPhpInContent', false);
             $runtimeConfig->allowMethodsInUserContent = config('statamic.antlers.allowMethodsInContent', false);
@@ -248,6 +252,29 @@ class ViewServiceProvider extends ServiceProvider
 
             return $parser;
         });
+    }
+
+    private function getAppTagPatternsForContentAllowlist(Application $app): array
+    {
+        $namespace = $app->getNamespace().'Tags\\';
+
+        return collect($app->make('statamic.tags'))
+            ->filter(fn ($binding) => is_string($binding) && str_starts_with($binding, $namespace))
+            ->keys()
+            ->flatMap(fn ($handle) => [$handle, $handle.':*'])
+            ->values()
+            ->all();
+    }
+
+    private function getAppModifierHandlesForContentAllowlist(Application $app): array
+    {
+        $namespace = $app->getNamespace().'Modifiers\\';
+
+        return collect($app->make('statamic.modifiers'))
+            ->filter(fn ($binding) => is_string($binding) && str_starts_with($binding, $namespace))
+            ->keys()
+            ->values()
+            ->all();
     }
 
     public function registerBladeDirectives()
