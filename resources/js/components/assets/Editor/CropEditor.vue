@@ -18,6 +18,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    canReplace: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const cropper = ref(null);
@@ -495,7 +499,7 @@ function close() {
                     <Icon name="loading" />
                 </div>
 
-                <p>{{ __('Would you like to save this as a new copy or replace the original image?') }}</p>
+                <p>{{ canReplace ? __('Would you like to save this as a new copy or replace the original image?') : __('Save the cropped image as a new copy?') }}</p>
 
                 <template #footer>
                     <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
@@ -506,11 +510,13 @@ function close() {
                             @click="dismissConfirmation"
                         />
                         <Button
+                            :variant="canReplace ? 'default' : 'primary'"
                             :disabled="uploading"
                             :text="__('Save as Copy')"
                             @click="upload(false)"
                         />
                         <Button
+                            v-if="canReplace"
                             variant="primary"
                             :disabled="uploading"
                             :text="__('Replace Original')"

@@ -39,7 +39,7 @@
                                 v-slot="{ actions }"
                             >
                                 <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="isCroppable" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
+                                <ui-button inset size="sm" v-if="canCrop" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
                                 <ui-button inset size="sm" v-if="asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
@@ -168,6 +168,7 @@
             <crop-editor
                 v-if="isCroppable"
                 :asset="asset"
+                :can-replace="asset.canReuploadCrop"
                 v-model:open="showCropEditor"
                 @replaced="handleCropReplaced"
                 @created="handleCropCreated"
@@ -272,6 +273,10 @@ export default {
 
         isCroppable() {
             return this.isImage && this.asset.extension !== 'gif';
+        },
+
+        canCrop() {
+            return this.isCroppable && this.asset.canCrop;
         },
 
         hasErrors: function () {

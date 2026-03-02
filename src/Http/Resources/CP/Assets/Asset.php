@@ -36,6 +36,8 @@ class Asset extends JsonResource
             'isPreviewable' => $this->isPreviewable(),
             'isEditable' => User::current()->can('edit', $this->resource),
             'isViewable' => User::current()->can('view', $this->resource),
+            'canCrop' => User::current()->can('store', [get_class($this->resource), $this->resource->container()]),
+            'canReuploadCrop' => User::current()->can('reupload', $this->resource),
 
             $this->mergeWhen($this->hasDimensions(), function () {
                 return [
