@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -36,7 +37,7 @@ class Asset extends JsonResource
             'isPreviewable' => $this->isPreviewable(),
             'isEditable' => User::current()->can('edit', $this->resource),
             'isViewable' => User::current()->can('view', $this->resource),
-            'canCrop' => User::current()->can('store', [get_class($this->resource), $this->resource->container()]),
+            'canCrop' => User::current()->can('store', [AssetContract::class, $this->resource->container()]),
             'canReuploadCrop' => User::current()->can('reupload', $this->resource),
 
             $this->mergeWhen($this->hasDimensions(), function () {
