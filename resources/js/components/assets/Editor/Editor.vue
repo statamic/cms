@@ -29,7 +29,7 @@
                     <!-- Visual Area -->
                     <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-xl">
                         <!-- Toolbar -->
-                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
+                        <div v-if="showToolbar" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
                                 :item="id"
                                 :url="actionUrl"
@@ -38,7 +38,7 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
-                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
                                 <ui-button inset size="sm" v-if="asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
@@ -47,7 +47,7 @@
                                 <ui-button inset size="sm" @click="download" icon="download" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Download')" />
                                 <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
 
-                                <Dropdown class="me-4">
+                                <Dropdown class="me-4" v-if="filterForActionsMenu(actions).length">
                                     <DropdownMenu>
                                         <DropdownItem
                                             v-for="action in filterForActionsMenu(actions)"
@@ -265,10 +265,6 @@ export default {
 
         isFocalPointEditorEnabled() {
             return Statamic.$config.get('focalPointEditorEnabled');
-        },
-
-        isToolbarVisible() {
-            return !this.readOnly && this.showToolbar;
         },
     },
 
