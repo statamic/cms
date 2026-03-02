@@ -99,10 +99,10 @@
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^10.1.11",
-    "@storybook/addon-docs": "^10.1.11",
-    "@storybook/addon-vitest": "^10.1.11",
-    "@storybook/vue3-vite": "^10.1.11",
+    "@storybook/addon-a11y": "^10.2.10",
+    "@storybook/addon-docs": "^10.2.10",
+    "@storybook/addon-vitest": "^10.2.10",
+    "@storybook/vue3-vite": "^10.2.10",
     "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vitest/browser-playwright": "^4.0.12",
