@@ -25,6 +25,8 @@ return [
     'cache_utility_image_cache_description' => 'The image cache stores copies of all transformed and resized images.',
     'cache_utility_stache_description' => 'The Stache is Statamic\'s content store that functions much like a database. It is generated automatically from the content files.',
     'cache_utility_static_cache_description' => 'Static pages bypass Statamic completely and are rendered directly from the server for maximum performance.',
+    'crop_save_as_copy_confirm' => 'Save the cropped image as a new copy?',
+    'crop_save_copy_or_replace' => 'Would you like to save this as a new copy or replace the original image?',
     'choose_entry_localization_deletion_behavior' => 'Choose the action you wish to perform on the localized entries.',
     'collection_configure_date_behavior_private' => 'Private - Hidden from listings, URLs return 404',
     'collection_configure_date_behavior_public' => 'Public - Always visible',

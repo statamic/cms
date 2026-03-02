@@ -499,7 +499,7 @@ function close() {
                     <Icon name="loading" />
                 </div>
 
-                <p>{{ canReplace ? __('Would you like to save this as a new copy or replace the original image?') : __('Save the cropped image as a new copy?') }}</p>
+                <p>{{ canReplace ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
 
                 <template #footer>
                     <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
