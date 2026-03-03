@@ -2,7 +2,7 @@
     <div class="max-w-page mx-auto">
         <ui-header :title="__('Updates')" icon="updates">
             <template v-if="!gettingChangelog" #actions>
-                <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
+                <ui-badge :prepend="__(':name Version', { name })" :text="currentVersion" color="green" size="lg" />
                 <div v-if="onLatestVersion" v-text="__('Up to date')" />
             </template>
         </ui-header>
