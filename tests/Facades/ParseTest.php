@@ -57,6 +57,8 @@ class ParseTest extends TestCase
                 '[name:Test] [missing:]',
             ],
             'non-config antlers' => ['{{ config:app:name }} {{ foo }}', 'Test {{ foo }}'],
+            'modifiers passthrough' => ['{{ config:app:name | upper }}', '{{ config:app:name | upper }}'],
+            'modifiers passthrough 2' => ['{{ config:app:name|upper }}', '{{ config:app:name|upper }}'],
             'array passthrough' => [
                 ['foo' => 'bar'],
                 ['foo' => 'bar'],
