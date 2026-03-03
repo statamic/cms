@@ -1913,6 +1913,36 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_normalizes_pjpg_format_to_jpg_extension_on_upload()
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.progressive' => [
+            'fm' => 'pjpg',
+        ]]);
+
+        $this->container->sourcePreset('progressive');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        ImageValidator::partialMock()
+            ->shouldReceive('isValidImage')
+            ->with('jpg', 'image/jpeg')
+            ->andReturnTrue()
+            ->once();
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertMissing('path/to/asset.pjpg');
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+    }
+
+    #[Test]
     public function it_sanitizes_svgs_on_upload()
     {
         Event::fake();
