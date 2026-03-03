@@ -11,6 +11,7 @@ use Statamic\View\Antlers\AntlersString;
  * @method static array YAML($str)
  * @method static array frontMatter($string)
  * @method static mixed env($val)
+ * @method static mixed config($value)
  *
  * @see \Statamic\Facades\Endpoint\Parse
  */

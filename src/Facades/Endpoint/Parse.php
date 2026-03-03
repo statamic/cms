@@ -93,4 +93,23 @@ class Parse
 
         return str_replace($matches[0], env($matches[1]), $val);
     }
+
+    /**
+     * Parse config placeholders with actual values.
+     *
+     * @param  mixed  $value  The value to parse
+     * @return mixed
+     */
+    public function config($value)
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        return preg_replace_callback('/\{\{\s*config[\.:]([\w\.\:]+)\s*\}\}/', function ($matches) {
+            $key = str_replace(':', '.', $matches[1]);
+
+            return config($key, '');
+        }, $value);
+    }
 }
