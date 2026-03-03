@@ -67,6 +67,7 @@ return [
     'collections_taxonomies_instructions' => 'Koppel entries in deze collectie aan taxonomieën. Velden worden automatisch toegevoegd aan publiceerformulieren.',
     'dictionaries_countries_emojis_instructions' => 'Of vlag-emoji\'s in de labels moeten worden opgenomen.',
     'dictionaries_countries_region_instructions' => 'U kunt de landen eventueel op regio filteren.',
+    'dirty_navigation_warning' => 'Je hebt niet-opgeslagen wijzigingen. Weet je zeker dat je deze pagina wilt verlaten?',
     'disable_two_factor_authentication' => 'Weet je zeker dat je tweestapsverificatie wilt uitschakelen?',
     'disable_two_factor_authentication_current_user_enforced' => 'Je zult per direct worden uitgelogd en zal bij de volgende keer inloggen opnieuw tweestapsverificatie moeten instellen.',
     'disable_two_factor_authentication_current_user_optional' => 'Deze actie zal zowel jouw verificatie- als herstelcodes ongeldig maken en zal volledige toegang toestaan tot jouw account met slechts jouw wachtwoord.',
