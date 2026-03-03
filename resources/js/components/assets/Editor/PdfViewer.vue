@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import 'pdfjs-dist/web/pdf_viewer.css';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?worker&url';
 import { AnnotationLayerBuilder, EventBus, PDFLinkService } from 'pdfjs-dist/web/pdf_viewer.mjs';
