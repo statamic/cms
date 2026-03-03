@@ -172,7 +172,8 @@
             @apply p-0.75;
         }
 
-        th[data-column="date"] {
+        th[data-column="date"],
+        th[data-column="datestamp"] {
             @apply text-end;
         }
     }
