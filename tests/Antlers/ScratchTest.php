@@ -3,8 +3,11 @@
 namespace Tests\Antlers;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -74,5 +77,32 @@ next line
 EOT;
 
         $this->assertSame($expected, (string) Antlers::parse($template, $data));
+    }
+
+    #[Test]
+    public function reduce_for_antlers_restores_global_runtime_state_when_early_returning_with_model()
+    {
+        $prevUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        $prevData = GlobalRuntimeState::$isEvaluatingData;
+
+        try {
+            GlobalRuntimeState::$isEvaluatingUserData = false;
+            GlobalRuntimeState::$isEvaluatingData = false;
+
+            $model = new class extends Model
+            {
+                //
+            };
+            $parser = Antlers::parser();
+
+            $result = PathDataManager::reduceForAntlers($model, $parser, [], true);
+
+            $this->assertSame($model, $result);
+            $this->assertFalse(GlobalRuntimeState::$isEvaluatingUserData, 'isEvaluatingUserData should be restored after Model early return');
+            $this->assertFalse(GlobalRuntimeState::$isEvaluatingData, 'isEvaluatingData should be restored after Model early return');
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevUserData;
+            GlobalRuntimeState::$isEvaluatingData = $prevData;
+        }
     }
 }
