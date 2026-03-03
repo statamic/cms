@@ -1107,6 +1107,28 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_dispatch_creating_or_created_events_when_moved()
+    {
+        Event::fake();
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
+        $asset->save();
+
+        Event::fake();
+        $asset->move('new');
+
+        Event::assertDispatched(AssetSaving::class);
+        Event::assertDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetCreating::class);
+        Event::assertNotDispatched(AssetCreated::class);
+    }
+
+    #[Test]
     public function it_can_be_moved_to_another_folder_quietly()
     {
         Storage::fake('local');
