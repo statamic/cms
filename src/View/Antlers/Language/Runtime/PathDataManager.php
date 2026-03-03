@@ -1104,6 +1104,9 @@ class PathDataManager
         GlobalRuntimeState::$isEvaluatingData = true;
 
         if ($value instanceof Model) {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+
             return $value;
         }
 
