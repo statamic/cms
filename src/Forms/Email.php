@@ -245,6 +245,8 @@ class Email extends Mailable
         return collect($config)->map(function ($value) {
             $value = Parse::env($value); // deprecated
 
+            $value = Parse::config($value);
+
             return (string) Antlers::parse($value, array_merge(
                 ['config' => Cascade::config()],
                 $this->getGlobalsData(),
