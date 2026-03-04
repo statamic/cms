@@ -202,18 +202,18 @@ export default {
             this.$emit('changed', this.pages);
         },
 
-	    afterDrop() {
-			const root = this.$refs.tree.getData()[0];
+        afterDrop() {
+            const root = this.$refs.tree.getData()[0];
 
-		    // Prevent items with children being moved to the root position
-		    if (this.expectsRoot && root.id !== this.pages[0].id && root.children?.length > 0) {
-			    const { dragNode, parent, indexBeforeDrop } = dragContext.startInfo;
-			    this.$refs.tree.move(dragNode, parent, indexBeforeDrop);
-			    return;
-		    }
+            // Prevent items with children being moved to the root position
+            if (this.expectsRoot && root.id !== this.pages[0].id && root.children?.length > 0) {
+                const { dragNode, parent, indexBeforeDrop } = dragContext.startInfo;
+                this.$refs.tree.move(dragNode, parent, indexBeforeDrop);
+                return;
+            }
 
-			this.treeUpdated();
-	    },
+            this.treeUpdated();
+        },
 
         cleanPagesForSubmission(pages) {
             return pages.map((page) => ({
