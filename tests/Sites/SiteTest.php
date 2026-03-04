@@ -301,7 +301,7 @@ class SiteTest extends TestCase
         $site = new Site('test', []);
 
         $this->assertSame('test', (string) $site);
-        $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site]));
+        $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site], true));
     }
 
     #[Test]

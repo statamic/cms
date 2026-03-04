@@ -100,7 +100,7 @@
                 </div>
             </template>
 
-            <footer class="flex items-center justify-between border-t dark:border-dark-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
+            <footer class="flex items-center justify-between border-t dark:border-gray-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
                 <ui-badge
                     v-text="
                         hasMaxSelections

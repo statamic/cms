@@ -157,20 +157,30 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereIn($values, $where)
     {
-        $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
+        $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
 
         return $values->filter(
-            fn ($value) => ! is_array($value) && isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => ! is_array($value) && isset($lookup[$this->normalizeLookupValue($value)])
         );
     }
 
     protected function filterWhereNotIn($values, $where)
     {
-        $lookup = array_flip(array_map(fn ($v) => $v ?? '__NULL__', $where['values']));
+        $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
 
         return $values->filter(
-            fn ($value) => is_array($value) || ! isset($lookup[$value ?? '__NULL__'])
+            fn ($value) => is_array($value) || ! isset($lookup[$this->normalizeLookupValue($value)])
         );
+    }
+
+    private function normalizeLookupValue($value): string|int
+    {
+        return match (true) {
+            $value === null => '__NULL__',
+            $value === true => '__TRUE__',
+            $value === false => '__FALSE__',
+            default => $value,
+        };
     }
 
     protected function filterWhereNull($values, $where)

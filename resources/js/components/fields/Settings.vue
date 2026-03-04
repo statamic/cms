@@ -275,8 +275,10 @@ export default {
                     this.$emit('committed', response.data, this.editedFields);
 
                     if (shouldCommitParent && this.commitParentField) {
-                        this.commitParentField(params);
-                        this.close();
+						this.$nextTick(() => {
+							this.commitParentField(params);
+							this.close();
+						});
 
                         return;
                     }

@@ -15,22 +15,16 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     additionalColumns: Array,
     collection: String,
-	icon: String,
+    icon: String,
     title: String,
     listingUrl: String,
-    initialPerPage: {
-        type: Number,
-        default: 5,
-    },
-    initialSortColumn: {
-        type: String,
-    },
-    initialSortDirection: {
-        type: String,
-    },
+    initialPerPage: { type: Number, default: 5 },
+    initialSortColumn: { type: String },
+    initialSortDirection: { type: String },
     canCreate: Boolean,
     createLabel: String,
     blueprints: Array,
+    showTableHeader: { type: Boolean, default: false },
 });
 
 const requestUrl = cp_url(`collections/${props.collection}/entries`);
@@ -72,8 +66,8 @@ function formatDate(value) {
                     {{ __('There are no entries in this collection') }}
                 </ui-description>
                 <div class="px-4 py-3">
-                    <table class="w-full [&_td]:p-0.75 [&_td]:text-sm" :class="{ 'opacity-50': loading }">
-                        <TableHead sr-only />
+                    <table class="w-full widget-table" :class="{ 'opacity-50': loading }">
+                        <TableHead :sr-only="!props.showTableHeader" />
                         <TableBody>
                             <template #cell-title="{ row: entry, isColumnVisible }">
                                 <div class="flex items-center gap-2">
@@ -85,8 +79,8 @@ function formatDate(value) {
                             </template>
                             <template #cell-date="{ row: entry, isColumnVisible }">
                                 <div
-                                    class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased px-2"
-                                    v-html="formatDate(entry.date.date)"
+                                    class="text-end font-inter tabular-nums text-xs whitespace-nowrap text-gray-600 dark:text-gray-400 antialiased px-2"
+                                    v-text="formatDate(entry.date.date)"
                                     v-if="isColumnVisible('date')"
                                 />
                             </template>

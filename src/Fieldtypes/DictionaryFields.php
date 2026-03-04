@@ -65,13 +65,13 @@ class DictionaryFields extends Fieldtype
     public function process($data): string|array
     {
         $dictionary = Dictionary::find($data['type']);
-        $values = $dictionary->fields()->addValues($data)->process()->values();
+        $values = $dictionary->fields()->addValues($data)->process()->values()->all();
 
-        if ($values->filter()->isEmpty()) {
+        if (count(Arr::removeNullValues($values)) === 0) {
             return $dictionary->handle();
         }
 
-        return array_merge(['type' => $dictionary->handle()], $values->filter()->all());
+        return array_merge(['type' => $dictionary->handle()], Arr::removeNullValues($values));
     }
 
     public function extraRules(): array

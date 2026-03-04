@@ -20,12 +20,15 @@
                     ref="listing"
                     :url="requestUrl"
                     :columns="columns"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
+                    :additional-parameters="additionalParameters"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                     @update:selections="$emit('selections-updated', $event)"
@@ -295,6 +298,12 @@ export default {
 
         actionContext() {
             return { container: this.container.id };
+        },
+
+        additionalParameters() {
+            return {
+                queryScopes: this.queryScopes,
+            };
         },
 
         canCreateFolders() {
@@ -665,7 +674,11 @@ export default {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
 
-                this.selectedAssets.push(asset.id);
+                if (this.maxFiles === 1) {
+                    this.selectedAssets.splice(0, this.selectedAssets.length, asset.id);
+                } else if (!this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset.id);
+                }
                 this.$emit('selections-updated', this.selectedAssets);
             }
 

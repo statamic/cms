@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\Passkey;
@@ -178,6 +179,90 @@ class ElevatedSessionTest extends TestCase
             ->post('/cp/elevated-session', ['password' => 'incorrect-password'])
             ->assertSessionHasErrors('password')
             ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    #[DataProvider('invalidPasswordPayloads')]
+    public function it_rejects_invalid_password_payloads(array $payload): void
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('password')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidPasswordPayloads(): array
+    {
+        return [
+            'no fields' => [[]],
+            'string zero' => [['password' => '0']],
+            'integer zero' => [['password' => 0]],
+            'false' => [['password' => false]],
+            'empty string' => [['password' => '']],
+            'null' => [['password' => null]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidVerificationCodePayloads')]
+    public function it_rejects_invalid_verification_code_payloads(array $payload): void
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidVerificationCodePayloads(): array
+    {
+        return [
+            'no fields' => [[]],
+            'string zero' => [['verification_code' => '0']],
+            'integer zero' => [['verification_code' => 0]],
+            'false' => [['verification_code' => false]],
+            'empty string' => [['verification_code' => '']],
+            'null' => [['verification_code' => null]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidPasskeyPayloads')]
+    public function it_handles_invalid_passkey_payloads(array $payload, bool $expectsValidationError): void
+    {
+        if ($expectsValidationError) {
+            $this
+                ->actingAs($this->user)
+                ->postJson('/cp/elevated-session', $payload)
+                ->assertStatus(422)
+                ->assertJsonValidationErrors('id')
+                ->assertSessionMissing('statamic_elevated_session');
+
+            return;
+        }
+
+        WebAuthn::shouldReceive('validateAssertion')->once()->andThrow(new \RuntimeException('Invalid assertion'));
+
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', array_merge($payload, ['rawId' => 'raw-id', 'response' => [], 'type' => 'public-key']))
+            ->assertStatus(500)
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidPasskeyPayloads(): array
+    {
+        return [
+            'no fields' => [[], true],
+            'string zero' => [['id' => '0'], false],
+            'integer zero' => [['id' => 0], false],
+            'false' => [['id' => false], false],
+            'empty string' => [['id' => ''], true],
+            'null' => [['id' => null], true],
+        ];
     }
 
     #[Test]

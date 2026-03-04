@@ -31,11 +31,11 @@ const props = defineProps({
     /** Badge text to display. */
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
-    /** The controlled date value. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
+    /** The controlled date value. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) or an ISO 8601 datetime string with a UTC offset. */
     modelValue: { type: [Object, String], default: null },
-    /** The minimum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
+    /** The minimum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) or an ISO 8601 datetime string with a UTC offset. */
     min: { type: [String, Object], default: null },
-    /** The maximum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
+    /** The maximum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) or an ISO 8601 datetime string with a UTC offset. */
     max: { type: [String, Object], default: null },
     /** The granularity of the date picker. <br><br> Options: `day`, `hour`, `minute`, `second` */
     granularity: { type: String, default: null },

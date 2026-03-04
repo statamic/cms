@@ -4,7 +4,7 @@ import debounce from '@/util/debounce.js';
 import props from './props.js';
 import emits from './emits.js';
 import { publishContextKey } from '@/components/ui';
-import { isRef } from 'vue';
+import { isRef, markRaw } from 'vue';
 
 export default {
     emits,
@@ -24,13 +24,15 @@ export default {
             this.$emit('update:value', value);
         },
 
-        updateDebounced: debounce(function (value) {
-            this.update(value);
-        }, 150),
-
         updateMeta(value) {
             this.$emit('update:meta', value);
         },
+    },
+
+    created() {
+        this.updateDebounced = markRaw(debounce((value) => {
+            this.update(value);
+        }, 150));
     },
 
     computed: {
