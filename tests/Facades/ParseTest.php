@@ -67,4 +67,18 @@ class ParseTest extends TestCase
             'null passthrough' => [null, null],
         ];
     }
+
+    #[Test]
+    public function app_key_is_banned_from_config_parsing()
+    {
+        config([
+            'app.key' => 'secret',
+            'foo.bar' => 'baz',
+        ]);
+
+        $this->assertSame('', Parse::config('{{ config:app:key }}'));
+        $this->assertSame('', Parse::config('{{ config.app.key }}'));
+        $this->assertSame('', Parse::config('{{ config.app:key }}'));
+        $this->assertSame('prefix  baz suffix', Parse::config('prefix {{ config:app:key }} {{ config:foo:bar }} suffix'));
+    }
 }

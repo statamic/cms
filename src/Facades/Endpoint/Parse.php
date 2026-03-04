@@ -109,6 +109,10 @@ class Parse
         return preg_replace_callback('/\{\{\s*config[\.:]([\w\.\:]+)\s*\}\}/', function ($matches) {
             $key = str_replace(':', '.', $matches[1]);
 
+            if (strtolower($key) === 'app.key') {
+                return '';
+            }
+
             return config($key, '');
         }, $value);
     }
