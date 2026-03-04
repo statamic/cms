@@ -122,7 +122,6 @@ EOT;
 
             $env = new Environment();
             $method = new \ReflectionMethod($env, 'checkForFieldValue');
-            $method->setAccessible(true);
 
             try {
                 $method->invoke($env, $throwingValue);
@@ -165,7 +164,6 @@ class TriggerValueExceptionTag extends \Statamic\Tags\Tags
         $env = new Environment();
         $env->setData($this->context->all());
         $method = new \ReflectionMethod($env, 'checkForFieldValue');
-        $method->setAccessible(true);
         try {
             $method->invoke($env, $throwingValue);
         } catch (\Throwable $e) {
