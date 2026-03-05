@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Facades\Statamic\Imaging\ImagickAvailability;
 use Intervention\Image\ImageManager;
 use Statamic\Support\Str;
 
@@ -69,7 +70,7 @@ trait DetectsTone
 
     private function detectSvgTone(string $fullPath): ?string
     {
-        if (extension_loaded('imagick')) {
+        if (ImagickAvailability::available()) {
             try {
                 $im = new \Imagick();
                 $im->setBackgroundColor(new \ImagickPixel('transparent'));
