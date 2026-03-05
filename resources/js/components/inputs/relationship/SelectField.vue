@@ -17,11 +17,9 @@
             @search="search"
         >
             <template #option="{ title, hint, status }">
-                <div class="flex w-full items-center justify-between">
-                    <div class="flex items-center">
-                        <StatusIndicator v-if="status" class="me-2" :status="status" />
-                        <div v-text="title" class="truncate" />
-                    </div>
+                <div class="flex w-full text-left items-center gap-2">
+                    <StatusIndicator v-if="status" :status="status" />
+                    <div v-text="title" class="truncate grow" />
                     <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
@@ -117,7 +115,7 @@ export default {
 
     methods: {
         request(params = {}) {
-			if (!params.length && loaders.value[this.cacheKey]) return;
+			if (!Object.keys(params).length && loaders.value[this.cacheKey]) return Promise.resolve();
 
             params = { ...this.parameters, ...params };
 

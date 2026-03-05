@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-dark-900">
+    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-gray-900">
         <Description v-if="index === 0" class="w-full mb-4" :text="__('messages.field_conditions_field_instructions')" />
 
         <div class="mb-2 w-full md:mb-0 md:w-1/3">
@@ -18,7 +18,7 @@
                         <span v-text="option.label" />
                         <span
                             v-text="option.value"
-                            class="font-mono text-2xs text-gray-500 dark:text-dark-150"
+                            class="font-mono text-2xs text-gray-500 dark:text-gray-300"
                             :class="{ 'ml-2': option.label }"
                         />
                     </div>

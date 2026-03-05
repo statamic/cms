@@ -86,8 +86,7 @@ return [
     | Support Link
     |--------------------------------------------------------------------------
     |
-    | Set the location of the support link in the "Useful Links" header
-    | dropdown. Use 'false' to remove it entirely.
+    | Set the location of the support link in the header.
     |
     */
 

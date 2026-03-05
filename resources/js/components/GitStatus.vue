@@ -64,7 +64,7 @@ export default {
         'MM': { class: 'text-yellow-700 bg-yellow-50 border-yellow-200', text: __('Modified'), displayCode: 'M' },
         'A': { class: 'text-green-700 bg-green-50 border-green-200', text: __('Added'), displayCode: 'A' },
         '??': { class: 'text-green-700 bg-green-50 border-green-200', text: __('Added'), displayCode: 'A' },
-        'D': { class: 'text-red-700 bg-red-50 border-red-200', text: __('Deleted'), displayCode: 'D' },
+        'D': { class: 'text-red-600 bg-red-50 border-red-200', text: __('Deleted'), displayCode: 'D' },
         'R': { class: 'text-blue-700 bg-blue-50 border-blue-200', text: __('Renamed'), displayCode: 'R' },
         'C': { class: 'text-purple-700 bg-purple-50 border-purple-200', text: __('Copied'), displayCode: 'C' }
       }

@@ -164,7 +164,7 @@ return [
     | Background Re-cache
     |--------------------------------------------------------------------------
     |
-    | When this enabled, Statamic will re-cache URLs in the background,
+    | When this is enabled, Statamic will re-cache URLs in the background,
     | overwriting the existing cache, without removing it first.
     |
     */

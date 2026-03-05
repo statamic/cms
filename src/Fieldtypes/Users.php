@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
@@ -101,8 +102,10 @@ class Users extends Relationship
     protected function toItemArray($id, $site = null)
     {
         if ($user = User::find($id)) {
+            $canViewUsers = $this->canViewUser($user);
+
             return [
-                'title' => $user->name(),
+                'title' => $this->userTitle($user, $canViewUsers),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
                 'editable' => User::current()->can('edit', $user),
@@ -122,7 +125,9 @@ class Users extends Relationship
             } else {
                 $query->where(function ($query) use ($search) {
                     $query
-                        ->where('email', 'like', '%'.$search.'%')
+                        ->when($this->canViewUsers(), function ($query) use ($search) {
+                            $query->where('email', 'like', '%'.$search.'%');
+                        })
                         ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
                             foreach (explode(' ', $search) as $word) {
                                 $query
@@ -147,11 +152,18 @@ class Users extends Relationship
                 $user = $user->getSearchable();
             }
 
-            return [
+            $canViewUsers = $this->canViewUser($user);
+
+            $fields = [
                 'id' => $user->id(),
-                'title' => $user->name(),
-                'email' => $user->email(),
+                'title' => $this->userTitle($user, $canViewUsers),
             ];
+
+            if ($canViewUsers) {
+                $fields['email'] = $user->email();
+            }
+
+            return $fields;
         };
 
         if ($request->boolean('paginate', true)) {
@@ -167,22 +179,52 @@ class Users extends Relationship
 
     protected function getColumns()
     {
-        return [
+        $columns = [
             Column::make('title')->label('Name'),
-            Column::make('email'),
         ];
+
+        if ($this->canViewUsers()) {
+            $columns[] = Column::make('email');
+        }
+
+        return $columns;
     }
 
     public function preProcessIndex($data)
     {
-        return $this->getItemsForPreProcessIndex($data)->map(function ($user) {
+        $canViewUsers = $this->canViewUsers();
+
+        return $this->getItemsForPreProcessIndex($data)->map(function ($user) use ($canViewUsers) {
             return [
                 'id' => $user->id(),
-                'title' => $user->name(),
+                'title' => $this->userTitle($user, $canViewUsers),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
         })->filter()->values();
+    }
+
+    private function userTitle($user, bool $canViewUsers): ?string
+    {
+        return $user->name() ?? ($canViewUsers ? $user->email() : $user->id());
+    }
+
+    private function canViewUsers(): bool
+    {
+        if (! $current = User::current()) {
+            return false;
+        }
+
+        return $current->can('index', UserContract::class);
+    }
+
+    private function canViewUser($user): bool
+    {
+        if (! $current = User::current()) {
+            return false;
+        }
+
+        return $current->can('view', $user);
     }
 
     protected function getItemsForPreProcessIndex($values): Collection

@@ -50,7 +50,7 @@ class GlideTest extends TestCase
      */
     public function it_outputs_an_absolute_url_when_the_url_does_not_have_a_valid_extension()
     {
-        $parse = (string) Parse::template('{{ glide src="https://statamic.com/foo" }}');
+        $parse = (string) Parse::template('{{ glide src="https://statamic.com/foo" }}', trusted: true);
 
         $this->assertSame('https://statamic.com/foo', $parse);
     }
@@ -64,7 +64,7 @@ class GlideTest extends TestCase
 {{ glide:data_url :src="foo" }}
 EOT;
 
-        $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg']));
+        $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg'], trusted: true));
     }
 
     #[Test]
@@ -76,7 +76,7 @@ EOT;
     {
         $this->createImageInPublicDirectory();
 
-        $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'http://localhost/glide/bar.jpg']);
+        $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'http://localhost/glide/bar.jpg'], trusted: true);
 
         $this->assertStringStartsWith('/img/glide/bar.jpg', $result);
     }
@@ -132,6 +132,6 @@ EOT;
 {{ glide:foo width="100" $absoluteParam }}
 EOT;
 
-        return (string) Parse::template($tag, ['foo' => 'bar.jpg']);
+        return (string) Parse::template($tag, ['foo' => 'bar.jpg'], trusted: true);
     }
 }

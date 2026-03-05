@@ -18,6 +18,11 @@ class CsrfTokenReplacer implements Replacer
         $this->replaceInResponse($response);
 
         $this->modifyFullMeasureResponse($response);
+
+        if (app(Cacher::class) instanceof FileCacher) {
+            $this->replaceInResponse($initial);
+            $this->modifyFullMeasureResponse($initial);
+        }
     }
 
     public function replaceInCachedResponse(Response $response)
