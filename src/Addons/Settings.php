@@ -97,6 +97,6 @@ abstract class Settings implements Contract
                 ->all();
         }
 
-        return (string) Antlers::parseUserContent($value, ['config' => Cascade::config()]);
+        return (string) Antlers::parse($value, ['config' => Cascade::config()]);
     }
 }

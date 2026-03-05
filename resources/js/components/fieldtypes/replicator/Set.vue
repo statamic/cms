@@ -83,7 +83,8 @@ const previewText = computed(() => {
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle) || {};
+            const config = props.config.fields.find((f) => f.handle === handle);
+            if (!config) return false;
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
@@ -128,7 +129,7 @@ reveal.use(rootEl, () => emit('expanded'));
         <div
             layout
             data-replicator-set
-            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
+            class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
                 'border-red-500': hasError
             }"
@@ -200,7 +201,7 @@ reveal.use(rootEl, () => emit('expanded'));
                 </div>
             </header>
 
-            <div v-show="!collapsed" :class="{ 'contain-paint': collapsed }">
+            <div v-show="!collapsed" :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"

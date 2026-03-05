@@ -471,15 +471,18 @@
             .tableWrapper &,
             blockquote > .tableWrapper &,
             :is(ol, ul) li > .tableWrapper & {
-                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-600 border-collapse table-fixed;
+                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-900 border-collapse table-fixed;
 
                 th {
-                    @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
+                    @apply bg-gray-50 dark:bg-gray-950/30 text-start;
+                    p {
+                        @apply font-medium dark:font-semibold;
+                    }
                 }
 
                 td,
                 th {
-                    @apply relative border px-2 py-1 align-top dark:border-gray-600;
+                    @apply relative border px-2 py-1 align-top dark:border-gray-700/75;
                     min-width: 1em;
                 }
 

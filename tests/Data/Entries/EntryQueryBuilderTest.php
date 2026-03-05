@@ -1254,6 +1254,7 @@ class EntryQueryBuilderTest extends TestCase
         ];
     }
 
+    #[Test]
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
@@ -1285,6 +1286,82 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function can_get_min_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(2, Entry::query()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(5, Entry::query()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(14, Entry::query()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(10, Entry::query()->where('type', 'b')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, Entry::query()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(3.5, Entry::query()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->average('quantity'));
     }
 
     #[Test]
