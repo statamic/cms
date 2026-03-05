@@ -42,7 +42,7 @@ class GlobalVariablesStore extends BasicStore
     {
         $variables = app(Variables::class)
             ->initialPath($path)
-            ->data(Arr::except($data, 'origin'));
+            ->data(Arr::except($data ?? [], 'origin'));
 
         $handle = explode('/', $handle);
 

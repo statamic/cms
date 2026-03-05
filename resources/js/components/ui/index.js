@@ -47,6 +47,7 @@ export { default as InputGroup } from './Input/Group.vue';
 export { default as InputGroupAppend } from './Input/GroupAppend.vue';
 export { default as InputGroupPrepend } from './Input/GroupPrepend.vue';
 export { default as Label } from './Label.vue';
+export { default as MiddleEllipsis } from './MiddleEllipsis/MiddleEllipsis.vue';
 export { default as Modal } from './Modal/Modal.vue';
 export { default as ModalClose } from './Modal/Close.vue';
 export { default as ModalTitle } from './Modal/Title.vue';

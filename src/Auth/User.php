@@ -85,13 +85,13 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function initials()
     {
+        if (! $name = $this->name()) {
+            return '?';
+        }
+
         $surname = '';
-        if ($name = $this->get('name')) {
-            if (Str::contains($name, ' ')) {
-                [$name, $surname] = explode(' ', $name);
-            }
-        } else {
-            $name = (string) $this->email();
+        if (Str::contains($name, ' ')) {
+            [$name, $surname] = explode(' ', $name, 2);
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
@@ -328,7 +328,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             return $name;
         }
 
-        return $this->email();
+        return null;
     }
 
     public function defaultAugmentedArrayKeys()

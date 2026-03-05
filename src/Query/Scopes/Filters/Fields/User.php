@@ -68,7 +68,8 @@ class User extends FieldtypeFilter
             return null;
         }
 
-        $user = Users::find($user)->name();
+        $user = Users::find($user);
+        $user = $user->name() ?? $user->email();
 
         return $field.' '.strtolower($translatedOperator).' '.$user;
     }
