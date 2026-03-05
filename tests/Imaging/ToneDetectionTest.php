@@ -51,7 +51,7 @@ class ToneDetectionTest extends TestCase
     public function it_detects_tone_for_svg(string $filename, string $expectedTone): void
     {
         if (! extension_loaded('imagick')) {
-            throw new \RuntimeException('Imagick is not available. Add imagick to the PHP extensions in .github/workflows/tests.yml to run this test.');
+            $this->markTestSkipped('imagick extension not enabled');
         }
 
         $disk = Storage::disk('tone_fixtures');
