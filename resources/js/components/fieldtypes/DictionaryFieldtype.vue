@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import DOMPurify from 'dompurify';
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
@@ -104,9 +105,15 @@ export default {
             return selections.map((value) => {
                 let option = this.selectedOptionData.find((option) => option.value === value);
 
-                if (!option) return { value, label: value };
+                if (!option) return { value, label: escapeHtml(String(value)) };
 
-                return { value: option.value, label: option.label, invalid: option.invalid };
+                return {
+                    value: option.value,
+                    label: DOMPurify.sanitize(option.label, {
+                        USE_PROFILES: { html: true, svg: true },
+                    }),
+                    invalid: option.invalid
+                };
             });
         },
 

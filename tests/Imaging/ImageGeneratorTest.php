@@ -10,16 +10,19 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\UnableToReadFile;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
+use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\RemoteUrlValidator;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -33,6 +36,16 @@ class ImageGeneratorTest extends TestCase
         parent::setUp();
 
         $this->clearGlideCache();
+
+        $this->app->bind(RemoteUrlValidator::class, function () {
+            return new RemoteUrlValidator(function ($host) {
+                return match ($host) {
+                    'example.com' => [['ip' => '93.184.216.34']],
+                    'internal.test' => [['ip' => '127.0.0.1']],
+                    default => [],
+                };
+            });
+        });
     }
 
     #[Test]
@@ -83,6 +96,22 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_throws_unable_to_read_file_when_asset_is_not_a_valid_image()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->create('foo/hoff.jpg', 100);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnFalse();
+
+        $this->expectException(UnableToReadFile::class);
+
+        $this->makeGenerator()->generateByAsset($asset, ['w' => 100]);
     }
 
     #[Test]
@@ -259,6 +288,24 @@ class ImageGeneratorTest extends TestCase
         $this->assertContains($expectedPath, $paths);
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_blocks_external_urls_that_target_non_public_ip_ranges()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->makeGenerator()->generateByUrl('http://169.254.169.254/latest/meta-data/', ['w' => 100]);
+    }
+
+    #[Test]
+    public function it_blocks_watermark_urls_that_target_non_public_ip_ranges()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->makeGenerator()->setParams(['mark' => 'http://127.0.0.1/watermark.png']);
     }
 
     #[Test]

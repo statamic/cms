@@ -15,6 +15,16 @@
     .form-group {
         grid-column: span var(--col-span, var(--grid-columns));
     }
+
+    .spacer-fieldtype {
+        /** It should be hidden so we dont see it, but we want it to take up space. */
+        visibility: hidden;
+
+        @variant @max-lg/panel {
+            /* When stacked we don't want it to take up space. */
+            display: none;
+        }
+    }
 }
 
 @variant @lg/panel {
@@ -110,7 +120,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 }
 
 .publish-section-header {
-    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-gray-850;
+    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-gray-900 dark:bg-gray-850;
 }
 
 .publish-section-header-inner {

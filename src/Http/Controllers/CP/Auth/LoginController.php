@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\CP\CpController;
@@ -137,7 +138,9 @@ class LoginController extends CpController
 
         $request->session()->regenerateToken();
 
-        return redirect($request->redirect ?? '/');
+        $redirect = $request->redirect ?? '/';
+
+        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
     }
 
     protected function getReferrer()

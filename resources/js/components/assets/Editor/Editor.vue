@@ -1,7 +1,7 @@
 <template>
     <Stack size="full" open inset ref="stack" :before-close="shouldClose" @update:open="$emit('closed')" :show-close-button="false">
         <div
-            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
+            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-gray-850"
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
@@ -29,7 +29,7 @@
                     <!-- Visual Area -->
                     <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-xl">
                         <!-- Toolbar -->
-                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
+                        <div v-if="showToolbar" class="@container/toolbar dark flex flex-wrap items-center justify-center gap-2 px-2 py-4">
                             <ItemActions
                                 :item="id"
                                 :url="actionUrl"
@@ -38,8 +38,9 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
-                                <ui-button inset size="sm" v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
-                                <ui-button inset size="sm" v-if="(isImage || asset?.isSvg) && asset?.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
+                                <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
+                                <ui-button inset size="sm" v-if="canCrop" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
+                                <ui-button inset size="sm" v-if="asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
@@ -47,7 +48,7 @@
                                 <ui-button inset size="sm" @click="download" icon="download" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Download')" />
                                 <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
 
-                                <Dropdown class="me-4">
+                                <Dropdown class="me-4" v-if="filterForActionsMenu(actions).length">
                                     <DropdownMenu>
                                         <DropdownItem
                                             v-for="action in filterForActionsMenu(actions)"
@@ -78,17 +79,17 @@
                                 <!-- SVG -->
                                 <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
-                                    <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="rounded-ss-md flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 w-4" />
                                     </div>
-                                    <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 w-12" />
                                     </div>
-                                    <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="rounded-se-md flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 w-24" />
                                     </div>
                                 </div>
-                                <div :class="{ 'bg-checkerboard': asset.can_be_transparent && showCheckerboard }" class="rounded-b-md h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                <div class="h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                     <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
                             </div>
@@ -109,10 +110,7 @@
                             </div>
                         </div>
 
-
-                        <div class="h-full" v-else-if="asset.isPdf">
-                            <pdf-viewer :src="asset.pdfUrl" />
-                        </div>
+                        <pdf-viewer v-else-if="asset.isPdf" :src="asset.pdfUrl" />
 
                         <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
                             <iframe
@@ -149,7 +147,7 @@
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
-                        <ui-badge pill v-if="asset.width && asset.height" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
+                        <ui-badge pill v-if="asset.width && asset.height" icon="assets" :text="__('messages.width_x_height', { width: Math.round(asset.width), height: Math.round(asset.height) })" />
                         <ui-badge pill v-if="imageTone && (asset.isImage || asset.isSvg)" :icon="imageTone === 'light' ? 'sun' : 'moon'" :text="imageTone === 'light' ? __('Light') : __('Dark')" />
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
@@ -175,6 +173,15 @@
                 @closed="closeFocalPointEditor"
             />
 
+            <crop-editor
+                v-if="isCroppable"
+                :asset="asset"
+                :can-replace="asset.canReuploadCrop"
+                v-model:open="showCropEditor"
+                @replaced="handleCropReplaced"
+                @created="handleCropCreated"
+            />
+
         <confirmation-modal
             v-model:open="closingWithChanges"
             :title="__('Unsaved Changes')"
@@ -190,9 +197,12 @@
 
 <script>
 import FocalPointEditor from './FocalPointEditor.vue';
+import CropEditor from './CropEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
+import { router } from '@inertiajs/vue3';
 import {
+    Button,
     Dropdown,
     DropdownMenu,
     DropdownItem,
@@ -207,11 +217,13 @@ export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
 
     components: {
+        Button,
         Dropdown,
         DropdownMenu,
         DropdownItem,
         ItemActions,
         FocalPointEditor,
+        CropEditor,
         PdfViewer,
         PublishContainer,
         PublishTabs,
@@ -247,6 +259,7 @@ export default {
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
+            showCropEditor: false,
             showCheckerboard: true,
             error: null,
             errors: {},
@@ -268,6 +281,14 @@ export default {
             return this.asset.isImage;
         },
 
+        isCroppable() {
+            return this.isImage && this.asset.extension !== 'gif';
+        },
+
+        canCrop() {
+            return this.isCroppable && this.asset.canCrop;
+        },
+
         hasErrors: function () {
             return this.error || Object.keys(this.errors).length;
         },
@@ -278,10 +299,6 @@ export default {
 
         isFocalPointEditorEnabled() {
             return Statamic.$config.get('focalPointEditorEnabled');
-        },
-
-        isToolbarVisible() {
-            return !this.readOnly && this.showToolbar;
         },
     },
 
@@ -298,6 +315,7 @@ export default {
     events: {
         'close-child-editor': function () {
             this.closeFocalPointEditor();
+            this.closeCropEditor();
             this.closeImageEditor();
             this.closeRenamer();
         },
@@ -315,7 +333,7 @@ export default {
 
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
-            this.$axios.get(url).then((response) => {
+            return this.$axios.get(url).then((response) => {
                 const data = response.data.data;
                 this.asset = data;
 
@@ -407,6 +425,27 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        openCropEditor() {
+            this.showCropEditor = true;
+        },
+
+        closeCropEditor() {
+            this.showCropEditor = false;
+        },
+
+        async handleCropReplaced() {
+            const originalPreview = this.asset?.preview;
+            const originalThumbnail = this.asset?.thumbnail;
+            await this.load();
+            Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
+        },
+
+        handleCropCreated(newAssetId) {
+            const [containerHandle, assetPath] = newAssetId.split('::');
+            const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
+            router.get(editUrl);
         },
 
         updateValues(values) {

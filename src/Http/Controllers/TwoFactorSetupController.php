@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 
@@ -31,7 +32,11 @@ class TwoFactorSetupController extends Controller
 
     protected function redirectPath()
     {
-        return request('redirect') ?? route('statamic.site');
+        $redirect = request('redirect');
+
+        return $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
     }
 
     protected function routes($user): array

@@ -192,6 +192,23 @@ class TwoFactorChallengeTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_redirect_to_external_url_on_frontend_route()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session(['login.id' => $user->id()])
+            ->post(route('statamic.two-factor-challenge', [
+                'redirect' => 'https://evil.com',
+            ]), [
+                'code' => $this->getOneTimeCode($user),
+            ])
+            ->assertRedirect(route('statamic.site'));
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
     public function the_session_is_elevated_upon_login()
     {
         $user = $this->userWithTwoFactorEnabled();

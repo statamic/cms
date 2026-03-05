@@ -27,14 +27,14 @@
                                 <div class="flex items-center">
                                     <span
                                         v-text="option.fieldset"
-                                        class="text-2xs text-gray-500 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
+                                        class="text-2xs text-gray-500 dark:text-gray-300 ltr:mr-2 rtl:ml-2"
                                     />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="px-4 py-2 text-sm text-gray-700 dark:text-gray-500 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -50,9 +50,9 @@
                     />
 
                     <div class="my-4 flex items-center">
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
-                        <div class="mx-4 text-2xs text-gray-600 dark:text-dark-175" v-text="__('or')"></div>
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
+                        <div class="flex-1 border-b border-gray-300 dark:border-gray-500" />
+                        <div class="mx-4 text-2xs text-gray-600 dark:text-gray-400" v-text="__('or')"></div>
+                        <div class="flex-1 border-b border-gray-300 dark:border-gray-500" />
                     </div>
 
                     <Field
@@ -69,7 +69,7 @@
                         >
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="px-4 py-2 text-sm text-gray-700 dark:text-gray-500 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>

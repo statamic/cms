@@ -4,11 +4,12 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\URL as LaravelURL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 
 class UserPasswordRequest extends FormRequest
@@ -47,14 +48,15 @@ class UserPasswordRequest extends FormRequest
             throw (new ValidationException($validator, $response));
         }
 
-        $errorResponse = $this->has('_error_redirect') ? redirect($this->input('_error_redirect')) : back();
+        $errorRedirect = $this->input('_error_redirect');
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect) ? redirect($errorRedirect) : back();
 
         throw (new ValidationException($validator, $errorResponse->withInput()->withErrors($validator->errors(), 'user.password')));
     }
 
     public function validateResolved()
     {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+        $site = Site::findByUrl(LaravelURL::previous()) ?? Site::default();
 
         return $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }

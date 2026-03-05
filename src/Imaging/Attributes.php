@@ -72,7 +72,8 @@ class Attributes
             $attrs = ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
         } elseif ($svg['viewBox']) {
             [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
-            $attrs = compact('width', 'height');
+
+            return ['width' => (float) $width, 'height' => (float) $height];
         } else {
             $attrs = $this->defaultSvgAttributes();
         }
