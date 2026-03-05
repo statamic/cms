@@ -248,11 +248,14 @@ class Replicator extends Fieldtype
             });
         }
 
+        $setConfigHashes = $this->flattenedSetsConfig()->map(fn ($config, $handle) => md5($handle.json_encode($config)))->all();
+
         return [
             'existing' => $existing,
             'new' => $new ?? null,
             'defaults' => $defaults ?? null,
             'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
+            'setConfigHashes' => $setConfigHashes,
         ];
     }
 

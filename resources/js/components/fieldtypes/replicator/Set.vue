@@ -19,7 +19,7 @@ import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
 
-const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
+const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'copied', 'cut', 'removed']);
 
 const replicatorSets = inject('replicatorSets');
 
@@ -191,6 +191,8 @@ reveal.use(rootEl, () => emit('expanded'));
                                 @click="toggleCollapsedState"
                             />
                             <DropdownItem :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem :text="__('Copy Set')" @click="emit('copied')" />
+                            <DropdownItem :text="__('Cut Set')" @click="emit('cut')" />
                             <DropdownItem
                                 :text="__('Delete Set')"
                                 variant="destructive"
