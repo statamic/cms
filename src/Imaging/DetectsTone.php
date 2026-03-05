@@ -7,6 +7,14 @@ use Statamic\Support\Str;
 
 trait DetectsTone
 {
+    /**
+     * Minimum alpha (0-255) for a pixel to be included in tone detection.
+     * Pixels below this are treated as transparent and skipped so that
+     * transparent PNGs are judged by their visible content (e.g. black
+     * logo on transparent → dark).
+     */
+    private const TONE_ALPHA_THRESHOLD = 26;
+
     private function detectTone(string $fullPath): ?string
     {
         try {
@@ -34,6 +42,10 @@ trait DetectsTone
                         continue;
                     }
                     $color = $image->pickColor($x, $y);
+                    $alpha = $color->alpha()->toInt();
+                    if ($alpha < self::TONE_ALPHA_THRESHOLD) {
+                        continue;
+                    }
                     $r = $color->red()->toInt() / 255;
                     $g = $color->green()->toInt() / 255;
                     $b = $color->blue()->toInt() / 255;
@@ -43,7 +55,11 @@ trait DetectsTone
                 }
             }
 
-            $avg = $count > 0 ? $sum / $count : 0.5;
+            if ($count === 0) {
+                return null;
+            }
+
+            $avg = $sum / $count;
 
             return $avg >= 0.4 ? 'light' : 'dark';
         } catch (\Throwable $e) {
