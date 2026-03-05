@@ -474,7 +474,7 @@
                 @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-900 border-collapse table-fixed;
 
                 th {
-                    @apply bg-gray-50 dark:bg-gray-925 text-start;
+                    @apply bg-gray-50 dark:bg-gray-950/30 text-start;
                     p {
                         @apply font-medium dark:font-semibold;
                     }
