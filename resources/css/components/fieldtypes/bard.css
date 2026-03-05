@@ -482,7 +482,7 @@
 
                 td,
                 th {
-                    @apply relative border px-2 py-1 align-top dark:border-gray-700/50;
+                    @apply relative border px-2 py-1 align-top dark:border-gray-700/75;
                     min-width: 1em;
                 }
 
