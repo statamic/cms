@@ -288,9 +288,16 @@ class Replicator extends Fieldtype
                 ]);
             }
 
-            return $sets->flatMap(function ($section) {
-                return $section['sets'];
-            });
+            return $sets
+                ->flatMap(function ($section) {
+                    return $section['sets'];
+                })
+                ->map(function ($config, $handle) {
+                    return [
+                        ...$config,
+                        'hash' => md5($handle.json_encode($config)),
+                    ];
+                });
         });
     }
 
