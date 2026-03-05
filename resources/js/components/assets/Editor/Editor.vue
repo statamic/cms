@@ -62,22 +62,6 @@
                             </ItemActions>
                         </div>
 
-                        <!-- Transparency toggle (always visible when toolbar is hidden, for transparent images/SVGs) -->
-                        <div
-                            v-if="showTransparencyToggle"
-                            class="flex flex-wrap items-center justify-center gap-2 px-2 py-2"
-                        >
-                            <ui-button
-                                inset
-                                size="sm"
-                                @click="showCheckerboard = !showCheckerboard"
-                                icon="eye"
-                                variant="ghost"
-                                :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']"
-                                :text="__('Transparency')"
-                            />
-                        </div>
-
                         <!-- Asset Preview Area -->
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
@@ -298,11 +282,6 @@ export default {
 
         isToolbarVisible() {
             return !this.readOnly && this.showToolbar;
-        },
-
-        /** Show standalone Transparency button when toolbar is hidden but asset supports transparency (e.g. from assets field) */
-        showTransparencyToggle() {
-            return !this.isToolbarVisible && this.asset && (this.asset.isImage || this.asset.isSvg) && this.asset.can_be_transparent;
         },
     },
 
