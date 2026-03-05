@@ -792,6 +792,7 @@ class AssetTest extends TestCase
             'height' => 60,
             'mime_type' => 'image/jpeg',
             'duration' => null,
+            'tone' => 'dark',
         ];
 
         $metaWithData = [
@@ -802,6 +803,7 @@ class AssetTest extends TestCase
             'height' => 60,
             'mime_type' => 'image/jpeg',
             'duration' => null,
+            'tone' => 'dark',
         ];
 
         // The meta that's saved to file will also be cached, but will not include in-memory data...
@@ -846,6 +848,7 @@ class AssetTest extends TestCase
             'height' => 60,
             'mime_type' => 'image/jpeg',
             'duration' => null,
+            'tone' => 'dark',
         ];
 
         Storage::disk('test')->put('foo/.meta/image.jpg.yaml', YAML::dump($incompleteMeta));
