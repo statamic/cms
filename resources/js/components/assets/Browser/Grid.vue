@@ -101,9 +101,16 @@
                     <Context>
                         <template #trigger>
                             <div
-                                class="asset-tile group relative bg-white dark:bg-gray-900"
+                                class="asset-tile group relative"
                                 :class="{
-                                    'bg-checkerboard!': asset.can_be_transparent,
+                                    'is-dark-tone': asset.can_be_transparent && asset.tone === 'dark',
+                                    'is-light-tone': asset.can_be_transparent && asset.tone === 'light',
+                                }"
+                            >
+                            <div
+                                class="size-full rounded-lg bg-white dark:bg-gray-900"
+                                :class="{
+                                    'bg-checkerboard': asset.can_be_transparent,
                                     'opacity-50!': draggingAsset === asset.id,
                                 }"
                             >
@@ -151,6 +158,7 @@
                                             />
                                         </DropdownMenu>
                                     </Dropdown>
+                                </div>
                                 </div>
                             </div>
                         </template>
