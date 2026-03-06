@@ -104,7 +104,7 @@
                                     :path="path"
                                     @navigated="selectFolder"
                                 />
-                                <div v-if="mode === 'grid'" class="flex items-center gap-2">
+                                <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
                                     <ui-button
                                         inset
                                         size="sm"
