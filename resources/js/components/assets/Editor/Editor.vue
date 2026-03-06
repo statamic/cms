@@ -82,7 +82,7 @@
                                 </div>
 
                                 <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
+                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl dark:bg-gray-800">
                                 <div class="grid grid-cols-3 gap-1">
                                     <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 w-4" />
