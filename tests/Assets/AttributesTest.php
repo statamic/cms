@@ -61,7 +61,7 @@ class AttributesTest extends TestCase
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals(['width' => 30, 'height' => 60, 'tone' => 'dark'], $attributes->get());
+        $this->assertEquals(['width' => 30, 'height' => 60], $attributes->get());
     }
 
     #[Test]
@@ -117,7 +117,7 @@ class AttributesTest extends TestCase
     {
         $asset = $this->svgAsset('<svg width="30" height="60" viewBox="0 0 100 200"></svg>');
 
-        $this->assertEquals(['width' => 30.0, 'height' => 60.0, 'tone' => null], $this->attributes->asset($asset)->get());
+        $this->assertEquals(['width' => 30.0, 'height' => 60.0], $this->attributes->asset($asset)->get());
     }
 
     #[Test]
@@ -147,9 +147,9 @@ class AttributesTest extends TestCase
     #[Test]
     public function it_uses_default_attributes_if_the_svg_has_no_viewbox_and_is_missing_either_or_both_dimensions()
     {
-        $this->assertEquals(['width' => 300, 'height' => 150, 'tone' => null], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());
-        $this->assertEquals(['width' => 300, 'height' => 150, 'tone' => null], $this->attributes->asset($this->svgAsset('<svg width="100"></svg>'))->get());
-        $this->assertEquals(['width' => 300, 'height' => 150, 'tone' => null], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
+        $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());
+        $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg width="100"></svg>'))->get());
+        $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
     }
 
     private function svgAsset($svg)
