@@ -1,11 +1,8 @@
 <template>
-    <ui-card
-        class="asset-browser-grid"
-        :class="{
-            'space-y-8': folders.length || assets.length || creatingFolder,
-            '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
-        }"
-    >
+    <ui-card class="asset-browser-grid" :class="{
+        'space-y-8': folders.length || assets.length || creatingFolder,
+        '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
+    }">
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
             <div

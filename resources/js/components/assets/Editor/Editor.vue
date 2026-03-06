@@ -76,13 +76,13 @@
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                             :class="previewBackgroundClass"
                         >
-                                <!-- Image -->
-                                <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100 rounded-md': asset.can_be_transparent && showCheckerboard }">
-                                    <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
-                                </div>
+                            <!-- Image -->
+                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100 rounded-md': asset.can_be_transparent && showCheckerboard }">
+                                <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            </div>
 
-                                <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl dark:bg-gray-800">
+                            <!-- SVG -->
+                            <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl dark:bg-gray-800">
                                 <div class="grid grid-cols-3 gap-1">
                                     <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 w-4" />
@@ -99,16 +99,16 @@
                                 </div>
                             </div>
 
-                                <!-- Audio -->
-                                <div class="w-full shadow-none" v-else-if="asset.isAudio">
-                                    <audio :src="asset.url" class="w-full" controls preload="auto" />
-                                </div>
+                            <!-- Audio -->
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio">
+                                <audio :src="asset.url" class="w-full" controls preload="auto" />
+                            </div>
 
-                                <!-- Video -->
-                                <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+                            <!-- Video -->
+                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
 
-                                <!-- Other thumbnail -->
-                                <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                            <!-- Other thumbnail -->
+                            <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                         </div>
 
                         <pdf-viewer v-else-if="asset.isPdf" :src="asset.pdfUrl" />
@@ -199,18 +199,18 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import CropEditor from './CropEditor.vue';
 import PdfViewer from './PdfViewer.vue';
-import { pick, flatten } from 'lodash-es';
+import { flatten, pick } from 'lodash-es';
 import { router } from '@inertiajs/vue3';
 import {
     Button,
     ButtonGroup,
     Dropdown,
-    DropdownMenu,
     DropdownItem,
+    DropdownMenu,
+    Icon,
     PublishContainer,
     PublishTabs,
-    Icon,
-	Stack,
+    Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
@@ -467,10 +467,8 @@ export default {
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
-            const payload = this.$refs.container.visibleValues;
-
             return this.$axios
-                .patch(url, payload)
+                .patch(url, this.$refs.container.visibleValues)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
                     this.$toast.success(__('Saved'));
@@ -568,7 +566,7 @@ export default {
             ];
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
-        },
+        }
     },
 };
 </script>
