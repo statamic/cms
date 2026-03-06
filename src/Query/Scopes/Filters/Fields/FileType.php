@@ -24,7 +24,7 @@ class FileType extends FieldtypeFilter
                 'options' => [
                     'image' => __('Image'),
                     'image-vector' => __('Vector image'),
-                    'image-pixel' => __('Pixel image'),
+                    'image-raster' => __('Raster image'),
                     'video' => __('Video'),
                     'audio' => __('Audio'),
                     'media' => __('Media'),
@@ -40,7 +40,7 @@ class FileType extends FieldtypeFilter
         $extensions = match ($values['value']) {
             'image' => FileTypes::image(),
             'image-vector' => FileTypes::vectorImage(),
-            'image-pixel' => FileTypes::pixelImage(),
+            'image-raster' => FileTypes::rasterImage(),
             'video' => FileTypes::video(),
             'audio' => FileTypes::audio(),
             'media' => FileTypes::media(),

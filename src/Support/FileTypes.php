@@ -16,12 +16,12 @@ class FileTypes
     public static function image(): array
     {
         return [
-            ...self::pixelImage(),
+            ...self::rasterImage(),
             ...self::vectorImage(),
         ];
     }
 
-    public static function pixelImage(): array
+    public static function rasterImage(): array
     {
         return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
     }
