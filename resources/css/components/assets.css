@@ -161,34 +161,34 @@
         --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
         --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23000000'/%3E%3C/svg%3E");
         isolation: isolate;
-    }
 
-    &.asset-tile-hover-checkerboard::before {
-        border-radius: inherit;
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        background-image: var(--checkerboard-light);
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 100ms;
-    }
+        &::before {
+            border-radius: inherit;
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background-image: var(--checkerboard-light);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 100ms;
+        }
 
-    &.asset-tile-hover-checkerboard:hover::before {
-        opacity: 1;
-    }
+        &:hover::before {
+            opacity: 1;
+        }
 
-    .dark &.asset-tile-hover-checkerboard::before {
-        background-image: var(--checkerboard-dark);
-    }
+        .dark &::before {
+            background-image: var(--checkerboard-dark);
+        }
 
-    &.asset-tile-hover-checkerboard.is-dark-tone::before {
-        background-image: var(--checkerboard-light);
-    }
+        &.is-dark-tone::before {
+            background-image: var(--checkerboard-light);
+        }
 
-    &.asset-tile-hover-checkerboard.is-light-tone::before {
-        background-image: var(--checkerboard-dark);
+        &.is-light-tone::before {
+            background-image: var(--checkerboard-dark);
+        }
     }
 }
 
