@@ -22,6 +22,7 @@
                     :columns="columns"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
+                    :filters="filters"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
@@ -84,6 +85,7 @@
                             <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
+                                    <ListingFilters @filters-updated="filtersUpdated" />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
@@ -130,7 +132,7 @@
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
-                                :is-searching="!!searchQuery"
+                                :is-searching="isSearching"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -193,6 +195,7 @@ import {
     Listing,
     ListingTable,
     ListingPagination,
+    ListingFilters,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
@@ -226,6 +229,7 @@ export default {
         ListingTable,
         ListingPagination,
         ListingSearch,
+        ListingFilters,
         ListingCustomizeColumns,
         Breadcrumbs,
         Slider,
@@ -250,6 +254,7 @@ export default {
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
+        filters: Array,
         initialColumns: {
             type: Array,
             default: () => [],
@@ -268,6 +273,7 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
+            activeFilters: {},
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
             creatingFolderError: false,
@@ -289,7 +295,7 @@ export default {
 
     computed: {
         requestUrl() {
-            return this.searchQuery
+            return this.isSearching
                 ? cp_url(
                       `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
                   ).replace(/\/$/, '')
@@ -330,6 +336,21 @@ export default {
 
         hasSelections() {
             return this.selectedAssets.length > 0;
+        },
+
+        hasActiveFilters() {
+            return Object.entries(this.activeFilters).some(([key, value]) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
+                } else if (typeof value === 'object' && value !== null) {
+                    return Object.keys(value).length > 0;
+                }
+                return Boolean(value);
+            });
+        },
+
+        isSearching() {
+            return this.searchQuery || this.hasActiveFilters;
         },
 
         parameters() {
@@ -439,6 +460,13 @@ export default {
             this.page = 1;
         },
 
+        activeFilters: {
+            deep: true,
+            handler() {
+                this.page = 1;
+            },
+        },
+
         selectedPath: {
             immediate: true,
             handler(newPath) {
@@ -456,6 +484,10 @@ export default {
     },
 
     methods: {
+        filtersUpdated(filters) {
+            this.activeFilters = filters;
+        },
+
         modeChanged(mode) {
             this.mode = mode;
         },
@@ -468,7 +500,7 @@ export default {
         listingRequestCompleted({ response }) {
             this.assets = response.data.data;
 
-            if (this.searchQuery) {
+            if (this.isSearching) {
                 this.folder = null;
                 this.folders = [];
             } else {
