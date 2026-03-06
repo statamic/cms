@@ -193,7 +193,7 @@
     }
 
     .dark .bg-checkerboard {
-        background-color: var(--color-gray-850);
+        background-color: #1c1c1e;
 
         &::before {
             background-image: var(--checkerboard-dark);
@@ -212,7 +212,7 @@
     }
 
     .dark.bg-checkerboard {
-        background-color: var(--color-gray-850);
+        background-color: #1c1c1e;
 
         &::before {
             background-image: var(--checkerboard-dark);
