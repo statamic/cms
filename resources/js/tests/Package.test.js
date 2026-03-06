@@ -167,6 +167,7 @@ it('exports ui', async () => {
         'InputGroupAppend',
         'InputGroupPrepend',
         'Label',
+        'MiddleEllipsis',
         'Modal',
         'ModalClose',
         'ModalTitle',

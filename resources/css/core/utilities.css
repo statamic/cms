@@ -170,7 +170,7 @@
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
-        @apply bg-dark-600/90;
+        @apply bg-gray-700/90;
     }
 
     .inner {

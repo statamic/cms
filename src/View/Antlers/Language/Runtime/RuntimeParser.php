@@ -139,13 +139,16 @@ class RuntimeParser implements Parser
     public function setRuntimeConfiguration(RuntimeConfiguration $configuration)
     {
         GlobalRuntimeState::$allowPhpInContent = $configuration->allowPhpInUserContent;
+        GlobalRuntimeState::$allowMethodsInContent = $configuration->allowMethodsInUserContent;
         GlobalRuntimeState::$throwErrorOnAccessViolation = $configuration->throwErrorOnAccessViolation;
         GlobalRuntimeState::$bannedVarPaths = $configuration->guardedVariablePatterns;
         GlobalRuntimeState::$bannedContentVarPaths = $configuration->guardedContentVariablePatterns;
         GlobalRuntimeState::$bannedTagPaths = $configuration->guardedTagPatterns;
         GlobalRuntimeState::$bannedContentTagPaths = $configuration->guardedContentTagPatterns;
+        GlobalRuntimeState::$allowedContentTagPaths = $configuration->allowedContentTagPatterns;
         GlobalRuntimeState::$bannedModifierPaths = $configuration->guardedModifiers;
         GlobalRuntimeState::$bannedContentModifierPaths = $configuration->guardedContentModifiers;
+        GlobalRuntimeState::$allowedContentModifierPaths = $configuration->allowedContentModifiers;
 
         $this->nodeProcessor->setRuntimeConfiguration($configuration);
 
@@ -694,10 +697,11 @@ INFO;
             $this->antlersLexer, $this->antlersParser
         ))->allowPhp($this->allowPhp);
 
-        // If we are evaluating a tag's scope, we still
-        // want the overall parser instances to be
-        // isolated, but we also need the Cascade.
-        if (GlobalRuntimeState::$evaulatingTagContents) {
+        foreach ($this->preParsers as $preParser) {
+            $parser->preparse($preParser);
+        }
+
+        if ($this->cascade != null) {
             $parser->cascade($this->cascade);
         }
 
@@ -764,7 +768,22 @@ INFO;
 
     public function parseView($view, $text, $data = [])
     {
+        $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
         $existingView = $this->view;
+        try {
+            return $this->renderViewContent($view, $text, $data);
+        } finally {
+            $this->view = $existingView;
+            array_pop(GlobalRuntimeState::$templateFileStack);
+            GlobalRuntimeState::$currentExecutionFile = $this->view;
+            GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
+        }
+    }
+
+    private function renderViewContent($view, $text, $data = [])
+    {
         $this->view = $view;
         GlobalRuntimeState::$templateFileStack[] = [$view, null];
 
@@ -782,15 +801,7 @@ INFO;
             'view' => $this->cascade->getViewData($view),
         ]);
 
-        $parsed = $this->renderText($text, $data);
-
-        $this->view = $existingView;
-
-        array_pop(GlobalRuntimeState::$templateFileStack);
-
-        GlobalRuntimeState::$currentExecutionFile = $this->view;
-
-        return $parsed;
+        return $this->renderText($text, $data);
     }
 
     public function injectNoparse($text)
