@@ -74,7 +74,7 @@
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
-                            :class="previewToneClass"
+                            :class="previewBackgroundClass"
                         >
                                 <!-- Image -->
                                 <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100 rounded-md': asset.can_be_transparent && showCheckerboard }">
@@ -82,7 +82,7 @@
                                 </div>
 
                                 <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl dark:bg-gray-800">
+                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl">
                                 <div class="grid grid-cols-3 gap-1">
                                     <div class="flex items-center justify-center p-3 aspect-square" :class="{ 'bg-checkerboard before:opacity-100': showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 w-4" />
@@ -311,7 +311,7 @@ export default {
             return 'eye-closed';
         },
 
-        previewToneClass() {
+        previewBackgroundClass() {
             if (this.checkerboardMode === 0) return 'light';
             if (this.checkerboardMode === 1) return 'dark';
             return '';
