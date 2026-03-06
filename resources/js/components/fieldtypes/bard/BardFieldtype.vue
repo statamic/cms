@@ -398,7 +398,7 @@ export default {
 
         if (!commandPaletteCallbackRegistered) {
             commandPaletteCallbackRegistered = true;
-			
+
             Statamic.$commandPalette.preventIf(() => {
                 const selection = window.getSelection();
                 const node = selection?.anchorNode;
