@@ -180,6 +180,7 @@ import { data_get } from "@/bootstrap/globals.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
+let commandPaletteCallbackRegistered = false;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -394,6 +395,17 @@ export default {
 		this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
+
+        if (!commandPaletteCallbackRegistered) {
+            commandPaletteCallbackRegistered = true;
+
+            Statamic.$commandPalette.preventIf(() => {
+                const selection = window.getSelection();
+                const node = selection?.anchorNode;
+                const isInBard = node?.parentElement?.closest('.bard-editor') !== null;
+                return isInBard && selection?.toString().length > 0;
+            });
+        }
 
         this.$nextTick(() => {
             let el = document.querySelector(`label[for="${this.fieldId}"]`);

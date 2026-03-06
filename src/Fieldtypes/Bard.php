@@ -6,6 +6,7 @@ use Closure;
 use Facades\Statamic\Fieldtypes\RowId;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
@@ -14,6 +15,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -834,6 +836,59 @@ class Bard extends Replicator
     public static function setDefaultButtons(array $buttons): void
     {
         static::$defaultButtons = $buttons;
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->config('container') !== $container) {
+            return $data;
+        }
+
+        if (is_string($data)) {
+            return $data ? $this->replaceStatamicUrls($data, $newValue, $oldValue) : $data;
+        }
+
+        if (! is_array($data) || empty($data)) {
+            return $data;
+        }
+
+        $flat = collect(Arr::dot($data));
+
+        $flat->filter(fn ($value, $key) => preg_match('/(.*)\.(type)/', $key) && $value === 'image')
+            ->each(function ($value, $key) use (&$data, $newValue, $oldValue, $container) {
+                $srcKey = str_replace('.type', '.attrs.src', $key);
+
+                if (Arr::get($data, $srcKey) === "asset::{$container}::{$oldValue}") {
+                    Arr::set($data, $srcKey, $newValue === null ? '' : "asset::{$container}::{$newValue}");
+                }
+            });
+
+        $flat->filter(fn ($value, $key) => preg_match('/(.*)\.(type)/', $key) && $value === 'link')
+            ->each(function ($value, $key) use (&$data, $newValue, $oldValue, $container) {
+                $hrefKey = str_replace('.type', '.attrs.href', $key);
+
+                if (Arr::get($data, $hrefKey) === "statamic://asset::{$container}::{$oldValue}") {
+                    Arr::set($data, $hrefKey, $newValue === null ? '' : "statamic://asset::{$container}::{$newValue}");
+                }
+            });
+
+        return $data;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        collect($data)->each(function ($set, $setKey) use ($updater) {
+            $setHandle = Arr::get($set, 'attrs.values.type');
+            $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $updater->update(new Fields($fields), "{$setKey}.attrs.values.");
+            }
+        });
     }
 
     private function containerRequiredRule(): ValidationRule
