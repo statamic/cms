@@ -98,20 +98,23 @@
                         />
 
                         <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
-                            <PanelHeader
-                                class="flex items-center justify-between px-1!"
-                                :showCheckerboardToggle="mode === 'grid'"
-                                :checkerboardMode="checkerboardMode"
-                                @checkerboard-toggled="onCheckerboardToggled"
-                            >
+                            <PanelHeader class="flex items-center justify-between gap-2 px-1!">
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
                                     @navigated="selectFolder"
                                 />
-                                <template #trailing>
+                                <div v-if="mode === 'grid'" class="flex items-center gap-2">
+                                    <ui-button
+                                        inset
+                                        size="sm"
+                                        variant="ghost"
+                                        class="[&_svg]:!opacity-45"
+                                        :icon="checkerboardIcon"
+                                        :text="__('Transparency')"
+                                        @click="onCheckerboardToggled((checkerboardMode + 1) % 3)"
+                                    />
                                     <Slider
-                                        v-if="mode === 'grid'"
                                         size="sm"
                                         class="w-24!"
                                         variant="subtle"
@@ -120,7 +123,7 @@
                                         :max="300"
                                         :step="25"
                                     />
-                                </template>
+                                </div>
                             </PanelHeader>
 
                             <Uploads
@@ -392,6 +395,16 @@ export default {
 
         showAssetEditor() {
             return Boolean(this.editedAssetId);
+        },
+
+        isCpDark() {
+            return typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+        },
+
+        checkerboardIcon() {
+            if (this.checkerboardMode === 0) return this.isCpDark ? 'moon' : 'sun';
+            if (this.checkerboardMode === 1) return this.isCpDark ? 'sun' : 'moon';
+            return 'eye-slash';
         },
 
         sharedAssetProps() {
