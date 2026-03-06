@@ -262,7 +262,7 @@ export default {
             fieldset: null,
             showFocalPointEditor: false,
             showCropEditor: false,
-            checkerboardMode: typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 1 : 0, // 0 = light, 1 = dark, 2 = off
+            checkerboardMode: 0, // 0 = current CP color, 1 = alt CP color, 2 = transparent
             error: null,
             errors: {},
             actions: [],
@@ -301,19 +301,23 @@ export default {
             return Statamic.$config.get('focalPointEditorEnabled');
         },
 
+        isCpDark() {
+            return typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+        },
+
         showCheckerboard() {
             return this.checkerboardMode !== 2;
         },
 
         checkerboardIcon() {
-            if (this.checkerboardMode === 0) return 'sun';
-            if (this.checkerboardMode === 1) return 'moon';
+            if (this.checkerboardMode === 0) return this.isCpDark ? 'moon' : 'sun';
+            if (this.checkerboardMode === 1) return this.isCpDark ? 'sun' : 'moon';
             return 'eye-closed';
         },
 
         previewBackgroundClass() {
-            if (this.checkerboardMode === 0) return 'light';
-            if (this.checkerboardMode === 1) return 'dark';
+            if (this.checkerboardMode === 0) return this.isCpDark ? 'dark' : 'light';
+            if (this.checkerboardMode === 1) return this.isCpDark ? 'light' : 'dark';
             return '';
         },
     },
