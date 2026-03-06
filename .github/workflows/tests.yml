@@ -72,7 +72,7 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
-          extensions: fileinfo, exif, gd, imagick, pdo, sqlite, pdo_sqlite
+          extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
           ini-values: short_open_tag=on
           coverage: none
 

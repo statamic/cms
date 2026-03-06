@@ -60,14 +60,8 @@ class AssetsController extends CpController
 
         $fields->validate();
 
-        $toneOverride = $request->tone_override;
-        if ($toneOverride === '' || $toneOverride === 'auto') {
-            $toneOverride = null;
-        }
-
         $values = $fields->process()->values()->merge([
             'focus' => $request->focus,
-            'tone_override' => $toneOverride,
         ]);
 
         foreach ($values as $key => $value) {

@@ -42,7 +42,6 @@ class FolderAsset extends JsonResource
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
             'editable' => User::current()->can('edit', $this->resource),
-            'tone' => $this->tone(),
 
             $this->merge($this->values()),
 

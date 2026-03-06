@@ -68,9 +68,6 @@ class AugmentedAsset extends AbstractAugmented
                 'duration_sec',
                 'duration_min',
                 'playtime',
-                'tone',
-                'is_light_tone',
-                'is_dark_tone',
             ]);
         }
 
@@ -195,20 +192,5 @@ class AugmentedAsset extends AbstractAugmented
         }
 
         return date('i:s', $this->duration());
-    }
-
-    protected function tone()
-    {
-        return $this->data->tone();
-    }
-
-    protected function isLightTone()
-    {
-        return $this->tone() === 'light';
-    }
-
-    protected function isDarkTone()
-    {
-        return $this->tone() === 'dark';
     }
 }

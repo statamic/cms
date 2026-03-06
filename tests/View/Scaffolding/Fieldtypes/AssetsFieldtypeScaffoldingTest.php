@@ -86,9 +86,6 @@ class AssetsFieldtypeScaffoldingTest extends ScaffoldingTestCase
     {{ duration_sec /}}
     {{ duration_min /}}
     {{ playtime /}}
-    {{ tone /}}
-    {{ is_light_tone /}}
-    {{ is_dark_tone /}}
 {{ /test }}
 EXPECTED;
 
@@ -153,9 +150,6 @@ EXPECTED;
     {{ duration_sec /}}
     {{ duration_min /}}
     {{ playtime /}}
-    {{ tone /}}
-    {{ is_light_tone /}}
-    {{ is_dark_tone /}}
 {{ /root:nested_group:test }}
 EXPECTED;
 
@@ -218,9 +212,6 @@ EXPECTED;
     {{ $asset->duration_sec }}
     {{ $asset->duration_min }}
     {{ $asset->playtime }}
-    {{ $asset->tone }}
-    {{ $asset->is_light_tone }}
-    {{ $asset->is_dark_tone }}
 @endforeach
 EXPECTED;
 
@@ -283,9 +274,6 @@ EXPECTED;
     {{ $asset->duration_sec }}
     {{ $asset->duration_min }}
     {{ $asset->playtime }}
-    {{ $asset->tone }}
-    {{ $asset->is_light_tone }}
-    {{ $asset->is_dark_tone }}
 @endforeach
 EXPECTED;
 
@@ -349,9 +337,6 @@ EXPECTED;
 {{ $test->duration_sec }}
 {{ $test->duration_min }}
 {{ $test->playtime }}
-{{ $test->tone }}
-{{ $test->is_light_tone }}
-{{ $test->is_dark_tone }}
 EXPECTED;
 
         $this->assertSame(
@@ -414,9 +399,6 @@ EXPECTED;
 {{ $root->nested_group->test->duration_sec }}
 {{ $root->nested_group->test->duration_min }}
 {{ $root->nested_group->test->playtime }}
-{{ $root->nested_group->test->tone }}
-{{ $root->nested_group->test->is_light_tone }}
-{{ $root->nested_group->test->is_dark_tone }}
 EXPECTED;
 
         $this->assertSame(

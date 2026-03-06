@@ -43,7 +43,6 @@ width: 30
 height: 60
 mime_type: image/jpeg
 duration: null
-tone: dark
 
 EOT;
         $this->assertEquals($contents, $disk->get($path));

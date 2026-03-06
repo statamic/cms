@@ -10,8 +10,6 @@ use Statamic\Support\Str;
 
 class Attributes
 {
-    use DetectsTone;
-
     private $cacheDisk;
 
     public function from(FilesystemAdapter $source, string $path)
@@ -46,20 +44,18 @@ class Attributes
         $fullPath = $this->prefixPath($path);
 
         if (! file_exists($fullPath)) {
-            return ['width' => 0, 'height' => 0, 'tone' => null];
+            return ['width' => 0, 'height' => 0];
         }
 
         $size = @getimagesize($fullPath);
 
         if ($size === false) {
-            return ['width' => 0, 'height' => 0, 'tone' => null];
+            return ['width' => 0, 'height' => 0];
         }
 
         [$width, $height] = $size;
 
-        $tone = $this->detectTone($fullPath);
-
-        return compact('width', 'height', 'tone');
+        return compact('width', 'height');
     }
 
     private function svgAttributes(string $path)
@@ -69,18 +65,14 @@ class Attributes
         if ($svg['width'] && $svg['height']
             && is_numeric((string) $svg['width'])
             && is_numeric((string) $svg['height'])) {
-            $attrs = ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
+            return ['width' => (float) $svg['width'], 'height' => (float) $svg['height']];
         } elseif ($svg['viewBox']) {
             [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
 
             return ['width' => (float) $width, 'height' => (float) $height];
-        } else {
-            $attrs = $this->defaultSvgAttributes();
         }
 
-        $attrs['tone'] = $this->detectSvgTone($this->prefixPath($path));
-
-        return $attrs;
+        return $this->defaultSvgAttributes();
     }
 
     private function defaultSvgAttributes()

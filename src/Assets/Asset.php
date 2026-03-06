@@ -295,7 +295,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 'height' => Arr::get($attributes, 'height'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
                 'duration' => Arr::get($attributes, 'duration'),
-                'tone' => Arr::get($attributes, 'tone'),
             ]);
         }
 
@@ -856,27 +855,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $this->meta('duration');
-    }
-
-    public function tone(): ?string
-    {
-        $override = $this->data->get('tone_override');
-
-        if ($override !== null && $override !== '') {
-            return $override;
-        }
-
-        return $this->meta('tone');
-    }
-
-    /**
-     * Get the detected tone (from image analysis), ignoring any user override.
-     *
-     * @return string|null
-     */
-    public function toneDetected(): ?string
-    {
-        return $this->meta('tone');
     }
 
     /**

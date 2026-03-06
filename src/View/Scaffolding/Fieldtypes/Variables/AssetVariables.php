@@ -59,9 +59,6 @@ class AssetVariables
             'duration_sec',
             'duration_min',
             'playtime',
-            'tone',
-            'is_light_tone',
-            'is_dark_tone',
         ];
     }
 }
