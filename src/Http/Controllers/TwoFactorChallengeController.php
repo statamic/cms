@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
+use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 use Statamic\Http\Requests\TwoFactorChallengeRequest;
@@ -67,6 +68,10 @@ class TwoFactorChallengeController extends Controller
 
     protected function redirectPath()
     {
-        return request('redirect') ?? route('statamic.site');
+        $redirect = request('redirect');
+
+        return $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
     }
 }

@@ -300,7 +300,7 @@ const parameters = computed(() => {
 });
 
 const shouldRequestFirstPage = computed(() => {
-    if (currentPage.value > 1 && items.value.length === 0) {
+    if (currentPage.value > 1 && meta.value?.last_page && currentPage.value > meta.value.last_page) {
         currentPage.value = 1;
         return true;
     }
@@ -684,6 +684,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    Statamic.$progress.complete(id);
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 

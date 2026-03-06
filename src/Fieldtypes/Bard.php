@@ -619,6 +619,18 @@ class Bard extends Replicator
             return [$set['attrs']['id'] => $this->fields($values['type'], $index)->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
+        if ($this->shouldProcessNewValues()) {
+            $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                return $this->fields($handle)->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                })->all();
+            })->all();
+
+            $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+            })->toArray();
+        }
+
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
                 return null;
@@ -639,6 +651,8 @@ class Bard extends Replicator
 
         $data = [
             'existing' => $existing,
+            'new' => $new ?? null,
+            'defaults' => $defaults ?? null,
             'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
@@ -663,6 +677,17 @@ class Bard extends Replicator
         }
 
         return $this->runHooks('preload', $data);
+    }
+
+    private function shouldProcessNewValues(): bool
+    {
+        $parent = $this->field()->parent();
+
+        if (! $parent || ! method_exists($parent, 'blueprint')) {
+            return true;
+        }
+
+        return is_null($parent->blueprint()->fullyQualifiedHandle());
     }
 
     public function preProcessValidatable($value)

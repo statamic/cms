@@ -14,7 +14,6 @@ import {
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
-import { Motion } from 'motion-v';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
@@ -84,7 +83,8 @@ const previewText = computed(() => {
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle) || {};
+            const config = props.config.fields.find((f) => f.handle === handle);
+            if (!config) return false;
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
@@ -121,18 +121,6 @@ function destroy() {
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
-
-const shouldClipOverflow = ref(false);
-
-function onAnimationStart() {
-    shouldClipOverflow.value = true;
-}
-
-function onAnimationComplete() {
-    if (!props.collapsed) {
-        shouldClipOverflow.value = false;
-    }
-}
 </script>
 
 <template>
@@ -141,7 +129,7 @@ function onAnimationComplete() {
         <div
             layout
             data-replicator-set
-            class="relative z-2 w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
+            class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
                 'border-red-500': hasError
             }"
@@ -213,14 +201,7 @@ function onAnimationComplete() {
                 </div>
             </header>
 
-            <Motion
-                :class="{ 'overflow-clip': shouldClipOverflow }"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
-                @animation-start="onAnimationStart"
-                @animation-complete="onAnimationComplete"
-            >
+            <div v-show="!collapsed" :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }">
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
@@ -231,7 +212,7 @@ function onAnimationComplete() {
                         <Fields class="p-4" />
                     </FieldsProvider>
                 </div>
-            </Motion>
+            </div>
         </div>
 
         <confirmation-modal

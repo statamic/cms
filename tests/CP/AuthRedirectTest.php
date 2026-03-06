@@ -69,6 +69,20 @@ class AuthRedirectTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_redirect_to_external_referrer()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->withHeaders(['referer' => 'https://external.com'])
+            ->get('/cp/hammertime')
+            ->assertRedirect(cp_route('index'))
+            ->assertSessionHas(['error' => "Can't touch this."]);
+    }
+
+    #[Test]
     public function it_redirects_to_unauthorized_view_if_there_would_be_a_redirect_loop()
     {
         $this->setTestRoles(['undashboardable' => ['access cp']]);

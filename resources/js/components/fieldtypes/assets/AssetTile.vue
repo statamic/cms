@@ -18,7 +18,7 @@
         >
         </asset-editor>
 
-        <div class="flex h-full rounded-b-md relative" :class="{ 'bg-checkerboard rounded-lg!': canBeTransparent, 'border-b dark:border-gray-700': showFilename }">
+        <div class="flex h-full w-full justify-center rounded-b-md relative" :class="{ 'bg-checkerboard rounded-lg!': canBeTransparent, 'border-b dark:border-gray-700': showFilename }">
             <div class="p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
@@ -26,7 +26,7 @@
                 </template>
 
                 <template v-else>
-                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 size-full relative" />
+                    <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4 w-full relative" />
 
                     <template v-else>
                         <img :src="thumbnail" v-if="thumbnail" :title="label" class="rounded-md relative"  />

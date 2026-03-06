@@ -154,6 +154,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $scopes = [
+        Scopes\Filters\AssetProperties::class,
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
