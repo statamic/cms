@@ -5,8 +5,6 @@
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
-            'is-dark-tone': canBeTransparent && asset.tone === 'dark',
-            'is-light-tone': canBeTransparent && asset.tone === 'light',
         }"
         :title="label"
     >
