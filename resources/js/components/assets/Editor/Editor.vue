@@ -212,6 +212,7 @@ import {
     Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
@@ -260,7 +261,6 @@ export default {
             fieldset: null,
             showFocalPointEditor: false,
             showCropEditor: false,
-            checkerboardMode: 0, // 0 = current CP color, 1 = alt CP color, 2 = transparent
             error: null,
             errors: {},
             actions: [],
@@ -298,26 +298,16 @@ export default {
         isFocalPointEditorEnabled() {
             return Statamic.$config.get('focalPointEditorEnabled');
         },
+    },
 
-        isCpDark() {
-            return typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-        },
-
-        showCheckerboard() {
-            return this.checkerboardMode !== 2;
-        },
-
-        checkerboardIcon() {
-            if (this.checkerboardMode === 0) return this.isCpDark ? 'moon' : 'sun';
-            if (this.checkerboardMode === 1) return this.isCpDark ? 'sun' : 'moon';
-            return 'eye-slash';
-        },
-
-        previewBackgroundClass() {
-            if (this.checkerboardMode === 0) return this.isCpDark ? 'dark' : 'light';
-            if (this.checkerboardMode === 1) return this.isCpDark ? 'light' : 'dark';
-            return '';
-        },
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            previewBackgroundClass: checkerboard.backgroundClass,
+            checkerboardIcon: checkerboard.icon,
+            showCheckerboard: checkerboard.enabled,
+            cycleCheckerboard: checkerboard.cycle,
+        };
     },
 
     mounted() {
@@ -425,10 +415,6 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
-        },
-
-        cycleCheckerboard() {
-            this.checkerboardMode = (this.checkerboardMode + 1) % 3;
         },
 
         openCropEditor() {

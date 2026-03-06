@@ -113,7 +113,7 @@
                                         :icon="checkerboardIcon"
                                         v-tooltip="__('Transparency')"
                                         :aria-label="__('Transparency')"
-                                        @click="onCheckerboardToggled((checkerboardMode + 1) % 3)"
+                                        @click="cycleCheckerboard"
                                     />
                                     <Slider
                                         size="sm"
@@ -154,7 +154,8 @@
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
-                                :checkerboard-mode="checkerboardMode"
+                                :show-checkerboard="showCheckerboard"
+                                :preview-background-class="previewBackgroundClass"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -215,6 +216,7 @@ import {
     ToggleItem,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     mixins: [HasPreferences],
@@ -272,6 +274,16 @@ export default {
         },
     },
 
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            showCheckerboard: checkerboard.enabled,
+            checkerboardIcon: checkerboard.icon,
+            previewBackgroundClass: checkerboard.backgroundClass,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
+
     data() {
         return {
             columns: this.initialColumns,
@@ -301,7 +313,6 @@ export default {
             lastItemClicked: null,
             preventDragging: false,
             gridThumbnailSize: this.$preferences.get('assets.browser_thumbnail_size', 200),
-            checkerboardMode: this.$preferences.get('assets.browser_checkerboard_mode', 2),
         };
     },
 
@@ -396,16 +407,6 @@ export default {
 
         showAssetEditor() {
             return Boolean(this.editedAssetId);
-        },
-
-        isCpDark() {
-            return typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-        },
-
-        checkerboardIcon() {
-            if (this.checkerboardMode === 0) return this.isCpDark ? 'moon' : 'sun';
-            if (this.checkerboardMode === 1) return this.isCpDark ? 'sun' : 'moon';
-            return 'eye-slash';
         },
 
         sharedAssetProps() {
@@ -506,11 +507,6 @@ export default {
     },
 
     methods: {
-        onCheckerboardToggled(mode) {
-            this.checkerboardMode = mode;
-            this.$preferences.set('assets.browser_checkerboard_mode', mode);
-        },
-
         filtersUpdated(filters) {
             this.activeFilters = filters;
         },

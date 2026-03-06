@@ -235,8 +235,8 @@ export default {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
-        /** 0 = current CP color, 1 = alt CP color, 2 = transparent */
-        checkerboardMode: { type: Number, default: 2 },
+        showCheckerboard: { type: Boolean, default: false },
+        previewBackgroundClass: { type: String, default: '' },
     },
 
     data() {
@@ -249,17 +249,6 @@ export default {
     computed: {
         gridSize() {
             return `repeat(auto-fill, minmax(${this.thumbnailSize}px, 1fr))`;
-        },
-        showCheckerboard() {
-            return this.checkerboardMode !== 2;
-        },
-        isCpDark() {
-            return typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-        },
-        previewBackgroundClass() {
-            if (this.checkerboardMode === 0) return this.isCpDark ? 'dark' : 'light';
-            if (this.checkerboardMode === 1) return this.isCpDark ? 'light' : 'dark';
-            return '';
         },
     },
 
