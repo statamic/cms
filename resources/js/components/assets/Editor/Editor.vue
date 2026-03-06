@@ -147,8 +147,33 @@
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
+                        <ui-button-group v-if="imageTone && (asset.isImage || asset.isSvg)" class="items-center">
+                            <ui-button
+                                size="sm"
+                                :variant="toneOverride === null ? 'pressed' : 'default'"
+                                :icon="autoToneIcon"
+                                :text="__('Auto')"
+                                :disabled="readOnly"
+                                @click="setToneOverride(null)"
+                            />
+                            <ui-button
+                                size="sm"
+                                :variant="toneOverride === 'light' ? 'pressed' : 'default'"
+                                icon="sun"
+                                :text="__('Light')"
+                                :disabled="readOnly"
+                                @click="setToneOverride('light')"
+                            />
+                            <ui-button
+                                size="sm"
+                                :variant="toneOverride === 'dark' ? 'pressed' : 'default'"
+                                icon="moon"
+                                :text="__('Dark')"
+                                :disabled="readOnly"
+                                @click="setToneOverride('dark')"
+                            />
+                        </ui-button-group>
                         <ui-badge pill v-if="asset.width && asset.height" icon="assets" :text="__('messages.width_x_height', { width: Math.round(asset.width), height: Math.round(asset.height) })" />
-                        <ui-badge pill v-if="imageTone && (asset.isImage || asset.isSvg)" :icon="imageTone === 'light' ? 'sun' : 'moon'" :text="imageTone === 'light' ? __('Light') : __('Dark')" />
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
                             <time
@@ -203,6 +228,7 @@ import { pick, flatten } from 'lodash-es';
 import { router } from '@inertiajs/vue3';
 import {
     Button,
+    ButtonGroup,
     Dropdown,
     DropdownMenu,
     DropdownItem,
@@ -218,6 +244,7 @@ export default {
 
     components: {
         Button,
+        ButtonGroup,
         Dropdown,
         DropdownMenu,
         DropdownItem,
@@ -265,8 +292,10 @@ export default {
             errors: {},
             actions: [],
             closingWithChanges: false,
-            imageTone: null, // 'dark' | 'light' - detected dominant tone for images/SVG
+            imageTone: null, // effective tone for preview: override ?? calculated
             imageToneReady: false, // true once tone is set or not applicable (avoids checkerboard flicker)
+            toneOverride: null, // null = auto, 'light' | 'dark' = user override (saved in yaml)
+            calculatedTone: null, // detected tone (for Auto button icon/label)
         };
     },
 
@@ -299,6 +328,13 @@ export default {
 
         isFocalPointEditorEnabled() {
             return Statamic.$config.get('focalPointEditorEnabled');
+        },
+
+        // Icon for Auto button: show detected tone (sun/moon) when we have one, else wand
+        autoToneIcon() {
+            if (this.calculatedTone === 'light') return 'sun';
+            if (this.calculatedTone === 'dark') return 'moon';
+            return 'wand';
         },
     },
 
@@ -354,15 +390,19 @@ export default {
                 fields = flatten(fields);
                 this.fields = fields;
 
-                // Tone from server meta (PHP DetectsTone) when available; otherwise client-side fallback below.
-                if (data.tone) {
-                    this.imageTone = data.tone;
+                // Tone: support auto (calculated) vs user override (saved in yaml as tone_override).
+                this.toneOverride = data.tone_override ?? null;
+                this.calculatedTone = data.tone_detected ?? data.tone ?? null;
+
+                if (data.tone_detected || data.tone) {
+                    this.imageTone = this.toneOverride ?? this.calculatedTone;
                     this.imageToneReady = true;
                 } else if (data.isSvg) {
                     this.imageToneReady = false;
                     this.detectImageTone(data.url)
                         .then((tone) => {
-                            this.imageTone = tone;
+                            this.calculatedTone = tone;
+                            this.imageTone = this.toneOverride ?? this.calculatedTone;
                         })
                         .finally(() => {
                             this.imageToneReady = true;
@@ -427,6 +467,13 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
+        setToneOverride(value) {
+            if (this.readOnly) return;
+            this.toneOverride = value; // null = auto, 'light' | 'dark' = override
+            this.imageTone = this.toneOverride ?? this.calculatedTone;
+            this.$dirty.add(this.publishContainer);
+        },
+
         openCropEditor() {
             this.showCropEditor = true;
         },
@@ -461,9 +508,10 @@ export default {
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
+            const payload = { ...this.$refs.container.visibleValues, tone_override: this.toneOverride };
 
             return this.$axios
-                .patch(url, this.$refs.container.visibleValues)
+                .patch(url, payload)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
                     this.$toast.success(__('Saved'));

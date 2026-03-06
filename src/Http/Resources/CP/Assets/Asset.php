@@ -54,6 +54,8 @@ class Asset extends JsonResource
             }),
 
             'tone' => $this->resource->tone(),
+            'tone_override' => $this->resource->data()->get('tone_override'),
+            'tone_detected' => $this->resource->toneDetected(),
 
             $this->mergeWhen($this->isPdf(), function () {
                 return [

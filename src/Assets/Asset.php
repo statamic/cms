@@ -860,6 +860,22 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function tone(): ?string
     {
+        $override = $this->data->get('tone_override');
+
+        if ($override !== null && $override !== '') {
+            return $override;
+        }
+
+        return $this->meta('tone');
+    }
+
+    /**
+     * Get the detected tone (from image analysis), ignoring any user override.
+     *
+     * @return string|null
+     */
+    public function toneDetected(): ?string
+    {
         return $this->meta('tone');
     }
 
