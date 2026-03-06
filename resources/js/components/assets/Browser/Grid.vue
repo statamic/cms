@@ -101,19 +101,18 @@
                     <Context>
                         <template #trigger>
                             <div
-                                class="asset-tile group relative"
-                                :class="{
-                                    'is-dark-tone': asset.can_be_transparent && asset.tone === 'dark',
-                                    'is-light-tone': asset.can_be_transparent && asset.tone === 'light',
-                                }"
-                            >
-                            <div
-                                class="size-full rounded-lg"
+                                class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
-                                    asset.can_be_transparent && showCheckerboard
-                                        ? `${previewBackgroundClass} bg-checkerboard before:opacity-100`
-                                        : 'bg-white dark:bg-gray-900',
-                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    {
+                                        'is-dark-tone': asset.can_be_transparent && asset.tone === 'dark',
+                                        'is-light-tone': asset.can_be_transparent && asset.tone === 'light',
+                                        'opacity-50!': draggingAsset === asset.id,
+                                    },
+                                    asset.can_be_transparent
+                                        ? (showCheckerboard
+                                            ? `${previewBackgroundClass} bg-checkerboard before:opacity-100`
+                                            : 'asset-tile-hover-checkerboard')
+                                        : '',
                                 ]"
                             >
                                 <button
@@ -160,7 +159,6 @@
                                             />
                                         </DropdownMenu>
                                     </Dropdown>
-                                </div>
                                 </div>
                             </div>
                         </template>
