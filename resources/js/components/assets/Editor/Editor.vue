@@ -199,17 +199,16 @@
 import FocalPointEditor from './FocalPointEditor.vue';
 import CropEditor from './CropEditor.vue';
 import PdfViewer from './PdfViewer.vue';
-import { flatten, pick } from 'lodash-es';
+import { pick, flatten } from 'lodash-es';
 import { router } from '@inertiajs/vue3';
 import {
     Button,
-    ButtonGroup,
     Dropdown,
-    DropdownItem,
     DropdownMenu,
-    Icon,
+    DropdownItem,
     PublishContainer,
     PublishTabs,
+    Icon,
     Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -219,7 +218,6 @@ export default {
 
     components: {
         Button,
-        ButtonGroup,
         Dropdown,
         DropdownMenu,
         DropdownItem,
@@ -467,6 +465,7 @@ export default {
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
+
             return this.$axios
                 .patch(url, this.$refs.container.visibleValues)
                 .then((response) => {

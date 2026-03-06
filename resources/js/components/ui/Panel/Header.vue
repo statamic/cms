@@ -9,7 +9,7 @@ const props = defineProps({
 
 <template>
     <header class="px-4.5 py-3 [&:has(button)]:pr-1 [&_button]:-my-2 [&_button]:relative" data-ui-panel-header>
-        <Heading v-if="props.title" v-text="props.title" />
+        <Heading v-text="props.title" v-if="props.title" />
         <slot v-else />
     </header>
 </template>
