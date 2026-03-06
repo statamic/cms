@@ -43,7 +43,7 @@ class FileTypes
 
     public static function document(): array
     {
-        return ['pdf', 'dic', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
+        return ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
     }
 
     public static function archive(): array
