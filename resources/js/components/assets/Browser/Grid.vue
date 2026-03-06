@@ -1,8 +1,11 @@
 <template>
-    <ui-card :class="{
-        'space-y-8': folders.length || assets.length || creatingFolder,
-        '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
-    }">
+    <ui-card
+        class="asset-browser-grid"
+        :class="{
+            'space-y-8': folders.length || assets.length || creatingFolder,
+            '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
+        }"
+    >
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
             <div
@@ -108,11 +111,13 @@
                                 }"
                             >
                             <div
-                                class="size-full rounded-lg bg-white dark:bg-gray-900"
-                                :class="{
-                                    'bg-checkerboard': asset.can_be_transparent,
-                                    'opacity-50!': draggingAsset === asset.id,
-                                }"
+                                class="size-full rounded-lg"
+                                :class="[
+                                    asset.can_be_transparent && showCheckerboard
+                                        ? `${previewBackgroundClass} bg-checkerboard before:opacity-100`
+                                        : 'bg-white dark:bg-gray-900',
+                                    { 'opacity-50!': draggingAsset === asset.id },
+                                ]"
                             >
                                 <button
                                     class="size-full"
@@ -235,6 +240,8 @@ export default {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
+        /** 0 = current CP color, 1 = alt CP color, 2 = transparent */
+        checkerboardMode: { type: Number, default: 2 },
     },
 
     data() {
@@ -247,6 +254,17 @@ export default {
     computed: {
         gridSize() {
             return `repeat(auto-fill, minmax(${this.thumbnailSize}px, 1fr))`;
+        },
+        showCheckerboard() {
+            return this.checkerboardMode !== 2;
+        },
+        isCpDark() {
+            return typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+        },
+        previewBackgroundClass() {
+            if (this.checkerboardMode === 0) return this.isCpDark ? 'dark' : 'light';
+            if (this.checkerboardMode === 1) return this.isCpDark ? 'light' : 'dark';
+            return '';
         },
     },
 

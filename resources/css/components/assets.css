@@ -201,6 +201,25 @@
     }
 }
 
+/* Asset browser grid: same checkerboard light/dark as editor (element has both .light/.dark and .bg-checkerboard) */
+.asset-browser-grid {
+    .light.bg-checkerboard {
+        background-color: #fff;
+
+        &::before {
+            background-image: var(--checkerboard-light);
+        }
+    }
+
+    .dark.bg-checkerboard {
+        background-color: var(--color-gray-850);
+
+        &::before {
+            background-image: var(--checkerboard-dark);
+        }
+    }
+}
+
 /* Lazyloading
   ========================================================================== */
 

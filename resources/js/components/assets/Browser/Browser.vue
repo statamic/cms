@@ -98,23 +98,29 @@
                         />
 
                         <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
-                            <PanelHeader class="flex items-center justify-between px-1!">
+                            <PanelHeader
+                                class="flex items-center justify-between px-1!"
+                                :showCheckerboardToggle="mode === 'grid'"
+                                :checkerboardMode="checkerboardMode"
+                                @checkerboard-toggled="onCheckerboardToggled"
+                            >
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
                                     @navigated="selectFolder"
                                 />
-
-                                <Slider
-                                    v-if="mode === 'grid'"
-                                    size="sm"
-                                    class="me-2 w-24!"
-                                    variant="subtle"
-                                    v-model="gridThumbnailSize"
-                                    :min="60"
-                                    :max="300"
-                                    :step="25"
-                                />
+                                <template #trailing>
+                                    <Slider
+                                        v-if="mode === 'grid'"
+                                        size="sm"
+                                        class="w-24!"
+                                        variant="subtle"
+                                        v-model="gridThumbnailSize"
+                                        :min="60"
+                                        :max="300"
+                                        :step="25"
+                                    />
+                                </template>
                             </PanelHeader>
 
                             <Uploads
@@ -144,6 +150,7 @@
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
+                                :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -290,6 +297,7 @@ export default {
             lastItemClicked: null,
             preventDragging: false,
             gridThumbnailSize: this.$preferences.get('assets.browser_thumbnail_size', 200),
+            checkerboardMode: this.$preferences.get('assets.browser_checkerboard_mode', 2),
         };
     },
 
@@ -484,6 +492,11 @@ export default {
     },
 
     methods: {
+        onCheckerboardToggled(mode) {
+            this.checkerboardMode = mode;
+            this.$preferences.set('assets.browser_checkerboard_mode', mode);
+        },
+
         filtersUpdated(filters) {
             this.activeFilters = filters;
         },

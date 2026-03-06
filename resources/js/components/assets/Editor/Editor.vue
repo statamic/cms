@@ -43,7 +43,7 @@
                                     v-if="asset.can_be_transparent"
                                     :icon="checkerboardIcon"
                                     class="[&_svg]:!opacity-45"
-                                    :text="__('Checkerboard')"
+                                    :text="__('Transparency')"
                                     @click="cycleCheckerboard"
                                 />
                                 <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
@@ -312,7 +312,7 @@ export default {
         checkerboardIcon() {
             if (this.checkerboardMode === 0) return this.isCpDark ? 'moon' : 'sun';
             if (this.checkerboardMode === 1) return this.isCpDark ? 'sun' : 'moon';
-            return 'eye-closed';
+            return 'eye-slash';
         },
 
         previewBackgroundClass() {
