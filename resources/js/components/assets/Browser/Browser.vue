@@ -109,9 +109,10 @@
                                         inset
                                         size="sm"
                                         variant="ghost"
-                                        class="[&_svg]:!opacity-45"
+                                        icon-only
                                         :icon="checkerboardIcon"
-                                        :text="__('Transparency')"
+                                        v-tooltip="__('Transparency')"
+                                        :aria-label="__('Transparency')"
                                         @click="onCheckerboardToggled((checkerboardMode + 1) % 3)"
                                     />
                                     <Slider
