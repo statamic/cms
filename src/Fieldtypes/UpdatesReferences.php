@@ -69,7 +69,9 @@ trait UpdatesReferences
     }
 
     /**
-     * Helper: Replace values in a flat or nested array.
+     * Replace values in a flat array.
+     *
+     * e.g. ['one', 'two', 'three'] where newValue is 'four' and oldValue is 'two' will return ['one', 'four', 'three']
      *
      * @param  mixed  $data
      * @param  mixed  $newValue
