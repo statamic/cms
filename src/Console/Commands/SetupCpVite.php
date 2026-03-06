@@ -40,12 +40,13 @@ class SetupCpVite extends Command
             ->addScriptsToPackageJson()
             ->publishViteConfig()
             ->publishStubs()
+            ->publishDevBuild()
             ->appendViteSnippetToAppServiceProvider();
     }
 
     private function installDependencies(): self
     {
-        spin(
+        $result = spin(
             callback: function () {
                 $packageJsonPath = base_path('package.json');
                 $contents = File::json($packageJsonPath);
@@ -62,12 +63,17 @@ class SetupCpVite extends Command
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
-                    echo $buffer;
-                });
+                return Process::path(base_path())->run('npm install');
             },
             message: 'Installing dependencies...'
         );
+
+        if ($result->failed()) {
+            $this->line($result->errorOutput() ?: $result->output());
+            $this->components->error('Failed to install dependencies. You need to run "npm install" manually.');
+
+            return $this;
+        }
 
         $this->components->info('Installed dependencies');
 
@@ -81,7 +87,7 @@ class SetupCpVite extends Command
 
         $contents['scripts'] = [
             ...$contents['scripts'] ?? [],
-            'cp:dev' => 'vite build --config vite-cp.config.js --watch',
+            'cp:dev' => 'vite --config vite-cp.config.js',
             'cp:build' => 'vite build --config vite-cp.config.js',
         ];
 
@@ -138,6 +144,13 @@ class SetupCpVite extends Command
         return $this;
     }
 
+    private function publishDevBuild(): self
+    {
+        $this->call('vendor:publish', ['--tag' => 'statamic-cp-dev']);
+
+        return $this;
+    }
+
     private function appendViteSnippetToAppServiceProvider(): self
     {
         spin(
@@ -150,6 +163,7 @@ class SetupCpVite extends Command
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => public_path('cp-hot'),
             'buildDirectory' => 'vendor/app',
         ]);
 PHP);

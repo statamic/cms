@@ -18,10 +18,10 @@
 
         <ui-panel v-if="showTitle" :heading="__('Settings')">
             <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
-                <ui-field as-config :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
+                <ui-field inline :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
                     <ui-input v-model="blueprint.title" />
                 </ui-field>
-                <ui-field as-config :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
+                <ui-field inline :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
                     <ui-switch v-model="blueprint.hidden" />
                 </ui-field>
             </ui-card>
@@ -33,6 +33,7 @@
             :initial-tabs="tabs"
             :errors="errors?.tabs"
             :can-define-localizable="canDefineLocalizable"
+            show-section-collapsible-field
             @updated="tabsUpdated"
         />
     </div>
@@ -62,6 +63,7 @@ export default {
         return {
             blueprint: this.initializeBlueprint(),
             errors: {},
+	        saveKeyBinding: null,
         };
     },
 
@@ -72,7 +74,7 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -80,7 +82,7 @@ export default {
         // Listen for root-form-save events from child components
         // This also happens on the fieldset builder.
         this.$events.$on('root-form-save', () => {
-            this.save();
+            this.$nextTick(() => this.save());
         });
 
         if (this.isFormBlueprint) {
@@ -89,7 +91,11 @@ export default {
     },
 
     beforeUnmount() {
+		Statamic.$config.set('isFormBlueprint', false);
+
         this.$events.$off('root-form-save');
+
+		this.saveKeyBinding.destroy();
     },
 
     watch: {
@@ -124,7 +130,7 @@ export default {
                 });
         },
 
-        saved(response) {
+        saved() {
             this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');

@@ -41,7 +41,7 @@
         </element-container>
 
         <confirmation-modal
-            v-if="deletingRow !== null"
+            :open="deletingRow !== null"
             :title="__('Delete Row')"
             :body-text="__('Are you sure?')"
             :button-text="__('Delete')"
@@ -54,7 +54,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
@@ -140,8 +140,9 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'collapse-all' : 'expand-all'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,
                 },
@@ -173,9 +174,10 @@ export default {
     methods: {
         addRow() {
             const id = uniqid();
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
 
             const row = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             row._id = id;
@@ -191,8 +193,9 @@ export default {
         removed(index) {
             // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
             const row = this.value[index];
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
             const emptyRow = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             // Check if the row has been modified from its default state

@@ -20,9 +20,9 @@ function classes(widget) {
 
 function tailwindWidthClass(width) {
     const sizes = {
-        sm: 'w-full @2xl:w-1/2 @4xl:w-1/3 @8xl:w-1/4',
-        md: 'w-full @2xl:w-1/2 @4xl:w-1/2 @8xl:w-1/3',
-        lg: 'w-full @2xl:w-full @4xl:w-2/3 @8xl:w-3/4',
+        sm: 'w-full @2xl:w-1/2 @4xl:w-1/3 @7xl:w-1/4',
+        md: 'w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3',
+        lg: 'w-full @2xl:w-full @4xl:w-2/3 @7xl:w-3/4',
         full: 'w-full',
     };
 
@@ -51,7 +51,7 @@ function tailwindWidthClass(width) {
         <div class="widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
             <div
                 v-for="widget in widgets"
-                class="min-h-54 px-3 starting-style-transition starting-style-transition--siblings"
+                class="px-3 starting-style-transition"
                 :class="classes(widget)"
             >
                 <component v-if="widget.component" :is="widget.component.name" v-bind="widget.component.props" />

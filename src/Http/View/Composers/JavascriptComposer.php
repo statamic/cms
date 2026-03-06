@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\CommandPalette\Category;
+use Statamic\CP\Color;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Icon;
@@ -79,6 +80,7 @@ class JavascriptComposer
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
             'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
+            'defaultTheme' => $this->defaultTheme(),
         ];
     }
 
@@ -110,7 +112,7 @@ class JavascriptComposer
         return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
-            'theme' => $user->preferredTheme(),
+            'color_mode' => $user->preferredColorMode(),
             'is_impersonating' => session()->has('statamic_impersonated_by'),
         ])->toArray();
     }
@@ -128,5 +130,15 @@ class JavascriptComposer
         return Icon::sets()->mapWithKeys(fn (IconSet $set) => [
             $set->name() => $set->contents(),
         ]);
+    }
+
+    private function defaultTheme()
+    {
+        return [
+            'light' => Color::defaults(),
+            'dark' => collect(Color::defaults(dark: true))
+                ->keyBy(fn ($value, $key) => str($key)->after('dark-'))
+                ->all(),
+        ];
     }
 }

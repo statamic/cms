@@ -5,7 +5,7 @@ import debounce from '@/util/debounce.js';
 import { useTemplateRef } from 'vue';
 
 const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();
-const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value), 300);
+const searchQueryUpdated = debounce((value) => setSearchQuery(value), 300);
 
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
@@ -17,15 +17,16 @@ defineExpose({ focus });
     <div class="flex-1 max-w-sm" :class="{ 'max-w-60!': activeFilterBadgeCount > 2 }">
         <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
         <Input
-            autofocus
+            :focus="true"
             ref="input"
             icon="magnifying-glass"
             id="listings-search"
             variant="light"
+            clearable
             :placeholder="__('Search...')"
-            :value="searchQuery"
+            :model-value="searchQuery"
             :disabled="reorderable"
-            @input="searchQueryUpdated"
+            @update:model-value="searchQueryUpdated"
             @keyup.esc="setSearchQuery(null)"
         />
     </div>

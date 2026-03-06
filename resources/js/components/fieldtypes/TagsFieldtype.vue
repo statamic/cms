@@ -1,6 +1,5 @@
 <template>
     <Combobox
-        class="w-full"
         :clearable="config.clearable"
         :disabled="config.disabled"
         :model-value="value"

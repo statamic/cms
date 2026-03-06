@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import axios from 'axios';
@@ -20,6 +20,12 @@ const confirmableActions = useTemplateRef('confirmableActions');
 const actions = ref(props.actions);
 const actionsLoaded = ref(props.actions !== undefined);
 
+watch(
+	() => props.actions,
+	() => actions.value = props.actions,
+	{ deep: true }
+);
+
 let preparedActions = computed(() => {
     return prepareActions(actions.value, confirmableActions.value);
 });
@@ -31,7 +37,13 @@ function runAction(action, values, onSuccess, onError) {
     emit('started');
 
     runServerAction({ action, values, onSuccess, onError, url: props.url, selections: [props.item] })
-        .then((data) => emit('completed', true, data))
+        .then((data) => {
+            if (props.actions === undefined) {
+                actionsLoaded.value = false;
+            }
+
+            emit('completed', true, data);
+        })
         .catch((data) => {
             errors.value = data.errors;
             emit('completed', false, data);

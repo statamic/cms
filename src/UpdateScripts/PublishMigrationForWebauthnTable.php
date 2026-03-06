@@ -9,7 +9,7 @@ class PublishMigrationForWebauthnTable extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('6.0.0')
+        return $this->isUpdatingTo('6.0.0-beta.4')
             && config('statamic.users.repository', 'file') === 'eloquent';
     }
 
@@ -19,7 +19,11 @@ class PublishMigrationForWebauthnTable extends UpdateScript
             $stub = __DIR__.'/../Console/Commands/stubs/auth/statamic_webauthn_table.php.stub';
             $filename = date('Y_m_d_His').'_statamic_webauthn_table.php';
 
-            File::put(database_path("migrations/$filename"), File::get($stub));
+            $contents = File::get($stub);
+
+            $contents = str_replace('WEBAUTHN_TABLE', config('statamic.users.tables.webauthn', 'webauthn'), $contents);
+
+            File::put(database_path("migrations/$filename"), $contents);
 
             $this->console->line(sprintf(
                 'Migration <info>database/migrations/%s</info> created successfully.',

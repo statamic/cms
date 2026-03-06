@@ -31,6 +31,29 @@ class Group extends Fieldtype
                 ],
             ],
             [
+                'display' => __('Behaviour'),
+                'fields' => [
+                    'collapsible' => [
+                        'display' => __('Collapsible'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsible'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                    ],
+                    'collapsed' => [
+                        'display' => __('Collapsed by default'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsed'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                        'always_save' => false,
+                        'if' => [
+                            'collapsible' => 'equals true',
+                        ],
+                    ],
+                ],
+            ],
+            [
                 'display' => __('Appearance'),
                 'fields' => [
                     'fullscreen' => [

@@ -1,5 +1,4 @@
 <script setup>
-import { sortBy } from 'lodash-es';
 import { Combobox, CardPanel } from '@ui';
 import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
@@ -44,14 +43,12 @@ const hasAvailableFieldFilters = computed(() => {
 });
 
 const fieldComboboxOptions = computed(() => {
-    let options = availableFieldFilters.value.map((filter) => {
+    return availableFieldFilters.value.map((filter) => {
         return {
             value: filter.handle,
             label: filter.display,
         };
     });
-
-    return sortBy(options, (option) => option.label);
 });
 
 async function createFilter(newField) {
@@ -140,20 +137,20 @@ defineExpose({
 </script>
 
 <template>
-    <div v-if="hasAvailableFieldFilters">
-        <FieldFilterRow
-            v-for="filter in rows"
-            :key="filter.handle"
-            :ref="(el) => { if (el) rowRefs[filter.handle] = el }"
-            :display="filter.display"
-            :fields="filter.fields"
-            :meta="filter.meta"
-            :values="filter.values"
-            @update:values="rowUpdated(filter.handle, $event)"
-            @removed="removeRow(filter.handle)"
-            @enter-pressed="handleEnterPressed"
-        />
+    <FieldFilterRow
+        v-for="filter in rows"
+        :key="filter.handle"
+        :ref="(el) => { if (el) rowRefs[filter.handle] = el }"
+        :display="filter.display"
+        :fields="filter.fields"
+        :meta="filter.meta"
+        :values="filter.values"
+        @update:values="rowUpdated(filter.handle, $event)"
+        @removed="removeRow(filter.handle)"
+        @enter-pressed="handleEnterPressed"
+    />
 
+    <div v-if="hasAvailableFieldFilters">
         <Combobox
             ref="fieldSelect"
             :placeholder="__('Add Field')"
@@ -162,5 +159,5 @@ defineExpose({
         />
     </div>
 
-    <div v-else v-text="__('No available filters')"></div>
+    <div v-else-if="!rows.length" v-text="__('No available filters')" class="text-gray-500 dark:text-gray-400"></div>
 </template>

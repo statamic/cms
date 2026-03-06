@@ -90,6 +90,7 @@ const use = function(emit, props) {
         handle: props.handle,
         name,
         fieldActions,
+        replicatorPreview,
     };
 
     return {

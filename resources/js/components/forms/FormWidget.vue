@@ -17,6 +17,7 @@ const props = defineProps({
     title: { type: String },
     submissionsUrl: { type: String },
     initialPerPage: { type: Number, default: 5 },
+    showTableHeader: { type: Boolean, default: false },
 });
 
 const requestUrl = cp_url(`forms/${props.form}/submissions`);
@@ -42,6 +43,8 @@ function formatDate(value) {
         :url="requestUrl"
         :columns="cols"
         :per-page="initialPerPage"
+        sort-column="datestamp"
+        sort-direction="desc"
         :show-pagination-totals="false"
         :show-pagination-page-links="false"
         :show-pagination-per-page-selector="false"
@@ -59,8 +62,8 @@ function formatDate(value) {
                     {{ __('This form is awaiting responses') }}
                 </ui-description>
                 <div class="px-4 py-3">
-                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
-                        <TableHead sr-only />
+                    <table class="w-full widget-table">
+                        <TableHead :sr-only="!props.showTableHeader" />
                         <TableBody>
                             <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
                                 <a
@@ -72,8 +75,8 @@ function formatDate(value) {
                             </template>
                             <template #cell-datestamp="{ row: submission }">
                                 <div
-                                    class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
-                                    v-html="formatDate(submission.datestamp)"
+                                    class="text-end font-inter tabular-nums text-xs whitespace-nowrap text-gray-600 dark:text-gray-400 antialiased"
+                                    v-text="formatDate(submission.datestamp)"
                                 />
                             </template>
                         </TableBody>

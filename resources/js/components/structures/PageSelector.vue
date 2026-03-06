@@ -14,6 +14,7 @@
         :can-create="false"
         :can-reorder="false"
         :max-items="maxItems"
+        :tree="tree"
         @item-data-updated="itemDataUpdated"
     />
 </template>
@@ -26,10 +27,18 @@ export default {
         site: String,
         collections: Array,
         canSelectAcrossSites: Boolean,
+        queryScopes: {
+            type: Array,
+            default: () => []
+        },
         maxItems: {
             type: Number,
             required: false,
         },
+	    tree: {
+			type: Object,
+		    required: false,
+	    },
     },
 
     data() {
@@ -38,6 +47,7 @@ export default {
                 type: 'entries',
                 collections: this.collections,
                 select_across_sites: this.canSelectAcrossSites,
+                query_scopes: this.queryScopes,
             },
             columns: [
                 { label: __('Title'), field: 'title' },
@@ -86,7 +96,7 @@ export default {
 
     methods: {
         linkExistingItem() {
-            this.$refs.input.$refs.existing.$el.click();
+            this.$refs.input.openSelector();
         },
 
         itemDataUpdated(data) {

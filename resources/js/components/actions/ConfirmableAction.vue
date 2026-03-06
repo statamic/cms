@@ -87,7 +87,7 @@ defineExpose({
 
 <template>
     <confirmation-modal
-        v-if="confirming"
+        v-model:open="confirming"
         :title="action.title"
         :danger="action.dangerous"
         :submittable="action.runnable"

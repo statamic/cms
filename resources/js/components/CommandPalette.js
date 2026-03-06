@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { CATEGORY } from './command-palette/Constants.js';
 
 const commands = ref({});
@@ -17,6 +17,7 @@ class Command {
         this.keys = command.keys;
         this.prioritize = command.prioritize ?? false;
         this.trackRecent = command.trackRecent ?? false;
+        this.persist = command.persist ?? false;
 
         this.#validate();
     }
@@ -47,6 +48,10 @@ export default class CommandPalette {
         commands.value[command.key] = command;
 
         return command;
+    }
+
+    clear() {
+        commands.value = Object.fromEntries(Object.entries(commands.value).filter(([key, command]) => command.persist));
     }
 
     actions() {

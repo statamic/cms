@@ -1,5 +1,5 @@
 <template>
-    <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3">
+    <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3 with-contrast:border with-contrast:border-gray-500">
         <ui-subheading size="lg" v-if="config.prepend" :text="__(config.prepend)" class="whitespace-nowrap" />
         <input
             class="min-w-0 flex-1 w-full"

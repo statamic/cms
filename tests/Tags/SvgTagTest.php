@@ -15,12 +15,12 @@ class SvgTagTest extends TestCase
     {
         parent::setUp();
 
-        File::copy(statamic_path('packages/ui/icons/users.svg'), resource_path('users.svg'));
+        File::copy(statamic_path('resources/svg/icons/users.svg'), resource_path('users.svg'));
     }
 
     private function tag($tag, $variables = [])
     {
-        return Parse::template($tag, $variables);
+        return Parse::template($tag, $variables, trusted: true);
     }
 
     #[Test]

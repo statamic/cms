@@ -13,24 +13,28 @@ defineProps([
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="__('Preferences')" />
 
         <Header :title="__('Preferences')" icon="preferences" />
 
-        <section class="space-y-6">
-            <CardPanel :heading="__('Global Preferences')">
+        <section class="flex flex-col">
+            <CardPanel class="mb-0!" :heading="__('Global Preferences')" :subheading="__('Applied to all users by default.')">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="globals" />
-                        <Link :href="defaultPreferencesUrl">{{ __('Default') }}</Link>
+                        <Link :href="defaultPreferencesUrl">{{ __('Site Defaults') }}</Link>
                     </div>
 
                     <Badge v-if="Object.keys(defaultPreferences).length" color="green">{{ __('Modified') }}</Badge>
                 </div>
             </CardPanel>
 
-            <CardPanel v-if="roles.length" :heading="__('Preferences by Role')">
+            <div class="h-8 ps-8">
+                <div data-pref-connector class="h-full border-s border-dashed border-gray-300 dark:border-gray-700"></div>
+            </div>
+
+            <CardPanel class="mb-0!" v-if="roles.length" :heading="__('Role Preferences')" :subheading="__('Applied to users in specific roles.')">
                 <div v-for="role in roles" :key="role.handle" class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="permissions" />
@@ -40,7 +44,11 @@ defineProps([
                 </div>
             </CardPanel>
 
-            <CardPanel :heading="__('User Preferences')">
+            <div v-if="roles.length" class="h-8 ps-8">
+                <div data-pref-connector class="h-full border-s border-dashed border-gray-300 dark:border-gray-700"></div>
+            </div>
+
+            <CardPanel class="mb-0!" :heading="__('User Preferences')" :subheading="__('Applied to your account.')">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <Icon name="avatar" />

@@ -1,8 +1,7 @@
 <script setup>
-import { Panel, PanelFooter } from '@ui';
-import { ref, computed, useTemplateRef, useSlots } from 'vue';
+import { ref, computed, useSlots } from 'vue';
 import { injectListingContext } from '../Listing/Listing.vue';
-import Pagination from './Pagination.vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
 
@@ -38,11 +37,13 @@ const forwardedTableCellSlots = computed(() => {
             return acc;
         }, {});
 });
+
+const hasTbodyStartContent = hasSlotContent('tbody-start');
 </script>
 
 <template>
     <table
-        v-if="items.length > 0"
+        v-if="items.length > 0 || hasTbodyStartContent"
         :data-size="relativeColumnsSize"
         :class="{
             'select-none': shifting,
@@ -67,7 +68,7 @@ const forwardedTableCellSlots = computed(() => {
             </template>
         </TableBody>
     </table>
-    <div v-if="items.length === 0">
+    <div v-if="items.length === 0 && !hasTbodyStartContent">
         <div class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>

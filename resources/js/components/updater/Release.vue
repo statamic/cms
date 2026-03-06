@@ -5,7 +5,7 @@
                 <ui-heading :text="release.version" />
                 <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>
-            <ui-modal :title="__('Update to :version', { version: release.version })">
+            <ui-modal :title="__('Update to :version', { version: release.version })" blur>
                 <template #trigger>
                     <ui-button
                         ref="getCommandButton"
@@ -18,7 +18,7 @@
                 </template>
                 <div class="prose prose-sm prose-zinc prose-headings:font-medium space-y-3">
                     <p v-text="confirmationText" />
-                    <ui-input v-model="command" readonly copyable class="font-mono text-sm dark" />
+                    <ui-input readonly copyable :model-value="command" class="dark" inputClass="font-mono text-sm" />
                     <p v-html="link" />
                 </div>
             </ui-modal>

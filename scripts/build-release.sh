@@ -18,13 +18,8 @@ tar -czvf dist-frontend.tar.gz dist-frontend
 cd ..
 
 # Create a tarball for @statamic/cms
-cp packages/ui/src/ui.css packages/cms/src/ui.css
+cp resources/css/ui.css packages/cms/src/ui.css
 cd packages/cms
 tar -czvf ../../resources/dist-package.tar.gz *
-cd ../..
-
-# Create a tarball for @statamic/ui
-cd packages/ui
-tar -czvf ../../resources/dist-ui.tar.gz *
 cd ../..
 

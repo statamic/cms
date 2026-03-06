@@ -14,11 +14,10 @@ import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Portal from '../components/portals/Portal.vue';
-import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
+import ConfirmationModal from '../components/ui/Modal/ConfirmationModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
-import Stack from '../components/stacks/Stack.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import GitStatus from '../components/GitStatus.vue';
 import DateTime from '../components/DateTime.vue';
@@ -76,9 +75,6 @@ export default function registerGlobalComponents(app) {
     app.component('resource-deleter', ResourceDeleter);
     app.component('field-action-modal', FieldActionModal);
     app.component('elevated-session-modal', ElevatedSessionModal);
-
-    app.component('stack', Stack);
-
     app.component('blueprint-resetter', BlueprintResetter);
 
     // Temporarily global during intertia migration

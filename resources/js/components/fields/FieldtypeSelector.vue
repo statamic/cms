@@ -1,15 +1,10 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
-        <header class="flex items-center justify-between pl-3">
-            <ui-heading :text="__('Fieldtypes')" size="lg" icon="cog" />
-            <ui-button type="button" icon="x" variant="subtle" @click="close" />
-        </header>
-
+    <div class="">
         <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>
 
-        <div class="flex p-3" v-if="fieldtypesLoaded">
+        <div class="flex mb-8" v-if="fieldtypesLoaded">
             <ui-input
                 v-model="search"
                 ref="search"
@@ -19,7 +14,7 @@
             />
         </div>
 
-        <div class="p-2 space-y-8" v-if="fieldtypesLoaded">
+        <div class="space-y-8" v-if="fieldtypesLoaded">
             <div
                 v-for="group in displayedFieldtypes"
                 :key="group.handle"

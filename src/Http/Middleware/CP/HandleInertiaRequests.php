@@ -26,6 +26,7 @@ class HandleInertiaRequests extends Middleware
         return array_filter([
             ...parent::share($request),
             '_statamic' => [
+                'version' => Statamic::version(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
             ],
@@ -36,7 +37,12 @@ class HandleInertiaRequests extends Middleware
     private function logos()
     {
         if (! Statamic::pro()) {
-            return false;
+            return [
+                'text' => null,
+                'siteName' => config('app.name'),
+                'light' => ['nav' => null, 'outside' => null],
+                'dark' => ['nav' => null, 'outside' => null],
+            ];
         }
 
         if (is_string($light = config('statamic.cp.custom_logo_url'))) {

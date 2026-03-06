@@ -5,6 +5,9 @@ import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import svgLoader from 'vite-svg-loader';
 import path from 'path';
+import { playwright } from '@vitest/browser-playwright';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
 export default defineConfig(({ mode, command }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -20,6 +23,7 @@ export default defineConfig(({ mode, command }) => {
             }
         },
         plugins: [
+            tsconfigPaths(),
             tailwindcss(),
             laravel({
                 valetTls: env.VALET_TLS,
@@ -37,11 +41,6 @@ export default defineConfig(({ mode, command }) => {
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
-                '@': path.resolve(__dirname, 'resources/js'),
-                '@ui': path.resolve(__dirname, 'resources/js/components/ui'),
-                '@api': path.resolve(__dirname, 'resources/js/api.js'),
-                '@statamic/ui': path.resolve(__dirname, 'packages/ui/src'),
-                '@statamic/cms': path.resolve(__dirname, 'packages/cms/src'),
             },
         },
         build: {
@@ -52,9 +51,41 @@ export default defineConfig(({ mode, command }) => {
             },
             minify: isProdBuild
         },
-        test: { environment: 'jsdom', setupFiles: 'resources/js/tests/setup.js' },
+        test: {
+            projects: [
+                {
+                    extends: true,
+                    test: {
+                        name: 'unit',
+                        environment: 'jsdom',
+                        setupFiles: 'resources/js/tests/setup.js',
+                        include: ['resources/js/tests/**/*.test.js'],
+                        exclude: ['resources/js/tests/browser/**'],
+                    },
+                },
+                {
+                    extends: true,
+                    plugins: [
+                        storybookTest({
+                            configDir: '.storybook',
+                        }),
+                    ],
+                    test: {
+                        name: 'storybook',
+                        browser: {
+                            enabled: true,
+                            headless: true,
+                            provider: playwright(),
+                            instances: [{ browser: 'chromium' }],
+                        },
+                        setupFiles: ['.storybook/vitest.setup.ts'],
+                    },
+                },
+            ],
+        },
         define: {
             __VUE_PROD_DEVTOOLS__: isProdDevBuild,
+            ...(isRunningBuild && { 'process.env.NODE_ENV': isProdDevBuild ? '"development"' : '"production"' }),
         }
     };
 });

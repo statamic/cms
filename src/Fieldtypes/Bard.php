@@ -7,6 +7,7 @@ use Facades\Statamic\Fieldtypes\RowId;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -47,6 +48,14 @@ class Bard extends Replicator
 
     protected function configFieldItems(): array
     {
+        $containers = AssetContainer::all();
+
+        $defaultButtons = $containers->isEmpty()
+            ? collect(static::$defaultButtons)
+                ->reject(fn ($value) => $value === 'image')
+                ->values()->all()
+            : static::$defaultButtons;
+
         return [
             [
                 'display' => __('Editor Settings'),
@@ -57,7 +66,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
                         'type' => 'bard_buttons_setting',
                         'full_width_setting' => true,
-                        'default' => static::$defaultButtons,
+                        'default' => $defaultButtons,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),
@@ -180,6 +189,8 @@ class Bard extends Replicator
                             'buttons' => 'contains_any anchor, image',
                         ],
                         'width' => 50,
+                        'default' => $containers->count() == 1 ? $containers->first()->handle() : null,
+                        'force_in_config' => true,
                         'validate' => [
                             $this->containerRequiredRule(),
                         ],
@@ -606,15 +617,17 @@ class Bard extends Replicator
             return [$set['attrs']['id'] => $this->fields($values['type'], $index)->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-            return $this->fields($handle)->all()->map(function ($field) {
-                return $field->fieldtype()->preProcess($field->defaultValue());
+        if ($this->shouldProcessNewValues()) {
+            $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                return $this->fields($handle)->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                })->all();
             })->all();
-        })->all();
 
-        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
-        })->toArray();
+            $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+            })->toArray();
+        }
 
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
@@ -636,9 +649,9 @@ class Bard extends Replicator
 
         $data = [
             'existing' => $existing,
-            'new' => $new,
-            'defaults' => $defaults,
-            'collapsed' => [],
+            'new' => $new ?? null,
+            'defaults' => $defaults ?? null,
+            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkCollections' => $linkCollections,
@@ -662,6 +675,17 @@ class Bard extends Replicator
         }
 
         return $this->runHooks('preload', $data);
+    }
+
+    private function shouldProcessNewValues(): bool
+    {
+        $parent = $this->field()->parent();
+
+        if (! $parent || ! method_exists($parent, 'blueprint')) {
+            return true;
+        }
+
+        return is_null($parent->blueprint()->fullyQualifiedHandle());
     }
 
     public function preProcessValidatable($value)

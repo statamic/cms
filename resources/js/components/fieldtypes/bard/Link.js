@@ -63,7 +63,7 @@ export const Link = Mark.create({
 
     addKeyboardShortcuts() {
         return {
-            'Mod-k': () => this.options.vm.events.emit('link-toggle'),
+            'Ctrl-k': () => this.options.vm.events.emit('open-link-toolbar'),
         };
     },
 

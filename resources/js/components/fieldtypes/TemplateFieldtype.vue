@@ -1,7 +1,6 @@
 <template>
     <Combobox
         v-if="!loading"
-        class="w-full"
         :clearable="config.clearable"
         :placeholder="__(config.placeholder)"
         :read-only="isReadOnly"

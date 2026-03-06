@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, DocsCallout, DropdownItem, Listing } from '@ui';
@@ -42,55 +42,66 @@ function saveOrder() {
 }
 
 const reloadPage = () => router.reload();
+
+const saveKeyBinding = ref(Statamic.$keys.bindGlobal(['mod+s'], (e) => {
+    if (hasBeenReordered.value) {
+        e.preventDefault();
+        saveOrder();
+    }
+}));
+
+onBeforeUnmount(() => saveKeyBinding.value?.destroy());
 </script>
 
 <template>
     <Head :title="__('Blueprints')" />
 
-    <Header :title="__('Blueprints')" icon="blueprints">
-        <Button v-if="reorderable" :disabled="!hasBeenReordered" @click="saveOrder">
-            {{ __('Save Order') }}
-        </Button>
+    <div class="max-w-page mx-auto">
+        <Header :title="__('Blueprints')" icon="blueprints">
+            <Button v-if="reorderable" :disabled="!hasBeenReordered" @click="saveOrder">
+                {{ __('Save Order') }}
+            </Button>
 
-        <Button :text="__('Create Blueprint')" :href="createUrl" variant="primary" />
-    </Header>
+            <Button :text="__('Create Blueprint')" :href="createUrl" variant="primary" />
+        </Header>
 
-    <Listing
-        :items="rows"
-        :columns="columns"
-        :allow-search="false"
-        :allow-customizing-columns="false"
-        :reorderable="reorderable"
-        :sortable="false"
-        :allow-actions-while-reordering="true"
-        @refreshing="reloadPage"
-        @reordered="reordered"
-    >
-        <template #cell-title="{ row: blueprint }">
-            <div class="flex items-center">
-                <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
-                <Link :href="blueprint.edit_url" v-text="__(blueprint.title)" />
+        <Listing
+            :items="rows"
+            :columns="columns"
+            :allow-search="false"
+            :allow-customizing-columns="false"
+            :reorderable="reorderable"
+            :sortable="false"
+            :allow-actions-while-reordering="true"
+            @refreshing="reloadPage"
+            @reordered="reordered"
+        >
+            <template #cell-title="{ row: blueprint }">
+                <div class="flex items-center">
+                    <div class="little-dot me-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-500']" />
+                    <Link :href="blueprint.edit_url" v-text="__(blueprint.title)" />
 
-                <resource-deleter
-                    :ref="`deleter_${blueprint.id}`"
-                    :resource="blueprint"
-                    reload
+                    <resource-deleter
+                        :ref="`deleter_${blueprint.id}`"
+                        :resource="blueprint"
+                        reload
+                    />
+                </div>
+            </template>
+            <template #cell-handle="{ value }">
+                <span class="font-mono text-xs" v-text="value" />
+            </template>
+            <template #prepended-row-actions="{ row: blueprint }">
+                <DropdownItem :text="__('Edit')" icon="edit" :href="blueprint.edit_url" />
+                <DropdownItem
+                    :text="__('Delete')"
+                    icon="trash"
+                    variant="destructive"
+                    @click="$refs[`deleter_${blueprint.id}`].confirm()"
                 />
-            </div>
-        </template>
-        <template #cell-handle="{ value }">
-            <span class="font-mono text-xs" v-text="value" />
-        </template>
-        <template #prepended-row-actions="{ row: blueprint }">
-            <DropdownItem :text="__('Edit')" icon="edit" :href="blueprint.edit_url" />
-            <DropdownItem
-                :text="__('Delete')"
-                icon="trash"
-                variant="destructive"
-                @click="$refs[`deleter_${blueprint.id}`].confirm()"
-            />
-        </template>
-    </Listing>
+            </template>
+        </Listing>
 
-    <DocsCallout :topic="__('Blueprints')" url="blueprints" />
+        <DocsCallout :topic="__('Blueprints')" url="blueprints" />
+    </div>
 </template>

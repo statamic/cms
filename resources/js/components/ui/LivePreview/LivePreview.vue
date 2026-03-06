@@ -1,5 +1,15 @@
 <script setup>
-import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted, onBeforeMount } from 'vue';
+import {
+    computed,
+    nextTick,
+    ref,
+    watch,
+    useTemplateRef,
+    onBeforeUnmount,
+    onUnmounted,
+    onBeforeMount,
+    toRaw,
+} from 'vue';
 import Resizer from './Resizer.vue';
 import {
     Select,
@@ -107,7 +117,7 @@ const update = debounce(() => {
         .then((response) => {
             token.value = response.data.token;
             const url = response.data.url;
-            const tgt = props.targets[target.value];
+            const tgt = toRaw(props.targets[target.value]);
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
@@ -119,6 +129,10 @@ const update = debounce(() => {
             throw e;
         });
 }, 150);
+
+function componentUpdated(handle, value) {
+    extras.value[handle] = value;
+}
 
 function setIframeAttributes(iframe) {
     iframe.setAttribute('frameborder', '0');
@@ -285,7 +299,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
         <div class="live-preview fixed flex flex-col">
             <transition name="live-preview-header-slide">
                 <div v-show="headerVisible" class="live-preview-header">
-                    <div class="dark:text-dark-150 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
+                    <div class="dark:text-gray-300 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
                         {{ __('Live Preview') }}
                     </div>
                     <div class="flex items-center gap-x-2">

@@ -105,6 +105,12 @@ function replicatorPreviewUpdated(value) {
     setFieldPreviewValue(fullPath.value, value);
 }
 
+watch(
+    () => fullPath.value,
+    () => setFieldPreviewValue(fullPath.value, fieldtype.value?.replicatorPreview),
+    { immediate: true }
+);
+
 function focused() {
     // todo
 }
@@ -127,7 +133,7 @@ const extraValues = computed(() => {
 
 const shouldShowField = computed(() => {
     return new ShowField(
-        visibleValues.value,
+        values.value,
         extraValues.value,
         containerVisibleValues.value,
         revealerValues.value,
@@ -142,6 +148,7 @@ const shouldShowLabelText = computed(() => !props.config.hide_display);
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
+        props.config.hide_display || // Need label for accessibility (visually hidden)
         isLocked.value || // Need to see the avatar
         isSyncable.value, // Need to see the icon
 );
@@ -222,7 +229,7 @@ const fieldtypeComponentEvents = computed(() => ({
             :required="isRequired"
             :errors="errors"
             :read-only="isReadOnly"
-            :variant="config.variant"
+            :inline="asConfig"
             :full-width-setting="config.full_width_setting"
             v-bind="$attrs"
         >
@@ -233,6 +240,9 @@ const fieldtypeComponentEvents = computed(() => ({
                             {{ __(config.display) }}
                         </span>
                     </template>
+                    <template v-else-if="config.hide_display">
+                        <span class="sr-only">{{ __(config.display) }}</span>
+                    </template>
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                 </Label>
@@ -240,10 +250,10 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #actions v-if="shouldShowFieldActions">
                 <FieldActions :actions="fieldActions" />
             </template>
-            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists">
+            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction">
+            <div :dir="direction" v-if="fieldtypeComponentExists">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"

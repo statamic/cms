@@ -1,5 +1,6 @@
 import axios from 'axios';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import { reveal } from '@api';
 
 let container = null;
 let errors = null;
@@ -86,6 +87,7 @@ export class Request extends Step {
                         const { errors: messages, message } = e.response.data;
                         if (errors) errors.value = messages;
                         Statamic.$toast.error(message);
+                        reveal.invalid();
                         e = new PipelineStopped();
                     } else if (e.response && e.response.data.message) {
                         Statamic.$toast.error(e.response.data.message);

@@ -21,6 +21,7 @@ class MakeFieldtypeTest extends TestCase
 
         Process::fake();
         $this->files = app(Filesystem::class);
+        $this->files->makeDirectory(__DIR__.'/../../../resources/dist-dev', 0755, true, true);
         $this->fakeSuccessfulComposerRequire();
     }
 
@@ -156,6 +157,8 @@ PHP
     {
         $path = base_path('addons/yoda/bag-odah');
 
+        $this->assertDirectoryDoesNotExist(public_path('vendor/statamic/cp-dev'));
+
         $this->artisan('statamic:make:addon', ['addon' => 'yoda/bag-odah']);
 
         Composer::shouldReceive('installedPath')->andReturn($path);
@@ -168,5 +171,7 @@ PHP
 
         $this->assertFileExists($fieldtype);
         $this->assertStringContainsString('namespace Yoda\BagOdah\Fieldtypes;', $this->files->get($fieldtype));
+
+        $this->assertDirectoryExists(public_path('vendor/statamic/cp-dev'));
     }
 }

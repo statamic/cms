@@ -1,14 +1,12 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
-        <header class="flex items-center justify-between pl-3 mb-6">
-            <Heading :text="__('Linked fieldset')" size="lg" icon="fieldsets" />
-            <div class="flex items-center gap-2 sm:gap-3">
-                <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
-                <Button variant="primary" @click.prevent="commit" :text="__('Apply')" />
-                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
-            </div>
-        </header>
+    <StackHeader :title="__('Linked fieldset')" icon="fieldsets">
+        <template #actions>
+            <Button variant="primary" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+        </template>
+    </StackHeader>
 
+    <StackContent>
         <CardPanel :heading="__('Linked fieldset')">
             <div class="publish-fields">
                 <Field :label="__('Fieldset')" :instructions="__('messages.fieldset_import_fieldset_instructions')" class="form-group field-w-100">
@@ -20,14 +18,14 @@
                 </Field>
             </div>
         </CardPanel>
-    </div>
+    </StackContent>
 </template>
 
 <script>
-import { Button, Heading, CardPanel, Field, Input } from '@/components/ui';
+import { Button, Heading, CardPanel, Field, Input, StackHeader, StackContent } from '@/components/ui';
 
 export default {
-    components: { Heading, Button, CardPanel, Field, Input },
+    components: { StackContent, StackHeader, Heading, Button, CardPanel, Field, Input },
 
     props: ['config', 'isInsideSet'],
 

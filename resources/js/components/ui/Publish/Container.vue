@@ -5,8 +5,8 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 </script>
 
 <script setup>
-import uniqid from 'uniqid';
-import { watch, ref, computed, toRef } from 'vue';
+import { nanoid as uniqid } from 'nanoid';
+import { watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
@@ -19,56 +19,80 @@ const props = defineProps({
         type: String,
         default: () => uniqid(),
     },
+	/** Reference of the item being edited. eg. entry::the-entry-id */
     reference: {
         type: String,
     },
+	/** The blueprint's publish array. */
     blueprint: {
         type: Object,
+		required: true,
     },
+	/** The controlled publish form values. */
     modelValue: {
         type: Object,
         default: () => ({}),
     },
+	/** Extra values to be made available to field conditions. */
     extraValues: {
         type: Object,
         default: () => ({}),
     },
+	/** Fieldtype metadata. */
     meta: {
         type: Object,
         default: () => ({}),
     },
+	/** Publish form values from the origin localization. */
     originValues: {
         type: Object,
     },
+	/** Fieldtype metadata from the origin localization. */
     originMeta: {
         type: Object,
     },
+	/** Validation errors. */
     errors: {
         type: Object,
         default: () => ({}),
     },
+	/** The site handle of the active localization. */
     site: {
         type: String,
     },
+	/** Array of field handles, indicating which fields have changed. */
     modifiedFields: {
         type: Array,
     },
+	/** Determines whether dirty state tracking is enabled. */
     trackDirtyState: {
         type: Boolean,
         default: true,
     },
-    syncFieldConfirmationText: {
-        type: String,
-        default: () => __('Are you sure?'),
-    },
-    readOnly: {
-        type: Boolean,
-        default: false,
-    },
+	/** Confirmation text when syncing a localized field with the origin value. */
+	syncFieldConfirmationText: {
+		type: String,
+		default: () => __('Are you sure?'),
+	},
+	readOnly: {
+		type: Boolean,
+		default: false,
+	},
+	/** Marks it as a "config" form, which renders slightly differently. */
     asConfig: {
         type: Boolean,
         default: false,
-    }
+    },
+	/** Determines whether the active tab is remembered in the URL hash. */
+    rememberTab: {
+        type: Boolean,
+        default: false,
+    },
+    /** Extra values to be provided through the context. */
+    provide: {
+        type: Object,
+        default: () => ({})
+    },
 });
 
 const parentContainer = injectContainerContext(containerContextKey);
@@ -155,12 +179,23 @@ watch(
     { deep: true },
 );
 
+const avoidTrackingDirtyState = ref(false);
+const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
+const isDirty = computed(() => Statamic.$dirty.has(props.name));
+
 function dirty() {
-    if (props.trackDirtyState) Statamic.$dirty.add(props.name);
+    if (trackingDirtyState.value) Statamic.$dirty.add(props.name);
 }
 
 function clearDirtyState() {
     if (props.trackDirtyState) Statamic.$dirty.remove(props.name);
+}
+
+function withoutDirtying(callback) {
+    const previous = avoidTrackingDirtyState.value;
+    avoidTrackingDirtyState.value = true;
+    callback();
+    nextTick(() => avoidTrackingDirtyState.value = previous);
 }
 
 function setValues(newValues) {
@@ -207,7 +242,11 @@ function pushComponent(name, { props }) {
     return component;
 }
 
-const provided = {
+const additionalProvides = Object.fromEntries(
+    Object.entries(props.provide).map(([key]) => [key, toRef(() => props.provide[key])])
+);
+
+const builtInProvides = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -230,6 +269,7 @@ const provided = {
     desyncField,
     components,
     asConfig: toRef(() => props.asConfig),
+    rememberTab: toRef(() => props.rememberTab),
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
@@ -238,7 +278,19 @@ const provided = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    isDirty,
+    withoutDirtying,
 };
+
+if (import.meta.env.DEV) {
+    for (const key of Object.keys(additionalProvides)) {
+        if (key in builtInProvides) {
+            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key, which takes precedence.`);
+        }
+    }
+}
+
+const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
 

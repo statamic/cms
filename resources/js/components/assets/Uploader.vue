@@ -1,6 +1,6 @@
 <script>
 import { Upload } from 'upload';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { h } from 'vue';
 
 export default {
@@ -17,6 +17,7 @@ export default {
         return h(
             'div',
             {
+                class: 'h-full',
                 onDragenter: this.dragenter,
                 onDragover: this.dragover,
                 onDragleave: this.dragleave,

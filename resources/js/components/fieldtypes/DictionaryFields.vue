@@ -84,3 +84,9 @@ export default {
     },
 };
 </script>
+
+<style>
+.dictionary_fields-fieldtype {
+    padding: 0;
+}
+</style>

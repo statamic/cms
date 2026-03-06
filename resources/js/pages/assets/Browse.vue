@@ -8,7 +8,7 @@ export default {
         DocsCallout,
     },
 
-    props: ['container', 'folder', 'columns', 'canCreateContainers', 'createContainerUrl', 'editing'],
+    props: ['container', 'folder', 'columns', 'filters', 'canCreateContainers', 'createContainerUrl', 'editing'],
 
     data() {
         return {
@@ -90,7 +90,7 @@ export default {
 </script>
 
 <template>
-    <div v-cloak>
+    <div class="h-full" v-cloak>
         <Head :title="container.title" />
 
         <asset-browser
@@ -103,6 +103,7 @@ export default {
             :selected-path="path"
             :selected-assets="selectedAssets"
             :initial-columns="columns"
+            :filters="filters"
             @navigated="navigate"
             @selections-updated="updateSelections"
             @edit-asset="editAsset"
@@ -127,10 +128,11 @@ export default {
                     <ui-skeleton class="h-30 w-full" />
                 </div>
             </template>
+            <template #footer>
+                <div class="starting-style-transition starting-style-transition--delay">
+                    <DocsCallout :topic="__('Assets')" url="assets" />
+                </div>
+            </template>
         </asset-browser>
-
-        <div class="starting-style-transition starting-style-transition--delay">
-            <DocsCallout :topic="__('Assets')" url="assets" />
-        </div>
     </div>
 </template>

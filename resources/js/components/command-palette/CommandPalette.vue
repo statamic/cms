@@ -11,6 +11,8 @@ import { each, groupBy, orderBy, find, uniq } from 'lodash-es';
 import { motion } from 'motion-v';
 import { cva } from 'cva';
 import { Icon, Subheading } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
+import { escapeHtml } from '@/bootstrap/globals.js';
 
 let metaPressed = ref(false);
 let open = ref(false);
@@ -73,22 +75,37 @@ const aggregatedItems = computed(() => [
     ...(searchResults.value || []),
 ]);
 
+function highlightResult(text) {
+    const classes = 'text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45';
+    const safeText = escapeHtml(text);
+    const result = fuzzysort.single(query.value, safeText);
+    return result?.highlight(`<span class="${classes}">`, '</span>') || safeText;
+}
+
 const results = computed(() => {
     let items = aggregatedItems.value.map(item => normalizeItem(item));
+    let filterableItems = items.filter(item => item.text && item.category !== 'Content Search');
 
     let filtered = fuzzysort
-        .go(query.value, items, {
+        .go(query.value, filterableItems, {
             all: true,
             keys: ['text'],
             scoreFn: fuzzysortScoringAlgorithm,
         })
-        .map(result => {
-            return {
-                score: result._score,
-                html: result[0].highlight('<span class="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-blue-200 dark:decoration-blue-600/45">', '</span>'),
-                ...result.obj,
-            };
-        });
+        .map(result => ({
+            score: result._score,
+            html: highlightResult(result.obj.text),
+            ...result.obj,
+        }));
+
+	let contentSearchResults = items
+		.filter(item => item.category === 'Content Search')
+		.map(item => ({
+			...item,
+			html: highlightResult(item.text),
+		}));
+
+    filtered = [...contentSearchResults, ...filtered];
 
     let categoryOrder = query.value
         ? uniq(filtered.map(item => item.category))
@@ -194,6 +211,7 @@ function searchContent() {
 
 function select(selected) {
     let item = findSelectedItem(selected);
+	if (!item) return;
 
     if (item.trackRecent) {
         addToRecentItems(item);
@@ -223,10 +241,10 @@ function getRecentItems() {
 }
 
 function addToRecentItems(item) {
-    item.category = __('Recent');
+    const recentItem = { ...item, category: __('Recent') };
 
     const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
-    const updated = [item, ...filtered].slice(0, 5);
+    const updated = [recentItem, ...filtered].slice(0, 5);
 
     localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
 
@@ -269,6 +287,8 @@ const modalClasses = cva({
         'slide-in-from-top-2',
     ],
 })({});
+
+router.on('start', () => Statamic.$commandPalette.clear());
 </script>
 
 <template>

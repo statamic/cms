@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Preferences\Nav;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
@@ -23,7 +24,7 @@ class RoleNavController extends Controller
 
     public function edit($handle)
     {
-        abort_unless($role = Role::find($handle), 404);
+        throw_unless($role = Role::find($handle), new NotFoundHttpException);
 
         $this->currentHandle = $handle;
 
@@ -43,7 +44,7 @@ class RoleNavController extends Controller
 
     public function update(Request $request, $handle)
     {
-        abort_unless($role = Role::find($handle), 404);
+        throw_unless($role = Role::find($handle), new NotFoundHttpException);
 
         $nav = $this->getUpdatedNav($request);
 
@@ -58,7 +59,7 @@ class RoleNavController extends Controller
 
     public function destroy($handle)
     {
-        abort_unless($role = Role::find($handle), 404);
+        throw_unless($role = Role::find($handle), new NotFoundHttpException);
 
         $role->removePreference('nav')->save();
 

@@ -1,5 +1,5 @@
 import { translate, translateChoice } from '../translations/translator';
-import uid from 'uniqid';
+import { nanoid as uid } from 'nanoid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
 import renderMarkdown from '@/util/markdown.js';
 
@@ -135,19 +135,6 @@ export function escapeHtml(string) {
 
 export function replicatorPreviewHtml(html) {
     return new PreviewHtml(html);
-}
-
-export function closestVm(el, name) {
-    let parent = el;
-    while (parent) {
-        if (parent.__vue__) break;
-        parent = parent.parentElement;
-    }
-    let vm = parent.__vue__;
-    while (vm !== vm.$root) {
-        if (!name || name === vm.$options.name) return vm;
-        vm = vm.$parent;
-    }
 }
 
 export function str_slug(string) {

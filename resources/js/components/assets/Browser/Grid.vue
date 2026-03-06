@@ -1,7 +1,7 @@
 <template>
     <ui-card :class="{
-        'space-y-8': folders.length || assets.length,
-        '!p-0': folders.length === 0 && assets.length === 0
+        'space-y-8': folders.length || assets.length || creatingFolder,
+        '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
     }">
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
@@ -37,7 +37,7 @@
                             <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
                                 <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
+                                    class="overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />
@@ -66,7 +66,10 @@
                         :start-with-edit-mode="true"
                         submit-mode="enter"
                         :placeholder="__('Name')"
-                        class="flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                        :class="[
+                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
+                            { 'st-has-error': creatingFolderError }
+                        ]"
                         @submit="$emit('create-folder', newFolderName)"
                         @cancel="
                             () => {
@@ -121,7 +124,7 @@
                                                 loading="lazy"
                                                 :draggable="false"
                                                 :class="{
-                                                    'size-full p-4': asset.extension === 'svg',
+                                                    'w-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
                                                 }"
                                             />
@@ -129,7 +132,7 @@
                                         </div>
                                     </div>
                                 </button>
-                                <div class="absolute end-2 top-1">
+                                <div class="absolute end-1 top-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity [&_button]:bg-white [&_button]:hover:bg-white [&_button]:dark:bg-gray-900 [&_button]:dark:hover:bg-gray-900">
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem
@@ -165,12 +168,14 @@
                         </ContextMenu>
                     </Context>
                 </ItemActions>
-                <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
+                <div class="asset-filename">
+                    <MiddleEllipsis :text="asset.basename" />
+                </div>
             </div>
         </section>
 
         <!-- Empty state -->
-        <div v-if="folders.length === 0 && assets.length === 0" class="text-center text-gray-500 text-sm py-4">
+        <div v-if="folders.length === 0 && assets.length === 0 && !creatingFolder" class="text-center text-gray-500 text-sm py-4">
             {{ __('No items found') }}
         </div>
     </ui-card>
@@ -190,7 +195,8 @@ import {
     DropdownMenu,
     DropdownLabel,
     DropdownItem,
-    DropdownSeparator
+    DropdownSeparator,
+    MiddleEllipsis
 } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -214,6 +220,7 @@ export default {
         DropdownSeparator,
         ItemActions,
         FolderSvg,
+        MiddleEllipsis,
     },
 
     props: {
@@ -242,17 +249,6 @@ export default {
     },
 
     methods: {
-        truncateFilename(filename) {
-            const maxLength = Math.floor(this.thumbnailSize / 7);
-            if (filename.length <= maxLength) return filename;
-
-            const extension = filename.split('.').pop();
-            const name = filename.slice(0, -(extension.length + 1));
-            const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
-
-            return `${name.slice(0, charsToKeep)}…${name.slice(-charsToKeep)}.${extension}`;
-        },
-
         isSelected(id) {
             return this.selectedAssets.includes(id);
         },

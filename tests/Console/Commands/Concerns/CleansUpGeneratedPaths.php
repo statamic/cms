@@ -20,6 +20,8 @@ trait CleansUpGeneratedPaths
             resource_path('js/components'),
             resource_path('views/widgets'),
             base_path('vendor'),
+            public_path('vendor'),
+            __DIR__.'/../../../../resources/dist-dev',
         ];
 
         foreach ($dirs as $dir) {

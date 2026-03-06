@@ -21,6 +21,6 @@ export const {
     reveal,
     slug,
     stacks,
-    theme,
+    colorMode,
     toast,
 } = __STATAMIC__.api;

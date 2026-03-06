@@ -2,6 +2,8 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
+use Illuminate\Support\Arr;
+
 class Toggle extends FieldtypeFilter
 {
     public function fieldItems()
@@ -32,5 +34,12 @@ class Toggle extends FieldtypeFilter
         $value = $values['value'];
 
         return $field.' '.strtolower($operator).' '.$value;
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        return Arr::has($values, 'value');
     }
 }

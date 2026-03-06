@@ -3,7 +3,7 @@
 /* Here we extend Tailwind's classes to add additional functionality where we're sure it won't break anything. */
 
 /* If the next sibling is hidden (by a Vue conditional), remove the bottom border. For example, /cp/asset-containers/assets/edit, the Image Manipulation toggle. */
-.divide-y > *:has(+[style*="display: none"]) {
+.divide-y > *:has(+[style*="display: none"]:last-child) {
     border-block-end: none;
 }
 
@@ -20,6 +20,38 @@
 
 .z-max {
     z-index: var(--z-index-max);
+}
+
+@utility st-overflow-clip-margin {
+    overflow-clip-margin: 1px;
+    /* As of 2026-01-08 Safari doesn't support overflow-clip-margin */
+    @supports not (overflow-clip-margin: 1px) {
+        padding-inline-start: 1px;
+    }
+}
+
+@utility st-custom-scrollbar {
+    --sb-size: 3px;
+    --sb-thumb-color: var(--color-gray-400);
+    &:where(.dark, .dark *) {
+        --sb-thumb-color: var(--color-gray-500);
+    }
+    --sb-track-color: transparent;
+
+    scrollbar-color: var(--sb-thumb-color), var(--sb-track-color);
+
+    &::-webkit-scrollbar {
+        width: var(--sb-size);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--sb-track-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--sb-thumb-color);
+        border-radius: 2px;
+    }
 }
 
 /* UTILITIES / TEXT
@@ -41,6 +73,9 @@
 @utility st-text-trim-cap {
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
+}
+@utility st-text-trim-ex-alphabetic {
+    text-box: ex alphabetic;
 }
 
 @utility placeholder-xs {
@@ -135,7 +170,7 @@
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
-        @apply bg-dark-600/90;
+        @apply bg-gray-700/90;
     }
 
     .inner {
@@ -151,10 +186,6 @@
             margin-right: 0;
         }
     }
-}
-
-@utility bg-frosted {
-    @apply bg-white/85 backdrop-blur-sm;
 }
 
 /* UTILITIES / DECORATION / MASK BACKGROUND
@@ -190,11 +221,8 @@
         width: calc(150% + var(--cover));
         height: calc(100% + var(--height-offset) * 2);
         top: calc(0% - var(--height-offset));
-        background: radial-gradient(circle at center, white 0%,transparent 80%);
+        background: radial-gradient(circle at center, var(--theme-color-content-bg) 0%,transparent 80%);
         border-radius: 1.5rem 0 0 1.5rem;
-    }
-    .dark &::before {
-        background: radial-gradient(circle at center, hsl(240deg 6% 10%) 0%, transparent 80%);
     }
 }
 @utility mask-bg--left {
@@ -270,7 +298,8 @@
                 position: absolute;
                 inset: 0;
                 height: var(--height);
-                border-image: conic-gradient(var(--line-color) 0 0) fill 0/ /**/0 100vw;
+                /* Bust out of the container to create a full-width horizontal line, ref https://www.smashingmagazine.com/2024/01/css-border-image-property/#full-width-backgrounds */
+                border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
                 top: calc(50% - var(--height));
             }
             .dark &::after {
@@ -278,17 +307,6 @@
             }
         }
         footer {
-            position: relative;
-            &::before {
-                content: '';
-                pointer-events: none;
-                position: absolute;
-                border-block-end: 1px solid black;
-                opacity: 0.06;
-                width: 100vw;
-                top: 50%;
-                transform: translateY(50%);
-            }
             button:only-child {
                 position: relative;
                 &::before, &::after {
@@ -317,12 +335,14 @@
 =================================================== */
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
-    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23000000'/%3E%3C/svg%3E");
 
     position: relative;
     background-color: #fff;
 
     &::before {
+        /* e.g. Asset field > Grid Mode */
+        border-radius: inherit;
         content: '';
         position: absolute;
         inset: 0;
@@ -347,4 +367,20 @@
 
 @utility shape-squircle {
     corner-shape: squircle;
+}
+
+/* UTILITIES / ANIMATIONS
+=================================================== */
+@keyframes pulse-on-appearance {
+    50% {
+        opacity: 0.85;
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@utility animate-pulse-on-appearance {
+    animation: pulse-on-appearance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

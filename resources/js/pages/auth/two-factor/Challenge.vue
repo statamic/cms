@@ -1,7 +1,7 @@
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
-import { AuthCard, Field, Input, Button } from '@statamic/ui';
+import { AuthCard, Field, Input, Button } from '@ui';
 import { computed, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 
@@ -73,11 +73,11 @@ const submit = () => {
 
             <Button type="submit" variant="primary" :disabled="processing" :loading="processing" class="w-full">{{ __('Continue') }}</Button>
 
-            <button v-if="mode === 'code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-900" type="button" @click="mode = 'recovery_code'">
+            <button v-if="mode === 'code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-900 dark:hover:text-gray-300" type="button" @click="mode = 'recovery_code'">
                 {{ __('Use recovery code') }}
             </button>
 
-            <button v-if="mode === 'recovery_code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-900" type="button" @click="mode = 'code'">
+            <button v-if="mode === 'recovery_code'" class="cursor-pointer text-xs text-gray-500 hover:text-gray-900 dark:hover:text-gray-300" type="button" @click="mode = 'code'">
                 {{ __('Use one-time code') }}
             </button>
         </form>

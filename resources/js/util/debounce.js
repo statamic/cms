@@ -1,7 +1,7 @@
 export default function (func, wait, immediate) {
     let timeout;
 
-    return function () {
+    const debounced = function () {
         const context = this,
             args = arguments;
 
@@ -14,4 +14,11 @@ export default function (func, wait, immediate) {
             if (!immediate) func.apply(context, args);
         }, wait);
     };
+
+    debounced.cancel = function () {
+        clearTimeout(timeout);
+        timeout = null;
+    };
+
+    return debounced;
 }

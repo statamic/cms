@@ -131,7 +131,6 @@ class EntriesController extends CpController
             'extraValues' => $extraValues,
             'meta' => $meta,
             'collection' => $collection->handle(),
-            'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
@@ -306,10 +305,14 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
+        $published = User::current()->can('publish', [EntryContract::class, $collection])
+            ? $collection->defaultPublishState()
+            : false;
+
         $values = collect([
             'title' => null,
             'slug' => null,
-            'published' => $collection->defaultPublishState(),
+            'published' => $published,
         ])->merge($fields->values());
 
         $viewData = [
@@ -325,7 +328,6 @@ class EntriesController extends CpController
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
             'collectionCreateLabel' => $collection->createLabel(),
-            'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
@@ -390,7 +392,6 @@ class EntriesController extends CpController
             ->collection($collection)
             ->blueprint($request->_blueprint)
             ->locale($site->handle())
-            ->published($request->get('published'))
             ->slug($this->resolveSlug($request));
 
         if ($collection->dated()) {
@@ -398,6 +399,12 @@ class EntriesController extends CpController
         }
 
         $entry->data($values);
+
+        if (User::current()->can('publish', $entry)) {
+            $entry->published($request->get('published'));
+        } else {
+            $entry->published(false);
+        }
 
         if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());

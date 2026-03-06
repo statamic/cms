@@ -86,6 +86,8 @@ trait MakesVueComponents
         });
 
         $this->configureViteInAddonServiceProvider();
+
+        $this->call('vendor:publish', ['--tag' => 'statamic-cp-dev']);
     }
 
     private function cpJsExists(): bool

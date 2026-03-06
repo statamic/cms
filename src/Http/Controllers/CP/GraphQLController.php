@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
 class GraphQLController extends CpController
@@ -22,6 +23,7 @@ class GraphQLController extends CpController
 
         return view('statamic::graphql.graphiql', [
             'url' => '/'.config('graphql.route.prefix'),
+            'introspection' => GraphQL::introspectionEnabled(),
         ]);
     }
 }

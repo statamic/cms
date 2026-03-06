@@ -104,7 +104,7 @@ function setDropdownItemActive(breadcrumbIndex, linkIndex, breadcrumb) {
                     <Link
                         :href="breadcrumb.url"
                         :aria-label="`${__('Navigate to')} ${__(breadcrumb.display)}`"
-                        v-text="breadcrumb.display"
+                        v-text="__(breadcrumb.display)"
                         @click="setBreadcrumbActive(breadcrumbIndex)"
                     />
                 </ui-dropdown-header>

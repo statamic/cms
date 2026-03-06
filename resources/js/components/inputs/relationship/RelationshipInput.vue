@@ -68,12 +68,12 @@
                         icon="link"
                         :size="buttonSize"
                         :text="linkLabel"
-                        @click.prevent="isSelecting = true"
+                        @click.prevent="openSelector"
                     />
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
+            <Stack v-model:open="isSelecting" inset :show-close-button="false">
                 <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
@@ -89,9 +89,9 @@
                     :type="config.type"
                     :tree="config.query_scopes?.length > 0 ? null : tree"
                     @selected="selectionsUpdated"
-                    @closed="close"
+                    @closed="isSelecting = false"
                 />
-            </stack>
+            </Stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </template>
@@ -104,7 +104,7 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
-import { Button, Icon } from '@/components/ui';
+import { Button, Icon, Stack } from '@/components/ui';
 
 export default {
     props: {
@@ -147,6 +147,7 @@ export default {
         RelationshipSelectField,
         Button,
         Icon,
+	    Stack,
     },
 
     data() {
@@ -285,6 +286,10 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
+	    openSelector() {
+			this.isSelecting = true;
+	    },
+
         selectionsUpdated(selections) {
             this.getDataForSelections(selections).then(() => {
                 this.update(selections);
@@ -292,7 +297,7 @@ export default {
         },
 
         initializeData() {
-            if (!this.data || !this.data.length) {
+            if (!this.data) {
                 return this.getDataForSelections(this.value);
             }
 

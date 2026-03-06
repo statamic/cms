@@ -1,6 +1,7 @@
 <template>
     <div>
         <confirmation-modal
+            open
             :title="title"
             :danger="dangerous"
             :buttonText="buttonText"
@@ -31,7 +32,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { PublishContainer, PublishFieldsProvider as FieldsProvider, PublishFields } from '@/components/ui';
 
 export default {

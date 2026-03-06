@@ -64,7 +64,6 @@ request();
 <template>
     <Combobox
         v-if="!loading"
-        class="w-full"
         clearable
         :disabled="config.disabled"
         :model-value="value"

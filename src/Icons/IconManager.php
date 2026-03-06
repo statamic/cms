@@ -34,6 +34,6 @@ class IconManager
 
     public function default(): IconSet
     {
-        return new IconSet('default', statamic_path('packages/ui/icons'));
+        return new IconSet('default', statamic_path('resources/svg/icons'));
     }
 }

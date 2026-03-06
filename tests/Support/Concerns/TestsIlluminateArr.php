@@ -6,7 +6,6 @@ use ArrayIterator;
 use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
@@ -48,10 +47,6 @@ trait TestsIlluminateArr
 
     public function testArrayable(): void
     {
-        if (version_compare(Application::VERSION, '12.14.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.14.0 or higher.');
-        }
-
         $this->assertTrue(Arr::arrayable([]));
         $this->assertTrue(Arr::arrayable(new TestArrayableObject));
         $this->assertTrue(Arr::arrayable(new TestJsonableObject));
@@ -555,10 +550,6 @@ trait TestsIlluminateArr
 
     public function testItGetsAString()
     {
-        if (version_compare(Application::VERSION, '12.11.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
-        }
-
         $test_array = ['string' => 'foo bar', 'integer' => 1234];
 
         // Test string values are returned as strings
@@ -579,10 +570,6 @@ trait TestsIlluminateArr
 
     public function testItGetsAnInteger()
     {
-        if (version_compare(Application::VERSION, '12.11.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
-        }
-
         $test_array = ['string' => 'foo bar', 'integer' => 1234];
 
         // Test integer values are returned as integers
@@ -603,10 +590,6 @@ trait TestsIlluminateArr
 
     public function testItGetsAFloat()
     {
-        if (version_compare(Application::VERSION, '12.11.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
-        }
-
         $test_array = ['string' => 'foo bar', 'float' => 12.34];
 
         // Test float values are returned as floats
@@ -627,10 +610,6 @@ trait TestsIlluminateArr
 
     public function testItGetsABoolean()
     {
-        if (version_compare(Application::VERSION, '12.11.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
-        }
-
         $test_array = ['string' => 'foo bar',  'boolean' => true];
 
         // Test boolean values are returned as booleans
@@ -651,10 +630,6 @@ trait TestsIlluminateArr
 
     public function testItGetsAnArray()
     {
-        if (version_compare(Application::VERSION, '12.11.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.11.0 or higher.');
-        }
-
         $test_array = ['string' => 'foo bar', 'array' => ['foo', 'bar']];
 
         // Test array values are returned as arrays
@@ -738,10 +713,6 @@ trait TestsIlluminateArr
 
     public function testHasAllMethod()
     {
-        if (version_compare(Application::VERSION, '12.16.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.16.0 or higher.');
-        }
-
         $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
         $this->assertTrue(Arr::hasAll($array, 'name'));
         $this->assertTrue(Arr::hasAll($array, 'age'));
@@ -787,10 +758,6 @@ trait TestsIlluminateArr
 
     public function testEvery()
     {
-        if (version_compare(Application::VERSION, '12.22.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.22.0 or higher.');
-        }
-
         $this->assertFalse(Arr::every([1, 2], fn ($value, $key) => is_string($value)));
         $this->assertFalse(Arr::every(['foo', 2], fn ($value, $key) => is_string($value)));
         $this->assertTrue(Arr::every(['foo', 'bar'], fn ($value, $key) => is_string($value)));
@@ -798,10 +765,6 @@ trait TestsIlluminateArr
 
     public function testSome()
     {
-        if (version_compare(Application::VERSION, '12.22.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.22.0 or higher.');
-        }
-
         $this->assertFalse(Arr::some([1, 2], fn ($value, $key) => is_string($value)));
         $this->assertTrue(Arr::some(['foo', 2], fn ($value, $key) => is_string($value)));
         $this->assertTrue(Arr::some(['foo', 'bar'], fn ($value, $key) => is_string($value)));
@@ -1277,10 +1240,6 @@ trait TestsIlluminateArr
 
     public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists()
     {
-        if (version_compare(Application::VERSION, '12.4.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.4.0 or higher.');
-        }
-
         $this->assertSame('foo', Arr::sole(['foo']));
 
         $array = [
@@ -1296,10 +1255,6 @@ trait TestsIlluminateArr
 
     public function testSoleThrowsExceptionIfNoItemsExist()
     {
-        if (version_compare(Application::VERSION, '12.4.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.4.0 or higher.');
-        }
-
         $this->expectException(ItemNotFoundException::class);
 
         Arr::sole(['foo'], fn (string $value) => $value === 'baz');
@@ -1307,10 +1262,6 @@ trait TestsIlluminateArr
 
     public function testSoleThrowsExceptionIfMoreThanOneItemExists()
     {
-        if (version_compare(Application::VERSION, '12.4.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.4.0 or higher.');
-        }
-
         $this->expectExceptionObject(new MultipleItemsFoundException(2));
 
         Arr::sole(['baz', 'foo', 'baz'], fn (string $value) => $value === 'baz');
@@ -1605,10 +1556,6 @@ trait TestsIlluminateArr
 
     public function testFrom()
     {
-        if (version_compare(Application::VERSION, '12.14.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.14.0 or higher.');
-        }
-
         $this->assertSame(['foo' => 'bar'], Arr::from(['foo' => 'bar']));
         $this->assertSame(['foo' => 'bar'], Arr::from((object) ['foo' => 'bar']));
         $this->assertSame(['foo' => 'bar'], Arr::from(new TestArrayableObject));
@@ -1817,10 +1764,6 @@ trait TestsIlluminateArr
 
     public function testReject()
     {
-        if (version_compare(Application::VERSION, '11.43', '<')) {
-            $this->markTestSkipped('These tests require Laravel 11.43 or higher.');
-        }
-
         $array = [1, 2, 3, 4, 5, 6];
 
         // Test rejection behavior (removing even numbers)
@@ -1849,10 +1792,6 @@ trait TestsIlluminateArr
 
     public function testPartition()
     {
-        if (version_compare(Application::VERSION, '12.1.0', '<')) {
-            $this->markTestSkipped('These tests require Laravel 12.1.0 or higher.');
-        }
-
         $array = ['John', 'Jane', 'Greg'];
 
         $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));

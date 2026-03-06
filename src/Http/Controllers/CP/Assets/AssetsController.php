@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +13,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
@@ -41,7 +43,9 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
-        // TODO: Auth
+        abort_if(! $asset, 404);
+
+        $this->authorize('view', $asset);
 
         return new AssetResource($asset);
     }
@@ -82,10 +86,16 @@ class AssetsController extends CpController
 
         $container = AssetContainer::find($request->container);
 
+        throw_unless($container, NotFoundHttpException::class);
+
         $this->authorize('store', [AssetContract::class, $container]);
 
+        $validationRules = collect($container->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
+            ->all();
+
         $request->validate([
-            'file' => array_merge(['file', new AllowedFile], $container->validationRules()),
+            'file' => array_merge(['file', new AllowedFile], $validationRules),
         ]);
 
         $file = $request->file('file');
@@ -127,7 +137,9 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
-        // TODO: Auth
+        abort_if(! $asset, 404);
+
+        $this->authorize('view', $asset);
 
         return $asset->download();
     }

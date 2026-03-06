@@ -131,13 +131,12 @@ class Replicator extends Fieldtype
 
     public function fields($set, $index = -1)
     {
-        $config = Arr::get($this->flattenedSetsConfig(), $set);
-        $configHash = $config['hash'] ?? 'invalid_set';
-        $itemHash = md5($this->field->fieldPathPrefix().'.'.$index);
+        $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
 
-        return Blink::once('replicator-'.$configHash.'-'.$itemHash, function () use ($config, $index) {
+        return Blink::once($hash, function () use ($config, $index) {
             return new Fields(
-                $config['fields'] ?? [],
+                $config,
                 $this->field()->parent(),
                 $this->field(),
                 $index
@@ -163,6 +162,7 @@ class Replicator extends Fieldtype
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
             ]);
+
         $rules = $this
             ->addEntryValidationReplacements($this->field, $rules)
             ->rules();
@@ -224,42 +224,57 @@ class Replicator extends Fieldtype
 
     public function preload()
     {
-        $configHash = $this->field->configHash();
-
         $existing = collect($this->field->value())->mapWithKeys(function ($set, $index) {
             return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = Blink::once('replicator-'.$configHash.'-defaults', function () {
-            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-                return $this->fields($handle)->all()->map(function ($field) {
-                    return $field->fieldtype()->preProcess($field->defaultValue());
-                })->all();
-            })->all();
-        });
+        // Most of the time, these values will be fetched over AJAX.
+        // However, if the blueprint doesn't have a FQH, we need to fallback here.
+        if ($this->shouldProcessNewValues()) {
+            $blink = md5(json_encode($this->flattenedSetsConfig()));
 
-        $new = Blink::once('replicator-'.$configHash.'-new', function () use ($defaults) {
-            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
-            })->toArray();
-        });
+            $defaults = Blink::once($blink.'-defaults', function () {
+                return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                    return $this->fields($handle)->all()->map(function ($field) {
+                        return $field->fieldtype()->preProcess($field->defaultValue());
+                    })->all();
+                })->all();
+            });
+
+            $new = Blink::once($blink.'-new', function () use ($defaults) {
+                return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                    return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+                })->toArray();
+            });
+        }
 
         return [
             'existing' => $existing,
-            'new' => $new,
-            'defaults' => $defaults,
-            'collapsed' => [],
+            'new' => $new ?? null,
+            'defaults' => $defaults ?? null,
+            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
             'setConfigHashes' => $this->flattenedSetsConfig()
                 ->map(fn ($set) => $set['hash'])
                 ->all(),
         ];
     }
 
+    private function shouldProcessNewValues(): bool
+    {
+        $parent = $this->field()->parent();
+
+        if (! $parent || ! method_exists($parent, 'blueprint')) {
+            return true;
+        }
+
+        return is_null($parent->blueprint()->fullyQualifiedHandle());
+    }
+
     public function flattenedSetsConfig()
     {
-        $configHash = $this->field->configHash();
+        $blink = md5($this->field?->handle().json_encode($this->field?->config()));
 
-        return Blink::once('replicator-'.$configHash.'-sets', function () {
+        return Blink::once($blink, function () {
             $sets = collect($this->config('sets'));
 
             // If the first set doesn't have a nested "set" key, it would be the legacy format.

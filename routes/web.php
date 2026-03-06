@@ -70,7 +70,8 @@ Route::name('statamic.')->group(function () {
 
         Route::post('nocache', NoCacheController::class)
             ->middleware(NoCacheLocalize::class)
-            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
+            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
+            ->name('nocache');
 
         Route::post('csrf', CsrfTokenController::class)
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);

@@ -97,54 +97,6 @@ class PasskeyTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_last_login()
-    {
-        $user = User::make()->id('test-user')->email('test@example.com');
-        $credential = $this->createTestCredential();
-        $lastLogin = Carbon::create(2024, 1, 15, 10, 30, 0);
-
-        $passkey = (new Passkey)
-            ->setName('My Passkey')
-            ->setUser($user)
-            ->setCredential($credential)
-            ->setLastLogin($lastLogin);
-
-        $this->assertInstanceOf(Carbon::class, $passkey->lastLogin());
-        $this->assertEquals('2024-01-15 10:30:00', $passkey->lastLogin()->format('Y-m-d H:i:s'));
-    }
-
-    #[Test]
-    public function it_handles_null_last_login()
-    {
-        $user = User::make()->id('test-user')->email('test@example.com');
-        $credential = $this->createTestCredential();
-
-        $passkey = (new Passkey)
-            ->setName('My Passkey')
-            ->setUser($user)
-            ->setCredential($credential);
-
-        $this->assertNull($passkey->lastLogin());
-    }
-
-    #[Test]
-    public function it_sets_last_login_from_timestamp()
-    {
-        $user = User::make()->id('test-user')->email('test@example.com');
-        $credential = $this->createTestCredential();
-        $timestamp = 1705315800; // 2024-01-15 10:30:00 UTC
-
-        $passkey = (new Passkey)
-            ->setName('My Passkey')
-            ->setUser($user)
-            ->setCredential($credential)
-            ->setLastLogin($timestamp);
-
-        $this->assertInstanceOf(Carbon::class, $passkey->lastLogin());
-        $this->assertEquals($timestamp, $passkey->lastLogin()->timestamp);
-    }
-
-    #[Test]
     public function it_serializes()
     {
         $user = User::make()->id('test-user')->email('test@example.com');

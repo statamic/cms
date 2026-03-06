@@ -1,21 +1,22 @@
 <template>
     <div>
-        <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
+        <Stack
+            size="narrow"
+            v-model:open="open"
+            :title="__('Link Fields')"
+            icon="fieldsets"
+        >
+	        <template #trigger>
+		        <Button icon="link" :text="__('Link Existing')" />
+	        </template>
 
-        <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
-            <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
-                <header class="flex items-center justify-between pl-3">
-                    <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
-                    <Button type="button" icon="x" variant="subtle" @click="close" />
-                </header>
-
-                <div class="flex-1 overflow-auto px-3 py-4">
+            <div class="">
+                <div class="">
                     <Field
                         :label="__('Link a single field')"
                         :instructions="__('Changes to this field in the fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fields')"
                             :options="fieldSuggestions"
                             searchable
@@ -26,14 +27,14 @@
                                 <div class="flex items-center">
                                     <span
                                         v-text="option.fieldset"
-                                        class="text-2xs text-gray-500 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
+                                        class="text-2xs text-gray-500 dark:text-gray-300 ltr:mr-2 rtl:ml-2"
                                     />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="px-4 py-2 text-sm text-gray-700 dark:text-gray-500 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -49,9 +50,9 @@
                     />
 
                     <div class="my-4 flex items-center">
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
-                        <div class="mx-4 text-2xs text-gray-600 dark:text-dark-175" v-text="__('or')"></div>
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
+                        <div class="flex-1 border-b border-gray-300 dark:border-gray-500" />
+                        <div class="mx-4 text-2xs text-gray-600 dark:text-gray-400" v-text="__('or')"></div>
+                        <div class="flex-1 border-b border-gray-300 dark:border-gray-500" />
                     </div>
 
                     <Field
@@ -60,7 +61,6 @@
                         :instructions="__('Changes to this fieldset will stay in sync.')"
                     >
                         <Combobox
-                            class="w-full"
                             :placeholder="__('Fieldsets')"
                             :options="fieldsetSuggestions"
                             searchable
@@ -69,7 +69,7 @@
                         >
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="px-4 py-2 text-sm text-gray-700 dark:text-gray-500 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -92,17 +92,17 @@
                     />
                 </div>
             </div>
-        </stack>
+        </Stack>
     </div>
 </template>
 
 <script>
-import uniqid from 'uniqid';
-import { Combobox, Button, Input, Heading, Field } from '@/components/ui';
+import { nanoid as uniqid } from 'nanoid';
+import { Combobox, Button, Input, Heading, Field, Stack, StackClose } from '@/components/ui';
 import { usePage } from '@inertiajs/vue3';
 
 export default {
-    components: { Heading, Combobox, Button, Input, Field },
+    components: { Heading, Combobox, Button, Input, Field, Stack, StackClose },
 
     props: {
         excludeFieldset: String,
