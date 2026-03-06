@@ -196,8 +196,8 @@ trait DetectsTone
     {
         $value = strtolower(trim($value));
 
-        if ($value === 'currentcolor' || $value === 'currentColor') {
-            return 0.5;
+        if ($value === 'currentcolor') {
+            return 0.0;
         }
 
         if (preg_match('/^#([0-9a-f]{3})$/i', $value, $m)) {

@@ -399,9 +399,10 @@ export default {
                     this.imageToneReady = true;
                 } else if (data.isSvg) {
                     this.imageToneReady = false;
-                    this.detectImageTone(data.url)
+                    this.detectSvgTone(data.url)
                         .then((tone) => {
-                            this.calculatedTone = tone;
+                            // When detection fails, default to 'dark' so black/dark SVGs get a light background.
+                            this.calculatedTone = tone ?? 'dark';
                             this.imageTone = this.toneOverride ?? this.calculatedTone;
                         })
                         .finally(() => {
@@ -610,13 +611,98 @@ export default {
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
         },
-        // Client-side tone detection for the Asset Editor only.
-        // Used when tone isn't in server meta yet (e.g. SVG without cached meta).
-        // Raster images normally get tone from PHP (DetectsTone trait) when meta is generated.
-        // Same luminance formula and threshold (0.4) as server generation for consistent "light" / "dark" result.
+        // Prefer parsing SVG XML so black/dark icons (e.g. fill="black" or no fill) are detected correctly.
+        // Canvas-based detection can misread SVGs (e.g. white background or currentColor when drawn in Image()).
+        detectSvgTone(url) {
+            return this.detectSvgToneFromXml(url).then((tone) => {
+                if (tone !== null) return tone;
+                return this.detectImageTone(url);
+            });
+        },
+        // Parse SVG fill/stroke from XML; matches server logic (DetectsTone::detectSvgToneFromSvgColors).
+        detectSvgToneFromXml(url) {
+            const luminanceThreshold = 0.4;
+            const drawingElements = new Set(['path', 'circle', 'rect', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'image']);
+
+            return fetch(url, { credentials: 'same-origin' })
+                .then((r) => (r.ok ? r.text() : Promise.reject()))
+                .then((svgText) => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+                    if (doc.querySelector('parsererror')) return null;
+
+                    const luminances = [];
+                    const all = doc.querySelectorAll('*');
+
+                    all.forEach((el) => {
+                        const style = (el.getAttribute('style') || '').trim();
+                        const elementLuminances = [];
+                        for (const attr of ['fill', 'stroke']) {
+                            let value = (el.getAttribute(attr) || '').trim();
+                            if (!value && style) {
+                                const re = new RegExp(`\\b${attr}\\s*:\\s*([^;]+)`, 'i');
+                                const m = style.match(re);
+                                value = m ? m[1].trim() : '';
+                            }
+                            if (!value || value === 'none' || value === 'transparent') continue;
+                            const lum = this.colorToLuminance(value);
+                            if (lum !== null) elementLuminances.push(lum);
+                        }
+                        if (elementLuminances.length > 0) {
+                            luminances.push(...elementLuminances);
+                        } else {
+                            const localName = (el.localName || el.nodeName || '').toLowerCase().split(':').pop();
+                            if (drawingElements.has(localName)) luminances.push(0);
+                        }
+                    });
+
+                    if (luminances.length === 0) return null;
+                    const avg = luminances.reduce((a, b) => a + b, 0) / luminances.length;
+                    return avg >= luminanceThreshold ? 'light' : 'dark';
+                })
+                .catch(() => null);
+        },
+        colorToLuminance(value) {
+            value = (value || '').toLowerCase().trim();
+            // currentColor is typically used for dark icons (inherit text color); treat as dark so background is light.
+            if (value === 'currentcolor') return 0;
+
+            let m = value.match(/^#([0-9a-f]{3})$/i);
+            if (m) {
+                const r = parseInt(m[1][0] + m[1][0], 16) / 255;
+                const g = parseInt(m[1][1] + m[1][1], 16) / 255;
+                const b = parseInt(m[1][2] + m[1][2], 16) / 255;
+                return 0.299 * r + 0.587 * g + 0.114 * b;
+            }
+            m = value.match(/^#([0-9a-f]{6})$/i);
+            if (m) {
+                const r = parseInt(m[1].slice(0, 2), 16) / 255;
+                const g = parseInt(m[1].slice(2, 4), 16) / 255;
+                const b = parseInt(m[1].slice(4, 6), 16) / 255;
+                return 0.299 * r + 0.587 * g + 0.114 * b;
+            }
+            m = value.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/);
+            if (m) {
+                const r = Math.min(255, parseInt(m[1], 10)) / 255;
+                const g = Math.min(255, parseInt(m[2], 10)) / 255;
+                const b = Math.min(255, parseInt(m[3], 10)) / 255;
+                return 0.299 * r + 0.587 * g + 0.114 * b;
+            }
+            m = value.match(/^rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,/);
+            if (m) {
+                const r = Math.min(255, parseInt(m[1], 10)) / 255;
+                const g = Math.min(255, parseInt(m[2], 10)) / 255;
+                const b = Math.min(255, parseInt(m[3], 10)) / 255;
+                return 0.299 * r + 0.587 * g + 0.114 * b;
+            }
+            const named = { black: 0, white: 1, red: 0.212, lime: 0.715, blue: 0.072, gray: 0.5, grey: 0.5, silver: 0.753, maroon: 0.144, green: 0.357, navy: 0.028, yellow: 0.927, olive: 0.502, purple: 0.132, teal: 0.357, fuchsia: 0.284, aqua: 0.787, orange: 0.695 };
+            return named[value] !== undefined ? named[value] : null;
+        },
+        // Canvas-based tone detection; used as fallback for SVGs when XML parsing fails.
+        // Same luminance formula and threshold (0.4) as server for consistent result.
         detectImageTone(src) {
             const maxSize = 64;
-            const luminanceThreshold = 0.4; // 0–1; above = light, below = dark
+            const luminanceThreshold = 0.4;
 
             return new Promise((resolve) => {
                 const img = new Image();
