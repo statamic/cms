@@ -38,9 +38,16 @@
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
+                                <ui-button
+                                    inset size="sm" variant="ghost"
+                                    v-if="asset.can_be_transparent"
+                                    :icon="checkerboardIcon"
+                                    class="[&_svg]:!opacity-45"
+                                    :text="__('Checkerboard')"
+                                    @click="cycleCheckerboard"
+                                />
                                 <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
                                 <ui-button inset size="sm" v-if="canCrop" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
-                                <ui-button inset size="sm" v-if="asset.can_be_transparent" @click="showCheckerboard = !showCheckerboard" icon="eye" variant="ghost" :class="[showCheckerboard ? '[&_svg]:!opacity-45' : '[&_svg]:!opacity-100']" :text="__('Transparency')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
@@ -67,10 +74,8 @@
                         <div
                             v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo || asset.preview"
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
-                            :class="imageTone && (asset.isImage || asset.isSvg) ? (imageTone === 'light' ? 'dark' : 'light') : ''"
+                            :class="previewToneClass"
                         >
-                            <!-- Image: delay until tone analyzed to avoid checkerboard/background flicker -->
-                            <template v-if="!(asset.isImage || asset.isSvg) || imageToneReady">
                                 <!-- Image -->
                                 <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ 'bg-checkerboard before:opacity-100 rounded-md': asset.can_be_transparent && showCheckerboard }">
                                     <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
@@ -104,10 +109,6 @@
 
                                 <!-- Other thumbnail -->
                                 <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
-                            </template>
-                            <div v-else class="flex flex-1 items-center justify-center min-h-0">
-                                <Icon name="loading" />
-                            </div>
                         </div>
 
                         <pdf-viewer v-else-if="asset.isPdf" :src="asset.pdfUrl" />
@@ -147,32 +148,6 @@
 
                 <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
                     <div class="hidden h-full flex-1 gap-2 sm:gap-3 py-1 sm:flex">
-                        <ui-button-group v-if="imageTone && (asset.isImage || asset.isSvg)" class="items-center">
-                            <ui-button
-                                size="sm"
-                                :variant="toneOverride === null ? 'pressed' : 'default'"
-                                :icon="autoToneIcon"
-                                :text="__('Auto')"
-                                :disabled="readOnly"
-                                @click="setToneOverride(null)"
-                            />
-                            <ui-button
-                                size="sm"
-                                :variant="toneOverride === 'light' ? 'pressed' : 'default'"
-                                icon="sun"
-                                :text="__('Light')"
-                                :disabled="readOnly"
-                                @click="setToneOverride('light')"
-                            />
-                            <ui-button
-                                size="sm"
-                                :variant="toneOverride === 'dark' ? 'pressed' : 'default'"
-                                icon="moon"
-                                :text="__('Dark')"
-                                :disabled="readOnly"
-                                @click="setToneOverride('dark')"
-                            />
-                        </ui-button-group>
                         <ui-badge pill v-if="asset.width && asset.height" icon="assets" :text="__('messages.width_x_height', { width: Math.round(asset.width), height: Math.round(asset.height) })" />
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
@@ -287,15 +262,11 @@ export default {
             fieldset: null,
             showFocalPointEditor: false,
             showCropEditor: false,
-            showCheckerboard: true,
+            checkerboardMode: 0, // 0 = light checkerboard, 1 = dark checkerboard, 2 = off
             error: null,
             errors: {},
             actions: [],
             closingWithChanges: false,
-            imageTone: null, // effective tone for preview: override ?? calculated
-            imageToneReady: false, // true once tone is set or not applicable (avoids checkerboard flicker)
-            toneOverride: null, // null = auto, 'light' | 'dark' = user override (saved in yaml)
-            calculatedTone: null, // detected tone (for Auto button icon/label)
         };
     },
 
@@ -330,11 +301,20 @@ export default {
             return Statamic.$config.get('focalPointEditorEnabled');
         },
 
-        // Icon for Auto button: show detected tone (sun/moon) when we have one, else wand
-        autoToneIcon() {
-            if (this.calculatedTone === 'light') return 'sun';
-            if (this.calculatedTone === 'dark') return 'moon';
-            return 'wand';
+        showCheckerboard() {
+            return this.checkerboardMode !== 2;
+        },
+
+        checkerboardIcon() {
+            if (this.checkerboardMode === 0) return 'sun';
+            if (this.checkerboardMode === 1) return 'moon';
+            return 'eye-closed';
+        },
+
+        previewToneClass() {
+            if (this.checkerboardMode === 0) return 'light';
+            if (this.checkerboardMode === 1) return 'dark';
+            return '';
         },
     },
 
@@ -389,28 +369,6 @@ export default {
                 fields = fields.map((section) => section.fields);
                 fields = flatten(fields);
                 this.fields = fields;
-
-                // Tone: support auto (calculated) vs user override (saved in yaml as tone_override).
-                this.toneOverride = data.tone_override ?? null;
-                this.calculatedTone = data.tone_detected ?? data.tone ?? null;
-
-                if (data.tone_detected || data.tone) {
-                    this.imageTone = this.toneOverride ?? this.calculatedTone;
-                    this.imageToneReady = true;
-                } else if (data.isSvg) {
-                    this.imageToneReady = false;
-                    this.detectImageTone(data.url)
-                        .then((tone) => {
-                            this.calculatedTone = tone;
-                            this.imageTone = this.toneOverride ?? this.calculatedTone;
-                        })
-                        .finally(() => {
-                            this.imageToneReady = true;
-                        });
-                } else {
-                    this.imageTone = null;
-                    this.imageToneReady = true;
-                }
 
                 this.extraValues = pick(this.asset, [
                     'filename',
@@ -467,11 +425,8 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
-        setToneOverride(value) {
-            if (this.readOnly) return;
-            this.toneOverride = value; // null = auto, 'light' | 'dark' = override
-            this.imageTone = this.toneOverride ?? this.calculatedTone;
-            this.$dirty.add(this.publishContainer);
+        cycleCheckerboard() {
+            this.checkerboardMode = (this.checkerboardMode + 1) % 3;
         },
 
         openCropEditor() {
@@ -508,7 +463,7 @@ export default {
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
-            const payload = { ...this.$refs.container.visibleValues, tone_override: this.toneOverride };
+            const payload = this.$refs.container.visibleValues;
 
             return this.$axios
                 .patch(url, payload)
@@ -609,56 +564,6 @@ export default {
             ];
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
-        },
-        // Client-side tone detection for the Asset Editor only.
-        // Used when tone isn't in server meta yet (e.g. SVG without cached meta).
-        // Raster images normally get tone from PHP (DetectsTone trait) when meta is generated.
-        // Same luminance formula and threshold (0.4) as server generation for consistent "light" / "dark" result.
-        detectImageTone(src) {
-            const maxSize = 64;
-            const luminanceThreshold = 0.4; // 0–1; above = light, below = dark
-
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-
-                img.onerror = () => resolve(null);
-                img.onload = () => {
-                    try {
-                        const w = img.naturalWidth;
-                        const h = img.naturalHeight;
-                        const scale = Math.min(1, maxSize / Math.max(w, h));
-                        const cw = Math.max(1, Math.round(w * scale));
-                        const ch = Math.max(1, Math.round(h * scale));
-
-                        const canvas = document.createElement('canvas');
-                        canvas.width = cw;
-                        canvas.height = ch;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, cw, ch);
-                        const data = ctx.getImageData(0, 0, cw, ch).data;
-
-                        let sum = 0;
-                        let count = 0;
-                        for (let i = 0; i < data.length; i += 4) {
-                            const a = data[i + 3] / 255;
-                            if (a < 0.1) continue;
-                            const r = data[i] / 255;
-                            const g = data[i + 1] / 255;
-                            const b = data[i + 2] / 255;
-                            const l = 0.299 * r + 0.587 * g + 0.114 * b;
-                            sum += l * a;
-                            count += a;
-                        }
-                        const avgLuminance = count > 0 ? sum / count : 0.5;
-                        resolve(avgLuminance >= luminanceThreshold ? 'light' : 'dark');
-                    } catch {
-                        resolve(null);
-                    }
-                };
-
-                img.src = src;
-            });
         },
     },
 };
