@@ -217,42 +217,6 @@
         @apply grid grid-cols-none!;
         --grid-columns: none !important;
     }
-
-    /* For the asset editor checkerboard, override the CP theme and use image tone (bright image → .dark container, dark image → .light) */
-    .light .bg-checkerboard {
-        background-color: #fff;
-
-        &::before {
-            background-image: var(--checkerboard-light);
-        }
-    }
-
-    .dark .bg-checkerboard {
-        background-color: #1c1c1e;
-
-        &::before {
-            background-image: var(--checkerboard-dark);
-        }
-    }
-}
-
-/* Asset browser grid: same checkerboard light/dark as editor (element has both .light/.dark and .bg-checkerboard) */
-.asset-browser-grid {
-    .light.bg-checkerboard {
-        background-color: #fff;
-
-        &::before {
-            background-image: var(--checkerboard-light);
-        }
-    }
-
-    .dark.bg-checkerboard {
-        background-color: #1c1c1e;
-
-        &::before {
-            background-image: var(--checkerboard-dark);
-        }
-    }
 }
 
 /* Lazyloading

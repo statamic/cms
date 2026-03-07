@@ -110,7 +110,7 @@
                                     },
                                     asset.can_be_transparent
                                         ? (showCheckerboard
-                                            ? `${previewBackgroundClass} bg-checkerboard before:opacity-100`
+                                            ? `bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100`
                                             : 'asset-tile-hover-checkerboard')
                                         : '',
                                 ]"
@@ -236,7 +236,7 @@ export default {
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
         showCheckerboard: { type: Boolean, default: false },
-        previewBackgroundClass: { type: String, default: '' },
+        checkerboardMode: { type: String, default: 'transparent' },
     },
 
     data() {

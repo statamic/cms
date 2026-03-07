@@ -33,16 +33,14 @@ export default function useCheckerboard() {
         return 'eye-slash';
     });
 
-    const backgroundClass = computed(() => mode.value === 'transparent' ? '' : mode.value);
-
     function cycle() {
         mode.value = nextMode.value;
     }
 
     checkerboardState = {
+        mode,
         enabled,
         icon,
-        backgroundClass,
         cycle,
     };
 

@@ -155,7 +155,7 @@
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
                                 :show-checkerboard="showCheckerboard"
-                                :preview-background-class="previewBackgroundClass"
+                                :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -279,7 +279,7 @@ export default {
         return {
             showCheckerboard: checkerboard.enabled,
             checkerboardIcon: checkerboard.icon,
-            previewBackgroundClass: checkerboard.backgroundClass,
+            checkerboardMode: checkerboard.mode,
             cycleCheckerboard: checkerboard.cycle,
         };
     },
