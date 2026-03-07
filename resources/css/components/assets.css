@@ -172,7 +172,6 @@
   ========================================================================== */
 
 .asset-editor {
-
     .loading {
         @apply absolute inset-0 flex items-center justify-center rounded-sm bg-gray-800 dark:bg-gray-900;
         z-index: var(--z-index-portal);
@@ -182,42 +181,18 @@
         @apply grid grid-cols-none!;
         --grid-columns: none !important;
     }
-
-    /* For the asset editor checkerboard, override the CP theme and use image tone (bright image → .dark container, dark image → .light) */
-    .light .bg-checkerboard {
-        background-color: #fff;
-
-        &::before {
-            background-image: var(--checkerboard-light);
-        }
-    }
-
-    .dark .bg-checkerboard {
-        background-color: #1c1c1e;
-
-        &::before {
-            background-image: var(--checkerboard-dark);
-        }
-    }
 }
 
-/* Asset browser grid: same checkerboard light/dark as editor (element has both .light/.dark and .bg-checkerboard) */
-.asset-browser-grid {
-    .light.bg-checkerboard {
-        background-color: #fff;
-
-        &::before {
-            background-image: var(--checkerboard-light);
-        }
-    }
-
-    .dark.bg-checkerboard {
-        background-color: #1c1c1e;
-
-        &::before {
-            background-image: var(--checkerboard-dark);
-        }
-    }
+/* Checkerboard light/dark by tone */
+.asset-editor .light .bg-checkerboard,
+.asset-browser-grid .light.bg-checkerboard {
+    background-color: #fff;
+    &::before { background-image: var(--checkerboard-light); }
+}
+.asset-editor .dark .bg-checkerboard,
+.asset-browser-grid .dark.bg-checkerboard {
+    background-color: #1c1c1e;
+    &::before { background-image: var(--checkerboard-dark); }
 }
 
 /* Lazyloading
