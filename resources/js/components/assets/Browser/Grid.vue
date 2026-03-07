@@ -108,7 +108,7 @@
                                     },
                                     asset.can_be_transparent
                                         ? (showCheckerboard
-                                            ? `${previewBackgroundClass} bg-checkerboard before:opacity-100 isolate`
+                                            ? `${previewBackgroundClass} bg-checkerboard before:opacity-100`
                                             : ['bg-checkerboard', 'isolate', asset.tone === 'dark' ? 'light' : asset.tone === 'light' ? 'dark' : null].filter(Boolean))
                                         : '',
                                 ]"

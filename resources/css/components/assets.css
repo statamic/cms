@@ -155,11 +155,6 @@
             @apply absolute max-h-full max-w-full;
         }
     }
-
-    /* Keep checkerboard ::before behind button (no Tailwind utility for pseudo z-index) */
-    &.bg-checkerboard::before {
-        z-index: -1;
-    }
 }
 
 .asset-filename {
