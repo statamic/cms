@@ -103,14 +103,9 @@
                             <div
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
-                                    {
-                                        'opacity-50!': draggingAsset === asset.id,
-                                    },
-                                    asset.can_be_transparent
-                                        ? (showCheckerboard
-                                            ? `bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100`
-                                            : 'asset-tile-hover-checkerboard')
-                                        : '',
+                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
+                                    asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
                                 ]"
                             >
                                 <button

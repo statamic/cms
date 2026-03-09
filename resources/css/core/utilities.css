@@ -333,6 +333,14 @@
 
 /* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
+
+:root {
+    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%230a0a0a'/%3E%3C/svg%3E");
+    --checkerboard-dark-color: #1c1c1e;
+    --checkerboard-light-color: #fff;
+}
+
 @utility bg-checkerboard {
     position: relative;
 
@@ -341,27 +349,29 @@
         content: '';
         position: absolute;
         inset: 0;
-        opacity: 0;
         transition: opacity 0.2s ease-in-out;
         pointer-events: none;
+        background-color: var(--checkerboard-light-color);
+        background-image: var(--checkerboard-light);
     }
 
-    &:hover::before {
-        opacity: 1;
+    .dark &::before {
+        background-color: var(--checkerboard-dark-color);
+        background-image: var(--checkerboard-dark);
     }
 }
 
 @utility bg-checkerboard-light {
     &::before {
-        background-color: #fff;
-        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+        background-color: var(--checkerboard-light-color) !important;
+        background-image: var(--checkerboard-light) !important;
     }
 }
 
 @utility bg-checkerboard-dark {
     &::before {
-        background-color: #1c1c1e;
-        background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%230a0a0a'/%3E%3C/svg%3E");
+        background-color: var(--checkerboard-dark-color) !important;
+        background-image: var(--checkerboard-dark) !important;
     }
 }
 

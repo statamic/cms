@@ -76,24 +76,24 @@
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
                             <!-- Image -->
-                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100 rounded-md`]: asset.can_be_transparent && showCheckerboard }">
+                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-md`]: asset.can_be_transparent && showCheckerboard }">
                                 <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                             </div>
 
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl dark:bg-gray-800">
                                 <div class="grid grid-cols-3 gap-1">
-                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100`]: showCheckerboard }">
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode}`]: showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 w-4" />
                                     </div>
-                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100`]: showCheckerboard }">
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode}`]: showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 w-12" />
                                     </div>
-                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100`]: showCheckerboard }">
+                                    <div class="flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode}`]: showCheckerboard }">
                                         <img :src="asset.url" class="asset-thumb relative z-10 w-24" />
                                     </div>
                                 </div>
-                                <div class="h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} before:opacity-100`]: showCheckerboard }">
+                                <div class="h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode}`]: showCheckerboard }">
                                     <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                 </div>
                             </div>
