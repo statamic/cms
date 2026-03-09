@@ -38,7 +38,7 @@ defineProps(['requestError', 'statamic', 'addons']);
                             </TableCell>
                             <TableCell>{{ statamic.currentVersion }}</TableCell>
                             <TableCell v-if="statamic.availableUpdatesCount" class="text-right">
-                                <Badge size="sm" color="green">{{ __n('1 update|:count updates', statamic.availableUpdatesCount) }}</Badge>
+                                <Badge size="sm" color="amber">{{ __n('1 update|:count updates', statamic.availableUpdatesCount) }}</Badge>
                             </TableCell>
                             <TableCell v-else class="text-right">{{ __('Up to date') }}</TableCell>
                         </TableRow>
@@ -63,7 +63,7 @@ defineProps(['requestError', 'statamic', 'addons']);
                             </TableCell>
                             <TableCell>{{ addon.version }}</TableCell>
                             <TableCell v-if="addon.availableUpdatesCount" class="text-right">
-                                <Badge size="sm" color="green">{{ __n('1 update|:count updates', addon.availableUpdatesCount) }}</Badge>
+                                <Badge size="sm" color="amber">{{ __n('1 update|:count updates', addon.availableUpdatesCount) }}</Badge>
                             </TableCell>
                             <TableCell v-else class="text-right">{{ __('Up to date') }}</TableCell>
                         </TableRow>
