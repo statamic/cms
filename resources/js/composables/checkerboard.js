@@ -1,24 +1,32 @@
 import { ref, computed, watch } from 'vue';
 import { preferences } from '@api';
 
-const PREFERENCE_KEY = 'assets.browser_checkerboard_mode';
+const PREFERENCE_KEYS = {
+    listing: 'assets.browser_checkerboard_mode',
+    editor: 'assets.editor_checkerboard_mode',
+};
+
 const DEFAULT_MODE = 'transparent';
 const CHECKERBOARD_MODES = ['light', 'dark', 'transparent'];
 
-let checkerboardState = null;
+const stateByContext = {};
 
 function normalizeMode(raw) {
     return CHECKERBOARD_MODES.includes(raw) ? raw : DEFAULT_MODE;
 }
 
-export default function useCheckerboard() {
-    if (checkerboardState) {
-        return checkerboardState;
+/**
+ * @param {'listing'|'editor'} [context='listing'] - 'listing' for assets fieldtype and browser grid, 'editor' for asset editor
+ */
+export default function useCheckerboard(context = 'listing') {
+    if (stateByContext[context]) {
+        return stateByContext[context];
     }
 
-    const mode = ref(normalizeMode(preferences.get(PREFERENCE_KEY, DEFAULT_MODE)));
+    const preferenceKey = PREFERENCE_KEYS[context];
+    const mode = ref(normalizeMode(preferences.get(preferenceKey, DEFAULT_MODE)));
 
-    watch(mode, (value) => preferences.set(PREFERENCE_KEY, value === 'transparent' ? null : value));
+    watch(mode, (value) => preferences.set(preferenceKey, value === 'transparent' ? null : value));
 
     const nextMode = computed(() => {
         const i = CHECKERBOARD_MODES.indexOf(mode.value);
@@ -37,12 +45,12 @@ export default function useCheckerboard() {
         mode.value = nextMode.value;
     }
 
-    checkerboardState = {
+    stateByContext[context] = {
         mode,
         enabled,
         icon,
         cycle,
     };
 
-    return checkerboardState;
+    return stateByContext[context];
 }

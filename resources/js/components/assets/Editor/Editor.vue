@@ -300,7 +300,7 @@ export default {
     },
 
     setup() {
-        const checkerboard = useCheckerboard();
+        const checkerboard = useCheckerboard('editor');
         return {
             checkerboardMode: checkerboard.mode,
             checkerboardIcon: checkerboard.icon,
