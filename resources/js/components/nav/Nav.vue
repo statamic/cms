@@ -134,11 +134,14 @@ function handleChildClick(event, item, child) {
     }
 }
 
+function isUrlWithinControlPanel(url) {
+    const cpBase = Statamic.$config.get('cpUrl');
+    return url && (url === cpBase || url.startsWith(cpBase + '/'));
+}
+
 function shouldRenderAsInertiaLink(item) {
     if (item.attributes?.target === '_blank') return false;
-    if (item.url?.startsWith('http://') || item.url?.startsWith('https://')) return false;
-
-    return true;
+    return isUrlWithinControlPanel(item.url);
 }
 
 Statamic.$keys.bind(['command+\\', ['[']], (e) => {
