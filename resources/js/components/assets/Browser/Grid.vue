@@ -104,8 +104,6 @@
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
                                     {
-                                        'is-dark-tone': asset.can_be_transparent && asset.tone === 'dark',
-                                        'is-light-tone': asset.can_be_transparent && asset.tone === 'light',
                                         'opacity-50!': draggingAsset === asset.id,
                                     },
                                     asset.can_be_transparent
