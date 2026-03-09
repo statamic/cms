@@ -440,7 +440,7 @@ function close() {
 
 <template>
     <Stack size="full" :open="open" inset @update:open="$emit('update:open', $event)" @opened="initCropper" :show-close-button="false">
-        <div class="min-h-0 flex h-full flex-col bg-gray-100 dark:bg-dark-800">
+        <div class="min-h-0 flex h-full flex-col bg-gray-100 dark:bg-gray-850">
             <!-- Header -->
             <header class="relative flex w-full items-center justify-between px-4 py-3 border-b dark:border-gray-700">
                 <Heading size="lg">{{ __('Crop Image') }}</Heading>
@@ -448,7 +448,7 @@ function close() {
             </header>
 
             <!-- Content -->
-            <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-800 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
+            <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-850 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
                 <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
