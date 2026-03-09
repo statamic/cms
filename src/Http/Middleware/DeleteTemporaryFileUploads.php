@@ -9,6 +9,10 @@ class DeleteTemporaryFileUploads
 {
     public function handle($request, Closure $next)
     {
+        if (! $request->inertia() && $request->ajax()) {
+            return $next($request);
+        }
+
         $lottery = [2, 100];
 
         if (random_int(1, $lottery[1]) <= $lottery[0]) {

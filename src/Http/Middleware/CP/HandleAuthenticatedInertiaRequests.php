@@ -19,6 +19,10 @@ class HandleAuthenticatedInertiaRequests
 {
     public function handle(Request $request, Closure $next)
     {
+        if (! $request->inertia() && $request->ajax()) {
+            return $next($request);
+        }
+
         Inertia::share($this->share($request));
 
         return $next($request);

@@ -11,6 +11,10 @@ class CountUsers
 {
     public function handle($request, Closure $next, $guard = null)
     {
+        if (! $request->inertia() && $request->ajax()) {
+            return $next($request);
+        }
+
         if (! Statamic::pro() && User::count() > 1) {
             throw new StatamicProRequiredException('Statamic Pro is required for multiple users.');
         }

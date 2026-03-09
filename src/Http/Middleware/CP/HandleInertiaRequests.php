@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Middleware\CP;
 
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Statamic\CP\Toasts\Manager;
@@ -19,6 +20,15 @@ class HandleInertiaRequests extends Middleware
     public function __construct(private Manager $toasts)
     {
         //
+    }
+
+    public function handle(Request $request, Closure $next)
+    {
+        if (! $request->inertia() && $request->ajax()) {
+            return $next($request);
+        }
+
+        return parent::handle($request, $next);
     }
 
     public function share(Request $request): array

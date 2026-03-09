@@ -10,6 +10,10 @@ class RedirectIfTwoFactorSetupIncomplete
 {
     public function handle(Request $request, Closure $next)
     {
+        if (! $request->inertia() && $request->ajax()) {
+            return $next($request);
+        }
+
         if (
             ($user = User::fromUser($request->user()))
             && $user->isTwoFactorAuthenticationRequired()
