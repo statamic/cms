@@ -455,7 +455,7 @@ function close() {
             </div>
 
             <!-- Footer -->
-            <div class="flex items-center justify-between gap-3 border-t dark:border-gray-700 px-4 py-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t dark:border-gray-700 px-4 py-3">
                 <div class="flex gap-3">
                     <Select
                         clearable
