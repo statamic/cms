@@ -438,7 +438,7 @@ export default {
                     title: __('Transparency'),
                     icon: this.checkerboardIcon,
                     run: () => this.cycleCheckerboard(),
-                    visible: this.displayMode === 'grid',
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
                     quick: true,
                 },
                 {
