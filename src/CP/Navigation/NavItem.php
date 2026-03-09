@@ -3,12 +3,12 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
-use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -208,7 +208,22 @@ class NavItem
             $value = Statamic::svg("icons/{$value}");
         }
 
+        $value = $this->sanitizeSvg($value);
+
         return Svg::withClasses($value, 'size-4 shrink-0');
+    }
+
+    private function sanitizeSvg(string $svg): string
+    {
+        try {
+            $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
+
+            return $sanitizer->sanitize($svg, [
+                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            ]);
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     /**

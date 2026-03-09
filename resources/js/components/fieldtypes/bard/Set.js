@@ -78,6 +78,13 @@ export const Set = Node.create({
     addProseMirrorPlugins() {
         const bard = this.options.bard;
         const type = this.type;
+        const sliceHasSetNodes = (slice) => {
+            let found = false;
+            slice.content.forEach((node) => {
+                if (node.type === type) found = true;
+            });
+            return found;
+        };
         return [
             new Plugin({
                 key: new PluginKey('setSelectionDecorator'),
@@ -106,13 +113,13 @@ export const Set = Node.create({
             new Plugin({
                 key: new PluginKey('setPastedTransformer'),
                 props: {
-                    handlePaste: (view, event, slice) => {
-                        let hasSetNodes = false;
-                        slice.content.forEach((node) => {
-                            if (node.type === type) hasSetNodes = true;
-                        });
+                    handleDrop: (view, event, slice, moved) => {
+                        if (moved || !slice) return false;
 
-                        if (!hasSetNodes) return false;
+                        return sliceHasSetNodes(slice);
+                    },
+                    handlePaste: (view, event, slice) => {
+                        if (!sliceHasSetNodes(slice)) return false;
 
                         (async () => {
                             const content = [];

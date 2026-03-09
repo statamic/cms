@@ -163,6 +163,41 @@
     }
 }
 
+.widget-table {
+    @apply w-full max-w-full outline-hidden min-w-full overflow-x-auto text-start;
+
+    thead {
+        th {
+            @apply text-sm font-medium text-start;
+            @apply p-0.75;
+        }
+
+        th[data-column="date"],
+        th[data-column="datestamp"] {
+            @apply text-end;
+        }
+    }
+
+    tbody {
+        @apply text-sm;
+
+        tr {
+            td {
+                @apply p-0.75 text-sm;
+            }
+
+        }
+
+        .type-column {
+            @apply text-end;
+        }
+    }
+
+    .date-index-field {
+        @apply whitespace-nowrap;
+    }
+}
+
 .table-drag-handle {
     @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 dark:opacity-75;
     background-image: url('../../svg/drag-dots.svg');

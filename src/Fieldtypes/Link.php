@@ -17,6 +17,7 @@ use Statamic\Support\Str;
 
 class Link extends Fieldtype
 {
+    use UpdatesReferences;
     protected $categories = ['relationship'];
 
     protected function configFieldItems(): array
@@ -218,5 +219,18 @@ class Link extends Fieldtype
             ->map->handle()
             ->values()
             ->all();
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->config('container') !== $container) {
+            return $data;
+        }
+
+        if ($data !== "asset::{$container}::{$oldValue}") {
+            return $data;
+        }
+
+        return $newValue !== null ? "asset::{$container}::{$newValue}" : null;
     }
 }

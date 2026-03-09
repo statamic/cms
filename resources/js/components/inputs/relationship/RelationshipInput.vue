@@ -105,6 +105,8 @@ import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
 import { Button, Icon, Stack } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
 
 export default {
     props: {
@@ -159,6 +161,8 @@ export default {
             loading: true,
             inline: false,
             sortable: null,
+            abortController: null,
+            removeNavigationListener: null,
         };
     },
 
@@ -240,6 +244,12 @@ export default {
         },
     },
 
+    created() {
+        this.removeNavigationListener = router.on('before', () => {
+            if (this.abortController) this.abortController.abort();
+        });
+    },
+
     mounted() {
         this.initializeData().then(() => {
             this.initializing = false;
@@ -250,6 +260,8 @@ export default {
     },
 
     beforeUnmount() {
+        if (this.abortController) this.abortController.abort();
+        if (this.removeNavigationListener) this.removeNavigationListener();
         if (this.sortable) {
             this.sortable.destroy();
             this.sortable = null;
@@ -308,10 +320,17 @@ export default {
         getDataForSelections(selections) {
             this.loading = true;
 
+            if (this.abortController) this.abortController.abort();
+            this.abortController = new AbortController();
+
             return this.$axios
-                .post(this.itemDataUrl, { site: this.site, selections })
+                .post(this.itemDataUrl, { site: this.site, selections }, { signal: this.abortController.signal })
                 .then((response) => {
                     this.$emit('item-data-updated', response.data.data);
+                })
+                .catch((e) => {
+                    if (axios.isCancel(e)) return;
+                    throw e;
                 })
                 .finally(() => {
                     this.loading = false;

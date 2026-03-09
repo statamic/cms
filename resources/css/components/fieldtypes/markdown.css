@@ -19,7 +19,7 @@
   ========================================================================== */
 
 .markdown-fieldtype .cm-header {
-    @apply text-gray-900 dark:text-dark-150;
+    @apply text-gray-900 dark:text-gray-300;
 
     &.cm-header-1 {
         @apply text-lg;
@@ -35,11 +35,11 @@
 }
 
 .markdown-fieldtype .cm-quote {
-    @apply text-sm italic text-gray-900 dark:text-dark-150;
+    @apply text-sm italic text-gray-900 dark:text-gray-300;
 }
 
 .markdown-fieldtype .cm-variable-2 {
-    @apply text-gray-900 dark:text-dark-150;
+    @apply text-gray-900 dark:text-gray-300;
 }
 
 .markdown-fieldtype .CodeMirror {

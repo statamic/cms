@@ -71,6 +71,10 @@ class AssetUploader extends Uploader
             return null;
         }
 
+        if ($ext === 'pjpg') {
+            $ext = 'jpg';
+        }
+
         return $ext;
     }
 
