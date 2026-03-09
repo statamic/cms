@@ -193,7 +193,7 @@ class DuplicatesTest extends TestCase
         $store3->shouldReceive('discoverStores')->once()->andReturn([$childStore]);
 
         $lock = $this->mock(\Symfony\Component\Lock\LockInterface::class);
-        $lock->shouldReceive('acquire')->with(true)->once()->andReturnSelf();
+        $lock->shouldReceive('acquire')->with(true)->once()->andReturnTrue();
         $lock->shouldReceive('release')->once();
 
         $stache = $this->mock(Stache::class);
