@@ -134,9 +134,10 @@ function handleChildClick(event, item, child) {
     }
 }
 
+const cpBaseUrl = Statamic.$config.get('cpUrl');
+
 function isUrlWithinControlPanel(url) {
-    const cpBase = Statamic.$config.get('cpUrl');
-    return url && (url === cpBase || url.startsWith(cpBase + '/'));
+    return url && (url === cpBaseUrl || url.startsWith(cpBaseUrl + '/'));
 }
 
 function shouldRenderAsInertiaLink(item) {
