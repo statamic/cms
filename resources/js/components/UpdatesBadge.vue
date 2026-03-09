@@ -1,5 +1,5 @@
 <template>
-    <Badge v-if="count" :text="String(count)" color="red" size="sm" pill />
+    <Badge v-if="count" :text="String(count)" color="amber" size="sm" pill />
 </template>
 
 <script>
