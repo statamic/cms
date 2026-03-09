@@ -71,8 +71,9 @@ onBeforeUnmount(() => {
         /* Split buttons apart when wrapped */
         &[data-wrapped] {
             gap: 0.25rem;
+            box-shadow: none;
 
-            & button {
+            button {
                 border-radius: 0.375rem !important;
             }
         }
