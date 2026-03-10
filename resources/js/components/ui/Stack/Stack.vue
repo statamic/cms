@@ -213,6 +213,7 @@ provide('closeStack', close);
                 class="stack-container outline-none"
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
+                @keydown.esc="isTopStack && runCloseCallback()"
             >
                 <div
                     class="stack-hit-area"
