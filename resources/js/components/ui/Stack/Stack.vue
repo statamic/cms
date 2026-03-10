@@ -202,6 +202,11 @@ provide('closeStack', close);
     </Primitive>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
+            <div
+                class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50 transition-opacity duration-200 ease-out"
+                :class="visible ? 'opacity-100' : 'opacity-0'"
+            />
+
             <FocusScope
 	            :trapped="isTopPortal"
 	            loop
@@ -209,14 +214,6 @@ provide('closeStack', close);
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
             >
-                <transition name="stack-overlay-fade">
-                    <div
-                        v-if="visible"
-                        class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50"
-                        :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }"
-                    />
-                </transition>
-
                 <div
                     class="stack-hit-area"
                     :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }"
