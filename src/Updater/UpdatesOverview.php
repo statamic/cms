@@ -122,6 +122,8 @@ class UpdatesOverview
             ->values()
             ->all();
 
+        $this->count += count($this->addons);
+
         return $this;
     }
 
