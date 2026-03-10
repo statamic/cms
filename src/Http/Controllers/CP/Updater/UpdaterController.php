@@ -50,6 +50,6 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        return UpdatesOverview::count();
+        return UpdatesOverview::badge();
     }
 }
