@@ -33,12 +33,14 @@ class UpdaterController extends CpController
             'statamic' => [
                 'currentVersion' => $changelog->currentVersion(),
                 'availableUpdatesCount' => $changelog->availableUpdatesCount(),
+                'critical' => $changelog->hasCriticalUpdate(),
             ],
             'addons' => $addons->filter->existsOnMarketplace()->map(fn ($addon) => [
                 'name' => $addon->name(),
                 'slug' => $addon->slug(),
                 'version' => $addon->version(),
                 'availableUpdatesCount' => $addon->changelog()->availableUpdatesCount(),
+                'critical' => $addon->changelog()->hasCriticalUpdate(),
             ])->values()->all(),
         ]);
     }
