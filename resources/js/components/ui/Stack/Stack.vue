@@ -45,6 +45,7 @@ const stack = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const isHovering = ref(false);
+const isStackEntering = ref(false);
 const escBinding = ref(null);
 const windowInnerWidth = ref(window.innerWidth);
 
@@ -123,6 +124,13 @@ const mouseOutHitArea = () => {
 };
 
 const windowResized = () => windowInnerWidth.value = window.innerWidth;
+const stackEnteringChanged = (entering) => {
+    isStackEntering.value = entering;
+
+    if (entering) {
+        isHovering.value = false;
+    }
+};
 
 function open() {
     if (!stack.value) stack.value = stacks.add(instance.proxy);
@@ -192,10 +200,13 @@ watch(
 );
 
 onMounted(() => {
+    events.$on('stacks.entering', stackEnteringChanged);
+
 	if (props.open) open();
 });
 
 onBeforeUnmount(() => {
+    events.$off('stacks.entering', stackEnteringChanged);
     cleanup();
 });
 
@@ -241,7 +252,7 @@ provide('closeStack', close);
                         class="stack-content fixed flex flex-col sm:end-1.5 bg-content-bg dark:bg-dark-content-bg overflow-hidden rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-200 ease-out will-change-transform"
                         :class="[
                             size === 'full' ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
-                            { '-translate-x-4 rtl:translate-x-4': isHovering }
+                            { '-translate-x-4 rtl:translate-x-4': isHovering && !isStackEntering }
                         ]"
                     >
                         <template v-if="shouldAddHeader">
