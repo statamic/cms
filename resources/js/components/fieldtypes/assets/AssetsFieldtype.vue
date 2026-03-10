@@ -116,6 +116,7 @@
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
+                                :checkerboard-mode="checkerboardMode"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)"
@@ -191,6 +192,7 @@ import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
 import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     components: {
@@ -209,6 +211,15 @@ export default {
     },
 
     mixins: [Fieldtype],
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
 
     inject: {
         isInBardField: {
@@ -423,6 +434,13 @@ export default {
 
         internalFieldActions() {
             return [
+                {
+                    title: __('Transparency'),
+                    icon: this.checkerboardIcon,
+                    run: () => this.cycleCheckerboard(),
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    quick: true,
+                },
                 {
                     title: __('Remove All'),
                     dangerous: true,

@@ -30,6 +30,7 @@ use function Statamic\trans as __;
 
 class Terms extends Relationship
 {
+    use UpdatesReferences;
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -529,5 +530,27 @@ class Terms extends Relationship
         return collect([
             count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
         ])->filter()->implode(' • ');
+    }
+
+    public function replaceTermReferences($data, ?string $newValue, string $oldValue, string $taxonomy)
+    {
+        $configuredTaxonomies = Arr::wrap($this->config('taxonomies'));
+
+        if (count($configuredTaxonomies) > 0) {
+            if (! in_array($taxonomy, $configuredTaxonomies)) {
+                return $data;
+            }
+
+            return is_string($data)
+                ? $this->replaceValue($data, $newValue, $oldValue)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue);
+        }
+
+        $scopedOldValue = "{$taxonomy}::{$oldValue}";
+        $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
+
+        return is_string($data)
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
     }
 }

@@ -128,7 +128,7 @@ function open() {
 
         nextTick(() => {
             visible.value = true;
-            emit('opened');
+            nextTick(() => emit('opened'));
         });
     });
 }
@@ -205,7 +205,7 @@ provide('closeStack', close);
             <FocusScope
 	            :trapped="isTopPortal"
 	            loop
-                class="stack-container"
+                class="stack-container outline-none"
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
             >

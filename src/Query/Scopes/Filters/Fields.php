@@ -2,6 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
@@ -18,7 +19,7 @@ class Fields extends Filter
 
     public static function title()
     {
-        return __('Field');
+        return __('Fields');
     }
 
     public function extra()
@@ -32,6 +33,7 @@ class Fields extends Filter
                     'meta' => $fields->meta(),
                 ];
             })
+            ->sortBy('display')
             ->values()
             ->all();
     }
@@ -67,7 +69,7 @@ class Fields extends Filter
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'entries-fieldtype', 'form-submissions', 'terms', 'users', 'usergroup-users']);
+        return in_array($key, ['entries', 'entries-fieldtype', 'form-submissions', 'terms', 'users', 'usergroup-users', 'assets']);
     }
 
     protected function getFields()
@@ -92,6 +94,12 @@ class Fields extends Filter
         if ($taxonomies = Arr::getFirst($this->context, ['taxonomy', 'taxonomies'])) {
             return collect(Arr::wrap($taxonomies))->flatMap(function ($taxonomy) {
                 return Taxonomy::findByHandle($taxonomy)->termBlueprints();
+            });
+        }
+
+        if ($containers = Arr::getFirst($this->context, ['container', 'containers'])) {
+            return collect(Arr::wrap($containers))->map(function ($container) {
+                return AssetContainer::find($container)->blueprint();
             });
         }
 

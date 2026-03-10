@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
@@ -16,7 +17,7 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
-    use AddsEntryValidationReplacements;
+    use AddsEntryValidationReplacements, UpdatesReferences;
 
     protected $categories = ['structured'];
     protected $keywords = ['builder', 'page builder', 'content'];
@@ -351,5 +352,21 @@ class Replicator extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        collect($data)->each(function ($set, $setKey) use ($updater) {
+            $setHandle = Arr::get($set, 'type');
+            $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $updater->update(new Fields($fields), "{$setKey}.");
+            }
+        });
     }
 }

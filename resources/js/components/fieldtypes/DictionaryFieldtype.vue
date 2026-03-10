@@ -1,5 +1,6 @@
 <template>
     <Combobox
+        label-html
         searchable
         ignore-filter
         :disabled="config.disabled"

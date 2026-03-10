@@ -22,12 +22,14 @@
                     :columns="columns"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
+                    :filters="filters"
                     :action-url="actionUrl"
                     :action-context="actionContext"
                     :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
+                    :additional-parameters="additionalParameters"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
                     @update:selections="$emit('selections-updated', $event)"
@@ -83,6 +85,7 @@
                             <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
                                 <div class="flex flex-1 items-center gap-2 sm:gap-3">
                                     <ListingSearch />
+                                    <ListingFilters @filters-updated="filtersUpdated" />
                                 </div>
                                 <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
@@ -95,23 +98,33 @@
                         />
 
                         <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
-                            <PanelHeader class="flex items-center justify-between px-1!">
+                            <PanelHeader class="flex items-center justify-between gap-2 px-1!">
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
                                     @navigated="selectFolder"
                                 />
-
-                                <Slider
-                                    v-if="mode === 'grid'"
-                                    size="sm"
-                                    class="me-2 w-24!"
-                                    variant="subtle"
-                                    v-model="gridThumbnailSize"
-                                    :min="60"
-                                    :max="300"
-                                    :step="25"
-                                />
+                                <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
+                                    <ui-button
+                                        inset
+                                        size="sm"
+                                        variant="ghost"
+                                        icon-only
+                                        :icon="checkerboardIcon"
+                                        v-tooltip="__('Transparency')"
+                                        :aria-label="__('Transparency')"
+                                        @click="cycleCheckerboard"
+                                    />
+                                    <Slider
+                                        size="sm"
+                                        class="w-24!"
+                                        variant="subtle"
+                                        v-model="gridThumbnailSize"
+                                        :min="60"
+                                        :max="300"
+                                        :step="25"
+                                    />
+                                </div>
                             </PanelHeader>
 
                             <Uploads
@@ -129,7 +142,7 @@
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
-                                :is-searching="!!searchQuery"
+                                :is-searching="isSearching"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -141,6 +154,8 @@
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
+                                :show-checkerboard="showCheckerboard"
+                                :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -192,6 +207,7 @@ import {
     Listing,
     ListingTable,
     ListingPagination,
+    ListingFilters,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
@@ -200,6 +216,7 @@ import {
     ToggleItem,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     mixins: [HasPreferences],
@@ -225,6 +242,7 @@ export default {
         ListingTable,
         ListingPagination,
         ListingSearch,
+        ListingFilters,
         ListingCustomizeColumns,
         Breadcrumbs,
         Slider,
@@ -249,10 +267,21 @@ export default {
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
+        filters: Array,
         initialColumns: {
             type: Array,
             default: () => [],
         },
+    },
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            showCheckerboard: checkerboard.enabled,
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
     },
 
     data() {
@@ -267,6 +296,7 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
+            activeFilters: {},
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
             creatingFolderError: false,
@@ -288,7 +318,7 @@ export default {
 
     computed: {
         requestUrl() {
-            return this.searchQuery
+            return this.isSearching
                 ? cp_url(
                       `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
                   ).replace(/\/$/, '')
@@ -297,6 +327,12 @@ export default {
 
         actionContext() {
             return { container: this.container.id };
+        },
+
+        additionalParameters() {
+            return {
+                queryScopes: this.queryScopes,
+            };
         },
 
         canCreateFolders() {
@@ -323,6 +359,21 @@ export default {
 
         hasSelections() {
             return this.selectedAssets.length > 0;
+        },
+
+        hasActiveFilters() {
+            return Object.entries(this.activeFilters).some(([key, value]) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
+                } else if (typeof value === 'object' && value !== null) {
+                    return Object.keys(value).length > 0;
+                }
+                return Boolean(value);
+            });
+        },
+
+        isSearching() {
+            return this.searchQuery || this.hasActiveFilters;
         },
 
         parameters() {
@@ -432,6 +483,13 @@ export default {
             this.page = 1;
         },
 
+        activeFilters: {
+            deep: true,
+            handler() {
+                this.page = 1;
+            },
+        },
+
         selectedPath: {
             immediate: true,
             handler(newPath) {
@@ -449,6 +507,10 @@ export default {
     },
 
     methods: {
+        filtersUpdated(filters) {
+            this.activeFilters = filters;
+        },
+
         modeChanged(mode) {
             this.mode = mode;
         },
@@ -461,7 +523,7 @@ export default {
         listingRequestCompleted({ response }) {
             this.assets = response.data.data;
 
-            if (this.searchQuery) {
+            if (this.isSearching) {
                 this.folder = null;
                 this.folders = [];
             } else {

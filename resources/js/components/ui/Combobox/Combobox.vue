@@ -18,6 +18,7 @@ import Button from '../Button/Button.vue';
 import Icon from '../Icon/Icon.vue';
 import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
+import DOMPurify from 'dompurify';
 import { SortableList } from '@/components/sortable/Sortable.js';
 
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
@@ -143,7 +144,16 @@ const searchInputRef = useTemplateRef('search');
 watch(searchQuery, (value) => emit('search', value, () => {}));
 watch(dropdownOpen, () => searchQuery.value = '');
 
-const getOptionLabel = (option) => option?.[props.optionLabel];
+const getOptionLabel = (option) => {
+    const label = option?.[props.optionLabel];
+    if (props.labelHtml) {
+        return DOMPurify.sanitize(label ?? '', {
+            USE_PROFILES: { html: true, svg: true },
+        });
+    }
+    return label;
+};
+
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
 const isDisabled = (option) => !isSelected(option) && props.multiple && limitReached.value;

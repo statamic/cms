@@ -56,6 +56,7 @@ class Collection extends Widget
             'collection' => $collection->handle(),
             'icon' => $collection->icon(),
             'title' => $this->config('title', $collection->title()),
+            'showTableHeader' => $this->config('show_table_header', false),
             'additionalColumns' => $columns,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
