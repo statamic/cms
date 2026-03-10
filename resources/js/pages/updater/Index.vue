@@ -2,15 +2,22 @@
 import { Link } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Card, Panel, Table, TableRow, TableCell, Badge, Heading, Button, DocsCallout, CommandPaletteItem } from '@ui';
+import { computed } from 'vue';
 
-defineProps(['requestError', 'statamic', 'addons']);
+const props = defineProps(['requestError', 'statamic', 'addons']);
+
+const criticalUpdateAvailable = computed(() => props.statamic.critical || props.addons.some(addon => addon.critical));
 </script>
 
 <template>
     <Head :title="__('Updates')" />
 
     <div class="max-w-page mx-auto">
-        <Header :title="__('Updates')" icon="updates" />
+        <Header :title="__('Updates')" icon="updates">
+            <template #actions>
+                <Badge v-if="criticalUpdateAvailable" :text="__('Critical update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+            </template>
+        </Header>
 
         <Card v-if="requestError" class="w-full space-y-4 flex items-center justify-between">
             <Heading size="lg" class="mb-0!" :text="__('statamic::messages.outpost_issue_try_later')" icon="warning-diamond" />
