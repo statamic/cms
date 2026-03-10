@@ -46,6 +46,7 @@ trait ChangelogTests
         collect($contents)->each(function ($release) {
             $this->assertEquals('2018-11-06T00:00:00+00:00', $release->date);
             $this->assertIsString($release->body);
+            $this->assertFalse($release->critical);
         });
     }
 
@@ -60,6 +61,25 @@ trait ChangelogTests
         $this->assertEquals('1.0.2', $latest->version);
         $this->assertEquals('upgrade', $latest->type);
         $this->assertTrue($latest->latest);
+        $this->assertFalse($latest->critical);
+    }
+
+    #[Test]
+    public function it_exposes_critical_flag_from_marketplace()
+    {
+        Client::shouldReceive('request')
+            ->andReturn($this->fakeMarketplaceReleasesResponse([
+                ['version' => '2.0.0', 'critical' => true],
+                ['version' => '1.0.3', 'critical' => false],
+                '1.0.2',
+                ['version' => '1.0.1', 'critical' => true],
+                '1.0.0',
+            ]));
+
+        $contents = $this->changelog()->get();
+
+        $this->assertSame([true, false, false, true, false], collect($contents)->map->critical->all());
+        $this->assertTrue($this->changelog()->latest()->critical);
     }
 
     private function fakeCoreChangelogResponse($versions)
@@ -78,11 +98,16 @@ trait ChangelogTests
 
     private function fakeReleasesData($versions)
     {
-        return collect($versions)->map(function ($version) {
+        return collect($versions)->map(function ($release) {
+            if (is_string($release)) {
+                $release = ['version' => $release];
+            }
+
             return [
-                'version' => $version,
+                'version' => $release['version'],
                 'date' => '2018-11-06',
                 'changelog' => '- [new] Stuff.',
+                'critical' => $release['critical'] ?? false,
             ];
         })->all();
     }

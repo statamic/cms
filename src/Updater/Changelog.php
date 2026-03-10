@@ -70,6 +70,7 @@ abstract class Changelog
                 'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->toIso8601String(),
                 'body' => $release['changelog'],
+                'critical' => $release['critical'] ?? false,
             ];
         });
     }
