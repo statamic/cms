@@ -2,8 +2,10 @@
     <div class="max-w-page mx-auto">
         <ui-header :title="name" icon="updates">
             <template v-if="!gettingChangelog" #actions>
-                <ui-badge :prepend="__('Version')" :text="currentVersion" :color="onLatestVersion ? 'green' : 'amber'" size="lg" />
-                <div v-if="onLatestVersion" v-text="__('Up to date')" />
+                {{ currentVersion }}
+                <ui-badge v-if="onLatestVersion" :text="__('Up to date')" color="green" size="lg" icon="checkmark" />
+                <ui-badge v-else-if="criticalUpdateAvailable" :text="__('Critical update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <ui-badge v-else :text="__('Update available')" color="amber" size="lg" icon="alert-warning-exclamation-mark" />
             </template>
         </ui-header>
 
@@ -91,6 +93,12 @@ export default {
 
         onLatestVersion() {
             return this.currentVersion && this.currentVersion == this.latestVersion;
+        },
+
+        criticalUpdateAvailable() {
+            return this.currentVersion && this.changelog
+                .filter((release) => release.type === 'upgrade')
+                .some((release) => release.critical);
         },
 
         licensedReleases() {
