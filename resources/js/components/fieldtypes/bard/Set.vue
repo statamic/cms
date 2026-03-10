@@ -6,6 +6,7 @@
             :class="{
                 'st-set-is-selected': showSelectionHighlight,
                 'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed,
             }"
             :data-type="config.handle"
             contenteditable="false"
@@ -44,7 +45,7 @@
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
                     <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
@@ -126,6 +127,12 @@ export default {
     },
 
     mixins: [ManagesPreviewText, HasFieldActions],
+
+    data() {
+        return {
+            dropdownJustClosed: false,
+        };
+    },
 
     inject: {
         bard: {},
@@ -312,6 +319,15 @@ export default {
                 this.node.attrs,
                 this.getPos,
             );
+        },
+
+        onSetDropdownClosed() {
+            this.dropdownJustClosed = true;
+            if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
+            this._dropdownJustClosedTimeout = setTimeout(() => {
+                this.dropdownJustClosed = false;
+                this._dropdownJustClosedTimeout = null;
+            }, 100);
         },
     },
 
