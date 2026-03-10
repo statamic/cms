@@ -88,6 +88,18 @@ abstract class Changelog
     }
 
     /**
+     * Check if any available upgrade is marked as critical.
+     *
+     * @return bool
+     */
+    public function hasCriticalUpdate()
+    {
+        return $this->get()->contains(function ($release) {
+            return $release->type === 'upgrade' && $release->critical;
+        });
+    }
+
+    /**
      * Get latest release.
      *
      * @return \stdClass
