@@ -35,8 +35,8 @@ export default {
             this.$axios
                 .get(cp_url('updater/count'))
                 .then((response) => {
-                    countRef.value = response.data.count;
-                    criticalRef.value = response.data.critical;
+                    countRef.value = response.data?.count ?? 0;
+                    criticalRef.value = response.data?.critical ?? false;
                 });
 
             requested.value = true;
