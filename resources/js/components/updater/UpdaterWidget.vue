@@ -18,10 +18,12 @@ defineProps({
                             <Link :href="update.url" class="flex items-center gap-2" v-text="update.name" />
                         </td>
                         <td>
-                            <Badge pill :color="update.critical ? 'red' : 'amber'" :text="update.count" />
-                            <div class="inline-flex" v-tooltip="__('Critical')">
-                                <Icon v-if="update.critical" name="warning-diamond" color="red" />
-                            </div>
+                            <Badge
+                                pill
+                                :text="update.count"
+                                :color="update.critical ? 'red' : 'amber'"
+                                v-tooltip="update.critical ? __('Critical update available') : null"
+                            />
                         </td>
                     </tr>
                 </table>
