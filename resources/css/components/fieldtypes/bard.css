@@ -45,8 +45,6 @@
     /* The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field). */
     /* This prevents the outer selection outline from showing while the user is actively working inside the Set. */
     .st-set-is-selected:not(:has(:focus-within)) {
-        @apply border-blue-400! dark:border-blue-400!;
-
         &::before {
             content: '';
             position: absolute;
