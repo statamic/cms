@@ -15,7 +15,7 @@ class LoginFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]

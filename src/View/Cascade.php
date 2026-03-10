@@ -183,8 +183,14 @@ class Cascade
             'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>', // @TODO remove and document new best practice
             'csrf_token' => csrf_token(),
             'csrf_field' => csrf_field(),
-            'config' => static::config(),
             'response_code' => 200,
+
+            /**
+             * Full config is merged in at View level.
+             *
+             * @see \Statamic\View\View
+             */
+            'config' => static::config(),
 
             // Auth
             'logged_in' => $loggedIn = auth()->check(),

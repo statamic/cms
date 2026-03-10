@@ -1,5 +1,37 @@
 # Release Notes
 
+## 5.73.12 (2026-03-04)
+
+### What's fixed
+- Antlers config backwards compatibility [#14146](https://github.com/statamic/cms/issues/14146) by @jasonvarga
+- Config parsing exclusion [#14152](https://github.com/statamic/cms/issues/14152) by @jasonvarga
+- Fix Antlers parser state restoration [#14151](https://github.com/statamic/cms/issues/14151) by @jasonvarga
+- Support Laravel Debugbar 4 [#14142](https://github.com/statamic/cms/issues/14142) by @jasonvarga
+- Remove pdf css [#14141](https://github.com/statamic/cms/issues/14141) by @jasonvarga
+- More Antlers defaults [#14125](https://github.com/statamic/cms/issues/14125) by @jasonvarga
+
+
+
+## 5.73.11 (2026-02-27)
+
+**This release contains a potentially breaking change for the sake of security.**
+
+### What's fixed
+- Antlers hardening (Breaking: See PR for upgrade notes) [#14092](https://github.com/statamic/cms/issues/14092) by @jasonvarga
+- External Glide URL validation [#14101](https://github.com/statamic/cms/issues/14101) by @jasonvarga
+- Harden redirects [#14099](https://github.com/statamic/cms/issues/14099) by @jasonvarga
+- Harden auth redirects [#14089](https://github.com/statamic/cms/issues/14089) by @duncanmcclean
+- Fix user fieldtype search [#14084](https://github.com/statamic/cms/issues/14084) by @duncanmcclean
+- Fix user name and email logic [#14079](https://github.com/statamic/cms/issues/14079) by @jasonvarga
+- Sanitize SVGs [#14077](https://github.com/statamic/cms/issues/14077) by @jasonvarga
+- Fix CSRF token on pages excluded from static caching [#14056](https://github.com/statamic/cms/issues/14056) by @duncanmcclean
+- Improve PDF Viewer [#14045](https://github.com/statamic/cms/issues/14045) by @duncanmcclean
+- Throw UnableToReadFile for invalid images in ImageGenerator [#14043](https://github.com/statamic/cms/issues/14043) by @mmodler
+- Antlers user content and config [#14058](https://github.com/statamic/cms/issues/14058) by @jasonvarga
+- Block methods in Antlers by default [#14059](https://github.com/statamic/cms/issues/14059) by @jasonvarga
+
+
+
 ## 5.73.10 (2026-02-20)
 
 ### What's fixed

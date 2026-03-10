@@ -77,7 +77,7 @@ class GlobalRuntimeState
      *
      * @var bool
      */
-    public static $isEvaluatingUserData = false;
+    public static $isEvaluatingUserData = true;
 
     public static $isEvaluatingData = false;
 
@@ -164,6 +164,13 @@ class GlobalRuntimeState
     public static $bannedContentTagPaths = [];
 
     /**
+     * A list of all allowed content tag paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentTagPaths = [];
+
+    /**
      * A list of all invalid modifier paths.
      *
      * @var string[]
@@ -176,6 +183,13 @@ class GlobalRuntimeState
      * @var string[]
      */
     public static $bannedContentModifierPaths = [];
+
+    /**
+     * A list of all allowed content modifier paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentModifierPaths = [];
 
     /**
      * Controls if PHP is evaluated in user content.
@@ -233,7 +247,7 @@ class GlobalRuntimeState
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         self::$abandonedNodes = [];
-        self::$isEvaluatingUserData = false;
+        self::$isEvaluatingUserData = true;
         self::$isEvaluatingData = false;
         self::$userContentEvalState = null;
 
