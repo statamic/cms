@@ -125,8 +125,8 @@ class UpdatesOverviewTest extends TestCase
     {
         $this->setDefaultVersion();
         $this->mockMarketplaceStatamicChangelog('current');
-        $addon1 = $this->mockAddon('vendor/one', isLatestVersion: false, hasCriticalUpdate: false);
-        $addon2 = $this->mockAddon('vendor/two', isLatestVersion: true, hasCriticalUpdate: true);
+        $addon1 = $this->mockAddon('vendor/one', isLatestVersion: false, hasCriticalUpdate: true);
+        $addon2 = $this->mockAddon('vendor/two', isLatestVersion: true, hasCriticalUpdate: false);
         $addon3 = $this->mockAddon('vendor/three', isLatestVersion: false, hasCriticalUpdate: false);
         Addon::shouldReceive('all')->andReturn(collect([$addon1, $addon2, $addon3]));
 
