@@ -1,5 +1,5 @@
 import { Node } from '@tiptap/core';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Plugin, PluginKey, NodeSelection } from '@tiptap/pm/state';
 import { Slice, Fragment } from '@tiptap/pm/model';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { VueNodeViewRenderer } from '@tiptap/vue-3';
@@ -73,6 +73,35 @@ export const Set = Node.create({
                     }
                 },
         };
+    },
+
+    addKeyboardShortcuts() {
+        const shortcuts = {};
+        const type = this.type;
+
+        const isSetSelected = (state) => {
+            const { selection } = state;
+            return selection instanceof NodeSelection && selection.node.type === type;
+        };
+
+        const blockCharacterKey = () => isSetSelected(this.editor.state);
+
+        // Letters a-z
+        for (let i = 97; i <= 122; i++) {
+            shortcuts[String.fromCharCode(i)] = blockCharacterKey;
+        }
+
+        // Numbers 0-9
+        for (let i = 0; i <= 9; i++) {
+            shortcuts[String(i)] = blockCharacterKey;
+        }
+
+        // Common punctuation/symbols
+        [' ', '-', '=', '[', ']', '\\', ';', "'", ',', '.', '/', '`'].forEach(
+            (key) => (shortcuts[key] = blockCharacterKey),
+        );
+
+        return shortcuts;
     },
 
     addProseMirrorPlugins() {
