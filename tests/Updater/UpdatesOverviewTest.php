@@ -26,6 +26,7 @@ class UpdatesOverviewTest extends TestCase
     {
         Cache::forget('updates-overview.count');
         Cache::forget('updates-overview.statamic');
+        Cache::forget('updates-overview.critical');
         Cache::forget('updates-overview.addons');
     }
 
@@ -38,12 +39,28 @@ class UpdatesOverviewTest extends TestCase
     public function it_shows_statamic_update()
     {
         $this->setDefaultVersion();
-        $this->mockMarketplaceStatamicChangelogLatest('upgrade');
+        $this->mockMarketplaceStatamicChangelog('upgrade');
         Addon::shouldReceive('all')->andReturn(collect());
 
         $overview = new UpdatesOverview;
 
         $this->assertSame(1, $overview->count());
+        $this->assertSame(['count' => 1, 'critical' => false], $overview->badge());
+        $this->assertTrue($overview->hasStatamicUpdate());
+        $this->assertSame([], $overview->updatableAddons());
+    }
+
+    #[Test]
+    public function it_shows_critical_statamic_update()
+    {
+        $this->setDefaultVersion();
+        $this->mockMarketplaceStatamicChangelog('upgrade', hasCriticalUpdate: true);
+        Addon::shouldReceive('all')->andReturn(collect());
+
+        $overview = new UpdatesOverview;
+
+        $this->assertSame(1, $overview->count());
+        $this->assertSame(['count' => 1, 'critical' => true], $overview->badge());
         $this->assertTrue($overview->hasStatamicUpdate());
         $this->assertSame([], $overview->updatableAddons());
     }
@@ -52,7 +69,7 @@ class UpdatesOverviewTest extends TestCase
     public function it_shows_no_statamic_update()
     {
         $this->setDefaultVersion();
-        $this->mockMarketplaceStatamicChangelogLatest('current');
+        $this->mockMarketplaceStatamicChangelog('current');
         Addon::shouldReceive('all')->andReturn(collect());
 
         $overview = new UpdatesOverview;
@@ -67,7 +84,7 @@ class UpdatesOverviewTest extends TestCase
     public function it_does_not_increment_count_or_offer_statamic_update_for_dev_versions(string $version)
     {
         Version::shouldReceive('get')->andReturn($version);
-        $this->mockMarketplaceStatamicChangelogLatest('upgrade');
+        $this->mockMarketplaceStatamicChangelog('upgrade');
         Addon::shouldReceive('all')->andReturn(collect());
 
         $overview = new UpdatesOverview;
@@ -89,15 +106,34 @@ class UpdatesOverviewTest extends TestCase
     public function it_shows_addon_updates()
     {
         $this->setDefaultVersion();
-        $this->mockMarketplaceStatamicChangelogLatest('current');
-        $addon1 = $this->mockAddon('vendor/one', isLatestVersion: false);
-        $addon2 = $this->mockAddon('vendor/two', isLatestVersion: true);
-        $addon3 = $this->mockAddon('vendor/three', isLatestVersion: false);
+        $this->mockMarketplaceStatamicChangelog('current');
+        $addon1 = $this->mockAddon('vendor/one', isLatestVersion: false, hasCriticalUpdate: false);
+        $addon2 = $this->mockAddon('vendor/two', isLatestVersion: true, hasCriticalUpdate: false);
+        $addon3 = $this->mockAddon('vendor/three', isLatestVersion: false, hasCriticalUpdate: false);
         Addon::shouldReceive('all')->andReturn(collect([$addon1, $addon2, $addon3]));
 
         $overview = new UpdatesOverview;
 
         $this->assertSame(2, $overview->count());
+        $this->assertSame(['count' => 2, 'critical' => false], $overview->badge());
+        $this->assertFalse($overview->hasStatamicUpdate());
+        $this->assertSame(['vendor/one', 'vendor/three'], $overview->updatableAddons());
+    }
+
+    #[Test]
+    public function it_shows_critical_addon_updates()
+    {
+        $this->setDefaultVersion();
+        $this->mockMarketplaceStatamicChangelog('current');
+        $addon1 = $this->mockAddon('vendor/one', isLatestVersion: false, hasCriticalUpdate: false);
+        $addon2 = $this->mockAddon('vendor/two', isLatestVersion: true, hasCriticalUpdate: true);
+        $addon3 = $this->mockAddon('vendor/three', isLatestVersion: false, hasCriticalUpdate: false);
+        Addon::shouldReceive('all')->andReturn(collect([$addon1, $addon2, $addon3]));
+
+        $overview = new UpdatesOverview;
+
+        $this->assertSame(2, $overview->count());
+        $this->assertSame(['count' => 2, 'critical' => true], $overview->badge());
         $this->assertFalse($overview->hasStatamicUpdate());
         $this->assertSame(['vendor/one', 'vendor/three'], $overview->updatableAddons());
     }
@@ -107,10 +143,12 @@ class UpdatesOverviewTest extends TestCase
     {
         $cachedCount = 2;
         $cachedStatamic = true;
+        $cachedCritical = true;
         $cachedAddons = ['vendor/one', 'vendor/two'];
 
         Cache::forever('updates-overview.count', $cachedCount);
         Cache::forever('updates-overview.statamic', $cachedStatamic);
+        Cache::forever('updates-overview.critical', $cachedCritical);
         Cache::forever('updates-overview.addons', $cachedAddons);
 
         Marketplace::shouldReceive('statamic')->never();
@@ -120,26 +158,30 @@ class UpdatesOverviewTest extends TestCase
 
         $this->assertSame($cachedCount, $overview->count());
         $this->assertSame($cachedStatamic, $overview->hasStatamicUpdate());
+        $this->assertSame($cachedCritical, $overview->hasCriticalUpdate());
         $this->assertSame($cachedAddons, $overview->updatableAddons());
+        $this->assertSame(['count' => $cachedCount, 'critical' => $cachedCritical], $overview->badge());
     }
 
-    protected function mockMarketplaceStatamicChangelogLatest(string $type): void
+    protected function mockMarketplaceStatamicChangelog(string $latestType, bool $hasCriticalUpdate = false): void
     {
-        $latest = (object) ['type' => $type];
+        $latest = (object) ['type' => $latestType];
         $changelog = \Mockery::mock();
         $changelog->shouldReceive('latest')->andReturn($latest);
+        $changelog->shouldReceive('hasCriticalUpdate')->andReturn($hasCriticalUpdate);
         $statamic = \Mockery::mock();
         $statamic->shouldReceive('changelog')->andReturn($changelog);
         Marketplace::shouldReceive('statamic')->andReturn($statamic);
     }
 
-    protected function mockAddon(string $id, bool $isLatestVersion)
+    protected function mockAddon(string $id, bool $isLatestVersion, bool $hasCriticalUpdate = false)
     {
-        return new class($id, $isLatestVersion)
+        return new class($id, $isLatestVersion, $hasCriticalUpdate)
         {
             public function __construct(
                 private readonly string $addonId,
-                private readonly bool $isLatest
+                private readonly bool $isLatest,
+                private readonly bool $hasCriticalUpdate
             ) {
             }
 
@@ -151,6 +193,14 @@ class UpdatesOverviewTest extends TestCase
             public function isLatestVersion(): bool
             {
                 return $this->isLatest;
+            }
+
+            public function changelog()
+            {
+                $changelog = \Mockery::mock();
+                $changelog->shouldReceive('hasCriticalUpdate')->andReturn($this->hasCriticalUpdate);
+
+                return $changelog;
             }
         };
     }
