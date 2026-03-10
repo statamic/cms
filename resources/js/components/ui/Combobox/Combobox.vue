@@ -229,12 +229,16 @@ const filteredOptions = computed(() => {
         return props.options;
     }
 
-    const results = fuzzysort
-        .go(searchQuery.value, props.options, {
-            all: true,
-            key: props.optionLabel,
-        })
-        .map((result) => result.obj);
+    const matches = new Set(
+        fuzzysort
+            .go(searchQuery.value, props.options, {
+                all: true,
+                key: props.optionLabel,
+            })
+            .map((result) => result.obj)
+    );
+
+    const results = props.options.filter((option) => matches.has(option));
 
     if (props.taggable && searchQuery.value && results.length === 0) {
         results.push({
