@@ -91,6 +91,18 @@ const leftOffset = computed(() => {
 const hasChild = computed(() => stacks.count() > depth.value);
 const direction = computed(() => config.get('direction', 'ltr'));
 
+const containerStyle = computed(() => {
+    if (props.size === 'full') {
+        return direction.value === 'ltr' ? { left: 0, transform: 'translateZ(0)' } : { right: 0, transform: 'translateZ(0)' };
+    }
+    const x = leftOffset.value;
+    const width = `calc(100% - ${x}px)`;
+    if (direction.value === 'ltr') {
+        return { left: 0, width, transform: `translateX(${x}px) translateZ(0)` };
+    }
+    return { right: 0, width, transform: `translateX(-${x}px) translateZ(0)` };
+});
+
 const clickedHitArea = () => {
     if (!visible.value) return;
     if (!runCloseCallback()) return;
@@ -212,7 +224,7 @@ provide('closeStack', close);
 	            loop
                 class="stack-container outline-none"
                 :class="{ 'stack-is-current': isTopStack }"
-                :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
+                :style="containerStyle"
                 @keydown.esc="isTopStack && runCloseCallback()"
             >
                 <div
