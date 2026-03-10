@@ -80,11 +80,6 @@ class DefaultSchema implements ConfigConvertible
             ->all();
     }
 
-    private function getMutations()
-    {
-        return config('statamic.graphql.mutations', []);
-    }
-
     private function getMiddleware()
     {
         return array_merge(
