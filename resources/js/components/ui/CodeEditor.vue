@@ -119,6 +119,11 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     visibilityObserver.value?.disconnect();
+
+    if (codemirror.value) {
+        codemirror.value.getWrapperElement().remove();
+        codemirror.value = null;
+    }
 });
 
 function initCodeMirror() {
