@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -15,6 +16,7 @@ use Statamic\Support\Str;
 class Grid extends Fieldtype
 {
     use AddsEntryValidationReplacements;
+    use UpdatesReferences;
 
     protected $categories = ['structured'];
     protected $defaultable = false;
@@ -276,5 +278,24 @@ class Grid extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        $fields = $this->config('fields');
+
+        if (! $fields) {
+            return;
+        }
+
+        $fields = new Fields($fields);
+
+        foreach (array_keys($data) as $idx) {
+            $updater->update($fields, "{$idx}.");
+        }
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 trait RendersControlPanelExceptions
@@ -35,7 +36,7 @@ trait RendersControlPanelExceptions
 
         // If we came to this URL from another, we'll send them back, but not
         // if it was the login page otherwise there'd be a redirect loop.
-        if ($referrer && $referrer != cp_route('login')) {
+        if ($referrer && $referrer != cp_route('login') && ! URL::isExternalToApplication($referrer)) {
             return $referrer;
         }
 

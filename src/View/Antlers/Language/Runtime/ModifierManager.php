@@ -38,10 +38,34 @@ class ModifierManager
         self::$lastModifierName = $modifierName;
 
         if (GlobalRuntimeState::$isEvaluatingUserData) {
+            $allowList = GlobalRuntimeState::$allowedContentModifierPaths;
             $guardList = GlobalRuntimeState::$bannedContentModifierPaths;
-        } else {
-            $guardList = GlobalRuntimeState::$bannedModifierPaths;
+
+            $isAllowed = Str::is($allowList, $modifierName);
+            $isBlocked = ! empty($guardList) && Str::is($guardList, $modifierName);
+
+            if (! $isAllowed || $isBlocked) {
+                Log::warning('Runtime Access Violation: '.$modifierName, [
+                    'modifier' => $modifierName,
+                    'file' => GlobalRuntimeState::$currentExecutionFile,
+                    'trace' => GlobalRuntimeState::$templateFileStack,
+                ]);
+
+                if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::RUNTIME_PROTECTED_MODIFIER_ACCESS,
+                        null,
+                        'Protected tag access.'
+                    );
+                }
+
+                return false;
+            }
+
+            return true;
         }
+
+        $guardList = GlobalRuntimeState::$bannedModifierPaths;
 
         if (empty($guardList)) {
             return true;

@@ -77,7 +77,7 @@
 }
 
 body {
-    @apply font-sans text-base tracking-normal text-gray-900 dark:text-white;
+    @apply font-sans text-base tracking-normal text-gray-900 dark:text-gray-50;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings:
         'zero',

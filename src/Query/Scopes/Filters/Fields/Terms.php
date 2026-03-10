@@ -70,6 +70,14 @@ class Terms extends FieldtypeFilter
     {
         $values = array_filter($values);
 
-        return Arr::has($values, 'operator') && Arr::has($values, 'term');
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'term');
     }
 }
