@@ -73,7 +73,7 @@ function canDeletePreset(handle) {
 }
 
 function renamePreset() {
-    savingPresetName.value = activePresetPayload.value.display;
+    savingPresetName.value = selectedPresetPayload.value.display;
     isRenaming.value = true;
 }
 
@@ -161,7 +161,7 @@ const currentTab = computed({
 
 const presetPreferencesPayload = computed(() => {
     let payload = {
-        display: savingPresetName.value || activePresetPayload.value.display || '',
+        display: savingPresetName.value || selectedPresetPayload.value?.display || '',
     };
 
     if (searchQuery.value) payload.query = searchQuery.value;
@@ -194,7 +194,7 @@ function saveExisting() {
 
     preference = Object.fromEntries(
         Object.entries(preference).map(([key, value]) => {
-            if (key === activePreset.value) {
+            if (key === selectedPreset.value) {
                 return [savingPresetHandle.value, presetPreferencesPayload.value];
             }
 
@@ -218,7 +218,7 @@ function saveExisting() {
 
 function deletePreset() {
     Statamic.$preferences
-        .remove(`${preferencesKey.value}.${activePreset.value}`)
+        .remove(`${preferencesKey.value}.${selectedPreset.value}`)
         .then((response) => {
             Statamic.$toast.success(__('View deleted'));
             isConfirmingDeletion.value = false;
@@ -328,7 +328,7 @@ function deletePreset() {
         <div
             v-if="
                 Object.keys(presets)
-                    .filter((preset) => preset !== activePreset)
+                    .filter((preset) => preset !== selectedPreset)
                     .includes(savingPresetHandle)
             "
         >
