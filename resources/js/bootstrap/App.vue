@@ -49,6 +49,10 @@ export default {
                 document.body.querySelectorAll(`img[src='${url}']`).forEach((img) => (img.src = url));
             });
         });
+
+        Statamic.$callbacks.add('removeFromSelections', function (ids) {
+            Statamic.$events.$emit('removeFromSelections', ids);
+        });
     },
 
     methods: {

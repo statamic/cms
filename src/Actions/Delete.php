@@ -86,7 +86,10 @@ class Delete extends Action
             }
         }
 
-        return trans_choice('Item deleted|Items deleted', $total);
+        return [
+            'message' => trans_choice('Item deleted|Items deleted', $total),
+            'callback' => ['removeFromSelections', $items->map->id()],
+        ];
     }
 
     public function redirect($items, $values)
