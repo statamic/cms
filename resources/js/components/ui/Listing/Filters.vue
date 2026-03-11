@@ -39,6 +39,18 @@ function removeFieldFilter(filterHandle, fieldHandle) {
     setFilter(filterHandle, fields);
 }
 
+function getFieldFilterBadgeLabel(handle, badge) {
+    if (handle === 'date') {
+        return [badge.field, badge.translatedOperator].filter(Boolean).join(' ');
+    }
+
+    return badge;
+}
+
+function getClearFilterLabel(label) {
+    return `${__('Clear')} ${label}`;
+}
+
 function isActive(handle) {
     return activeFilters.value.hasOwnProperty(handle);
 }
@@ -201,7 +213,7 @@ function handleStackClosed() {
                 iconOnly
                 inset
                 class="opacity-100 [&_svg]:size-4"
-                :aria-label="__('Clear')"
+                :aria-label="getClearFilterLabel(getFieldFilterBadgeLabel(handle, badge))"
                 @click="removeFieldFilter(filter, handle)"
             />
         </div>
@@ -219,7 +231,7 @@ function handleStackClosed() {
                 iconOnly
                 inset
                 class="opacity-100 [&_svg]:size-4"
-                :aria-label="__('Clear')"
+                :aria-label="getClearFilterLabel(badge)"
                 @click="setFilter(handle, null)"
             />
         </div>
