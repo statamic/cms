@@ -70,6 +70,7 @@ abstract class Changelog
                 'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->toIso8601String(),
                 'body' => $release['changelog'],
+                'critical' => $release['critical'] ?? false,
             ];
         });
     }
@@ -84,6 +85,18 @@ abstract class Changelog
         return $this->get()->filter(function ($release) {
             return $release->type === 'upgrade';
         })->count();
+    }
+
+    /**
+     * Check if any available upgrade is marked as critical.
+     *
+     * @return bool
+     */
+    public function hasCriticalUpdate()
+    {
+        return $this->get()->contains(function ($release) {
+            return $release->type === 'upgrade' && $release->critical;
+        });
     }
 
     /**

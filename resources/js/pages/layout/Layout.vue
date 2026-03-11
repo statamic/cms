@@ -108,7 +108,7 @@ onUnmounted(() => {
             @confirm="$root.copyToClipboardModalUrl = null"
         >
             <div class="prose">
-                <ui-input :model-value="$root.copyToClipboardModalUrl" readonly copyable class="font-mono text-sm dark" />
+                <ui-input :model-value="$root.copyToClipboardModalUrl" readonly copyable class="font-mono text-sm" />
             </div>
         </confirmation-modal>
 
