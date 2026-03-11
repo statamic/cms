@@ -64,12 +64,12 @@ function createPreset() {
     isCreating.value = true;
 }
 
-function canRenamePreset(handle) {
+function canSavePreset(handle) {
     return !Statamic.$preferences.hasDefault(`${preferencesKey.value}.${handle}`);
 }
 
 function canDeletePreset(handle) {
-    return canRenamePreset(handle);
+    return canSavePreset(handle);
 }
 
 function renamePreset() {
@@ -103,10 +103,6 @@ const isDirty = computed(() => {
 
     return false;
 });
-
-function canSavePreset(handle) {
-    return !Statamic.$preferences.hasDefault(`${preferencesKey.value}.${handle}`);
-}
 
 function savePreset() {
     const payload = { display: selectedPresetPayload.value.display };
@@ -251,7 +247,7 @@ function deletePreset() {
                             <DropdownMenu>
                                 <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
                                 <DropdownItem
-                                    v-if="canRenamePreset(handle)"
+                                    v-if="canSavePreset(handle)"
                                     :text="__('Rename')"
                                     icon="rename"
                                     @click="renamePreset"
