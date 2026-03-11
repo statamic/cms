@@ -33,64 +33,13 @@ const fieldFilterBadges = computed(() => Object.entries(activeFilterBadges.value
     .flatMap(([filter, badges]) => Object.entries(badges).map(([handle, badge]) => ({ filter, handle, badge })))
 );
 
-const filterPanels = computed(() => [
-    ...fieldFilters.value.map((filter) => ({
-        handle: filter.handle,
-        title: filter.title,
-        component: FieldFilter,
-        componentProps: {
-            config: filter,
-            values: activeFilters.value[filter.handle] || {},
-        },
-    })),
-    ...standardFilters.value.map((filter) => ({
-        handle: filter.handle,
-        title: filter.title,
-        component: DataListFilter,
-        componentProps: {
-            filter,
-            values: activeFilters.value[filter.handle],
-        },
-    })),
-]);
-
-const badgeChipClasses = 'group last:me-12 inline-flex h-10 items-center gap-1 rounded-lg bg-gray-950/5 ps-4 pe-2 text-sm font-medium text-gray-900 dark:bg-white/4 dark:text-gray-200';
+const badgeChipClasses = 'relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-gray-950/5 px-4 pe-2 text-sm font-medium text-gray-900 last:me-12 gap-1 dark:bg-white/4 dark:text-gray-200 [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white';
 const badgeChipClearButtonClasses = 'opacity-100 [&_svg]:size-4';
-
-const badgeChips = computed(() => [
-    ...fieldFilterBadges.value.map(({ filter, handle, badge }) => ({
-        key: `${filter}-${handle}`,
-        filter,
-        handle,
-        badge,
-        isFieldBadge: true,
-    })),
-    ...Object.entries(standardBadges.value).map(([handle, badge]) => ({
-        key: handle,
-        handle,
-        badge,
-        isFieldBadge: false,
-    })),
-]);
 
 function removeFieldFilter(filterHandle, fieldHandle) {
     const fields = { ...activeFilters.value[filterHandle] };
     delete fields[fieldHandle];
     setFilter(filterHandle, fields);
-}
-
-function clearBadgeChip(chip) {
-    if (chip.isFieldBadge) {
-        removeFieldFilter(chip.filter, chip.handle);
-
-        return;
-    }
-
-    setFilter(chip.handle, null);
-}
-
-function isDateBadge(chip) {
-    return chip.isFieldBadge && chip.handle === 'date';
 }
 
 function isActive(handle) {
@@ -188,18 +137,34 @@ function handleStackClosed() {
             <div ref="stackContentRef" class="">
                 <div class="space-y-4">
                     <Panel
-                        v-for="panel in filterPanels"
-                        :key="panel.handle"
+                        v-for="filter in fieldFilters"
+                        :key="filter.handle"
                     >
                         <PanelHeader class="flex items-center justify-between">
-                            <Heading :text="panel.title" />
-                            <Button v-if="isActive(panel.handle)" size="sm" :text="__('Clear')" @click="setFilter(panel.handle, null)" />
+                            <Heading :text="filter.title" />
+                            <Button v-if="isActive(filter.handle)" size="sm" :text="__('Clear')" @click="setFilter(filter.handle, null)" />
                         </PanelHeader>
                         <Card>
-                            <component
-                                :is="panel.component"
-                                v-bind="panel.componentProps"
-                                @changed="setFilter(panel.handle, $event)"
+                            <FieldFilter
+                                :config="filter"
+                                :values="activeFilters[filter.handle] || {}"
+                                @changed="setFilter(filter.handle, $event)"
+                            />
+                        </Card>
+                    </Panel>
+                    <Panel
+                        v-for="filter in standardFilters"
+                        :key="filter.handle"
+                    >
+                        <PanelHeader class="flex items-center justify-between">
+                            <Heading :text="filter.title" />
+                            <Button v-if="isActive(filter.handle)" size="sm" :text="__('Clear')" @click="setFilter(filter.handle, null)" />
+                        </PanelHeader>
+                        <Card>
+                            <data-list-filter
+                                :filter="filter"
+                                :values="activeFilters[filter.handle]"
+                                @changed="setFilter(filter.handle, $event)"
                             />
                         </Card>
                     </Panel>
@@ -209,24 +174,24 @@ function handleStackClosed() {
         </Stack>
 
         <div
-            v-for="chip in badgeChips"
-            :key="chip.key"
+            v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
+            :key="`${filter}-${handle}`"
             :class="badgeChipClasses"
         >
             <div class="flex items-center gap-1.5 whitespace-nowrap">
-                <template v-if="isDateBadge(chip)">
-                    {{ chip.badge.field }}
-                    {{ chip.badge.translatedOperator }}
-                    <template v-if="chip.badge.operator === 'between'">
-                        <date-time :of="chip.badge.value.start" options="date" />
+                <template v-if="handle == 'date'">
+                    {{ badge.field }}
+                    {{ badge.translatedOperator }}
+                    <template v-if="badge.operator === 'between'">
+                        <date-time :of="badge.value.start" options="date" />
                         {{ __('and') }}
-                        <date-time :of="chip.badge.value.end" options="date" />
+                        <date-time :of="badge.value.end" options="date" />
                     </template>
-                    <date-time v-else :of="chip.badge.value" options="date" />
+                    <date-time v-else :of="badge.value" options="date" />
                 </template>
 
                 <template v-else>
-                    {{ chip.badge }}
+                    {{ badge }}
                 </template>
             </div>
 
@@ -239,7 +204,25 @@ function handleStackClosed() {
                 inset
                 :class="badgeChipClearButtonClasses"
                 :aria-label="__('Clear')"
-                @click="clearBadgeChip(chip)"
+                @click="removeFieldFilter(filter, handle)"
+            />
+        </div>
+        <div
+            v-for="(badge, handle, index) in standardBadges"
+            :key="handle"
+            :class="badgeChipClasses"
+        >
+            <span class="whitespace-nowrap">{{ badge }}</span>
+            <Button
+                v-if="!reorderable"
+                variant="ghost"
+                size="xs"
+                icon="x"
+                iconOnly
+                inset
+                :class="badgeChipClearButtonClasses"
+                :aria-label="__('Clear')"
+                @click="setFilter(handle, null)"
             />
         </div>
     </div>
