@@ -257,7 +257,7 @@ class AssetContainersController extends CpController
 
         $params = collect($params)
             ->map(function ($value, $param) {
-                return sprintf('<code class="hidden-outside">%s: %s</code>', $param, $value);
+                return sprintf('<code class="hidden-outside">%s:&hairsp;%s</code>', $param, $value);
             })
             ->implode(' ');
 
