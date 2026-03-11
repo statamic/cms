@@ -149,6 +149,7 @@ function handleStackClosed() {
                             />
                         </Card>
                     </Panel>
+
                     <Panel
                         v-for="filter in standardFilters"
                         :key="filter.handle"
