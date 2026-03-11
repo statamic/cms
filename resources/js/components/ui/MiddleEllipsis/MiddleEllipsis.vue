@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import truncateOnResize from './TruncateText.js';
 
 const props = defineProps({
+    /** The text to display. Will be truncated from the middle when it overflows its container. */
     text: { type: String, required: true },
 });
 
