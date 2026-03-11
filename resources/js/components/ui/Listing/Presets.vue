@@ -12,7 +12,7 @@ import {
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import clone from '@/util/clone.js';
+import { deepClone } from '@/util/clone.js';
 
 const { preferencesPrefix, activeFilters, searchQuery, setFilters, clearFilters, setSearchQuery, clearSearchQuery } =
     injectListingContext();
@@ -55,7 +55,7 @@ function viewAll() {
 function selectPreset(handle) {
     activePreset.value = handle;
     selectedPreset.value = handle;
-    setFilters(clone(activePresetPayload.value.filters ?? {}));
+    setFilters(deepClone(activePresetPayload.value.filters ?? {}));
     setSearchQuery(activePresetPayload.value.query);
 }
 
@@ -112,7 +112,7 @@ function savePreset() {
     const payload = { display: selectedPresetPayload.value.display };
 
     if (searchQuery.value) payload.query = searchQuery.value;
-    if (Object.entries(activeFilters.value).length) payload.filters = activeFilters.value;
+    if (Object.entries(activeFilters.value).length) payload.filters = deepClone(activeFilters.value);
 
     Statamic.$preferences
         .set(`${preferencesKey.value}.${selectedPreset.value}`, payload)
@@ -126,7 +126,7 @@ function savePreset() {
 }
 
 function resetPreset() {
-    setFilters(clone(selectedPresetPayload.value.filters ?? {}));
+    setFilters(deepClone(selectedPresetPayload.value.filters ?? {}));
     setSearchQuery(selectedPresetPayload.value.query ?? '');
 }
 
