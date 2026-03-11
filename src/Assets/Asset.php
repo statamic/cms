@@ -618,7 +618,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
-        $isNew = is_null($this->container()->asset($this->path()));
+        $pathHasChanged = $this->getOriginal('path') !== $this->path();
+        $isNew = $pathHasChanged ? false : is_null($this->container()->asset($this->path()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;

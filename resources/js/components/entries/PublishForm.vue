@@ -86,6 +86,7 @@
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             :remember-tab="!isInline"
+            :provide="{ isWorkingCopy, revisionsEnabled }"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -123,7 +124,7 @@
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
-                                    :read-only="!canManagePublishState"
+                                    :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
                                 />
                             </Panel>
@@ -144,15 +145,19 @@
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('Entry has a published version') }}
                                     </Subheading>
-                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Entry has not been published') }}
+                                    </Subheading>
+                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('This is the working copy') }}
                                     </Subheading>
                                     <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('This is the published version') }}
                                     </Subheading>
-                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Unsaved Changes') }}
                                     </Subheading>
@@ -190,21 +195,20 @@
             </LivePreview>
         </PublishContainer>
 
-        <ui-stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
+        <Stack
+	        ref="revisionHistoryStack"
+	        size="narrow"
+	        :title="__('Revision History')"
+	        v-model:open="showRevisionHistory"
         >
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
-                @closed="close"
+                @closed="$refs.revisionHistoryStack.close()"
             />
-        </ui-stack>
+        </Stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -221,7 +225,7 @@
         />
 
         <confirmation-modal
-            v-if="selectingOrigin"
+            :open="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             @cancel="cancelLocalization()"
@@ -235,7 +239,7 @@
         </confirmation-modal>
 
         <confirmation-modal
-            v-if="pendingLocalization"
+            :open="pendingLocalization"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
             :button-text="__('Continue')"
@@ -277,6 +281,7 @@ import {
     PublishComponents,
     PublishLocalizations as LocalizationsCard,
     LivePreview,
+	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
@@ -312,6 +317,7 @@ export default {
         Subheading,
         Switch,
         Select,
+	    Stack,
     },
 
     props: {
@@ -502,7 +508,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -586,8 +592,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
@@ -677,6 +683,7 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
@@ -754,8 +761,8 @@ export default {
                 this.redirectTo(this.createAnotherUrl);
             }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (!this.isInline && nextAction === null) {
+            // If the user has opted to go to listing, redirect them there.
+            else if (!this.isInline && nextAction === 'listing') {
                 this.redirectTo(this.listingUrl);
             }
 
@@ -820,13 +827,15 @@ export default {
                 prioritize: true,
             });
 
-            Statamic.$commandPalette.add({
-                category: Statamic.$commandPalette.category.Actions,
-                text: __('Edit Blueprint'),
-                icon: 'blueprint-edit',
-                when: () => this.canEditBlueprint,
-                url: this.actions.editBlueprint,
-            });
+			if (this.actions.editBlueprint) {
+				Statamic.$commandPalette.add({
+					category: Statamic.$commandPalette.category.Actions,
+					text: __('Edit Blueprint'),
+					icon: 'blueprint-edit',
+					when: () => this.canEditBlueprint,
+					url: this.actions.editBlueprint,
+				});
+			}
 
             this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
                 category: Statamic.$commandPalette.category.Actions,

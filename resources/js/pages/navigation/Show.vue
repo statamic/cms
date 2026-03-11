@@ -1,7 +1,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Head from '@/pages/layout/Head.vue';
 import PageEditor from '@/components/structures/PageEditor.vue';
 import PageSelector from '@/components/structures/PageSelector.vue';
@@ -50,6 +50,8 @@ export default {
         canEdit: { type: Boolean, required: true },
         canSelectAcrossSites: { type: Boolean, required: true },
         canEditBlueprint: { type: Boolean, required: true },
+        entryQueryScopes: { type: Array, default: () => [] },
+	    collectionTree: { type: Object, required: false },
     },
 
     data() {
@@ -356,7 +358,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Head :title="title" />
 
         <Header v-if="mounted" :title="title" icon="navigation">
@@ -536,8 +538,10 @@ export default {
             ref="selector"
             :site="site"
             :collections="collections"
+            :query-scopes="entryQueryScopes"
             :max-items="maxPagesSelection"
             :can-select-across-sites="canSelectAcrossSites"
+            :tree="collectionTree"
             @selected="entriesSelected"
         />
 

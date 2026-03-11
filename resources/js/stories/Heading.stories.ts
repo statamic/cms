@@ -65,7 +65,7 @@ export const _Sizes: Story = {
 };
 
 const levelCode = `
-<Heading level="3" size="xl">Create collection</Heading>
+<Heading :level="3" size="xl">Create collection</Heading>
 `;
 
 export const _HeadingLevel: Story = {

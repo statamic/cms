@@ -52,7 +52,7 @@ function complete() {
 </script>
 
 <template>
-    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" :open="true" @update:model-value="$emit('cancel')">
+    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" blur open @update:model-value="$emit('cancel')">
         <div>
             <div v-if="loading" class="flex items-center justify-center text-center">
                 <Icon name="loading" />
@@ -66,7 +66,7 @@ function complete() {
                         <div class="bg-white" v-html="qrCode"></div>
                         <div class="space-y-6 w-full">
                             <ui-field :label="__('Setup Key')">
-                                <ui-input copyable readonly :value="secretKey" />
+                                <ui-input copyable readonly :model-value="secretKey" />
                             </ui-field>
 
                             <ui-field :label="__('Verification Code')" :error="error">

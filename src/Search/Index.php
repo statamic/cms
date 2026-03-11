@@ -91,7 +91,7 @@ abstract class Index
         $documents
             ->chunk(config('statamic.search.chunk_size'))
             ->each(fn ($documents) => InsertMultipleJob::dispatch(
-                name: Str::beforeLast($this->name, '_'),
+                name: $this->locale ? Str::before($this->name, "_{$this->locale}") : $this->name,
                 locale: $this->locale,
                 documents: $documents
             ));

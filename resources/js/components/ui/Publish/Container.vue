@@ -5,8 +5,8 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 </script>
 
 <script setup>
-import uniqid from 'uniqid';
-import { watch, ref, computed, toRef } from 'vue';
+import { nanoid as uniqid } from 'nanoid';
+import { watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
@@ -87,6 +87,11 @@ const props = defineProps({
     rememberTab: {
         type: Boolean,
         default: false,
+    },
+    /** Extra values to be provided through the context. */
+    provide: {
+        type: Object,
+        default: () => ({})
     },
 });
 
@@ -174,12 +179,23 @@ watch(
     { deep: true },
 );
 
+const avoidTrackingDirtyState = ref(false);
+const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
+const isDirty = computed(() => Statamic.$dirty.has(props.name));
+
 function dirty() {
-    if (props.trackDirtyState) Statamic.$dirty.add(props.name);
+    if (trackingDirtyState.value) Statamic.$dirty.add(props.name);
 }
 
 function clearDirtyState() {
     if (props.trackDirtyState) Statamic.$dirty.remove(props.name);
+}
+
+function withoutDirtying(callback) {
+    const previous = avoidTrackingDirtyState.value;
+    avoidTrackingDirtyState.value = true;
+    callback();
+    nextTick(() => avoidTrackingDirtyState.value = previous);
 }
 
 function setValues(newValues) {
@@ -226,7 +242,11 @@ function pushComponent(name, { props }) {
     return component;
 }
 
-const provided = {
+const additionalProvides = Object.fromEntries(
+    Object.entries(props.provide).map(([key]) => [key, toRef(() => props.provide[key])])
+);
+
+const builtInProvides = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -258,7 +278,19 @@ const provided = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    isDirty,
+    withoutDirtying,
 };
+
+if (import.meta.env.DEV) {
+    for (const key of Object.keys(additionalProvides)) {
+        if (key in builtInProvides) {
+            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key, which takes precedence.`);
+        }
+    }
+}
+
+const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
 

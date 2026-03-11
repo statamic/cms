@@ -32,7 +32,7 @@
 
 
         <confirmation-modal
-            v-if="showNewFilenameModal"
+            :open="showNewFilenameModal"
             :title="__('New Filename')"
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"

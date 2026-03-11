@@ -274,8 +274,12 @@ class FileCacher extends AbstractCacher
             window.livewire_token = data.csrf
         }
 
-        if (window.hasOwnProperty('livewireScriptConfig')) {
-            window.livewireScriptConfig.csrf = data.csrf
+        if (window.livewireScriptConfig) {
+            // Replaces token if Livewire is already available. Usually on fast networks.
+            window.livewireScriptConfig.csrf = data.csrf;
+        } else {
+            // Delays replacing the token until Livewire is initialized. Usually on slow networks.
+            document.addEventListener('livewire:init', () => window.livewireScriptConfig.csrf = data.csrf);
         }
 
         document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));

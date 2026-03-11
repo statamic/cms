@@ -102,12 +102,12 @@ defineExpose({
             />
         </div>
 
-        <div class="grid grid-cols-2 @lg/themes:grid-cols-3 @2xl/themes:grid-cols-4 gap-4">
+        <div class="grid items-start grid-cols-2 @lg/themes:grid-cols-3 @2xl/themes:grid-cols-4 gap-4">
             <button
                 v-for="theme in results"
                 :key="theme.id"
                 class="p-1 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900"
-                :class="{ 'bg-blue-400! dark:bg-blue-500!': isActive(theme) }"
+                :class="{ 'bg-blue-600!': isActive(theme) }"
                 @click="selectTheme(theme)"
             >
                 <Preview :theme="theme" />

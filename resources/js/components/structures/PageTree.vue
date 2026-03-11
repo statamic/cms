@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
@@ -29,10 +29,9 @@
                     :node-key="(stat) => stat.data.id"
                     :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
-                    :root-droppable="rootDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
-                    @after-drop="treeUpdated"
+                    @after-drop="afterDrop"
                     @open:node="nodeOpened"
                     @close:node="nodeClosed"
                 >
@@ -77,7 +76,7 @@
         </ui-panel>
 
         <confirmation-modal
-            v-if="discardingChanges"
+            :open="discardingChanges"
             :title="__('Discard Changes')"
             :body-text="__('Are you sure?')"
             :button-text="__('Discard Changes')"
@@ -127,6 +126,7 @@ export default {
             treeData: [],
             collapsedState: [],
             discardingChanges: false,
+            ready: false,
         };
     },
 
@@ -172,6 +172,10 @@ export default {
         });
     },
 
+    mounted() {
+        setTimeout(() => this.ready = true, 500); // arbitrary delay after initial transitions
+    },
+
     methods: {
         isRoot(stat) {
             if (!this.expectsRoot) {
@@ -196,6 +200,19 @@ export default {
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
             this.$emit('changed', this.pages);
+        },
+
+        afterDrop() {
+            const root = this.$refs.tree.getData()[0];
+
+            // Prevent items with children being moved to the root position
+            if (this.expectsRoot && root.id !== this.pages[0].id && root.children?.length > 0) {
+                const { dragNode, parent, indexBeforeDrop } = dragContext.startInfo;
+                this.$refs.tree.move(dragNode, parent, indexBeforeDrop);
+                return;
+            }
+
+            this.treeUpdated();
         },
 
         cleanPagesForSubmission(pages) {
@@ -298,14 +315,6 @@ export default {
             this.updateTreeData();
             this.$emit('canceled');
             this.discardingChanges = false;
-        },
-
-        rootDroppable() {
-            if (!this.expectsRoot) {
-                return true;
-            }
-
-            return true;
         },
 
         eachDroppable(targetStat) {

@@ -7,7 +7,7 @@ defineProps({
 	action: String,
 	showTitle: Boolean,
 	useTabs: { type: Boolean, default: true },
-	canDefineLocalizable: Boolean,
+	canDefineLocalizable: { type: Boolean, default: undefined },
 	resetRoute: String,
 	isResettable: Boolean,
 	isFormBlueprint: Boolean,
@@ -17,7 +17,7 @@ defineProps({
 <template>
     <Head :title="__('Edit Blueprint')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl 3xl:max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <blueprint-builder
             :show-title="showTitle"
             :action="action"

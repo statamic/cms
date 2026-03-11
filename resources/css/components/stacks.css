@@ -23,10 +23,10 @@
     }
     .stack-container {
         @apply absolute inset-0;
-        transition: left 0.3s ease;
+        transition: left 200ms ease-out;
 
         [dir='rtl'] & {
-            transition: right 0.3s ease;
+            transition: right 200ms ease-out;
         }
     }
 
@@ -44,7 +44,8 @@
 
     .stack-overlay-fade-enter-active,
     .stack-overlay-fade-leave-active {
-        transition: opacity 250ms ease;
+        transition: opacity 200ms ease-out;
+        will-change: opacity;
     }
 
     .stack-overlay-fade-enter-from,
@@ -54,7 +55,8 @@
 
     .stack-slide-enter-active,
     .stack-slide-leave-active {
-        transition: transform 250ms ease, opacity 250ms ease;
+        transition: transform 200ms ease-out, opacity 200ms ease-out;
+        will-change: transform, opacity;
     }
 
     .stack-slide-enter-from {

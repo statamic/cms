@@ -1,5 +1,5 @@
 import { translate, translateChoice } from '../translations/translator';
-import uid from 'uniqid';
+import { nanoid as uid } from 'nanoid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
 import renderMarkdown from '@/util/markdown.js';
 

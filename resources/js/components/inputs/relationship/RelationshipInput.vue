@@ -68,12 +68,12 @@
                         icon="link"
                         :size="buttonSize"
                         :text="linkLabel"
-                        @click.prevent="isSelecting = true"
+                        @click.prevent="openSelector"
                     />
                 </div>
             </div>
 
-            <ui-stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
+            <Stack v-model:open="isSelecting" inset :show-close-button="false">
                 <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
@@ -89,9 +89,9 @@
                     :type="config.type"
                     :tree="config.query_scopes?.length > 0 ? null : tree"
                     @selected="selectionsUpdated"
-                    @closed="close"
+                    @closed="isSelecting = false"
                 />
-            </ui-stack>
+            </Stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </template>
@@ -104,7 +104,9 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
-import { Button, Icon } from '@/components/ui';
+import { Button, Icon, Stack } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
 
 export default {
     props: {
@@ -147,6 +149,7 @@ export default {
         RelationshipSelectField,
         Button,
         Icon,
+	    Stack,
     },
 
     data() {
@@ -158,6 +161,8 @@ export default {
             loading: true,
             inline: false,
             sortable: null,
+            abortController: null,
+            removeNavigationListener: null,
         };
     },
 
@@ -239,6 +244,12 @@ export default {
         },
     },
 
+    created() {
+        this.removeNavigationListener = router.on('before', () => {
+            if (this.abortController) this.abortController.abort();
+        });
+    },
+
     mounted() {
         this.initializeData().then(() => {
             this.initializing = false;
@@ -249,6 +260,8 @@ export default {
     },
 
     beforeUnmount() {
+        if (this.abortController) this.abortController.abort();
+        if (this.removeNavigationListener) this.removeNavigationListener();
         if (this.sortable) {
             this.sortable.destroy();
             this.sortable = null;
@@ -273,6 +286,14 @@ export default {
             if (this.initializing) return;
             this.$emit('item-data-updated', data);
         },
+
+        items(items, oldItems) {
+            if (items.length > 0 && oldItems.length === 0) {
+                if (this.canReorder) {
+                    this.$nextTick(() => this.makeSortable());
+                }
+            }
+        },
     },
 
     methods: {
@@ -285,6 +306,10 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
+	    openSelector() {
+			this.isSelecting = true;
+	    },
+
         selectionsUpdated(selections) {
             this.getDataForSelections(selections).then(() => {
                 this.update(selections);
@@ -292,7 +317,7 @@ export default {
         },
 
         initializeData() {
-            if (!this.data || !this.data.length) {
+            if (!this.data) {
                 return this.getDataForSelections(this.value);
             }
 
@@ -303,10 +328,17 @@ export default {
         getDataForSelections(selections) {
             this.loading = true;
 
+            if (this.abortController) this.abortController.abort();
+            this.abortController = new AbortController();
+
             return this.$axios
-                .post(this.itemDataUrl, { site: this.site, selections })
+                .post(this.itemDataUrl, { site: this.site, selections }, { signal: this.abortController.signal })
                 .then((response) => {
                     this.$emit('item-data-updated', response.data.data);
+                })
+                .catch((e) => {
+                    if (axios.isCancel(e)) return;
+                    throw e;
                 })
                 .finally(() => {
                     this.loading = false;

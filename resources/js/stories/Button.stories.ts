@@ -135,10 +135,10 @@ export const Icons: Story = {
         docs: {
             source: {
                 code: `
-                    <Button size="lg" text="Large" />
-                    <Button size="base" text="Base" />
-                    <Button size="sm" text="Small" />
-                    <Button size="xs" text="Extra Small" />
+                    <Button icon="arrow-left" text="Prepend" />
+                    <Button icon-append="arrow-right" text="Append" />
+                    <Button icon="arrow-left" icon-append="arrow-right" text="Both" />
+                    <Button icon="cog" icon-only />
                 `,
             },
         },

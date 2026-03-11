@@ -8,6 +8,7 @@ export default {
         path: String,
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
+        creatingFolderError: Boolean,
     },
 
     data() {
@@ -26,11 +27,27 @@ export default {
         draggingFolder() {
             this.$emit('prevent-dragging', this.draggingFolder !== null);
         },
+
+        newFolderName() {
+            if (this.creatingFolderError) this.$emit('update:creatingFolderError', null);
+        }
     },
 
     methods: {
-        actionCompleted() {
+        actionCompleted(successful = null, response = {}) {
+            successful ? this.actionSuccess(response) : this.actionFailed(response);
+
             this.$emit('action-completed');
+        },
+
+        actionSuccess(response) {
+            if (response.message !== false) {
+                Statamic.$toast.success(response.message || __('Action completed'));
+            }
+        },
+
+        actionFailed(response) {
+            Statamic.$toast.error(response.message || __('Action failed'));
         },
 
         actionStarted() {

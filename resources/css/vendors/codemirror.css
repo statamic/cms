@@ -23,7 +23,7 @@
 /* CODEMIRROR / GUTTERS
 =================================================== */
 .CodeMirror-gutters {
-    @apply border-r bg-gray-200;
+    @apply border-r bg-gray-50;
     height: 100% !important;
     white-space: nowrap;
 }
@@ -31,8 +31,10 @@
 .CodeMirror-linenumber {
     padding: 0 3px 0 5px;
     min-width: 20px;
+    /* Can't pull over any more really otherwise it looks rubbish when you get into the 100s lines */
+    margin-inline-start: -0.5px;
     @apply text-right;
-    color: #999;
+    color: var(--color-gray-500);
     white-space: nowrap;
 }
 
@@ -99,7 +101,7 @@
     /* Explicitly set some colors rather than inherit from the body, because we could have a dark cp > light code field, which would result in pale text on a white background, etc. */
     &.CodeMirror pre.CodeMirror-line,
     &.CodeMirror pre.CodeMirror-line-like {
-        @apply text-gray-900;
+        @apply text-gray-900 dark:text-gray-300;
     }
 
     .CodeMirror-gutters {
@@ -316,7 +318,6 @@ div.CodeMirror span {
     left: 0;
     top: 0;
     min-height: 100%;
-    z-index: 3;
 }
 
 .CodeMirror-gutter {
@@ -329,7 +330,7 @@ div.CodeMirror span {
 
 .CodeMirror-gutter-wrapper {
     position: absolute;
-    z-index: 4;
+    z-index: var(--z-index-above);
     background: none !important;
     border: none !important;
 }
@@ -344,7 +345,6 @@ div.CodeMirror span {
 .CodeMirror-gutter-elt {
     position: absolute;
     cursor: default;
-    z-index: 4;
 }
 
 .CodeMirror-gutter-wrapper ::selection {
@@ -375,7 +375,6 @@ div.CodeMirror span {
     word-wrap: normal;
     line-height: inherit;
     color: inherit;
-    z-index: 2;
     position: relative;
     overflow: visible;
     -webkit-tap-highlight-color: transparent;
@@ -515,14 +514,14 @@ span.CodeMirror-selectedtext {
     .CodeMirror-gutters {
         background: #263238;
         @apply dark:bg-gray-900;
-        color: #546e7a;
+        color: #678695;
         border: none;
     }
 
     .CodeMirror-guttermarker,
     .CodeMirror-guttermarker-subtle,
     .CodeMirror-linenumber {
-        color: #546e7a;
+        color: #678695;
     }
 
     .CodeMirror-cursor {
@@ -595,7 +594,7 @@ span.CodeMirror-selectedtext {
     }
 
     .cm-comment {
-        color: #546e7a;
+        color: #678695;
     }
 
     .cm-variable {

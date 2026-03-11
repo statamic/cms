@@ -14,7 +14,7 @@ class UpdateGlobalVariables extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('6.0.0');
+        return $this->isUpdatingTo('6.0.0-beta.4');
     }
 
     public function update()
@@ -51,7 +51,7 @@ class UpdateGlobalVariables extends UpdateScript
             $globalSet->sites($sites)->save();
 
             $variables->each(function ($variable) {
-                $data = YAML::file($variable->path())->parse();
+                $data = YAML::file($variable->path())->parse() ?? [];
 
                 File::put($variable->path(), YAML::dump(Arr::except($data, 'origin')));
             });
@@ -72,7 +72,7 @@ class UpdateGlobalVariables extends UpdateScript
             }
 
             $contents = YAML::file($globalSet->path())->parse();
-            $data = Arr::get($contents, 'data', []);
+            $data = Arr::get($contents, 'data') ?? [];
 
             $globalSet->save();
 

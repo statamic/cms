@@ -1,6 +1,6 @@
 <script>
 import { Upload } from 'upload';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import { h } from 'vue';
 
 export default {

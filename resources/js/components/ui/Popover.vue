@@ -22,6 +22,8 @@ const props = defineProps({
     side: { type: String, default: 'bottom' },
     /** The controlled open state of the popover. */
     open: { type: Boolean, default: false },
+    /** When `true`, clicking outside the modal will dismiss it. */
+    dismissible: { type: Boolean, default: true },
 });
 
 const popoverContentClasses = cva({
@@ -67,6 +69,7 @@ function updateOpen(value) {
                 :align
                 :sideOffset="offset"
                 :side
+                @interact-outside="(e) => !dismissible && e.preventDefault()"
             >
                 <slot v-bind="slotProps" />
                 <PopoverClose as-child>

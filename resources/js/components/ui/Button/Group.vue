@@ -19,8 +19,9 @@
 </template>
 
 <style>
+    /* GROUP FLOATING TOOLBAR / BUTTON GROUP BORDERS
+    =================================================== */
     [data-ui-button-group] [data-ui-group-target] {
-
         @apply shadow-none;
 
         &:not(:first-child):not([data-floating-toolbar] &) {

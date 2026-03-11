@@ -10,6 +10,13 @@ const meta = {
         ModalClose,
     },
     argTypes: {
+        'opened': {
+            description: 'Event handler called when the modal is opened.',
+            table: {
+                category: 'events',
+                type: { summary: '() => void' },
+            },
+        },
         'dismissed': {
             description: 'Event handler called when the modal is dismissed.',
             table: {

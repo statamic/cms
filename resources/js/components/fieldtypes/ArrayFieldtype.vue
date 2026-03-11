@@ -92,7 +92,7 @@
         </div>
 
         <confirmation-modal
-            v-if="deleting !== false"
+            :open="deleting !== false"
             :title="__('Delete Row')"
             :bodyText="__('Are you sure you want to delete this row?')"
             :buttonText="__('Delete')"

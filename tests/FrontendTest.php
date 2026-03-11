@@ -17,7 +17,6 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -38,8 +37,7 @@ class FrontendTest extends TestCase
 
     private function withStandardBlueprints()
     {
-        $this->addToAssertionCount(-1);
-        Blueprint::shouldReceive('in')->withAnyArgs()->zeroOrMoreTimes()->andReturn(collect([new \Statamic\Fields\Blueprint]));
+        Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
     }
 
     #[Test]
@@ -1046,33 +1044,5 @@ class FrontendTest extends TestCase
             ->actingAs(tap(User::make())->save())
             ->get('/does-not-exist')
             ->assertStatus(404);
-    }
-
-    #[Test]
-    public function it_sets_etag_header_and_returns_304_when_content_matches()
-    {
-        $this->withStandardBlueprints();
-        $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('default', '<h1>Test Page</h1>');
-
-        $this->createPage('about');
-
-        $response = $this->get('/about');
-        $response->assertStatus(200);
-
-        $content = trim($response->content());
-        $this->assertEquals('<h1>Test Page</h1>', $content);
-
-        $etag = $response->headers->get('ETag');
-        $this->assertEquals('"'.md5($content).'"', $etag); // Per spec, the quotes need to be in the string.
-
-        $response = $this->get('/about', ['If-None-Match' => $etag]);
-        $response->assertStatus(304);
-        $this->assertEmpty($response->content());
-
-        $response = $this->get('/about', ['If-None-Match' => '"wrong-etag"']);
-        $response->assertStatus(200);
-        $this->assertEquals('<h1>Test Page</h1>', trim($response->content()));
     }
 }

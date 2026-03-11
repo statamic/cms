@@ -85,21 +85,21 @@ const gridStyle = computed(() => {
         :maxValue="maxValue"
         :locale="$date.locale"
         fixed-weeks
-        :number-of-months="inline ? numberOfMonths : 1"
+        :number-of-months="numberOfMonths"
         @update:model-value="emit('update:modelValue', $event)"
     >
         <Component :is="components.CalendarHeader" class="flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1">
-            <Component :is="components.CalendarHeading" class="text-sm font-medium text-black dark:text-white" />
+            <Component :is="components.CalendarHeading" class="text-sm font-medium text-gray-925 dark:text-white" />
             <div>
                 <Component
                     :is="components.CalendarPrev"
-                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
+                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
                 >
                     <Icon name="chevron-left" class="size-4" />
                 </Component>
                 <Component
                     :is="components.CalendarNext"
-                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
+                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
                 >
                     <Icon name="chevron-right" class="size-4" />
                 </Component>
@@ -114,7 +114,7 @@ const gridStyle = computed(() => {
                 class="w-full border-collapse space-y-1 select-none"
             >
                 <Component :is="components.CalendarGridHead">
-                    <ui-badge class="mb-2" v-if="inline && numberOfMonths > 1">
+                    <ui-badge class="mb-2" v-if="numberOfMonths > 1">
                         {{ new Date(month.value.toString()).toLocaleString($date.locale, { month: 'long' }) }}
                     </ui-badge>
                     <Component :is="components.CalendarGridRow" class="mb-1 grid w-full grid-cols-7">
@@ -122,7 +122,7 @@ const gridStyle = computed(() => {
                             :is="components.CalendarHeadCell"
                             v-for="day in weekDays"
                             :key="day"
-                            class="rounded-md text-xs text-black dark:text-white"
+                            class="rounded-md text-xs text-gray-925 dark:text-white"
                         >
                             {{ day }}
                         </Component>
@@ -148,13 +148,13 @@ const gridStyle = computed(() => {
                                 :day="weekDate"
                                 :month="month.value"
                                 :class="[
-                                    'relative flex size-8 items-center justify-center rounded-lg text-sm font-normal whitespace-nowrap text-black outline-hidden dark:text-white',
+                                    'relative flex size-8 items-center justify-center rounded-lg text-sm font-normal whitespace-nowrap text-gray-925 outline-hidden dark:text-white',
                                     'data-outside-view:text-gray-400 dark:data-outside-view:text-gray-600',
-                                    'data-selected:bg-gray-800! data-selected:text-white dark:data-selected:bg-gray-200! dark:data-selected:text-black',
+                                    'data-selected:bg-gray-800! data-selected:text-white dark:data-selected:bg-gray-200! dark:data-selected:text-gray-925',
                                     'hover:bg-gray-100 data-highlighted:bg-gray-200 dark:hover:bg-black dark:data-highlighted:bg-black',
                                     'data-disabled:pointer-events-none data-disabled:hover:bg-transparent',
                                     'data-disabled:text-gray-400 dark:data-disabled:text-gray-600',
-                                    'data-unavailable:pointer-events-none data-unavailable:text-black/30 data-unavailable:line-through',
+                                    'data-unavailable:pointer-events-none data-unavailable:text-gray-925/30 data-unavailable:line-through',
                                     'before:absolute before:top-[3px] before:hidden before:h-1 before:w-1 before:rounded-lg before:bg-white',
                                     'data-today:before:block data-today:before:bg-green-500',
                                 ]"

@@ -6,9 +6,12 @@ const theme = create({
   base: 'light',
   brandTitle: 'Statamic UI Components',
   brandUrl: 'https://statamic.dev',
-  brandImage: '/logo.png',
+  brandImage: '/logo.svg',
   fontBase: '"Lexend", sans-serif',
-  fontCode: '"Source Code Pro", monospace'
+  fontCode: '"Source Code Pro", monospace',
+
+   appBorderColor: 'hsl(287deg 80% 90%)',
+   textColor: '#181a1b',
 });
 
 addons.setConfig({

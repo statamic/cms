@@ -59,7 +59,7 @@ class Translate extends Command
 
     protected function translateStringFile($lang)
     {
-        $path = "resources/lang/{$lang}.json";
+        $path = "lang/{$lang}.json";
         $fullPath = getcwd().'/'.$path;
         if (! $this->files->exists($fullPath)) {
             return;
@@ -106,7 +106,7 @@ class Translate extends Command
 
     protected function translateKeyFiles($lang)
     {
-        collect($this->files->files(getcwd().'/resources/lang/'.$lang))
+        collect($this->files->files(getcwd().'/lang/'.$lang))
             ->filter(function ($file) {
                 $filename = substr($file->getBasename(), 0, -4); // without extension
 
@@ -122,7 +122,7 @@ class Translate extends Command
         $fullPath = $file->getPathname();
         $filename = substr($file->getBasename(), 0, -4); // without extension
         $existing = Arr::dot(include $fullPath);
-        $path = "resources/lang/{$lang}/{$filename}.php";
+        $path = "lang/{$lang}/{$filename}.php";
 
         $pendingTranslations = collect($existing)->filter(function ($string) {
             return $string == '';
@@ -174,7 +174,7 @@ class Translate extends Command
             return $cached;
         }
 
-        $path = getcwd()."/resources/lang/en/{$file}.php";
+        $path = getcwd()."/lang/en/{$file}.php";
 
         return $this->englishTranslations[$file] = require $path;
     }
@@ -186,7 +186,7 @@ class Translate extends Command
 
     protected function existingLanguages()
     {
-        return collect($this->files->directories(getcwd().'/resources/lang'))
+        return collect($this->files->directories(getcwd().'/lang'))
             ->map(function ($dir) {
                 return basename($dir);
             })

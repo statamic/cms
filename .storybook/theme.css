@@ -32,6 +32,13 @@ manually copy them here.
     --theme-color-ui-accent-text: var(--theme-color-ui-accent-bg);
     --theme-color-switch-bg: var(--theme-color-ui-accent-bg);
 
+    --z-index-below: -1;
+    --z-index-above: 1;
+    --z-index-portal: 2;
+    --z-index-draggable: 3;
+    --z-index-modal: 4;
+    --z-index-max: 5;
+
     &.dark {
         --theme-color-body-bg: oklch(0.21 0.006 285.885);
         --theme-color-body-border: oklch(0.141 0.005 285.823);

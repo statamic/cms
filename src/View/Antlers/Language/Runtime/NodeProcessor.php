@@ -1078,10 +1078,34 @@ class NodeProcessor
     public function guardRuntimeTag($tagCheck)
     {
         if (GlobalRuntimeState::$isEvaluatingUserData) {
+            $allowList = GlobalRuntimeState::$allowedContentTagPaths;
             $guardList = GlobalRuntimeState::$bannedContentTagPaths;
-        } else {
-            $guardList = GlobalRuntimeState::$bannedTagPaths;
+
+            $isAllowed = Str::is($allowList, $tagCheck);
+            $isBlocked = ! empty($guardList) && Str::is($guardList, $tagCheck);
+
+            if (! $isAllowed || $isBlocked) {
+                Log::warning('Runtime Access Violation: '.$tagCheck, [
+                    'tag' => $tagCheck,
+                    'file' => GlobalRuntimeState::$currentExecutionFile,
+                    'trace' => GlobalRuntimeState::$templateFileStack,
+                ]);
+
+                if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::RUNTIME_PROTECTED_TAG_ACCESS,
+                        null,
+                        'Protected tag access.'
+                    );
+                }
+
+                return false;
+            }
+
+            return true;
         }
+
+        $guardList = GlobalRuntimeState::$bannedTagPaths;
 
         if (empty($guardList)) {
             return true;
@@ -2196,6 +2220,8 @@ class NodeProcessor
 
                                     if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
+                                            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             GlobalRuntimeState::$userContentEvalState = [
@@ -2203,14 +2229,18 @@ class NodeProcessor
                                                 $node,
                                             ];
 
-                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
-                                            GlobalRuntimeState::$userContentEvalState = null;
-                                            GlobalRuntimeState::$isEvaluatingUserData = false;
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            try {
+                                                $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            } finally {
+                                                GlobalRuntimeState::$userContentEvalState = null;
+                                                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+                                                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+                                            }
                                         } else {
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
                                         }
                                     }
 
@@ -2557,7 +2587,10 @@ class NodeProcessor
                 $___antlersVarAfter = get_defined_vars();
 
                 foreach ($___antlersVarAfter as $___varKey => $___varValue) {
-                    if (str_starts_with($___varKey, '___')) {
+                    if (
+                        str_starts_with($___varKey, '___') ||
+                        (isset($___antlersVarBefore[$___varKey]) && $___antlersVarBefore[$___varKey] === $___varValue)
+                    ) {
                         continue;
                     }
 
@@ -2705,9 +2738,13 @@ class NodeProcessor
             return $data->value();
         }
 
+        $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
-        $value = $data->antlersValue($this->antlersParser, $context);
-        GlobalRuntimeState::$isEvaluatingUserData = false;
+        try {
+            $value = $data->antlersValue($this->antlersParser, $context);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+        }
 
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();

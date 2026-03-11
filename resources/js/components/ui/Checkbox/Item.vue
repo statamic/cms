@@ -1,7 +1,12 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
-import { computed } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { cva } from 'cva';
+import { twMerge } from 'tailwind-merge';
+
+defineOptions({ inheritAttrs: false });
+
+const attrs = useAttrs();
 
 const props = defineProps({
     /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
@@ -10,6 +15,8 @@ const props = defineProps({
     description: { type: String, default: null },
     /** When `true`, disables the checkbox */
     disabled: { type: Boolean, default: false },
+    /** When `true`, displays the checkbox in an indeterminate state (shows a dash) */
+    indeterminate: { type: Boolean, default: false },
     /** Label text to display next to the checkbox */
     label: { type: String, default: null },
     /** The controlled value of the checkbox */
@@ -21,8 +28,6 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     /** When `true`, hides the label and description. Use this when the checkbox is used in a context where the label is provided elsewhere, like in a table cell */
     solo: { type: Boolean, default: false },
-    /** Tab index for keyboard navigation */
-    tabindex: { type: Number, default: null },
     /** Value of the checkbox when used in a group */
     value: { type: [String, Number, Boolean] },
 });
@@ -42,9 +47,10 @@ const handleKeydown = (event) => {
 const checkboxClasses = computed(() => {
     return cva({
         base: [
-            'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 bg-white',
+            'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 with-contrast:border-gray-500 bg-white',
             'dark:bg-gray-500 dark:border-gray-900',
             'data-[state=checked]:border-ui-accent-bg data-[state=checked]:bg-ui-accent-bg',
+            'data-[state=indeterminate]:border-ui-accent-bg data-[state=indeterminate]:bg-ui-accent-bg',
             'dark:border-none',
             'dark:data-[disabled]:bg-ui-accent-bg/60 dark:data-[disabled]:border-ui-accent-bg/70',
             'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
@@ -60,7 +66,7 @@ const checkboxClasses = computed(() => {
 });
 
 const containerClasses = computed(() => {
-    return cva({
+    const classes = cva({
         base: 'flex gap-2',
         variants: {
             align: {
@@ -69,6 +75,8 @@ const containerClasses = computed(() => {
             },
         },
     })({ ...props });
+
+    return twMerge(classes, attrs.class);
 });
 
 const conditionalProps = computed(() => {
@@ -76,6 +84,10 @@ const conditionalProps = computed(() => {
 
     if (props.modelValue !== null) {
         props_obj.modelValue = props.modelValue;
+    }
+
+    if (props.indeterminate) {
+        props_obj.indeterminate = true;
     }
 
     // Only add aria-describedby if description exists AND it's not a solo checkbox
@@ -102,13 +114,16 @@ const conditionalProps = computed(() => {
             @update:modelValue="emit('update:modelValue', $event)"
             @keydown="handleKeydown"
             :class="checkboxClasses"
-            :tabindex="tabindex"
+            :tabindex="attrs.tabindex"
         >
             <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <!-- Checkmark icon for checked state -->
+                <svg v-if="!indeterminate" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <!-- Dash icon for indeterminate state -->
+                <svg v-else viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M2 1H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
             </CheckboxIndicator>
             <span class="sr-only">
-                {{ modelValue ? 'Checked' : 'Unchecked' }}
+                {{ indeterminate ? __('Indeterminate') : (modelValue ? __('Checked') : __('Unchecked')) }}
             </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">

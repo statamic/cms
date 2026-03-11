@@ -1,7 +1,7 @@
 <template>
     <div class="flex items-center">
         <!-- <div class="input-group w-auto" :class="{ 'max-w-[130px]': config.allow_any }"> -->
-        <div class="flex items-center rounded-full relative border shadow-ui-sm">
+        <div class="flex items-center rounded-full relative border shadow-ui-sm with-contrast:border-gray-500">
             <ui-popover
                 ref="colorPopover"
                 name="swatches"
@@ -12,7 +12,7 @@
                 @update:open="popoverOpen = $event"
             >
                 <template #trigger>
-                    <button type="button" class="cursor-pointer size-9 border rounded-full flex items-center justify-center" :aria-label="__('Pick Color')">
+                    <button type="button" class="cursor-pointer size-9 border rounded-full flex items-center justify-center with-contrast:border-gray-500" :aria-label="__('Pick Color')">
                         <div
                             class="size-8 rounded-full"
                             :class="{ 'cursor-not-allowed': isReadOnly }"
@@ -102,7 +102,7 @@ export default {
             if (!this.showFieldPreviews) return;
 
             return this.value
-                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.value}"></span>`)
+                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${escapeHtml(this.value)}"></span>`)
                 : null;
         },
     },

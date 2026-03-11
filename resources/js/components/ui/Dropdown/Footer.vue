@@ -34,7 +34,7 @@ const footerClasses = cva({
                 <Icon :name="icon" />
             </div>
             <div
-                class="grow truncate text-sm text-gray-600 antialiased group-hover/footer:text-gray-950 dark:text-gray-400 dark:group-hover/footer:text-gray-200"
+                class="grow truncate text-sm text-gray-600 antialiased group-hover/footer:text-gray-925 dark:text-gray-400 dark:group-hover/footer:text-gray-200"
             >
                 {{ text }}
             </div>

@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import Button from '../Button/Button.vue';
 import CharacterCounter from '../CharacterCounter.vue';
+import useCopy from '@/composables/copy';
 
 defineOptions({ inheritAttrs: false });
 
@@ -42,8 +43,6 @@ const props = defineProps({
     required: { type: Boolean, default: false },
     /** Controls the size of the input. Options: `xs`, `sm`, `base`, `lg` */
     size: { type: String, default: 'base' },
-    /** Tab index for keyboard navigation */
-    tabindex: { type: Number, default: null },
     /** Input type attribute */
     type: { type: String, default: 'text' },
     /** Controls the appearance of the input. Options: `default`, `filled` */
@@ -62,7 +61,7 @@ const inputAttributeKeys = [
     'accept', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'form',
     'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
     'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern',
-    'readonly', 'required', 'size', 'src', 'step', 'value'
+    'readonly', 'required', 'size', 'src', 'step', 'tabindex', 'value'
 ];
 
 const outerAttrs = computed(() => {
@@ -92,14 +91,14 @@ const inputAttrs = computed(() => {
 });
 
 const hasPrependedIcon = computed(() => !!props.iconPrepend || !!props.icon || !!slots.prepend);
-const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || copyable.value || props.loading);
+const hasAppendedIcon = computed(() => !!props.iconAppend || !!slots.append || clearable.value || props.viewable || canCopy.value || props.loading);
 
 const inputClasses = computed(() => {
     const classes = cva({
         base: [
             'w-full block bg-white dark:bg-gray-900',
-            'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-950 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
+            'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
+            'text-gray-925 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
         ],
         variants: {
@@ -190,20 +189,14 @@ const togglePassword = () => {
     inputType.value = inputType.value === 'password' ? 'text' : 'password';
 };
 
-const copySupported = computed(() => 'clipboard' in navigator && typeof navigator.clipboard.writeText === 'function');
-const copyable = computed(() => props.copyable && copySupported.value)
-const copied = ref(false);
-const copy = () => {
-    if (!copyable.value || !props.modelValue) return;
-    navigator.clipboard.writeText(props.modelValue);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 1000);
-};
+const { copySupported, copied, copy } = useCopy();
+const canCopy = computed(() => props.copyable && copySupported.value);
 
 const clearable = computed(() => props.clearable && !props.readOnly && !props.disabled && !!props.modelValue);
 
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
+const select = () => input.value.select();
 
 onMounted(() => {
     if (props.focus) {
@@ -211,7 +204,7 @@ onMounted(() => {
     }
 })
 
-defineExpose({ focus });
+defineExpose({ focus, select });
 </script>
 
 <template>
@@ -232,7 +225,6 @@ defineExpose({ focus });
                 :placeholder="placeholder"
                 :disabled="disabled"
                 :readonly="readOnly"
-                :tabindex="tabindex"
                 data-ui-control
                 data-ui-group-target
                 v-bind="inputAttrs"
@@ -252,8 +244,8 @@ defineExpose({ focus });
                         size="sm"
                         :icon="copied ? 'clipboard-check' : 'clipboard'"
                         variant="subtle"
-                        v-else-if="copyable"
-                        @click="copy"
+                        v-else-if="canCopy"
+                        @click="copy(modelValue)"
                         class="animate"
                         :class="copied ? 'animate-wiggle' : ''"
                     />

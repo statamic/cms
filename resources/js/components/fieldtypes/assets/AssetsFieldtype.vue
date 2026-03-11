@@ -20,7 +20,7 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg text-gray-700"
+                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
                     <ui-icon name="upload-cloud" class="size-5" />
                     <span class="text-sm">{{ __('Drop to Upload') }}</span>
@@ -29,7 +29,7 @@
                 <div
                     v-if="!isReadOnly && showPicker"
                     data-asset-picker
-                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @2xs:flex-row items-center gap-2 sm:gap-3 gap-y-3"
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @[22rem]:flex-row gap-2 sm:gap-3 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -49,9 +49,10 @@
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
                         <div class="text-xs">
                             <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
-                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
-                                {{ __('choose a file') }}.
-                            </button>
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}
+                            </button>.
+                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
                         </div>
                     </div>
 
@@ -115,6 +116,7 @@
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
+                                :checkerboard-mode="checkerboardMode"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)"
@@ -163,7 +165,7 @@
             </div>
         </uploader>
 
-        <ui-stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
+        <Stack v-model:open="showSelector" inset :show-close-button="false">
             <Selector
                 :container="container"
                 :folder="folder"
@@ -173,9 +175,9 @@
                 :query-scopes="queryScopes"
                 :columns="columns"
                 @selected="assetsSelected"
-                @closed="closeSelector"
+                @closed="showSelector = false"
             />
-        </ui-stack>
+        </Stack>
     </div>
 </template>
 
@@ -188,8 +190,9 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     components: {
@@ -204,9 +207,19 @@ export default {
         DropdownMenu,
         DropdownItem,
         ItemActions,
+	    Stack,
     },
 
     mixins: [Fieldtype],
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
 
     inject: {
         isInBardField: {
@@ -413,8 +426,21 @@ export default {
                   });
         },
 
+        selectedFilesText() {
+            if (this.maxFiles !== Infinity) {
+                return __n(':count\/:max selected', this.assets.length, { max: this.maxFiles });
+            }
+        },
+
         internalFieldActions() {
             return [
+                {
+                    title: __('Transparency'),
+                    icon: this.checkerboardIcon,
+                    run: () => this.cycleCheckerboard(),
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    quick: true,
+                },
                 {
                     title: __('Remove All'),
                     dangerous: true,
@@ -427,7 +453,7 @@ export default {
 
     events: {
         'close-selector'() {
-            this.closeSelector();
+            this.showSelector = false;
         },
     },
 
@@ -487,13 +513,6 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
-        },
-
-        /**
-         * Close the asset selector modal
-         */
-        closeSelector() {
-            this.showSelector = false;
         },
 
         /**

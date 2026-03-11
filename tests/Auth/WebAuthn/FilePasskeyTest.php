@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Passkey;
+use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -16,9 +17,21 @@ use Webauthn\TrustPath\EmptyTrustPath;
 #[Group('passkeys')]
 class FilePasskeyTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PasskeyTests, PreventSavingStacheItemsToDisk;
 
-    private function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        File::delete(storage_path('statamic/users'));
+    }
+
+    protected function newPasskey(): \Statamic\Contracts\Auth\Passkey
+    {
+        return new Passkey;
+    }
+
+    protected function createTestCredential(string $id = 'test-credential-id-123'): PublicKeyCredentialSource
     {
         return PublicKeyCredentialSource::create(
             publicKeyCredentialId: $id,
@@ -54,6 +67,25 @@ class FilePasskeyTest extends TestCase
         $freshUser = User::find('test-user');
         $this->assertCount(1, $freshUser->passkeys());
         $this->assertEquals('My Passkey', $freshUser->passkeys()->first()->name());
+        $this->assertEquals([], $user->getMeta('passkey_last_logins'));
+    }
+
+    #[Test]
+    public function it_reads_last_login_from_meta()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com');
+        $user->save();
+
+        $passkey = (new Passkey)
+            ->setName('My Passkey')
+            ->setUser($user)
+            ->setCredential($this->createTestCredential());
+        $passkey->save();
+
+        $lastLogin = Carbon::create(2024, 1, 15, 10, 30, 0);
+        $user->setMeta('passkey_last_logins', [$passkey->id() => $lastLogin->timestamp]);
+
+        $this->assertTrue($passkey->lastLogin()->eq($lastLogin));
     }
 
     #[Test]
@@ -73,7 +105,7 @@ class FilePasskeyTest extends TestCase
 
         // Update the passkey
         $passkey->setName('Updated Passkey Name');
-        $passkey->setLastLogin(Carbon::create(2024, 1, 15, 10, 30, 0));
+        $passkey->setLastLogin($lastLogin = Carbon::create(2024, 1, 15, 10, 30, 0));
         $result = $passkey->save();
 
         $this->assertTrue($result);
@@ -83,6 +115,7 @@ class FilePasskeyTest extends TestCase
         $this->assertCount(1, $freshUser->passkeys());
         $this->assertEquals('Updated Passkey Name', $freshUser->passkeys()->first()->name());
         $this->assertNotNull($freshUser->passkeys()->first()->lastLogin());
+        $this->assertEquals([$passkey->id() => $lastLogin->timestamp], $user->getMeta('passkey_last_logins'));
     }
 
     #[Test]
@@ -112,6 +145,7 @@ class FilePasskeyTest extends TestCase
         $names = $freshUser->passkeys()->map->name()->values();
         $this->assertTrue($names->contains('Passkey 1'));
         $this->assertTrue($names->contains('Passkey 2'));
+        $this->assertEquals([], $user->getMeta('passkey_last_logins'));
     }
 
     #[Test]
@@ -139,6 +173,7 @@ class FilePasskeyTest extends TestCase
         // Verify passkey was removed
         $freshUser = User::find('test-user');
         $this->assertCount(0, $freshUser->passkeys());
+        $this->assertEquals([], $user->getMeta('passkey_last_logins'));
     }
 
     #[Test]
@@ -149,17 +184,20 @@ class FilePasskeyTest extends TestCase
 
         $credential1 = $this->createTestCredential('credential-1');
         $credential2 = $this->createTestCredential('credential-2');
+        $lastLogin = Carbon::create(2024, 1, 15, 10, 30, 0);
 
         $passkey1 = (new Passkey)
             ->setName('Passkey 1')
             ->setUser($user)
-            ->setCredential($credential1);
+            ->setCredential($credential1)
+            ->setLastLogin($lastLogin->timestamp);
         $passkey1->save();
 
         $passkey2 = (new Passkey)
             ->setName('Passkey 2')
             ->setUser($user)
-            ->setCredential($credential2);
+            ->setCredential($credential2)
+            ->setLastLogin($lastLogin->timestamp);
         $passkey2->save();
 
         // Delete only the first passkey
@@ -168,6 +206,7 @@ class FilePasskeyTest extends TestCase
         $freshUser = User::find('test-user');
         $this->assertCount(1, $freshUser->passkeys());
         $this->assertEquals('Passkey 2', $freshUser->passkeys()->first()->name());
+        $this->assertEquals([$passkey2->id() => $lastLogin->timestamp], $user->getMeta('passkey_last_logins'));
     }
 
     #[Test]
@@ -175,6 +214,7 @@ class FilePasskeyTest extends TestCase
     {
         $user = User::make()->id('test-user')->email('test@example.com');
         $user->save();
+        $this->assertNull($user->getMeta('passkey_last_logins'));
 
         $credential = $this->createTestCredential();
         $lastLogin = Carbon::create(2024, 1, 15, 10, 30, 0);
@@ -193,5 +233,6 @@ class FilePasskeyTest extends TestCase
         $this->assertEquals('test-credential-id-123', $savedPasskey->credential()->publicKeyCredentialId);
         $this->assertEquals('2024-01-15 10:30:00', $savedPasskey->lastLogin()->format('Y-m-d H:i:s'));
         $this->assertEquals('test-user', $savedPasskey->user()->id());
+        $this->assertEquals([$savedPasskey->id() => $lastLogin->timestamp], $user->getMeta('passkey_last_logins'));
     }
 }

@@ -3,7 +3,7 @@
         <Button @click="confirming = true" :text="__('Restore')" />
 
         <confirmation-modal
-            v-if="confirming"
+            :open="confirming"
             :title="__('Restore Revision')"
             :buttonText="__('Restore')"
             @confirm="restore"
@@ -17,7 +17,6 @@
 
 <script>
 import { Button } from '@/components/ui';
-import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -45,7 +44,7 @@ export default {
             this.$axios.post(this.url, payload).then((response) => {
                 Statamic.$hooks.run('revision.restored', { reference: this.reference }).then(() => {
                     this.$dirty.disableWarning();
-                    router.reload();
+                    window.location.reload();
                 });
             });
         },

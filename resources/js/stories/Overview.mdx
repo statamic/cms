@@ -15,7 +15,7 @@ For example, if you need a card, don't use `<div class="bg-white p-4 rounded bor
 
 All of the components are available with their kebab-cased name prefixed with `ui-`. For example:
 
-```blade
+```html
 <ui-card>
     <ui-heading text="A lovely card" />
     <ui-button @click="doSomething" text="Click me" />
@@ -28,7 +28,7 @@ This syntax works in Blade _and_ Vue, which is especially handy for those times 
 
 You can optionally import the UI components and namespace them, which gives your IDE the ability to autocomplete, link to the original components, and other useful dev-centric workflows. You import them from `@statamic/cms/ui`.
 
-```vue
+```js
 <script setup>
 import { Card, Heading, Button } from '@statamic/cms/ui';
 </script>

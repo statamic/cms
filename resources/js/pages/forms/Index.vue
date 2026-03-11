@@ -23,7 +23,7 @@ const reloadPage = () => router.reload();
 <template>
     <Head :title="__('Forms')" />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <template v-if="isEmpty">
             <header class="py-8 pt-16 text-center">
                 <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2 sm:gap-3">
