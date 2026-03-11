@@ -33,9 +33,6 @@ const fieldFilterBadges = computed(() => Object.entries(activeFilterBadges.value
     .flatMap(([filter, badges]) => Object.entries(badges).map(([handle, badge]) => ({ filter, handle, badge })))
 );
 
-const badgeChipClasses = 'relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-gray-950/5 px-4 pe-2 text-sm font-medium text-gray-900 last:me-12 gap-1 dark:bg-white/4 dark:text-gray-200 [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white';
-const badgeChipClearButtonClasses = 'opacity-100 [&_svg]:size-4';
-
 function removeFieldFilter(filterHandle, fieldHandle) {
     const fields = { ...activeFilters.value[filterHandle] };
     delete fields[fieldHandle];
@@ -176,7 +173,7 @@ function handleStackClosed() {
         <div
             v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
             :key="`${filter}-${handle}`"
-            :class="badgeChipClasses"
+            class="relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-gray-950/5 ps-4 pe-2 text-sm font-medium text-gray-900 last:me-12 gap-1 dark:bg-white/4 dark:text-gray-200 [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white"
         >
             <div class="flex items-center gap-1.5 whitespace-nowrap">
                 <template v-if="handle == 'date'">
@@ -202,7 +199,7 @@ function handleStackClosed() {
                 icon="x"
                 iconOnly
                 inset
-                :class="badgeChipClearButtonClasses"
+                class="opacity-100 [&_svg]:size-4"
                 :aria-label="__('Clear')"
                 @click="removeFieldFilter(filter, handle)"
             />
@@ -210,7 +207,7 @@ function handleStackClosed() {
         <div
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"
-            :class="badgeChipClasses"
+            class="relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-gray-950/5 ps-4 pe-2 text-sm font-medium text-gray-900 last:me-12 gap-1 dark:bg-white/4 dark:text-gray-200 [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white"
         >
             <span class="whitespace-nowrap">{{ badge }}</span>
             <Button
@@ -220,7 +217,7 @@ function handleStackClosed() {
                 icon="x"
                 iconOnly
                 inset
-                :class="badgeChipClearButtonClasses"
+                class="opacity-100 [&_svg]:size-4"
                 :aria-label="__('Clear')"
                 @click="setFilter(handle, null)"
             />
