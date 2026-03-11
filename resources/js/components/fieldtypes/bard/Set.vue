@@ -162,7 +162,7 @@ export default {
         },
 
         collapsed() {
-            return this.extension.options.bard.meta.collapsed.includes(this.node.attrs.id);
+            return this.extension.options.bard.collapsed.includes(this.node.attrs.id);
         },
 
         config() {
