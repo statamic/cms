@@ -78,7 +78,9 @@ function renamePreset() {
 }
 
 const canSaveNewPreset = computed(() => {
-    return !activePreset.value && !selectedPreset.value && (Object.keys(activeFilters.value).length > 0 || (searchQuery.value ?? '') !== '');
+    if (selectedPreset.value) return isDirty.value;
+
+    return (Object.keys(activeFilters.value).length > 0 || (searchQuery.value ?? '') !== '');
 });
 
 const isDirty = computed(() => {
@@ -265,9 +267,9 @@ function deletePreset() {
                     </template>
                 </PresetTrigger>
             </TabList>
-            <div v-if="isDirty" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2 flex gap-1">
+            <div v-if="isDirty || canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2 flex gap-1">
                 <Button
-                    v-if="canSavePreset(selectedPreset)"
+                    v-if="isDirty && canSavePreset(selectedPreset)"
                     @click="savePreset"
                     variant="ghost"
                     size="sm"
@@ -276,6 +278,7 @@ function deletePreset() {
                     class="[&_svg]:size-4"
                 />
                 <Button
+                    v-if="isDirty"
                     @click="resetPreset"
                     variant="ghost"
                     size="sm"
@@ -283,9 +286,8 @@ function deletePreset() {
                     icon="sync"
                     class="[&_svg]:size-4"
                 />
-            </div>
-            <div v-else-if="canSaveNewPreset" class="border-b border-gray-200 dark:border-gray-700 relative -top-[2px] hover:border-transparent ps-2">
                 <Button
+                    v-if="canSaveNewPreset"
                     @click="createPreset"
                     variant="ghost"
                     size="sm"
