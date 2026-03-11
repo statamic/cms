@@ -206,7 +206,7 @@ export default {
             json: [],
             fullScreenMode: false,
             buttons: [],
-            collapsed: clone(this.meta.collapsed),
+            collapsed: this.meta.collapsed,
             mounted: false,
             initError: null,
             pageHeader: null,
@@ -456,7 +456,9 @@ export default {
         },
 
         collapsed(collapsed) {
-            this.updateMeta({ ...this.meta, collapsed });
+            const meta = this.meta;
+            meta.collapsed = value;
+            this.updateMeta(meta);
         },
 
         fullScreenMode(fullScreenMode) {
@@ -624,7 +626,7 @@ export default {
 
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
-                this.collapsed = [...this.collapsed, id];
+                this.collapsed.push(id);
             }
         },
 
@@ -635,7 +637,8 @@ export default {
             }
 
             if (this.collapsed.includes(id)) {
-                this.collapsed = this.collapsed.filter((v) => v !== id);
+                var index = this.collapsed.indexOf(id);
+                this.collapsed.splice(index, 1);
             }
         },
 
