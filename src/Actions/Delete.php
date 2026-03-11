@@ -88,7 +88,9 @@ class Delete extends Action
 
         return [
             'message' => trans_choice('Item deleted|Items deleted', $total),
-            'callback' => ['removeFromSelections', $items->map->id()],
+            'callback' => [
+                'removeFromSelections', $items->map(fn ($item) => method_exists($item, 'id') ? $item->id() : null),
+            ],
         ];
     }
 
