@@ -75,35 +75,6 @@ export const Set = Node.create({
         };
     },
 
-    addKeyboardShortcuts() {
-        const shortcuts = {};
-        const type = this.type;
-
-        const isSetSelected = (state) => {
-            const { selection } = state;
-            return selection instanceof NodeSelection && selection.node.type === type;
-        };
-
-        const blockCharacterKey = () => isSetSelected(this.editor.state);
-
-        // Letters a-z
-        for (let i = 97; i <= 122; i++) {
-            shortcuts[String.fromCharCode(i)] = blockCharacterKey;
-        }
-
-        // Numbers 0-9
-        for (let i = 0; i <= 9; i++) {
-            shortcuts[String(i)] = blockCharacterKey;
-        }
-
-        // Common punctuation/symbols
-        [' ', '-', '=', '[', ']', '\\', ';', "'", ',', '.', '/', '`'].forEach(
-            (key) => (shortcuts[key] = blockCharacterKey),
-        );
-
-        return shortcuts;
-    },
-
     addProseMirrorPlugins() {
         const bard = this.options.bard;
         const type = this.type;
@@ -115,6 +86,21 @@ export const Set = Node.create({
             return found;
         };
         return [
+            new Plugin({
+                key: new PluginKey('setBlockCharacterInput'),
+                props: {
+                    handleKeyDown(view, event) {
+                        const { selection } = view.state;
+                        if (!(selection instanceof NodeSelection) || selection.node.type !== type) return false;
+
+                        const key = event.key;
+                        if (['Backspace', 'Delete', 'Enter', 'Escape', 'Tab'].includes(key)) return false;
+                        if (key.length === 1) return true;
+
+                        return false;
+                    },
+                },
+            }),
             new Plugin({
                 key: new PluginKey('setSelectionDecorator'),
                 props: {
