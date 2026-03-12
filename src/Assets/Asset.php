@@ -744,9 +744,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function rename($filename, $unique = false)
     {
-        $filename = $unique ? $this->ensureUniqueFilename($this->folder(), $filename) : $filename;
-
-        return $this->move($this->folder(), $filename);
+        return $this->move($this->folder(), $filename, $unique);
     }
 
     /**
@@ -756,9 +754,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      * @param  string|null  $filename  The new filename, if renaming.
      * @return $this
      */
-    public function move($folder, $filename = null)
+    public function move($folder, $filename = null, $unique = false)
     {
         $filename = Uploader::getSafeFilename($filename ?: $this->filename());
+        $filename = $unique ? $this->ensureUniqueFilename($folder, $filename) : $filename;
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');

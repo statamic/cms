@@ -1261,6 +1261,70 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_can_be_moved_to_another_folder_with_a_unique_filename_when_conflict_exists()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $disk->put('new/asset.txt', 'Existing asset');
+        $disk->put('new/asset-1.txt', 'Another existing asset');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
+        $asset->save();
+
+        $return = $asset->move('new', null, true);
+
+        $this->assertEquals($asset, $return);
+        $disk->assertMissing('old/asset.txt');
+        $disk->assertExists('new/asset-2.txt');
+        $this->assertEquals('new/asset-2.txt', $asset->path());
+    }
+
+    #[Test]
+    public function it_can_be_moved_to_another_folder_with_unique_flag_without_renaming_when_no_conflict()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
+        $asset->save();
+
+        $return = $asset->move('new', null, true);
+
+        $this->assertEquals($asset, $return);
+        $disk->assertMissing('old/asset.txt');
+        $disk->assertExists('new/asset.txt');
+        $this->assertEquals('new/asset.txt', $asset->path());
+    }
+
+    #[Test]
+    public function it_does_not_ensure_unique_filename_when_moving_by_default()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $disk->put('new/asset.txt', 'Existing asset');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
+        $asset->save();
+
+        $return = $asset->move('new');
+
+        $this->assertEquals($asset, $return);
+        $disk->assertMissing('old/asset.txt');
+        // Without unique flag, it overwrites the existing file
+        $disk->assertExists('new/asset.txt');
+        $this->assertEquals('new/asset.txt', $asset->path());
+    }
+
+    #[Test]
     public function it_renames()
     {
         Event::fake();
