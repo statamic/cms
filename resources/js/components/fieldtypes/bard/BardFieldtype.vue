@@ -455,7 +455,7 @@ export default {
             this.editor.setEditable(!this.readOnly);
         },
 
-        collapsed(collapsed) {
+        collapsed(value) {
             const meta = this.meta;
             meta.collapsed = value;
             this.updateMeta(meta);

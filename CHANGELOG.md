@@ -1,5 +1,65 @@
 # Release Notes
 
+## 6.6.1 (2026-03-12)
+
+### What's fixed
+- Add "Content Search" string to translator's `$additionalStrings` array [#14226](https://github.com/statamic/cms/issues/14226) by @duncanmcclean
+- Make image manipulation presets more readable [#14230](https://github.com/statamic/cms/issues/14230) by @jaygeorge
+- Fix undefined variable in Bard fieldtype [#14238](https://github.com/statamic/cms/issues/14238) by @duncanmcclean
+- French translations [#14232](https://github.com/statamic/cms/issues/14232) by @ebeauchamps
+- Bump tar from 7.5.10 to 7.5.11 [#14231](https://github.com/statamic/cms/issues/14231) by @dependabot
+
+
+
+## 6.6.0 (2026-03-11)
+
+### What's new
+- Image transparency checkerboard [#13975](https://github.com/statamic/cms/issues/13975) by @jaygeorge
+- Support reference updates for custom fieldtypes and working copies [#13693](https://github.com/statamic/cms/issues/13693) by @morhi
+- Asset listing filters [#14025](https://github.com/statamic/cms/issues/14025) by @daun
+- Ability to save/reset changes to filter presets [#13956](https://github.com/statamic/cms/issues/13956) by @duncanmcclean
+
+### What's fixed
+- Improve tables in Bard fields, particularly dark mode [#14158](https://github.com/statamic/cms/issues/14158) by @jaygeorge
+- Add `MiddleEllipsis` component to Storybook [#14215](https://github.com/statamic/cms/issues/14215) by @duncanmcclean
+- Update ip_address protector to use request()->ips() [#14063](https://github.com/statamic/cms/issues/14063) by @gavynd6
+- Fix $isNew detection after Asset::move() [#14140](https://github.com/statamic/cms/issues/14140) by @lwekuiper
+- Avoid escaping dictionary fieldtype labels [#13845](https://github.com/statamic/cms/issues/13845) by @duncanmcclean
+- Force full width on asset grid to account for smaller SVGs [#14164](https://github.com/statamic/cms/issues/14164) by @jaygeorge
+- Avoid opening Command Palette when Bard field is focused & text is selected [#14019](https://github.com/statamic/cms/issues/14019) by @duncanmcclean
+- Asset cropper fixes [#14173](https://github.com/statamic/cms/issues/14173) by @jaygeorge
+- External URLs in the nav should render as anchor tags [#14174](https://github.com/statamic/cms/issues/14174) by @duncanmcclean
+- Cancel inflight requests [#14178](https://github.com/statamic/cms/issues/14178) by @macaws
+- Performance: Reduce duplicate cache reads on nav [#14179](https://github.com/statamic/cms/issues/14179) by @macaws
+- Performance: memoize outpost [#14180](https://github.com/statamic/cms/issues/14180) by @macaws
+- Memoize marketplace cache [#14182](https://github.com/statamic/cms/issues/14182) by @macaws
+- Fix outline focus briefly showing as the stack comes in [#14187](https://github.com/statamic/cms/issues/14187) by @jaygeorge
+- Use amber for update badges [#14175](https://github.com/statamic/cms/issues/14175) by @duncanmcclean
+- Fix copy to clipboard input in light mode [#14186](https://github.com/statamic/cms/issues/14186) by @duncanmcclean
+- Handle stop words case insensitive [#14201](https://github.com/statamic/cms/issues/14201) by @marcorieser
+- Critical updates visibility [#14202](https://github.com/statamic/cms/issues/14202) by @jasonvarga
+- Tiny border-radius fix from the checkerboard PR by @jaygeorge
+- Collapse the assets fieldtype to its mobile layout at a higher breakpoint [#14212](https://github.com/statamic/cms/issues/14212) by @jaygeorge
+- Fix expanding Bard sets in localized entries [#14214](https://github.com/statamic/cms/issues/14214) by @duncanmcclean
+- Handle CarbonInterval instances in Localize middleware [#14209](https://github.com/statamic/cms/issues/14209) by @duncanmcclean
+- Handle cancelled requests when generating slugs [#14211](https://github.com/statamic/cms/issues/14211) by @duncanmcclean
+- Allow dev stability for local starter kit installations [#14208](https://github.com/statamic/cms/issues/14208) by @marcorieser
+- Refresh CodeMirror instance when switching tabs [#14199](https://github.com/statamic/cms/issues/14199) by @duncanmcclean
+- Update bulk action selections when individual row is deleted [#14196](https://github.com/statamic/cms/issues/14196) by @duncanmcclean
+- Add skeleton ui to lazy loaded actions [#14217](https://github.com/statamic/cms/issues/14217) by @jaygeorge
+- Various drag & drop fixes [#14219](https://github.com/statamic/cms/issues/14219) by @duncanmcclean
+- Avoid sanitizing `target` attribute in `markdown()` helper [#14221](https://github.com/statamic/cms/issues/14221) by @duncanmcclean
+- Fix create entry translations [#14223](https://github.com/statamic/cms/issues/14223) by @duncanmcclean
+- Acquire stache-warming lock in Duplicates::find [#14176](https://github.com/statamic/cms/issues/14176) by @mmodler
+- French translations [#14163](https://github.com/statamic/cms/issues/14163) by @dadaxr
+- German translations [#14165](https://github.com/statamic/cms/issues/14165) by @helloDanuk
+- French translations [#14166](https://github.com/statamic/cms/issues/14166) by @ebeauchamps
+- Bump minimatch and dompurify [#14161](https://github.com/statamic/cms/issues/14161) by @jasonvarga
+- Bump svgo from 3.3.2 to 3.3.3 [#14153](https://github.com/statamic/cms/issues/14153) by @dependabot
+- Bump tar from 7.5.9 to 7.5.10 [#14156](https://github.com/statamic/cms/issues/14156) by @dependabot
+
+
+
 ## 6.5.0 (2026-03-04)
 
 ### What's new
