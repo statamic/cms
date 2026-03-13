@@ -28,7 +28,7 @@
                 <div v-text="noOptionsText" />
             </template>
             <template #selected-option>
-                <span v-if="items.length === 1" v-text="items[0].title"></span>
+                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
             </template>
             <template #selected-options>
                 <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
