@@ -5,6 +5,8 @@ namespace Tests\Feature\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Scope;
 use Tests\FakesRoles;
@@ -59,7 +61,7 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_denies_access_when_theres_a_collection_the_user_cannot_view()
+    public function it_denies_access_to_entries_when_theres_a_collection_the_user_cannot_view()
     {
         Collection::make('secret')->save();
         Entry::make()->collection('secret')->slug('secret-one')->data(['title' => 'Secret One'])->save();
@@ -79,7 +81,7 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_forbids_access_when_filters_target_a_collection_the_user_cannot_view()
+    public function it_forbids_access_to_entries_when_filters_target_a_collection_the_user_cannot_view()
     {
         Collection::make('secret')->save();
         Entry::make()->collection('test')->slug('apple')->data(['title' => 'Apple'])->save();
@@ -101,6 +103,50 @@ class RelationshipFieldtypeTest extends TestCase
         $this
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}&filters={$filters}")
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_forbids_access_to_terms_when_config_contains_a_taxonomy_the_user_cannot_view()
+    {
+        Taxonomy::make('secret')->save();
+        Term::make('internal')->taxonomy('secret')->data([])->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'terms',
+            'taxonomies' => ['secret'],
+        ]));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}&taxonomies[0]=secret")
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_forbids_access_to_terms_when_requested_taxonomy_is_forbidden()
+    {
+        Taxonomy::make('topics')->save();
+        Taxonomy::make('secret')->save();
+        Term::make('public')->taxonomy('topics')->data([])->save();
+        Term::make('internal')->taxonomy('secret')->data([])->save();
+
+        $this->setTestRoles([
+            'test' => ['access cp', 'view topics terms'],
+        ]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'terms',
+            'taxonomies' => ['topics'],
+        ]));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}&taxonomies[0]=secret")
             ->assertForbidden();
     }
 }

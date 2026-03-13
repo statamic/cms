@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
@@ -257,6 +258,10 @@ class Terms extends Relationship
             return collect();
         }
 
+        $this->authorizeTaxonomyAccess(
+            $this->getRequestedTaxonomies($request, $this->getConfiguredTaxonomies())
+        );
+
         $query = $this->getIndexQuery($request);
 
         if ($sort = $this->getSortColumn($request)) {
@@ -264,6 +269,27 @@ class Terms extends Relationship
         }
 
         return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+    }
+
+    private function getRequestedTaxonomies($request, $configuredTaxonomies)
+    {
+        $requestedTaxonomies = collect($request->taxonomies)->filter()->values()->all();
+
+        return empty($requestedTaxonomies) ? $configuredTaxonomies : $requestedTaxonomies;
+    }
+
+    private function authorizeTaxonomyAccess($taxonomies)
+    {
+        $user = User::current();
+
+        collect($taxonomies)->each(function ($taxonomyHandle) use ($user) {
+            $taxonomy = Taxonomy::findByHandle($taxonomyHandle);
+
+            throw_if(
+                ! $taxonomy || ! $user->can('view', $taxonomy),
+                new AuthorizationException
+            );
+        });
     }
 
     public function getResourceCollection($request, $items)
