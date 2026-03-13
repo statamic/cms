@@ -2,10 +2,10 @@
 
 namespace Statamic\Data;
 
+use Statamic\Facades\Blink;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
-use Statamic\Facades\Blink;
 use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;

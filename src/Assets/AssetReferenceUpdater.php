@@ -3,11 +3,9 @@
 namespace Statamic\Assets;
 
 use Statamic\Data\DataReferenceUpdater;
-use Statamic\Facades\AssetContainer;
 use Statamic\Fieldtypes\Sets;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\Set;
 
 class AssetReferenceUpdater extends DataReferenceUpdater
 {
