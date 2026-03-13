@@ -744,7 +744,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function rename($filename, $unique = false)
     {
-        return $this->move($this->folder(), $filename, $unique);
+        if ($unique) {
+            return $this->moveUnique($this->folder(), $filename);
+        }
+
+        return $this->move($this->folder(), $filename);
     }
 
     /**
@@ -754,10 +758,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      * @param  string|null  $filename  The new filename, if renaming.
      * @return $this
      */
-    public function move($folder, $filename = null, $unique = false)
+    public function move($folder, $filename = null)
     {
         $filename = Uploader::getSafeFilename($filename ?: $this->filename());
-        $filename = $unique ? $this->ensureUniqueFilename($folder, $filename) : $filename;
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -774,6 +777,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
+    }
+
+    /**
+     * Move the asset to a different location with a unique filename.
+     *
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
+     * @return $this
+     */
+    public function moveUnique($folder, $filename = null)
+    {
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
+        $filename = $this->ensureUniqueFilename($folder, $filename);
+
+        return $this->move($folder, $filename);
     }
 
     public function moveQuietly($folder, $filename = null)
