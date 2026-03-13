@@ -22,17 +22,16 @@ const textClasses = computed(() => {
         base: 'antialiased',
         variants: {
             variant: {
-                default: 'text-gray-700 dark:text-gray-300',
-                strong: 'font-semibold text-gray-900 dark:text-white',
-                subtle: 'text-gray-500 dark:text-gray-400',
-                code: 'font-mono text-[0.9em] text-gray-700 dark:text-gray-300 bg-gray-600/10 dark:bg-white/10 rounded-sm px-1 py-0.5',
+                default: 'text-gray-900 dark:text-gray-50',
+                strong: 'font-semibold text-gray-900 dark:text-gray-50',
+                subtle: 'text-gray-600 dark:text-gray-600/90',
+                code: 'font-mono text-[0.9em] text-gray-900 dark:text-gray-50 bg-gray-600/10 dark:bg-white/10 rounded-sm px-1 py-0.5',
                 danger: 'text-red-600 dark:text-red-400',
                 success: 'text-green-600 dark:text-green-400',
                 warning: 'text-amber-600 dark:text-amber-400',
             },
             size: {
-                xs: 'text-xs',
-                sm: 'text-sm',
+                sm: 'text-xs',
                 base: 'text-sm',
                 lg: 'text-base',
             },

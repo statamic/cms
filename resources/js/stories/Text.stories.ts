@@ -107,7 +107,6 @@ export const Sizes: Story = {
                     <Text size="lg" text="Large" />
                     <Text size="base" text="Base" />
                     <Text size="sm" text="Small" />
-                    <Text size="xs" text="Extra Small" />
                 `,
             },
         },
@@ -126,7 +125,6 @@ export const Sizes: Story = {
                 <Text size="lg" text="Large" v-bind="sharedProps" />
                 <Text size="base" text="Base" v-bind="sharedProps" />
                 <Text size="sm" text="Small" v-bind="sharedProps" />
-                <Text size="xs" text="Extra Small" v-bind="sharedProps" />
             </div>
         `,
     }),
