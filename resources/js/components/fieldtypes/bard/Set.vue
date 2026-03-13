@@ -23,7 +23,7 @@
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
                 }"
             >
-                <span v-if="!isReadOnly" draggable="true" data-drag-handle class="flex cursor-grab">
+                <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
                     <Icon name="handles" class="size-4 text-gray-400" />
                 </span>
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
@@ -317,6 +317,19 @@ export default {
                 this.node.attrs,
                 this.getPos,
             );
+        },
+
+        enableDragging() {
+            this._draggableObserver?.disconnect();
+            this.$el.setAttribute('draggable', true);
+
+            document.addEventListener('mouseup', this.disableDragging, { once: true });
+            document.addEventListener('dragend', this.disableDragging, { once: true });
+        },
+
+        disableDragging() {
+            this.$el.setAttribute('draggable', false);
+            this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },
     },
 
