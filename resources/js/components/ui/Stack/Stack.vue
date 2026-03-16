@@ -138,7 +138,7 @@ function open() {
     events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
     events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
 
-    escBinding.value = keys.bindGlobal('esc', close);
+    escBinding.value = keys.bindGlobal('esc', runCloseCallback);
 
     window.addEventListener('resize', windowResized);
 
@@ -236,7 +236,6 @@ provide('closeStack', close);
                 class="stack-container outline-none"
                 :class="{ 'stack-is-current': isTopStack }"
                 :style="containerStyle"
-                @keydown.esc="isTopStack && runCloseCallback()"
             >
                 <div
                     class="stack-hit-area"
