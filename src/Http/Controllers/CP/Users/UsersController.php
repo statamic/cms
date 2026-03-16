@@ -277,7 +277,7 @@ class UsersController extends CpController
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
-            'twoFactor' => $isCurrentUser ? [
+            'twoFactor' => $isCurrentUser && config('statamic.users.two_factor_enabled', true) ? [
                 'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
                 'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
                 'routes' => [

@@ -365,6 +365,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function isTwoFactorAuthenticationRequired(): bool
     {
+        if (! config('statamic.users.two_factor_enabled', true)) {
+            return false;
+        }
+
         $enforcedRoles = config('statamic.users.two_factor_enforced_roles', []);
 
         if (in_array('*', $enforcedRoles)) {
@@ -383,6 +387,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
      */
     public function hasEnabledTwoFactorAuthentication(): bool
     {
+        if (! config('statamic.users.two_factor_enabled', true)) {
+            return false;
+        }
+
         return ! is_null($this->two_factor_secret) &&
             ! is_null($this->two_factor_confirmed_at);
     }
