@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -25,7 +26,7 @@ class RevisionsStore extends BasicStore
             $yaml['action'] = 'working';
         }
 
-        return Revision::make()
+        $revision = Revision::make()
             ->initialPath($path)
             ->key($key)
             ->action($yaml['action'] ?? false)
@@ -33,5 +34,11 @@ class RevisionsStore extends BasicStore
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? null)
             ->attributes($yaml['attributes'] ?? []);
+
+        if (! is_null($timestamp = Arr::get($yaml, 'publish_at'))) {
+            $revision->publishAt(Carbon::createFromTimestamp($timestamp));
+        }
+
+        return $revision;
     }
 }
