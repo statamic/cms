@@ -50,6 +50,8 @@
                                     @collapsed="collapseSet(set._id)"
                                     @expanded="expandSet(set._id)"
                                     @duplicated="duplicateSet(set._id)"
+                                    @copied="copySet(set._id)"
+                                    @cut="copySet(set._id, true)"
                                     @removed="removed(set, index)"
                                 >
                                     <template v-slot:picker>
@@ -95,6 +97,7 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
+import useClipboard from '@/composables/clipboard.js';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -103,6 +106,11 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
+    },
+
+    setup() {
+        const clipboard = useClipboard();
+        return { clipboard };
     },
 
     data() {
@@ -154,6 +162,14 @@ export default {
             return `${this.name}-sortable-handle`;
         },
 
+        setConfigHashes() {
+            return this.meta.setConfigHashes || {};
+        },
+
+        canPasteSets() {
+            return this.clipboard.canPaste('replicator', Object.values(this.setConfigHashes));
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
 
@@ -186,6 +202,25 @@ export default {
                     visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
+                },
+                {
+                    title: __('Copy All Sets'),
+                    icon: 'clipboard-copy',
+                    disabled: () => this.value.length === 0,
+                    run: () => this.copySets(false),
+                },
+                {
+                    title: __('Cut All Sets'),
+                    icon: 'clipboard-cut',
+                    disabled: () => this.value.length === 0,
+                    run: () => this.copySets(true),
+                },
+                {
+                    title: __('Paste Sets'),
+                    icon: 'clipboard-paste',
+                    visible: this.canPasteSets,
+                    disabled: () => !this.canPasteSets,
+                    run: this.pasteSets,
                 },
             ];
         },
@@ -287,6 +322,69 @@ export default {
                 .filter((key) => key !== undefined)
                 .concat(this.handle)
                 .join('.');
+        },
+
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle] || null;
+        },
+
+        copySet(id, cut = false) {
+            const index = this.value.findIndex((v) => v._id === id);
+            const set = this.value[index];
+            const configHash = this.setConfigHash(set.type);
+
+            this.clipboard.set('replicator', [{
+                configHash,
+                type: set.type,
+                values: JSON.parse(JSON.stringify(set)),
+                meta: JSON.parse(JSON.stringify(this.meta.existing[id])),
+            }]);
+
+            if (cut) {
+                this.removed(set, index);
+            }
+
+            this.$toast.success(cut ? __('Set cut to clipboard') : __('Set copied to clipboard'));
+        },
+
+        copySets(cut = false) {
+            const items = this.value.map((set) => ({
+                configHash: this.setConfigHash(set.type),
+                type: set.type,
+                values: JSON.parse(JSON.stringify(set)),
+                meta: JSON.parse(JSON.stringify(this.meta.existing[set._id])),
+            }));
+
+            this.clipboard.set('replicator', items);
+
+            if (cut) {
+                this.value.forEach((set) => this.removeSetMeta(set._id));
+                this.update([]);
+            }
+
+            this.$toast.success(cut ? __('Sets cut to clipboard') : __('Sets copied to clipboard'));
+        },
+
+        pasteSets() {
+            const data = this.clipboard.get();
+            if (!data || data.type !== 'replicator') {
+                return;
+            }
+
+            const maxSets = this.config.max_sets;
+            if (maxSets && (this.value.length + data.items.length) > maxSets) {
+                this.$toast.error(__('Pasting would exceed the maximum number of sets'));
+                return;
+            }
+
+            const newSets = data.items.map((item) => {
+                const newId = uniqid();
+                this.updateSetMeta(newId, item.meta);
+                return { ...item.values, _id: newId };
+            });
+
+            this.update([...this.value, ...newSets]);
+            this.$toast.success(__('Sets pasted'));
         },
 
         duplicateSet(old_id) {
