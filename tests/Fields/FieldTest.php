@@ -55,9 +55,7 @@ class FieldTest extends TestCase
     #[Test]
     public function it_gets_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype
-        {
-        };
+        $fieldtype = new class extends Fieldtype {};
 
         FieldtypeRepository::shouldReceive('find')
             ->with('the_fieldtype')
@@ -295,6 +293,7 @@ class FieldTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'example';
+
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
                     'a_config_field_without_pre_processing' => ['type' => 'without_processing'],
@@ -493,7 +492,7 @@ class FieldTest extends TestCase
                 }
             });
 
-        Fields::default('computed-value', fn() => 'computed defined default');
+        Fields::default('computed-value', fn () => 'computed defined default');
 
         $field = (new Field('test', ['default' => 'computed:computed-value', 'type' => 'fieldtype']));
 
