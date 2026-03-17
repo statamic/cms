@@ -485,9 +485,20 @@ class Terms extends Relationship
         $slug = Str::slug($string, '-', $lang);
 
         if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
+
+            // Only enforce authorization when there's no parent context,
+            // e.g. when processing fields via the field-action-modal endpoint.
+            if (! $parent) {
+                throw_if(
+                    User::current()->cant('create', [TermContract::class, $taxonomy]),
+                    new AuthorizationException
+                );
+            }
+
             $term = Facades\Term::make()
                 ->slug($slug)
-                ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
+                ->taxonomy($taxonomy)
                 ->set('title', $string);
 
             $term->save();
