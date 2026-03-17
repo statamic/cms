@@ -53,6 +53,7 @@
 
 <script>
 import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack } from '@/components/ui';
+import { dateFormatter } from '@api';
 
 export default {
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack },
@@ -124,8 +125,8 @@ export default {
 
         now() {
             return {
-                date: moment().format('YYYY-MM-DD'),
-                time: moment().format('HH:mm')
+                date: dateFormatter.format(Date.now(), 'date'),
+                time: dateFormatter.format(Date.now(), 'time')
             };
         },
 
