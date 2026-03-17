@@ -70,10 +70,10 @@ trait ChangelogTests
     {
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceReleasesResponse([
-                ['version' => '2.0.0', 'critical' => true],
-                ['version' => '1.0.3', 'critical' => false],
+                ['version' => '2.0.0', 'security' => true],
+                ['version' => '1.0.3', 'security' => false],
                 '1.0.2',
-                ['version' => '1.0.1', 'critical' => true],
+                ['version' => '1.0.1', 'security' => true],
                 '1.0.0',
             ]));
 
@@ -89,10 +89,10 @@ trait ChangelogTests
     {
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceReleasesResponse([
-                ['version' => '1.0.3', 'critical' => false],
-                ['version' => '1.0.2', 'critical' => false],
-                ['version' => '1.0.1', 'critical' => true], // current
-                ['version' => '1.0.0', 'critical' => true],
+                ['version' => '1.0.3', 'security' => false],
+                ['version' => '1.0.2', 'security' => false],
+                ['version' => '1.0.1', 'security' => true], // current
+                ['version' => '1.0.0', 'security' => true],
             ]));
 
         $this->assertFalse($this->changelog()->hasSecurityUpdate());
@@ -106,10 +106,10 @@ trait ChangelogTests
 
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceReleasesResponse([
-                ['version' => '1.0.3', 'critical' => false],
-                ['version' => '1.0.2', 'critical' => true],
-                ['version' => '1.0.1', 'critical' => false], // current
-                ['version' => '1.0.0', 'critical' => false],
+                ['version' => '1.0.3', 'security' => false],
+                ['version' => '1.0.2', 'security' => true],
+                ['version' => '1.0.1', 'security' => false], // current
+                ['version' => '1.0.0', 'security' => false],
             ]));
 
         $this->assertTrue($this->changelog()->hasSecurityUpdate());
@@ -140,7 +140,7 @@ trait ChangelogTests
                 'version' => $release['version'],
                 'date' => '2018-11-06',
                 'changelog' => '- [new] Stuff.',
-                'critical' => $release['critical'] ?? false,
+                'security' => $release['security'] ?? false,
             ];
         })->all();
     }
