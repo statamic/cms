@@ -22,7 +22,7 @@ trait ChangelogTests
 
         $this->assertCount(5, $contents);
         $this->assertEquals(3, $changelog->availableUpdatesCount());
-        $this->assertFalse($changelog->hasCriticalUpdate());
+        $this->assertFalse($changelog->hasSecurityUpdate());
 
         $this->assertEquals('2.0.0', $contents[0]->version);
         $this->assertEquals('upgrade', $contents[0]->type);
@@ -47,7 +47,7 @@ trait ChangelogTests
         collect($contents)->each(function ($release) {
             $this->assertEquals('2018-11-06T00:00:00+00:00', $release->date);
             $this->assertIsString($release->body);
-            $this->assertFalse($release->critical);
+            $this->assertFalse($release->security);
         });
     }
 
@@ -62,11 +62,11 @@ trait ChangelogTests
         $this->assertEquals('1.0.2', $latest->version);
         $this->assertEquals('upgrade', $latest->type);
         $this->assertTrue($latest->latest);
-        $this->assertFalse($latest->critical);
+        $this->assertFalse($latest->security);
     }
 
     #[Test]
-    public function it_exposes_critical_flag_from_marketplace()
+    public function it_exposes_security_flag_from_marketplace()
     {
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceReleasesResponse([
@@ -79,13 +79,13 @@ trait ChangelogTests
 
         $contents = $this->changelog()->get();
 
-        $this->assertSame([true, false, false, true, false], collect($contents)->map->critical->all());
-        $this->assertTrue($this->changelog()->latest()->critical);
-        $this->assertTrue($this->changelog()->hasCriticalUpdate());
+        $this->assertSame([true, false, false, true, false], collect($contents)->map->security->all());
+        $this->assertTrue($this->changelog()->latest()->security);
+        $this->assertTrue($this->changelog()->hasSecurityUpdate());
     }
 
     #[Test]
-    public function has_critical_update_false_when_no_upgrades_are_critical()
+    public function has_security_update_false_when_no_upgrades_are_security()
     {
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceReleasesResponse([
@@ -95,13 +95,13 @@ trait ChangelogTests
                 ['version' => '1.0.0', 'critical' => true],
             ]));
 
-        $this->assertFalse($this->changelog()->hasCriticalUpdate());
+        $this->assertFalse($this->changelog()->hasSecurityUpdate());
     }
 
     #[Test]
-    public function has_critical_update_true_when_upgrades_are_critical()
+    public function has_security_update_true_when_upgrades_are_security()
     {
-        // An upgrade is marked as critical but intentionally not the latest.
+        // An upgrade is marked as a security update but intentionally not the latest.
         // This ensures that we are checking for ANY upgrades and not just the latest.
 
         Client::shouldReceive('request')
@@ -112,7 +112,7 @@ trait ChangelogTests
                 ['version' => '1.0.0', 'critical' => false],
             ]));
 
-        $this->assertTrue($this->changelog()->hasCriticalUpdate());
+        $this->assertTrue($this->changelog()->hasSecurityUpdate());
     }
 
     private function fakeCoreChangelogResponse($versions)

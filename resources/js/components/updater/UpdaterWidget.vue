@@ -21,8 +21,8 @@ defineProps({
                             <Badge
                                 pill
                                 :text="update.count"
-                                :color="update.critical ? 'red' : 'amber'"
-                                v-tooltip="update.critical ? __('Critical update available') : null"
+                                :color="update.security ? 'red' : 'amber'"
+                                v-tooltip="update.security ? __('Security update available') : null"
                             />
                         </td>
                     </tr>
