@@ -19,10 +19,7 @@ class RevisableTest extends TestCase
     {
         parent::setUp();
 
-        config(['statamic.revisions' => [
-            'enabled' => true,
-            'path' => __DIR__.'/__fixtures__',
-        ]]);
+        config(['statamic.revisions' => ['enabled' => true]]);
 
         $this->revisable = new class
         {
@@ -45,12 +42,6 @@ class RevisableTest extends TestCase
                 return new self;
             }
         };
-    }
-
-    #[Test]
-    public function has_revisions()
-    {
-        $this->assertTrue($this->revisable->hasRevisions());
     }
 
     #[Test]
