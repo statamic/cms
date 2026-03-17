@@ -97,9 +97,8 @@
                         v-model="assets"
                         :animate="false"
                         :constrain-dimensions="true"
-                        :disabled="config.disabled"
+                        :disabled="config.disabled || isReadOnly"
                         :distance="5"
-                        :read-only="isReadOnly"
                         @dragend="$emit('blur')"
                         @dragstart="$emit('focus')"
                     >
@@ -141,10 +140,9 @@
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :disabled="config.disabled"
+                                :disabled="config.disabled || isReadOnly"
                                 :distance="5"
                                 :mirror="false"
-                                :read-only="isReadOnly"
                                 :vertical="true"
                             >
                                 <tbody ref="assets">
