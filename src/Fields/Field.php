@@ -297,7 +297,24 @@ class Field implements Arrayable
 
     public function defaultValue()
     {
+        if ($this->hasComputedDefault()) {
+            return Fields::resolveDefault(Str::chopStart($this->config['default'], 'computed:'));
+        }
+
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
+    }
+
+    public function hasComputedDefault(): bool
+    {
+        if (! isset($this->config['default'])) {
+            return false;
+        }
+
+        if (! is_string($this->config['default'])) {
+            return false;
+        }
+
+        return Str::startsWith($this->config['default'], 'computed:');
     }
 
     public function validationValue()
