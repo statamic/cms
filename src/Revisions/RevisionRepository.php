@@ -11,7 +11,6 @@ use Statamic\Support\Str;
 class RevisionRepository implements Contract
 {
     protected $stache;
-
     protected $store;
 
     public function __construct(Stache $stache)
