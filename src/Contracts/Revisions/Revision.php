@@ -8,7 +8,7 @@ interface Revision
 {
     public function entry(): Entry;
 
-    public function id($id = null);
+    public function id();
 
     public function message($message = null);
 
