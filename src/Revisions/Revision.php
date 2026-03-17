@@ -22,22 +22,13 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
 
-    protected $id;
-
     protected $key;
-
     protected $date;
-
     protected $user;
-
     protected $userId;
-
     protected $message;
-
     protected $publishAt;
-
     protected $action = 'revision';
-
     protected $attributes = [];
 
     public function entry(): Entry
