@@ -220,8 +220,13 @@ class Terms extends Relationship
                     $id = $this->createTermFromString($id, $taxonomy);
                 }
 
+                if (! $id) {
+                    return null;
+                }
+
                 return explode('::', $id, 2)[1];
             })
+                ->filter()
                 ->unique()
                 ->values()
                 ->all();
@@ -487,13 +492,8 @@ class Terms extends Relationship
         if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
             $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
 
-            // Only enforce authorization when there's no parent context,
-            // e.g. when processing fields via the field-action-modal endpoint.
-            if (! $parent) {
-                throw_if(
-                    User::current()->cant('create', [TermContract::class, $taxonomy]),
-                    new AuthorizationException
-                );
+            if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
+                return null;
             }
 
             $term = Facades\Term::make()
