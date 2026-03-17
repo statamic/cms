@@ -290,6 +290,8 @@ export default {
         },
 
         duplicateSet(old_id) {
+            if (!this.canAddSet) return;
+
             const index = this.value.findIndex((v) => v._id === old_id);
             const old = this.value[index];
             const set = {

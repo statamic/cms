@@ -190,7 +190,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
                                 @click="toggleCollapsedState"
                             />
-                            <DropdownItem :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
                             <DropdownItem
                                 :text="__('Delete Set')"
                                 variant="destructive"
