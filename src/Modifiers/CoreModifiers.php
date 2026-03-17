@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -27,14 +28,21 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\ChecksDumpability;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
 {
+    use ChecksDumpability {
+        dumpingAllowed as traitDumpingAllowed;
+    }
+
     /**
      * Adds values together with science. Context aware.
      *
@@ -119,7 +127,9 @@ class CoreModifiers extends Modifier
      */
     public function antlers($value, $params, $context)
     {
-        return (string) Antlers::parse($value, $context);
+        $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
+
+        return (string) Antlers::parse($value, $context, $trusted);
     }
 
     /**
@@ -283,6 +293,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -291,8 +302,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -546,14 +562,18 @@ class CoreModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInDays(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
     }
 
     /**
      * Dump, Die, and Debug using Ignition.
      */
-    public function ddd($value)
+    public function ddd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         ddd(Dumper::resolve($value));
     }
 
@@ -609,16 +629,24 @@ class CoreModifiers extends Modifier
     /**
      * Dump and die the output of a variable.
      */
-    public function dd($value)
+    public function dd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dd(Dumper::resolve($value));
     }
 
     /**
      * Dump a variable.
      */
-    public function dump($value)
+    public function dump($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dump(Dumper::resolve($value));
     }
 
@@ -691,7 +719,7 @@ class CoreModifiers extends Modifier
      */
     public function explode($value, $params)
     {
-        return explode(Arr::get($params, 0), $value);
+        return explode(Arr::get($params, 0), $value, Arr::get($params, 1, PHP_INT_MAX));
     }
 
     /**
@@ -794,6 +822,20 @@ class CoreModifiers extends Modifier
     public function formatTranslated($value, $params)
     {
         return $this->carbon($value)->translatedFormat(Arr::get($params, 0));
+    }
+
+    /**
+     * Format a time string without timezone conversion.
+     *
+     * @return string
+     */
+    public function formatTime($value, $params)
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        return Date::parse($value)->format(Arr::get($params, 0, 'g:ia'));
     }
 
     /**
@@ -1078,6 +1120,11 @@ class CoreModifiers extends Modifier
         return $headline;
     }
 
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
+    }
+
     /**
      * Converts a hex color to rgb values.
      *
@@ -1103,7 +1150,7 @@ class CoreModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInHours(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
     }
 
     /**
@@ -1351,6 +1398,11 @@ class CoreModifiers extends Modifier
     public function isPast($value)
     {
         return $this->carbon($value)->isPast();
+    }
+
+    public function isString($value)
+    {
+        return is_string($value);
     }
 
     /**
@@ -1665,7 +1717,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMinutes(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
     }
 
     /**
@@ -1700,7 +1752,7 @@ class CoreModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMonths(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
     }
 
     /**
@@ -1866,7 +1918,7 @@ class CoreModifiers extends Modifier
 
         $partial = 'partials/'.$name.'.html';
 
-        return Parse::template(File::disk('resources')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value, trusted: true);
     }
 
     /**
@@ -1977,6 +2029,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function rawurlencode($value)
+    {
+        return rawurlencode($value);
+    }
+
+    /**
+     * URL-encode according to RFC 3986, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function rawurlencode_except_slashes($value)
     {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
@@ -2280,14 +2342,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
@@ -2300,7 +2356,7 @@ class CoreModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInSeconds(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
     }
 
     /**
@@ -2857,9 +2913,9 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)
@@ -2905,6 +2961,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function urlencode($value)
+    {
+        return urlencode($value);
+    }
+
+    /**
+     * URL-encodes string, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function urlencode_except_slashes($value)
     {
         return implode('/', array_map('urlencode', explode('/', $value)));
     }
@@ -2999,7 +3065,7 @@ class CoreModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInWeeks(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
     }
 
     /**
@@ -3275,8 +3341,16 @@ class CoreModifiers extends Modifier
 
     private function carbon($value)
     {
+        if (! $value) {
+            return optional();
+        }
+
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
+        }
+
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;
@@ -3313,5 +3387,10 @@ class CoreModifiers extends Modifier
         }
 
         return [$url, $hash];
+    }
+
+    private function dumpingAllowed(array $params): bool
+    {
+        return $this->traitDumpingAllowed() || (Arr::get($params, 0) === 'force');
     }
 }

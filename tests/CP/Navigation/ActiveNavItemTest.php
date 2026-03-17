@@ -110,17 +110,9 @@ class ActiveNavItemTest extends TestCase
         // Now let's create a new collection
         Facades\Collection::make('products')->title('Products')->save();
 
-        // Simply building the nav should change what is cached
-        $collectionsChildrenUrls = [
-            'http://localhost/cp/collections/articles',
-            'http://localhost/cp/collections/pages',
-        ];
-        $this->assertEquals($collectionsChildrenUrls, Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
-        $this->assertEquals($collectionsChildrenUrls, Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
-        collect($collectionsChildrenUrls)->each(function ($url) {
-            $this->assertTrue(Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
-            $this->assertTrue(Blink::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
-        });
+        // The InvalidateNavCache subscriber will clear the URLs cache.
+        $this->assertNull(Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertNull(Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
 
         // But if we build the nav again by hitting collections url to resolve its' children, the caches should get updated
         $this
@@ -241,8 +233,8 @@ class ActiveNavItemTest extends TestCase
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -266,8 +258,8 @@ class ActiveNavItemTest extends TestCase
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -291,8 +283,8 @@ class ActiveNavItemTest extends TestCase
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -317,9 +309,9 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/')->can('view seo reports'),
-                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults')->can('edit seo site defaults'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/'),
+                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -343,8 +335,8 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -370,8 +362,8 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -397,8 +389,8 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });

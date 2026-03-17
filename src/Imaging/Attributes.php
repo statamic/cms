@@ -41,7 +41,19 @@ class Attributes
 
     private function imageAttributes(string $path)
     {
-        [$width, $height] = getimagesize($this->prefixPath($path));
+        $fullPath = $this->prefixPath($path);
+
+        if (! file_exists($fullPath)) {
+            return ['width' => 0, 'height' => 0];
+        }
+
+        $size = @getimagesize($fullPath);
+
+        if ($size === false) {
+            return ['width' => 0, 'height' => 0];
+        }
+
+        [$width, $height] = $size;
 
         return compact('width', 'height');
     }
@@ -57,7 +69,7 @@ class Attributes
         } elseif ($svg['viewBox']) {
             [,,$width, $height] = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
 
-            return compact('width', 'height');
+            return ['width' => (float) $width, 'height' => (float) $height];
         }
 
         return $this->defaultSvgAttributes();

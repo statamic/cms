@@ -18,7 +18,6 @@ class Authorize
         }
 
         if ($user->cant('access cp')) {
-            // dd('theres a user but they are unauthorized', $user);
             throw new AuthorizationException('Unauthorized.');
         }
 

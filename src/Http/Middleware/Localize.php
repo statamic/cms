@@ -2,7 +2,8 @@
 
 namespace Statamic\Http\Middleware;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use ReflectionClass;
@@ -32,7 +33,13 @@ class Localize
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
-        Date::setToStringFormat(Statamic::dateFormat());
+        Date::setToStringFormat(function (CarbonInterface|CarbonInterval $date) {
+            if ($date instanceof CarbonInterval) {
+                return $date->forHumans();
+            }
+
+            return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
+        });
 
         $response = $next($request);
 
@@ -51,21 +58,11 @@ class Localize
      *
      * @throws \ReflectionException
      */
-    private function getToStringFormat(): ?string
+    private function getToStringFormat(): string|\Closure|null
     {
         $reflection = new ReflectionClass($date = Date::now());
 
-        // Carbon 2.x
-        if ($reflection->hasProperty('toStringFormat')) {
-            $format = $reflection->getProperty('toStringFormat');
-            $format->setAccessible(true);
-
-            return $format->getValue();
-        }
-
-        // Carbon 3.x
         $factory = $reflection->getMethod('getFactory');
-        $factory->setAccessible(true);
 
         return Arr::get($factory->invoke($date)->getSettings(), 'toStringFormat');
     }

@@ -529,6 +529,8 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             }, $format);
         }
 
+        $format = Facades\Parse::config($format);
+
         return (string) Antlers::parse($format, $this->augmented()->all());
     }
 
@@ -555,6 +557,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function getCpSearchResultBadge()
     {
         return $this->taxonomy()->title();
+    }
+
+    public function getCpSearchResultIcon()
+    {
+        return 'taxonomies';
     }
 
     public function getBulkAugmentationReferenceKey(): ?string

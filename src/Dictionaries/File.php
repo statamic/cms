@@ -2,6 +2,7 @@
 
 namespace Statamic\Dictionaries;
 
+use League\Flysystem\PathTraversalDetected;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\YAML;
 
@@ -55,7 +56,13 @@ class File extends BasicDictionary
 
     protected function getItems(): array
     {
-        $path = resource_path('dictionaries').'/'.$this->config['filename'];
+        $filename = $this->config['filename'];
+
+        if (str_contains($filename, '..')) {
+            throw PathTraversalDetected::forPath($filename);
+        }
+
+        $path = resource_path('dictionaries/'.$filename);
 
         if (! file_exists($path)) {
             throw new \Exception('Dictionary file ['.$path.'] does not exist.');

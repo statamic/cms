@@ -2,66 +2,64 @@
 
 namespace Statamic\Revisions;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Statamic\Contracts\Revisions\Revision as RevisionContract;
+use Statamic\Contracts\Revisions\RevisionQueryBuilder;
 use Statamic\Contracts\Revisions\RevisionRepository as Contract;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
-use Statamic\Support\Arr;
-use Statamic\Support\FileCollection;
+use Statamic\Stache\Stache;
 use Statamic\Support\Str;
 
 class RevisionRepository implements Contract
 {
+    protected $stache;
+
+    protected $store;
+
+    public function __construct(Stache $stache)
+    {
+        $this->stache = $stache;
+        $this->store = $stache->store('revisions');
+    }
+
     public function directory()
     {
-        return config('statamic.revisions.path');
+        return Str::removeRight($this->store->directory(), '/');
     }
 
     public function make(): RevisionContract
     {
-        return new Revision;
+        return app(RevisionContract::class);
     }
 
     public function whereKey($key)
     {
-        $directory = $this->directory().'/'.$key;
-
-        $files = Folder::getFiles($directory);
-
-        $revisions = FileCollection::make($files)->filterByExtension('yaml')->reject(function ($path) {
-            return Str::endsWith($path, 'working.yaml');
-        })->map(function ($path) use ($key) {
-            return $this->makeRevisionFromFile($key, $path);
-        })->keyBy(function ($revision) {
-            return $revision->date()->timestamp;
-        });
-
-        return collect($revisions->all());
+        return $this->query()
+            ->where('key', $key)
+            ->where('action', '!=', 'working')
+            ->get()
+            ->keyBy(fn ($revision) => $revision->date()->timestamp);
     }
 
     public function findWorkingCopyByKey($key)
     {
-        $path = $this->directory().'/'.$key.'/working.yaml';
-
-        if (! File::exists($path)) {
-            return null;
-        }
-
-        return $this->makeRevisionFromFile($key, $path);
+        return $this
+            ->query()
+            ->where('key', $key)
+            ->where('action', 'working')
+            ->first();
     }
 
     public function save(RevisionContract $revision)
     {
-        File::put($revision->path(), $revision->fileContents());
-
-        $revision->id($revision->date()->timestamp);
+        $this->store->save($revision);
     }
 
     public function delete(RevisionContract $revision)
     {
-        File::delete($revision->path());
+        $this->store->delete($revision);
     }
 
     protected function makeRevisionFromFile($key, $path)
@@ -82,5 +80,18 @@ class RevisionRepository implements Contract
         }
 
         return $revision;
+    }
+
+    public function query()
+    {
+        return app(RevisionQueryBuilder::class);
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            RevisionContract::class => Revision::class,
+            RevisionQueryBuilder::class => \Statamic\Stache\Query\RevisionQueryBuilder::class,
+        ];
     }
 }

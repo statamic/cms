@@ -27,4 +27,8 @@ interface Revision
     public function save();
 
     public function delete();
+
+    public function toWorkingCopy(): Revision;
+
+    public function isWorkingCopy(): bool;
 }

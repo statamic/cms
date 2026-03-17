@@ -1,0 +1,13 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as TabsStories from '../Tabs.stories';
+
+<Meta of={TabsStories} />
+
+# Tabs
+Tabs are a way to organize content into different sections.
+
+Tabs are useful for when you have a lot of content to show, but don't want to overwhelm the user with a single, monster page or component.
+<Canvas of={TabsStories._DocsIntro} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={TabsStories} />

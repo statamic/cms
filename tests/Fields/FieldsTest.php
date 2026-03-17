@@ -415,10 +415,9 @@ class FieldsTest extends TestCase
                 'display' => 'One',
                 'instructions' => 'One instructions',
                 'required' => true,
-                'validate' => 'required|min:2',
                 'component' => 'text',
                 'placeholder' => null,
-                'character_limit' => 0,
+                'character_limit' => null,
                 'input_type' => 'text',
                 'prepend' => null,
                 'append' => null,
@@ -434,6 +433,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'actions' => true,
             ],
             [
                 'handle' => 'two',
@@ -442,7 +442,6 @@ class FieldsTest extends TestCase
                 'display' => 'Two',
                 'instructions' => 'Two instructions',
                 'required' => false,
-                'validate' => 'min:2',
                 'character_limit' => null,
                 'component' => 'textarea',
                 'antlers' => false,
@@ -457,6 +456,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'actions' => true,
             ],
         ], $fields->toPublishArray());
     }
@@ -504,7 +504,7 @@ class FieldsTest extends TestCase
                 'display' => 'Nested One',
                 'placeholder' => null,
                 'input_type' => 'text',
-                'character_limit' => 0,
+                'character_limit' => null,
                 'prepend' => null,
                 'append' => null,
                 'component' => 'text',
@@ -522,6 +522,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'actions' => true,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -530,7 +531,7 @@ class FieldsTest extends TestCase
                 'display' => 'Nested Deeper Two',
                 'placeholder' => null,
                 'input_type' => 'text',
-                'character_limit' => 0,
+                'character_limit' => null,
                 'prepend' => null,
                 'append' => null,
                 'component' => 'text',
@@ -548,6 +549,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'actions' => true,
             ],
         ], $fields->toPublishArray());
     }

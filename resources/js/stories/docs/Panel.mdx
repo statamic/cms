@@ -1,0 +1,31 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as PanelStories from '../Panel.stories';
+
+<Meta of={PanelStories} />
+
+# Panel
+Panels are content containers with optional headers and footers, commonly used for forms and settings. Panels are typically combined with Cards to structure content.
+<Canvas of={PanelStories._DocsIntro} sourceState={'shown'} />
+
+## With Subheading
+Add a subheading below the panel title for additional context.
+<Canvas of={PanelStories.WithSubheading} sourceState={'shown'} />
+
+## With Header Actions
+Add action buttons to the panel header using the `header-actions` slot.
+<Canvas of={PanelStories.WithHeaderActions} sourceState={'shown'} />
+
+## Custom Header
+Use the PanelHeader component directly for more control over the header content.
+<Canvas of={PanelStories.CustomHeader} sourceState={'shown'} />
+
+## With Footer
+Add a footer to the panel using the PanelFooter component.
+<Canvas of={PanelStories.WithFooter} sourceState={'shown'} />
+
+## No Header
+Panels can be used without a header for simpler layouts.
+<Canvas of={PanelStories.NoHeader} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={PanelStories} />

@@ -17,6 +17,16 @@ class FieldtypeFilter
         $this->fieldtype = $fieldtype;
     }
 
+    public function handle()
+    {
+        return $this->fieldtype->field()->handle();
+    }
+
+    public function display()
+    {
+        return $this->fieldtype->field()->display();
+    }
+
     public function fieldItems()
     {
         return [
@@ -68,5 +78,20 @@ class FieldtypeFilter
         $value = $values['value'];
 
         return $field.' '.strtolower($translatedOperator).' '.$value;
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'value');
     }
 }

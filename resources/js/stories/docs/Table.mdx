@@ -1,0 +1,14 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as TableStories from '../Table.stories';
+
+<Meta of={TableStories} />
+
+# Table
+A responsive table component for displaying structured data in rows and columns.
+<Canvas of={TableStories._DocsIntro} sourceState={'shown'} />
+
+## Structure
+The table component uses a simplified structure where `TableColumns` automatically creates the header row, eliminating the need for a separate row component in the header, and `TableRows` automatically creates the body rows.
+
+## Arguments
+<ArgTypes of={TableStories} />

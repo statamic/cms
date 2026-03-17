@@ -4,6 +4,8 @@ namespace Tests\View\Antlers;
 
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
+use Statamic\Facades\Cascade;
 use Statamic\View\Events\ViewRendered;
 use Statamic\View\View;
 use Tests\FakesViews;
@@ -227,5 +229,29 @@ partial-bar
 EOT;
 
         $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($view->render()));
+    }
+
+    #[Test]
+    public function view_gets_full_config_but_antlers_parse_gets_allowlisted_config_only()
+    {
+        config([
+            'app.name' => 'test', // allowed by default
+            'allowlisted.foo' => 'bar', // allowlisted
+            'top.secret' => '123',
+            'statamic.system.view_config_allowlist' => ['@default', 'allowlisted.foo'],
+        ]);
+
+        $template = 'hello {{ name }} [{{ config:app:name }}] [{{ config:top:secret }}] [{{ config:allowlisted:foo }}]';
+
+        $data = ['name' => 'world', Cascade::instance()->toArray()];
+
+        $this->viewShouldReturnRaw('template', $template);
+        $parsed = (string) View::make('template', $data)->render();
+        $this->assertStringContainsString('123', $parsed, 'Parsed view is missing config value.');
+        $this->assertSame('hello world [test] [123] [bar]', $parsed);
+
+        $parsed = (string) Antlers::parse($template, $data);
+        $this->assertStringNotContainsString('123', $parsed, 'Parsed string contains unexpected config value.');
+        $this->assertSame('hello world [test] [] [bar]', $parsed);
     }
 }

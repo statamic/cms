@@ -4,8 +4,11 @@ namespace Statamic\Revisions;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\User;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Entries\Entry;
 use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
@@ -15,9 +18,9 @@ use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Revision implements Arrayable, Contract
+class Revision implements Arrayable, ContainsQueryableValues, Contract
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $id;
 
@@ -44,12 +47,12 @@ class Revision implements Arrayable, Contract
 
     public function id($id = null)
     {
-        return $this->fluentlyGetOrSet('id')->value($id);
+        return $this->key.'/'.($this->isWorkingCopy() ? 'working' : $this->date()->timestamp);
     }
 
     public function user($user = null)
     {
-        if (is_null($user)) {
+        if (func_num_args() === 0) {
             if ($this->user) {
                 return $this->user;
             }
@@ -69,12 +72,12 @@ class Revision implements Arrayable, Contract
 
     public function action($action = null)
     {
-        return $this->fluentlyGetOrSet('action')->value($action);
+        return $this->fluentlyGetOrSet('action')->args(func_get_args());
     }
 
     public function message($message = null)
     {
-        return $this->fluentlyGetOrSet('message')->value($message);
+        return $this->fluentlyGetOrSet('message')->args(func_get_args());
     }
 
     public function publishAt($dateTime = null)
@@ -84,7 +87,7 @@ class Revision implements Arrayable, Contract
 
     public function attributes($attributes = null)
     {
-        return $this->fluentlyGetOrSet('attributes')->value($attributes);
+        return $this->fluentlyGetOrSet('attributes')->args(func_get_args());
     }
 
     public function attribute(string $key, $value = null)
@@ -100,12 +103,12 @@ class Revision implements Arrayable, Contract
 
     public function key($key = null)
     {
-        return $this->fluentlyGetOrSet('key')->value($key);
+        return $this->fluentlyGetOrSet('key')->args(func_get_args());
     }
 
     public function date($date = null)
     {
-        return $this->fluentlyGetOrSet('date')->value($date);
+        return $this->fluentlyGetOrSet('date')->args(func_get_args());
     }
 
     public function path()
@@ -113,7 +116,7 @@ class Revision implements Arrayable, Contract
         return vsprintf('%s/%s/%s.yaml', [
             Revisions::directory(),
             $this->key(),
-            $this->date()->timestamp,
+            $this->isWorkingCopy() ? 'working' : $this->date()->timestamp,
         ]);
     }
 
@@ -135,14 +138,14 @@ class Revision implements Arrayable, Contract
             $user = [
                 'id' => $user->id(),
                 'email' => $user->email(),
-                'name' => $user->name(),
+                'name' => $user->name() ?? $user->email(),
                 'avatar' => $user->avatar(),
                 'initials' => $user->initials(),
             ];
         }
 
         return [
-            'id' => $this->id,
+            'id' => $this->id(),
             'action' => $this->action,
             'date' => $this->date()->timestamp,
             'user' => $user,
@@ -170,5 +173,35 @@ class Revision implements Arrayable, Contract
         Revisions::delete($this);
 
         RevisionDeleted::dispatch($this);
+    }
+
+    public function isWorkingCopy(): bool
+    {
+        return $this->action === 'working';
+    }
+
+    public function toWorkingCopy(): Revision
+    {
+        return (new static)
+            ->action('working')
+            ->key($this->key())
+            ->date($this->date())
+            ->user($this->user() ?? null)
+            ->message($this->message() ?? null)
+            ->attributes($this->attributes());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        return match ($field) {
+            'id' => $this->id(),
+            'key' => $this->key(),
+            'action' => $this->action(),
+            'date' => $this->date(),
+            'user' => $this->userId,
+            'message' => $this->message(),
+            'path' => $this->path(),
+            default => throw new \Exception('Field ['.$field.'] is not queryable on Revision.'),
+        };
     }
 }

@@ -12,7 +12,7 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure collections')) {
+        if ($user->isSuper() || $user->hasPermission('configure collections')) {
             return true;
         }
     }
@@ -97,6 +97,10 @@ class EntryPolicy
     public function publish($user, $entry)
     {
         $user = User::fromUser($user);
+
+        if ($entry instanceof \Statamic\Contracts\Entries\Collection) {
+            return $user->hasPermission("publish {$entry->handle()} entries");
+        }
 
         if ($this->hasAnotherAuthor($user, $entry)) {
             return $user->hasPermission("publish other authors {$entry->collectionHandle()} entries");
