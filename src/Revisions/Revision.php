@@ -36,7 +36,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
         return EntryFacade::find($this->attribute('id'));
     }
 
-    public function id($id = null)
+    public function id()
     {
         return $this->key.'/'.($this->isWorkingCopy() ? 'working' : $this->date()->timestamp);
     }
