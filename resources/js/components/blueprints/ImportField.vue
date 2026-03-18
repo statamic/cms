@@ -11,6 +11,12 @@
                                 <a class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" :href="fieldsetEditUrl" v-text="fieldsetTitle" v-tooltip="__('Edit fieldset')" />
                                 <ui-icon name="link" class="text-gray-400" />
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
+                                <ui-badge
+                                    v-if="field.prefix"
+                                    size="sm"
+                                    color="gray"
+                                    :text="`${__('Prefix')}: ${field.prefix}`"
+                                />
                             </div>
                         </div>
                         <div class="flex items-center">
