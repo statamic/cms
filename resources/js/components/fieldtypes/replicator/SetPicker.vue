@@ -14,7 +14,9 @@
         class="xl:max-w-3xl 2xl:max-w-page"
     >
         <template #trigger>
-            <slot name="trigger" />
+            <Primitive @click.capture="onTriggerClick">
+                <slot name="trigger" />
+            </Primitive>
         </template>
 
         <template #default>
@@ -90,7 +92,9 @@
         inset
     >
         <template #trigger>
-            <slot name="trigger" />
+            <Primitive @click.capture="onTriggerClick">
+                <slot name="trigger" />
+            </Primitive>
         </template>
 
         <template #default>
@@ -447,6 +451,13 @@ export default {
 
         open() {
             this.isOpen = true;
+        },
+
+        onTriggerClick(e) {
+            if (!this.enabled) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
         },
 
         getStoredMode() {

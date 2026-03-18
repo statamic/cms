@@ -274,7 +274,7 @@ class URL
             ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
             ->isEmpty();
 
-        $isExternalToCurrentRequestDomain = ! Str::startsWith($url, self::getDomainFromAbsolute(url()->to('/')));
+        $isExternalToCurrentRequestDomain = $urlDomain !== self::getDomainFromAbsolute(url()->to('/'));
 
         return self::$externalAppUrlsCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
@@ -386,7 +386,7 @@ class URL
      */
     private function getDomainFromAbsolute(string $url): string
     {
-        return preg_replace('/(https*:\/\/[^\/]+)(.*)/', '$1', $url);
+        return parse_url($url, PHP_URL_HOST) ?? $url;
     }
 
     /**

@@ -67,6 +67,21 @@ trait ProvidesExternalUrls
             ['http://subdomain.this-site.com.au/some-slug', true],
             ['http://subdomain.this-site.com.au/some-slug?foo', true],
             ['http://subdomain.this-site.com.au/some-slug#anchor', true],
+
+            // Credential injection
+            ['http://this-site.com@evil.com', true],
+            ['http://this-site.com@evil.com/', true],
+            ['http://this-site.com@evil.com/path', true],
+            ['http://this-site.com@evil.com/path?query', true],
+            ['http://this-site.com:password@evil.com', true],
+            ['http://user:pass@evil.com', true],
+            ['http://absolute-url-resolved-from-request.com@evil.com', true],
+            ['http://absolute-url-resolved-from-request.com@evil.com/path', true],
+            ['http://subdomain.this-site.com@evil.com', true],
+            ['http://subdomain.this-site.com@evil.com/path', true],
+            ['http://this-site.com:8000@evil.com', true],
+            ['http://this-site.com:8000@evil.com/path', true],
+            ['http://this-site.com:8000@webhook.site/token', true],
         ];
     }
 }

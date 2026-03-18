@@ -48,6 +48,7 @@ const {
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
+const hasFields = computed(() => Array.isArray(props.config.fields) ? props.config.fields.length > 0 : Object.keys(props.config.fields || {}).length > 0);
 
 const setGroup = computed(() => {
     if (replicatorSets.length < 1) return null;
@@ -140,9 +141,9 @@ reveal.use(rootEl, () => emit('expanded'));
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
                 <Icon
@@ -201,7 +202,11 @@ reveal.use(rootEl, () => emit('expanded'));
                 </div>
             </header>
 
-            <div v-show="!collapsed" :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }">
+            <div
+                v-show="!collapsed && hasFields"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
+            >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <FieldsProvider
                         :fields="config.fields"
