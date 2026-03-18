@@ -68,6 +68,11 @@
 
             const fetcher = createGraphiQLFetcher({
                 url: '{{ $url }}',
+                @if ($authToken)
+                headers: {
+                    'Authorization': 'Bearer {{ $authToken }}',
+                },
+                @endif
             });
 
             let plugins = [HISTORY_PLUGIN];
