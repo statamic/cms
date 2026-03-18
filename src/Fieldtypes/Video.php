@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Embera\ProviderCollection\SlimProviderCollection;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Video\Video as VideoDetails;
 
 class Video extends Fieldtype
 {
@@ -27,8 +28,12 @@ class Video extends Fieldtype
     {
         $providers = new Providers();
 
+        $video = VideoDetails::fromUrl($this->field()->value());
+
         /** @todo Fetch these from some repository so folks can add their own */
         return [
+            'embed' => $video->embed,
+            'provider' => $video->provider,
             'providers' => $providers->get(),
             'url' => cp_route('video.details'),
         ];

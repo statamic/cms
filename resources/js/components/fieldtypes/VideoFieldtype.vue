@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
-        <ui-combo-box
+        <ui-combobox
             v-model="provider"
             :options="providers"
             option-label="provider"
@@ -8,19 +8,19 @@
             :placeholder="__('Provider...')"
         />
 
-        <ui-input-group v-if="provider != 'Cloudflare'">
-            <ui-input-group-prepend :text="__('URL')" />
-            <ui-input
-                :model-value="url"
-                :isReadOnly="isReadOnly"
-                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-                :aria-label="__('Video URL')"
-                @update:model-value="detailsFromUrl"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                input-class="border-s-0"
-            />
-        </ui-input-group>
+        <ui-input
+            v-if="provider != 'Cloudflare'"
+            :aria-label="__('Video URL')"
+            input-class="border-s-0"
+            :isReadOnly="isReadOnly"
+            :model-value="url"
+            :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+            :prepend="__('URL')"
+            @update:model-value="detailsFromUrl"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
+
         <ui-input
             v-else
             :model-value="videoId"
@@ -30,15 +30,10 @@
         />
 
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
-        <iframe
+        <div
             v-if="shouldShowPreview"
-            ref="iframe"
-            :src="isVisible ? embedUrl : null"
-            frameborder="0"
-            allow="fullscreen"
-            class="rounded-lg aspect-video"
-            loading="lazy"
-        ></iframe>
+            v-html="embed"
+        ></div>
     </div>
 </template>
 
@@ -50,49 +45,20 @@ export default {
 
     data() {
         return {
-            embedUrl: null,
+            embed: this.meta.embed,
             isVisible: false,
             observer: null,
-            provider: null,
+            provider: this.meta.provider,
             savedValue: null,
-            url: null,
+            url: this.value,
             videoId: null,
         };
     },
 
     computed: {
         shouldShowPreview() {
-            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+            return this.embed;
         },
-
-        // embedUrl() {
-        //     let embed_url = this.value || '';
-
-        //     if (embed_url.includes('youtube')) {
-        //         embed_url = embed_url.includes('shorts/')
-        //             ? embed_url.replace('shorts/', 'embed/')
-        //             : embed_url.replace('watch?v=', 'embed/');
-        //     }
-
-        //     if (embed_url.includes('youtu.be')) {
-        //         embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
-        //     }
-
-        //     if (embed_url.includes('vimeo')) {
-        //         embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
-
-        //         if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
-        //             let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
-        //             embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
-        //         }
-        //     }
-
-        //     if (embed_url.includes('&') && !embed_url.includes('?')) {
-        //         embed_url = embed_url.replace('&', '?');
-        //     }
-
-        //     return embed_url;
-        // },
 
         isEmbeddable() {
             const url = this.value || '';
@@ -122,6 +88,15 @@ export default {
         }
     },
 
+    watch: {
+        provider(newProvider, oldProvider) {
+            if (newProvider != oldProvider) {
+                this.embed = null;
+                this.url = null;
+            }
+        }
+    },
+
     methods: {
         detailsFromCloudflare(id) {
             if (id == null) return;
@@ -148,7 +123,7 @@ export default {
                 .get(this.meta.url, { params: params })
                 .then((response) => response.data)
                 .then((data) => {
-                    this.embedUrl = data.embed_url;
+                    this.embed = data.embed;
                     this.provider = data.provider;
                 });
 
