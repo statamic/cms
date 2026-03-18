@@ -11,18 +11,9 @@
 
                     <template v-if="action">
                         <DatePicker
-                            v-if="action == 'schedule'"
-                            class="mb-6"
-                            name="publishTime"
-                            :value="publishTime"
-                        />
-
-                        <DatePicker
-                            v-if="action == 'publish_later'"
-                            class="mb-6"
-                            :config="config"
-                            handle="publishLaterDateTime"
-                            :value="publishRevisionAt"
+                            v-if="action == 'publishLater'"
+                            granularity="minute"
+                            v-model="publishRevisionAt"
                         />
 
                         <Textarea
@@ -53,9 +44,11 @@
 
 <script>
 import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack } from '@/components/ui';
-import { dateFormatter } from '@api';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 
 export default {
+    emits: ['saving', 'saved', 'failed'],
+
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack },
 
     props: {
@@ -70,12 +63,7 @@ export default {
     data() {
         return {
             action: this.canManagePublishState ? 'publish' : 'revision',
-            config: {
-                earliest_date: this.now(),
-                latest_date: { date: null, time: null},
-                time_enabled: true
-            },
-            publishRevisionAt: this.now(),
+            publishRevisionAt: parseAbsoluteToLocal((new Date).toISOString()),
             revisionMessage: null,
             saving: false,
         };
@@ -122,13 +110,6 @@ export default {
     },
 
     methods: {
-
-        now() {
-            return {
-                date: dateFormatter.format(Date.now(), 'date'),
-                time: dateFormatter.format(Date.now(), 'time')
-            };
-        },
 
         submit() {
             this.saving = true;
@@ -218,7 +199,7 @@ export default {
             const payload = { message: this.revisionMessage };
 
             if (publishRevisionAt) {
-                payload.publish_at = publishRevisionAt;
+                payload.publish_at = publishRevisionAt.toAbsoluteString();
             }
 
             this.$axios.post(this.actions.createRevision, payload).then(response => {

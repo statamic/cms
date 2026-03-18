@@ -48,7 +48,7 @@ class EntryRevisionsController extends CpController
         ];
 
         if (! is_null($dateTime = $request->publish_at)) {
-            $data['publish_at'] = Carbon::parse($dateTime['date'].' '.$dateTime['time'] ?? '00:00');
+            $data['publish_at'] = Carbon::parse($dateTime);
         }
 
         return new EntryResource($entry->createRevision($data));
