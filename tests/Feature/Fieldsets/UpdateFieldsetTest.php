@@ -106,6 +106,88 @@ class UpdateFieldsetTest extends TestCase
     }
 
     #[Test]
+    public function fieldset_gets_saved_with_sections()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        (new Fieldset)->setHandle('seo_defaults')->setContents([
+            'title' => 'SEO Defaults',
+            'fields' => [
+                ['handle' => 'canonical_url', 'field' => ['type' => 'text']],
+            ],
+        ])->save();
+
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'foo' => 'bar',
+            'fields' => [
+                ['handle' => 'legacy', 'field' => ['type' => 'text']],
+            ],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($fieldset, [
+                'title' => 'Updated title',
+                'sections' => [
+                    [
+                        '_id' => 'section-1',
+                        'display' => 'SEO',
+                        'instructions' => 'SEO fields',
+                        'collapsible' => true,
+                        'collapsed' => true,
+                        'fields' => [
+                            [
+                                '_id' => 'section-1-field-1',
+                                'handle' => 'meta_title',
+                                'type' => 'inline',
+                                'config' => [
+                                    'type' => 'text',
+                                    'display' => 'Meta title',
+                                ],
+                            ],
+                            [
+                                '_id' => 'section-1-field-2',
+                                'type' => 'import',
+                                'fieldset' => 'seo_defaults',
+                                'prefix' => 'seo_',
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertStatus(204);
+
+        $this->assertEquals([
+            'title' => 'Updated title',
+            'foo' => 'bar',
+            'fields' => [
+                ['handle' => 'legacy', 'field' => ['type' => 'text']],
+            ],
+            'sections' => [
+                [
+                    'display' => 'SEO',
+                    'instructions' => 'SEO fields',
+                    'collapsible' => true,
+                    'collapsed' => true,
+                    'fields' => [
+                        [
+                            'handle' => 'meta_title',
+                            'field' => [
+                                'type' => 'text',
+                                'display' => 'Meta title',
+                            ],
+                        ],
+                        [
+                            'import' => 'seo_defaults',
+                            'prefix' => 'seo_',
+                        ],
+                    ],
+                ],
+            ],
+        ], Facades\Fieldset::find('test')->contents());
+    }
+
+    #[Test]
     public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();

@@ -16,10 +16,14 @@
                 @deleted="deleteSection(i)"
             />
 
-            <button class="w-full flex gap-2 items-center justify-center relative min-h-24 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 cursor-pointer border border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 rounded-xl outline-hidden" @click="addAndEditSection">
-                <ui-icon name="plus" class="size-4" />
-                <div v-text="addSectionText" />
-            </button>
+            <div class="blueprint-add-section-container w-full">
+                <button class="blueprint-add-section-button" @click="addAndEditSection">
+                    <div class="flex items-center gap-2">
+                        <ui-icon name="plus" class="size-4" />
+                        <div v-text="addSectionText" />
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
 </template>

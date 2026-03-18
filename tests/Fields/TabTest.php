@@ -4,8 +4,10 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\Tab;
 use Tests\TestCase;
 
@@ -193,5 +195,86 @@ class TabTest extends TestCase
                 ],
             ],
         ], $tab->toPublishArray());
+    }
+
+    #[Test]
+    public function it_expands_sectioned_fieldset_imports_into_publish_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'display' => 'Social',
+                        'fields' => [
+                            ['handle' => 'og_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ['import' => 'seo'],
+                        ['handle' => 'summary', 'field' => ['type' => 'textarea']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+
+        $this->assertCount(4, $publish['sections']);
+        $this->assertEquals('Main', $publish['sections'][0]['display']);
+        $this->assertEquals(['title'], collect($publish['sections'][0]['fields'])->pluck('handle')->all());
+        $this->assertEquals('SEO', $publish['sections'][1]['display']);
+        $this->assertEquals(['meta_title'], collect($publish['sections'][1]['fields'])->pluck('handle')->all());
+        $this->assertEquals('Social', $publish['sections'][2]['display']);
+        $this->assertEquals(['og_title'], collect($publish['sections'][2]['fields'])->pluck('handle')->all());
+        $this->assertEquals('Main', $publish['sections'][3]['display']);
+        $this->assertEquals(['summary'], collect($publish['sections'][3]['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function it_applies_prefixes_to_fields_inside_imported_fieldset_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['import' => 'seo', 'prefix' => 'seo_'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+        $field = $publish['sections'][0]['fields'][0];
+
+        $this->assertEquals('seo_meta_title', $field['handle']);
+        $this->assertEquals('seo_', $field['prefix']);
     }
 }
