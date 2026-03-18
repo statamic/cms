@@ -46,7 +46,15 @@ class ForgotPasswordController extends Controller
         try {
             $url = decrypt($url);
         } catch (DecryptException $e) {
-            return str_starts_with($url, '/') && ! str_starts_with($url, '//') ? $url : null;
+            if (! str_starts_with($url, '/') || str_starts_with($url, '//')) {
+                return null;
+            }
+
+            if (preg_match('/[\x00-\x1F\x7F]/', $url)) {
+                return null;
+            }
+
+            return $url;
         }
 
         return URL::isExternalToApplication($url) ? null : $url;
