@@ -45,6 +45,10 @@ class ForgotPasswordController extends Controller
             return null;
         }
 
+        if (strlen($url) > 2048) {
+            return null;
+        }
+
         try {
             $url = decrypt($url);
         } catch (DecryptException $e) {

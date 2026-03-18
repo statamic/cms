@@ -103,6 +103,19 @@ class ForgotPasswordTest extends TestCase
     }
 
     #[Test]
+    public function it_rejects_reset_url_longer_than_2048_characters_when_sending_reset_link_email()
+    {
+        $this->simulateSuccessfulPasswordResetEmail();
+        $this->createUser();
+
+        $this->post('/!/auth/password/email', [
+            'email' => 'san@holo.com',
+            '_reset_url' => '/'.str_repeat('a', 2048),
+        ])->assertSessionHasNoErrors();
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/!/auth/password/reset/test-token?', PasswordReset::url('test-token', 'resets'));
+    }
+
+    #[Test]
     public function it_rejects_unencrypted_string_reset_url_when_sending_reset_link_email()
     {
         // Unencrypted string that doesn't look like a URL is probably a tampered encrypted string.
