@@ -161,7 +161,7 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateNavTreeUrls($tree)
     {
-        $rules = collect(Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"));
+        $rules = collect(Arr::get($this->rules, "navigation.{$tree->handle()}.urls"));
 
         $absoluteUrls = $rules->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))->all();
 

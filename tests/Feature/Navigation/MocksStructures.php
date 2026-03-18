@@ -19,6 +19,7 @@ trait MocksStructures
             $s->shouldReceive('editUrl')->andReturn('/nav-edit-url');
             $s->shouldReceive('deleteUrl')->andReturn('/nav-delete-url');
             $s->shouldReceive('collections')->andReturn(collect());
+            $s->shouldReceive('collectionsQueryScopes')->andReturn([]);
             $s->shouldReceive('expectsRoot')->andReturnFalse();
             $s->shouldReceive('maxDepth')->andReturnNull();
             $s->shouldReceive('canSelectAcrossSites')->andReturnFalse();

@@ -10,7 +10,6 @@ return [
     'AZN' => 'Manat Azerbaijan',
     'BAM' => 'Tanda Boleh Tukar Bosnia-Herzegovina',
     'BDT' => 'Taka Bangladesh',
-    'BGN' => 'Lev Bulgaria',
     'BHD' => 'Dinar Bahrain',
     'BIF' => 'Franc Burundi',
     'BND' => 'Dolar Brunei',

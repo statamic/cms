@@ -216,13 +216,13 @@ class DataResponse implements Responsable
     {
         switch ($type) {
             case 'html':
-                return 'text/html; charset=UTF-8';
+                return 'text/html; charset=utf-8';
             case 'xml':
                 return 'text/xml';
             case 'rss':
                 return 'application/rss+xml';
             case 'atom':
-                return 'application/atom+xml; charset=UTF-8';
+                return 'application/atom+xml; charset=utf-8';
             case 'json':
                 return 'application/json';
             case 'text':

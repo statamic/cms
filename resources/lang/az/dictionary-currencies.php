@@ -10,7 +10,6 @@ return [
     'AZN' => 'Azərbaycan manatı',
     'BAM' => 'Bosniya-Herseqovina konvertasiya oluna bilən marka',
     'BDT' => 'Banqladeş Takası',
-    'BGN' => 'Bolqar Lev',
     'BHD' => 'Bəhreyn Dinarı',
     'BIF' => 'Burundi frankı',
     'BND' => 'Bruney Dolları',

@@ -10,7 +10,6 @@ return [
     'AZN' => 'Manat của Azerbaijan',
     'BAM' => 'Mark chuyển đổi Bosnia-Herzegovina',
     'BDT' => 'Taka Bangladesh',
-    'BGN' => 'Lev Bulgaria',
     'BHD' => 'Dinar Bahrain',
     'BIF' => 'Franc Burundi',
     'BND' => 'Đô la Brunei',

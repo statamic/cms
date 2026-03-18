@@ -10,7 +10,6 @@ return [
     'AZN' => 'Aserbaidžaani manat',
     'BAM' => 'Bosnia ja Hertsegoviina konverteeritav mark',
     'BDT' => 'Bangladeshi taka',
-    'BGN' => 'Bulgaaria leev',
     'BHD' => 'Bahreini dinaar',
     'BIF' => 'Burundi frank',
     'BND' => 'Brunei dollar',

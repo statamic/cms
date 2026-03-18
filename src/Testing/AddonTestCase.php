@@ -36,7 +36,8 @@ abstract class AddonTestCase extends OrchestraTestCase
         $this->addToAssertionCount(-1);
 
         \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-        $this->addToAssertionCount(-1); // Dont want to assert this
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
+        $this->addToAssertionCount(-2); // Dont want to assert this
     }
 
     protected function tearDown(): void

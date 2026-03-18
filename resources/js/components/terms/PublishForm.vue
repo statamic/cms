@@ -399,7 +399,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
     },
@@ -498,13 +498,13 @@ export default {
                         window.location = this.createAnotherUrl;
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         window.location = this.listingUrl;
                     }
 
                     // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
-                    else if (window.location.href !== response.data.data.edit_url) {
+                    else if (!this.isInline && window.location.href !== response.data.data.edit_url) {
                         window.location = response.data.data.edit_url;
                     }
 

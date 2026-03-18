@@ -10,7 +10,6 @@ return [
     'AZN' => 'Azerbajdzsáni Manat',
     'BAM' => 'Bosznia-Hercegovina kabrió márka',
     'BDT' => 'Bangladesi Taka',
-    'BGN' => 'bolgár Lev',
     'BHD' => 'Bahreini dínár',
     'BIF' => 'burundi frank',
     'BND' => 'Brunei dollár',
