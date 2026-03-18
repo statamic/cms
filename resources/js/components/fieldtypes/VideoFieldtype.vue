@@ -1,42 +1,34 @@
 <template>
     <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
-<!--
-<Combobox
+        <ui-combo-box
             v-model="provider"
             :options="providers"
             option-label="provider"
             option-value="provider"
             :placeholder="__('Provider...')"
         />
-        <Input
-            v-if="provider != 'Cloudflare'"
-            :model-value="url"
-            :isReadOnly="isReadOnly"
-            :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-            :prepend="__('URL')"
-            @update:model-value="detailsFromUrl"
-        />
-        <Input
+
+        <ui-input-group v-if="provider != 'Cloudflare'">
+            <ui-input-group-prepend :text="__('URL')" />
+            <ui-input
+                :model-value="url"
+                :isReadOnly="isReadOnly"
+                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                :aria-label="__('Video URL')"
+                @update:model-value="detailsFromUrl"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+                input-class="border-s-0"
+            />
+        </ui-input-group>
+        <ui-input
             v-else
             :model-value="videoId"
             :isReadOnly="isReadOnly"
             :prepend="__('ID')"
             @update:model-value="detailsFromCloudflare"
         />
--->
-        <ui-input-group>
-            <ui-input-group-prepend :text="__('URL')" />
-            <ui-input
-                :model-value="value"
-                :isReadOnly="isReadOnly"
-                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-                :aria-label="__('Video URL')"
-                @update:model-value="update"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                input-class="border-s-0"
-            />
-        </ui-input-group>
+
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
@@ -62,12 +54,12 @@ export default {
     data() {
         return {
             embedUrl: null,
+            isVisible: false,
+            observer: null,
             provider: null,
             savedValue: null,
             url: null,
             videoId: null,
-            isVisible: false,
-            observer: null,
         };
     },
 
@@ -76,34 +68,34 @@ export default {
             return !this.isInvalid && (this.isEmbeddable || this.isVideo);
         },
 
-        embedUrl() {
-            let embed_url = this.value || '';
+        // embedUrl() {
+        //     let embed_url = this.value || '';
 
-            if (embed_url.includes('youtube')) {
-                embed_url = embed_url.includes('shorts/')
-                    ? embed_url.replace('shorts/', 'embed/')
-                    : embed_url.replace('watch?v=', 'embed/');
-            }
+        //     if (embed_url.includes('youtube')) {
+        //         embed_url = embed_url.includes('shorts/')
+        //             ? embed_url.replace('shorts/', 'embed/')
+        //             : embed_url.replace('watch?v=', 'embed/');
+        //     }
 
-            if (embed_url.includes('youtu.be')) {
-                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
-            }
+        //     if (embed_url.includes('youtu.be')) {
+        //         embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
+        //     }
 
-            if (embed_url.includes('vimeo')) {
-                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
+        //     if (embed_url.includes('vimeo')) {
+        //         embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
 
-                if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
-                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
-                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
-                }
-            }
+        //         if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
+        //             let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
+        //             embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
+        //         }
+        //     }
 
-            if (embed_url.includes('&') && !embed_url.includes('?')) {
-                embed_url = embed_url.replace('&', '?');
-            }
+        //     if (embed_url.includes('&') && !embed_url.includes('?')) {
+        //         embed_url = embed_url.replace('&', '?');
+        //     }
 
-            return embed_url;
-        },
+        //     return embed_url;
+        // },
 
         isEmbeddable() {
             const url = this.value || '';
