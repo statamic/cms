@@ -274,7 +274,9 @@ class URL
             ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
             ->isEmpty();
 
-        $isExternalToCurrentRequestDomain = ! Str::startsWith($url, self::getDomainFromAbsolute(url()->to('/')));
+        $urlHost = self::getHostFromUrl($urlWithoutQuery);
+        $currentRequestHost = self::getHostFromUrl(url()->to('/'));
+        $isExternalToCurrentRequestDomain = $urlHost !== $currentRequestHost;
 
         return self::$externalAppUrlsCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
@@ -387,6 +389,34 @@ class URL
     private function getDomainFromAbsolute(string $url): string
     {
         return preg_replace('/(https*:\/\/[^\/]+)(.*)/', '$1', $url);
+    }
+
+    /**
+     * Safely extract the host from a URL using parse_url.
+     *
+     * This properly handles URL credential injection attacks like
+     * "http://trusted.com@evil.com/path" where the actual host is "evil.com".
+     */
+    private function getHostFromUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        $parsed = parse_url($url);
+
+        if (! isset($parsed['host'])) {
+            return null;
+        }
+
+        $host = strtolower($parsed['host']);
+
+        // Include the port in the comparison to match the original behavior
+        if (isset($parsed['port'])) {
+            $host .= ':'.$parsed['port'];
+        }
+
+        return $host;
     }
 
     /**
