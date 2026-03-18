@@ -1,6 +1,6 @@
 <script setup>
-import { Button } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Button } from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed } from 'vue';
 
 const props = defineProps({
@@ -10,20 +10,24 @@ const props = defineProps({
     },
 });
 
-const { sortColumn, setSortColumn } = injectListingContext();
+const { sortColumn, sortDirection, setSortColumn } = injectListingContext();
 const isCurrentSortColumn = computed(() => props.column.field === sortColumn.value);
+const sortIcon = computed(() => {
+    if (!isCurrentSortColumn.value) return null;
+    return sortDirection.value === 'asc' ? 'sort-asc' : 'sort-desc';
+});
 </script>
 
 <template>
-    <th>
+    <th scope="col">
         <span v-if="!column.sortable" v-text="__(column.label)" />
         <Button
             v-else
             :text="__(column.label)"
-            :icon-append="isCurrentSortColumn ? 'up-down' : null"
+            :icon-append="sortIcon"
             size="sm"
             variant="ghost"
-            class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-800! dark:text-gray-400!"
+            class="-mt-2 -mb-1 -ms-3 text-sm! font-medium! text-gray-900! dark:text-gray-400!"
             @click.prevent="setSortColumn(column.field)"
         />
     </th>

@@ -1,6 +1,6 @@
 <script>
 import ResizeObserver from 'resize-observer-polyfill';
-import throttle from '@statamic/util/throttle.js';
+import throttle from '@/util/throttle.js';
 
 export default {
     emits: ['resized'],
@@ -16,13 +16,17 @@ export default {
     },
 
     mounted() {
-        const observer = new ResizeObserver(
-            throttle((entries) => {
-                this.width = entries[0].contentRect.width;
-            }, 200),
-        );
+        this.throttledCallback = throttle((entries) => {
+            this.width = entries[0].contentRect.width;
+        }, 200);
 
-        observer.observe(this.$el);
+        this.observer = new ResizeObserver(this.throttledCallback);
+        this.observer.observe(this.$el);
+    },
+
+    beforeUnmount() {
+        this.observer.disconnect();
+        this.throttledCallback.cancel();
     },
 
     watch: {

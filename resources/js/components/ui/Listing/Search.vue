@@ -1,23 +1,32 @@
 <script setup>
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import { Input } from '@statamic/ui';
-import debounce from '@statamic/util/debounce.js';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { Input } from '@ui';
+import debounce from '@/util/debounce.js';
+import { useTemplateRef } from 'vue';
 
-const { searchQuery, setSearchQuery, reorderable } = injectListingContext();
-const placeholder = 'Search...';
-const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value), 300);
+const { activeFilterBadgeCount, searchQuery, setSearchQuery, reorderable } = injectListingContext();
+const searchQueryUpdated = debounce((value) => setSearchQuery(value), 300);
+
+const input = useTemplateRef('input');
+const focus = () => input.value.focus();
+
+defineExpose({ focus });
 </script>
 
 <template>
-    <div class="min-w-64 lg:w-1/3">
+    <div class="flex-1 max-w-sm" :class="{ 'max-w-60!': activeFilterBadgeCount > 2 }">
+        <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
         <Input
-            autofocus
+            :focus="true"
             ref="input"
             icon="magnifying-glass"
-            :placeholder="__(placeholder)"
-            :value="searchQuery"
+            id="listings-search"
+            variant="light"
+            clearable
+            :placeholder="__('Search...')"
+            :model-value="searchQuery"
             :disabled="reorderable"
-            @input="searchQueryUpdated"
+            @update:model-value="searchQueryUpdated"
             @keyup.esc="setSearchQuery(null)"
         />
     </div>

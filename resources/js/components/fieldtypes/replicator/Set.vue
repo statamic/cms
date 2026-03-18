@@ -1,24 +1,23 @@
 <script setup>
-import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import { computed, inject } from 'vue';
+import { computed, inject, ref } from 'vue';
 import {
     Icon,
     Switch,
     Subheading,
     Badge,
-    Tooltip,
     Dropdown,
     DropdownItem,
     DropdownSeparator,
     Button,
     DropdownMenu,
-} from '@statamic/ui';
-import { Motion } from 'motion-v';
-import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
-import PreviewHtml from '@statamic/components/fieldtypes/replicator/PreviewHtml.js';
-import FieldAction from '@statamic/components/field-actions/FieldAction.js';
-import toFieldActions from '@statamic/components/field-actions/toFieldActions.js';
+    PublishFields as Fields,
+    PublishFieldsProvider as FieldsProvider,
+    injectPublishContext as injectContainerContext,
+} from '@/components/ui';
+import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
+import FieldAction from '@/components/field-actions/FieldAction.js';
+import toFieldActions from '@/components/field-actions/toFieldActions.js';
+import { reveal } from '@api';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -41,10 +40,15 @@ const props = defineProps({
     showFieldPreviews: Boolean,
 });
 
-const { store } = injectContainerContext();
+const {
+    setFieldValue,
+    setFieldMeta,
+    previews
+} = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
+const hasFields = computed(() => Array.isArray(props.config.fields) ? props.config.fields.length > 0 : Object.keys(props.config.fields || {}).length > 0);
 
 const setGroup = computed(() => {
     if (replicatorSets.length < 1) return null;
@@ -66,11 +70,9 @@ const fieldActionPayload = computed(() => ({
     values: props.values,
     config: props.config,
     // meta: this.meta,
-    update: (handle, value) => store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.${handle}`, value }),
-    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${metaPathPrefix.value}.${handle}`, value }),
+    update: (handle, value) => setFieldValue(`${fieldPathPrefix.value}.${handle}`, value),
+    updateMeta: (handle, value) => setFieldMeta(`${metaPathPrefix.value}.${handle}`, value),
     isReadOnly: props.readOnly,
-    // store: this.store,
-    // storeName: this.storeName,
 }));
 
 const fieldActions = computed(() => {
@@ -78,15 +80,16 @@ const fieldActions = computed(() => {
 });
 
 const previewText = computed(() => {
-    return Object.entries(data_get(store.previews, fieldPathPrefix.value) || {})
+    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle) || {};
+            const config = props.config.fields.find((f) => f.handle === handle);
+            if (!config) return false;
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
         })
         .map(([handle, value]) => value)
-        .filter((value) => (['null', '[]', '{}', ''].includes(JSON.stringify(value)) ? null : value))
+        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
         .map((value) => {
             if (value instanceof PreviewHtml) return value.html;
 
@@ -98,28 +101,39 @@ const previewText = computed(() => {
 
             return escapeHtml(JSON.stringify(value));
         })
-        .join(' / ');
+        .filter((html) => html && html.trim() !== '')
+        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
 });
 
 function toggleEnabledState() {
-    store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.enabled`, value: !props.enabled });
+    setFieldValue(`${fieldPathPrefix.value}.enabled`, !props.enabled);
 }
 
 function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
 
+const deletingSet = ref(false);
+
 function destroy() {
-    if (confirm(__('Are you sure?'))) emit('removed');
+    deletingSet.value = false;
+    emit('removed');
 }
+
+const rootEl = ref();
+reveal.use(rootEl, () => emit('expanded'));
 </script>
 
 <template>
-    <div :class="sortableItemClass">
+    <div ref="rootEl" :class="sortableItemClass">
         <slot name="picker" />
         <div
             layout
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            data-replicator-set
+            class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
+            :class="{
+                'border-red-500': hasError
+            }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
             :data-invalid="isInvalid ?? undefined"
@@ -127,8 +141,10 @@ function destroy() {
             :data-type="config.handle"
         >
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed }"
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :class="{
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
+                }"
             >
                 <Icon
                     name="handles"
@@ -136,21 +152,20 @@ function destroy() {
                     class="size-4 cursor-grab text-gray-400"
                     v-if="!readOnly"
                 />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
-                    <Badge variant="flat" size="lg">
-                        <span v-if="isSetGroupVisible">
+                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                    <Badge size="lg" pill color="white" class="px-3">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
-                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
+                            <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Tooltip :markdown="__(config.instructions)">
-                        <Icon
-                            v-if="config.instructions && !collapsed"
-                            name="info-square"
-                            class="size-3.5! text-gray-500"
-                        />
-                    </Tooltip>
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="__(config.instructions)"
+                    />
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"
@@ -158,13 +173,10 @@ function destroy() {
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
-                        <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" />
-                    </Tooltip>
-
+                    <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -179,32 +191,43 @@ function destroy() {
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
                                 @click="toggleCollapsedState"
                             />
-                            <DropdownItem :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
                             <DropdownItem
                                 :text="__('Delete Set')"
                                 variant="destructive"
-                                @click="destroy"
+                                @click="deletingSet = true"
                             />
                         </DropdownMenu>
                     </Dropdown>
                 </div>
             </header>
 
-            <Motion
-                layout
-                class="overflow-hidden"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                v-show="!collapsed && hasFields"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
-                <FieldsProvider
-                    :fields="config.fields"
-                    :field-path-prefix="fieldPathPrefix"
-                    :meta-path-prefix="metaPathPrefix"
-                >
-                    <Fields class="p-4" />
-                </FieldsProvider>
-            </Motion>
+                <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
+                    <FieldsProvider
+                        :fields="config.fields"
+                        :as-config="false"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
+                </div>
+            </div>
         </div>
+
+        <confirmation-modal
+            :open="deletingSet"
+            :title="__('Delete Set')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="destroy"
+            @cancel="deletingSet = false"
+        />
     </div>
 </template>

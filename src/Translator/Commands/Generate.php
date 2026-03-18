@@ -84,7 +84,7 @@ class Generate extends Command
 
     protected function generateStringFile($lang, $strings)
     {
-        $path = 'resources/lang/'.$lang.'.json';
+        $path = 'lang/'.$lang.'.json';
         $fullPath = __DIR__.'/../../../'.$path;
 
         $exists = file_exists($fullPath);
@@ -153,7 +153,7 @@ class Generate extends Command
 
     protected function generateKeyFile($lang, $file, $translationCallback)
     {
-        $path = 'resources/lang/'.$lang.'/'.$file.'.php';
+        $path = 'lang/'.$lang.'/'.$file.'.php';
         $fullPath = __DIR__.'/../../../'.$path;
 
         $exists = file_exists($fullPath);
@@ -183,7 +183,7 @@ class Generate extends Command
     protected function generateManualKeyFiles()
     {
         foreach ($this->manualFiles as $file) {
-            $source = 'resources/lang/en/'.$file.'.php';
+            $source = 'lang/en/'.$file.'.php';
             $fullSourcePath = __DIR__.'/../../../'.$source;
             $strings = require $fullSourcePath;
             $strings = collect(Arr::dot($strings));
@@ -222,7 +222,7 @@ class Generate extends Command
 
     protected function existingLanguages()
     {
-        return collect($this->files->directories(getcwd().'/resources/lang'))
+        return collect($this->files->directories(getcwd().'/lang'))
             ->map(function ($dir) {
                 return basename($dir);
             })

@@ -1,28 +1,26 @@
 <template>
     <div>
         <Combobox
-            class="w-full"
             searchable
-            :options
-            :multiple
-            option-value="id"
-            option-label="title"
-            :taggable="isTaggable"
-            :max-selections="maxSelections"
-            :disabled="readOnly"
+            :disabled="config.disabled"
             :ignore-filter="typeahead"
-            :placeholder="__(config.placeholder) || __('Choose...')"
+            :max-selections="maxSelections"
             :model-value="items.map((item) => item.id)"
+            :multiple
+            :options
+            :placeholder="__(config.placeholder) || __('Choose...')"
+            :read-only="readOnly"
+            :taggable="isTaggable"
+            option-label="title"
+            option-value="id"
             @update:modelValue="itemsSelected"
             @search="search"
         >
             <template #option="{ title, hint, status }">
-                <div class="flex w-full items-center justify-between">
-                    <div class="flex items-center">
-                        <StatusIndicator v-if="status" class="me-2" :status="status" />
-                        <div v-text="title" class="truncate" />
-                    </div>
-                    <ui-badge v-if="hint" size="sm" variant="flat" v-text="hint" />
+                <div class="flex w-full text-left items-center gap-2">
+                    <StatusIndicator v-if="status" :status="status" />
+                    <div v-text="title" class="truncate grow" />
+                    <ui-badge v-if="hint" size="sm" v-text="hint" />
                 </div>
             </template>
             <template #no-options>
@@ -40,7 +38,13 @@
 </template>
 
 <script>
-import { Combobox, StatusIndicator } from '@statamic/ui';
+import { Combobox, StatusIndicator } from '@/components/ui';
+import { ref, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+
+const optionsCache = ref({});
+const loaders = ref({});
 
 export default {
     components: {
@@ -64,6 +68,8 @@ export default {
         return {
             requested: false,
             options: [],
+            abortController: null,
+            removeNavigationListener: null,
         };
     },
 
@@ -84,15 +90,34 @@ export default {
             };
         },
 
+	    cacheKey() {
+			return JSON.stringify({ ...this.parameters, url: this.url });
+	    },
+
         noOptionsText() {
             return this.typeahead && !this.requested ? __('Start typing to search.') : __('No options to choose from.');
         },
     },
 
     created() {
-        // Get the items via ajax.
-        // TODO: To save on requests, this should probably be done in the preload step and sent via meta.
         if (!this.typeahead) this.request();
+
+		watch(
+			() => loaders.value[this.cacheKey],
+			(loading) => {
+				this.options = optionsCache[this.cacheKey];
+				this.requested = true;
+			}
+		);
+
+        this.removeNavigationListener = router.on('before', () => {
+            if (this.abortController) this.abortController.abort();
+        });
+    },
+
+    beforeUnmount() {
+        if (this.abortController) this.abortController.abort();
+        if (this.removeNavigationListener) this.removeNavigationListener();
     },
 
     watch: {
@@ -103,13 +128,29 @@ export default {
 
     methods: {
         request(params = {}) {
+			if (!Object.keys(params).length && loaders.value[this.cacheKey]) return Promise.resolve();
+
             params = { ...this.parameters, ...params };
 
-            return this.$axios.get(this.url, { params }).then((response) => {
-                this.options = response.data.data;
-                this.requested = true;
-                return Promise.resolve(response);
-            });
+			loaders.value = {...loaders.value, [this.cacheKey]: true};
+
+            if (this.abortController) this.abortController.abort();
+            this.abortController = new AbortController();
+
+            return this.$axios.get(this.url, { params, signal: this.abortController.signal })
+	            .then((response) => {
+	                this.options = response.data.data;
+	                this.requested = true;
+		            optionsCache[this.cacheKey] = this.options;
+	                return Promise.resolve(response);
+	            })
+	            .catch((e) => {
+	                if (axios.isCancel(e)) return;
+	                throw e;
+	            })
+	            .finally(() => {
+					loaders.value = {...loaders.value, [this.cacheKey]: false};
+	            });
         },
 
         search(search, loading) {
@@ -129,7 +170,7 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: value, title: value };
+                return existing || option || { id: id, title: id };
             });
 
             this.$emit('input', items);

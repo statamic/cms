@@ -1,7 +1,12 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
-import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions/index.js';
+import {
+    PublishContainer,
+    PublishFieldsProvider as FieldsProvider,
+    PublishFields,
+    Description,
+} from '@ui';
+import { requireElevatedSessionIf } from '@/components/elevated-sessions/index.js';
 
 const props = defineProps({
     action: { type: Object, required: true },
@@ -15,7 +20,7 @@ const emit = defineEmits(['confirmed']);
 let confirming = ref(false);
 let running = ref(false);
 let fieldset = ref({ tabs: [{ fields: props.action.fields }] });
-let values = ref(props.action.values);
+let values = ref(clone(props.action.values));
 
 let confirmationText = computed(() => {
     if (!props.action.confirmationText) return;
@@ -40,9 +45,13 @@ let runButtonText = computed(() => {
     return __n(props.action.buttonText, props.selections);
 });
 
-function onDone() {
+function onSuccess() {
     running.value = false;
     reset();
+}
+
+function onError() {
+    running.value = false;
 }
 
 function confirm() {
@@ -61,7 +70,7 @@ function confirmed() {
 function runAction() {
     requireElevatedSessionIf(props.action.requiresElevatedSession).then(() => {
         running.value = true;
-        emit('confirmed', props.action, values.value, onDone);
+        emit('confirmed', props.action, values.value, onSuccess, onError);
     });
 }
 
@@ -78,40 +87,49 @@ defineExpose({
 
 <template>
     <confirmation-modal
-        v-if="confirming"
+        v-model:open="confirming"
         :title="action.title"
         :danger="action.dangerous"
+        :submittable="action.runnable"
         :buttonText="runButtonText"
         :busy="running"
         @confirm="confirmed"
         @cancel="reset"
     >
-        <div
-            v-if="confirmationText"
-            v-text="confirmationText"
-            :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+        <component
+            v-if="action.component"
+            :is="action.component"
+            :action="action"
+            :values="values"
         />
 
-        <div
-            v-if="warningText"
-            v-text="warningText"
-            class="text-red-500"
-            :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
-        />
+        <template v-else>
+            <Description
+                v-if="confirmationText"
+                :text="confirmationText"
+                :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+            />
 
-        <div
-            v-if="showDirtyWarning"
-            v-text="dirtyText"
-            class="text-red-500"
-            :class="{ 'mb-4': action.fields.length }"
-        />
+            <div
+                v-if="warningText"
+                v-text="warningText"
+                class="text-red-600"
+                :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
+            />
+
+            <div
+                v-if="showDirtyWarning"
+                v-text="dirtyText"
+                class="text-red-600"
+                :class="{ 'mb-4': action.fields.length }"
+            />
+        </template>
 
         <PublishContainer
             v-if="action.fields.length"
             name="confirm-action"
             :blueprint="fieldset"
             v-model="values"
-            :values="values"
             :meta="action.meta"
             :errors="errors"
         >

@@ -1,9 +1,10 @@
 <template>
-    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
+    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive, 'inset-ring-1 inset-ring-red': hasError }]">
         <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
 
         <FieldsProvider
             :fields="fields"
+            :as-config="false"
             :field-path-prefix="`${fieldPathPrefix}.${index}`"
             :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
         >
@@ -29,14 +30,10 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, PublishFieldsProvider as FieldsProvider } from '@ui';
 
 export default {
     components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
-
-    mixins: [ValidatesFieldConditions],
 
     props: {
         index: {
@@ -73,9 +70,13 @@ export default {
             type: Boolean,
             default: true,
         },
+        hasError: {
+            type: Boolean,
+            default: false,
+        },
     },
 
-    inject: ['grid', 'sortableItemClass', 'sortableHandleClass', 'store'],
+    inject: ['grid', 'sortableItemClass', 'sortableHandleClass'],
 
     data() {
         return {
@@ -106,12 +107,6 @@ export default {
 
         fieldPath(handle) {
             return `${this.fieldPathPrefix}.${this.index}.${handle}`;
-        },
-
-        errors(handle) {
-            const state = this.store;
-            if (!state) return [];
-            return state.errors[this.fieldPath(handle)] || [];
         },
     },
 };

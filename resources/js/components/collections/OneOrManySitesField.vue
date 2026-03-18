@@ -43,8 +43,16 @@
 </template>
 
 <script>
+import { publishContextKey } from '@ui';
+
 export default {
-    props: ['handle', 'value', 'store', 'columnHeader'],
+    props: ['handle', 'value', 'columnHeader'],
+
+    inject: {
+        publishContainer: {
+            from: publishContextKey
+        }
+    },
 
     computed: {
         mode() {
@@ -52,12 +60,12 @@ export default {
         },
 
         sites() {
-            if (!this.store.values.sites) return [];
+            if (!this.publishContainer.values.value.sites) return [];
 
-            return this.store.values.sites.map((handle, i) => {
+            return this.publishContainer.values.value.sites.map((handle, i) => {
                 return {
                     handle,
-                    name: this.store.meta.sites.data[i].title,
+                    name: this.publishContainer.meta.value.sites.data[i].title,
                 };
             });
         },

@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Facades\Date;
 use Statamic\Fields\Fieldtype;
 use Statamic\Rules\TimeFieldtype as ValidationRule;
 
@@ -13,7 +14,7 @@ class Time extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'seconds_enabled' => [
                         'display' => __('Show Seconds'),
@@ -21,14 +22,33 @@ class Time extends Fieldtype
                         'type' => 'toggle',
                         'default' => false,
                     ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'text',
                     ],
+                    'augment_format' => [
+                        'display' => __('Augment Format'),
+                        'instructions' => __('statamic::fieldtypes.time.config.augment_format'),
+                        'type' => 'text',
+                    ],
                 ],
             ],
         ];
+    }
+
+    public function augment($value)
+    {
+        if (! $value || ! $this->config('augment_format')) {
+            return $value;
+        }
+
+        return Date::parse($value)->format($this->config('augment_format'));
     }
 
     public function rules(): array

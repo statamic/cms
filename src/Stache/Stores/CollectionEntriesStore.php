@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -161,7 +161,7 @@ class CollectionEntriesStore extends ChildStore
         $indexes = collect([
             'slug',
             'uri',
-            'collection',
+            'collectionHandle',
             'published',
             'title',
             'site' => Indexes\Site::class,

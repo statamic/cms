@@ -1,28 +1,30 @@
 <script setup>
 import { computed } from 'vue';
+import DateFormatter from '@/components/DateFormatter.js';
 import {
     Widget,
     StatusIndicator,
     Listing,
+    ListingTableHead as TableHead,
     ListingTableBody as TableBody,
     ListingPagination as Pagination,
     Icon,
-} from '@statamic/ui';
+} from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     additionalColumns: Array,
     collection: String,
+    icon: String,
     title: String,
-    initialPerPage: {
-        type: Number,
-        default: 5,
-    },
-    initialSortColumn: {
-        type: String,
-    },
-    initialSortDirection: {
-        type: String,
-    },
+    listingUrl: String,
+    initialPerPage: { type: Number, default: 5 },
+    initialSortColumn: { type: String },
+    initialSortDirection: { type: String },
+    canCreate: Boolean,
+    createLabel: String,
+    blueprints: Array,
+    showTableHeader: { type: Boolean, default: false },
 });
 
 const requestUrl = cp_url(`collections/${props.collection}/entries`);
@@ -31,11 +33,12 @@ const cols = computed(() => [{ label: 'Title', field: 'title', visible: true }, 
 
 const widgetProps = computed(() => ({
     title: props.title,
-    icon: 'collections',
+    icon: props.icon,
+    href: props.listingUrl,
 }));
 
-function columnShowing(column) {
-    return cols.value.find((c) => c.field === column);
+function formatDate(value) {
+    return DateFormatter.format(value, 'date');
 }
 </script>
 
@@ -51,7 +54,11 @@ function columnShowing(column) {
         :sort-direction="initialSortDirection"
     >
         <template #initializing>
-            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col justify-between px-4 py-3">
+                    <ui-skeleton v-for="i in initialPerPage" class="h-[1.25rem] mb-[0.375rem] w-full" />
+                </div>
+            </Widget>
         </template>
         <template #default="{ items, loading }">
             <Widget v-bind="widgetProps">
@@ -59,15 +66,23 @@ function columnShowing(column) {
                     {{ __('There are no entries in this collection') }}
                 </ui-description>
                 <div class="px-4 py-3">
-                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm " :class="{ 'opacity-50': loading }">
+                    <table class="w-full widget-table" :class="{ 'opacity-50': loading }">
+                        <TableHead :sr-only="!props.showTableHeader" />
                         <TableBody>
-                            <template #cell-title="{ row: entry }">
+                            <template #cell-title="{ row: entry, isColumnVisible }">
                                 <div class="flex items-center gap-2">
-                                    <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
-                                    <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
+                                    <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
+                                    <Link :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
                                         entry.title
-                                    }}</a>
+                                    }}</Link>
                                 </div>
+                            </template>
+                            <template #cell-date="{ row: entry, isColumnVisible }">
+                                <div
+                                    class="text-end font-inter tabular-nums text-xs whitespace-nowrap text-gray-600 dark:text-gray-400 antialiased px-2"
+                                    v-text="formatDate(entry.date.date)"
+                                    v-if="isColumnVisible('date')"
+                                />
                             </template>
                             <template #cell-status="{ row: entry }">
                                 <StatusIndicator :status="entry.status" :show-dot="false" show-label />
@@ -77,7 +92,13 @@ function columnShowing(column) {
                 </div>
                 <template #actions>
                     <Pagination />
-                    <slot name="actions" />
+                    <create-entry-button
+                        v-if="canCreate"
+                        :text="createLabel"
+                        size="sm"
+                        variant="default"
+                        :blueprints
+                    />
                 </template>
             </Widget>
         </template>

@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:bg-dark-800 h-full bg-white">
+    <div class="h-full rounded-s-xl">
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
@@ -8,21 +8,23 @@
                 :max-selections="maxSelections"
                 :sort-column="sortColumn"
                 :sort-direction="sortDirection"
+                :additional-parameters="additionalParameters"
                 v-model:selections="selections"
+                @request-completed="focusSearchInput"
             >
                 <template #initializing>
                     <div class="flex flex-1">
                         <div class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                            <loading-graphic />
+                            <Icon name="loading" />
                         </div>
                     </div>
                 </template>
 
-                <div class="flex flex-1 flex-col gap-4 overflow-scroll p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="flex flex-1 items-center gap-3">
-                            <Search />
-                            <Filters />
+                <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex flex-1 items-center gap-2 sm:gap-3">
+                            <Search ref="search" />
+                            <Filters v-if="filters && filters.length" />
                         </div>
 
                         <ui-toggle-group v-model="view" v-if="canUseTree">
@@ -32,7 +34,20 @@
                     </div>
 
                     <Panel class="relative mb-0! overflow-x-auto overscroll-x-contain">
-                        <Table />
+                        <Table>
+                            <template #cell-title="{ row: entry, isColumnVisible }">
+                                <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
+                                    <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
+                                    <span v-text="entry.title" />
+                                </a>
+                            </template>
+                            <template #cell-status="{ row: entry }">
+                                <StatusIndicator :status="entry.status" show-label :show-dot="false" />
+                            </template>
+                            <template #cell-type="{ value }">
+                                <Badge :text="value" />
+                            </template>
+                        </Table>
                         <PanelFooter>
                             <Pagination />
                         </PanelFooter>
@@ -49,50 +64,44 @@
                     </ui-toggle-group>
                 </div>
 
-                <div class="mx-4 flex-1 overflow-scroll">
-                    <Panel>
-                        <page-tree
-                            ref="tree"
-                            :pages-url="tree.url"
-                            :show-slugs="tree.showSlugs"
-                            :blueprints="tree.blueprints"
-                            :expects-root="tree.expectsRoot"
-                            :site="site"
-                            :preferences-prefix="`selector-field.${name}`"
-                            :editable="false"
-                            @branch-clicked="$refs[`tree-branch-${$event.id}`].click()"
-                        >
-                            <template #branch-action="{ branch, index }">
-                                <div>
-                                    <input
-                                        :ref="`tree-branch-${branch.id}`"
-                                        type="checkbox"
-                                        class="mt-3 ltr:ml-3 rtl:mr-3"
-                                        :value="branch.id"
-                                        :checked="isSelected(branch.id)"
-                                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :id="`checkbox-${branch.id}`"
-                                        @click="toggleSelection(branch.id)"
-                                    />
-                                </div>
-                            </template>
-
-                            <template #branch-icon="{ branch }">
-                                <svg-icon
-                                    v-if="isRedirectBranch(branch)"
-                                    class="dark:text-dark-175 inline-block h-4 w-4 text-gray-500"
-                                    name="light/external-link"
-                                    v-tooltip="__('Redirect')"
+                <div class="mx-4 flex-1 overflow-auto">
+                    <page-tree
+                        ref="tree"
+                        :pages-url="tree.url"
+                        :show-slugs="tree.showSlugs"
+                        :blueprints="tree.blueprints"
+                        :expects-root="tree.expectsRoot"
+                        :site="site"
+                        :preferences-prefix="`selector-field.${name}`"
+                        :editable="false"
+                        @branch-clicked="toggleSelection($event.id)"
+                    >
+                        <template #branch-action="{ branch, index }">
+                            <div>
+                                <Checkbox
+                                    :ref="`tree-branch-${branch.id}`"
+                                    class="mt-3 mx-3"
+                                    :value="branch.id"
+                                    :model-value="isSelected(branch.id)"
+                                    :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
+                                    :label="getCheckboxLabel(branch)"
+                                    :description="getCheckboxDescription(branch)"
+                                    size="sm"
+                                    solo
+                                    @update:model-value="toggleSelection(branch.id)"
                                 />
-                            </template>
-                        </page-tree>
-                    </Panel>
+                            </div>
+                        </template>
+
+                        <template #branch-icon="{ branch }">
+                            <ui-icon name="external-link" v-if="isRedirectBranch(branch)" v-tooltip="__('Redirect')" />
+                        </template>
+                    </page-tree>
                 </div>
             </template>
 
-            <div class="flex items-center justify-between border-t bg-gray-100 p-4">
-                <div
-                    class="dark:text-dark-150 text-sm text-gray-700"
+            <footer class="flex items-center justify-between border-t dark:border-gray-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
+                <ui-badge
                     v-text="
                         hasMaxSelections
                             ? __n(':count/:max selected', selections, { max: maxSelections })
@@ -109,18 +118,17 @@
                         {{ __('Select') }}
                     </Button>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
 </template>
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     ButtonGroup,
-    Tooltip,
     Listing,
     ListingTable as Table,
     ListingSearch as Search,
@@ -129,14 +137,17 @@ import {
     Panel,
     PanelFooter,
     Heading,
-} from '@statamic/ui';
+    Checkbox,
+    Icon,
+    StatusIndicator,
+    Badge,
+} from '@/components/ui';
 
 export default {
     components: {
         PageTree: defineAsyncComponent(() => import('../../structures/PageTree.vue')),
         Button,
         ButtonGroup,
-        Tooltip,
         Listing,
         Table,
         Search,
@@ -145,6 +156,10 @@ export default {
         Panel,
         PanelFooter,
         Heading,
+        Checkbox,
+        Icon,
+        StatusIndicator,
+        Badge,
     },
 
     // todo, when opening and closing the stack, you cant save?
@@ -156,7 +171,7 @@ export default {
         initialSortColumn: String,
         initialSortDirection: String,
         maxSelections: Number,
-        site: String, // todo: this should be sent to the request.
+        site: String,
         type: String, // todo: this controls the extra column that is commented out in the new table at the moment.
         name: String,
         initialColumns: {
@@ -204,6 +219,12 @@ export default {
 
         viewLocalStorageKey() {
             return `statamic.selector.field.${this.name}`;
+        },
+
+        additionalParameters() {
+            return {
+                site: this.site,
+            }
         },
     },
 
@@ -271,6 +292,35 @@ export default {
                 this.selections.push(id);
             }
         },
+
+        getCheckboxLabel(row) {
+            const rowTitle = this.getRowTitle(row);
+            return this.isSelected(row.id)
+                ? __('Deselect :title', { title: rowTitle })
+                : __('Select :title', { title: rowTitle });
+        },
+
+        getCheckboxDescription(row) {
+            const rowTitle = this.getRowTitle(row);
+            const isDisabled = this.reachedSelectionLimit && !this.singleSelect && !this.isSelected(row.id);
+
+            if (isDisabled) {
+                return __('messages.selections_limit_reached', { title: rowTitle });
+            }
+
+            return this.isSelected(row.id)
+                ? __('messages.selections_item_selected', { title: rowTitle })
+                : __('messages.selections_item_unselected', { title: rowTitle });
+        },
+
+        getRowTitle(row) {
+            // Try to get a meaningful title from common fields
+            return row.title || row.name || row.label || row.id || __('item');
+        },
+
+	    focusSearchInput() {
+		    this.$nextTick(() => this.$refs.search.focus());
+	    },
     },
 };
 </script>

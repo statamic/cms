@@ -1,20 +1,28 @@
 <script setup>
 import { useAttrs, useSlots } from 'vue';
-import { Combobox } from '@statamic/ui';
+import Combobox from '../Combobox/Combobox.vue';
 
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    modelValue: { type: [Object, String, Number], default: null },
-    size: { type: String, default: 'base' },
-    placeholder: { type: String, default: 'Select...' },
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon: { type: String, default: null },
+    /** The controlled value of the select. */
+    modelValue: { type: [Object, String, Number], default: null },
+    /** Key of the option's label in the option's object. */
     optionLabel: { type: String, default: 'label' },
-    optionValue: { type: String, default: 'value' },
+    /** Array of option objects */
     options: { type: Array, default: null },
-    flat: { type: Boolean, default: false },
-    buttonAppearance: { type: Boolean, default: true },
+    /** Key of the option's value in the option's object. */
+    optionValue: { type: String, default: 'value' },
+    placeholder: { type: String, default: () => __('Select...') },
+    readOnly: { type: Boolean, default: false },
+    /** Controls the size of the select. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+    size: { type: String, default: 'base' },
+    /** Controls the appearance of the select. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+    variant: { type: String, default: 'default' },
 });
 
 defineOptions({
@@ -32,17 +40,18 @@ const usingOptionSlot = !!slots['option'];
 <template>
     <Combobox
         v-bind="attrs"
-        :size
-        :placeholder
         :clearable
         :disabled
+        :icon
+        :model-value="modelValue"
         :option-label
         :option-value
         :options
-        :flat
-        :button-appearance
+        :placeholder
+        :read-only
         :searchable="false"
-        :model-value="modelValue"
+        :size
+        :variant
         @update:modelValue="emit('update:modelValue', $event)"
     >
         <template #selected-option="{ option }" v-if="usingSelectedOptionSlot">

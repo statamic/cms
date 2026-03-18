@@ -2,16 +2,12 @@
     <div>
         <Header>
             <template #title>
-                <span
-                    v-if="!isCreating"
-                    class="little-dot -top-1"
-                    :class="activeLocalization.published ? 'published' : 'draft'"
-                    v-tooltip="__(activeLocalization.status)"
-                />
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
                 {{ formattedTitle }}
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -23,14 +19,14 @@
             >
                 <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem
                             :text="__('Edit Blueprint')"
                             icon="blueprint-edit"
                             v-if="canEditBlueprint"
-                            :redirect="actions.editBlueprint"
+                            :href="actions.editBlueprint"
                         />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
@@ -45,9 +41,7 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="readOnly" />
 
             <div class="hidden items-center md:flex">
                 <save-button-options v-if="!readOnly" :show-options="!isInline" :preferences-prefix="preferencesPrefix">
@@ -69,10 +63,10 @@
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
-            :is-root="isRoot"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -84,11 +78,8 @@
                 <PublishComponents />
 
                 <PublishTabs>
-                    <template #actions>
-                        <div
-                            class="space-y-6"
-                            v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
-                        >
+                    <template v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector" #actions>
+                        <div class="space-y-6">
                             <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
@@ -118,6 +109,16 @@
                 </PublishTabs>
             </LivePreview>
         </PublishContainer>
+
+        <confirmation-modal
+            :open="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
     </div>
 </template>
 
@@ -126,7 +127,7 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Header,
     Badge,
@@ -136,25 +137,24 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import { SavePipeline } from '@statamic/exports.js';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+    StatusIndicator,
+} from '@ui';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { ref, computed } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import ItemActions from '@/components/actions/ItemActions.vue';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
 
     components: {
+        StatusIndicator,
         ItemActions,
         Header,
         Badge,
@@ -192,9 +192,7 @@ export default {
         isCreating: Boolean,
         isInline: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         initialPermalink: String,
-        preloadedAssets: Array,
         canEditBlueprint: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
@@ -221,27 +219,37 @@ export default {
             state: 'new',
             published: this.initialPublished,
             readOnly: this.initialReadOnly,
-            isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
+            pendingLocalization: null,
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
-        },
-
-        store() {
-            return this.$refs.container.store;
+            return this.errorsRef.value;
         },
 
         formattedTitle() {
@@ -253,7 +261,7 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {
@@ -293,7 +301,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         direction() {
@@ -328,20 +336,22 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
-                    new BeforeSaveHooks('entry', {
+                    new BeforeSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
                         published: this.published,
                         _localized: this.localizedFields,
                     }),
-                    new AfterSaveHooks('entry', {
+                    new AfterSaveHooks('term', {
                         taxonomy: this.taxonomyHandle,
                         reference: this.initialReference,
                     }),
@@ -355,12 +365,17 @@ export default {
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && this.afterSaveOption === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
+                        this.redirectTo(this.listingUrl);
+                    }
+
+                    // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
+                    else if (!this.isInline && window.location.href !== response.data.data.edit_url) {
+                        this.redirectTo(response.data.data.edit_url);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -384,11 +399,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.localizing = localization.handle;
 
             if (localization.exists) {
@@ -416,7 +439,6 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
@@ -442,9 +464,38 @@ export default {
             if (response.data) {
                 this.title = response.data.title;
                 this.permalink = response.data.permalink;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
@@ -459,16 +510,14 @@ export default {
             this.save();
         });
 
-        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
+        this.addToCommandPalette();
     },
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-
-        container = computed(() => this.$refs.container);
     },
 
-    unmounted() {
+	beforeUnmount() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     },

@@ -1,15 +1,10 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
-        <header class="flex items-center justify-between pl-3">
-            <ui-heading :text="__('Fieldtypes')" size="lg" icon="cog" />
-            <ui-button type="button" icon="x" variant="subtle" @click="close" />
-        </header>
-
+    <div class="">
         <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
+            <Icon name="loading" />
         </div>
 
-        <div class="flex p-3" v-if="fieldtypesLoaded">
+        <div class="flex mb-8" v-if="fieldtypesLoaded">
             <ui-input
                 v-model="search"
                 ref="search"
@@ -19,7 +14,7 @@
             />
         </div>
 
-        <div class="p-2 space-y-8" v-if="fieldtypesLoaded">
+        <div class="space-y-8" v-if="fieldtypesLoaded">
             <div
                 v-for="group in displayedFieldtypes"
                 :key="group.handle"
@@ -28,7 +23,8 @@
                 <h2 v-if="group.title" v-text="group.title" class="mb-2 px-2" />
                 <div class="fieldtype-selector">
                     <ui-panel>
-                        <ui-panel-header v-if="group.description" class="px-2! py-1.5!">
+                        <ui-panel-header v-if="group.description" class="px-2! py-1.7
+                        5!">
                             <ui-description :text="group.description" />
                         </ui-panel-header>
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
@@ -37,9 +33,9 @@
                                 class="flex items-center gap-2 w-full px-3 py-2.5 group bg-white dark:bg-gray-850 shadow-ui-sm rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-gray-700 cursor-pointer"
                                 type="button"
                                 @click="select(fieldtype)"
-                                :title="fieldtype.icon"
+                                :title="fieldtype.text"
                             >
-                                <ui-icon :name="`fieldtype-${fieldtype.icon}`" class="text-gray-500 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-100" />
+                                <ui-icon :name="fieldtype.icon" class="text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-100" />
                                 <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100" v-text="fieldtype.text" />
                             </button>
                             </div>
@@ -55,10 +51,15 @@
 import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
+import { Icon } from '@/components/ui';
 
 const loadedFieldtypes = ref(null);
 
 export default {
+    components: {
+        Icon,
+    },
+
     props: {
         allowTitle: {
             default: false,

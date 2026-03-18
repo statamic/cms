@@ -2,6 +2,7 @@
     <div>
         <Header :title="title" icon="users">
             <ItemActions
+                ref="actions"
                 v-if="canEditBlueprint || hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -13,10 +14,11 @@
             >
                 <Dropdown>
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
@@ -38,7 +40,17 @@
                 :requires-current-password="requiresCurrentPassword"
             />
 
-            <Button variant="primary" @click.prevent="save" v-text="__('Save')" />
+            <CommandPaletteItem
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                keys="mod+s"
+                prioritize
+                v-slot="{ text, action }"
+            >
+                <Button variant="primary" @click.prevent="action" :text="text" />
+            </CommandPaletteItem>
 
             <slot name="action-buttons-right" />
         </Header>
@@ -61,9 +73,9 @@
 <script>
 import ChangePassword from './ChangePassword.vue';
 import HasActions from '../publish/HasActions';
-import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
-import clone from '@statamic/util/clone.js';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+import TwoFactor from '@/components/two-factor/TwoFactor.vue';
+import clone from '@/util/clone.js';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import {
     Button,
     Dropdown,
@@ -73,15 +85,11 @@ import {
     PublishContainer,
     PublishTabs,
     Header,
-} from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { SavePipeline } from '@statamic/exports.js';
+    CommandPaletteItem
+} from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
 export default {
     mixins: [HasActions],
@@ -98,6 +106,7 @@ export default {
         PublishContainer,
         PublishTabs,
         Header,
+        CommandPaletteItem
     },
 
     props: {
@@ -121,14 +130,31 @@ export default {
             values: clone(this.initialValues),
             meta: clone(this.initialMeta),
             error: null,
-            errors: {},
             title: this.initialTitle,
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
-        store() {
-            return this.$refs.container.store;
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
+        saving() {
+            return this.savingRef.value;
+        },
+
+        errors() {
+            return this.errorsRef.value;
         },
 
         isDirty() {
@@ -139,12 +165,14 @@ export default {
     methods: {
         save() {
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method),
                     new AfterSaveHooks('user', {
@@ -152,22 +180,36 @@ export default {
                     }),
                 ])
                 .then((response) => {
-                    Statamic.$toast.success('Saved');
+                    Statamic.$toast.success(__('Saved'));
 
                     this.title = response.data.title;
+
+                    this.$nextTick(() => this.$emit('saved', response));
                 });
         },
 
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.title = response.data.title;
-                this.values = resetValuesFromResponse(response.data.values, this.$refs.container.store);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
             }
         },
-    },
 
-    created() {
-        container = computed(() => this.$refs.container);
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                url: this.actions.editBlueprint,
+            });
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
     },
 
     mounted() {
@@ -175,6 +217,8 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 };
 </script>

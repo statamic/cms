@@ -13,10 +13,10 @@
             push-query
         >
             <template #cell-email="{ row: user }">
-                <a class="title-index-field" :href="user.edit_url" @click.stop>
-                    <avatar :user="user" class="h-8 w-8 rounded-full ltr:mr-2 rtl:ml-2" />
+                <Link class="title-index-field" :href="user.edit_url" @click.stop>
+                    <ui-avatar :user="user" class="size-8 text-xs ltr:mr-2 rtl:ml-2" />
                     <span v-text="user.email" />
-                </a>
+                </Link>
             </template>
             <template #cell-roles="{ row: user, value: roles }">
                 <div class="role-index-field">
@@ -37,25 +37,28 @@
                 </div>
             </template>
             <template #cell-two_factor="{ row: user, value }">
-                <div class="flex items-center space-x-2">
-                    <template v-if="value">
-                        <svg-icon name="light/check" class="w-3 text-green-600" />
-                    </template>
-                    <template v-else>
-                        <svg-icon name="light/close" class="w-3 text-gray-500" />
-                    </template>
+                <div class="flex items-center">
+                    <ui-icon name="checkmark" class="size-3 text-green-600" v-if="value" />
+                    <ui-icon name="x" class="size-3 text-gray-400 dark:text-gray-600" v-else />
                 </div>
+            </template>
+            <template #prepended-row-actions="{ row: user }">
+                <DropdownItem :text="__('Edit')" :href="user.edit_url" icon="edit" v-if="user.editable" />
+                <DropdownItem :text="__('View')" :href="user.edit_url" icon="eye" v-else />
             </template>
         </Listing>
     </div>
 </template>
 
 <script>
-import { Listing } from '@statamic/ui';
+import { Listing, DropdownItem } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     components: {
+        Link,
         Listing,
+        DropdownItem,
     },
 
     props: {

@@ -15,7 +15,7 @@ export default {
             return this.modelValue ? this.modelValue.length : 0;
         },
         limitIndicatorColor() {
-            return this.limitReached ? 'text-red-500' : 'text-gray';
+            return this.limitReached ? 'text-red-600' : 'text-gray';
         },
     },
 };

@@ -3,10 +3,11 @@
         <CheckboxGroup v-model="values" :inline="config.inline" ref="checkboxes">
             <Checkbox
                 v-for="(option, index) in options"
+                :disabled="config.disabled"
                 :key="index"
                 :label="option.label || option.value"
+                :read-only="isReadOnly"
                 :value="option.value"
-                :disabled="isReadOnly"
             />
         </CheckboxGroup>
     </div>
@@ -15,7 +16,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import { CheckboxGroup, Checkbox } from '@statamic/ui';
+import { CheckboxGroup, Checkbox } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -37,7 +38,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.values
                 .map((value) => {

@@ -20,6 +20,9 @@ class Permission
     protected $description;
     protected $group;
 
+    /**
+     * @return ($value is null ? string|string[] : static)
+     */
     public function value(?string $value = null)
     {
         if (func_num_args() > 0) {
@@ -41,6 +44,9 @@ class Permission
         return $this->label;
     }
 
+    /**
+     * @return ($label is null ? string|null : static)
+     */
     public function label(?string $label = null)
     {
         if (func_num_args() > 0) {
@@ -51,7 +57,9 @@ class Permission
 
         $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
 
-        return __($label, [$this->placeholder => $this->placeholderLabel]);
+        return $this->placeholder
+            ? __($label, [$this->placeholder => $this->placeholderLabel])
+            : __($label);
     }
 
     public function placeholder(?string $placeholder = null)

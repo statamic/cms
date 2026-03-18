@@ -9,17 +9,43 @@ use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 class Floatval extends Fieldtype
 {
     protected $categories = ['number'];
-    protected $icon = 'float';
     protected $rules = ['numeric'];
     protected static $handle = 'float';
 
     protected function configFieldItems(): array
     {
         return [
+            'min' => [
+                'display' => __('Min'),
+                'instructions' => __('statamic::fieldtypes.integer.config.min'),
+                'type' => 'float',
+            ],
+            'max' => [
+                'display' => __('Max'),
+                'instructions' => __('statamic::fieldtypes.integer.config.max'),
+                'type' => 'float',
+            ],
+            'step' => [
+                'display' => __('Step'),
+                'instructions' => __('statamic::fieldtypes.integer.config.step'),
+                'type' => 'float',
+            ],
             'default' => [
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'text',
+            ],
+            'prepend' => [
+                'display' => __('Prepend'),
+                'instructions' => __('statamic::fieldtypes.text.config.prepend'),
+                'type' => 'text',
+                'width' => '50',
+            ],
+            'append' => [
+                'display' => __('Append'),
+                'instructions' => __('statamic::fieldtypes.text.config.append'),
+                'type' => 'text',
+                'width' => '50',
             ],
         ];
     }
@@ -36,11 +62,6 @@ class Floatval extends Fieldtype
             return;
         }
 
-        return floatval($data);
-    }
-
-    public function preProcessConfig($data)
-    {
         return floatval($data);
     }
 
@@ -61,5 +82,20 @@ class Floatval extends Fieldtype
     public function toGqlType()
     {
         return GraphQL::type(GraphQL::float());
+    }
+
+    public function rules(): array
+    {
+        $rules = ['numeric'];
+
+        if ($min = $this->config('min')) {
+            $rules[] = 'min:'.$min;
+        }
+
+        if ($max = $this->config('max')) {
+            $rules[] = 'max:'.$max;
+        }
+
+        return $rules;
     }
 }

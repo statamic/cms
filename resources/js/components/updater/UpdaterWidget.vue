@@ -1,6 +1,7 @@
 <script setup>
-import { Widget, Badge, Listing, Icon, Tooltip } from '@statamic/ui';
+import { Widget, Badge, Listing, Icon } from '@/components/ui';
 import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 defineProps({
     items: Object,
@@ -9,22 +10,24 @@ defineProps({
 
 <template>
     <Listing :items="items" v-slot="{ items }">
-        <Widget :title="__('Updates')" icon="updates">
-            <table v-if="items.length" class="">
-                <tr v-for="update in items" class="text-sm">
-                    <td class="py-1 pr-4 leading-tight">
-                        <a :href="update.url" class="flex items-center gap-2" v-text="update.name" />
-                    </td>
-                    <td>
-                        <Badge pill variant="flat" :color="update.critical ? 'red' : 'green'" :text="update.count" />
-                        <Tooltip :text="__('Critical')">
-                            <div class="inline-flex">
-                                <Icon v-if="update.critical" name="warning-diamond" color="red" />
-                            </div>
-                        </Tooltip>
-                    </td>
-                </tr>
-            </table>
+        <Widget :title="__('Updates')" icon="updates" :href="cp_url('updater')">
+            <div v-if="items.length" class="w-full px-4 py-3">
+                <table class="w-full">
+                    <tr v-for="update in items" class="text-sm">
+                        <td class="py-1 pr-4 leading-tight">
+                            <Link :href="update.url" class="flex items-center gap-2" v-text="update.name" />
+                        </td>
+                        <td>
+                            <Badge
+                                pill
+                                :text="update.count"
+                                :color="update.security ? 'red' : 'amber'"
+                                v-tooltip="update.security ? __('Security update available') : null"
+                            />
+                        </td>
+                    </tr>
+                </table>
+            </div>
             <ui-description v-else class="flex-1 flex items-center justify-center">
                 {{ __('Everything is up to date.') }}
             </ui-description>

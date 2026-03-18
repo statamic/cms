@@ -4,16 +4,16 @@
             :id="fieldId"
             :name="name"
             :value="value"
-            @update:modelValue="updateDebounced"
-            @keydown="$emit('keydown', $event)"
+            @update:model-value="updateDebounced"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >
             <template #append>
                 <Button
                     size="sm"
-                    :icon="hidden ? 'eye' : 'eye-closed'"
+                    :icon="hidden ? 'eye-closed' : 'eye'"
                     variant="ghost"
+                    v-tooltip="hideDisplayTooltip"
                     @click="toggleHidden"
                 />
             </template>
@@ -22,7 +22,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Button, Input } from '@statamic/ui';
+import { Button, Input } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],
@@ -34,6 +34,9 @@ export default {
     computed: {
         hidden() {
             return this.getFieldSettingsValue('hide_display');
+        },
+        hideDisplayTooltip() {
+            return this.hidden ? __('Show Display Label') : __('Hide Display Label');
         },
     },
 

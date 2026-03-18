@@ -1,24 +1,13 @@
 <template>
-    <node-view-wrapper>
-        <Motion
-            layout
-            class="flex justify-center py-3 relative group"
-            :initial="{ paddingTop: '0.75rem', paddingBottom: '0.75rem' }"
-            :hover="{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }"
-            :transition="{ duration: 0.2 }"
-        >
-            <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
-            <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75 cursor-pointer" @click="addSetButtonClicked">
-                <div class="h-full flex flex-col justify-center">
-                    <div class="rounded-full bg-gray-200 h-2" />
-                </div>
-            </button>
-            <Button v-if="enabled" @click="addSetButtonClicked" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
-        </Motion>
+    <node-view-wrapper class="my-4">
         <div
-            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            ref="container"
+            class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
-                'dark:border-dark-blue-100 border-blue-400!': selected || withinSelection,
+                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
+                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
+                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
+                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
                 'border-red-500': hasError,
             }"
             :data-type="config.handle"
@@ -29,25 +18,28 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
-                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed, invalid: isInvalid }"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :class="{
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
+                }"
             >
-                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
-                <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
-                    <Badge variant="flat" size="lg">
-                        <span v-if="isSetGroupVisible">
+                <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
+                    <Icon name="handles" class="size-4 text-gray-400" />
+                </span>
+                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                    <Badge size="lg" :pill="true" color="white" class="px-3">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
-                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
+                            <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Tooltip :markdown="__(config.instructions)">
-                        <Icon
-                            v-if="config.instructions && !collapsed"
-                            name="info-square"
-                            class="size-3.5! text-gray-500"
-                        />
-                    </Tooltip>
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                    />
                     <Subheading
                         v-show="collapsed"
                         v-html="previewText"
@@ -55,13 +47,11 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
-                        <Switch size="xs" v-model="enabled" />
-                    </Tooltip>
+                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" size="xs" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -87,50 +77,48 @@
                 </div>
             </header>
 
-            <Motion
-                layout
-                v-if="index !== undefined"
-                class="overflow-hidden"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                v-if="index !== undefined && hasFields"
+                v-show="!collapsed"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
                 <FieldsProvider
                     :fields="fields"
+                    :as-config="false"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >
                     <Fields class="p-4" />
                 </FieldsProvider>
-            </Motion>
+            </div>
         </div>
     </node-view-wrapper>
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-3';
-import SetField from '../replicator/Field.vue';
+import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
-import { Motion } from 'motion-v';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
-import Fields from '@statamic/components/ui/Publish/Fields.vue';
-import { within } from '@popperjs/core/lib/utils/within.js';
+import {
+    Badge,
+    Button,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    Icon,
+    Subheading,
+    Switch,
+    PublishFieldsProvider as FieldsProvider,
+    PublishFields as Fields
+} from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { watch } from 'vue';
+import { reveal } from '@api';
 
 export default {
-    props: {
-        editor: { type: Object, required: true },
-        node: { type: Object, required: true },
-        decorations: { type: Array, required: true },
-        selected: { type: Boolean, required: true },
-        extension: { type: Object, required: true },
-        getPos: { type: Function, required: true },
-        updateAttributes: { type: Function, required: true },
-        deleteNode: { type: Function, required: true },
-        showConnector: { type: Boolean, default: true },
-    },
+    props: nodeViewProps,
 
     components: {
         Button,
@@ -141,22 +129,29 @@ export default {
         Fields,
         FieldsProvider,
         Switch,
-        Tooltip,
         Subheading,
         Badge,
         Icon,
         NodeViewWrapper,
-        SetField,
-        Motion,
     },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
+    mixins: [ManagesPreviewText, HasFieldActions],
 
-    inject: ['bard', 'bardSets', 'store', 'storeName'],
+    inject: {
+        bard: {},
+        bardSets: {},
+        publishContainer: { from: containerContextKey },
+    },
 
     computed: {
         fields() {
             return this.config.fields;
+        },
+
+        hasFields() {
+            return Array.isArray(this.fields)
+                ? this.fields.length > 0
+                : Object.keys(this.fields || {}).length > 0;
         },
 
         display() {
@@ -176,11 +171,11 @@ export default {
         },
 
         previews() {
-            return data_get(this.store.previews, this.fieldPathPrefix) || {};
+            return data_get(this.publishContainer.previews.value, this.fieldPathPrefix) || {};
         },
 
         collapsed() {
-            return this.extension.options.bard.meta.collapsed.includes(this.node.attrs.id);
+            return this.extension.options.bard.collapsed.includes(this.node.attrs.id);
         },
 
         config() {
@@ -245,7 +240,7 @@ export default {
         },
 
         hasError() {
-            return this.extension.options.bard.setsWithErrors.includes(this.index);
+            return this.extension.options.bard.setHasError(this.node.attrs.id);
         },
 
         showFieldPreviews() {
@@ -264,6 +259,10 @@ export default {
             return this.decorationSpecs.withinSelection;
         },
 
+        showSelectionHighlight() {
+            return (this.selected || this.withinSelection) && this.bard.hasBeenFocused;
+        },
+
         fieldVm() {
             return this.extension.options.bard;
         },
@@ -278,12 +277,10 @@ export default {
                 config: this.config,
                 // meta: this.meta,
                 update: (handle, value) =>
-                    this.store.setDottedFieldValue({ path: `${this.fieldPathPrefix}.${handle}`, value }),
+                    this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
                 updateMeta: (handle, value) =>
-                    this.store.setDottedFieldMeta({ path: `${this.metaPathPrefix}.${handle}`, value }),
+                    this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
                 isReadOnly: this.isReadOnly,
-                // store: this.store,
-                // storeName: this.storeName,
             };
         },
 
@@ -293,9 +290,6 @@ export default {
     },
 
     methods: {
-        within() {
-            return within;
-        },
         focused() {
             this.extension.options.bard.$emit('focus');
         },
@@ -332,15 +326,55 @@ export default {
             this.extension.options.bard.duplicateSet(
                 this.node.attrs.id,
                 this.node.attrs,
-                this.getPos() + this.node.nodeSize,
+                this.getPos,
             );
+        },
+
+        enableDragging() {
+            this._draggableObserver?.disconnect();
+            this.$el.setAttribute('draggable', true);
+
+            document.addEventListener('mouseup', this.disableDragging, { once: true });
+            document.addEventListener('dragend', this.disableDragging, { once: true });
+        },
+
+        disableDragging() {
+            this.$el.setAttribute('draggable', false);
+            this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },
     },
 
-    updated() {
-        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
-        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
+    mounted() {
+        watch(
+            () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
+            (values) => {
+				if (! values) return;
+
+                this.updateAttributes({ values });
+            },
+            { deep: true }
+        );
+
+        reveal.mount(this.$refs.container, this.expand);
+
+        // Firefox bug 739071: text selection doesn't work inside elements with a
+        // draggable ancestor. ProseMirror sets draggable=true on the node-view-wrapper
+        // because the Set node spec has draggable:true. We must keep it false.
         this.$el.setAttribute('draggable', false);
+        this._draggableObserver = new MutationObserver(() => {
+            if (this.$el.getAttribute('draggable') !== 'false') {
+                this.$el.setAttribute('draggable', false);
+            }
+        });
+        this._draggableObserver.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+    },
+
+    updated() {
+        this.$el.setAttribute('draggable', false);
+    },
+
+    beforeUnmount() {
+        this._draggableObserver?.disconnect();
     },
 };
 </script>

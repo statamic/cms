@@ -1,12 +1,11 @@
 <template>
-    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-dark-900">
+    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-gray-900">
         <Description v-if="index === 0" class="w-full mb-4" :text="__('messages.field_conditions_field_instructions')" />
 
         <div class="mb-2 w-full md:mb-0 md:w-1/3">
             <Combobox
                 ref="fieldSelect"
                 :model-value="condition.field"
-                class="w-full"
                 :options="fieldOptions"
                 :placeholder="__('Field')"
                 :taggable="true"
@@ -19,18 +18,18 @@
                         <span v-text="option.label" />
                         <span
                             v-text="option.value"
-                            class="font-mono text-2xs text-gray-500 dark:text-dark-150"
+                            class="font-mono text-2xs text-gray-500 dark:text-gray-300"
                             :class="{ 'ml-2': option.label }"
                         />
                     </div>
                 </template>
-                <template #selected-option>
-                    <span v-text=" __(field.config.display) || field.handle"></span>
+                <template #selected-option="{ option }">
+                    <div class="truncate" v-text="__(field?.config.display) || option.value" />
                 </template>
             </Combobox>
         </div>
 
-        <div class="w-32">
+        <div class="w-auto min-w-32">
             <Select
                 class="w-full"
                 :model-value="condition.operator"
@@ -72,9 +71,8 @@
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
-import { Description, Combobox, Input, Button } from '@statamic/ui';
-import Select from '@statamic/components/ui/Select/Select.vue'
-import Switch from '@statamic/components/ui/Switch.vue'
+import { Description, Combobox, Input, Button } from '@/components/ui';
+import { Select, Switch } from '@ui';
 
 export default {
     mixins: [HasInputOptions],
@@ -157,17 +155,17 @@ export default {
 
         operatorOptions() {
             return this.normalizeInputOptions({
-                equals: __('equals'),
-                not: __('not'),
-                contains: __('contains'),
-                contains_any: __('contains any'),
+                equals: __('Equals'),
+                not: __('Not'),
+                contains: __('Contains'),
+                contains_any: __('Contains Any'),
                 '===': '===',
                 '!==': '!==',
                 '>': '>',
                 '>=': '>=',
                 '<': '<',
                 '<=': '<=',
-                custom: __('custom'),
+                custom: __('Custom'),
             });
         },
     },

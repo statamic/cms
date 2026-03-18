@@ -9,12 +9,7 @@ use Statamic\Facades\User;
 
 class Updater extends Widget
 {
-    /**
-     * The HTML that should be shown in the widget.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function html()
+    public function component()
     {
         if (! User::current()->can('view updates')) {
             return;
@@ -23,23 +18,28 @@ class Updater extends Widget
         $items = collect(UpdatesOverview::updatableAddons())->map(function ($id) {
             $addon = Addon::get($id);
 
+            $changelog = $addon->changelog();
+
             return [
                 'name' => $addon->name(),
-                'count' => $addon->changelog()->availableUpdatesCount(),
-                'critical' => false,
+                'count' => $changelog->availableUpdatesCount(),
+                'security' => $changelog->hasSecurityUpdate(),
                 'url' => cp_route('updater.product', $addon->slug()),
             ];
         });
 
         if (UpdatesOverview::hasStatamicUpdate()) {
+            $changelog = Marketplace::statamic()->changelog();
             $items->push([
                 'name' => 'Statamic Core',
-                'count' => Marketplace::statamic()->changelog()->availableUpdatesCount(),
-                'critical' => false,
+                'count' => $changelog->availableUpdatesCount(),
+                'security' => $changelog->hasSecurityUpdate(),
                 'url' => cp_route('updater.product', 'statamic'),
             ]);
         }
 
-        return view('statamic::widgets.updater', compact('items'));
+        return VueComponent::render('updater-widget', [
+            'items' => $items,
+        ]);
     }
 }

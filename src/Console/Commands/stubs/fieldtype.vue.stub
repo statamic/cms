@@ -1,26 +1,13 @@
-<template>
+<script setup>
+import { Fieldtype } from '@statamic/cms';
+import { Input } from '@statamic/cms/ui';
 
-    <div>
-        <text-input
-            :model-value="value"
-            @update:model-value="update"
-        />
-    </div>
-
-</template>
-
-<script>
-import { Fieldtype } from 'statamic';
-
-export default {
-
-    mixins: [Fieldtype],
-
-    data() {
-        return {
-            //
-        };
-    }
-
-};
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { expose, update } = Fieldtype.use(emit, props);
+defineExpose(expose);
 </script>
+
+<template>
+    <Input :model-value="value" @update:model-value="update" />
+</template>

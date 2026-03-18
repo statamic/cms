@@ -1,7 +1,7 @@
 <script setup>
-import { Button, Modal, Tooltip } from '@statamic/ui';
-import { SortableList } from '@statamic/components/sortable/Sortable.js';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { Button, Modal } from '@ui';
+import { SortableList } from '@/components/sortable/Sortable.js';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref } from 'vue';
 
 const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns, reorderable } = injectListingContext();
@@ -69,70 +69,53 @@ function reset() {
 </script>
 
 <template>
-    <div>
-        <Tooltip :text="__('Customize Columns')">
-            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" />
-        </Tooltip>
+    <div data-ui-column-customizer class="absolute right-0 mask-bg mask-bg--left">
+        <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" v-tooltip="__('Customize Columns')" />
         <Modal :title="__('Customize Columns')" v-model:open="open">
-            <div class="flex h-full flex-col">
-                <div class="dark:bg-dark-600 flex min-h-0 grow rounded-t-md bg-gray-100">
+            <div class="border rounded-lg dark:border-gray-700">
+                <div class="flex">
                     <!-- Available Columns -->
-                    <div
-                        class="dark:border-dark-900 flex w-1/2 flex-col outline-hidden ltr:border-r ltr:text-left rtl:border-l rtl:text-right"
-                    >
-                        <header
-                            v-text="__('Available Columns')"
-                            class="dark:border-dark-900 dark:bg-dark-700 border-b bg-white px-3 py-2 text-sm font-medium"
-                        />
-                        <div
-                            class="flex flex-1 flex-col space-y-1 overflow-y-scroll px-3 py-2 shadow-inner select-none"
-                        >
-                            <div
-                                class="column-picker-item"
+                    <div class="flex w-1/2 flex-col text-start">
+                        <ui-heading :text="__('Available Columns')" class="py-2 px-3 border-b dark:border-gray-700" />
+                        <div class="flex flex-1 flex-col space-y-1 overflow-y-auto h-full px-3 py-2 select-none bg-gray-100 dark:bg-gray-900 rounded-es-[calc(var(--radius-lg)-1px)]">
+                            <ui-checkbox
+                                v-model="column.visible"
+                                :label="column.label"
                                 v-for="column in sortedHiddenColumns"
                                 :key="column.field"
-                                v-if="hiddenColumns.length"
-                            >
-                                <label class="flex cursor-pointer items-center">
-                                    <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="column.visible" />
-                                    {{ __(column.label) }}
-                                </label>
-                            </div>
+                                class="column-picker-item"
+                            />
                         </div>
                     </div>
 
                     <!-- Displayed Columns -->
-                    <div class="flex w-1/2 flex-col">
-                        <header
-                            v-text="__('Displayed Columns')"
-                            class="dark:border-dark-900 dark:bg-dark-700 flex-none border-b bg-white px-3 py-2 text-sm font-medium"
-                        />
-                        <div class="grow overflow-y-scroll shadow-inner">
+                    <div class="flex w-1/2 flex-col text-start border-l dark:border-gray-700">
+                        <ui-heading :text="__('Displayed Columns')" class="py-2 px-3 border-b dark:border-gray-700" />
+                        <div class="overflow-y-auto bg-gray-100 dark:bg-gray-900 rounded-ee-[calc(var(--radius-lg)-1px)] h-full">
                             <sortable-list
                                 v-model="selectedColumns"
-                                :vertical="true"
                                 :distance="5"
+                                :mirror="false"
+                                :vertical="true"
                                 item-class="item"
                                 handle-class="item"
-                                append-to=".modal-body"
-                                constrain-dimensions
+                                append-to="[data-ui-modal-content]"
+                                :constrain-dimensions="true"
                             >
-                                <div class="space-y-1 p-3 px-3 select-none">
+                                <div class="space-y-1.5 p-3 select-none">
                                     <div
-                                        class="item sortable cursor-grab"
+                                        class="item sortable cursor-grab py-2 px-2.5 gap-2 sm:gap-3 relative rounded-lg bg-white dark:bg-gray-800 flex items-center justify-between text-xs shadow"
                                         v-for="column in selectedColumns"
                                         :key="column.field"
                                         tabindex="-1"
                                     >
-                                        <div class="item-move py-1">&nbsp;</div>
-                                        <div class="flex flex-1 items-center p-0 ltr:ml-2 rtl:mr-2">
-                                            <input
-                                                type="checkbox"
-                                                class="ltr:mr-2 rtl:ml-2"
+                                        <ui-drag-handle class="item-move" />
+                                        <div class="flex flex-1 items-center">
+                                            <ui-checkbox
                                                 v-model="column.visible"
+                                                :label="column.label"
                                                 :disabled="selectedColumns.length === 1 || column.required"
                                             />
-                                            {{ __(column.label) }}
                                         </div>
                                     </div>
                                 </div>

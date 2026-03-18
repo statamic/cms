@@ -1,19 +1,19 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
-        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-            <loading-graphic />
-        </div>
+    <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+        <Icon name="loading" />
+    </div>
 
-        <header v-if="!loading" class="flex items-center justify-between pl-3">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `fieldtype-${fieldtype.icon}`" />
-            <div class="flex items-center gap-3">
-                <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
-                <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
-            </div>
-        </header>
+    <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
+        <template #actions>
+            <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
+            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
+            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
+        </template>
+    </StackHeader>
 
-        <section class="isolate px-3 py-4">
+    <StackContent>
+        <section v-if="!loading" class="isolate">
             <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
@@ -21,30 +21,25 @@
                     <TabTrigger name="validation" :text="__('Validation')" />
                 </TabList>
 
-                <div v-if="!loading">
-                    <publish-container
-                        :name="`field-settings-${$.uid}`"
-                        :blueprint="blueprint"
-                        :values="values"
-                        :meta="meta"
-                        :errors="errors"
-                        :is-root="true"
-                        @updated="values = $event"
-                        v-slot="{ setFieldValue, setFieldMeta }"
-                    >
-                        <TabContent name="settings">
-                            <publish-sections
-                                :sections="blueprint.tabs[0].sections"
-                                @updated="(handle, value) => updateField(handle, value, setFieldValue)"
-                                @meta-updated="setFieldMeta"
-                            />
-                        </TabContent>
-                    </publish-container>
+                <div>
+                    <TabContent name="settings">
+                        <ui-publish-container
+                            ref="container"
+                            :blueprint="adjustedBlueprint"
+                            :meta="meta"
+                            :errors="errors"
+                            v-model="values"
+                            v-model:modified-fields="editedFields"
+                            :origin-values="originValues"
+                            :origin-meta="originMeta"
+                            as-config
+                        />
+                    </TabContent>
 
                     <TabContent name="conditions">
                         <CardPanel :heading="__('Conditions')">
                             <FieldConditionsBuilder
-                                :config="config"
+                                :config="values"
                                 :suggestable-fields="suggestableConditionFields"
                                 @updated="updateFieldConditions"
                                 @updated-always-save="updateAlwaysSave"
@@ -54,24 +49,26 @@
 
                     <TabContent name="validation">
                         <CardPanel :heading="__('Validation')">
-                            <FieldValidationBuilder :config="config" @updated="updateField('validate', $event)" />
+                            <FieldValidationBuilder :config="values" @updated="updateField('validate', $event)" />
                         </CardPanel>
                     </TabContent>
                 </div>
             </Tabs>
         </section>
-    </div>
+    </StackContent>
 </template>
 
 <script>
-import PublishField from '../publish/Field.vue';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel } from '@statamic/ui';
+import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon, StackHeader, StackContent } from '@/components/ui';
 
 export default {
+    emits: ['committed', 'closed'],
+
     components: {
-        PublishField,
+        StackContent,
+        StackHeader,
         FieldConditionsBuilder,
         FieldValidationBuilder,
         Heading,
@@ -80,11 +77,12 @@ export default {
         TabList,
         TabTrigger,
         TabContent,
-        CardPanel
+        CardPanel,
+        Icon
     },
 
     props: {
-        id: String,
+        id: [String, Number],
         config: Object,
         overrides: { type: Array, default: () => [] },
         type: String,
@@ -104,6 +102,9 @@ export default {
     },
 
     inject: {
+        isInsideConfigFields: {
+            default: false
+        },
         commitParentField: {
             default: () => {}
         }
@@ -118,6 +119,8 @@ export default {
         return {
             values: null,
             meta: null,
+            originValues: null,
+            originMeta: null,
             error: null,
             errors: {},
             editedFields: clone(this.overrides),
@@ -125,10 +128,27 @@ export default {
             fieldtype: null,
             loading: true,
             blueprint: null,
+            isSaving: false, // Prevent multiple simultaneous saves
         };
     },
 
     computed: {
+        adjustedBlueprint() {
+            let blueprint = this.blueprint;
+
+            blueprint.tabs = [blueprint.tabs[0]]; // Only the first tab is supported/necessary.
+
+            // Make all fields localizable so they can be edited.
+            // Fields are non-localizable by default, but this UI requires all fields to be editable.
+            blueprint.tabs[0].sections.forEach((section, sectionIndex) => {
+                section.fields.forEach((field, fieldIndex) => {
+                    blueprint.tabs[0].sections[sectionIndex].fields[fieldIndex].localizable = true;
+                });
+            });
+
+            return blueprint;
+        },
+
         selectedWidth: function () {
             var width = this.config.width || 100;
             var found = this.widths.find((w) => w.value === width);
@@ -168,17 +188,34 @@ export default {
 
             return this.fieldtypeConfig;
         },
+
+        isNestedField() {
+            return this.isInsideSet || this.isInsideConfigFields;
+        },
     },
 
     created() {
         this.load();
+
+        // Add keyboard shortcut for Cmd+S / Ctrl+S only when this component is focused
+        this.saveBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            // Only handle if this component is currently visible/focused
+            if (this.$el && this.$el.offsetParent !== null) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleSaveShortcut();
+            }
+        });
+    },
+
+    beforeUnmount() {
+        // Clean up keyboard binding
+        if (this.saveBinding) {
+            this.saveBinding.destroy();
+        }
     },
 
     methods: {
-        configFieldClasses(field) {
-            return [`form-group p-4 m-0 ${field.type}-fieldtype`, field_width_class(field.width)];
-        },
-
         getFieldValue(handle) {
             return this.values[handle];
         },
@@ -220,7 +257,9 @@ export default {
             }
         },
 
-        commit(shouldCommitParent = false) {
+        commit(params = {}) {
+            let { shouldCommitParent, shouldSaveRoot } = params;
+
             this.clearErrors();
 
             this.$axios
@@ -232,14 +271,58 @@ export default {
                     isInsideSet: this.isInsideSet,
                 })
                 .then((response) => {
+                    this.$refs.container?.clearDirtyState();
                     this.$emit('committed', response.data, this.editedFields);
-                    this.close();
 
                     if (shouldCommitParent && this.commitParentField) {
-                        this.commitParentField(true);
+						this.$nextTick(() => {
+							this.commitParentField(params);
+							this.close();
+						});
+
+                        return;
                     }
+
+                    if (shouldSaveRoot) {
+                        this.saveRootForm();
+                    }
+
+                    this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
+        },
+
+        // Top-level field: saves the current field and the blueprint/fieldset.
+        commitAndSave() {
+            this.commit({
+                shouldSaveRoot: true,
+            });
+        },
+
+        // Nested field: saves the current field and any parents.
+        commitAndCloseAll() {
+            this.commit({
+                shouldCommitParent: true,
+            });
+        },
+
+        // Nested field: saves the current field and the blueprint/fieldset.
+        commitAndSaveAll() {
+            this.commit({
+                shouldCommitParent: true,
+                shouldSaveRoot: true,
+            });
+        },
+
+        saveRootForm() {
+            // The "root form" could be the blueprint or fieldset forms.
+            this.$events.$emit('root-form-save');
+        },
+
+        handleSaveShortcut() {
+            this.isNestedField
+                ? this.commitAndSaveAll()
+                : this.commitAndSave();
         },
 
         handleAxiosError(e) {
@@ -263,9 +346,12 @@ export default {
         },
 
         load() {
+            const field = this.fields.find(f => f.handle === this.config.handle);
+
             this.$axios
                 .post(cp_url('fields/edit'), {
                     type: this.type,
+                    reference: field?.type === 'reference' ? field.field_reference : false,
                     values: this.config,
                 })
                 .then((response) => {
@@ -274,6 +360,8 @@ export default {
                     this.blueprint = response.data.blueprint;
                     this.values = response.data.values;
                     this.meta = { ...response.data.meta };
+                    this.originValues = response.data.originValues;
+                    this.originMeta = response.data.originMeta;
                 });
         },
     },

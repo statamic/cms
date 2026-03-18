@@ -1,5 +1,6 @@
 import { sortBy, keyBy } from 'lodash-es';
 import axios from 'axios';
+import { router } from '@inertiajs/vue3';
 
 export default function useActions() {
     function prepareActions(actions, confirmableActions) {
@@ -30,7 +31,7 @@ export default function useActions() {
         return keyBy(confirmableActions, 'handle')[handle];
     }
 
-    function runServerAction({ url, selections, action, values, done }) {
+    function runServerAction({ url, selections, action, values, onSuccess, onError }) {
         return new Promise((resolve, reject) => {
             const payload = {
                 action: action.handle,
@@ -47,10 +48,11 @@ export default function useActions() {
                     response.headers['content-disposition']
                         ? handleFileDownload(response, resolve)
                         : handleActionSuccess(response, resolve);
+                    if (onSuccess) onSuccess();
                 })
-                .catch(error => handleActionError(error.response, reject))
-                .finally(() => {
-                    if (done) done();
+                .catch(error => {
+                    handleActionError(error.response, reject);
+                    if (onError) onError();
                 });
         });
     }
@@ -60,8 +62,14 @@ export default function useActions() {
             data = JSON.parse(data);
 
             if (data.redirect) {
-                if (data.bypassesDirtyWarning) this.$dirty.disableWarning();
-                window.location = data.redirect;
+                if (data.bypassesDirtyWarning) Statamic.$dirty.disableWarning();
+
+                if (data.triggersFullPageRefresh) {
+                    window.location = data.redirect;
+                    return;
+                }
+
+                router.get(data.redirect);
             }
 
             if (data.callback) {

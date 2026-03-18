@@ -1,5 +1,8 @@
 <template>
-    <ui-card class="space-y-8">
+    <ui-card class="asset-browser-grid" :class="{
+        'space-y-8': folders.length || assets.length || creatingFolder,
+        '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
+    }">
         <!-- Folders -->
         <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
             <div
@@ -31,10 +34,10 @@
                 >
                     <Context>
                         <template #trigger>
-                            <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                            <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
+                                <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                                    class="overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />
@@ -53,17 +56,20 @@
                     </Context>
                 </ItemActions>
             </div>
-            <div v-if="creatingFolder" class="group/folder relative">
+            <div v-if="creatingFolder" class="group/folder relative p-1">
                 <div class="group h-[66px] w-[80px]">
-                    <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                    <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
 
                     <Editable
                         ref="newFolderInput"
                         v-model:modelValue="newFolderName"
                         :start-with-edit-mode="true"
                         submit-mode="enter"
-                        :placeholder="__('New Folder')"
-                        class="flex w-[80px] items-center justify-center overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                        :placeholder="__('Name')"
+                        :class="[
+                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
+                            { 'st-has-error': creatingFolderError }
+                        ]"
                         @submit="$emit('create-folder', newFolderName)"
                         @cancel="
                             () => {
@@ -95,11 +101,12 @@
                     <Context>
                         <template #trigger>
                             <div
-                                class="asset-tile group relative bg-white"
-                                :class="{
-                                    'bg-checkerboard!': asset.can_be_transparent,
-                                    'opacity-50!': draggingAsset === asset.id,
-                                }"
+                                class="asset-tile group relative bg-white dark:bg-gray-900"
+                                :class="[
+                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
+                                    asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
+                                ]"
                             >
                                 <button
                                     class="size-full"
@@ -113,12 +120,12 @@
                                     <div class="relative flex aspect-square size-full items-center justify-center">
                                         <div class="asset-thumb">
                                             <img
-                                                v-if="asset.is_image"
+                                                v-if="asset.thumbnail"
                                                 :src="asset.thumbnail"
                                                 loading="lazy"
                                                 :draggable="false"
                                                 :class="{
-                                                    'size-full p-4': asset.extension === 'svg',
+                                                    'w-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
                                                 }"
                                             />
@@ -126,11 +133,11 @@
                                         </div>
                                     </div>
                                 </button>
-                                <div class="absolute end-2 top-1">
+                                <div class="absolute end-1 top-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity [&_button]:bg-white [&_button]:hover:bg-white [&_button]:dark:bg-gray-900 [&_button]:dark:hover:bg-gray-900">
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
                                             <DropdownItem
-                                                :text="__(canEdit ? 'Edit' : 'View')"
+                                                :text="__(asset.editable ? 'Edit' : 'View')"
                                                 @click="edit(asset.id)"
                                                 icon="edit"
                                             />
@@ -149,7 +156,7 @@
                             </div>
                         </template>
                         <ContextMenu>
-                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                            <ContextItem icon="edit" :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" />
                             <ContextSeparator />
                             <ContextItem
                                 v-for="action in actions"
@@ -162,9 +169,16 @@
                         </ContextMenu>
                     </Context>
                 </ItemActions>
-                <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
+                <div class="asset-filename">
+                    <MiddleEllipsis :text="asset.basename" />
+                </div>
             </div>
         </section>
+
+        <!-- Empty state -->
+        <div v-if="folders.length === 0 && assets.length === 0 && !creatingFolder" class="text-center text-gray-500 text-sm py-4">
+            {{ __('No items found') }}
+        </div>
     </ui-card>
 </template>
 
@@ -183,9 +197,11 @@ import {
     DropdownLabel,
     DropdownItem,
     DropdownSeparator,
-} from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+    MiddleEllipsis
+} from '@ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
+import FolderSvg from '@/../svg/folder.svg';
 
 export default {
     mixins: [AssetBrowserMixin],
@@ -204,12 +220,16 @@ export default {
         DropdownItem,
         DropdownSeparator,
         ItemActions,
+        FolderSvg,
+        MiddleEllipsis,
     },
 
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
+        showCheckerboard: { type: Boolean, default: false },
+        checkerboardMode: { type: String, default: 'transparent' },
     },
 
     data() {
@@ -232,17 +252,6 @@ export default {
     },
 
     methods: {
-        truncateFilename(filename) {
-            const maxLength = Math.floor(this.thumbnailSize / 7);
-            if (filename.length <= maxLength) return filename;
-
-            const extension = filename.split('.').pop();
-            const name = filename.slice(0, -(extension.length + 1));
-            const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
-
-            return `${name.slice(0, charsToKeep)}…${name.slice(-charsToKeep)}.${extension}`;
-        },
-
         isSelected(id) {
             return this.selectedAssets.includes(id);
         },

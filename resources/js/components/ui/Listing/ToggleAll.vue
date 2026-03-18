@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { Checkbox } from '@ui';
 
 const { items, selections, maxSelections, clearSelections, reorderable } = injectListingContext();
 const anyItemsChecked = computed(() => selections.value.length > 0);
@@ -15,17 +16,41 @@ function checkMaximumAmountOfItems() {
     if (maxSelections.value) newSelections = newSelections.slice(0, maxSelections.value);
     selections.value.splice(0, selections.value.length, ...newSelections);
 }
+
+function getAriaLabel() {
+    if (indeterminate.value) {
+        return __('Select all items');
+    }
+
+    return anyItemsChecked.value ? __('Deselect all items') : __('Select all items');
+}
+
+function getScreenReaderText() {
+    const totalItems = items.value.length;
+    const selectedItems = selections.value.length;
+
+    if (indeterminate.value) {
+        return __('messages.selections_select_all', { selected: selectedItems, total: totalItems });
+    }
+
+    if (anyItemsChecked.value) {
+        return __('messages.selections_click_to_deselect_all', { total: totalItems });
+    }
+
+    return __('messages.selections_click_to_select_all', { total: totalItems });
+}
 </script>
 
 <template>
-    <label v-if="!reorderable" for="checkerOfAllBoxes" class="relative flex cursor-pointer items-center justify-center">
-        <input
-            type="checkbox"
-            @change="toggle"
-            :checked="anyItemsChecked"
-            :indeterminate="indeterminate"
-            id="checkerOfAllBoxes"
-            class="relative top-0"
-        />
-    </label>
+    <Checkbox
+        v-if="!reorderable"
+        :model-value="anyItemsChecked"
+        :indeterminate="indeterminate"
+        :label="getAriaLabel()"
+        :description="getScreenReaderText()"
+        :value="'all'"
+        size="sm"
+        solo
+        @update:model-value="toggle"
+    />
 </template>

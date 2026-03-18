@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasDirtyState;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
@@ -36,7 +37,7 @@ use function Statamic\trans as __;
 
 class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
 
     protected $handle;
     protected $routes = [];
@@ -67,6 +68,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $previewTargets = [];
     protected $autosave;
     protected $withEvents = true;
+
+    protected $entryClass;
 
     public function __construct()
     {
@@ -116,6 +119,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function requiresSlugs($require = null)
     {
         return $this->fluentlyGetOrSet('requiresSlugs')->args(func_get_args());
+    }
+
+    public function entryClass($class = null)
+    {
+        return $this->fluentlyGetOrSet('entryClass')->args(func_get_args());
     }
 
     public function titleFormats($formats = null)
@@ -293,6 +301,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $site = $site ?? $this->sites()->first();
 
         return cp_route('collections.entries.create', [$this->handle(), $site]);
+    }
+
+    public function editBlueprintUrl($blueprint)
+    {
+        return cp_route('blueprints.collections.edit', [$this, $blueprint]);
     }
 
     public function queryEntries()
@@ -474,6 +487,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
+        Blink::forget("collection-{$this->id()}-structure");
+
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
@@ -489,6 +504,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::save($this);
 
+        if ($this->isDirty('route')) {
+            Facades\Entry::updateUris($this);
+        }
+
         Blink::forget('collection-handles');
         Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
@@ -500,6 +519,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
             CollectionSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return $this;
     }
@@ -573,6 +594,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
             'autosave' => $this->autosave,
+            'entry_class' => $this->entryClass,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -915,6 +937,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         File::delete(dirname($this->path()).'/'.$this->handle);
     }
 
+    public function entryBlueprintCommandPaletteLinks()
+    {
+        $text = [__('Collections'), __($this->title())];
+
+        return $this
+            ->entryBlueprints()
+            ->map(fn ($blueprint) => $blueprint->commandPaletteLink(
+                type: $text,
+                url: $this->editBlueprintUrl($blueprint),
+            ));
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Collection::{$method}(...$parameters);
@@ -931,5 +965,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return $this->fileData();
     }
 }

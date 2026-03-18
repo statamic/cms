@@ -47,8 +47,6 @@ export default {
         };
     },
 
-    inject: ['store'],
-
     computed: {
         maxItems() {
             return this.config.max_items || Infinity;
@@ -90,11 +88,7 @@ export default {
         },
 
         site() {
-            if (this.store) {
-                return this.store.site || this.$config.get('selectedSite');
-            }
-
-            return this.$config.get('selectedSite');
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
         },
 
         canEdit() {
@@ -138,7 +132,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.value.map((id) => {
                 const item = this.meta.data.find((d) => d.id === id);
@@ -166,7 +160,7 @@ export default {
         },
 
         linkExistingItem() {
-            this.$refs.input.$refs.existing.click();
+            this.$refs.input.openSelector();
         },
 
         unlinkAll() {

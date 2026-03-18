@@ -1,16 +1,16 @@
 <template>
     <div>
-        <stack
-            name="inline-editor"
+        <Stack
+	        open
+            inset
+            :show-close-button="false"
             :before-close="shouldClose"
-            :narrow="stackSize === 'narrow'"
-            :half="stackSize === 'half'"
-            :full="stackSize === 'full'"
+            :size="stackSize"
             @closed="close"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-gray-300 p-6 dark:bg-dark-800">
+            <div class="h-full overflow-scroll overflow-x-auto px-6 rounded-l-xl">
                 <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                    <loading-graphic />
+                    <Icon name="loading" />
                 </div>
 
                 <component
@@ -24,18 +24,36 @@
                     :publish-container="publishContainer"
                     @saved="saved"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <slot name="action-buttons-right" />
-                        <button type="button" class="btn-close" @click="confirmClose" v-html="'&times'" />
+                        <Button icon="x" size="sm" variant="ghost" class="-me-2" @click="close" />
                     </template>
                 </component>
             </div>
-        </stack>
+        </Stack>
+
+        <confirmation-modal
+            :open="closingWithChanges"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmCloseWithChanges"
+            @cancel="closingWithChanges = false"
+        />
     </div>
 </template>
 
 <script>
+import { Button, Icon, Stack } from '@/components/ui';
+
 export default {
+    components: {
+        Button,
+        Icon,
+	    Stack,
+    },
+
     props: {
         component: String,
         componentProps: Object,
@@ -47,6 +65,7 @@ export default {
             loading: true,
             readOnly: false,
             componentPropValues: {},
+            closingWithChanges: false,
         };
     },
 
@@ -95,12 +114,16 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return false;
-                }
+                this.closingWithChanges = true;
+                return false;
             }
 
             return true;
+        },
+
+        confirmCloseWithChanges() {
+            this.closingWithChanges = false;
+            this.$emit('closed');
         },
     },
 };

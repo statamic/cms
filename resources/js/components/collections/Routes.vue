@@ -2,7 +2,6 @@
     <one-or-many-sites-field
         :handle="handle"
         :value="value"
-        :store="store"
         @update:value="update"
         :column-header="__('Route')"
     ></one-or-many-sites-field>
@@ -14,7 +13,6 @@ import OneOrManySitesField from './OneOrManySitesField.vue';
 
 export default {
     mixins: [Fieldtype],
-    inject: ['store'],
     components: { OneOrManySitesField },
 };
 </script>

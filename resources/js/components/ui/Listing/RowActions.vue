@@ -1,7 +1,14 @@
 <script setup>
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator } from '@statamic/ui';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+    Skeleton,
+} from '@ui';
+import { injectListingContext } from '../Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -14,10 +21,12 @@ const props = defineProps({
 const { actionUrl, actionContext, refresh, reorderable, allowActionsWhileReordering } = injectListingContext();
 const busy = ref(false);
 
+const hasPrependedActionsContent = hasSlotContent('prepended-actions', computed(() => ({ row: props.row })));
+
 const shouldShowActions = computed(() => {
     if (reorderable.value && !allowActionsWhileReordering.value) return false;
 
-    return true;
+    return hasPrependedActionsContent.value || props.row.actions?.length > 0;
 });
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
@@ -32,7 +41,9 @@ function actionCompleted(successful = null, response = {}) {
 }
 
 function actionSuccess(response) {
-    Statamic.$toast.success(response.message || __('Action completed'));
+    if (response.message !== false) {
+        Statamic.$toast.success(response.message || __('Action completed'));
+    }
     refresh();
 }
 
@@ -54,20 +65,37 @@ function dropdownHovered(loadActions) {
         :actions="row.actions"
         @started="actionStarted"
         @completed="actionCompleted"
-        v-slot="{ actions, loadActions }"
+        v-slot="{ actions, loadActions, shouldShowSkeleton }"
     >
-        <Dropdown @mouseover="dropdownHovered(loadActions)" placement="left-start" class="me-3">
+        <Dropdown
+            @mouseover="dropdownHovered(loadActions)"
+            @focus="dropdownHovered(loadActions)"
+            @click="dropdownHovered(loadActions)"
+            placement="left-start"
+            class="me-3"
+        >
             <DropdownMenu>
                 <slot name="prepended-actions" :row="row" />
-                <DropdownSeparator v-if="$slots['prepended-actions'] && actions.length" />
-                <DropdownItem
-                    v-for="action in actions"
-                    :key="action.handle"
-                    :text="__(action.title)"
-                    :icon="action.icon"
-                    :variant="action.dangerous ? 'destructive' : 'default'"
-                    @click="action.run"
-                />
+                <DropdownSeparator v-if="hasPrependedActionsContent && (shouldShowSkeleton || actions.length)" />
+                <template v-if="shouldShowSkeleton">
+                    <div v-for="index in 3" :key="index" class="contents">
+                        <Skeleton class="m-1 size-5" />
+                        <Skeleton
+                            class="mx-2 my-1.5 h-5"
+                            :class="index === 1 ? 'w-28' : index === 2 ? 'w-36' : 'w-24'"
+                        />
+                    </div>
+                </template>
+                <template v-else>
+                    <DropdownItem
+                        v-for="action in actions"
+                        :key="action.handle"
+                        :text="__(action.title)"
+                        :icon="action.icon"
+                        :variant="action.dangerous ? 'destructive' : 'default'"
+                        @click="action.run"
+                    />
+                </template>
             </DropdownMenu>
         </Dropdown>
     </ItemActions>

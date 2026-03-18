@@ -14,13 +14,13 @@
                         :selected="element.key === selectedKey"
                     />
                 </select>
-                <ui-icon name="ui/chevron-down" class="size-3 ms-1" />
+                <ui-icon name="chevron-down" class="size-3 ms-1" />
             </ui-input-group-prepend>
             <template v-for="(element, index) in keyedData">
                 <ui-input
                     v-if="element.key === selectedKey"
                     v-model="data[index].value"
-                    class="border-l-0"
+                    input-class="border-l-0"
                     :key="element._id"
                     :id="fieldId + '__' + element.key"
                     :readonly="isReadOnly"
@@ -68,41 +68,33 @@
                     <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                         <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                         <td>
-                            <input
-                                type="text"
-                                class="input-text font-medium"
+                            <ui-input
                                 v-model="element.key"
                                 :readonly="isReadOnly"
                             />
                         </td>
                         <td>
-                            <input
-                                type="text"
-                                class="input-text"
+                            <ui-input
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <a
-                                @click="deleteOrConfirm(index)"
-                                class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
-                                >&times;</a
-                            >
+                            <ui-button icon="x" variant="subtle" size="xs" round delete-action @click="deleteOrConfirm(index)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                         </td>
                     </tr>
                 </tbody>
             </sortable-list>
         </table>
 
-        <Button @click="addValue" icon="plus" size="sm" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed">
-            {{ addButton }}
-        </Button>
+        <div class="flex gap-2">
+            <ui-button @click="addValue" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" />
+        </div>
 
         <confirmation-modal
-            v-if="deleting !== false"
-            :title="__('Delete Value')"
-            :bodyText="__('Are you sure you want to delete this value?')"
+            :open="deleting !== false"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
             :buttonText="__('Delete')"
             :danger="true"
             @confirm="deleteValue(deleting)"
@@ -114,7 +106,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
-import { Button } from '@statamic/ui';
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
@@ -195,8 +187,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-
+            if (!this.showFieldPreviews) return;
             if (!this.value) return '';
 
             return Object.entries(this.value)

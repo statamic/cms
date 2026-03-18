@@ -23,7 +23,7 @@ const selected = computed(() => {
 })
 
 const wrapperClasses = cva({
-    base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 overflow-hidden flex cursor-pointer',
+    base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 with-contrast:border-gray-500 overflow-hidden flex cursor-pointer',
     variants: {
         size: {
             base: 'h-6 w-14 text-xs rounded-md',
@@ -66,6 +66,6 @@ const sizerClasses = cva({
                 :data-last="selected === width && width !== 100"
             />
         </div>
-        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-800">{{ selected }}%</div>
+        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-900 dark:text-gray-300">{{ selected }}%</div>
     </div>
 </template>

@@ -1,26 +1,50 @@
-/* BARD 
+/* BARD
 =================================================== */
 @layer ui {
-    .bard-fieldtype:not(.form-group) {
-        @apply relative rounded-xl border outline-hidden dark:border-dark-900;
+    /* .grid-cell, [data-ui-input-group] are exceptions for Bard fieldtypes inside a Grid fieldtype, since these cause double borders */
+    .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
+        @apply relative rounded-lg border outline-hidden dark:border-gray-700 with-contrast:border-gray-500;
     }
 }
 /* BARD / EDITOR
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
+        /* We need a transparent border inside Bard to properly see the focus outline. Without this border, the focus outline is hairline-thin */
+        border: 1px solid transparent;
+        @apply relative rounded-lg p-0 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
         }
         .ProseMirror {
-            @apply min-h-40 p-2 text-sm leading-tight;
-            @apply text-sm leading-normal @md/bard:p-2;
+            @apply min-h-40 p-2 leading-tight;
+            @apply leading-normal @md/bard:p-2;
             @apply @lg/bard:p-4;
         }
         .bard-error {
-            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
+            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-600 @lg:px-4;
+        }
+        p, ol, li {
+            @apply st-text-legibility;
+        }
+        &:has(
+            .bard-content *:focus,
+            .st-set-is-selected
+        ) {
+            /* When we're focused on something else inside the .bard-editor, remove the outline on the .bard-editor, otherwise we have two focus outlines.
+            E.g. If you have Bard > Replicator > Text field, when you focus on the internal text field, the outside .bard-editor should lose its outline */
+            outline: none;
+        }
+    }
+}
+/* BARD / FOOTER TOOLBAR
+=================================================== */
+@layer ui {
+    .bard-fieldtype:has(.bard-footer-toolbar) {
+        .bard-editor {
+            /* Remove the border-radius from the main container when we have the bottom toolbar (e.g. Reading Time) since it's no longer the last container in the vertical stack; instead the footer toolbar is now rounded */
+            border-radius: 0;
         }
     }
 }
@@ -28,7 +52,7 @@
 =================================================== */
 @layer ui {
     .bard-editor.mode\:read-only .ProseMirror {
-        @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
+        @apply bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-100;
     }
 
     .bard-editor.mode\:minimal .ProseMirror {
@@ -47,42 +71,42 @@
 =================================================== */
 @layer ui {
     .bard-fixed-toolbar {
-        @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
+        @apply top-0 flex items-start justify-between rounded-t-[calc(var(--radius-lg)-1px)] border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/10 dark:bg-gray-925;
 
         .bard-toolbar-button {
-            @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
+            @apply m-0 flex size-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-gray-100;
+
             svg {
                 @apply h-4 w-auto;
             }
-        }
 
-        .bard-toolbar-button:hover {
-            @apply bg-gray-200 dark:bg-dark-650;
-        }
-
-        .bard-toolbar-button.active {
-            @apply bg-gray-300 text-black dark:bg-dark-600 dark:text-white;
-        }
-
-        .bard-toolbar-button:focus {
-            @apply focus-outline;
-        }
-
-        .bard-toolbar-button:disabled {
-            @apply opacity-50;
             &:hover {
-                @apply text-gray-800 dark:text-dark-100;
+                @apply bg-gray-200 dark:bg-gray-600;
             }
-        }
 
-        button sup {
-            @apply font-sans;
+            &:focus {
+                @apply focus-outline;
+            }
+
+            &.active {
+                @apply bg-gray-300 text-gray-925 dark:bg-gray-600 dark:text-white;
+            }
+
+            &:disabled {
+                @apply opacity-50;
+                &:hover {
+                    @apply text-gray-900 dark:text-gray-100;
+                }
+            }
         }
 
         .active {
             @apply button-active;
             svg {
-                @apply text-black;
+                @apply text-gray-925;
+                :where(.dark) & {
+                    @apply text-white;
+                }
             }
         }
 
@@ -91,48 +115,86 @@
             @apply rounded-full bg-gray-900 px-4 shadow-lg;
 
             button {
-                @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-500;
+                @apply mx-0.5 my-0 flex size-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-500;
+
                 svg {
                     @apply h-4 w-auto;
+
+                    .active & {
+                        @apply text-white;
+                    }
                 }
             }
+        }
 
-            button.active svg {
-                @apply text-white;
+        &.bard-toolbar-setting {
+            @apply grid grid-cols-[repeat(auto-fit,minmax(--spacing(8),1fr))] rounded-[--spacing(5)];
+
+            button {
+                @apply justify-self-center;
+            }
+        }
+
+        /* When there's a fixed toolbar the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
+        .bard-fieldtype:has(> &) {
+            .bard-editor:focus-within {
+                border-top-left-radius: 0!important;
+                border-top-right-radius: 0!important;
             }
         }
     }
 
     /* Only top-level Bard fields should have a sticky header */
+    /* =Jay. I don't think we have the "workspace" class anymore, in which case this should be removed */
     .workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
     .live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
         @apply sticky;
     }
 
-    /*  Fixed toolbar inside another bard field */
-    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-        z-index: 4;
-        top: 40px;
+    .bard-fixed-toolbar {
+        z-index: var(--z-index-portal);
+        position: sticky;
+        /* Opt out the toolbar of scroll anchoring. Firefox's scroll anchoring adjusts the scroll position to compensate for the perceived layout change, scrolling up to the parent Bard's top. */
+        overflow-anchor: none;
+        @apply sm:-top-2;
+        /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
+        margin-block-end: 8px;
+        /* Pull the subsequent element up to compensate for this. The focus ring adjustment here keeps the focus ring from disappearing into the toolbar, which would make the focus ring appear bottom heavy. */
+        + * {
+            --focus-ring-adjustment: 0.7px;
+            margin-block-start: calc(-8px + var(--focus-ring-adjustment));
+        }
     }
 
-    /*  Fixed toolbar inside a stack */
+    /* [1] Where a Bard fieldtype with a fixed toolbar... */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) {
+        /* [2] has a any nested fieldtype with focus, e.g. a Markdown toolbar or another Bard toolbar */
+        &:has(.publish-fields:focus-within) {
+            /* [/3] release the sticky positioning so that it doesn't cover other UI elements */
+            > .bard-fixed-toolbar {
+                position: unset;
+            }
+        }
+    }
+
+    /* Bard > Grid > Bard */
+    .bard-content .grid-fieldtype .bard-fixed-toolbar {
+        @apply top-16;
+    }
+
+    /* Fixed toolbar inside a stack */
     .stack-content .bard-fixed-toolbar {
         top: -24px;
     }
 
-    /*  Responive Wangjangling */
+    /* Responsive Wangjangling */
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
-            top: 52px;
-        }
-        .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-            top: 92px;
-        }
-
-        /*  Fixed toolbar inside a stack */
-        .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-            top: 16px;
+            /* Fixed toolbar inside a stack */
+            .stack-content .bard-fieldtype .bard-fieldtype & {
+                top: 16px;
+            }
         }
 
         /* We don't need the `top` when in Live Preview */
@@ -145,68 +207,24 @@
 =================================================== */
 @layer ui {
     .bard-floating-toolbar {
-        @apply flex rounded-full bg-black px-0 shadow-lg;
-        white-space: nowrap;
+        /* We need to pull this above other things such as theads, e.g. Grid fieldtype > Bard fieldtype > floating toolbar. */
+        @apply flex rounded-full bg-black px-2 shadow-lg whitespace-nowrap z-(--z-index-draggable) relative;
 
         &:before {
-            content: '';
-            border: 6px solid transparent;
-            border-top-color: black;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            [dir='rtl'] & {
-                left: auto;
-                right: 50%;
-            }
-            margin-left: -3px;
+            @apply border-t-black top-full start-1/2 absolute -ml-[3px] content-none border-6 border-transparent;
         }
 
-        .bard-toolbar-button {
-            @apply flex h-10 w-10 items-center justify-center rounded-lg bg-black text-center text-gray-200;
-            font-size: 16px;
-            transition: all 0.1s ease-in-out;
-            svg {
-                @apply h-4 w-4;
-            }
+        button svg {
+            @apply text-white opacity-100;
         }
-
-        .bard-toolbar-button:hover {
-            @apply text-white;
-        }
-
-        .bard-toolbar-button.active {
-            @apply text-blue;
-        }
-
-        .bard-toolbar-button:focus {
-            outline: none;
-        }
-
-        .bard-toolbar-button:disabled {
-            @apply opacity-50;
-            &:hover {
-                @apply text-gray-200;
-            }
-        }
-
-        button sup {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        }
-    }
-
-    .bard-add-set-button {
-        @apply absolute top-[-6px] z-1 flex items-center justify-center ltr:-left-4 rtl:-right-4;
     }
 
     .bard-footer-toolbar {
-        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
+        @apply flex items-center justify-between rounded-b-lg border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400;
         padding: 8px 12px;
 
         .bard-fullscreen & {
-            position: sticky;
-            bottom: 0;
-            z-index: 10;
+            @apply sticky bottom-0 z-10;
         }
     }
 
@@ -215,7 +233,7 @@
     }
 
     .bard-set.has-error > .replicator-set-header label {
-        @apply text-red-500;
+        @apply text-red-600;
     }
 }
 
@@ -238,29 +256,32 @@
             }
         }
     }
-
-    .set-picker .popover .popover-content {
-        min-width: 320px !important;
-    }
 }
-/* Fullscreen mode
-   ========================================================================== */
+/* BARD / FULL SCREEN
+=================================================== */
 @layer ui-states {
     .bard-fullscreen {
-        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-dark-700;
+        @apply fixed inset-0 min-h-screen overflow-scroll border-none rounded-none bg-gray-100 pt-14 dark:bg-gray-850;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-dark-800 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-page rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
+        }
+        .bard-content {
+            @apply dark:bg-gray-925;
         }
 
         .bard-fixed-toolbar {
-            padding: 7px 8px;
-            top: 0;
-            background: unset;
-            border: unset;
+            /* Don't affect nested toolbars; only the one at the very top */
+            &:not(.bard-fieldtype.form-group .bard-fieldtype.form-group &) {
+                padding: 7px 8px;
+                margin-block-end: 0;
+                top: 0;
+                background: unset;
+                border: unset;
 
-            button {
-                @apply mx-1;
+                button {
+                    @apply mx-1;
+                }
             }
         }
 
@@ -269,33 +290,26 @@
             min-height: calc(100vh - 120px);
         }
 
-        .bard-content:not(.bard-set *) > {
-            p > code,
-            pre code {
-                @apply bg-gray-300;
+        .bard-content:not(.bard-set *) {
+            > p > code,
+            > pre code {
+                @apply bg-purple-100;
             }
         }
 
         .bard-set-selector {
-            @apply ltr:ml-6 rtl:mr-6;
+            @apply ms-6;
         }
 
         .bard-field-options {
-            @apply fixed inset-x-0 top-0 w-full bg-gray-700 p-4;
-            @apply ltr:text-right rtl:text-left;
-            z-index: 1; /*  to appear over the top of .bard-editor */
+            @apply fixed inset-x-0 top-0 w-full bg-gray-700 p-4 text-end z-1;
 
             .icon {
                 font-size: 24px;
             }
+
             a {
-                margin-left: 16px;
-                [dir='rtl'] & {
-                    margin-right: 16px;
-                    margin-left: 0;
-                }
-                color: #fff;
-                opacity: 1;
+                @apply ms-4 text-white opacity-100;
             }
         }
     }
@@ -312,16 +326,21 @@
     }
 
     .bard-fieldtype .bard-content {
+        @apply text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-lg;
         blockquote,
         ol,
         p,
         ul {
             margin-top: 0;
             margin-bottom: 0.85em;
+            table &:where(:last-child, :nth-last-child(2):has(+ .column-resize-handle)) {
+                /* If you type a single line of text in a table fieldtype cell you don't want it to have a bottom margin */
+                margin-block-end: 0;
+            }
 
             b,
             strong {
-                font-weight: 700;
+                @apply font-bold text-gray-800 dark:text-gray-100;
             }
 
             em,
@@ -330,7 +349,7 @@
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-blue-400;
             }
 
             a:active,
@@ -347,33 +366,24 @@
         }
 
         blockquote,
-        blockquote ol li,
-        blockquote ul li,
+        blockquote :is(ol li, ul li),
         ol li,
         ul li {
             > p {
-                margin-top: 0;
-                margin-bottom: 0.85em;
+                @apply mb-0;
             }
         }
 
         hr {
-            @apply bg-gray-600 dark:bg-dark-300;
-            height: 4px;
-            padding: 0;
-            margin: 1.7em 0;
-            overflow: hidden;
-            border: none;
-        }
-
-        hr:after,
-        hr:before {
-            display: table;
-            content: ' ';
-        }
-
-        hr:after {
-            clear: both;
+            @apply bg-gray-200 dark:bg-gray-500 h-0.75 border-0 my-8;
+            &::after,
+            &::before {
+                display: table;
+                content: ' ';
+            }
+            &:after {
+                clear: both;
+            }
         }
 
         h1,
@@ -382,17 +392,15 @@
         h4,
         h5,
         h6 {
-            margin-top: 1.275em;
-            margin-bottom: 0.85em;
-            font-weight: 700;
+            @apply mt-5 mb-2.5 font-bold text-gray-900 dark:text-gray-100;
 
             b,
             strong {
-                font-weight: 900;
+                @apply font-bold;
             }
 
             a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
+                @apply break-words text-blue-700 underline dark:text-blue-100;
             }
 
             a:active,
@@ -401,41 +409,18 @@
                 outline: 0;
                 text-decoration: underline;
             }
+
+            &:first-child {
+                margin-top: 0;
+            }
         }
 
-        h1 {
-            font-size: 2em;
-        }
-
-        h2 {
-            font-size: 1.75em;
-        }
-
-        h3 {
-            font-size: 1.5em;
-        }
-
-        h4 {
-            font-size: 1.25em;
-        }
-
-        h5 {
-            font-size: 1em;
-        }
-
-        h6 {
-            font-size: 1em;
-            @apply text-gray-700;
-        }
-
-        h1:first-child,
-        h2:first-child,
-        h3:first-child,
-        h4:first-child,
-        h5:first-child,
-        h6:first-child {
-            margin-top: 0;
-        }
+        h1 { @apply text-3xl; }
+        h2 { @apply text-2xl; }
+        h3 { @apply text-xl; }
+        h4 { @apply text-base; }
+        h5 { @apply text-sm; }
+        h6 { @apply text-2xs uppercase text-gray-800 dark:text-gray-500 tracking-wider; }
 
         ul,
         blockquote ul,
@@ -451,122 +436,90 @@
 
         ol,
         ul,
-        blockquote ol,
-        blockquote ul {
-            margin: 0 0 0.85em;
-            padding: 0 0 0 2em;
+        blockquote :is(ol, ul) {
+            @apply ms-4 ps-4;
+        }
 
-            [dir='rtl'] & {
-                padding-right: 2em;
-                padding-left: 0;
+        .tableWrapper table :is(ol, ul) {
+            @apply ms-4 ps-4;
+        }
+
+        :is(ol, ul) :is(ol, ul) {
+            @apply ms-4 ps-4 my-0;
+        }
+
+        :is(ol, ul) {
+            ul {
+                list-style-type: circle;
             }
-        }
-
-        .tableWrapper table ol,
-        .tableWrapper table ul {
-            margin: 0;
-            padding: 0 0 0 2em;
-
-            [dir='rtl'] & {
-                padding-right: 2em;
-                padding-left: 0;
+            ol {
+                list-style-type: decimal;
             }
-        }
-
-        ol ol,
-        ol ul,
-        ul ol,
-        ul ul {
-            margin-top: 0;
-            margin-bottom: 0;
-            padding-left: 2em;
-            [dir='rtl'] & {
-                padding-right: 2em;
-                padding-left: 0;
-            }
-        }
-
-        ul ul {
-            list-style-type: circle;
-        }
-
-        ol ol {
-            list-style-type: decimal;
-        }
-
-        ul ol {
-            list-style-type: decimal;
-        }
-
-        ol ul {
-            list-style-type: circle;
         }
 
         blockquote {
-            @apply border-blue px-4 text-gray-800 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
-            margin: 0 0 0.85em;
-        }
-
-        blockquote:first-child {
-            margin-top: 0;
-        }
-
-        blockquote:last-child {
-            margin-bottom: 0;
-        }
-
-        .tableWrapper table,
-        blockquote > .tableWrapper table,
-        ol li > .tableWrapper table,
-        ul li > .tableWrapper table {
-            @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500;
-            border-collapse: collapse;
-            table-layout: fixed;
-
-            th {
-                @apply bg-gray-200 font-bold dark:bg-dark-575 ltr:text-left rtl:text-right;
+            @apply border-gray-900 dark:border-gray-100 px-4 text-gray-900 dark:text-gray-100 border-s-4 ms-1;
+            &:first-child {
+                margin-top: 0;
             }
-
-            td,
-            th {
-                @apply relative border px-2 py-1 align-top dark:border-dark-200;
-                min-width: 1em;
+            &:last-child {
+                margin-bottom: 0;
             }
+        }
 
-            .selectedCell {
-                @apply relative;
+        table {
+            .tableWrapper &,
+            blockquote > .tableWrapper &,
+            :is(ol, ul) li > .tableWrapper & {
+                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-900 border-collapse table-fixed;
 
-                &:after {
-                    @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-dark-200;
-                    content: '';
+                th {
+                    @apply bg-gray-50 dark:bg-gray-950/30 text-start;
+                    p {
+                        @apply font-medium dark:font-semibold;
+                    }
                 }
-            }
 
-            a {
-                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
-            }
+                td,
+                th {
+                    @apply relative border px-2 py-1 align-top dark:border-gray-700/75;
+                    min-width: 1em;
+                }
 
-            a:active,
-            a:focus,
-            a:hover {
-                outline: 0;
-                text-decoration: underline;
+                .selectedCell {
+                    @apply relative;
+
+                    &::after {
+                        @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25;
+                        content: '';
+                    }
+                    :is(.dark) &::after {
+                        @apply bg-gray-600;
+                    }
+                }
+
+                a {
+                    @apply break-words text-blue-700 underline dark:text-blue-100;
+                }
+
+                a:active,
+                a:focus,
+                a:hover {
+                    outline: 0;
+                    text-decoration: underline;
+                }
             }
         }
 
         p > code {
-            @apply rounded-xs bg-gray-400 font-mono text-xs dark:bg-dark-750;
-            padding: 2px 4px;
-            top: -1px;
+            @apply rounded-sm bg-purple-100 dark:bg-blue-900 text-purple-700 dark:text-blue-100 font-mono text-xs px-1 py-0.5;
         }
 
         pre {
-            margin-bottom: 0.85em;
-        }
-
-        pre code {
-            @apply block w-full rounded-sm bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
-            line-height: 1.8;
+            @apply mb-2;
+            code {
+                @apply block w-full rounded-lg bg-gray-200 p-4 font-mono text-xs dark:bg-black dark:text-gray-100 leading-normal mb-4;
+            }
         }
     }
 }
@@ -575,14 +528,11 @@
 ========================================================================== */
 @layer ui {
     .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-        @apply text-gray-600 dark:text-dark-200;
+        @apply text-gray-600 float-start h-0 pointer-events-none;
         content: attr(data-placeholder);
-        float: left;
-        [dir='rtl'] & {
-            float: right;
-        }
-        height: 0;
-        pointer-events: none;
+    }
+    .dark .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+        @apply text-gray-400;
     }
 }
 
@@ -591,9 +541,7 @@
 @layer ui {
     .bard-link-toolbar {
         .input {
-            @apply h-8 border-none bg-transparent p-0 text-xs shadow-none;
-            width: 240px;
-            outline: none;
+            @apply h-8 border-none bg-transparent p-0 text-xs shadow-none outline-none w-60;
         }
 
         .bard-toolbar-button {
@@ -607,10 +555,7 @@
     }
 
     .bard-inline-image-container {
-        @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-dark-900 dark:bg-dark-600;
-        &:hover {
-            cursor: grab;
-        }
+        @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-gray-600 dark:bg-gray-900 hover:cursor-grab;
     }
 }
 
@@ -627,13 +572,17 @@
         }
 
         table .column-resize-handle {
-            @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200;
-            width: 3px;
-            right: -2px;
-            [dir='rtl'] & {
-                right: auto;
-                left: -2px;
-            }
+            @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200 w-0.5 right-[-2px];
         }
     }
 }
+
+
+
+
+
+
+
+
+
+

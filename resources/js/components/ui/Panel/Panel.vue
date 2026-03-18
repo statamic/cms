@@ -1,8 +1,12 @@
 <script setup>
-import { PanelHeader, Heading, Subheading } from '@statamic/ui';
+import PanelHeader from '../Panel/Header.vue';
+import Heading from '../Heading.vue';
+import Subheading from '../Subheading.vue';
 
 const props = defineProps({
+    /** Heading text for the panel */
     heading: { type: String, default: null },
+    /** Subheading text below the heading */
     subheading: { type: String, default: null },
 });
 </script>
@@ -10,15 +14,19 @@ const props = defineProps({
 <template>
     <div
         :class="[
-            'relative bg-gray-100 dark:border-b dark:border-white/13 dark:bg-black/25 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'not-prose w-full rounded-[.875rem] mb-5 px-1 py-1.5',
+            '@container/panel relative bg-gray-150 dark:bg-gray-950/35 dark:inset-shadow-2xs dark:inset-shadow-black',
+            'w-full rounded-2xl mb-8 max-[600px]:p-1.25 p-1.75 [&:has(>[data-ui-panel-header])]:pt-0 focus-none starting-style-transition',
         ]"
         data-ui-panel
     >
-        <PanelHeader v-if="heading">
-            <Heading v-html="heading" />
-            <Subheading v-if="subheading" v-html="subheading" />
-            <slot name="header-actions" />
+        <PanelHeader v-if="heading" class="flex items-center justify-between">
+	        <div>
+		        <Heading v-html="heading" />
+		        <Subheading v-if="subheading" v-html="subheading" />
+	        </div>
+	        <div v-if="$slots['header-actions']" class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <slot name="header-actions" />
+	        </div>
         </PanelHeader>
         <slot />
     </div>

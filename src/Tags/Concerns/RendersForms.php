@@ -107,7 +107,7 @@ trait RendersForms
     {
         return collect($meta)
             ->map(function ($value, $key) {
-                return sprintf('<input type="hidden" name="_%s" value="%s" />', $key, $value);
+                return sprintf('<input type="hidden" name="_%s" value="%s" />', $key, e($value));
             })
             ->implode("\n");
     }

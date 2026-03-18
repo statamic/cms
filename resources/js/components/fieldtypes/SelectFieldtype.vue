@@ -1,25 +1,25 @@
 <template>
     <Combobox
-        class="w-full"
-        :options="options"
         :clearable="config.clearable"
-        :placeholder="__(config.placeholder)"
+        :disabled="config.disabled"
+        :label-html="config.label_html"
+        :max-selections="config.max_items"
+        :model-value="value"
         :multiple="config.multiple"
+        :options="options"
+        :placeholder="__(config.placeholder)"
+        :read-only="isReadOnly"
         :searchable="config.searchable || config.taggable"
         :taggable="config.taggable"
-        :disabled="config.disabled || isReadOnly"
-        :max-selections="config.max_items"
-        :label-html="config.label_html"
-        :model-value="value"
+        :id="id"
         @update:modelValue="comboboxUpdated"
     />
 </template>
 
 <script setup>
-import { Fieldtype } from 'statamic';
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import HasInputOptions from './HasInputOptions.js';
-import { SortableList } from '../sortable/Sortable';
-import { Badge, Combobox } from '@statamic/ui';
+import { Combobox } from '@/components/ui';
 import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);

@@ -4,10 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Statamic\CommandPalette\Category;
-use Statamic\CommandPalette\Link;
 use Statamic\Facades\Blink;
-use Statamic\Facades\CommandPalette;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -20,8 +17,8 @@ class NavBuilder
 
     protected $items = [];
     protected $pendingItems = [];
+    protected $itemsKeyedById = null;
     protected $withHidden = false;
-    protected $withCommandPalette = false;
     protected $itemsWithChildrenClosures = [];
     protected $sections = [];
     protected $sectionsOriginalItemIds = [];
@@ -56,19 +53,6 @@ class NavBuilder
     }
 
     /**
-     * Build with command palette.
-     *
-     * @param  bool  $withHidden
-     * @return $this
-     */
-    public function withCommandPalette(bool $withCommandPalette = false): self
-    {
-        $this->withCommandPalette = $withCommandPalette;
-
-        return $this;
-    }
-
-    /**
      * Build navigation.
      *
      * @param  mixed  $preferences
@@ -85,16 +69,15 @@ class NavBuilder
             ->resolveChildrenClosures()
             ->validateNesting()
             ->validateViews()
-            ->authorizeItems()
-            ->authorizeChildren()
             ->syncOriginal()
             ->trackCoreSections()
             ->trackOriginalSectionItems()
             ->trackUrls()
             ->applyPreferenceOverrides($preferences)
+            ->authorizeItems()
+            ->authorizeChildren()
             ->buildSections()
             ->blinkUrls()
-            ->addToCommandPalette()
             ->get();
     }
 
@@ -172,6 +155,7 @@ class NavBuilder
     protected function authorizeItems()
     {
         $this->items = $this->filterAuthorizedNavItems($this->items);
+        $this->itemsKeyedById = null;
 
         return $this;
     }
@@ -185,7 +169,10 @@ class NavBuilder
     {
         collect($this->items)
             ->reject(fn ($item) => is_callable($item->children()))
-            ->each(fn ($item) => $item->children($this->filterAuthorizedNavItems($item->children())));
+            ->each(fn ($item) => $item->children(
+                items: $this->filterAuthorizedNavItems($item->children()),
+                generateNewIds: false,
+            ));
 
         return $this;
     }
@@ -367,6 +354,7 @@ class NavBuilder
 
         if (! in_array($item->manipulations()['action'], ['@modify', '@hide'])) {
             $this->items[] = $item;
+            $this->itemsKeyedById = null;
         }
 
         return $item;
@@ -533,6 +521,16 @@ class NavBuilder
     }
 
     /**
+     * Get items keyed by ID
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getItemsKeyedById()
+    {
+        return $this->itemsKeyedById ??= collect($this->items)->keyBy->id();
+    }
+
+    /**
      * Find existing nav item by ID.
      *
      * @param  string  $id
@@ -549,7 +547,7 @@ class NavBuilder
             return $item;
         }
 
-        $items = collect($this->items)->keyBy->id();
+        $items = $this->getItemsKeyedById();
 
         if ($item = $items->get($id)) {
             return $item;
@@ -577,7 +575,7 @@ class NavBuilder
             $id = NavTransformer::removeUniqueIdHash($id);
         }
 
-        $items = collect($this->items)->keyBy->id();
+        $items = $this->getItemsKeyedById();
 
         $idParts = collect(explode('::', $id));
 
@@ -736,7 +734,10 @@ class NavBuilder
 
         $newChildren->each(fn ($item, $index) => $item->order($index + 1));
 
-        $item->children($newChildren, false);
+        $item->children(
+            items: $newChildren,
+            generateNewIds: false,
+        );
 
         return $newChildren;
     }
@@ -844,6 +845,7 @@ class NavBuilder
         $this->items = collect($this->items)
             ->reject(fn ($registeredItem) => $registeredItem->id() === $item->id())
             ->all();
+        $this->itemsKeyedById = null;
     }
 
     /**
@@ -1050,8 +1052,17 @@ class NavBuilder
      */
     public static function getUnresolvedChildrenUrlsForItem($item)
     {
-        return Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id())
-            ?? Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id());
+        if ($urls = Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)) {
+            return $urls->get($item->id());
+        }
+
+        if ($urls = Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)) {
+            Blink::put(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY, $urls);
+
+            return $urls->get($item->id());
+        }
+
+        return null;
     }
 
     /**
@@ -1061,9 +1072,15 @@ class NavBuilder
      */
     public static function getAllUrls()
     {
-        return Blink::get(static::ALL_URLS_CACHE_KEY)
-            ?? Cache::get(static::ALL_URLS_CACHE_KEY)
-            ?? collect();
+        if ($urls = Blink::get(static::ALL_URLS_CACHE_KEY)) {
+            return $urls;
+        }
+
+        $urls = Cache::get(static::ALL_URLS_CACHE_KEY) ?? collect();
+
+        Blink::put(static::ALL_URLS_CACHE_KEY, $urls);
+
+        return $urls;
     }
 
     /**
@@ -1075,60 +1092,6 @@ class NavBuilder
         Blink::forget(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
         Cache::forget(static::ALL_URLS_CACHE_KEY);
         Blink::forget(static::ALL_URLS_CACHE_KEY);
-    }
-
-    /**
-     * Add built items to command palette.
-     */
-    protected function addToCommandPalette(): self
-    {
-        if (! $this->withCommandPalette) {
-            return $this;
-        }
-
-        $this->built
-            ->flatMap(fn ($section) => $section['items'])
-            ->filter(fn ($item) => $item->url())
-            ->each(fn ($item) => $this->addItemToCommandPalette($item));
-
-        return $this;
-    }
-
-    /**
-     * Add nav item and its children to command palette.
-     */
-    public function addItemToCommandPalette(NavItem $item)
-    {
-        CommandPalette::addCommand(static::transformToLink($item));
-
-        if ($children = $item->resolveChildren()->children()) {
-            $children->each(fn ($child) => CommandPalette::addCommand(static::transformToLink($child, $item)));
-        }
-    }
-
-    /**
-     * Transform nav item to valid command palette `Link` instance.
-     */
-    protected static function transformToLink(NavItem $item, ?NavItem $parentItem = null): Link
-    {
-        $displayItem = $parentItem ?? $item;
-
-        $text = $displayItem->section() !== 'Top Level'
-            ? __($displayItem->section()).' » '.__($displayItem->display())
-            : __($displayItem->display());
-
-        if ($parentItem) {
-            $text .= ' » '.__($item->display());
-        }
-
-        $link = new Link(
-            text: $text,
-            category: Category::Navigation,
-        );
-
-        return $link
-            ->url($item->url())
-            ->icon($item->icon());
     }
 
     /**

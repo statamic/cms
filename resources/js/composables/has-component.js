@@ -1,10 +1,10 @@
-import { useSlots, computed } from 'vue';
+import { useSlots, computed, unref } from 'vue';
 
-export function hasComponent(componentName) {
+export function hasComponent(componentName, slotProps = {}) {
     const slots = useSlots();
 
     return computed(() => {
-        const defaultSlot = slots.default?.();
+        const defaultSlot = slots.default?.(unref(slotProps));
         if (!defaultSlot) return false;
 
         return defaultSlot.some((vnode) => {

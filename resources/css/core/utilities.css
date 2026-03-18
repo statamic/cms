@@ -1,3 +1,12 @@
+/* UTILITIES / EXTENDED TAILWIND CLASSES
+=================================================== */
+/* Here we extend Tailwind's classes to add additional functionality where we're sure it won't break anything. */
+
+/* If the next sibling is hidden (by a Vue conditional), remove the bottom border. For example, /cp/asset-containers/assets/edit, the Image Manipulation toggle. */
+.divide-y > *:has(+[style*="display: none"]:last-child) {
+    border-block-end: none;
+}
+
 /* UTILITIES / LAYOUT
 =================================================== */
 [v-cloak],
@@ -13,9 +22,42 @@
     z-index: var(--z-index-max);
 }
 
+@utility st-overflow-clip-margin {
+    overflow-clip-margin: 1px;
+    /* As of 2026-01-08 Safari doesn't support overflow-clip-margin */
+    @supports not (overflow-clip-margin: 1px) {
+        padding-inline-start: 1px;
+    }
+}
+
+@utility st-custom-scrollbar {
+    --sb-size: 3px;
+    --sb-thumb-color: var(--color-gray-400);
+    &:where(.dark, .dark *) {
+        --sb-thumb-color: var(--color-gray-500);
+    }
+    --sb-track-color: transparent;
+
+    scrollbar-color: var(--sb-thumb-color), var(--sb-track-color);
+
+    &::-webkit-scrollbar {
+        width: var(--sb-size);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--sb-track-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--sb-thumb-color);
+        border-radius: 2px;
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
-@utility trim-text-start {
+/* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
+@utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
     &:has(svg),
@@ -28,9 +70,57 @@
         text-box: unset;
     }
 }
-@utility trim-cap-alphabetic {
+@utility st-text-trim-cap {
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
+}
+@utility st-text-trim-ex-alphabetic {
+    text-box: ex alphabetic;
+}
+
+@utility placeholder-xs {
+    /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
+    &::placeholder {
+        font-size: 0.975em;
+    }
+}
+@utility placeholder-text-xs {
+    /* =Jay. If it needs to be used directly on the element such as the link field i.e. pseudo ::placeholder */
+    font-size: 0.975em;
+}
+
+@utility st-text-legibility {
+    font-family: "inter", sans-serif;
+    letter-spacing: -0.01em;
+    font-optical-sizing: auto;
+    font-weight: 425;
+}
+
+@utility input-text {
+    width: 100%;
+    /* e.g. in a Bard table */
+    @apply p-2 text-gray-900 dark:text-gray-100;
+}
+
+/* UTILITIES / DECORATION / SHADOWS
+=================================================== */
+@utility shadow-sm-b {
+    box-shadow: 0 3px 2px -1px hsl(0deg 0% 90%), 0 1px 2px hsl(0deg 0% 90%);
+    &:where(.dark, .dark *) {
+        box-shadow: unset;
+    }
+}
+
+/* UTILITIES / DECORATION / OTHER
+=================================================== */
+/* e.g. /cp/utilities/licensing */
+@utility little-dot {
+    border-radius:7px;
+    display:inline-block;
+    height:7px;
+    position:relative;
+    width:7px;
+    flex-shrink:0
 }
 
 /* UTILITIES / STATES
@@ -39,13 +129,6 @@
 @utility focus-outline {
     outline-width: var(--focus-outline-width);
     outline-offset: var(--focus-outline-offset);
-    outline-color: var(--focus-outline-color, currentColor);
-    outline-style: var(--focus-outline-style, solid);
-}
-/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
-@utility focus-outline-within {
-    outline-offset: 0;
-    outline-width: var(--focus-outline-width);
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
 }
@@ -79,7 +162,7 @@
 }
 
 @utility button-active {
-    background: var(--color-button-active-light-theme);
+    background: var(--color-button-active);
 }
 
 @utility saving-overlay {
@@ -87,7 +170,7 @@
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
-        @apply bg-dark-600/90;
+        @apply bg-gray-700/90;
     }
 
     .inner {
@@ -105,11 +188,55 @@
     }
 }
 
-@utility bg-frosted {
-    @apply bg-white/85 backdrop-blur-sm;
+/* UTILITIES / DECORATION / MASK BACKGROUND
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/taxonomies/something
+
+    What does it do?
+    ----------------
+    - Adds a pseudo element below to mask anything that flows below it
+    - This was created to add to the "customize column" button, so that filters flowing below it would be half-masked/flow under smoothly
+
+*/
+/* HTML Example...
+
+    <div class="absolute right-0 mask-bg"> <-- needs to be position:absolute or position:relative. Use a modifier class to change the amount/direction, e.g. <div class="sticky left-0 mask-bg mask-bg--left mask-bg--left-small">
+
+    </div>
+
+*/
+@utility mask-bg {
+    z-index: var(--z-index-above);
+    &::before {
+        --cover: 3rem;
+        --height-offset: 0.3rem;
+        content: '';
+        opacity: 75%;
+        position: absolute;
+        z-index: var(--z-index-below);
+        width: calc(150% + var(--cover));
+        height: calc(100% + var(--height-offset) * 2);
+        top: calc(0% - var(--height-offset));
+        background: radial-gradient(circle at center, var(--theme-color-content-bg) 0%,transparent 80%);
+        border-radius: 1.5rem 0 0 1.5rem;
+    }
+}
+@utility mask-bg--left {
+    &::before {
+        left: calc(0.5rem - var(--cover));
+    }
+}
+@utility mask-bg--left-small {
+    &::before {
+        left: calc(-0.75rem - var(--cover));
+    }
 }
 
-/* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
+/* UTILITIES / DECORATION / ARCHIECTURAL LINES
 =================================================== */
 /* Notes...
 
@@ -125,89 +252,145 @@
 */
 /* HTML Example...
 
-<div class="content-card bg-architectural-lines"> <-- background lines added to this element
-    <footer>
-        <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
-    </footer>
-</div>
+    <div class="content-card bg-architectural-lines"> <-- background lines added to this element
+        [data-ui-panel] <-- a central horizontal line is created here
+        <footer>
+            <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
+        </footer>
+    </div>
 
 */
 @utility bg-architectural-lines {
-    &::before {
-        content: '';
-        pointer-events: none;
-        position: absolute;
-        inset: 0;
-        background-image: url('../../svg/ui/architectural-lines.svg');
-        background-size: 100%;
-        /* Reduce the chances of the background circles overlapping the button */
-        @media (width < 1300px) {
-            background-position-y: 130%;
-        }
-    }
-    footer {
-        position: relative;
+    &:not(:has(.page-tree-branch)) {
         &::before {
             content: '';
             pointer-events: none;
             position: absolute;
-            border-block-end: 1px solid black;
-            opacity: 0.06;
-            width: 100vw;
-            top: 50%;
-            transform: translateY(50%);
+            inset: 0;
+            background-image: url('../../svg/architectural-lines.svg');
+            background-size: 100%;
+            /* Reduce the chances of the background circles overlapping the button */
+            @media (width < 1300px) {
+                background-position-y: 130%;
+            }
+            @media (width > 2000px) {
+                /* The lines become thicker because the svg gets stretched, so reduce opacity to compensate for this */
+                opacity: 0.7;
+            }
         }
-        button:only-child {
-            position: relative;
-            &::before, &::after {
+        .dark &::before {
+            filter: invert(100%);
+            /* The negative margin is to compensate for the lack of a "raised panel" in dark mode */
+            @apply -mt-2;
+        }
+        /* Central horizontal line */
+        [data-ui-panel] {
+            > * {
+                position: relative;
+                z-index: var(--z-index-above);
+            }
+
+            &::after {
+                --height: 1px;
+                --line-color: hsl(0deg 0% 95%);
                 content: '';
                 pointer-events: none;
                 position: absolute;
                 inset: 0;
-                border: 1px solid black;
-                opacity: 0.06;
-                width: 60%;
-                aspect-ratio: 1;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                border-radius: 50%;
+                height: var(--height);
+                /* Bust out of the container to create a full-width horizontal line, ref https://www.smashingmagazine.com/2024/01/css-border-image-property/#full-width-backgrounds */
+                border-image: conic-gradient(var(--line-color) 0 0) fill 0//0 100vw;
+                top: calc(50% - var(--height));
             }
-            &::before {
-                width: 45%;
+            .dark &::after {
+                --line-color: hsl(240deg 2.56% 15%);
+            }
+        }
+        footer {
+            button:only-child {
+                position: relative;
+                &::before, &::after {
+                    content: '';
+                    pointer-events: none;
+                    position: absolute;
+                    inset: 0;
+                    border: 1px solid black;
+                    opacity: 0.06;
+                    width: 60%;
+                    aspect-ratio: 1;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    border-radius: 50%;
+                }
+                &::before {
+                    width: 45%;
+                }
             }
         }
     }
 }
 
-/* UTILITIES / STATES / DECORATION / CHECKERBOARD
+/* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
-@utility bg-checkerboard {
-    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
-    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
 
+:root {
+    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%230a0a0a'/%3E%3C/svg%3E");
+    --checkerboard-dark-color: #1c1c1e;
+    --checkerboard-light-color: #fff;
+}
+
+@utility bg-checkerboard {
     position: relative;
-    background-color: #fff;
 
     &::before {
+        border-radius: inherit;
         content: '';
         position: absolute;
         inset: 0;
-        background-image: var(--checkerboard-light);
-        opacity: 0;
         transition: opacity 0.2s ease-in-out;
         pointer-events: none;
+        background-color: var(--checkerboard-light-color);
+        background-image: var(--checkerboard-light);
     }
 
-    &:hover::before {
-        opacity: 1;
+    .dark &::before {
+        background-color: var(--checkerboard-dark-color);
+        background-image: var(--checkerboard-dark);
     }
+}
 
-    .dark & {
-        background-color: var(--color-gray-850);
-
-        &::before {
-            background-image: var(--checkerboard-dark);
-        }
+@utility bg-checkerboard-light {
+    &::before {
+        background-color: var(--checkerboard-light-color) !important;
+        background-image: var(--checkerboard-light) !important;
     }
+}
+
+@utility bg-checkerboard-dark {
+    &::before {
+        background-color: var(--checkerboard-dark-color) !important;
+        background-image: var(--checkerboard-dark) !important;
+    }
+}
+
+@utility shape-squircle {
+    corner-shape: squircle;
+}
+
+/* UTILITIES / ANIMATIONS
+=================================================== */
+@keyframes pulse-on-appearance {
+    50% {
+        opacity: 0.85;
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@utility animate-pulse-on-appearance {
+    animation: pulse-on-appearance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

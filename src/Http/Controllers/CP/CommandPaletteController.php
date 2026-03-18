@@ -7,29 +7,24 @@ use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\ContentSearchResult;
 use Statamic\Contracts\Search\Result;
 use Statamic\Facades\CommandPalette;
-use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Search;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Search\Index;
+use Statamic\Support\Arr;
 
 class CommandPaletteController extends CpController
 {
     public function index()
     {
-        // TODO:
-        // - Cache nav and/or built command palette?
-        // - Bust cache when nav preferences saved?
-
-        Nav::build(commands: true);
-
-        return [
-            'categories' => Category::order(),
-            'items' => CommandPalette::build(),
-        ];
+        return CommandPalette::build();
     }
 
     public function search(Request $request)
     {
-        return Search::index()
+        $index = Search::index(index: 'cp', locale: Site::selected()->handle());
+
+        return $index
             ->ensureExists()
             ->search($request->query('q'))
             ->get()
@@ -37,14 +32,29 @@ class CommandPaletteController extends CpController
                 return ! empty($item->getCpUrl()) && User::current()->can('view', $item->getSearchable());
             })
             ->take(10)
-            ->map(function (Result $result) {
+            ->map(function (Result $result) use ($index) {
                 return (new ContentSearchResult(text: $result->getCpTitle(), category: Category::Search))
                     ->url($result->getCpUrl())
-                    ->badge($result->getCpBadge())
+                    ->badge($this->badge($index, $result))
                     ->reference($result->getReference())
-                    // ->icon() // TODO: Make dynamic for entries/terms/users?
+                    ->icon($result->getCpIcon())
                     ->toArray();
             })
             ->values();
+    }
+
+    private function badge(Index $index, Result $result)
+    {
+        $badge = $result->getCpBadge();
+
+        if (
+            Site::hasMultiple()
+            && ! Arr::has($index->config(), 'sites')
+            && method_exists($result->getSearchable(), 'site')
+        ) {
+            $badge = $result->getSearchable()->site()->name().' - '.$badge;
+        }
+
+        return $badge;
     }
 }

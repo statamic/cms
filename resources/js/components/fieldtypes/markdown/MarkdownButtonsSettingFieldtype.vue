@@ -8,7 +8,7 @@
                 :class="{ active: enabled(button.name) }"
                 @click="toggleButton(button.name)"
             >
-                <svg-icon :name="button.svg"></svg-icon>
+                <ui-icon :name="button.svg" />
             </button>
         </div>
     </div>

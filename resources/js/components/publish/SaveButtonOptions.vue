@@ -3,11 +3,11 @@
         <slot />
         <Dropdown v-if="showOptions" align="end">
             <template #trigger>
-                <Button variant="primary" icon="ui/chevron-down" />
+                <Button variant="primary" icon="chevron-down" :aria-label="__('Save options')" />
             </template>
             <DropdownMenu>
-                <DropdownLabel v-text="__('After Saving')" />
-                <RadioGroup v-model="currentOption">
+                <DropdownLabel id="after-saving-label" v-text="__('After Saving')" />
+                <RadioGroup v-model="currentOption" aria-labelledby="after-saving-label">
                     <Radio :label="__('Go To Listing')" value="listing" />
                     <Radio :label="__('Continue Editing')" value="continue_editing" />
                     <Radio :label="__('Create Another')" value="create_another" />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@/components/ui';
 
 export default {
     components: {
@@ -65,9 +65,7 @@ export default {
         setPreference(value) {
             if (value === this.$preferences.get(this.preferencesKey)) return;
 
-            value === 'listing'
-                ? this.$preferences.remove(this.preferencesKey)
-                : this.$preferences.set(this.preferencesKey, value);
+            this.$preferences.set(this.preferencesKey, value);
         },
     },
 };

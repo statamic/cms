@@ -53,7 +53,7 @@ return [
     */
 
     'widgets' => [
-        'getting_started',
+        //
     ],
 
     /*
@@ -86,24 +86,11 @@ return [
     | Support Link
     |--------------------------------------------------------------------------
     |
-    | Set the location of the support link in the "Useful Links" header
-    | dropdown. Use 'false' to remove it entirely.
+    | Set the location of the support link in the header.
     |
     */
 
     'support_url' => env('STATAMIC_SUPPORT_URL', 'https://statamic.com/support'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Theme
-    |--------------------------------------------------------------------------
-    |
-    | Optionally spice up the login and other outside-the-control-panel
-    | screens. You may choose between "rad" or "business" themes.
-    |
-    */
-
-    'theme' => env('STATAMIC_THEME', 'rad'),
 
     /*
     |--------------------------------------------------------------------------
@@ -140,4 +127,5 @@ return [
     'thumbnail_presets' => [
         // 'medium' => 800,
     ],
+
 ];

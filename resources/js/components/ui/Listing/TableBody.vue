@@ -1,10 +1,10 @@
 <script setup>
-import TableField from '@statamic/components/data-list/TableField.vue';
-import RowActions from '@statamic/components/ui/Listing/RowActions.vue';
-import SortableList from '@statamic/components/sortable/SortableList.vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import TableField from '@/components/data-list/TableField.vue';
+import RowActions from '../Listing/RowActions.vue';
+import SortableList from '@/components/sortable/SortableList.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import Table from '@statamic/components/ui/Listing/Table.vue';
+import { Checkbox } from '@ui';
 
 const {
     items,
@@ -25,6 +25,43 @@ const {
 function isSelected(id) {
     return selections.value.includes(id);
 }
+
+function getCheckboxLabel(row) {
+    const rowTitle = getRowTitle(row);
+    return isSelected(row.id)
+        ? __('Deselect :title', { title: rowTitle })
+        : __('Select :title', { title: rowTitle });
+}
+
+function getCheckboxDescription(row) {
+    const rowTitle = getRowTitle(row);
+    const isDisabled = hasReachedSelectionLimit.value && allowsMultipleSelections.value && !isSelected(row.id);
+
+    if (isDisabled) {
+        return __('messages.selections_limit_reached', { title: rowTitle });
+    }
+
+    return isSelected(row.id)
+        ? __('messages.selections_item_selected', { title: rowTitle })
+        : __('messages.selections_item_unselected', { title: rowTitle });
+}
+
+function getRowTitle(row) {
+    return row.title || row.name || row.label || row.id || __('item');
+}
+
+function handleRowClick(event, index) {
+    if (! allowsSelections.value) return;
+
+    // Check if the click target is an interactive element
+    const target = event.target;
+    const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [role="menuitem"], [role="option"], [data-interactive]');
+
+    // If it's not an interactive element, fire the selection handler
+    if (!isInteractive) {
+        selectionClicked(index, event);
+    }
+}
 </script>
 
 <template>
@@ -41,19 +78,21 @@ function isSelected(id) {
             <tr
                 v-for="(row, index) in items"
                 :key="row.id"
-                class="sortable-row outline-hidden"
+                class="sortable-row outline-hidden starting-style-transition"
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
+                @click="handleRowClick($event, index)"
             >
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowsSelections && !reorderable">
-                    <input
-                        v-if="!reorderable"
-                        type="checkbox"
+                    <Checkbox
                         :value="row.id"
-                        :checked="isSelected(row.id)"
+                        :model-value="isSelected(row.id)"
                         :disabled="hasReachedSelectionLimit && allowsMultipleSelections && !isSelected(row.id)"
-                        :id="`checkbox-${row.id}`"
-                        @click="selectionClicked(index, $event)"
+                        :label="getCheckboxLabel(row)"
+                        :description="getCheckboxDescription(row)"
+                        size="sm"
+                        solo
+                        @update:model-value="selectionClicked(index, $event)"
                     />
                 </td>
                 <td
@@ -77,13 +116,6 @@ function isSelected(id) {
                         />
                     </slot>
                 </td>
-                <!--                    <td class="type-column" v-if="type">-->
-                <!--                        <Badge-->
-                <!--                            size="sm"-->
-                <!--                            v-if="type === 'entries' || type === 'terms'"-->
-                <!--                            :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"-->
-                <!--                        />-->
-                <!--                    </td>-->
                 <td class="actions-column" v-if="hasActions || $slots['prepended-row-actions']">
                     <RowActions :row="row">
                         <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">

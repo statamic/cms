@@ -47,6 +47,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Blueprints Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your blueprint YAML files are stored.
+    |
+    */
+
+    'blueprints_path' => resource_path('blueprints'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fieldsets Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your fieldset YAML files are stored.
+    |
+    */
+
+    'fieldsets_path' => resource_path('fieldsets'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Send the Powered-By Header
     |--------------------------------------------------------------------------
     |
@@ -63,8 +85,8 @@ return [
     | Date Format
     |--------------------------------------------------------------------------
     |
-    | Whenever a Carbon date is cast to a string on front-end routes, it will
-    | use this format. On CP routes, the format defined in cp.php is used.
+    | This format will be used whenever a Carbon date is cast to a string on
+    | front-end routes. It doesn't affect how dates are formatted in the CP.
     | You can customize this format using PHP's date string constants.
     | Setting this value to null will use Carbon's default format.
     |

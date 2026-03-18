@@ -1,5 +1,6 @@
 import axios from 'axios';
-import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import { reveal } from '@api';
 
 let container = null;
 let errors = null;
@@ -69,15 +70,15 @@ export class Request extends Step {
 
     handle(payload) {
         return new Promise((resolve, reject) => {
-            const data = { ...container.value.store.visibleValues, ...this.#extraData };
+            const data = { ...container.value.visibleValues, ...this.#extraData };
 
             return axios[this.#method](this.#url, data)
                 .then((response) => {
                     if (container && response.data.data?.hasOwnProperty('values')) {
-                        container.value.store.setValues(
-                            resetValuesFromResponse(response.data.data.values, container.value.store),
+                        container.value.setValues(
+                            resetValuesFromResponse(response.data.data.values, container.value),
                         );
-                        container.value.store.setExtraValues(response.data.data.extraValues);
+                        container.value.setExtraValues(response.data.data.extraValues);
                     }
                     resolve(response);
                 })
@@ -86,6 +87,7 @@ export class Request extends Step {
                         const { errors: messages, message } = e.response.data;
                         if (errors) errors.value = messages;
                         Statamic.$toast.error(message);
+                        reveal.invalid();
                         e = new PipelineStopped();
                     } else if (e.response && e.response.data.message) {
                         Statamic.$toast.error(e.response.data.message);

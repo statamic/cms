@@ -1,13 +1,23 @@
 <script setup>
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 import { computed } from 'vue';
-import { Widget, Icon, Listing, ListingTableBody as TableBody, ListingPagination as Pagination } from '@statamic/ui';
+import {
+    Widget,
+    Icon,
+    Listing,
+    ListingTableHead as TableHead,
+    ListingTableBody as TableBody,
+    ListingPagination as Pagination,
+    Button,
+} from '@/components/ui';
 
 const props = defineProps({
     form: { type: String, required: true },
     fields: { type: Array, default: () => [] },
     title: { type: String },
+    submissionsUrl: { type: String },
     initialPerPage: { type: Number, default: 5 },
+    showTableHeader: { type: Boolean, default: false },
 });
 
 const requestUrl = cp_url(`forms/${props.form}/submissions`);
@@ -20,6 +30,7 @@ const cols = computed(() => [
 const widgetProps = computed(() => ({
     title: props.title,
     icon: 'forms',
+    href: props.submissionsUrl,
 }));
 
 function formatDate(value) {
@@ -32,11 +43,18 @@ function formatDate(value) {
         :url="requestUrl"
         :columns="cols"
         :per-page="initialPerPage"
+        sort-column="datestamp"
+        sort-direction="desc"
         :show-pagination-totals="false"
         :show-pagination-page-links="false"
+        :show-pagination-per-page-selector="false"
     >
         <template #initializing>
-            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
+            <Widget v-bind="widgetProps">
+                <div class="flex flex-col justify-between px-4 py-3">
+                    <ui-skeleton v-for="i in initialPerPage" class="h-[1.25rem] mb-[0.25rem] w-full" />
+                </div>
+            </Widget>
         </template>
         <template #default="{ items }">
             <Widget v-bind="widgetProps">
@@ -44,7 +62,8 @@ function formatDate(value) {
                     {{ __('This form is awaiting responses') }}
                 </ui-description>
                 <div class="px-4 py-3">
-                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                    <table class="w-full widget-table">
+                        <TableHead :sr-only="!props.showTableHeader" />
                         <TableBody>
                             <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
                                 <a
@@ -56,8 +75,8 @@ function formatDate(value) {
                             </template>
                             <template #cell-datestamp="{ row: submission }">
                                 <div
-                                    class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
-                                    v-html="formatDate(submission.datestamp)"
+                                    class="text-end font-inter tabular-nums text-xs whitespace-nowrap text-gray-600 dark:text-gray-400 antialiased"
+                                    v-text="formatDate(submission.datestamp)"
                                 />
                             </template>
                         </TableBody>
@@ -65,7 +84,9 @@ function formatDate(value) {
                 </div>
                 <template #actions>
                     <Pagination />
-                    <slot name="actions" />
+                    <Button :href="submissionsUrl" size="sm">
+                        {{ __('View All') }}
+                    </Button>
                 </template>
             </Widget>
         </template>

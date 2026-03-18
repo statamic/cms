@@ -1,145 +1,110 @@
 <template>
-    <div class="bard-link-toolbar">
-        <div>
-            <div class="border-b px-4 py-4 bg-white dark:border-dark-900 border-gray-200 dark:bg-gray-900 dark:border-black rounded-b-xl">
-                <div class="flex">
-                    <div
-                        class="mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
-                    >
-                        <select class="input w-auto px-1 text-sm" v-model="linkType">
-                            <option v-for="visibleLinkType in visibleLinkTypes" :value="visibleLinkType.type">
-                                {{ visibleLinkType.title }}
-                            </option>
-                        </select>
+    <StackContent class="space-y-5">
+        <section class="flex gap-3 items-center">
+            <ui-select
+                v-model="linkType"
+                :options="visibleLinkTypes"
+                option-label="title"
+                option-value="type"
+                class="w-1/4 min-w-24"
+            />
+
+            <div class="flex-1 min-w-0">
+                <!-- URL input -->
+                <ui-input
+                    v-if="linkType === 'url'"
+                    v-model="url.url"
+                    type="text"
+                    ref="urlInput"
+                    autofocus
+                    placeholder="https://"
+                    @keydown.enter.prevent="commit"
+                />
+
+                <!-- Email input -->
+                <ui-input
+                    v-else-if="linkType === 'mailto'"
+                    v-model="urlData.mailto"
+                    type="text"
+                    ref="mailtoInput"
+                    :placeholder="__('Email Address')"
+                    @keydown.enter.prevent="commit"
+                />
+
+                <!-- Phone input -->
+                <ui-input
+                    v-else-if="linkType === 'tel'"
+                    v-model="urlData.tel"
+                    ref="telInput"
+                    :placeholder="__('Phone Number')"
+                    @keydown.enter.prevent="commit"
+                />
+
+                <!-- Data input -->
+                <div
+                    v-else
+                    :class="[
+                                'flex overflow-hidden cursor-pointer items-center justify-between',
+                                'w-full block bg-white dark:bg-gray-900 min-w-0',
+                                'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700 dark:with-contrast:border-gray-500 dark:inset-shadow-2xs dark:inset-shadow-black',
+                                'text-gray-925 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-400/85',
+                                'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 not-prose',
+                                'text-sm rounded-lg px-2.5 py-1.5 h-10 leading-[1.125rem]'
+                            ]"
+                    @click="openSelector"
+                >
+                    <Icon v-if="isLoading" name="loading" />
+
+                    <div v-else class="flex flex-1 items-center me-2 overflow-hidden min-w-0">
+                        <img
+                            v-if="linkType === 'asset' && itemData.asset && itemData.asset.isImage"
+                            :src="itemData.asset.thumbnail || itemData.asset.url"
+                            class="asset-thumbnail lazyloaded size-6 max-h-full max-w-full rounded-sm object-cover me-2 flex-shrink-0"
+                        />
+                        <div class="truncate min-w-0 flex-1">{{ displayValue || __('Choose item...') }}</div>
                     </div>
 
-                    <div
-                        class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
+                    <button
+                        class="flex items-center cursor-pointer"
+                        v-tooltip="`${__('Browse')}...`"
+                        :aria-label="`${__('Browse')}...`"
+                        @click="openSelector"
                     >
-                        <!-- URL input -->
-                        <input
-                            v-if="linkType === 'url'"
-                            v-model="url.url"
-                            type="text"
-                            ref="urlInput"
-                            class="input h-auto text-sm"
-                            :placeholder="__('URL')"
-                            @keydown.enter.prevent="commit"
-                        />
-
-                        <!-- Email input -->
-                        <input
-                            v-else-if="linkType === 'mailto'"
-                            v-model="urlData.mailto"
-                            type="text"
-                            ref="mailtoInput"
-                            class="input h-auto text-sm"
-                            :placeholder="__('Email Address')"
-                            @keydown.enter.prevent="commit"
-                        />
-
-                        <!-- Phone input -->
-                        <input
-                            v-else-if="linkType === 'tel'"
-                            v-model="urlData.tel"
-                            type="text"
-                            ref="telInput"
-                            class="input h-auto text-sm"
-                            placeholder="Phone Number"
-                            @keydown.enter.prevent="commit"
-                        />
-
-                        <!-- Data input -->
-                        <div
-                            v-else
-                            class="flex w-full min-w-[240px] cursor-pointer items-center justify-between"
-                            @click="openSelector"
-                        >
-                            <loading-graphic v-if="isLoading" :inline="true" />
-
-                            <div v-else class="flex flex-1 items-center truncate ltr:mr-2 rtl:ml-2">
-                                <img
-                                    v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
-                                    :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded-sm object-cover ltr:mr-2 rtl:ml-2"
-                                />
-                                {{ displayValue }}
-                            </div>
-
-                            <button
-                                class="flex items-center"
-                                v-tooltip="`${__('Browse')}...`"
-                                :aria-label="`${__('Browse')}...`"
-                                @click="openSelector"
-                            >
-                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
-                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
-                            </button>
-                        </div>
-                    </div>
+                        <Icon v-show="linkType === 'asset'" name="folder-photos" class="size-4" />
+                        <Icon v-show="linkType !== 'asset'" name="folder" class="size-4" />
+                    </button>
                 </div>
-
-                <div class="space-y-3">
-                    <!-- Title attribute -->
-                    <ui-input
-                        type="text"
-                        ref="input"
-                        v-model="title"
-                        :placeholder="`${__('Label')} (${__('Optional')})`"
-                    />
-
-                    <!-- Rel attribute -->
-                    <ui-input
-                        type="text"
-                        ref="input"
-                        v-model="rel"
-                        :placeholder="`${__('Relationship')} (${__('Optional')})`"
-                    />
-                </div>
-
-                <ui-checkbox-group name="target_blank" label="Choose if the link should open in a new window" class="mt-4">
-                    <ui-checkbox-item
-                        label="Open in new window"
-                        v-model="targetBlank"
-                        id="target-blank"
-                        size="sm"
-                        align="center"
-                    />
-                </ui-checkbox-group>
             </div>
+        </section>
 
-            <footer
-                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse rounded-b-xl"
-            >
-                <ui-button
-                    variant="ghost"
-                    size="xs"
-                    class="text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
-                    @click="$emit('canceled')"
-                >
-                    {{ __('Cancel') }}
-                </ui-button>
-                <ui-button
-                    size="sm"
-                    :aria-label="__('Remove Link')"
-                    @click="remove"
-                >
-                    {{ __('Remove Link') }}
-                </ui-button>
-                <ui-button
-                    variant="primary"
-                    size="sm"
-                    :disabled="!canCommit"
-                    :aria-label="__('Apply Link')"
-                    v-tooltip="__('Apply Link')"
-                    @click="commit"
-                >
-                    {{ __('Save') }}
-                </ui-button>
-            </footer>
-        </div>
+        <ui-separator :text="__('Advanced Options')" />
 
-        <!-- Selectors -->
+        <section class="space-y-5">
+            <!-- Title attribute -->
+            <ui-input
+                type="text"
+                ref="input"
+                v-model="title"
+                :prepend="__('Label')"
+                :placeholder="__('Add a link label')"
+            />
+
+            <!-- Rel attribute -->
+            <ui-input
+                type="text"
+                ref="input"
+                v-model="rel"
+                :prepend="__('Rel')"
+                :placeholder="__('noopener, noreferrer')"
+            />
+
+            <div class="flex items-center gap-2">
+                <ui-switch
+                    v-model="targetBlank"
+                />
+                <ui-description :text="__('Open in new window')" />
+            </div>
+        </section>
 
         <relationship-input
             class="hidden"
@@ -158,30 +123,58 @@
             @item-data-updated="entrySelected"
         />
 
-        <stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
+        <Stack v-model:open="showAssetSelector" inset :show-close-button="false">
             <asset-selector
-                :container="config.container"
+                :container="{id: config.container}"
                 :folder="config.folder || '/'"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
-                :view-mode="'grid'"
                 :max-files="1"
+                :columns="bard.meta.assets.columns"
                 @selected="assetSelected"
-                @closed="closeAssetSelector"
+                @closed="showAssetSelector = false"
             />
-        </stack>
-    </div>
+        </Stack>
+    </StackContent>
+
+
+    <StackFooter>
+        <template #end>
+            <ui-button
+                @click="$emit('canceled')"
+                :text="__('Cancel')"
+                variant="ghost"
+            />
+            <ui-button
+                :text="__('Remove Link')"
+                @click="remove"
+            />
+            <ui-button
+                :text="__('Apply Link')"
+                :disabled="!canCommit"
+                @click="commit"
+                variant="primary"
+            />
+        </template>
+    </StackFooter>
+
+    <!-- Selectors -->
 </template>
 
 <script>
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
-import SvgIcon from '../../SvgIcon.vue';
+import { Icon, Stack, StackContent, StackFooter } from '@/components/ui';
 
 export default {
+    emits: ['updated', 'canceled', 'deselected'],
+
     components: {
         AssetSelector,
-        SvgIcon,
+        Icon,
+	    Stack,
+        StackContent,
+        StackFooter,
     },
 
     props: {
@@ -205,7 +198,7 @@ export default {
             itemData: {},
             title: null,
             rel: null,
-            targetBlank: null,
+            targetBlank: false,
             showAssetSelector: false,
             isLoading: false,
         };
@@ -363,7 +356,7 @@ export default {
 
             this.title = attrs.title;
             this.rel = attrs.href ? attrs.rel : this.defaultRel;
-            this.targetBlank = attrs.href ? attrs.target === '_blank' : this.config.target_blank;
+            this.targetBlank = attrs.href ? attrs.target === '_blank' : (this.config.target_blank || false);
         },
 
         autofocus() {
@@ -424,15 +417,11 @@ export default {
         },
 
         openEntrySelector() {
-            this.$refs.relationshipInput.$refs.existing.click();
+            this.$refs.relationshipInput.openSelector();
         },
 
         openAssetSelector() {
             this.showAssetSelector = true;
-        },
-
-        closeAssetSelector() {
-            this.showAssetSelector = false;
         },
 
         assetSelected(data) {

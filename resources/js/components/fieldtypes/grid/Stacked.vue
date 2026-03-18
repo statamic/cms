@@ -27,6 +27,7 @@
                     :values="row"
                     :meta="meta[row._id]"
                     :name="name"
+                    :has-error="rowHasError(row._id)"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"

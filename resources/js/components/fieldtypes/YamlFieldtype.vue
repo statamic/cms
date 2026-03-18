@@ -1,21 +1,22 @@
 <template>
     <CodeEditor
         ref="codeEditor"
-        :theme="config.theme"
-        :disabled="isReadOnly"
-        :tab-size="2"
-        :indent-type="'spaces'"
         :allow-mode-selection="false"
-        :show-mode-label="false"
+        :disabled="config.disabled"
+        :indent-type="'spaces'"
         :mode="'yaml'"
         :model-value="value"
+        :read-only="isReadOnly"
+        :show-mode-label="false"
+        :tab-size="2"
+        :theme="config.color_mode"
         @update:model-value="update"
     />
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { CodeEditor } from '@statamic/ui';
+import { CodeEditor } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

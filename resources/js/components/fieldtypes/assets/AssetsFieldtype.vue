@@ -1,14 +1,14 @@
 <template>
-    <div class="@container relative">
+    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
         <div
             v-if="hasPendingDynamicFolder"
-            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-dark-200 dark:text-dark-175"
+            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
             v-html="pendingText"
         />
 
         <uploader
             ref="uploader"
-            :container="container.handle"
+            :container="container.id"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
@@ -16,19 +16,20 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="">
+            <div>
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                    class="absolute inset-0 z-(--z-index-above) flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
-                    <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
-                    <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
+                    <ui-icon name="upload-cloud" class="size-5" />
+                    <span class="text-sm">{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 flex flex-col @2xs:flex-row items-center gap-4"
+                    data-asset-picker
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @[22rem]:flex-row gap-2 sm:gap-3 gap-y-3"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -44,13 +45,15 @@
                         @keyup.space.enter="openSelector"
                     />
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1 ms-1" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
-                        <span v-text="__('Drag & drop here or&nbsp;')" />
-                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
-                            {{ __('choose a file') }}
-                        </button>
-                        <span>.</span>
+                        <div class="text-xs">
+                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}
+                            </button>.
+                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end" v-if="meta.rename_folder">
@@ -77,7 +80,7 @@
                     </div>
                 </div>
 
-                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                <div v-if="uploads.length" class="divide-y">
                     <uploads
                         :uploads="uploads"
                         allow-selecting-existing
@@ -88,21 +91,22 @@
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
-                        v-model="assets"
-                        item-class="asset-tile"
-                        handle-class="asset-thumb-container"
-                        @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
-                        :constrain-dimensions="true"
-                        :disabled="isReadOnly"
-                        :distance="5"
-                        :animate="false"
                         append-to="body"
+                        handle-class="asset-thumb-container"
+                        item-class="asset-tile"
+                        v-model="assets"
+                        :animate="false"
+                        :constrain-dimensions="true"
+                        :disabled="config.disabled || isReadOnly"
+                        :distance="5"
+                        @dragend="$emit('blur')"
+                        @dragstart="$emit('focus')"
                     >
                         <div
-                            class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
-                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
+                            style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
                             <asset-tile
                                 v-for="asset in assets"
@@ -111,6 +115,7 @@
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
+                                :checkerboard-mode="checkerboardMode"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)"
@@ -119,16 +124,26 @@
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none" v-if="displayMode === 'list'">
-                        <table class="w-full">
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                        v-if="displayMode === 'list'"
+                    >
+                        <table class="table-fixed w-full">
+                            <thead class="sr-only">
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :vertical="true"
-                                :disabled="isReadOnly"
+                                :disabled="config.disabled || isReadOnly"
                                 :distance="5"
                                 :mirror="false"
+                                :vertical="true"
                             >
                                 <tbody ref="assets">
                                     <component
@@ -152,21 +167,19 @@
             </div>
         </uploader>
 
-        <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
-            <selector
+        <Stack v-model:open="showSelector" inset :show-close-button="false">
+            <Selector
                 :container="container"
                 :folder="folder"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
-                :view-mode="selectorViewMode"
                 :max-files="maxFiles"
                 :query-scopes="queryScopes"
                 :columns="columns"
                 @selected="assetsSelected"
-                @closed="closeSelector"
-            >
-            </selector>
-        </stack>
+                @closed="showSelector = false"
+            />
+        </Stack>
     </div>
 </template>
 
@@ -179,8 +192,9 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
-import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
     components: {
@@ -195,12 +209,21 @@ export default {
         DropdownMenu,
         DropdownItem,
         ItemActions,
+	    Stack,
     },
 
     mixins: [Fieldtype],
 
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
+
     inject: {
-        store: { default: null },
         isInBardField: {
             name: 'isInBardField',
             default: false,
@@ -221,7 +244,6 @@ export default {
             loading: true,
             initializing: true,
             showSelector: false,
-            selectorViewMode: null,
             draggingFile: false,
             uploads: [],
             innerDragging: false,
@@ -278,7 +300,7 @@ export default {
                 throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
             }
 
-            const value = this.store.values[field];
+            const value = this.publishContainer.values[field];
 
             // If value is an array (e.g. a users fieldtype), get the first item.
             return Array.isArray(value) ? value[0] : value;
@@ -359,31 +381,25 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return replicatorPreviewHtml(
                 this.assets
                     .map((asset) => {
                         return asset.isImage || asset.isSvg
-                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
+                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5 rounded-sm mr-1 object-cover" height="20" title="${asset.basename}" />`
                             : asset.basename;
                     })
-                    .join(', '),
+                    .join(' '),
             );
         },
 
         showPicker() {
             if (!this.canBrowse && !this.canUpload) return false;
 
-            if (this.maxFilesReached && !this.isFullWidth) return false;
-
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
             return true;
-        },
-
-        isFullWidth() {
-            return !(this.config.width && this.config.width < 100);
         },
 
         showSetAlt() {
@@ -391,20 +407,15 @@ export default {
         },
 
         canBrowse() {
-            const hasPermission =
-                this.can('configure asset containers') || this.can('view ' + this.container.handle + ' assets');
-
-            if (!hasPermission) return false;
+            if (!this.container.can_view) return false;
 
             return !this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            const hasPermission =
-                this.config.allow_uploads &&
-                (this.can('configure asset containers') || this.can('upload ' + this.container.handle + ' assets'));
+            if (!this.config.allow_uploads) return false;
 
-            if (!hasPermission) return false;
+            if (!this.container.can_upload) return false;
 
             return !this.hasPendingDynamicFolder;
         },
@@ -417,8 +428,21 @@ export default {
                   });
         },
 
+        selectedFilesText() {
+            if (this.maxFiles !== Infinity) {
+                return __n(':count\/:max selected', this.assets.length, { max: this.maxFiles });
+            }
+        },
+
         internalFieldActions() {
             return [
+                {
+                    title: __('Transparency'),
+                    icon: this.checkerboardIcon,
+                    run: () => this.cycleCheckerboard(),
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    quick: true,
+                },
                 {
                     title: __('Remove All'),
                     dangerous: true,
@@ -431,7 +455,7 @@ export default {
 
     events: {
         'close-selector'() {
-            this.closeSelector();
+            this.showSelector = false;
         },
     },
 
@@ -491,13 +515,6 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
-        },
-
-        /**
-         * Close the asset selector modal
-         */
-        closeSelector() {
-            this.showSelector = false;
         },
 
         /**
@@ -619,17 +636,20 @@ export default {
     },
 
     watch: {
-        assets(assets) {
-            if (this.initializing) return;
+        assets: {
+            deep: true,
+            handler(assets) {
+                if (this.initializing) return;
 
-            // The components deal with passing around asset objects, however
-            // our fieldtype is only concerned with their respective IDs.
-            this.update(this.assetIds);
+                // The components deal with passing around asset objects, however
+                // our fieldtype is only concerned with their respective IDs.
+                this.update(this.assetIds);
 
-            this.updateMeta({
-                ...this.meta,
-                data: [...assets],
-            });
+                this.updateMeta({
+                    ...this.meta,
+                    data: [...assets],
+                });
+            }
         },
 
         loading(loading) {
@@ -651,8 +671,6 @@ export default {
 
     mounted() {
         this.displayMode = this.isInsideGridField ? 'list' : this.config.mode || 'grid';
-
-        this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
 
         // We only have URLs in the field data, so we'll need to get the asset data.
         this.initializeAssets();

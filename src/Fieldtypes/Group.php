@@ -2,15 +2,19 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\GroupType;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Group extends Fieldtype
 {
+    use UpdatesReferences;
+
     protected $categories = ['structured'];
     protected $defaultable = false;
     protected $selectableInForms = true;
@@ -30,19 +34,44 @@ class Group extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Behaviour'),
+                'fields' => [
+                    'collapsible' => [
+                        'display' => __('Collapsible'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsible'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                    ],
+                    'collapsed' => [
+                        'display' => __('Collapsed by default'),
+                        'instructions' => __('statamic::fieldtypes.group.config.collapsed'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'width' => 50,
+                        'always_save' => false,
+                        'if' => [
+                            'collapsible' => 'equals true',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
                 'fields' => [
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                     'border' => [
                         'display' => __('Border'),
                         'instructions' => __('statamic::fieldtypes.grid.config.border'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -51,7 +80,9 @@ class Group extends Fieldtype
 
     public function process($data)
     {
-        return $this->fields()->addValues($data ?? [])->process()->values()->filter()->all();
+        $values = $this->fields()->addValues($data ?? [])->process()->values()->all();
+
+        return Arr::removeNullValues($values);
     }
 
     public function preProcess($data)
@@ -76,7 +107,7 @@ class Group extends Fieldtype
             ->addValues((array) $this->field->value())
             ->validator()
             ->withContext([
-                'prefix' => $this->field->handle().'.',
+                'prefix' => $this->field->validationContext('prefix'),
             ])
             ->rules();
 
@@ -170,5 +201,16 @@ class Group extends Fieldtype
     public function hasJsDriverDataBinding(): bool
     {
         return false;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        $fieldsConfig = $this->config('fields');
+
+        if (! $fieldsConfig) {
+            return;
+        }
+
+        $updater->update(new Fields($fieldsConfig));
     }
 }

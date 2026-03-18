@@ -1,13 +1,25 @@
 <script setup>
 import { Motion } from 'motion-v';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import { Button, ButtonGroup } from '@statamic/ui';
-import BulkActions from '@statamic/components/actions/BulkActions.vue';
+import { Button, ButtonGroup } from '@ui';
+import BulkActions from '@/components/actions/BulkActions.vue';
+import BulkActionsFloatingToolbar from './BulkActionsFloatingToolbar.vue';
 
 const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
 const busy = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
+const visible = ref(false);
+let visibleTimeout = null;
+
+watch(hasSelections, (value) => {
+    clearTimeout(visibleTimeout);
+    if (value) {
+        visibleTimeout = setTimeout(() => visible.value = true, 300);
+    } else {
+        visible.value = false;
+    }
+});
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
 
@@ -21,7 +33,9 @@ function actionCompleted(successful = null, response = {}) {
 }
 
 function actionSuccess(response) {
-    Statamic.$toast.success(response.message || __('Action completed'));
+    if (response.message !== false) {
+        Statamic.$toast.success(response.message || __('Action completed'));
+    }
     refresh();
     clearSelections();
 }
@@ -40,22 +54,11 @@ function actionFailed(response) {
         @completed="actionCompleted"
         v-slot="{ actions }"
     >
-        <Motion
-            v-if="hasSelections"
-            layout
-            class="fixed inset-x-0 bottom-6 z-100 flex w-full justify-center"
-            :initial="{ y: 100, opacity: 0 }"
-            :animate="{ y: 0, opacity: 1 }"
-            :transition="{ duration: 0.2, ease: 'easeInOut' }"
-        >
-            <ButtonGroup>
-                <Button
-                    class="text-blue-500!"
-                    :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
-                    @click="clearSelections"
-                />
-                <Button v-for="action in actions" :key="action.handle" :text="__(action.title)" @click="action.run" />
-            </ButtonGroup>
-        </Motion>
+        <BulkActionsFloatingToolbar
+            :actions="actions"
+            :visible="visible"
+            :selections="selections"
+            :clear-selections="clearSelections"
+        />
     </BulkActions>
 </template>

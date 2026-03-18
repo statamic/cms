@@ -1,6 +1,7 @@
 <template>
-    <div class="flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900">
-        <Combobox
+    <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
+<!--
+<Combobox
             v-model="provider"
             :options="providers"
             option-label="provider"
@@ -22,11 +23,30 @@
             :prepend="__('ID')"
             @update:model-value="detailsFromCloudflare"
         />
-        <div
-            v-if="embedUrl"
-            class="aspect-video rounded-lg"
-            v-html="embedUrl"
-        ></div>
+-->
+        <ui-input-group>
+            <ui-input-group-prepend :text="__('URL')" />
+            <ui-input
+                :model-value="value"
+                :isReadOnly="isReadOnly"
+                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                :aria-label="__('Video URL')"
+                @update:model-value="update"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+                input-class="border-s-0"
+            />
+        </ui-input-group>
+        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
+        <iframe
+            v-if="shouldShowPreview"
+            ref="iframe"
+            :src="isVisible ? embedUrl : null"
+            frameborder="0"
+            allow="fullscreen"
+            class="rounded-lg aspect-video"
+            loading="lazy"
+        ></iframe>
     </div>
 </template>
 
@@ -46,6 +66,8 @@ export default {
             savedValue: null,
             url: null,
             videoId: null,
+            isVisible: false,
+            observer: null,
         };
     },
 
@@ -87,7 +109,30 @@ export default {
 
             this.update(this.savedValue);
         },
+    },
 
-    }
+    mounted() {
+        this.observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && entry.intersectionRatio > 0) {
+                        this.isVisible = true;
+                        this.observer.disconnect();
+                    }
+                });
+            },
+            { threshold: 0.01 }
+        );
+
+        if (this.$el) {
+            this.observer.observe(this.$el);
+        }
+    },
+
+    beforeUnmount() {
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+    },
 };
 </script>

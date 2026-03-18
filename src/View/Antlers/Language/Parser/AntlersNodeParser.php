@@ -12,6 +12,7 @@ use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
+use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
@@ -88,6 +89,20 @@ class AntlersNodeParser
     public function parseNode(AntlersNode $node)
     {
         $this->reset();
+
+        if ($node instanceof DirectiveNode) {
+            $docParser = new DocumentParser();
+            $antlersContent = '{{ '.$node->content.' }}';
+            $docParser->parse($antlersContent);
+            $newNode = $docParser->getNodes()[0];
+
+            $node->runtimeNodes = $newNode->runtimeNodes;
+            $node->interpolationRegions = $newNode->interpolationRegions;
+            $node->hasProcessedInterpolationRegions = $newNode->hasProcessedInterpolationRegions;
+            $node->processedInterpolationRegions = $newNode->processedInterpolationRegions;
+
+            return $node;
+        }
 
         if (Str::startsWith(trim($node->content), '*subrecursive')) {
             $nodeContent = $node->content;

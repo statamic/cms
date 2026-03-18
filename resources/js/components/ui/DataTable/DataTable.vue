@@ -3,9 +3,10 @@ import { ref, provide } from 'vue';
 import { cva } from 'cva';
 import DataTableColumns from './Columns.vue';
 import DataTableRows from './Rows.vue';
-import { Panel } from '@statamic/ui';
+import { Panel } from '@ui';
 
 const props = defineProps({
+    /** Controls the size and spacing of the table. <br><br> Options: `normal`, `compact` */
     variant: { type: String, default: 'normal' },
 });
 
@@ -27,7 +28,7 @@ const tableCellVariants = cva({
 });
 
 const titleClasses = cva({
-    base: 'font-medium text-gray-800 dark:text-white',
+    base: 'font-medium text-gray-900 dark:text-white',
     variants: {
         variant: {
             normal: 'text-base',

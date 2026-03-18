@@ -1,32 +1,17 @@
 <template>
-    <button
-        class="blueprint-tab tab-button"
-        role="tab"
-        :class="{ active: isActive }"
-        :aria-controls="`tab-panel-${tab._id}`"
-        :aria-selected="isActive"
-        :id="`tab-${tab._id}`"
-        :tabindex="isActive ? 0 : -1"
-        @click="$emit('selected')"
-        @mouseenter="$emit('mouseenter')"
-    >
-        <svg-icon
+    <TabTrigger :name="tab._id" class="blueprint-tab flex items-center">
+        <Icon
             v-if="tab.icon"
-            :name="iconName(tab.icon)"
-            :directory="iconBaseDirectory"
-            class="h-4 w-4 ltr:mr-1 rtl:ml-1"
+            :name="tab.icon"
+            :set="iconSet"
+            class="h-4 w-4 me-1"
         />
 
-        {{ __(tab.display) }}
+        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
-                <button
-                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ltr:ml-2 rtl:mr-2"
-                    :aria-label="__('Open Dropdown')"
-                >
-                    <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                </button>
+                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
             </template>
             <DropdownMenu>
                 <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
@@ -34,75 +19,59 @@
             </DropdownMenu>
         </Dropdown>
 
-        <confirmation-modal
-            v-if="editing"
+        <Stack
+	        size="narrow"
+            :open="editing"
+            @opened="() => $nextTick(() => $refs.title.select())"
+            @update:open="editCancelled"
             :title="editText"
-            @opened="$refs.title.focus()"
-            @confirm="editConfirmed"
-            @cancel="editCancelled"
         >
-            <div class="publish-fields @container">
-                <div class="form-group w-full">
-                    <label v-text="__('Title')" />
-                    <input
-                        ref="title"
-                        type="text"
-                        :value="display"
-                        @input="fieldUpdated('display', $event.target.value)"
-                        class="input-text"
-                    />
-                </div>
-                <div class="form-group w-full">
-                    <label v-text="__('Handle')" />
-                    <input
-                        type="text"
-                        :value="handle"
-                        @input="fieldUpdated('handle', $event.target.value)"
-                        class="input-text font-mono text-sm"
-                    />
-                </div>
-                <div class="form-group w-full" v-if="showInstructions">
-                    <label v-text="__('Instructions')" />
-                    <input
-                        type="text"
-                        :value="instructions"
-                        @input="fieldUpdated('instructions', $event.target.value)"
-                        class="input-text text-sm"
-                    />
-                </div>
-
-                <div class="form-group w-full" v-if="showInstructions">
-                    <label v-text="__('Icon')" />
-                    <publish-field-meta
-                        :config="{
+            <div class="">
+                <div class="space-y-6">
+                    <Field :label="__('Title')" class="form-group field-w-100">
+                        <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                    </Field>
+                    <Field :label="__('Handle')" class="form-group field-w-100">
+                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
+                        <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
+                        <publish-field-meta
+                            :config="{
                             handle: 'icon',
                             type: 'icon',
-                            directory: this.iconBaseDirectory,
-                            folder: this.iconSubFolder,
+                            set: iconSet,
                         }"
-                        :initial-value="icon"
-                        v-slot="{ meta, value, loading, config }"
-                    >
-                        <icon-fieldtype
-                            v-if="!loading"
-                            handle="icon"
-                            :config="config"
-                            :meta="meta"
-                            :value="value"
-                            @input="fieldUpdated('icon', $event)"
-                        />
-                    </publish-field-meta>
+                            :initial-value="icon"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="fieldUpdated('icon', $event)"
+                            />
+                        </publish-field-meta>
+                    </Field>
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
+                        <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
+                    </div>
                 </div>
             </div>
-        </confirmation-modal>
-    </button>
+        </Stack>
+    </TabTrigger>
 </template>
 
 <script>
-import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
 
 export default {
-    components: { Dropdown, DropdownMenu, DropdownItem },
+    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose },
 
     props: {
         tab: {
@@ -130,6 +99,7 @@ export default {
             icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
         };
     },
 
@@ -146,12 +116,35 @@ export default {
             return this.currentTab === this.tab._id;
         },
 
-        iconBaseDirectory() {
-            return this.$config.get('setIconsDirectory');
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
 
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
+        },
+    },
+
+    watch: {
+        editing: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleSaveOrConfirm();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
     },
 
@@ -176,6 +169,24 @@ export default {
             this.editing = false;
         },
 
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            // First confirm the tab changes
+            this.editConfirmed();
+            
+            // Then trigger the blueprint save
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
+        },
+
         editCancelled() {
             this.editing = false;
             this.handle = this.tab.handle;
@@ -197,12 +208,12 @@ export default {
         remove() {
             this.$emit('removed');
         },
+    },
 
-        iconName(name) {
-            if (!name) return null;
-
-            return this.iconSubFolder ? this.iconSubFolder + '/' + name : name;
-        },
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
     },
 };
 </script>

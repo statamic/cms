@@ -53,7 +53,8 @@ class Impersonate extends Action
 
             $guard->login($users->first());
             session()->put('statamic_impersonated_by', $impersonator->getKey());
-            Toast::success(__('You are now impersonating').' '.$impersonated->name());
+            session()->forget('statamic_elevated_session');
+            Toast::success(__('You are now impersonating').' '.($impersonated->name() ?? $impersonated->email()));
 
             ImpersonationStarted::dispatch($impersonator, $impersonated);
         } finally {
@@ -70,6 +71,11 @@ class Impersonate extends Action
         }
 
         return $users->first()->can('access cp') ? cp_route('index') : '/';
+    }
+
+    public function triggersFullPageRefresh(): bool
+    {
+        return true;
     }
 
     public function confirmationText()

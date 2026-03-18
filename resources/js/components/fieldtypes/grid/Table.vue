@@ -1,5 +1,5 @@
 <template>
-    <table class="grid-table" v-if="rows.length > 0">
+    <table class="grid-table" :class="{ 'mb-4': rows.length > 0 }" v-if="rows.length > 0">
         <thead>
             <tr>
                 <th class="w-3" v-if="grid.isReorderable"></th>
@@ -31,6 +31,7 @@
                     :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
+                    :has-error="rowHasError(row._id)"
                     @updated="(row, value) => $emit('updated', row, value)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @duplicate="(row) => $emit('duplicate', row)"

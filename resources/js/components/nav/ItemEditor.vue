@@ -1,83 +1,53 @@
 <template>
-    <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-white dark:bg-dark-800">
-            <div
-                class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
-            >
-                {{ creating ? __('Add Nav Item') : __('Edit Nav Item') }}
-                <button type="button" class="btn-close" @click="close" v-html="'&times'" />
-            </div>
+    <Stack size="narrow" :title="creating ? __('Add Nav Item') : __('Edit Nav Item')" open @update:open="$emit('closed')">
+        <div class="">
+            <div class="">
+                <div class="flex flex-col space-y-6">
+                    <Field id="display" :label="__('Display')" required>
+                        <Input id="display" v-model="config.display" :focus="true" :error="validateDisplay ? __('statamic::validation.required') : null" />
+                    </Field>
 
-            <div class="flex-1 overflow-auto">
-                <div class="px-2">
-                    <div class="publish-fields @container">
-                        <div class="form-group publish-field w-full" :class="{ 'has-error': validateDisplay }">
-                            <div class="field-inner">
-                                <label class="mb-2 text-sm font-medium"
-                                    >{{ __('Display') }} <span class="text-red-500">*</span></label
-                                >
-                                <text-input v-model="config.display" :focus="true" />
-                                <div v-if="validateDisplay" class="help-block mt-2 text-red-500">
-                                    <p>{{ __('statamic::validation.required') }}</p>
-                                </div>
-                            </div>
-                        </div>
+                    <Field id="url" :label="__('URL')" required>
+                        <Input id="url" v-model="config.url" :error="validateUrl ? __('statamic::validation.required') : null" />
+                    </Field>
 
-                        <div class="form-group publish-field w-full" :class="{ 'has-error': validateUrl }">
-                            <div class="field-inner">
-                                <label class="mb-2 text-sm font-medium"
-                                    >{{ __('URL') }} <span class="text-red-500">*</span></label
-                                >
-                                <div class="help-block -mt-2">
-                                    <p v-text="__('Enter any internal or external URL.')"></p>
-                                </div>
-                                <text-input v-model="config.url" />
-                                <div v-if="validateUrl" class="help-block mt-2 text-red-500">
-                                    <p>{{ __('statamic::validation.required') }}</p>
-                                </div>
-                            </div>
-                        </div>
+                    <Field v-if="!isChild" id="icon" :label="__('Icon')">
+                        <publish-field-meta
+                            :config="{ handle: 'icon', type: 'icon' }"
+                            :initial-value="config.icon"
+                            v-slot="{ meta, value, loading, config: fieldtypeConfig }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="fieldtypeConfig"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="config.icon = $event"
+                            />
+                        </publish-field-meta>
+                    </Field>
 
-                        <div class="form-group publish-field w-full" v-if="!isChild">
-                            <div class="field-inner">
-                                <label class="mb-2 text-sm font-medium">{{ __('Icon') }}</label>
-                                <publish-field-meta
-                                    :config="{ handle: 'icon', type: 'icon' }"
-                                    :initial-value="config.icon"
-                                    v-slot="{ meta, value, loading, config: fieldtypeConfig }"
-                                >
-                                    <icon-fieldtype
-                                        v-if="!loading"
-                                        handle="icon"
-                                        :config="fieldtypeConfig"
-                                        :meta="meta"
-                                        :value="value"
-                                        @update:value="config.icon = $event"
-                                    />
-                                </publish-field-meta>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <button
-                        class="btn-primary w-full"
-                        :class="{ 'opacity-50': false }"
-                        :disabled="false"
-                        @click="save"
-                        v-text="__('Save')"
-                    />
+                    <Button variant="primary" :text="__('Save')" @click="save" />
                 </div>
             </div>
         </div>
-    </stack>
+    </Stack>
 </template>
 
 <script>
+import { Button, Heading, Field, Input, Stack } from '@/components/ui';
 import { data_get } from '../../bootstrap/globals.js';
 
 export default {
+    components: {
+        Button,
+        Heading,
+        Field,
+        Input,
+	    Stack,
+    },
+
     emits: ['closed', 'updated'],
 
     props: {
@@ -102,7 +72,7 @@ export default {
         });
     },
 
-    unmounted() {
+    beforeUnmount() {
         this.saveKeyBinding.destroy();
     },
 

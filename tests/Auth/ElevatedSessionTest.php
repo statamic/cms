@@ -2,21 +2,26 @@
 
 namespace Tests\Auth;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
+use Statamic\Facades\WebAuthn;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
+use Tests\ElevatesSessions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-session')]
 class ElevatedSessionTest extends TestCase
 {
+    use ElevatesSessions;
     use PreventSavingStacheItemsToDisk;
 
     private $user;
@@ -24,6 +29,8 @@ class ElevatedSessionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->freezeTime();
 
         $this->user = User::make()->email('foo@bar.com')->makeSuper()->password('secret');
         $this->user->save();
@@ -40,17 +47,10 @@ class ElevatedSessionTest extends TestCase
         });
     }
 
-    private function withElevatedSession(?Carbon $time = null)
-    {
-        return $this->session(['statamic_elevated_session' => ($time ?? now())->timestamp]);
-    }
-
     #[Test]
     public function it_can_get_status_of_elevated_session()
     {
         config(['statamic.users.elevated_session_duration' => 15]);
-
-        $this->freezeTime();
 
         $this
             ->withElevatedSession(now()->subMinutes(5))
@@ -98,8 +98,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_get_status_of_elevated_session_when_session_has_expired_and_user_doesnt_have_a_password()
     {
-        $this->freezeTime();
-
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
@@ -128,7 +126,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function when_getting_status_for_user_without_password_it_only_sends_notification_once()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
@@ -154,8 +151,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_start_elevated_session()
     {
-        $this->freezeTime();
-
         redirect()->setIntendedUrl('/cp/target-url');
 
         $this
@@ -168,8 +163,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_start_elevated_session_via_json()
     {
-        $this->freezeTime();
-
         $this
             ->actingAs($this->user)
             ->postJson('/cp/elevated-session', ['password' => 'secret'])
@@ -186,6 +179,90 @@ class ElevatedSessionTest extends TestCase
             ->post('/cp/elevated-session', ['password' => 'incorrect-password'])
             ->assertSessionHasErrors('password')
             ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    #[DataProvider('invalidPasswordPayloads')]
+    public function it_rejects_invalid_password_payloads(array $payload): void
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('password')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidPasswordPayloads(): array
+    {
+        return [
+            'no fields' => [[]],
+            'string zero' => [['password' => '0']],
+            'integer zero' => [['password' => 0]],
+            'false' => [['password' => false]],
+            'empty string' => [['password' => '']],
+            'null' => [['password' => null]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidVerificationCodePayloads')]
+    public function it_rejects_invalid_verification_code_payloads(array $payload): void
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidVerificationCodePayloads(): array
+    {
+        return [
+            'no fields' => [[]],
+            'string zero' => [['verification_code' => '0']],
+            'integer zero' => [['verification_code' => 0]],
+            'false' => [['verification_code' => false]],
+            'empty string' => [['verification_code' => '']],
+            'null' => [['verification_code' => null]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidPasskeyPayloads')]
+    public function it_handles_invalid_passkey_payloads(array $payload, bool $expectsValidationError): void
+    {
+        if ($expectsValidationError) {
+            $this
+                ->actingAs($this->user)
+                ->postJson('/cp/elevated-session', $payload)
+                ->assertStatus(422)
+                ->assertJsonValidationErrors('id')
+                ->assertSessionMissing('statamic_elevated_session');
+
+            return;
+        }
+
+        WebAuthn::shouldReceive('validateAssertion')->once()->andThrow(new \RuntimeException('Invalid assertion'));
+
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', array_merge($payload, ['rawId' => 'raw-id', 'response' => [], 'type' => 'public-key']))
+            ->assertStatus(500)
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidPasskeyPayloads(): array
+    {
+        return [
+            'no fields' => [[], true],
+            'string zero' => [['id' => '0'], false],
+            'integer zero' => [['id' => 0], false],
+            'false' => [['id' => false], false],
+            'empty string' => [['id' => ''], true],
+            'null' => [['id' => null], true],
+        ];
     }
 
     #[Test]
@@ -247,7 +324,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_will_be_sent_for_passwordless_user_when_loading_the_form()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
 
@@ -267,7 +343,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_will_be_sent_for_passwordless_user_when_loading_the_form_once()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
@@ -291,7 +366,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_can_be_resent()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
 
@@ -314,7 +388,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function resending_code_is_rate_limited()
     {
-        $this->freezeTime();
         Notification::fake();
         $user = User::make()->email('foo@bar.com')->makeSuper();
 
@@ -338,7 +411,6 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function the_verification_code_will_not_be_sent_if_the_user_has_a_password()
     {
-        $this->freezeTime();
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
 
@@ -350,5 +422,151 @@ class ElevatedSessionTest extends TestCase
             ->assertSessionMissing('statamic_elevated_session_verification_code');
 
         Notification::assertNothingSent();
+    }
+
+    #[Test]
+    public function it_returns_passkey_method_when_config_is_false_and_user_has_passkeys()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper()->password('secret'))->save();
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $this->assertEquals('passkey', $user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_returns_password_confirmation_method_when_config_is_true_even_with_passkeys()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => true]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper()->password('secret'))->save();
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $this->assertEquals('password_confirmation', $user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_returns_password_confirmation_when_user_has_no_passkeys_regardless_of_config()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this->assertEquals('password_confirmation', $this->user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_returns_verification_code_when_no_password_and_no_passkeys()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
+
+        $this->assertEquals('verification_code', $user->getElevatedSessionMethod());
+    }
+
+    #[Test]
+    public function it_can_get_passkey_options_for_elevated_session()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = $this->user;
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('elevated-session.passkey-options'))
+            ->assertOk();
+
+        $data = $response->json();
+
+        $this->assertArrayHasKey('challenge', $data);
+        $this->assertNotNull(session('webauthn.challenge'));
+    }
+
+    #[Test]
+    public function it_can_start_elevated_session_with_passkey()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = $this->user;
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $credentials = [
+            'id' => 'credential-id',
+            'rawId' => 'raw-id',
+            'response' => [],
+            'type' => 'public-key',
+        ];
+
+        WebAuthn::shouldReceive('validateAssertion')
+            ->once()
+            ->with($user, $credentials)
+            ->andReturnTrue();
+
+        $this
+            ->actingAs($user)
+            ->postJson('/cp/elevated-session', $credentials)
+            ->assertOk()
+            ->assertJsonStructure(['elevated', 'expiry'])
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
+    public function status_endpoint_returns_passkey_method()
+    {
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockCollection = collect(['passkey-123' => $mockPasskey]);
+
+        $user = $this->user;
+
+        // Use reflection to set the passkeys property
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('passkeys');
+        $property->setAccessible(true);
+        $property->setValue($user, $mockCollection);
+
+        $this
+            ->actingAs($user)
+            ->get('/cp/elevated-session')
+            ->assertOk()
+            ->assertJson([
+                'elevated' => false,
+                'expiry' => null,
+                'method' => 'passkey',
+            ]);
     }
 }

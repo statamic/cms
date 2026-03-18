@@ -1,55 +1,61 @@
 <template>
-    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
-        <div v-for="(portal, i) in portals" :id="`portal-target-${portal.id}`" />
+    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks, 'stack-entering': isStackEntering, 'solo-narrow-stack': isSoloNarrowStack }">
+        <div v-for="(portal, i) in portals" :key="portal.id" :id="`portal-target-${portal.id}`" />
     </div>
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { events } from '@/api';
 
 export default {
+    data() {
+        return {
+            isStackEntering: false,
+            stackEnteringTimeout: null,
+        };
+    },
+
     computed: {
         portals() {
             return this.$portals.all();
         },
 
+        stackCount() {
+            return this.$stacks.count();
+        },
+
         hasStacks() {
-            return this.$stacks.count() > 0;
+            return this.stackCount > 0;
+        },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
         },
     },
 
     watch: {
-        hasStacks(hasStacks) {
-            hasStacks ? this.initStacks() : this.destroyStacks();
+        stackCount(newCount, oldCount) {
+            if (newCount <= oldCount) {
+                return;
+            }
+
+            clearTimeout(this.stackEnteringTimeout);
+            this.isStackEntering = true;
+            events.$emit('stacks.entering', true);
+
+            // Match the stack enter transition so CSS can ignore hover effects while a new stack slides in.
+            this.stackEnteringTimeout = setTimeout(() => {
+                this.isStackEntering = false;
+                this.stackEnteringTimeout = null;
+                events.$emit('stacks.entering', false);
+            }, 200);
         },
     },
 
-    methods: {
-        initStacks() {
-            this.$events.$on('stacks.hit-area-clicked', (depth) => {
-                for (let count = this.$stacks.count(); count > depth; count--) {
-                    if (!this.$stacks.stacks()[count - 1].data.vm.runCloseCallback()) {
-                        return;
-                    }
-                }
-            });
-
-            disableBodyScroll(this.$el, {
-                allowTouchMove: (el) => {
-                    while (el && el !== document.body) {
-                        if (el.classList.contains('overflow-scroll')) {
-                            return true;
-                        }
-                        el = el.parentElement;
-                    }
-                },
-            });
-        },
-
-        destroyStacks() {
-            this.$events.$off('stacks.hit-area-clicked');
-            enableBodyScroll(this.$el);
-        },
+    beforeUnmount() {
+        clearTimeout(this.stackEnteringTimeout);
+        events.$emit('stacks.entering', false);
     },
 };
 </script>

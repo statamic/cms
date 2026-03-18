@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Auth\UserCollection;
+use Statamic\Facades\User;
 
 class UserQueryBuilder extends Builder
 {
@@ -115,5 +116,10 @@ class UserQueryBuilder extends Builder
 
             return [$orderBy->sort => $items];
         });
+    }
+
+    protected function getBlueprintsForRelations()
+    {
+        return collect([User::make()->blueprint()]);
     }
 }

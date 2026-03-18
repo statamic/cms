@@ -1,29 +1,28 @@
 /* ==========================================================================
    TABLES
    ========================================================================== */
+/* Modifiers...
 
-.data-list-search-input {
-    @apply bg-white;
+    - .data-table--contained is used when the table head appears _inside_ the container, for example /assets.
 
-    &:focus {
-        @apply focus-outline;
-    }
-}
-
+*/
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
-    &.contained {
+    &.data-table--contained {
         @apply rounded-xl;
+        /* When we have overflow e.g. /cp/assets on mobile with lots of columns */
+        background: inherit;
+        box-shadow: inherit;
     }
 
     thead {
         th {
-            @apply whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-300 text-start;
-            @apply px-4 py-2;
+            @apply whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-start;
+            @apply px-2 md:px-4 py-2;
 
-            .contained & {
-                @apply py-2.5 border-b;
+            .data-table--contained & {
+                @apply py-2.5 border-b border-gray-200 dark:border-gray-700;
             }
         }
 
@@ -36,31 +35,47 @@
         }
     }
 
-    tbody {
-        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
-        .contained & {
-            @apply shadow-none rounded-none;
-        }
-
-        tr {
-            &:first-child {
+    /* Make sure we only apply this where the data table "head" is in the gray wrapper, i.e. _not_ assets, since otherwise we would be rounding the second row */
+    &:not(.data-table--contained) {
+        tbody {
+            tr:first-child {
+                /* [1] Round the corners */
                 td:first-child,
                 th:first-child {
                     @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
                 }
-
                 td:last-child,
                 th:last-child {
                     @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
                 }
-
+                /* [2] Add a border */
                 td {
-                    @apply border-0;
+                    @apply border-t border-t-gray-200 dark:border-t-gray-800;
                 }
             }
+            tr td {
+                @apply dark:bg-gray-850;
+                /* [3] Add left and right borders */
+                &:first-child {
+                    @apply border-s border-s-gray-200 dark:border-s-gray-800;
+                }
+                &:last-child {
+                    @apply border-e border-e-gray-200 dark:border-e-gray-800;
+                }
+            }
+        }
+    }
 
+    tbody {
+        @apply text-sm shadow-sm-b rounded-xl outline-none;
+
+        tr {
             &:last-child {
                 @apply border-none;
+
+                td {
+                    @apply border-b border-b-gray-200 dark:border-b-gray-800;
+                }
 
                 td:first-child,
                 th:first-child {
@@ -73,21 +88,19 @@
                 }
             }
 
-            &:hover {
-                @apply bg-gray-50 dark:bg-white/10;
-            }
-
             th {
                 @apply py-2 ltr:pr-4 rtl:pl-4;
             }
 
             td {
-                @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
-                @apply text-gray-800 dark:text-gray-200;
+                @apply bg-white dark:bg-gray-900;
+                @apply ps-2 md:pl-4.5 pe-1 md:pe-2.5 py-3 border-t border-gray-200 dark:border-white/10;
+                @apply text-gray-900 dark:text-gray-200;
             }
 
-            td.table-drag-handle {
-                @apply h-full w-1 px-0 py-2 border-e;
+            /* When the row is hovered, change the background of all its cells to a hover state color */
+            &:has(:hover) td {
+                @apply bg-gray-50 dark:bg-gray-900;
             }
         }
 
@@ -101,11 +114,25 @@
     }
 }
 
+.data-table--contained tbody {
+    tr:first-child td {
+        border-top: unset;
+    }
+}
+
 /* Sticky Meta Columns */
 .data-table {
+    .checkbox-column {
+        /* When the table is scrolled on smaller screens, remove the left border radius from the sticky checkbox column */
+        @container scroll-state(scrollable: inline-start) {
+            @apply rounded-l-none!;
+        }
+    }
+
     thead th.checkbox-column {
-        @apply sticky z-1 ps-3 w-8;
-        .contained & {
+        /* We need calc on the padding-start to account for the border of the table */
+        @apply sticky z-1 ps-[calc(0.75rem+1px)] w-8;
+        .data-table--contained & {
             @apply sticky ps-4;
         }
     }
@@ -117,8 +144,9 @@
     }
 
     tbody .checkbox-column {
-        @apply sticky px-3 -start-px;
-        .contained & {
+        @apply px-3 -start-px sticky -left-1.75;
+        container-type: scroll-state;
+        .data-table--contained & {
             @apply sticky ps-4;
         }
     }
@@ -129,27 +157,53 @@
 }
 
 /* Row Selection */
-
 .data-table[data-has-selections] {
-    tbody tr[data-row="unselected"] td {
-        @apply text-gray-500! dark:text-gray-400!;
+    tbody tr[data-row="selected"] td {
+        @apply bg-gray-100 dark:bg-gray-925;
+    }
+}
+
+.widget-table {
+    @apply w-full max-w-full outline-hidden min-w-full overflow-x-auto text-start;
+
+    thead {
+        th {
+            @apply text-sm font-medium text-start;
+            @apply p-0.75;
+        }
+
+        th[data-column="date"],
+        th[data-column="datestamp"] {
+            @apply text-end;
+        }
+    }
+
+    tbody {
+        @apply text-sm;
+
+        tr {
+            td {
+                @apply p-0.75 text-sm;
+            }
+
+        }
+
+        .type-column {
+            @apply text-end;
+        }
+    }
+
+    .date-index-field {
+        @apply whitespace-nowrap;
     }
 }
 
 .table-drag-handle {
-    @apply h-full w-3 p-2 dark:border-dark-900 border-e;
-    min-width: 16px;
-    cursor: grab;
-    background: var(--color-gray-200) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    @apply h-full cursor-grab hover:bg-gray-100 dark:hover:bg-gray-700 dark:opacity-75;
+    background-image: url('../../svg/drag-dots.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
     background-size: 7px 17px;
-
-    .dark & {
-        background-color: var(--color-dark-700);
-    }
-
-    &:hover {
-        @apply bg-gray-300 dark:bg-gray-700;
-    }
 }
 
 .column-sortable {
@@ -165,49 +219,3 @@
     @apply text-end w-12;
 }
 
-
-/* Index Fields
-  ========================================================================== */
-
-.bard-index-field,
-.code-index-field,
-.markdown-index-field,
-.textarea-index-field {
-    @apply line-clamp-2 text-xs;
-}
-
-.title-index-field {
-    @apply text-sm font-medium line-clamp-2 flex items-center gap-2 hover:text-black dark:hover:text-white;
-    min-width: 15vw;
-    max-width: 30vw;
-}
-
-.date-index-field {
-    @apply whitespace-nowrap;
-}
-
-.slug-index-field {
-    @apply line-clamp-2 font-mono text-xs;
-}
-
-.status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-800 dark:bg-gray-200 dark:text-dark-150;
-
-    &.status-published:not(.status-private) {
-        @apply bg-green-200 text-green-900 dark:bg-green-300 dark:text-green-950;
-    }
-
-    &.status-scheduled {
-        @apply bg-amber-200 text-amber-900 dark:bg-amber-300 dark:text-amber-950;
-    }
-}
-
-.role-index-field,
-.groups-index-field {
-    @apply -mb-1.5 flex flex-wrap;
-
-    .role-index-field-item,
-    .groups-index-field-item {
-        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-gray-700;
-    }
-}

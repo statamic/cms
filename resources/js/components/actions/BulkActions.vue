@@ -16,12 +16,27 @@ const emit = defineEmits(['started', 'completed']);
 const { prepareActions, runServerAction } = useActions();
 
 let actions = ref([]);
+let loading = ref(false);
 
 const confirmableActions = useTemplateRef('confirmableActions');
 
 let preparedActions = computed(() => {
     return prepareActions(actions.value, confirmableActions.value);
 });
+
+let commandPaletteActions = computed(() => {
+    return preparedActions.value.map(action => Statamic.$commandPalette.add({
+        category: Statamic.$commandPalette.category.Actions,
+        text: action.title,
+        icon: action.icon,
+        action: action.run,
+        prioritize: true,
+    }));
+});
+
+watch(commandPaletteActions, function (_, oldActions) {
+    oldActions.forEach(action => action.remove());
+})
 
 let hasSelections = computed(() => {
     return props.selections.length > 0;
@@ -35,6 +50,8 @@ function getActions() {
         return;
     }
 
+    loading.value = true;
+
     let params = {
         selections: toRaw(props.selections),
     };
@@ -45,16 +62,19 @@ function getActions() {
 
     axios
         .post(props.url + '/list', params)
-        .then(response => actions.value = response.data);
+        .then(response => {
+            actions.value = response.data;
+            loading.value = false;
+        });
 }
 
 let errors = ref({});
 
-function runAction(action, values, done) {
+function runAction(action, values, onSuccess, onError) {
     errors.value = {};
     emit('started');
 
-    runServerAction({ action, values, done, url: props.url, selections: props.selections })
+    runServerAction({ action, values, onSuccess, onError, url: props.url, selections: props.selections })
         .then(data => emit('completed', true, data))
         .catch(data => {
             errors.value = data.errors;
@@ -77,5 +97,6 @@ function runAction(action, values, done) {
     <slot
         v-if="showAlways || hasSelections"
         :actions="preparedActions"
+        :loading="loading"
     />
 </template>

@@ -2,12 +2,16 @@
     <ui-panel>
         <ui-panel-header class="flex items-center justify-between">
             <div>
-                <ui-heading :text="release.version" />
+                <div class="flex items-center gap-2">
+                    <ui-heading :text="release.version" />
+                    <ui-badge v-if="release.security" :text="__('Security')" color="red" size="sm" />
+                </div>
                 <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>
-            <ui-modal :title="__('Update to :version', { version: release.version })">
+            <ui-modal :title="__('Update to :version', { version: release.version })" blur>
                 <template #trigger>
                     <ui-button
+                        ref="getCommandButton"
                         v-if="showActions"
                         icon="clipboard"
                         size="sm"
@@ -15,21 +19,21 @@
                         :text="__('Get Command')"
                     />
                 </template>
-                <div class="prose space-y-3">
+                <div class="prose prose-sm prose-zinc prose-headings:font-medium space-y-3">
                     <p v-text="confirmationText" />
-                    <ui-input v-model="command" readonly copyable class="font-mono text-sm dark" />
+                    <ui-input readonly copyable :model-value="command" class="dark" inputClass="font-mono text-sm" />
                     <p v-html="link" />
                 </div>
             </ui-modal>
         </ui-panel-header>
         <ui-card>
-            <div v-html="body" class="prose" />
+            <div v-html="body" class="prose prose-sm prose-zinc prose-headings:font-medium" />
         </ui-card>
     </ui-panel>
 </template>
 
 <script>
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
 
 export default {
     props: {
@@ -96,6 +100,29 @@ export default {
                     link: `<a href="https://statamic.dev/updating" target="_blank" class="font-medium underline text-blue-500 dark:text-blue-400">${__('updating Statamic')}</a>`,
                 }) + '.'
             );
+        },
+    },
+
+    mounted() {
+        this.addToCommandPalette();
+    },
+
+    methods: {
+        addToCommandPalette() {
+            if (!this.release.latest) {
+                return;
+            }
+
+            if (this.release.type === 'current') {
+                return;
+            }
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: [__('Update to Latest'), __('Get Command')],
+                icon: 'clipboard',
+                action: () => this.$refs.getCommandButton.$el.click(),
+            });
         },
     },
 };

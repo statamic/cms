@@ -1,10 +1,7 @@
 <template>
     <portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div
-                class="grid-fieldtype-container"
-                :class="{ 'grid-fullscreen dark:bg-dark-600 bg-white': fullScreenMode }"
-            >
+            <div :class="{ '@apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-900': fullScreenMode }">
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.display"
@@ -14,12 +11,9 @@
                 </publish-field-fullscreen-header>
 
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <small v-if="hasExcessRows" class="help-block text-red-500">
-                        {{ __('Max Rows') }}: {{ maxRows }}
-                    </small>
-                    <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
-                        {{ __('Min Rows') }}: {{ minRows }}
-                    </small>
+
+                    <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
+                    <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
 
                     <component
                         :is="component"
@@ -31,6 +25,7 @@
                         :can-add-rows="canAddRows"
                         :allow-fullscreen="config.fullscreen"
                         :hide-display="config.hide_display"
+                        :errors="publishContainer.errors"
                         @updated="updated"
                         @meta-updated="updateRowMeta"
                         @removed="removed"
@@ -44,12 +39,22 @@
                 </section>
             </div>
         </element-container>
+
+        <confirmation-modal
+            :open="deletingRow !== null"
+            :title="__('Delete Row')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Delete')"
+            :danger="true"
+            @confirm="confirmDelete"
+            @cancel="deletingRow = null"
+        />
     </portal>
 </template>
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
@@ -67,14 +72,12 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            deletingRow: null,
             provide: {
                 grid: this.makeGridProvide(),
-                storeName: this.storeName,
             },
         };
     },
-
-    inject: ['storeName'],
 
     provide: {
         isInGridField: true,
@@ -128,7 +131,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return `${__(this.config.display)}: ${__n(':count row|:count rows', this.value.length)}`;
         },
@@ -137,8 +140,9 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,
                 },
@@ -170,9 +174,10 @@ export default {
     methods: {
         addRow() {
             const id = uniqid();
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
 
             const row = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             row._id = id;
@@ -188,18 +193,25 @@ export default {
         removed(index) {
             // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
             const row = this.value[index];
+            const defaults = JSON.parse(JSON.stringify(this.meta.defaults));
             const emptyRow = Object.fromEntries(
-                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+                this.fields.map((field) => [field.handle, defaults[field.handle]]),
             );
 
             // Check if the row has been modified from its default state
             const hasChanges = this.fields.some(field => row[field.handle] !== emptyRow[field.handle]);
 
             if (hasChanges) {
-                if (!confirm(__('Are you sure?'))) return;
+                this.deletingRow = index;
+                return;
             }
 
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        },
+
+        confirmDelete() {
+            this.update([...this.value.slice(0, this.deletingRow), ...this.value.slice(this.deletingRow + 1)]);
+            this.deletingRow = null;
         },
 
         duplicate(index) {

@@ -7,6 +7,7 @@
             </template>
 
             <ItemActions
+                ref="actions"
                 v-if="!isCreating && hasItemActions"
                 :item="values.id"
                 :url="itemActionUrl"
@@ -18,7 +19,7 @@
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
-                        <Button icon="ui/dots" variant="ghost" />
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -35,11 +36,9 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
-                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="readOnly" />
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -82,11 +81,12 @@
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
-            :is-root="isRoot"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            :remember-tab="!isInline"
+            :provide="{ isWorkingCopy, revisionsEnabled }"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -101,32 +101,30 @@
                     <template #actions>
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
-                            <div v-if="collectionHasRoutes">
-                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
-                                    <Button
-                                        :text="__('Live Preview')"
-                                        class="flex-1"
-                                        icon="live-preview"
-                                        @click="openLivePreview"
-                                        v-if="showLivePreviewButton"
-                                    />
-                                    <Button
-                                        :href="permalink"
-                                        :text="__('Visit URL')"
-                                        class="flex-1"
-                                        icon="external-link"
-                                        target="_blank"
-                                        v-if="showVisitUrlButton"
-                                    />
-                                </div>
+                            <div class="flex flex-wrap gap-3 lg:gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <Button
+                                    :text="__('Live Preview')"
+                                    class="flex-1"
+                                    icon="live-preview"
+                                    @click="openLivePreview"
+                                    v-if="showLivePreviewButton"
+                                />
+                                <Button
+                                    :href="permalink"
+                                    :text="__('Visit URL')"
+                                    class="flex-1"
+                                    icon="external-link"
+                                    target="_blank"
+                                    v-if="showVisitUrlButton"
+                                />
                             </div>
 
                             <!-- Published Switch -->
-                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                            <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!" v-if="!revisionsEnabled">
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
-                                    :read-only="!canManagePublishState"
+                                    :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
                                 />
                             </Panel>
@@ -140,7 +138,6 @@
                                         icon="history"
                                         :text="__('View History')"
                                         size="xs"
-                                        class="-me-4"
                                     />
                                 </PanelHeader>
                                 <Card class="space-y-2">
@@ -148,17 +145,21 @@
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('Entry has a published version') }}
                                     </Subheading>
-                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Entry has not been published') }}
+                                    </Subheading>
+                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('This is the working copy') }}
                                     </Subheading>
                                     <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('This is the published version') }}
                                     </Subheading>
-                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
-                                        {{ __('Unsaved changes') }}
+                                        {{ __('Unsaved Changes') }}
                                     </Subheading>
                                 </Card>
                             </Panel>
@@ -194,21 +195,20 @@
             </LivePreview>
         </PublishContainer>
 
-        <stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
+        <Stack
+	        ref="revisionHistoryStack"
+	        size="narrow"
+	        :title="__('Revision History')"
+	        v-model:open="showRevisionHistory"
         >
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
                 :can-restore-revisions="!readOnly"
-                @closed="close"
+                @closed="$refs.revisionHistoryStack.close()"
             />
-        </stack>
+        </Stack>
 
         <publish-actions
             v-if="confirmingPublish"
@@ -225,20 +225,28 @@
         />
 
         <confirmation-modal
-            v-if="selectingOrigin"
+            :open="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             @cancel="cancelLocalization()"
             @confirm="createLocalization(localizing)"
         >
             <div class="publish-fields">
-                <div class="form-group publish-field field-w-full">
-                    <label v-text="__('Origin')" />
-                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
-                </div>
+                <ui-field class="form-group field-w-100" :label="__('Origin')" :instructions="__('messages.entry_origin_instructions')">
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" placeholder="" />
+                </ui-field>
             </div>
         </confirmation-modal>
+
+        <confirmation-modal
+            :open="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
     </div>
 </template>
 
@@ -250,7 +258,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@statamic/util/clone.js';
+import clone from '@/util/clone.js';
 import {
     Button,
     Card,
@@ -268,19 +276,17 @@ import {
     Subheading,
     Switch,
     Select,
-} from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
-import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
-import { SavePipeline } from '@statamic/exports.js';
+    PublishContainer,
+    PublishTabs,
+    PublishComponents,
+    PublishLocalizations as LocalizationsCard,
+    LivePreview,
+	Stack,
+} from '@ui';
+import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     mixins: [HasPreferences, HasActions],
@@ -311,6 +317,7 @@ export default {
         Subheading,
         Switch,
         Select,
+	    Stack,
     },
 
     props: {
@@ -335,15 +342,12 @@ export default {
         isCreating: Boolean,
         isInline: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         initialPermalink: String,
         revisionsEnabled: Boolean,
-        preloadedAssets: Array,
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
         initialListingUrl: String,
-        collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
         parent: String,
@@ -363,8 +367,8 @@ export default {
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
-            originValues: this.initialOriginValues || {},
-            originMeta: this.initialOriginMeta || {},
+            originValues: this.initialOriginValues,
+            originMeta: this.initialOriginMeta,
             site: this.initialSite,
             selectingOrigin: false,
             selectedOrigin: null,
@@ -383,28 +387,39 @@ export default {
 
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
-            isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
 
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
+            autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            pendingLocalization: null,
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
-        },
-
-        store() {
-            return this.$refs.container.store;
+            return this.errorsRef.value;
         },
 
         formattedTitle() {
@@ -493,7 +508,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -533,13 +548,15 @@ export default {
             }
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
@@ -552,32 +569,32 @@ export default {
                     }),
                 ])
                 .then((response) => {
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
+
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
 
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
-
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
-                        window.location = this.createAnotherUrl;
+                        this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
-                        window.location = this.listingUrl;
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
+                        this.redirectTo(this.listingUrl);
                     }
 
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -619,11 +636,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.$dirty.remove(this.publishContainer);
 
             this.localizing = localization;
@@ -658,8 +683,8 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
@@ -674,7 +699,7 @@ export default {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
-                this.$nextTick(() => (window.location = localization.url));
+                this.$nextTick(() => this.redirectTo(localization.url));
                 return;
             }
 
@@ -682,7 +707,7 @@ export default {
             const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then((response) => {
                 this.editLocalization(response.data).then(() => {
-                    this.$events.$emit('localization.created', { store: this.publishContainer });
+                    this.$events.$emit('localization.created', { container: this.$refs.container });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
@@ -733,12 +758,12 @@ export default {
 
             // If the user has opted to create another entry, redirect them to create page.
             if (!this.isInline && nextAction === 'create_another') {
-                window.location = this.createAnotherUrl;
+                this.redirectTo(this.createAnotherUrl);
             }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (!this.isInline && nextAction === null) {
-                window.location = this.listingUrl;
+            // If the user has opted to go to listing, redirect them there.
+            else if (!this.isInline && nextAction === 'listing') {
+                this.redirectTo(this.listingUrl);
             }
 
             // Otherwise, leave them on the edit form and emit an event. We need to wait until after
@@ -748,7 +773,7 @@ export default {
                 this.title = response.data.data.title;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
@@ -764,38 +789,18 @@ export default {
         },
 
         setFieldValue(handle, value) {
-            if (this.hasOrigin) this.desyncField(handle);
+            if (this.hasOrigin) this.$refs.container.desyncField(handle);
 
             this.$refs.container.setFieldValue(handle, value);
         },
 
-        syncField(handle) {
-            if (!confirm("Are you sure? This field's value will be replaced by the value in the original entry."))
-                return;
-
-            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
-
-            this.$refs.container.dirty();
-        },
-
         setAutosaveInterval() {
-            const interval = setInterval(() => {
+            this.autosaveIntervalInstance = setInterval(() => {
                 if (!this.isDirty) return;
 
                 this.isAutosave = true;
                 this.save();
             }, this.autosaveInterval);
-
-            this.$refs.container.setAutosaveInterval(interval);
         },
 
         afterActionSuccessfullyCompleted(response) {
@@ -804,7 +809,7 @@ export default {
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
@@ -812,6 +817,37 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: this.saveText,
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+			if (this.actions.editBlueprint) {
+				Statamic.$commandPalette.add({
+					category: Statamic.$commandPalette.category.Actions,
+					text: __('Edit Blueprint'),
+					icon: 'blueprint-edit',
+					when: () => this.canEditBlueprint,
+					url: this.actions.editBlueprint,
+				});
+			}
+
+            this.$refs.actions?.preparedActions.forEach(action => Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: action.title,
+                icon: action.icon,
+                action: action.run,
+            }));
+        },
+
+        redirectTo(location) {
+            router.get(location);
+        }
     },
 
     mounted() {
@@ -828,11 +864,11 @@ export default {
             this.save();
         });
 
-        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
-
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
         }
+
+        this.addToCommandPalette();
     },
 
     created() {
@@ -842,21 +878,13 @@ export default {
             this.originBehavior === 'active'
                 ? this.localizations.find((l) => l.active)?.handle
                 : this.localizations.find((l) => l.root)?.handle;
-
-        container = computed(() => this.$refs.container);
-    },
-
-    unmounted() {
-        clearTimeout(this.trackDirtyStateTimeout);
     },
 
     beforeUnmount() {
-        this.$refs.container.store.clearAutosaveInterval();
-    },
-
-    unmounted() {
-        this.saveKeyBinding.destroy();
-        this.quickSaveKeyBinding.destroy();
+        if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
+	    clearTimeout(this.trackDirtyStateTimeout);
+	    this.saveKeyBinding.destroy();
+	    this.quickSaveKeyBinding.destroy();
     },
 };
 </script>

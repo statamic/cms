@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils';
 import { test, expect } from 'vitest';
 import DateFieldtype from '@/components/fieldtypes/DateFieldtype.vue';
-import { createPinia } from 'pinia';
-import DateFormatter from '@statamic/components/DateFormatter.js';
+import DateFormatter from '@/components/DateFormatter.js';
+import { containerContextKey } from '@ui/Publish/Container.vue';
 
 window.__ = (key) => key;
 
@@ -27,10 +27,11 @@ const makeDateField = (props = {}) => {
             },
             ...props,
         },
-        plugins: [createPinia()],
         global: {
             provide: {
-                store: '',
+                [containerContextKey]: {
+                    withoutDirtying: (callback) => callback(),
+                }
             },
             mocks: {
                 $config: {
@@ -74,4 +75,10 @@ test.each([
     await dateField.setProps({ value: '2025-12-25T02:15:00Z' });
 
     expect(dateField.vm.datePickerValue.toString()).toBe(expectedDate);
+});
+
+test('datePickerValue returns null when value is "now"', () => {
+    const dateField = makeDateField({ value: 'now' });
+
+    expect(dateField.vm.datePickerValue).toBe(null);
 });

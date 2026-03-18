@@ -1,7 +1,7 @@
 export default [
     'update:value',
+    'update:meta',
     'focus',
     'blur',
-    'meta-updated',
     'replicator-preview-updated',
 ];

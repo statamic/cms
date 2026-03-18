@@ -40,13 +40,9 @@
                             <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
                                 <td class="table-drag-handle" v-if="!isReadOnly"></td>
                                 <td v-for="(cell, cellIndex) in row.value.cells">
-                                    <input
-                                        type="text"
+                                    <ui-input
                                         v-model="row.value.cells[cellIndex]"
-                                        class="input-text"
                                         :readonly="isReadOnly"
-                                        @focus="$emit('focus')"
-                                        @blur="$emit('blur')"
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
@@ -65,7 +61,7 @@
             </section>
 
             <confirmation-modal
-                v-if="deletingRow !== false"
+                :open="deletingRow !== false"
                 :title="__('Delete Row')"
                 :bodyText="__('Are you sure you want to delete this row?')"
                 :buttonText="__('Delete')"
@@ -76,7 +72,7 @@
             </confirmation-modal>
 
             <confirmation-modal
-                v-if="deletingColumn !== false"
+                :open="deletingColumn !== false"
                 :title="__('Delete Column')"
                 :bodyText="__('Are you sure you want to delete this column?')"
                 :buttonText="__('Delete')"
@@ -166,7 +162,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             // Join all values with commas. Exclude any empties.
             return this.data
@@ -179,8 +175,9 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },

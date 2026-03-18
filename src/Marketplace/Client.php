@@ -44,27 +44,34 @@ class Client
         }
     }
 
+    public function get(string $endpoint, array $params = [])
+    {
+        return $this->request('GET', $endpoint, $params);
+    }
+
+    public function post(string $endpoint, array $params = [])
+    {
+        return $this->request('POST', $endpoint, $params);
+    }
+
     /**
      * Send API request.
      *
-     * @param  string  $endpoint
-     * @param  arra  $params
      * @return mixed
      */
-    public function get($endpoint, $params = [])
+    private function request(string $method, string $endpoint, array $params = [])
     {
         $lock = $this->lock(static::LOCK_KEY, 10);
-
-        $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
-        $key = 'marketplace-'.md5($endpoint.json_encode($params));
+        $endpoint = $this->requestEndpoint($endpoint);
+        $key = $this->requestCacheKey($endpoint, $params);
 
         try {
             $lock->block(5);
 
-            return $this->cache()->rememberWithExpiration($key, function () use ($endpoint, $params) {
-                $response = Guzzle::request('GET', $endpoint, [
+            return $this->cache()->rememberWithExpiration($key, function () use ($method, $endpoint, $params) {
+                $response = Guzzle::request($method, $endpoint, [
                     'verify' => $this->verifySsl,
-                    'query' => $params,
+                    ($method === 'GET' ? 'query' : 'json') => $params,
                 ]);
 
                 $json = json_decode($response->getBody(), true);
@@ -76,6 +83,23 @@ class Client
         } finally {
             $lock->release();
         }
+    }
+
+    public function requestEndpoint(string $endpoint): string
+    {
+        return collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
+    }
+
+    private function requestCacheKey(string $endpoint, array $params = []): string
+    {
+        return 'marketplace-'.md5($endpoint.json_encode($params));
+    }
+
+    public function clearCache($endpoint, $params = []): void
+    {
+        $this->cache()->forget(
+            $this->requestCacheKey($this->requestEndpoint($endpoint), $params)
+        );
     }
 
     private function cache(): Repository

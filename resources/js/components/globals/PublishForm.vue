@@ -1,9 +1,37 @@
 <template>
     <div>
         <Header :title="__(title)" icon="globals">
-            <Dropdown v-if="canConfigure || canEditBlueprint">
+            <ItemActions
+                v-if="hasItemActions"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :item="initialHandle"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                v-slot="{ actions: preparedActions }"
+            >
+                <Dropdown v-if="canConfigure || canEditBlueprint || hasItemActions">
+                    <template #trigger>
+                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator v-if="hasItemActions && (canConfigure || canEditBlueprint)" />
+                        <DropdownItem
+                            v-for="action in preparedActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
+            <Dropdown v-else-if="canConfigure || canEditBlueprint">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
+                    <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
@@ -11,19 +39,16 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="!canEdit">
-                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
-            </div>
+            <ui-badge icon="padlock-locked" :text="__('Read Only')" v-if="!canEdit" />
 
             <SiteSelector
                 v-if="showLocalizationSelector"
-                class="ltr:mr-4 rtl:ml-4"
                 :sites="localizations"
-                :value="site"
-                @input="localizationSelected"
+                :model-value="site"
+                @update:modelValue="localizationSelected"
             />
 
-            <div class="hidden items-center gap-3 md:flex">
+            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
                 <Button
                     v-if="canEdit"
                     variant="primary"
@@ -51,41 +76,50 @@
             :blueprint="fieldset"
             v-model="values"
             :meta="meta"
+            :origin-values="originValues"
+            :origin-meta="originMeta"
             :errors="errors"
             :site="site"
-            :localized-fields="localizedFields"
-            :is-root="isRoot"
+            v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+        />
+
+        <confirmation-modal
+            :open="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
         />
     </div>
 </template>
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import clone from '@statamic/util/clone.js';
-import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/ui';
-import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
-import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
-import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
-import { SavePipeline } from '@statamic/exports.js';
+import HasActions from '../publish/HasActions';
+import clone from '@/util/clone.js';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator, Header, PublishContainer, PublishTabs, PublishComponents } from '@ui';
 import { computed, ref } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
-
-let saving = ref(false);
-let errors = ref({});
-let container = null;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
+import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
+    mixins: [HasActions],
+
     components: {
         PublishComponents,
         PublishContainer,
         PublishTabs,
         Dropdown,
         DropdownItem,
+        DropdownSeparator,
         Button,
         DropdownMenu,
         Header,
         SiteSelector,
+        ItemActions,
     },
 
     props: {
@@ -108,7 +142,6 @@ export default {
         method: String,
         isCreating: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         canEdit: Boolean,
         canConfigure: Boolean,
         configureUrl: String,
@@ -130,23 +163,33 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
-            isRoot: this.initialIsRoot,
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            pendingLocalization: null,
         };
     },
 
+	setup() {
+		const savingRef = ref(false);
+		const errorsRef = ref({});
+
+		return {
+			savingRef: computed(() => savingRef),
+			errorsRef: computed(() => errorsRef),
+		};
+	},
+
     computed: {
+        containerRef() {
+            return computed(() => this.$refs.container);
+        },
+
         saving() {
-            return saving.value;
+            return this.savingRef.value;
         },
 
         errors() {
-            return errors.value;
-        },
-
-        store() {
-            return this.$refs.container.store;
+            return this.errorsRef.value;
         },
 
         somethingIsLoading() {
@@ -189,13 +232,15 @@ export default {
             if (!this.canSave) return;
 
             new Pipeline()
-                .provide({ container, errors, saving })
+                .provide({
+                    container: this.containerRef,
+                    errors: this.errorsRef,
+                    saving: this.savingRef,
+                })
                 .through([
                     new BeforeSaveHooks('global-set', {
                         globalSet: this.initialHandle,
                         values: this.values,
-                        container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
@@ -225,11 +270,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.localizing = localization.handle;
 
             if (this.publishContainer === 'base') {
@@ -246,9 +299,9 @@ export default {
                 this.hasOrigin = data.hasOrigin;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
+                this.afterActionSuccessfullyCompleted(data);
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
             });
         },
@@ -258,6 +311,38 @@ export default {
                 ? 'This global set exists in this site.'
                 : 'This global set does not exist for this site.';
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Save'),
+                icon: 'save',
+                action: () => this.save(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure'),
+                icon: 'cog',
+                when: () => this.canConfigure,
+                url: this.configureUrl,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                when: () => this.canEditBlueprint,
+                url: this.actions.editBlueprint,
+            });
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.itemActions) {
+                this.itemActions = response.itemActions;
+            }
+        },
     },
 
     mounted() {
@@ -265,12 +350,12 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        this.addToCommandPalette();
     },
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-
-        container = computed(() => this.$refs.container);
     },
 };
 </script>

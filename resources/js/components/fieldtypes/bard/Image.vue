@@ -12,44 +12,24 @@
             </div>
 
             <div
-                class="flex items-center justify-center space-x-1 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150 sm:space-x-3 rtl:space-x-reverse"
+                class="flex flex-wrap items-center justify-center gap-2 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-gray-900 dark:text-gray-300"
             >
-                <button v-if="!src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
-                    <svg-icon name="folder-image" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Choose Image') }}</span>
-                </button>
-                <button v-if="src" @click="edit" type="button" class="btn btn-sm flex px-3 py-1.5">
-                    <svg-icon name="pencil" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Edit Image') }}</span>
-                </button>
-                <button
-                    v-if="src"
-                    @click="toggleAltEditor"
-                    type="button"
-                    class="btn btn-sm flex px-3 py-1.5"
-                    :class="{ active: showingAltEdit }"
-                >
-                    <svg-icon name="rename-file" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Override Alt') }}</span>
-                </button>
-                <button v-if="src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
-                    <svg-icon name="swap" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Replace') }}</span>
-                </button>
-                <button @click="deleteNode" class="btn btn-sm flex px-3 py-1.5 text-red-500">
-                    <svg-icon name="trash" class="h-4" />
-                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Remove') }}</span>
-                </button>
+                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @click="openSelector" />
+
+                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @click="edit" />
+                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @click="toggleAltEditor" />
+                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @click="openSelector" />
+                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @click="deleteNode" />
             </div>
 
             <div
                 v-if="showingAltEdit"
-                class="flex items-center rounded-b border-t p-2 dark:border-dark-900"
+                class="flex items-center rounded-b border-t p-2 dark:border-gray-900"
                 @paste.stop
             >
-                <text-input
+                <Input
+	                ref="alt"
                     name="alt"
-                    :focus="showingAltEdit"
                     v-model="alt"
                     :placeholder="assetAlt"
                     :prepend="__('Alt Text')"
@@ -57,19 +37,18 @@
                 />
             </div>
 
-            <stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
+            <Stack v-model:open="showingSelector" inset :show-close-button="false">
                 <selector
-                    :container="extension.options.bard.config.container"
+                    :container="extension.options.bard.meta.assets.container"
                     :folder="extension.options.bard.config.folder || '/'"
                     :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
                     :selected="selections"
-                    :view-mode="'grid'"
                     :max-files="1"
+                    :columns="extension.options.bard.meta.assets.columns"
                     @selected="assetsSelected"
-                    @closed="closeSelector"
-                >
-                </selector>
-            </stack>
+                    @closed="showingSelector = false"
+                />
+            </Stack>
 
             <asset-editor
                 v-if="editing"
@@ -89,6 +68,8 @@
 import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
+import { Input, Button, Stack } from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 export default {
     mixins: [Asset],
@@ -96,9 +77,16 @@ export default {
     components: {
         NodeViewWrapper,
         Selector,
+        Input,
+        Button,
+	    Stack,
     },
 
-    inject: ['store'],
+    inject: {
+        publishContainer: {
+            from: containerContextKey,
+        },
+    },
 
     props: [
         'editor', // the editor instance
@@ -168,15 +156,17 @@ export default {
         alt(alt) {
             this.updateAttributes({ alt });
         },
+
+	    showingAltEdit(showingAltEdit) {
+		    if (showingAltEdit) {
+				this.$nextTick(() => this.$refs.alt.focus());
+		    }
+	    },
     },
 
     methods: {
         openSelector() {
             this.showingSelector = true;
-        },
-
-        closeSelector() {
-            this.showingSelector = false;
         },
 
         assetsSelected(selections) {
@@ -186,14 +176,11 @@ export default {
         },
 
         loadAsset(id) {
-            let preloaded = this.store.preloadedAssets.find((asset) => asset.id === id);
+            const cache = this.extension.options.bard.assetsCache;
 
-            if (preloaded) {
-                // TODO
-                // Disabling preloading temporarily. It's causing an infinite loop.
-                // It wasn't working on 3.2 anyway. It wasn't preloading, the AJAX request was always happening.
-                // this.setAsset(preloaded);
-                // return;
+            if (cache[id]) {
+                this.setAsset(cache[id]);
+                return;
             }
 
             this.$axios
@@ -206,6 +193,7 @@ export default {
         },
 
         setAsset(asset) {
+            this.extension.options.bard.assetsCache[asset.id] = asset;
             this.editorAsset = asset;
             this.assetId = asset.id;
             this.assetAlt = asset.values.alt;
@@ -224,12 +212,6 @@ export default {
             this.setAsset(asset);
             this.closeEditor();
         },
-    },
-
-    updated() {
-        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
-        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
-        this.$el.setAttribute('draggable', false);
     },
 };
 </script>

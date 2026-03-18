@@ -7,12 +7,15 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
+use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\View\Cascade;
 
 use function Statamic\trans as __;
 
@@ -155,15 +158,20 @@ class Email extends Mailable
     protected function addData()
     {
         $augmented = $this->submission->toAugmentedArray();
+        $form = $this->submission->form();
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
             ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
             });
+        $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            : [];
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
+            'form_config' => $formConfig,
             'email_config' => $this->config,
-            'config' => config()->all(),
+            'config' => Cascade::config(),
             'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
@@ -237,8 +245,10 @@ class Email extends Mailable
         return collect($config)->map(function ($value) {
             $value = Parse::env($value); // deprecated
 
+            $value = Parse::config($value);
+
             return (string) Antlers::parse($value, array_merge(
-                ['config' => config()->all()],
+                ['config' => Cascade::config()],
                 $this->getGlobalsData(),
                 $this->submissionData,
             ));

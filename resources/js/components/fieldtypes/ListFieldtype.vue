@@ -1,6 +1,6 @@
 <template>
-    <div class="table-field">
-        <table class="table-fieldtype-table" v-if="data.length > 0">
+    <div>
+        <table class="table-contained" v-if="data.length > 0">
             <sortable-list
                 v-model="data"
                 :vertical="true"
@@ -15,13 +15,12 @@
                         <td
                             class="sortable-handle table-drag-handle"
                             v-if="!isReadOnly"
-                            :class="{ 'rounded-tl': index === 0 }"
                         ></td>
                         <td>
-                            <input
+                            <ui-input
                                 type="text"
                                 ref="listItem"
-                                class="input-text"
+                                class="!inset-shadow-none focus:!inset-shadow-none"
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                                 @blur="focused = false"
@@ -33,33 +32,39 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <button
+                            <ui-button
+                                icon="x"
+                                variant="subtle"
+                                size="xs"
+                                round
+                                delete-action
                                 @click="deleteValue(index)"
-                                class="inline text-lg text-gray-600 antialiased hover:text-gray-800"
-                            >
-                                &times;
-                            </button>
+                                :aria-label="__('Delete Item')"
+                                v-tooltip="__('Delete Item')"
+                            />
                         </td>
                     </tr>
                 </tbody>
             </sortable-list>
         </table>
 
-        <button class="btn btn-sm" @click="addItem" v-if="!isReadOnly">
+        <Button @click="addItem" icon="plus" size="sm" v-if="!isReadOnly">
             {{ addButton }}
-        </button>
+        </Button>
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
+        Button,
     },
 
     data() {

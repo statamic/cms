@@ -4,23 +4,27 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
 use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
-    use HasRequestedColumns, RedirectsToFirstAssetContainer;
+    use HasRequestedColumns, QueriesFilters, RedirectsToFirstAssetContainer;
 
     private $columns;
 
@@ -41,22 +45,9 @@ class BrowserController extends CpController
 
         $this->setColumns($container);
 
-        return view('statamic::assets.browse', [
-            'container' => [
-                'id' => $container->id(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
-                'can_edit' => User::current()->can('edit', $container),
-                'can_delete' => User::current()->can('delete', $container),
-                'allow_uploads' => $container->allowUploads(),
-                'create_folders' => $container->createFolders(),
-                'sort_field' => $container->sortField(),
-                'sort_direction' => $container->sortDirection(),
-            ],
-            'folder' => $path,
-            'columns' => $this->columns,
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $path),
+            'editing' => null,
         ]);
     }
 
@@ -66,22 +57,40 @@ class BrowserController extends CpController
 
         $asset = Asset::find("{$containerHandle}::{$path}");
 
-        abort_unless($container && $asset, 404);
+        throw_unless($container && $asset, new NotFoundHttpException);
 
         $this->authorize('view', $asset);
 
         $this->setColumns($container);
 
-        return view('statamic::assets.browse', [
+        return Inertia::render('assets/Browse', [
+            ...$this->browseData($container, $asset->folder()),
+            'editing' => $asset->id(),
+        ]);
+    }
+
+    protected function browseData($container, $path)
+    {
+        return [
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
                 'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
             ],
-            'folder' => $asset->folder(),
-            'editing' => $asset->id(),
+            'folder' => $path,
             'columns' => $this->columns,
-        ]);
+            'filters' => Scope::filters('assets', ['container' => $container->handle(), 'folder' => $path]),
+            'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
+            'createContainerUrl' => cp_route('asset-containers.create'),
+        ];
     }
 
     public function folder(Request $request, $container, $path = '/')
@@ -161,13 +170,21 @@ class BrowserController extends CpController
         ];
     }
 
-    public function search(Request $request, $container, $path = null)
+    /**
+     * Search and filter through all assets in the container, ignoring folders.
+     * This is used for the global search and when listing filters are applied.
+     */
+    public function search(FilteredRequest $request, $container, $path = null)
     {
         $this->authorize('view', $container);
 
-        $query = $container->hasSearchIndex()
-            ? $container->searchIndex()->ensureExists()->search($request->search)
-            : $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+        if ($request->search && $container->hasSearchIndex()) {
+            $query = $container->searchIndex()->ensureExists()->search($request->search);
+        } elseif ($request->search) {
+            $query = $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+        } else {
+            $query = $container->queryAssets();
+        }
 
         if ($path) {
             $query->where('folder', $path);
@@ -179,15 +196,25 @@ class BrowserController extends CpController
 
         $this->applyQueryScopes($query, $request->all());
 
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'container' => $container->handle(),
+            'folder' => $path,
+        ]);
+
         $assets = $query->paginate(request('perPage'));
 
-        if ($container->hasSearchIndex()) {
+        if ($request->search && $container->hasSearchIndex()) {
             $assets->setCollection($assets->getCollection()->map->getSearchable());
         }
 
         return (new SearchedAssetsCollection($assets))
             ->blueprint($container->blueprint())
-            ->columnPreferenceKey("assets.{$container->handle()}.columns");
+            ->columnPreferenceKey("assets.{$container->handle()}.columns")
+            ->additional([
+                'meta' => [
+                    'activeFilterBadges' => $activeFilterBadges,
+                ],
+            ]);
     }
 
     protected function applyQueryScopes($query, $params)
@@ -225,9 +252,33 @@ class BrowserController extends CpController
             ->defaultVisibility(true)
             ->sortable(true);
 
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $duration = Column::make('duration')
+            ->label(__('Duration'))
+            ->value('duration_formatted')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
         $columns->put('basename', $basename);
         $columns->put('size', $size);
         $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
+        $columns->put('duration', $duration);
 
         $columns->setPreferred("assets.{$container->handle()}.columns");
 

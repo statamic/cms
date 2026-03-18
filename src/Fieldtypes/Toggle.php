@@ -17,24 +17,32 @@ class Toggle extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'inline_label' => [
                         'display' => __('Inline Label'),
                         'instructions' => __('statamic::fieldtypes.toggle.config.inline_label'),
                         'type' => 'text',
                         'default' => '',
+                        'width' => '50',
                     ],
                     'inline_label_when_true' => [
                         'display' => __('Inline Label when True'),
                         'instructions' => __('statamic::fieldtypes.toggle.config.inline_label_when_true'),
                         'type' => 'text',
                         'default' => '',
+                        'width' => '50',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'toggle',
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -68,5 +76,10 @@ class Toggle extends Fieldtype
     public function filter()
     {
         return new ToggleFilter($this);
+    }
+
+    public function toQueryableValue($value)
+    {
+        return (bool) $value;
     }
 }

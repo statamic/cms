@@ -1,16 +1,20 @@
 <template>
-    <div>
-        <Button @click="create" v-if="!hasMultipleBlueprints" :variant :text="text" :size="size" />
+    <div class="flex">
+        <slot v-if="!hasMultipleBlueprints" name="trigger" :create="create">
+            <Button @click="create" :variant :text="text" :size="size" :icon="icon" />
+        </slot>
         <Dropdown v-else>
             <template #trigger>
-                <Button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" :size="size" />
+                <slot name="trigger" :create="create">
+                    <Button @click.prevent="create" :variant icon-append="chevron-down" :text="text" :size="size" :icon="icon" />
+                </slot>
             </template>
             <DropdownMenu>
                 <DropdownLabel v-text="__('Choose Blueprint')" />
                 <DropdownItem
                     v-for="blueprint in blueprints"
                     :key="blueprint.handle"
-                    @click="select(blueprint.handle, $event)"
+                    @click="select(blueprint, $event)"
                     :text="blueprint.title"
                 />
             </DropdownMenu>
@@ -19,7 +23,9 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
+import qs from 'qs';
 
 export default {
     components: {
@@ -31,12 +37,14 @@ export default {
     },
 
     props: {
-        url: String,
         blueprints: Array,
         variant: { type: String, default: 'primary' },
         text: { type: String, default: () => __('Create Entry') },
         size: { type: String, default: 'base' },
         buttonClass: { type: String, default: 'btn' },
+        commandPalette: { type: Boolean, default: false },
+        icon: { type: String, default: null },
+        params: { type: Object },
     },
 
     computed: {
@@ -45,19 +53,49 @@ export default {
         },
     },
 
+    mounted() {
+        this.addToCommandPalette();
+    },
+
     methods: {
         create($event) {
             if (this.blueprints.length === 1) this.select(null, $event);
         },
 
         select(blueprint, $event) {
-            let url = this.url;
+            let url = this.createUrl(blueprint);
 
-            if (blueprint) {
-                url = url += `?blueprint=${blueprint}`;
+            $event.metaKey ? window.open(url) : router.get(url);
+        },
+
+        createUrl(blueprint) {
+            if (!blueprint) blueprint = this.blueprints[0];
+            let url = blueprint.createEntryUrl;
+
+            const [baseUrl, existingQuery] = url.split('?');
+            const existingParams = existingQuery ? qs.parse(existingQuery) : {};
+            const params = { ...existingParams, ...this.params };
+            const queryString = qs.stringify(params);
+
+            return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+        },
+
+        addToCommandPalette() {
+            if (! this.commandPalette) {
+                return;
             }
 
-            $event.metaKey ? window.open(url) : (window.location = url);
+            let title = __('Create Entry');
+
+            this.blueprints.forEach(blueprint => {
+                Statamic.$commandPalette.add({
+                    category: Statamic.$commandPalette.category.Actions,
+                    text: this.hasMultipleBlueprints ? [title, blueprint.title] : title,
+                    icon: 'entry',
+                    url: this.createUrl(blueprint),
+                    prioritize: true,
+                });
+            });
         },
     },
 };

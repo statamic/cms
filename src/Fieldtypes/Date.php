@@ -40,12 +40,14 @@ class Date extends Fieldtype
                             // 'multiple' => __('Multiple'), // @TODO hook up
                             'range' => __('Range'),
                         ],
+                        'width' => 50,
                     ],
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.date.config.inline'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'full_width' => [
                         'display' => __('Full Width'),
@@ -55,59 +57,67 @@ class Date extends Fieldtype
                         'if' => [
                             'inline' => true,
                         ],
+                        'width' => 50,
                     ],
-                    'columns' => [
-                        'display' => __('Columns'),
-                        'instructions' => __('statamic::fieldtypes.date.config.columns'),
+                    'number_of_months' => [
+                        'display' => __('Number of Months'),
+                        'instructions' => __('statamic::fieldtypes.date.config.number_of_months'),
                         'type' => 'integer',
+                        'if' => [
+                            'inline' => true,
+                        ],
                         'default' => 1,
-                    ],
-                    'rows' => [
-                        'display' => __('Rows'),
-                        'instructions' => __('statamic::fieldtypes.date.config.rows'),
-                        'type' => 'integer',
-                        'default' => 1,
+                        'width' => 50,
                     ],
                 ],
             ],
             [
-                'display' => __('Timepicker'),
+                'display' => __('Date & Time'),
                 'fields' => [
                     'time_enabled' => [
                         'display' => __('Time Enabled'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                     'time_seconds_enabled' => [
                         'display' => __('Show Seconds'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
                         'type' => 'toggle',
                         'default' => false,
+                        'width' => 50,
                     ],
                 ],
             ],
             [
-                'display' => __('Boundaries'),
+                'display' => __('Boundaries & Limits'),
                 'fields' => [
                     'earliest_date' => [
                         'display' => __('Earliest Date'),
                         'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                         'type' => 'date',
+                        'width' => 50,
                     ],
                     'latest_date' => [
                         'display' => __('Latest Date'),
                         'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
                         'type' => 'date',
+                        'width' => 50,
                     ],
                 ],
             ],
             [
-                'display' => __('Data Format'),
+                'display' => __('Data & Format'),
                 'fields' => [
                     'format' => [
                         'display' => __('Format'),
                         'instructions' => __('statamic::fieldtypes.date.config.format'),
+                        'type' => 'text',
+                    ],
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::fieldtypes.date.config.default'),
                         'type' => 'text',
                     ],
                 ],
@@ -132,7 +142,7 @@ class Date extends Fieldtype
         }
 
         if ($value === 'now') {
-            return now('UTC')->toIso8601ZuluString();
+            return 'now';
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -140,7 +150,7 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        return $this->parseSaved($value)->toIso8601ZuluString();
+        return $this->parseSaved($value)->toIso8601ZuluString('millisecond');
     }
 
     private function preProcessRange($value)
@@ -156,8 +166,8 @@ class Date extends Fieldtype
             $carbon = $this->parseSavedToCarbon($value);
 
             return [
-                'start' => $carbon->copy()->startOfDay()->utc()->toIso8601ZuluString(),
-                'end' => $carbon->copy()->endOfDay()->utc()->toIso8601ZuluString(),
+                'start' => $carbon->copy()->startOfDay()->utc()->toIso8601ZuluString('millisecond'),
+                'end' => $carbon->copy()->endOfDay()->utc()->toIso8601ZuluString('millisecond'),
             ];
         }
 
@@ -236,8 +246,8 @@ class Date extends Fieldtype
             }
 
             return [
-                'start' => $this->parseSaved($value['start'])->toIso8601ZuluString(),
-                'end' => $this->parseSaved($value['end'])->toIso8601ZuluString(),
+                'start' => $this->parseSaved($value['start'])->toIso8601ZuluString('millisecond'),
+                'end' => $this->parseSaved($value['end'])->toIso8601ZuluString('millisecond'),
                 ...$common,
             ];
         }
@@ -248,7 +258,7 @@ class Date extends Fieldtype
         }
 
         return [
-            'date' => $this->parseSaved($value)->toIso8601ZuluString(),
+            'date' => $this->parseSaved($value)->toIso8601ZuluString('millisecond'),
             ...$common,
         ];
     }
@@ -292,8 +302,8 @@ class Date extends Fieldtype
 
         if ($this->config('mode') === 'range') {
             return [
-                'start' => $this->parseSaved($value['start'])->startOfDay(),
-                'end' => $this->parseSaved($value['end'])->startOfDay(),
+                'start' => $this->parseSaved($value['start']),
+                'end' => $this->parseSaved($value['end']),
             ];
         }
 

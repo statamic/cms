@@ -4,7 +4,7 @@ namespace Statamic\Tags;
 
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
-use Statamic\Facades\URL;
+use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
@@ -31,12 +31,13 @@ class Svg extends Tags
             public_path('svg'),
             public_path(),
             statamic_path('resources/svg/icons'),
+            base_path(),
         ];
 
         $svg = null;
 
         foreach ($cascade as $location) {
-            $file = Url::assemble($location, $name);
+            $file = Path::assemble($location, $name);
             if (File::exists($file)) {
                 $svg = StaticStringy::collapseWhitespace(
                     File::get($file)

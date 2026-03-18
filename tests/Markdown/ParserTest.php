@@ -5,6 +5,8 @@ namespace Tests\Markdown;
 use League\CommonMark\Extension\CommonMark\Node\Block\Heading;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Markdown;
 use Tests\TestCase;
 
@@ -127,5 +129,31 @@ class ParserTest extends TestCase
         $this->assertCount(1, $this->parser->extensions());
         $this->assertCount(2, $newParser->renderers());
         $this->assertCount(1, $this->parser->renderers());
+    }
+
+    #[Test]
+    public function it_returns_instances_of_custom_parsers()
+    {
+        $markdown = new \Statamic\Fieldtypes\Markdown;
+        $field = new Field('test', [
+            'type' => 'markdown',
+            'parser' => 'custom',
+        ]);
+
+        $markdown->setField($field);
+
+        $markdownValue = new Value('A Test', 'test', $markdown);
+
+        $customParser = new class extends Markdown\Parser
+        {
+            public function parse(string $markdown): string
+            {
+                return strtolower($markdown);
+            }
+        };
+
+        \Statamic\Facades\Markdown::extend('custom', fn () => $customParser);
+
+        $this->assertSame('a test', $markdownValue->value());
     }
 }

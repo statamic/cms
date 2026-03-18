@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen dark:bg-dark-700 bg-gray-200': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'dark:bg-dark-700 mt-14 bg-gray-200 p-4': fullScreenMode }">
+                    <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
@@ -45,7 +45,7 @@
                                     :enabled="set.enabled"
                                     :read-only
                                     :can-add-set="canAddSet"
-                                    :has-error="setHasError(index)"
+                                    :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
                                     @collapsed="collapseSet(set._id)"
                                     @expanded="expandSet(set._id)"
@@ -55,11 +55,13 @@
                                     <template v-slot:picker>
                                         <add-set-button
                                             variant="between"
-                                            v-if="index !== 0"
                                             :groups="groupConfigs"
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :is-first="index === 0"
+                                            :show-connector="!(index === 0 && config.hide_display)"
+                                            :loading-set="loadingSet"
                                             @added="addSet"
                                         />
                                     </template>
@@ -71,9 +73,11 @@
                             v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :show-connector="false"
+                            :show-connector="value.length > 0"
                             :index="value.length"
                             :label="config.button_label"
+                            :is-first="value.length === 0"
+                            :loading-set="loadingSet"
                             @added="addSet"
                         />
                     </section>
@@ -85,11 +89,12 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
+import { data_get } from "@/bootstrap/globals.js";
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -100,17 +105,19 @@ export default {
         AddSetButton,
     },
 
-    inject: ['store', 'storeName'],
-
     data() {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
+            escBinding: null,
             provide: {
-                storeName: this.storeName,
                 replicatorSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
             },
+            errorsById: {},
+            setsCache: {},
+            loadingSet: null,
         };
     },
 
@@ -147,12 +154,8 @@ export default {
             return `${this.name}-sortable-handle`;
         },
 
-        storeState() {
-            return this.store || {};
-        },
-
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         },
@@ -161,22 +164,26 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'arrows-horizontal-expand',
+                    icon: 'expand',
                     quick: true,
+                    disabled: () => this.collapsed.length === 0,
+                    visible: this.config.collapse !== 'accordion',
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'arrows-horizontal-collapse',
+                    icon: 'collapse',
                     quick: true,
+                    disabled: () =>this.collapsed.length === this.value.length,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },
@@ -204,21 +211,87 @@ export default {
         },
 
         addSet(handle, index) {
+            this.loadingSet = handle;
+
+            this.fetchSet(handle)
+                .then(data => this._addSet(handle, index, data))
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, index, data) {
             const set = {
-                ...JSON.parse(JSON.stringify(this.meta.defaults[handle])),
+                ...JSON.parse(JSON.stringify(data.defaults)),
                 _id: uniqid(),
                 type: handle,
                 enabled: true,
             };
 
-            this.updateSetMeta(set._id, this.meta.new[handle]);
+            this.updateSetMeta(set._id, data.new);
 
-            this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+            this.$nextTick(() => {
+                this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
+                this.expandSet(set._id);
+            });
+        },
 
-            this.expandSet(set._id);
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.replicatorFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const token = this.publishContainer.blueprint.token;
+
+				if (this.meta.new?.hasOwnProperty(set)) {
+					let meta = this.meta.new[set];
+					let defaults = this.meta.defaults[set];
+
+					resolve({ new: meta, defaults });
+					return;
+				}
+
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
+
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        /**
+         * Returns the path to the Replicator field, replacing any set indexes with handles.
+         */
+        replicatorFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+					if (['attrs', 'values'].includes(key)) return;
+
+                    if (Number.isInteger(parseInt(key))) {
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+	                    return setValues.attrs?.values.type || setValues.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
         },
 
         duplicateSet(old_id) {
+            if (!this.canAddSet) return;
+
             const index = this.value.findIndex((v) => v._id === old_id);
             const old = this.value[index];
             const set = {
@@ -261,6 +334,15 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
+
+            if (this.fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.toggleFullscreen);
+            } else {
+                if (this.escBinding) {
+                    this.escBinding.destroy();
+                    this.escBinding = null;
+                }
+            }
         },
 
         blurred() {
@@ -271,15 +353,13 @@ export default {
             }, 1);
         },
 
-        setHasError(index) {
-            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
+        setHasError(id) {
+            if (Object.keys(this.errorsById).length === 0) {
+                return false;
+            }
 
-            return Object.keys(this.storeState.errors ?? []).some((handle) => handle.startsWith(prefix));
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
-    },
-
-    mounted() {
-        if (this.config.collapse) this.collapseAll();
     },
 
     watch: {
@@ -297,6 +377,31 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        },
+
+        loadingSet(loading) {
+            this.$progress.loading('replicator-set', !!loading);
+        },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?._id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
         },
     },
 };

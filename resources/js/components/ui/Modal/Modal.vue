@@ -1,75 +1,201 @@
 <script setup>
 import { cva } from 'cva';
-import { hasComponent } from '@statamic/composables/has-component.js';
-import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
-import { getCurrentInstance, ref, watch } from 'vue';
+import { hasComponent } from '@/composables/has-component.js';
+import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, provide, ref, useAttrs, useSlots, watch } from 'vue';
+import Icon from '../Icon/Icon.vue';
+import Heading from '../Heading.vue';
+import { portals, keys } from '@api';
+import wait from '@/util/wait';
+import { FocusScope } from 'reka-ui';
+import stack from '@ui/Stack/Stack.vue';
 
-const emit = defineEmits(['update:open']);
-
-const props = defineProps({
-    title: { type: String, default: '' },
-    open: { type: Boolean, default: false },
+defineOptions({
+    inheritAttrs: false,
 });
 
-const hasModalTitleComponent = hasComponent('ModalTitle');
+const attrs = useAttrs();
+const slots = useSlots();
+const emit = defineEmits(['update:open', 'opened', 'dismissed']);
+
+const props = defineProps({
+    /** When `true`, the modal's backdrop will be blurred */
+    blur: { type: Boolean, default: false },
+    /** Title displayed at the top of the modal */
+    title: { type: String, default: '' },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon: { type: [String, null], default: null },
+    /** The controlled open state of the modal. */
+    open: { type: Boolean, default: false },
+    /** Callback that fires before the modal closes. */
+    beforeClose: { type: Function, default: () => true },
+    /** When `true`, clicking outside the modal will dismiss it. */
+    dismissible: { type: Boolean, default: true },
+});
+
+const overlayClasses = cva({
+    base: 'fixed inset-0 z-(--z-index-portal) bg-gray-800/20 dark:bg-gray-800/50',
+    variants: {
+        blur: {
+            true: 'backdrop-blur-[2px]',
+        },
+    },
+})({ ...props });
 
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-1/6 z-50 w-full max-w-2xl -translate-x-1/2',
+        'fixed outline-hidden left-1/2 top-1/6 z-(--z-index-modal) w-full max-w-2xl -translate-x-1/2',
         'bg-white/80 dark:bg-gray-850 backdrop-blur-[2px] rounded-2xl p-2',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',
         'duration-200 will-change-[transform,opacity]',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out',
-        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-        'slide-in-from-top-2',
     ],
 })({});
 
-const instance = getCurrentInstance();
-const isUsingOpenProp = instance && 'open' in instance.vnode.props;
+const modal = ref(null);
+const modalContent = ref(null);
+const mounted = ref(false);
+const visible = ref(false);
+const escBinding = ref(null);
 
-const open = ref(props.open);
+const instance = getCurrentInstance();
+const hasModalTitleComponent = hasComponent('ModalTitle');
+const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
+const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
+const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
+
+function open() {
+    if (!modal.value) modal.value = portals.create('modal');
+
+    escBinding.value = keys.bindGlobal('esc', dismiss);
+
+    nextTick(() => {
+        mounted.value = true;
+        updateOpen(true);
+
+        nextTick(() => {
+            visible.value = true;
+            emit('opened');
+            nextTick(() => focusFirstFocusable());
+        });
+    });
+}
+
+const FOCUSABLE_SELECTOR = [
+    'button:not([disabled])',
+    '[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+].join(', ');
+
+function focusFirstFocusable() {
+    const first = modalContent.value?.querySelector(FOCUSABLE_SELECTOR);
+    if (first instanceof HTMLElement) {
+        first.focus();
+    } else {
+        modalContent.value?.focus();
+    }
+}
+
+function close() {
+    visible.value = false;
+
+    wait(300).then(() => {
+        mounted.value = false;
+        updateOpen(false);
+
+        cleanup();
+        modal.value = null;
+        escBinding.value = null;
+    });
+}
+
+function dismiss() {
+    if (!props.dismissible) return;
+    if (!runCloseCallback()) return;
+
+    emit('dismissed');
+    close();
+}
+
+function updateOpen(value) {
+    if (isUsingOpenProp.value && props.open !== value) {
+        emit('update:open', value);
+    }
+}
+
+function runCloseCallback() {
+    const shouldClose = props.beforeClose();
+
+    if (!shouldClose) return false;
+
+    close();
+
+    return true;
+}
+
+function cleanup() {
+    modal.value?.destroy();
+    escBinding.value?.destroy();
+}
 
 watch(
     () => props.open,
-    (value) => open.value = value,
+    (value) => value ? open() : close(),
 );
 
-// When the parent component controls the open state, emit an update event
-// so it can update its state, which eventually gets passed down as a prop.
-// Otherwise, just update the local state.
-function updateOpen(value) {
-    if (isUsingOpenProp) {
-        emit('update:open', value);
-        return;
-    }
+onMounted(() => {
+    if (props.open) open();
+});
 
-    open.value = value;
-}
+onBeforeUnmount(() => {
+    cleanup();
+});
+
+defineExpose({
+    open,
+    close,
+    runCloseCallback,
+});
+
+provide('closeModal', close);
 </script>
 
 <template>
-    <DialogRoot :open @update:open="updateOpen">
-        <DialogTrigger data-ui-modal-trigger as-child>
-            <slot name="trigger" />
-        </DialogTrigger>
-        <DialogPortal>
-            <DialogOverlay
-                class="data-[state=open]:show fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50"
-            />
-            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content :aria-describedby="undefined">
-                <div
-                    class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
-                >
-                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="font-medium">
-                        {{ title }}
-                    </DialogTitle>
-                    <slot />
+    <div v-if="slots.trigger" @click="open">
+        <slot name="trigger" />
+    </div>
+    <teleport :to="portal" v-if="mounted && portal">
+        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal">
+            <transition
+                enter-active-class="duration-200"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="duration-200"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div v-if="visible" :class="overlayClasses" @click="dismiss" />
+            </transition>
+            <transition
+                enter-active-class="duration-200"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="duration-200"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95"
+            >
+                <div ref="modalContent" v-if="visible" :class="[modalClasses, attrs.class]" data-ui-modal-content>
+                    <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
+                        <div v-if="!hasModalTitleComponent && (title || icon)" data-ui-modal-title class="flex items-center gap-2">
+                            <Icon :name="icon" v-if="icon" class="size-4" />
+                            <Heading :text="title" size="lg" class="font-medium" />
+                        </div>
+                        <slot />
+                    </div>
+                    <slot name="footer" />
                 </div>
-                <slot name="footer" />
-            </DialogContent>
-        </DialogPortal>
-    </DialogRoot>
+            </transition>
+        </FocusScope>
+    </teleport>
 </template>

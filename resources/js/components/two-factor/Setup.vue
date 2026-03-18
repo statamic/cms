@@ -1,11 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
-import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
+import TwoFactorRecoveryCodesModal from '@/components/two-factor/RecoveryCodesModal.vue';
 import axios from 'axios';
-import { Modal, Input, Button } from '@statamic/ui';
+import { Modal, Input, Button, Icon } from '@/components/ui';
 
-const emit = defineEmits(['setup-complete', 'cancel', 'cancel']);
+const emit = defineEmits(['setup-complete', 'cancel', 'close']);
 
 const props = defineProps({
     enableUrl: String,
@@ -41,8 +40,8 @@ function confirm() {
             setupModalOpen.value = false;
             recoveryCodesModalOpen.value = true;
         })
-        .catch((error) => {
-            error.value = error.response.data.errors.code[0];
+        .catch((e) => {
+            error.value = e.response.data.errors.code[0];
         });
 }
 
@@ -53,21 +52,21 @@ function complete() {
 </script>
 
 <template>
-    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" :open="true" @update:model-value="$emit('cancel')">
+    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" blur open @update:model-value="$emit('cancel')">
         <div>
-            <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
-                <loading-graphic />
+            <div v-if="loading" class="flex items-center justify-center text-center">
+                <Icon name="loading" />
             </div>
 
             <template v-else>
                 <div>
                     <ui-description class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</ui-description>
 
-                    <div class="flex justify-center space-x-6">
+                    <div class="flex space-x-6">
                         <div class="bg-white" v-html="qrCode"></div>
-                        <div class="space-y-6">
+                        <div class="space-y-6 w-full">
                             <ui-field :label="__('Setup Key')">
-                                <ui-input copyable readonly :value="secretKey" />
+                                <ui-input copyable readonly :model-value="secretKey" />
                             </ui-field>
 
                             <ui-field :label="__('Verification Code')" :error="error">

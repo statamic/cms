@@ -1,6 +1,9 @@
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 export default function (markdown, options = {}) {
+    if (!markdown) return '';
+
     const renderer = new marked.Renderer();
 
     if (options.openLinksInNewTabs) {
@@ -11,5 +14,8 @@ export default function (markdown, options = {}) {
         };
     }
 
-    return marked.parse(markdown, { renderer });
+    return DOMPurify.sanitize(
+        marked.parse(markdown, { renderer }),
+        { ADD_ATTR: ['target'] }
+    );
 }

@@ -7,6 +7,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
@@ -25,6 +27,7 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -73,7 +76,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->namespace;
     }
 
-    public function fullyQualifiedHandle(): string
+    public function renderableNamespace(): string
+    {
+        return str_replace('.', ' ', Str::humanize($this->namespace));
+    }
+
+    public function fullyQualifiedHandle(): ?string
     {
         $handle = $this->handle();
 
@@ -138,9 +146,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             $namespace = 'vendor/'.$namespace;
         }
 
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            Facades\Blueprint::directory(),
-            $namespace,
+        return Path::tidy(vsprintf('%s/%s.yaml', [
+            Facades\Blueprint::namespaceDirectory($namespace),
             $this->handle(),
         ]));
     }
@@ -151,6 +158,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         return $this
             ->normalizeTabs()
+            ->resetBlueprintCache()
             ->resetFieldsCache();
     }
 
@@ -259,7 +267,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 // override array, but only keys that don't already exist in the actual partial field's config.
                 $referencedField = FieldRepository::find($existingField['field']);
                 $referencedFieldConfig = $referencedField->config();
-                $config = array_merge($config, $referencedFieldConfig);
+                $fieldOverrides = $existingField['config'] ?? [];
+
+                $config = array_merge($config, $referencedFieldConfig, $fieldOverrides);
                 $config = Arr::except($config, array_keys($referencedFieldConfig));
                 $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
             } else {
@@ -443,6 +453,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             'handle' => $this->handle(),
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
+            'fqh' => $this->fullyQualifiedHandle(),
+            'token' => encrypt([
+                'fqh' => $this->fullyQualifiedHandle(),
+                'user_id' => User::current()->id(),
+            ]),
         ];
     }
 
@@ -653,7 +668,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $field = $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey];
 
-        $isImportedField = Arr::has($field, 'config');
+        $fieldValue = Arr::get($field, 'field');
+        $isImportedField = is_string($fieldValue);
 
         if ($isImportedField) {
             $existingConfig = Arr::get($field, 'config', []);
@@ -780,13 +796,29 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->handle();
     }
 
-    public function resetUrl()
+    public function editAdditionalBlueprintUrl()
     {
-        return cp_route('blueprints.reset', [$this->namespace(), $this->handle()]);
+        return cp_route('blueprints.additional.edit', [$this->namespace(), $this->handle()]);
+    }
+
+    public function resetAdditionalBlueprintUrl()
+    {
+        return cp_route('blueprints.additional.reset', [$this->namespace(), $this->handle()]);
     }
 
     public function writeFile($path = null)
     {
         File::put($path ?? $this->buildPath(), $this->fileContents());
+    }
+
+    public function commandPaletteLink(string|array $type, string $url): Link
+    {
+        $type = is_array($type) ? $type : [__($type)];
+
+        $text = [__('Blueprints'), ...$type, __($this->title())];
+
+        return (new Link($text, Category::Fields))
+            ->url($url)
+            ->icon('blueprints');
     }
 }

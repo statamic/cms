@@ -88,7 +88,7 @@ class DateFieldtype implements ValidationRule
 
     private function validDateFormat($value)
     {
-        $format = 'Y-m-d\TH:i:s\Z';
+        $format = 'Y-m-d\TH:i:s.v\Z';
 
         $date = DateTime::createFromFormat('!'.$format, $value);
 

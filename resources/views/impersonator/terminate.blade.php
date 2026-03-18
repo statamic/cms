@@ -6,7 +6,7 @@
     #__impersonator-link__ {
         position: fixed;
         display: flex;
-        z-index: 100;
+        z-index: var(--z-index-portal);
         align-items: center;
         bottom: 0;
         right: 0;
@@ -86,5 +86,5 @@
             ></path>
         </g>
     </svg>
-    {{ __('Stop impersonating') }}
+    {{ __('Stop impersonating', locale: $locale) }}
 </a>

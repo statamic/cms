@@ -2,18 +2,26 @@
     <div>
         <ui-header :title="__('Edit Blueprint')" icon="blueprints">
             <template #actions>
-                <ui-button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+                <slot name="actions"></slot>
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <ui-button type="submit" variant="primary" @click.prevent="action" v-text="text" />
+                </ui-command-palette-item>
             </template>
         </ui-header>
 
-        <ui-panel :heading="__('Settings')">
-            <ui-card>
-                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors.title">
+        <ui-panel v-if="showTitle" :heading="__('Settings')">
+            <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <ui-field inline :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
                     <ui-input v-model="blueprint.title" />
                 </ui-field>
-            </ui-card>
-            <ui-card class="mt-2">
-                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden" variant="inline">
+                <ui-field inline :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
                     <ui-switch v-model="blueprint.hidden" />
                 </ui-field>
             </ui-card>
@@ -23,8 +31,9 @@
             class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
-            :errors="errors.tabs"
+            :errors="errors?.tabs"
             :can-define-localizable="canDefineLocalizable"
+            show-section-collapsible-field
             @updated="tabsUpdated"
         />
     </div>
@@ -54,6 +63,7 @@ export default {
         return {
             blueprint: this.initializeBlueprint(),
             errors: {},
+	        saveKeyBinding: null,
         };
     },
 
@@ -64,14 +74,28 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
+        });
+
+        // Listen for root-form-save events from child components
+        // This also happens on the fieldset builder.
+        this.$events.$on('root-form-save', () => {
+            this.$nextTick(() => this.save());
         });
 
         if (this.isFormBlueprint) {
             Statamic.$config.set('isFormBlueprint', true);
         }
+    },
+
+    beforeUnmount() {
+		Statamic.$config.set('isFormBlueprint', false);
+
+        this.$events.$off('root-form-save');
+
+		this.saveKeyBinding.destroy();
     },
 
     watch: {
@@ -97,16 +121,16 @@ export default {
         },
 
         save() {
-            // this.$axios[this.method](this.action, this.fieldset)
             this.$axios['patch'](this.action, this.blueprint)
                 .then((response) => this.saved(response))
                 .catch((e) => {
+                    console.error('Blueprint save failed:', e);
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 });
         },
 
-        saved(response) {
+        saved() {
             this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');

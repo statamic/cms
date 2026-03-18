@@ -26,7 +26,7 @@ class SendPasswordReset extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Send password reset email to this user?|Send password reset email to these :count users?';
+        return 'Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?';
     }
 
     public function dirtyWarningText()

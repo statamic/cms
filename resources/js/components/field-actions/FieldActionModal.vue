@@ -1,6 +1,7 @@
 <template>
     <div>
         <confirmation-modal
+            open
             :title="title"
             :danger="dangerous"
             :buttonText="buttonText"
@@ -11,7 +12,7 @@
             <div class="min-h-20">
                 <div v-if="bodyText" v-text="bodyText" :class="{ 'mb-4': warningText || hasFields }" />
 
-                <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
+                <div v-if="warningText" v-text="warningText" class="text-red-600" :class="{ 'mb-4': hasFields }" />
 
                 <PublishContainer
                     v-if="hasFields && !resolving"
@@ -31,8 +32,8 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
-import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
+import { nanoid as uniqid } from 'nanoid';
+import { PublishContainer, PublishFieldsProvider as FieldsProvider, PublishFields } from '@/components/ui';
 
 export default {
     components: { PublishContainer, FieldsProvider, PublishFields },

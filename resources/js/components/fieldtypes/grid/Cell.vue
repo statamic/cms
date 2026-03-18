@@ -1,11 +1,12 @@
 <template>
     <td class="grid-cell" :class="classes" :width="width">
-        <Field :config="field" />
+        <Field :config="field" :inline="false" />
     </td>
 </template>
 
 <script>
-import Field from '@statamic/components/ui/Publish/Field.vue';
+import { PublishField as Field } from '@ui';
+
 export default {
     components: {
         Field,

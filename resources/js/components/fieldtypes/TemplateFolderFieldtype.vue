@@ -16,8 +16,6 @@ import Fieldtype from './Fieldtype.vue';
 export default {
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
-
     computed: {
         relationshipMeta() {
             return {

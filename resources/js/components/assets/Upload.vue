@@ -1,9 +1,9 @@
 <template>
     <div class="p-3 overflow-hidden dark:border-gray-700 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
-        <div class="flex flex-1 items-center gap-3">
+        <div class="flex flex-1 items-center gap-2 sm:gap-3">
             <div class="size-7 flex items-center justify-center">
-                <ui-icon name="warning-diamond" class="size-5 text-red-500" v-tooltip="error" v-if="status === 'error'" />
-                <loading-graphic v-else :inline="true" text="" />
+                <ui-icon name="warning-diamond" class="size-5 text-red-600" v-tooltip="error" v-if="status === 'error'" />
+                <Icon v-else name="loading" />
             </div>
 
             <div class="truncate">{{ basename }}</div>
@@ -32,7 +32,7 @@
 
 
         <confirmation-modal
-            v-if="showNewFilenameModal"
+            :open="showNewFilenameModal"
             :title="__('New Filename')"
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem, Input } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@/components/ui';
 
 export default {
     components: {
@@ -52,6 +52,7 @@ export default {
         DropdownMenu,
         DropdownItem,
         Input,
+        Icon,
     },
 
     props: {

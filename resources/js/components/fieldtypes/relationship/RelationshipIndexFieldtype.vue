@@ -3,8 +3,8 @@
         <div class="flex flex-wrap gap-2">
             <Badge size="sm" v-for="item in items" :key="item.id" :href="item.edit_url" :icon="item.icon">
                 <StatusIndicator
-                    v-if="item.hasOwnProperty('published') && item.published !== null"
-                    :status="item.published"
+                    v-if="item.hasOwnProperty('status') && item.status !== null"
+                    :status="item.status"
                     class="h-1"
                 />
                 <span v-text="item.title" />
@@ -37,7 +37,7 @@
 
 <script>
 import IndexFieldtype from '../IndexFieldtype.vue';
-import { Badge, StatusIndicator, Dropdown, DropdownMenu, DropdownLabel, DropdownItem } from '@statamic/ui';
+import { Badge, StatusIndicator, Dropdown, DropdownMenu, DropdownLabel, DropdownItem } from '@/components/ui';
 
 export default {
     mixins: [IndexFieldtype],

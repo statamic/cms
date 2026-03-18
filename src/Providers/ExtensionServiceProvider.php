@@ -7,9 +7,9 @@ use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Addons\Manifest;
 use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
-use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
 use Statamic\Forms\JsDrivers;
@@ -56,6 +56,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Dictionaries\Countries::class,
         Dictionaries\Currencies::class,
         Dictionaries\File::class,
+        Dictionaries\Languages::class,
         Dictionaries\Locales::class,
         Dictionaries\Timezones::class,
     ];
@@ -114,6 +115,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\TemplateFolder::class,
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
+        Fieldtypes\Theme::class,
         Fieldtypes\Time::class,
         Fieldtypes\Toggle::class,
         Fieldtypes\UserGroups::class,
@@ -152,6 +154,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $scopes = [
+        Scopes\Filters\AssetProperties::class,
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
@@ -167,6 +170,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Cache::class,
         Tags\Can::class,
         Tags\Children::class,
+        Tags\ComponentProxy::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
@@ -226,7 +230,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,
         \Statamic\Forms\Widget::class,
@@ -234,6 +237,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $formJsDrivers = [
         JsDrivers\Alpine::class,
+        JsDrivers\AlpinePrecognition::class,
     ];
 
     protected $updateScripts = [
@@ -251,6 +255,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
         Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\PublishMigrationForWebauthnTable::class,
+        Updates\AddAddonSettingsToGitConfig::class,
     ];
 
     public function register()

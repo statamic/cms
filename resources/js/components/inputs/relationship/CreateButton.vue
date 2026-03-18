@@ -1,21 +1,32 @@
 <template>
     <div>
-        <ui-dropdown :disabled="creatables.length === 1">
+        <ui-button
+            v-if="creatables.length === 1"
+            :icon="icon"
+            :text="text"
+            size="sm"
+            @click="create"
+        />
+        <ui-dropdown v-else>
             <template #trigger>
                 <ui-button
                     :icon="icon"
-                    variant="filled"
                     :text="text"
-                    @click="create"
+                    size="sm"
                 />
             </template>
             <ui-dropdown-menu>
+                <ui-dropdown-label v-text="__('Choose Blueprint')" />
                 <ui-dropdown-item
                     v-for="creatable in creatables"
                     :key="creatable.url"
-                    :text="creatable.title"
                     @click="select(creatable)"
-                />
+                >
+                    <div class="flex items-center justify-between">
+                        <span>{{ creatable.blueprint }}</span>
+                        <ui-badge size="sm">{{ creatable.parent_title }}</ui-badge>
+                    </div>
+                </ui-dropdown-item>
             </ui-dropdown-menu>
         </ui-dropdown>
 

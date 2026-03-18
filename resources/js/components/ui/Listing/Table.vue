@@ -1,8 +1,7 @@
 <script setup>
-import { Panel, PanelFooter } from '@statamic/ui';
-import { ref, computed, useTemplateRef, useSlots } from 'vue';
-import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import Pagination from './Pagination.vue';
+import { ref, computed, useSlots } from 'vue';
+import { injectListingContext } from '../Listing/Listing.vue';
+import { hasSlotContent } from '@/composables/has-slot-content';
 import TableHead from './TableHead.vue';
 import TableBody from './TableBody.vue';
 
@@ -17,7 +16,7 @@ const props = defineProps({
     },
 });
 
-const { visibleColumns, selections, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
+const { visibleColumns, selections, items, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
 const shifting = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
 
@@ -38,20 +37,22 @@ const forwardedTableCellSlots = computed(() => {
             return acc;
         }, {});
 });
+
+const hasTbodyStartContent = hasSlotContent('tbody-start');
 </script>
 
 <template>
     <table
+        v-if="items.length > 0 || hasTbodyStartContent"
         :data-size="relativeColumnsSize"
         :class="{
             'select-none': shifting,
             'data-table': !unstyled,
-            contained: contained,
+            'data-table--contained': contained,
             'opacity-50': loading,
         }"
         data-table
         ref="table"
-        tabindex="0"
         :data-has-selections="hasSelections ? true : null"
         @keydown.shift="shifting = true"
         @keyup="shifting = false"
@@ -67,4 +68,9 @@ const forwardedTableCellSlots = computed(() => {
             </template>
         </TableBody>
     </table>
+    <div v-if="items.length === 0 && !hasTbodyStartContent">
+        <div class="text-center text-gray-500 text-sm py-4">
+            {{ __('No items found') }}
+        </div>
+    </div>
 </template>

@@ -5,12 +5,14 @@ import { cva } from 'cva';
 const variant = inject('dataTableVariant', 'normal');
 
 const props = defineProps({
+    /** Text alignment. <br><br> Options: `left`, `center`, `right` */
     align: { type: String, default: 'left' },
+    /** Column width */
     width: { type: String, default: null },
 });
 
 const headerCellClasses = cva({
-    base: 'text-sm font-medium text-gray-800 dark:text-gray-300',
+    base: 'text-sm font-medium text-gray-900 dark:text-gray-300',
     variants: {
         variant: {
             normal: 'px-4 py-2',

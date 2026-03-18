@@ -85,13 +85,13 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function initials()
     {
+        if (! $name = $this->name()) {
+            return '?';
+        }
+
         $surname = '';
-        if ($name = $this->get('name')) {
-            if (Str::contains($name, ' ')) {
-                [$name, $surname] = explode(' ', $name);
-            }
-        } else {
-            $name = (string) $this->email();
+        if (Str::contains($name, ' ')) {
+            [$name, $surname] = explode(' ', $name, 2);
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
@@ -328,7 +328,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             return $name;
         }
 
-        return $this->email();
+        return null;
     }
 
     public function defaultAugmentedArrayKeys()
@@ -356,9 +356,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->setPreference('locale', $locale);
     }
 
-    public function preferredTheme()
+    public function preferredColorMode()
     {
-        return $this->getPreference('theme') ?? 'auto';
+        $mode = $this->getPreference('color_mode') ?? 'auto';
+
+        return in_array($mode, ['auto', 'light', 'dark'], true) ? $mode : 'auto';
     }
 
     public function isTwoFactorAuthenticationRequired(): bool
@@ -447,8 +449,17 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return __('User');
     }
 
+    public function getCpSearchResultIcon(): string
+    {
+        return 'users';
+    }
+
     public function getElevatedSessionMethod(): string
     {
+        if (! config('statamic.webauthn.allow_password_login_with_passkey', true) && $this->passkeys()->isNotEmpty()) {
+            return 'passkey';
+        }
+
         return $this->password() ? 'password_confirmation' : 'verification_code';
     }
 

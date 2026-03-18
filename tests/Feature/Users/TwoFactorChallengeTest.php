@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Users;
+namespace Tests\Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -43,7 +43,7 @@ class TwoFactorChallengeTest extends TestCase
         $this
             ->session(['login.id' => $user->id()])
             ->get(cp_route('two-factor-challenge'))
-            ->assertViewIs('statamic::auth.two-factor.challenge');
+            ->assertInertia(fn ($page) => $page->component('auth/two-factor/Challenge'));
     }
 
     #[Test]
@@ -187,6 +187,23 @@ class TwoFactorChallengeTest extends TestCase
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertRedirect('http://localhost/cp/collections');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_frontend_route()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session(['login.id' => $user->id()])
+            ->post(route('statamic.two-factor-challenge', [
+                'redirect' => 'https://evil.com',
+            ]), [
+                'code' => $this->getOneTimeCode($user),
+            ])
+            ->assertRedirect(route('statamic.site'));
 
         $this->assertAuthenticatedAs($user);
     }

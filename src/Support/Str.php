@@ -149,6 +149,19 @@ class Str
         return trans('statamic::messages.units.B', ['count' => $bytes]);
     }
 
+    public static function durationForHumans($s)
+    {
+        $hours = floor($s / 3600);
+        $mins = floor(($s % 3600) / 60);
+        $secs = $s % 60;
+
+        if ($hours > 0) {
+            return sprintf('%d:%02d:%02d', $hours, $mins, $secs);
+        }
+
+        return sprintf('%d:%02d', $mins, $secs);
+    }
+
     public static function timeForHumans($ms)
     {
         if ($ms < 1000) {
@@ -245,9 +258,9 @@ class Str
     public static function tailwindWidthClass($width)
     {
         $sizes = [
-            'sm' => 'w-full @lg:w-1/2 @4xl:w-1/3 @8xl:w-1/4',
-            'md' => 'w-full @lg:w-1/2 @4xl:w-1/2 @8xl:w-1/3',
-            'lg' => 'w-full @lg:w-full @4xl:w-2/3 @8xl:w-3/4',
+            'sm' => 'w-full @lg:w-1/2 @4xl:w-1/3 @7xl:w-1/4',
+            'md' => 'w-full @lg:w-1/2 @4xl:w-1/2 @7xl:w-1/3',
+            'lg' => 'w-full @lg:w-full @4xl:w-2/3 @7xl:w-3/4',
             'full' => 'w-full',
         ];
 

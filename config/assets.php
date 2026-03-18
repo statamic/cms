@@ -132,6 +132,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Control Panel Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic will generate thumbnails for videos.
+    | Generated thumbnails are displayed in the Control Panel.
+    |
+    */
+
+    'video_thumbnails' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | File Previews with Google Docs
     |--------------------------------------------------------------------------
     |
@@ -207,5 +219,36 @@ return [
     */
 
     'svg_sanitization_on_upload' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | FFmpeg
+    |--------------------------------------------------------------------------
+    |
+    | Statamic uses FFmpeg to extract thumbnails from videos to be shown in the
+    | Control Panel. You may adjust the binary location and cache path here.
+    |
+    */
+
+    'ffmpeg' => [
+        'binary' => null,
+        'cache_path' => storage_path('statamic/glide/ffmpeg'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Replicator and Bard Set Preview Images
+    |--------------------------------------------------------------------------
+    |
+    | Replicator and Bard sets may have preview images to give users a visual
+    | representation of the content within. Here you may specify the asset
+    | container and folder where these preview images are to be stored.
+    |
+    */
+
+    'set_preview_images' => [
+        'container' => 'assets',
+        'folder' => 'set-previews',
+    ],
 
 ];

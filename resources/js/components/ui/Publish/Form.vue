@@ -1,11 +1,11 @@
 <script setup>
 import Container from './Container.vue';
 import Tabs from './Tabs.vue';
-import { Header, Button } from '@statamic/ui';
-import uniqid from 'uniqid';
+import { Header, Button } from '@ui';
+import { nanoid as uniqid } from 'nanoid';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { SavePipeline } from '@statamic/exports.js';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
+import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     icon: {
@@ -30,8 +30,8 @@ const props = defineProps({
         default: () => ({}),
     },
     submitUrl: {
-        type: String,
-        required: true,
+        type: [String, null],
+        default: null,
     },
     submitMethod: {
         type: String,
@@ -44,6 +44,10 @@ const props = defineProps({
     asConfig: {
         type: Boolean,
         default: false,
+    },
+    rememberTab: {
+        type: Boolean,
+        default: true,
     }
 });
 
@@ -58,15 +62,13 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new BeforeSaveHooks('entry'),
             new Request(props.submitUrl, props.submitMethod),
-            new AfterSaveHooks('entry'),
         ])
         .then((response) => {
-            Statamic.$toast.success('Saved');
+            Statamic.$toast.success(__('Saved'));
 
             if (response.data.redirect) {
-                window.location = response.data.redirect;
+                router.get(response.data.redirect);
             }
         });
 }
@@ -85,7 +87,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Header :title="title" :icon="icon">
-        <Button v-if="!readOnly" variant="primary" text="Save" @click="save" :disabled="saving" />
+        <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
     </Header>
     <Container
         ref="container"
@@ -95,6 +97,7 @@ onUnmounted(() => saveKeyBinding.destroy());
         :errors="errors"
         :read-only="readOnly"
         :as-config="asConfig"
+        :remember-tab="rememberTab"
         v-model="values"
     >
         <Tabs />

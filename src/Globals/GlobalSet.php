@@ -55,6 +55,14 @@ class GlobalSet implements Contract
         return Blueprint::find('globals.'.$this->handle());
     }
 
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->inDefaultSite()->blueprint()?->commandPaletteLink(
+            type: 'Globals',
+            url: $this->editBlueprintUrl(),
+        );
+    }
+
     public function path()
     {
         return vsprintf('%s/%s.%s', [
@@ -266,6 +274,11 @@ class GlobalSet implements Contract
     public function deleteUrl()
     {
         return cp_route('globals.destroy', $this->handle());
+    }
+
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.globals.edit', $this->handle());
     }
 
     public static function __callStatic($method, $parameters)

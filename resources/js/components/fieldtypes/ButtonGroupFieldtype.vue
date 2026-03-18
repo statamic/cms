@@ -2,14 +2,15 @@
     <ButtonGroup ref="buttonGroup">
         <Button
             v-for="(option, $index) in options"
-            :key="$index"
             ref="button"
+            :disabled="config.disabled"
+            :key="$index"
             :name="name"
-            @click="updateSelectedOption(option.value)"
-            :value="option.value"
-            :disabled="isReadOnly"
-            :variant="value == option.value ? 'primary' : 'default'"
+            :read-only="isReadOnly"
             :text="option.label || option.value"
+            :value="option.value"
+            :variant="value == option.value ? 'pressed' : 'default'"
+            @click="updateSelectedOption(option.value)"
         />
     </ButtonGroup>
 </template>
@@ -18,7 +19,7 @@
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import ResizeObserver from 'resize-observer-polyfill';
-import { Button, ButtonGroup } from '@statamic/ui';
+import { Button, ButtonGroup } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -47,7 +48,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             var option = this.options.find((o) => o.value === this.value);
             return option ? option.label : this.value;

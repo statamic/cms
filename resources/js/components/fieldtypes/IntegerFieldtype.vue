@@ -5,9 +5,12 @@
         :name="name"
         :focus="config.focus"
         :model-value="value"
-        :disabled="isReadOnly"
+        :read-only="isReadOnly"
+        :disabled="config.disabled"
         :id="fieldId"
         :min="config.min"
+        :max="config.max"
+        :step="config.step"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :placeholder="__(config.placeholder)"
@@ -19,7 +22,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input } from '@statamic/ui';
+import { Input } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

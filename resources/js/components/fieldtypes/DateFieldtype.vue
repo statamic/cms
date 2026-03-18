@@ -3,12 +3,17 @@
         <Button :text="__('Add Date')" icon="calendar" v-if="!isReadOnly && !isInline && !hasDate" @click="addDate" />
 
         <Component
-            :is="pickerComponent"
             v-if="hasDate || isInline"
-            :model-value="datePickerValue"
+            :disabled="config.disabled"
             :granularity="datePickerGranularity"
             :inline="isInline"
-            :disabled="isReadOnly"
+            :is="pickerComponent"
+            :max="config.latest_date"
+            :min="config.earliest_date"
+            :model-value="datePickerValue"
+            :number-of-months="config.number_of_months"
+            :read-only="isReadOnly"
+            :clearable="config.clearable"
             @update:model-value="datePickerUpdated"
         />
     </div>
@@ -16,9 +21,9 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import DateFormatter from '@statamic/components/DateFormatter.js';
-import { DatePicker, DateRangePicker, Button } from '@statamic/ui';
-import { parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
+import DateFormatter from '@/components/DateFormatter.js';
+import { DatePicker, DateRangePicker, Button } from '@/components/ui';
+import { getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -28,8 +33,6 @@ export default {
     },
 
     mixins: [Fieldtype],
-
-    inject: ['store'],
 
     data() {
         return {
@@ -45,7 +48,7 @@ export default {
         },
 
         hasDate() {
-            return !!(this.config.required || this.value);
+            return this.config.required || (this.value && this.value !== 'now');
         },
 
         hasTime() {
@@ -65,7 +68,7 @@ export default {
         },
 
         datePickerValue() {
-            if (!this.value) {
+            if (!this.value || this.value === 'now') {
                 return null;
             }
 
@@ -84,8 +87,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-
+            if (!this.showFieldPreviews) return;
             if (!this.value) return;
 
             if (this.isRange) {
@@ -98,11 +100,15 @@ export default {
     },
 
     created() {
-        this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+        this.$events.$on(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
+
+        if (this.value === 'now') {
+            this.injectedPublishContainer.withoutDirtying(() => this.addDate());
+        }
     },
 
     unmounted() {
-        this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+        this.$events.$off(`container.${this.publishContainer.name}.saving`, this.triggerChangeOnFocusedField);
     },
 
     methods: {
@@ -113,8 +119,19 @@ export default {
         },
 
         datePickerUpdated(value) {
+	        // Clearing the date on a required Date field should set the date/time to now.
+	        if (!value && !this.isRange && this.config.required) {
+				return this.addDate();
+	        }
+
             if (!value) {
                 return this.update(null);
+            }
+
+            // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
+            // information. In that case, we need to convert it to a ZonedDateTime object.
+            if (!this.isRange && !value.offset && !value.timeZone) {
+                value = toZoned(value, getLocalTimeZone());
             }
 
             // The date picker will give us CalendarDateTimes in the local time zone.

@@ -1,18 +1,25 @@
 <script setup>
-import HasInputOptions from '@statamic/components/fieldtypes/HasInputOptions.js';
+import HasInputOptions from '@/components/fieldtypes/HasInputOptions.js';
 const normalizeInputOptions = HasInputOptions.methods.normalizeInputOptions;
 import { flatten, sortBy, range } from 'lodash-es';
-import { Select, Button } from '@statamic/ui';
+import Select from './Select/Select.vue';
+import Button from './Button/Button.vue';
 import { computed } from 'vue';
 
 const emit = defineEmits(['page-selected', 'per-page-changed']);
 
 const props = defineProps({
+    /** When `true`, shows the totals (eg. 1-10 of 50) */
     showTotals: { type: Boolean, default: true },
+    /** The number of items per page */
     perPage: { type: Number },
+    /** The `meta` object from a Laravel API resource */
     resourceMeta: { type: Object, required: true },
+    /** When `true`, scrolls to the top when changing pages */
     scrollToTop: { type: Boolean, default: true },
+    /** When `true`, shows individual page number buttons */
     showPageLinks: { type: Boolean, default: true },
+    /** When `true`, shows the "per page" dropdown */
     showPerPageSelector: { type: Boolean, default: true },
 });
 
@@ -147,7 +154,7 @@ function getRange(start, end) {
 <template>
     <div class="flex">
         <div class="flex flex-1 items-center">
-            <div class="text-sm text-gray-500" v-if="showTotals && totalItems > 0">
+            <div class="text-sm text-gray-600 dark:text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -157,7 +164,7 @@ function getRange(start, end) {
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
                 round
-                icon="ui/chevron-left"
+                icon="chevron-left"
                 :disabled="!hasPrevious"
                 @click="selectPreviousPage"
             />
@@ -178,14 +185,14 @@ function getRange(start, end) {
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
                 round
-                icon="ui/chevron-right"
+                icon="chevron-right"
                 :disabled="!hasNext"
                 @click="selectNextPage"
             />
         </div>
 
         <div class="flex flex-1 items-center justify-end" v-if="perPage && showPerPageSelector">
-            <span class="me-3 text-sm text-gray-500">{{ __('Per Page') }}</span>
+            <span class="me-3 text-sm text-gray-600">{{ __('Per Page') }}</span>
             <Select
                 class="w-auto!"
                 size="sm"

@@ -8,80 +8,48 @@
             v-else
             icon="eye-closed"
             @click="buttonReveal"
-            :disabled="isReadOnly"
-            :v-tooltip="__(config.instructions)"
+            :read-only="isReadOnly"
+            :disabled="config.disabled"
             :text="config.input_label || __('Show Fields')"
+            :v-tooltip="__(config.instructions)"
         />
     </div>
 </template>
 
-<script>
-import Fieldtype from './Fieldtype.vue';
-import { Switch, Heading, Button } from '@/components/ui';
-import { useId } from 'vue'
+<script setup>
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { Switch, Heading, Button, injectPublishContext as injectContainerContext } from '@ui';
+import { onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue';
 
-export default {
-    components: {
-        Switch,
-        Heading,
-        Button,
-    },
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { update, expose, isReadOnly, defineReplicatorPreview } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
-    mixins: [Fieldtype],
+const { setRevealerField, unsetRevealerField, setHiddenField } = injectContainerContext();
+const isRevealed = computed(() => props.value);
+const isToggleMode = computed(() => data_get(props.config, 'mode') === 'toggle');
+const fieldPath = computed(() => props.fieldPathPrefix ? `${props.fieldPathPrefix}.${props.handle}` : props.handle);
 
-    setup() {
-        const id = useId();
+onMounted(() => setRevealerField(fieldPath.value));
+onBeforeUnmount(() => unsetRevealerField(fieldPath.value));
 
-        return { id };
-    },
+watch(fieldPath, (fieldPath, oldFieldPath) => {
+    unsetRevealerField(oldFieldPath);
+    nextTick(() => setRevealerField(fieldPath));
+});
 
-    computed: {
-        isRevealed() {
-            return this.value;
-        },
+function buttonReveal() {
+    if (isReadOnly.value) return;
 
-        isToggleMode() {
-            return data_get(this.config, 'mode') === 'toggle';
-        },
+    setHiddenField({
+        dottedKey: fieldPath.value,
+        hidden: 'force',
+        omitValue: true,
+    });
 
-        fieldPath() {
-            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
-        },
-    },
+    update(true);
+}
 
-    inject: ['store'],
-
-    mounted() {
-        this.store.setRevealerField(this.fieldPath);
-    },
-
-    beforeUnmount() {
-        this.store.unsetRevealerField(this.fieldPath);
-    },
-
-    watch: {
-        fieldPath(fieldPath, oldFieldPath) {
-            this.store.unsetRevealerField(oldFieldPath);
-            this.$nextTick(() => {
-                this.store.setRevealerField(fieldPath);
-            });
-        },
-    },
-
-    methods: {
-        buttonReveal() {
-            if (this.isReadOnly) {
-                return;
-            }
-
-            this.store.setHiddenField({
-                dottedKey: this.fieldPath,
-                hidden: 'force',
-                omitValue: true,
-            });
-
-            this.update(true);
-        },
-    },
-};
+defineReplicatorPreview(() => null);
 </script>

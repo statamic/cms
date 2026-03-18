@@ -24,7 +24,7 @@ class DictionaryRepositoryTest extends TestCase
     {
         $all = $this->repo->all();
 
-        $this->assertCount(6, $all); // The built-in dictionaries + our fake one
+        $this->assertCount(7, $all); // The built-in dictionaries + our fake one
         $this->assertEveryItem($all, fn ($item) => $item instanceof Dictionary);
     }
 

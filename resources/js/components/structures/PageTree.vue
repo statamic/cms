@@ -1,24 +1,24 @@
 <template>
     <div>
-        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+        <div v-if="!loading && treeData.length == 0" class="no-results flex w-full items-center">
             <slot name="empty" />
         </div>
 
-        <ui-panel v-show="pages.length">
+        <ui-panel v-show="treeData.length">
             <div class="loading card" v-if="loading">
-                <loading-graphic />
+                <Icon name="loading" />
             </div>
 
             <ui-panel-header>
                 <div class="page-tree-header font-medium text-sm items-center flex justify-between">
                     <div v-text="__('Tree Structure')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
@@ -27,11 +27,11 @@
                     :indent="24"
                     :dir="direction"
                     :node-key="(stat) => stat.data.id"
+                    :dragOverThrottleInterval="30"
                     :each-droppable="eachDroppable"
-                    :root-droppable="rootDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
-                    @after-drop="treeUpdated"
+                    @after-drop="afterDrop"
                     @open:node="nodeOpened"
                     @close:node="nodeClosed"
                 >
@@ -74,13 +74,25 @@
                 </Draggable>
             </div>
         </ui-panel>
+
+        <confirmation-modal
+            :open="discardingChanges"
+            :title="__('Discard Changes')"
+            :body-text="__('Are you sure?')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmDiscard"
+            @cancel="discardingChanges = false"
+        />
     </div>
 </template>
 
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import { PanelHeader, Panel } from '@statamic/ui';
+import { PanelHeader, Panel, Icon } from '@/components/ui';
+import { clone } from '@/bootstrap/globals.js';
+import { router } from '@inertiajs/vue3';
 
 export default {
     components: {
@@ -88,6 +100,7 @@ export default {
         TreeBranch,
         PanelHeader,
         Panel,
+        Icon,
     },
 
     props: {
@@ -112,6 +125,8 @@ export default {
             pages: [],
             treeData: [],
             collapsedState: [],
+            discardingChanges: false,
+            ready: false,
         };
     },
 
@@ -148,13 +163,17 @@ export default {
         this.collapsedState = this.getCollapsedState();
 
         this.getPages().then(() => {
-            this.initialPages = this.pages;
+            this.initialPages = clone(this.pages);
         });
 
         this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
+    },
+
+    mounted() {
+        setTimeout(() => this.ready = true, 500); // arbitrary delay after initial transitions
     },
 
     methods: {
@@ -174,12 +193,26 @@ export default {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
+                this.$emit('loaded', this.pages);
             });
         },
 
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
+        },
+
+        afterDrop() {
+            const root = this.$refs.tree.getData()[0];
+
+            // Prevent items with children being moved to the root position
+            if (this.expectsRoot && root.id !== this.pages[0].id && root.children?.length > 0) {
+                const { dragNode, parent, indexBeforeDrop } = dragContext.startInfo;
+                this.$refs.tree.move(dragNode, parent, indexBeforeDrop);
+                return;
+            }
+
+            this.treeUpdated();
         },
 
         cleanPagesForSubmission(pages) {
@@ -266,7 +299,7 @@ export default {
         },
 
         editLocalization(localization) {
-            window.location = localization.url;
+            router.get(localization.url);
         },
 
         createLocalization(localization) {
@@ -274,19 +307,14 @@ export default {
         },
 
         cancel() {
-            if (!confirm(__('Are you sure?'))) return;
+            this.discardingChanges = true;
+        },
 
+        confirmDiscard() {
             this.pages = this.initialPages;
             this.updateTreeData();
             this.$emit('canceled');
-        },
-
-        rootDroppable() {
-            if (!this.expectsRoot) {
-                return true;
-            }
-
-            return dragContext.dragNode.children.length === 0;
+            this.discardingChanges = false;
         },
 
         eachDroppable(targetStat) {
@@ -299,15 +327,21 @@ export default {
 
         pageUpdated() {
             this.pages = this.$refs.tree.getData();
-            this.$emit('changed');
+            this.$emit('changed', this.pages);
         },
 
         expandAll() {
             this.$refs.tree.openAll();
+            this.collapsedState = [];
         },
 
         collapseAll() {
             this.$refs.tree.closeAll();
+            // Get all node IDs to mark them as collapsed
+            this.collapsedState = [];
+            walkTreeData(this.treeData, (node) => {
+                this.collapsedState.push(node.id);
+            });
         },
 
         getNodeByBranchId(id) {

@@ -1,24 +1,25 @@
 <template>
-    <div class="flex gap-3">
+    <div class="flex gap-2 sm:gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
-            <Select :options v-model="option" />
+            <Select :options v-model="option"  />
         </div>
 
         <div class="flex-1 flex">
             <!-- URL text input -->
-            <Input v-if="option === 'url'" v-model="urlValue" />
+            <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
             <!-- Entry select -->
             <relationship-fieldtype
-                v-if="option === 'entry'"
-                ref="entries"
-                handle="entry"
-                :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
-                @input="entriesSelected"
-                @meta-updated="meta.entry.meta = $event"
+                :value="selectedEntries"
+                @update:meta="meta.entry.meta = $event"
+                @update:value="entriesSelected"
+                button-size="base"
+                handle="entry"
+                ref="entries"
+                v-if="option === 'entry'"
             />
 
             <!-- Asset select -->
@@ -29,28 +30,16 @@
                 :value="selectedAssets"
                 :config="meta.asset.config"
                 :meta="meta.asset.meta"
-                @input="assetsSelected"
-                @meta-updated="meta.asset.meta = $event"
+                @update:value="assetsSelected"
+                @update:meta="meta.asset.meta = $event"
             />
         </div>
     </div>
 </template>
 
-<!-- This is a hack to...  -->
-<style scoped>
-    /* [1] Make the relationship input full height when it's in a link field. */
-    :deep(.relationship-input) > div:first-child {
-        @apply h-full;
-    }
-    /* [/2] Make the combobox text smaller when it's in a link field so it's not jarring when looking between the two. */
-    :deep([data-ui-combobox-anchor]) {
-        font-size: var(--text-sm)!important;
-    }
-</style>
-
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input, Select } from '@statamic/ui';
+import { Input, Select } from '@/components/ui';
 
 export default {
     components: { Input, Text, Select },
@@ -81,13 +70,13 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             switch (this.option) {
                 case 'url':
                     return this.urlValue;
                 case 'first-child':
-                    return __('First child');
+                    return __('First Child');
                 case 'entry':
                     return data_get(this.meta, 'entry.meta.data.0.title', this.entryValue);
                 case 'asset':
@@ -155,7 +144,7 @@ export default {
 
                 { label: __('Entry'), value: 'entry' },
 
-                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset' } : null,
+                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset', maxFiles: 1 } : null,
             ].filter((option) => option);
         },
 

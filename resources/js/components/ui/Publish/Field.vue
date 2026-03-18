@@ -1,19 +1,57 @@
 <script setup>
-import { computed, useTemplateRef, watch } from 'vue';
+import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
-import { Field, Icon, Tooltip, Label } from '@statamic/ui';
-import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import {
+    Field,
+    Icon,
+    Label,
+} from '@ui';
+import FieldActions from '@/components/field-actions/FieldActions.vue';
+import ShowField from '@/components/field-conditions/ShowField.js';
 
 const props = defineProps({
     config: {
         type: Object,
         required: true,
     },
+    fieldPathPrefix: {
+        type: String,
+    },
+    metaPathPrefix: {
+        type: String,
+    },
 });
 
-const { store, syncField, desyncField, asConfig } = injectContainerContext();
-const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
+const {
+    values: containerValues,
+    extraValues: containerExtraValues,
+    visibleValues: containerVisibleValues,
+    revealerValues,
+    meta: containerMeta,
+    syncField,
+    desyncField,
+    isTrackingOriginValues,
+    originValues: containerOriginValues,
+    asConfig,
+    errors: containerErrors,
+    readOnly: containerReadOnly,
+    setFieldPreviewValue,
+    localizedFields,
+    setFieldValue,
+    setFieldMeta,
+    hiddenFields,
+    setHiddenField,
+    container,
+    direction,
+} = injectContainerContext();
+const {
+    fieldPathPrefix: injectedFieldPathPrefix,
+    metaPathPrefix: injectedMetaPathPrefix,
+    readOnly: fieldsProviderReadOnly,
+} = injectFieldsContext();
+const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
+const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
 
 const fieldtypeComponent = computed(() => {
@@ -26,12 +64,19 @@ const fieldtypeComponentExists = computed(() => {
 
 const fullPath = computed(() => [fieldPathPrefix.value, handle].filter(Boolean).join('.'));
 const metaFullPath = computed(() => [metaPathPrefix.value, handle].filter(Boolean).join('.'));
-const value = computed(() => data_get(store.values, fullPath.value));
+const value = computed(() => data_get(containerValues.value, fullPath.value));
 const meta = computed(() => {
     const key = [metaPathPrefix.value, handle].filter(Boolean).join('.');
-    return data_get(store.meta, key);
+    return data_get(containerMeta.value, key);
 });
-const errors = computed(() => store.errors[fullPath.value]);
+
+const errors = ref();
+watch(
+    () => containerErrors.value,
+    (newErrors) => errors.value = newErrors[fullPath.value] || [],
+    { immediate: true },
+);
+
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
@@ -41,20 +86,30 @@ const fieldActions = computed(() => {
     return fieldtype.value ? fieldtype.value.fieldActions : [];
 });
 
+const shouldShowFieldActions = computed(() => {
+    return props.config.actions && fieldActions.value?.length > 0;
+});
+
 function valueUpdated(value) {
-    const existingValue = data_get(store.values, fullPath.value);
+    const existingValue = data_get(containerValues.value, fullPath.value);
     if (value === existingValue) return;
-    store.setDottedFieldValue({ path: fullPath.value, value });
-    if (isSyncable.value) desync();
+    setFieldValue(fullPath.value, value);
+    desync();
 }
 
 function metaUpdated(value) {
-    store.setDottedFieldMeta({ path: metaFullPath.value, value });
+    setFieldMeta(metaFullPath.value, value);
 }
 
 function replicatorPreviewUpdated(value) {
-    store.setDottedFieldReplicatorPreview({ path: fullPath.value, value });
+    setFieldPreviewValue(fullPath.value, value);
 }
+
+watch(
+    () => fullPath.value,
+    () => setFieldPreviewValue(fullPath.value, fieldtype.value?.replicatorPreview),
+    { immediate: true }
+);
 
 function focused() {
     // todo
@@ -65,19 +120,27 @@ function blurred() {
 }
 
 const values = computed(() => {
-    return fieldPathPrefix.value ? data_get(store.values, fieldPathPrefix.value) : store.values;
+    return fieldPathPrefix.value ? data_get(containerValues.value, fieldPathPrefix.value) : containerValues.value;
 });
 
 const visibleValues = computed(() => {
-    return fieldPathPrefix.value ? data_get(store.visibleValues, fieldPathPrefix.value) : store.visibleValues;
+    return fieldPathPrefix.value ? data_get(containerVisibleValues.value, fieldPathPrefix.value) : containerVisibleValues.value;
 });
 
 const extraValues = computed(() => {
-    return fieldPathPrefix.value ? data_get(store.extraValues, fieldPathPrefix.value) : store.extraValues;
+    return fieldPathPrefix.value ? data_get(containerExtraValues.value, fieldPathPrefix.value) : containerExtraValues.value;
 });
 
 const shouldShowField = computed(() => {
-    return new ShowField(store, visibleValues.value, extraValues.value).showField(props.config, fullPath.value);
+    return new ShowField(
+        values.value,
+        extraValues.value,
+        containerVisibleValues.value,
+        revealerValues.value,
+        hiddenFields.value,
+        setHiddenField,
+        { container },
+    ).showField(props.config, fullPath.value);
 });
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
@@ -85,27 +148,40 @@ const shouldShowLabelText = computed(() => !props.config.hide_display);
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
-        isReadOnly.value || // Need to see the "Read Only" text
-        isRequired.value || // Need to see the asterisk
+        props.config.hide_display || // Need label for accessibility (visually hidden)
         isLocked.value || // Need to see the avatar
-        isLocalizable.value || // Need to see the icon
         isSyncable.value, // Need to see the icon
 );
+
+const shouldShowFieldPreviews = computed(() => {
+    if (! props.config.replicator_preview) return false;
+
+    return inject('showReplicatorFieldPreviews', false);
+});
 
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
-    if (store.readOnly) return true;
-    if (store.isRoot === false && !isLocalizable.value) return true;
+    if (containerReadOnly.value) return true;
+    if (fieldsProviderReadOnly.value) return true;
+
+    if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
 const isLocked = computed(() => false); // todo
-const isSyncable = computed(() => store.isRoot === false);
-const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
+
+const isSyncable = computed(() => {
+    // Only top-level fields can be synced.
+    if (isNested.value) return false;
+
+    // If origin values have been provided but the field is missing, there's nothing to sync.
+    return isTrackingOriginValues.value && containerOriginValues.value.hasOwnProperty(fullPath.value)
+});
+
+const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
 
 function sync() {
     syncField(fullPath.value);
@@ -114,56 +190,77 @@ function sync() {
 function desync() {
     desyncField(fullPath.value);
 }
+
+const fieldtypeComponentProps = computed(() => ({
+    id: fieldId.value,
+    config: props.config,
+    value: value.value,
+    meta: meta.value,
+    handle: handle,
+    namePrefix: namePrefix,
+    fieldPathPrefix: fieldPathPrefix.value,
+    metaPathPrefix: metaPathPrefix.value,
+    readOnly: isReadOnly.value,
+    showFieldPreviews: shouldShowFieldPreviews.value,
+}));
+
+const fieldtypeComponentEvents = computed(() => ({
+    'update:value': valueUpdated,
+    'update:meta': metaUpdated,
+    focus: focused,
+    blur: blurred,
+    replicatorPreviewUpdated: replicatorPreviewUpdated
+}));
 </script>
 
 <template>
-    <Field
-        v-show="shouldShowField"
-        :class="`${config.type}-fieldtype`"
-        :id="fieldId"
-        :instructions="config.instructions"
-        :instructions-below="config.instructions_position === 'below'"
-        :required="isRequired"
-        :errors="errors"
-        :disabled="isReadOnly"
-        :as="wrapperComponent"
+    <slot
+        :fieldtypeComponent="fieldtypeComponent"
+        :fieldtypeComponentProps="fieldtypeComponentProps"
+        :fieldtypeComponentEvents="fieldtypeComponentEvents"
+        :shouldShowField="shouldShowField"
     >
-        <template #label>
-            <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">
-                <template v-if="shouldShowLabelText">
-                    <Tooltip :text="config.handle" :delay="1000">
-                        {{ __(config.display) }}
-                    </Tooltip>
-                </template>
-                <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
-                <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
-            </Label>
-        </template>
-        <template #actions>
-            <publish-field-actions v-if="fieldActions?.length" :actions="fieldActions" />
-        </template>
-        <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
-            Component <code v-text="fieldtypeComponent"></code> does not exist.
-        </div>
-        <Component
-            v-else
-            ref="fieldtype"
-            :is="fieldtypeComponent"
+        <Field
+            v-show="shouldShowField"
+            :class="`${config.type}-fieldtype`"
             :id="fieldId"
-            :config="config"
-            :value="value"
-            :meta="meta"
-            :handle="handle"
-            :name-prefix="namePrefix"
-            :field-path-prefix="fieldPathPrefix"
-            :meta-path-prefix="metaPathPrefix"
+            :instructions="config.instructions"
+            :instructions-below="config.instructions_position === 'below'"
+            :required="isRequired"
+            :errors="errors"
             :read-only="isReadOnly"
-            show-field-previews
-            @update:value="valueUpdated"
-            @meta-updated="metaUpdated"
-            @focus="focused"
-            @blur="blurred"
-            @replicator-preview-updated="replicatorPreviewUpdated"
-        />
-    </Field>
+            :inline="asConfig"
+            :full-width-setting="config.full_width_setting"
+            v-bind="$attrs"
+        >
+            <template #label v-if="shouldShowLabel">
+                <Label :for="fieldId" :required="isRequired">
+                    <template v-if="shouldShowLabelText">
+                        <span v-tooltip="config.handle">
+                            {{ __(config.display) }}
+                        </span>
+                    </template>
+                    <template v-else-if="config.hide_display">
+                        <span class="sr-only">{{ __(config.display) }}</span>
+                    </template>
+                    <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
+                    <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
+                </Label>
+            </template>
+            <template #actions v-if="shouldShowFieldActions">
+                <FieldActions :actions="fieldActions" />
+            </template>
+            <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
+                Component <code v-text="fieldtypeComponent"></code> does not exist.
+            </div>
+            <div :dir="direction" v-if="fieldtypeComponentExists">
+                <Component
+                    ref="fieldtype"
+                    :is="fieldtypeComponent"
+                    v-bind="fieldtypeComponentProps"
+                    v-on="fieldtypeComponentEvents"
+                />
+            </div>
+        </Field>
+    </slot>
 </template>

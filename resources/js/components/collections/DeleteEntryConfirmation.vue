@@ -1,5 +1,5 @@
 <script setup>
-import { Modal, ModalClose, Button } from '@statamic/ui';
+import { Modal, ModalClose, Button } from '@/components/ui';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -11,7 +11,7 @@ const shouldDeleteChildren = ref(false);
 </script>
 
 <template>
-    <Modal :title="__('Delete Entry')" v-model:open="modalOpen">
+    <Modal :title="__('Delete Entry')" v-model:open="modalOpen" @dismissed="$emit('cancel')">
         <p class="mb-4" v-text="__('Are you sure you want to delete this entry?')" />
         <label class="flex items-center" v-if="children">
             <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="shouldDeleteChildren" />
@@ -24,7 +24,7 @@ const shouldDeleteChildren = ref(false);
                     <Button variant="ghost" :text="__('Cancel')" />
                 </ModalClose>
                 <Button
-                    variant="primary"
+                    variant="danger"
                     :text="__('Delete')"
                     @click="$emit('confirm', shouldDeleteChildren)"
                 />

@@ -1,7 +1,8 @@
 <template>
     <div
-        class="bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
-        :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
+        class="@container/panel bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
+        :class="[sortableItemClass, { 'opacity-50': isExcessive, 'ring-red-500': hasError }]"
+        :data-error="hasError ?? undefined"
     >
         <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
             <ui-drag-handle :class="{ [sortableHandleClass]: grid.isReorderable }" />
@@ -29,6 +30,7 @@
         <div class="px-4 py-3">
             <FieldsProvider
                 :fields="fields"
+                :as-config="false"
                 :field-path-prefix="`${fieldPathPrefix}.${index}`"
                 :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
             >
@@ -40,14 +42,11 @@
 
 <script>
 import Row from './Row.vue';
-import SetField from '../replicator/Field.vue';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
-import { default as PublishFields } from '@statamic/components/ui/Publish/Fields.vue';
-import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { PublishFields, PublishFieldsProvider as FieldsProvider } from '@ui';
 
 export default {
-    mixins: [Row, ValidatesFieldConditions],
+    mixins: [Row],
 
-    components: { SetField, PublishFields, FieldsProvider },
+    components: { PublishFields, FieldsProvider },
 };
 </script>

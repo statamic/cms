@@ -1,12 +1,18 @@
 <template>
     <Input
-        type="text"
+        type="number"
         :tabindex="0"
         :name="name"
         :focus="focus"
         :model-value="value"
-        :is-read-only="isReadOnly"
+        :read-only="isReadOnly"
+        :disabled="config.disabled"
         :id="fieldId"
+        :prepend="__(config.prepend)"
+        :append="__(config.append)"
+        :min="config.min"
+        :max="config.max"
+        :step="config.step"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
@@ -15,7 +21,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Input } from '@statamic/ui';
+import { Input } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype],

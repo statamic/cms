@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Addon;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\CP\Nav;
@@ -32,7 +33,7 @@ class CoreNav
     public static function make()
     {
         (new static)
-            ->makeTopLevel()
+            ->makeTopLevelSection()
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
@@ -41,11 +42,11 @@ class CoreNav
     }
 
     /**
-     * Make top level items.
+     * Make top level section items.
      *
      * @return $this
      */
-    protected function makeTopLevel()
+    protected function makeTopLevelSection()
     {
         if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
             Nav::topLevel('Dashboard')
@@ -113,12 +114,12 @@ class CoreNav
                             || $nav->sites()->contains(Site::selected()->handle());
                     })
                     ->map(function ($nav) {
+                        $availableInSelectedSite = Site::hasMultiple()
+                            ? $nav->sites()->contains(Site::selected()->handle())
+                            : true;
+
                         return Nav::item($nav->title())
-                            ->url(
-                                $nav->sites()->contains(Site::selected()->handle())
-                                    ? $nav->showUrl()
-                                    : $nav->editUrl()
-                            )
+                            ->url($availableInSelectedSite ? $nav->showUrl() : $nav->editUrl())
                             ->can('view', $nav)
                             ->extra([
                                 'breadcrumbs' => [
@@ -259,15 +260,20 @@ class CoreNav
             ->view('statamic::nav.updates')
             ->can('view updates');
 
-        Nav::tools('Addons')
-            ->route('addons.index')
-            ->icon('addons')
-            ->can('configure addons');
+        if (User::current()->can('configure addons')) {
+            Nav::tools('Addons')
+                ->route('addons.index')
+                ->icon('addons')
+                ->can('configure addons')
+                ->children(fn () => $this->makeAddonSettingsItems());
+        } else {
+            $this->makeAddonSettingsItems();
+        }
 
         if (Stache::duplicates()->isNotEmpty()) {
             Nav::tools('Duplicate IDs')
                 ->route('duplicates')
-                ->icon('duplicate-ids')
+                ->icon('duplicate')
                 ->view('statamic::nav.duplicates')
                 ->can('resolve duplicate ids');
         }
@@ -283,6 +289,19 @@ class CoreNav
         }
 
         return $this;
+    }
+
+    protected function makeAddonSettingsItems()
+    {
+        return Addon::all()
+            ->sortBy->name()
+            ->filter->hasSettingsBlueprint()
+            ->map(function ($addon) {
+                return Nav::tools($addon->name())
+                    ->url($addon->settingsUrl())
+                    ->icon('cog')
+                    ->can('editSettings', $addon);
+            });
     }
 
     /**

@@ -1,25 +1,37 @@
 <script setup>
 import { cva } from 'cva';
 import { computed } from 'vue';
-import { Description, Label, Card } from '@statamic/components/ui/index.js';
-import markdown from '@statamic/util/markdown.js';
+import Description from './Description.vue';
+import Label from './Label.vue';
+import ErrorMessage from './ErrorMessage.vue';
+import markdown from '@/util/markdown.js';
+import { twMerge } from 'tailwind-merge';
 
 defineOptions({
     inheritAttrs: false,
 });
 
 const props = defineProps({
-    as: { type: String, default: 'div', validator: (value) => ['div', 'card'].includes(value) },
+    /** When `true`, the field is styled as a configuration field with a two-column grid layout. */
+    inline: { type: Boolean, default: false },
+    /** Badge text to display next to the label. */
     badge: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
+    /** Error message to display below the field. */
     error: { type: String },
-    errors: { type: Object, default: (props) => (props.error ? [props.error] : []) },
+    /** Object or array of error messages to display below the field. */
+    errors: { type: Object },
+    /** When `true`, forces the field to use full width even when `asConfig` is enabled. */
+    fullWidthSetting: { type: Boolean, default: false },
     id: { type: String },
+    /** Instructions text to display above or below the label. Supports Markdown. */
     instructions: { type: String, default: '' },
+    /** When `true`, displays instructions below the control instead of below the label. */
     instructionsBelow: { type: Boolean, default: false },
+    /** Label text for the field. */
     label: { type: String },
+    readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
-    variant: { type: String, default: 'block' },
 });
 
 const labelProps = computed(() => ({
@@ -29,49 +41,86 @@ const labelProps = computed(() => ({
     text: props.label,
 }));
 
-const classes = computed(() =>
-    cva({
+const rootClasses = computed(() =>
+    twMerge(cva({
         base: [
             'min-w-0',
         ],
         variants: {
-            variant: {
-                block: 'w-full',
-                inline: [
-                    'flex justify-between gap-x-3 gap-y-1.5',
-                    'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
-                    'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
-                    '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
-                    '[&>[data-ui-label]~[data-ui-control]]:row-start-1 [&>[data-ui-label]~[data-ui-control]]:col-start-2',
-                ],
-            },
             disabled: {
                 true: 'opacity-50',
             },
+            inline: {
+                true: 'grid md:grid-cols-2 items-start px-4.5 py-4 gap-y-3 md:gap-y-0 md:gap-x-5!',
+            },
+            fullWidthSetting: {
+                true: 'md:grid-cols-1',
+            },
         },
-    })({ ...props }),
+    })({
+        ...props,
+    })),
 );
 
-const instructions = computed(() => props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null);
-const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
+const descriptionClasses = computed(() =>
+    twMerge(cva({
+        base: ['mb-2 -mt-0.5'],
+        variants: {
+            inline: {
+                true: 'mb-0',
+            },
+            fullWidthSetting: {
+                true: 'mb-3',
+            },
+        },
+    })({
+        ...props,
+    })),
+);
+
+const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
+
+const errors = computed(() => {
+    if (props.error) {
+        return [props.error];
+    }
+
+    return props.errors;
+});
+
+const hasErrors = computed(() => {
+    if (!errors.value) return false;
+    return Array.isArray(errors.value) ? errors.value.length > 0 : Object.keys(errors.value).length > 0;
+});
 </script>
 
 <template>
-    <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
-        <div v-if="$slots.actions" class="flex items-center justify-between gap-x-1 h-6" data-ui-field-header>
-            <slot name="label">
-                <Label v-if="label" v-bind="labelProps" class="flex-1" />
-            </slot>
-            <slot name="actions" />
-        </div>
-        <div data-ui-field-text class="mb-1.5">
-            <slot v-if="!$slots.actions" name="label">
-                <Label v-if="label" v-bind="labelProps" class="flex-1" />
-            </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.5" />
+    <div :class="[rootClasses, $attrs.class]" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
+        <div v-if="label || (instructions && !instructionsBelow) || $slots.label || $slots.actions">
+            <div
+                v-if="$slots.actions"
+                :class="[
+                    'flex items-center gap-x-1 mb-0',
+                    props.label || $slots.label ? 'justify-between' : 'justify-end',
+                ]"
+                data-ui-field-header
+            >
+                <slot name="label">
+                    <Label v-if="label" v-bind="labelProps" class="flex-1" />
+                </slot>
+                <slot name="actions" />
+            </div>
+            <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-2'">
+                <slot v-if="!$slots.actions" name="label">
+                    <Label v-if="label" v-bind="labelProps" class="flex-1" />
+                </slot>
+                <Description :text="instructions" v-if="instructions && !instructionsBelow" :class="descriptionClasses" />
+            </div>
         </div>
         <slot />
-        <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
-        <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
-    </component>
+        <div v-if="(instructions && instructionsBelow) || hasErrors">
+            <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
+            <ErrorMessage v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2" />
+        </div>
+    </div>
 </template>

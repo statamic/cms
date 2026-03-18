@@ -1,14 +1,16 @@
 <template>
     <Combobox
         v-if="!loading"
-        class="w-full"
         :clearable="config.clearable"
         :placeholder="__(config.placeholder)"
-        :disabled="isReadOnly"
+        :read-only="isReadOnly"
+        :disabled="config.disabled"
         :options="options"
         :searchable="true"
         :multiple="false"
         :model-value="value"
+        :id="id"
+        :discrete-focus-outline="true"
         @update:modelValue="update"
     >
         <template #no-options>
@@ -19,7 +21,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Combobox } from '@statamic/ui';
+import { Combobox } from '@/components/ui';
 
 export default {
     components: { Combobox },

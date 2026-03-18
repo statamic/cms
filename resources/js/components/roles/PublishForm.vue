@@ -1,64 +1,84 @@
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
-            <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
+            <CommandPaletteItem
+                :category="$commandPalette.category.Actions"
+                :text="__('Save')"
+                icon="save"
+                :action="save"
+                prioritize
+                v-slot="{ text, action }"
+            >
+                <Button
+                    v-if="!isSuper"
+                    :icon="areAllCheckedInAllGroups() ? 'checkbox-uncheck' : 'checkbox'"
+                    @click="toggleAllInAllGroups()"
+                    :text="areAllCheckedInAllGroups() ? __('Uncheck All') : __('Check All')"
+                />
+                <Button type="submit" variant="primary" @click="action" :text="text" />
+            </CommandPaletteItem>
         </Header>
 
-        <ui-panel>
-            <div class="publish-fields-fluid">
-                <ui-card class="field-w-50">
-                    <form-group
-                        handle="title"
-                        :display="__('Title')"
-                        :errors="errors.title"
-                        :instructions="__('messages.role_title_instructions')"
-                        v-model="title"
-                        :focus="true"
-                    />
-                </ui-card>
-                <ui-card class="field-w-50">
-                    <form-group
-                        fieldtype="slug"
-                        handle="handle"
-                        :display="__('Handle')"
-                        :instructions="__('messages.role_handle_instructions')"
-                        :errors="errors.title"
-                        v-model="handle"
-                    />
-                    <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
-                        {{ __('messages.role_change_handle_warning') }}
-                    </div>
-                </ui-card>
-                <ui-card class="field-w-100">
-                    <form-group
-                        v-if="canAssignSuper"
-                        class="toggle-fieldtype"
-                        fieldtype="toggle"
-                        handle="super"
-                        :display="__('permissions.super')"
-                        :instructions="__('permissions.super_desc')"
-                        v-model="isSuper"
-                    />
-                </ui-card>
-            </div>
-        </ui-panel>
+        <Panel :heading="__('Settings')">
+            <Card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <Field
+                    inline
+                    :label="__('Title')"
+                    :instructions="__('messages.role_title_instructions')"
+                    :errors="errors.title"
+                    id="role-title"
+                >
+                    <Input v-model="title" id="role-title" autocomplete="off" focus />
+                </Field>
+
+                <Field
+                    inline
+                    :label="__('Handle')"
+                    :instructions="__('messages.role_handle_instructions')"
+                    :errors="handleErrors"
+                    id="role-handle"
+                >
+                    <Input v-model="handle" id="role-handle" autocomplete="off" />
+                </Field>
+
+                <Field
+                    inline
+                    v-if="canAssignSuper"
+                    :label="__('permissions.super')"
+                    :instructions="__('permissions.super_desc')"
+                    variant="inline"
+                    id="role-super"
+                >
+                    <Switch v-model="isSuper" id="role-super" />
+                </Field>
+            </Card>
+        </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
-            <ui-panel v-for="group in permissions" :key="group.handle">
-                <ui-panel-header>
-                    <ui-heading :text="group.label" />
-                </ui-panel-header>
-                <ui-card>
-                    <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
-                </ui-card>
-            </ui-panel>
+            <Panel :heading="group.label" v-for="group in permissions" :key="group.handle">
+                <template #header-actions>
+                    <Button
+                        size="sm"
+                        variant="subtle"
+                        :icon="areAllChecked(group) ? 'checkbox-uncheck' : 'checkbox'"
+                        @click="toggleAllInGroup(group)"
+                    >
+                        {{ areAllChecked(group) ? __('Uncheck All') : __('Check All') }}
+                    </Button>
+                </template>
+                <Card>
+                    <PermissionTree :depth="1" :initial-permissions="group.permissions" />
+                </Card>
+            </Panel>
         </div>
     </div>
 </template>
 
 <script>
-import { Header, Button } from '@statamic/ui';
-import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
+import { requireElevatedSession } from '@/components/elevated-sessions';
+import PermissionTree from '@/components/roles/PermissionTree.vue';
+import { router } from '@inertiajs/vue3';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -69,8 +89,17 @@ const checked = function (permissions) {
 
 export default {
     components: {
+        PermissionTree,
         Header,
         Button,
+        Panel,
+        PanelHeader,
+        Heading,
+        Card,
+        Switch,
+        Field,
+        Input,
+        CommandPaletteItem,
     },
 
     props: {
@@ -102,8 +131,14 @@ export default {
     },
 
     computed: {
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
+        handleErrors() {
+            let errors = this.errors.handle || [];
+
+            if (this.initialHandle && this.handle !== this.initialHandle) {
+                errors = errors.concat(__('messages.role_change_handle_warning'));
+            }
+
+            return errors;
         },
 
         payload() {
@@ -123,6 +158,50 @@ export default {
     },
 
     methods: {
+        areAllChecked(group) {
+            const checkAll = (permissions) => {
+                return permissions.every(permission => {
+                    const childrenChecked = permission.children && permission.children.length
+                        ? checkAll(permission.children)
+                        : true;
+                    return permission.checked && childrenChecked;
+                });
+            };
+            return checkAll(group.permissions);
+        },
+
+        areAllCheckedInAllGroups() {
+            return this.permissions.every(group => this.areAllChecked(group));
+        },
+
+        toggleAllInGroup(group) {
+            const allChecked = this.areAllChecked(group);
+            const toggle = (permissions, checked) => {
+                permissions.forEach(permission => {
+                    permission.checked = checked;
+                    if (permission.children && permission.children.length) {
+                        toggle(permission.children, checked);
+                    }
+                });
+            };
+            toggle(group.permissions, !allChecked);
+        },
+
+        toggleAllInAllGroups() {
+            const allChecked = this.areAllCheckedInAllGroups();
+            this.permissions.forEach(group => {
+                const toggle = (permissions, checked) => {
+                    permissions.forEach(permission => {
+                        permission.checked = checked;
+                        if (permission.children && permission.children.length) {
+                            toggle(permission.children, checked);
+                        }
+                    });
+                };
+                toggle(group.permissions, !allChecked);
+            });
+        },
+
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -139,7 +218,7 @@ export default {
 
             this.$axios[this.method](this.action, this.payload)
                 .then((response) => {
-                    window.location = response.data.redirect;
+                    router.get(response.data.redirect);
                 })
                 .catch((e) => {
                     if (e.response && e.response.status === 422) {

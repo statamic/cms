@@ -1,6 +1,6 @@
 import axios from 'axios';
 import speakingUrl from 'speakingurl';
-import debounce from '@statamic/util/debounce.js';
+import debounce from '@/util/debounce.js';
 
 export default class Slug {
     busy = false;
@@ -111,12 +111,11 @@ export default class Slug {
 
         let aborted = false;
         return axios
-            .post(cp_url('slug'), payload, { signal: this.#controller.signal })
+            .post(cp_url('slug'), payload, { signal: this.#controller.signal, transformResponse: [(data) => data] })
             .then((response) => response.data)
             .catch((e) => {
                 if (axios.isCancel(e)) {
                     aborted = true;
-                    return;
                 }
                 throw e;
             })

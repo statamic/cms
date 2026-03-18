@@ -16,10 +16,10 @@
         @reordered="reordered"
     >
         <template #cell-title="{ row: entry, isColumnVisible }">
-            <a class="title-index-field" :href="entry.edit_url" @click.stop>
+            <Link class="title-index-field" :href="entry.edit_url" @click.stop>
                 <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                 <span v-text="entry.title" />
-            </a>
+            </Link>
         </template>
         <template #cell-status="{ row: entry }">
             <StatusIndicator :status="entry.status" show-label :show-dot="false" />
@@ -38,12 +38,14 @@
 </template>
 
 <script>
-import { StatusIndicator, DropdownItem, Listing } from '@statamic/ui';
+import { StatusIndicator, DropdownItem, Listing } from '@/components/ui';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     emits: ['reordered', 'site-changed'],
 
     components: {
+        Link,
         StatusIndicator,
         Listing,
         DropdownItem,
@@ -70,6 +72,7 @@ export default {
             items: null,
             page: null,
             perPage: null,
+	        saveKeyBinding: null,
         };
     },
 
@@ -84,7 +87,20 @@ export default {
         },
     },
 
-    methods: {
+	created() {
+		this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+			if (this.reordering) {
+				e.preventDefault();
+				this.saveOrder();
+			}
+		});
+	},
+
+	beforeUnmount() {
+		this.saveKeyBinding.destroy();
+	},
+
+	methods: {
         requestComplete({ items, parameters, activeFilters }) {
             this.items = items;
             this.page = parameters.page;

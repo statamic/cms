@@ -27,35 +27,17 @@ class AssetPolicy
 
     public function store($user, $assetContainer)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
-            return false;
-        }
-
-        return $assetContainer->allowUploads();
+        return User::fromUser($user)->hasPermission("upload {$assetContainer->handle()} assets");
     }
 
     public function move($user, $asset)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("move {$asset->container()->handle()} assets")) {
-            return false;
-        }
-
-        return $asset->container()->allowMoving();
+        return User::fromUser($user)->hasPermission("move {$asset->container()->handle()} assets");
     }
 
     public function rename($user, $asset)
     {
-        $user = User::fromUser($user);
-
-        if (! $user->hasPermission("rename {$asset->container()->handle()} assets")) {
-            return false;
-        }
-
-        return $asset->container()->allowRenaming();
+        return User::fromUser($user)->hasPermission("rename {$asset->container()->handle()} assets");
     }
 
     public function delete($user, $asset)

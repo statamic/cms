@@ -1,12 +1,26 @@
 <script setup>
-import { computed, nextTick, ref, watch, useTemplateRef, onBeforeUnmount, onUnmounted } from 'vue';
-import Resizer from '@statamic/components/live-preview/Resizer.vue';
-import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
-import debounce from '@statamic/util/debounce.js';
-import { Select, Button } from '@statamic/ui';
+import {
+    computed,
+    nextTick,
+    ref,
+    watch,
+    useTemplateRef,
+    onBeforeUnmount,
+    onUnmounted,
+    onBeforeMount,
+    toRaw,
+} from 'vue';
+import Resizer from './Resizer.vue';
+import {
+    Select,
+    Button,
+    injectPublishContext as injectContainerContext,
+} from '@ui';
+import debounce from '@/util/debounce.js';
 import axios from 'axios';
-import wait from '@statamic/util/wait.js';
+import wait from '@/util/wait.js';
 import { mapValues } from 'lodash-es';
+import { useIframeManager } from './ManagesIframes.js';
 
 const props = defineProps({
     enabled: {
@@ -16,7 +30,7 @@ const props = defineProps({
     },
     url: {
         type: String,
-        required: true,
+        required: false,
     },
     targets: {
         type: Array,
@@ -27,7 +41,7 @@ const props = defineProps({
 
 const emit = defineEmits(['opened', 'closed']);
 
-const { name, blueprint, store } = injectContainerContext();
+const { name, blueprint, values } = injectContainerContext();
 const portalEnabled = ref(false);
 const panesVisible = ref(false);
 const headerVisible = ref(false);
@@ -43,12 +57,13 @@ const loading = ref(true);
 const extras = ref({});
 const token = ref(null);
 const target = ref(0);
-const previousUrl = ref(null);
 const iframeContentContainer = useTemplateRef('contents');
 let source;
 
+const { updateIframeContents } = useIframeManager(iframeContentContainer);
+
 const livePreviewFieldsPortal = computed(() => {
-    return `live-preview-fields-${name}`;
+    return `live-preview-fields-${name.value}`;
 });
 
 watch(
@@ -78,8 +93,8 @@ const tokenizedUrl = computed(() => {
 });
 
 const payload = computed(() => ({
-    blueprint: blueprint.handle,
-    preview: store.values,
+    blueprint: blueprint.value.handle,
+    preview: values.value,
     extras: extras.value,
 }));
 
@@ -102,11 +117,11 @@ const update = debounce(() => {
         .then((response) => {
             token.value = response.data.token;
             const url = response.data.url;
-            const tgt = props.targets[target.value];
+            const tgt = toRaw(props.targets[target.value]);
             const payload = { token: token.value, reference: props.reference };
             poppedOut.value
                 ? channel.value.postMessage({ event: 'updated', url, target: tgt, payload })
-                : updateIframeContents(url, target, payload);
+                : updateIframeContents(url, tgt, payload, setIframeAttributes);
             loading.value = false;
         })
         .catch((e) => {
@@ -115,81 +130,8 @@ const update = debounce(() => {
         });
 }, 150);
 
-// This was in a mixin. Probably should go into a composable.
-const hasIframeSourceChanged = (existingSrc, newSrc) => {
-    existingSrc = new URL(existingSrc);
-    newSrc = new URL(newSrc);
-    existingSrc.searchParams.delete('live-preview');
-    newSrc.searchParams.delete('live-preview');
-
-    return existingSrc.toString() !== newSrc.toString();
-};
-
-// This was in a mixin. Probably should go into a composable.
-const postMessageToIframe = (container, url, payload) => {
-    // If the target is a relative url, we'll get the origin from the current window.
-    const targetOrigin = /^https?:\/\//.test(url) ? new URL(url)?.origin : window.origin;
-
-    container.firstChild.contentWindow.postMessage(
-        {
-            name: 'statamic.preview.updated',
-            url,
-            ...payload,
-        },
-        targetOrigin,
-    );
-};
-
-// This was in a mixin. Probably should go into a composable.
-function updateIframeContents(url, target, payload) {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('src', url);
-    iframe.setAttribute('id', 'live-preview-iframe');
-    setIframeAttributes(iframe);
-
-    const container = iframeContentContainer.value;
-    let iframeUrl = new URL(url);
-    let cleanUrl = iframeUrl.host + iframeUrl.pathname;
-
-    // If there's no iframe yet, just append it.
-    if (!container.firstChild) {
-        container.appendChild(iframe);
-        previousUrl.value = cleanUrl;
-        return;
-    }
-
-    let shouldRefresh = target.refresh;
-
-    if (hasIframeSourceChanged(container.firstChild.src, iframe.src)) {
-        shouldRefresh = true;
-    }
-
-    if (!shouldRefresh) {
-        postMessageToIframe(container, url, payload);
-        return;
-    }
-
-    let isSameOrigin = url.startsWith('/') || iframeUrl.host === window.location.host;
-    let preserveScroll = isSameOrigin && cleanUrl === previousUrl.value;
-
-    let scroll = preserveScroll
-        ? [container.firstChild.contentWindow.scrollX ?? 0, container.firstChild.contentWindow.scrollY ?? 0]
-        : null;
-
-    container.replaceChild(iframe, container.firstChild);
-
-    if (preserveScroll) {
-        let iframeContentWindow = iframe.contentWindow;
-        const iframeScrollUpdate = (event) => {
-            iframeContentWindow.scrollTo(...scroll);
-        };
-
-        iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
-        iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
-    }
-
-    previousUrl.value = cleanUrl;
+function componentUpdated(handle, value) {
+    extras.value[handle] = value;
 }
 
 function setIframeAttributes(iframe) {
@@ -343,8 +285,8 @@ const keybinding = ref(
 
 onUnmounted(() => keybinding.value.destroy());
 
-Statamic.$events.$on(`live-preview.${props.name}.refresh`, () => {
-    update();
+Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
+    if (props.enabled) update();
 });
 </script>
 
@@ -357,7 +299,7 @@ Statamic.$events.$on(`live-preview.${props.name}.refresh`, () => {
         <div class="live-preview fixed flex flex-col">
             <transition name="live-preview-header-slide">
                 <div v-show="headerVisible" class="live-preview-header">
-                    <div class="dark:text-dark-150 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
+                    <div class="dark:text-gray-300 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
                         {{ __('Live Preview') }}
                     </div>
                     <div class="flex items-center gap-x-2">
@@ -393,11 +335,11 @@ Statamic.$events.$on(`live-preview.${props.name}.refresh`, () => {
                         class="live-preview-editor @container/live-preview"
                         :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }"
                     >
-                        <div class="live-preview-fields h-full flex-1 overflow-scroll">
+                        <div class="live-preview-fields h-full flex-1 overflow-scroll px-4 pt-2">
                             <portal-target :name="livePreviewFieldsPortal" />
                         </div>
 
-                        <resizer
+                        <Resizer
                             v-show="!poppedOut"
                             @resized="setEditorWidth"
                             @resize-start="editorResizing = true"

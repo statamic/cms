@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
+use Inertia\Inertia;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
@@ -36,6 +37,7 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
+    public static bool $isRenderingCpException = false;
 
     public static function version()
     {
@@ -243,10 +245,12 @@ class Statamic
 
     public static function svg($name, $attrs = null, $fallback = null)
     {
-        $path = statamic_path("resources/svg/{$name}.svg");
+        $dir = statamic_path('resources/svg');
+
+        $path = "{$dir}/{$name}.svg";
 
         if ($fallback && ! File::exists($path)) {
-            $path = statamic_path("resources/svg/{$fallback}.svg");
+            $path = "{$dir}/{$fallback}.svg";
         }
 
         if (File::exists($path) && $attrs) {
@@ -462,5 +466,17 @@ class Statamic
     public static function cpDirection()
     {
         return TextDirection::of(static::cpLocale());
+    }
+
+    public static function nonInertiaPageData()
+    {
+        $props = Inertia::getShared();
+
+        return [
+            'url' => '/'.request()->path(),
+            'component' => 'NonInertiaPage',
+            'version' => inertia()->getVersion(),
+            'props' => $props,
+        ];
     }
 }

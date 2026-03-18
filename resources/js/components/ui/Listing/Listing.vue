@@ -1,15 +1,20 @@
 <script>
-import createContext from '@statamic/util/createContext.js';
+import createContext from '@/util/createContext.js';
 
 export const [injectListingContext, provideListingContext] = createContext('Listing');
 </script>
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-import { Icon, Panel, PanelFooter } from '@statamic/ui';
+import useSkeletonDelay from '@/composables/skeleton-delay.js';
+import {
+    Icon,
+    Panel,
+    PanelFooter,
+} from '@ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import CustomizeColumns from './CustomizeColumns.vue';
 import Presets from './Presets.vue';
 import Search from './Search.vue';
@@ -31,100 +36,126 @@ const emit = defineEmits([
 ]);
 
 const props = defineProps({
+    /** The URL from which to retrieve results. Either use this or `items`. */
     url: {
         type: String,
     },
+    /** Array of items to display in the listing. When provided, sorting and filtering is done client-side. Either use this or `url`. */
     items: {
         type: Array,
     },
+    /** When `true`, allows users to save and load column/filter presets. */
     allowPresets: {
         type: Boolean,
         default: true,
     },
+    /** When `true`, bulk actions are available when items are selected. */
     allowBulkActions: {
         type: Boolean,
         default: true,
     },
+    /** The URL from which to retrieve actions. */
     actionUrl: {
         type: String,
     },
+    /** Extra data to pass to the server when using actions. */
     actionContext: {
         type: Object,
         default: () => ({}),
     },
+    /** When `true`, enables the action dropdown while reordering is enabled. */
     allowActionsWhileReordering: {
         type: Boolean,
         default: false,
     },
+    /** When `true`, adds drag handles to the rows. */
     reorderable: {
         type: Boolean,
         default: false,
     },
+    /** Any preferences (preferred columns, etc) will be saved nested under this. */
     preferencesPrefix: {
         type: String,
     },
+    /** The columns to display. Can be array of strings or column definitions. */
     columns: {
         type: Array,
     },
+    /** When `true`, users can show/hide columns. */
     allowCustomizingColumns: {
         type: Boolean,
         default: true,
     },
+    /** Defines the sort column. */
     sortColumn: {
         type: String,
         default: '',
     },
+    /** Defines the sort direction. Defaults to `asc` for most fields, `desc` for dates. <br><br> Options: `asc`, `desc` */
     sortDirection: {
         type: String,
         default: 'asc',
     },
+    /** When `true`, columns can be sorted by clicking on headers. */
     sortable: {
         type: Boolean,
         default: true,
     },
+    /** Array of checked item IDs. */
     selections: {
         type: Array,
     },
+    /** Maximum number of items that can be selected. */
     maxSelections: {
         type: Number,
         default: Infinity,
     },
+    /** When `true`, adds the parameters to the current URL. */
     pushQuery: {
         type: Boolean,
         default: false,
     },
+    /** Extra data to send to the AJAX URL. */
     additionalParameters: {
         type: Object,
         default: () => ({}),
     },
+    /** When `true`, displays a search input for filtering items. */
     allowSearch: {
         type: Boolean,
         default: true,
     },
+    /** The search query value. */
     searchQuery: {
         type: String,
         default: null,
     },
+    /** Array of filter definitions. You can get this by doing `Scope::filters($name, $context)` */
     filters: {
         type: Array,
         default: () => [],
     },
+    /** A function that returns array of filter values to be activated when reordering is enabled. */
     filtersForReordering: {
         type: Function,
         default: null,
     },
+    /** Number of items to display per page. */
     perPage: {
         type: Number,
-        default: 15,
+        default: () => Statamic.$config.get('paginationSize', 15),
     },
+    /** When `true`, shows the totals in the paginator. e.g. "1-5 of 10" */
     showPaginationTotals: {
         type: Boolean,
         default: true,
     },
+    /** When `true`, shows the page links. e.g. 1,2,3,4. With this disabled you'll just get the prev/next arrows. */
     showPaginationPageLinks: {
         type: Boolean,
         default: true,
     },
+    /** When `true`, shows the per page dropdown. */
     showPaginationPerPageSelector: {
         type: Boolean,
         default: true,
@@ -156,6 +187,7 @@ const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
+const shouldShowSkeleton = useSkeletonDelay(initializing);
 
 const items = computed({
     get() {
@@ -189,6 +221,26 @@ const items = computed({
     },
 });
 
+watch(
+    () => props.items,
+    (items) => rawItems.value = items,
+);
+
+watch(
+    () => props.selections,
+    () => {
+        if (JSON.stringify(props.selections) === JSON.stringify(selections.value)) {
+            return;
+        }
+
+        selections.value = props.selections || [];
+    }
+);
+
+const removeFromSelections = (ids) => selections.value = selections.value.filter(selection => !ids.includes(selection));
+Statamic.$events.$on('removeFromSelections', removeFromSelections);
+onBeforeUnmount(() => Statamic.$events.$off('removeFromSelections', removeFromSelections));
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
@@ -214,17 +266,31 @@ const forwardedTableCellSlots = computed(() => {
         }, {});
 });
 
+const activeFilterBadgeCount = computed(() => {
+    let count = Object.keys(activeFilterBadges.value).length;
+
+    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+        count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
+    }
+
+    return count;
+});
+
 function setParameters(params) {
-    currentPage.value = parseInt(params.page);
-    perPage.value = parseInt(params.perPage);
-    sortColumn.value = params.sort;
-    sortDirection.value = params.order;
-    searchQuery.value = params.search;
-    columns.value = columns.value.map((column) => ({
-        ...column,
-        visible: params.columns.split(',').includes(column.field),
-    }));
-    activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
+    if (params.hasOwnProperty('page')) currentPage.value = parseInt(params.page);
+    if (params.hasOwnProperty('perPage')) perPage.value = parseInt(params.perPage);
+    if (params.hasOwnProperty('sort')) sortColumn.value = params.sort;
+    if (params.hasOwnProperty('order')) sortDirection.value = params.order;
+    if (params.hasOwnProperty('search')) searchQuery.value = params.search;
+    if (params.hasOwnProperty('columns')) {
+        columns.value = columns.value.map((column) => ({
+            ...column,
+            visible: params.columns.split(',').includes(column.field),
+        }));
+    }
+    if (params.hasOwnProperty('filters')) {
+        activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
+    }
 }
 
 const parameters = computed(() => {
@@ -238,7 +304,7 @@ const parameters = computed(() => {
 });
 
 const shouldRequestFirstPage = computed(() => {
-    if (currentPage.value > 1 && items.value.length === 0) {
+    if (currentPage.value > 1 && meta.value?.last_page && currentPage.value > meta.value.last_page) {
         currentPage.value = 1;
         return true;
     }
@@ -518,6 +584,10 @@ function autoApplyFilters() {
 }
 
 function reordered(order) {
+	if (! props.items) {
+		items.value = order;
+	}
+
     emit('reordered', order);
 }
 
@@ -560,6 +630,7 @@ provideListingContext({
     isColumnVisible,
     hiddenColumns,
     sortColumn,
+    sortDirection,
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
@@ -588,6 +659,7 @@ provideListingContext({
     filters: toRef(() => props.filters),
     activeFilters,
     activeFilterBadges,
+    activeFilterBadgeCount,
     setFilter,
     setFilters,
     clearFilters,
@@ -616,6 +688,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    Statamic.$progress.complete(id);
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
@@ -633,38 +706,49 @@ autoApplyState();
 </script>
 
 <template>
-    <slot name="initializing" v-if="initializing">
-        <Icon name="loading" />
-    </slot>
-    <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
-        <Presets v-if="showPresets" />
-        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex items-center gap-3 py-3">
-            <div class="flex flex-1 items-center gap-3">
-                <Search v-if="allowSearch" />
-                <Filters v-if="hasFilters" />
+    <div>
+        <slot name="initializing" v-if="shouldShowSkeleton">
+            <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
+                <ui-skeleton class="h-5 w-48" />
+                <div class="flex gap-2 sm:gap-3">
+                    <ui-skeleton class="h-9 w-96" />
+                    <ui-skeleton class="h-9 w-24" />
+                    <div class="flex-1" />
+                    <ui-skeleton class="size-10" />
+                </div>
+                <ui-skeleton class="h-48 w-full" />
             </div>
-            <CustomizeColumns v-if="allowCustomizingColumns" />
-        </div>
+        </slot>
+        <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
+            <Presets v-if="showPresets" />
+            <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
+                    <Search v-if="allowSearch" />
+                    <Filters v-if="hasFilters" />
+                </div>
+                <CustomizeColumns v-if="allowCustomizingColumns" />
+            </div>
 
-        <div
-            v-if="!items.length"
-            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
-            v-text="__('No results')"
-        />
+            <div
+                v-if="!items.length"
+                class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
+                v-text="__('No results')"
+            />
 
-        <Panel v-else class="relative overflow-x-auto overscroll-x-contain">
-            <Table>
-                <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
-                    <component :is="slot" v-bind="slotProps" />
-                </template>
-                <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
-                    <slot name="prepended-row-actions" :row="row" />
-                </template>
-            </Table>
-            <PanelFooter v-if="meta">
-                <Pagination />
-            </PanelFooter>
-        </Panel>
-    </slot>
-    <BulkActions v-if="showBulkActions" />
+            <Panel v-else class="relative overflow-x-auto overscroll-x-contain" style="container-type: scroll-state;">
+                <Table>
+                    <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
+                        <component :is="slot" v-bind="slotProps" />
+                    </template>
+                    <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
+                        <slot name="prepended-row-actions" :row="row" />
+                    </template>
+                </Table>
+                <PanelFooter v-if="meta">
+                    <Pagination />
+                </PanelFooter>
+            </Panel>
+        </slot>
+        <BulkActions v-if="showBulkActions" />
+    </div>
 </template>

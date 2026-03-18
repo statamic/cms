@@ -1,5 +1,5 @@
 <template>
-    <Modal :title="__('Delete')" :open="true" @update:open="$emit('cancel')">
+    <Modal :title="__('Delete')" open @update:open="$emit('cancel')">
         <p>Are you sure you want to delete this?</p>
 
         <Field
@@ -13,7 +13,7 @@
                     :name="name"
                     @click="behavior = 'delete'"
                     value="delete"
-                    :variant="behavior === 'delete' ? 'primary' : 'default'"
+                    :variant="behavior === 'delete' ? 'danger' : 'default'"
                     :text="__('Delete')"
                 />
 
@@ -35,14 +35,14 @@
                     @click="$emit('cancel')"
                     :text="__('Cancel')"
                 />
-                <Button variant="primary" @click="confirm" :text="__('Confirm')" />
+                <Button variant="danger" @click="confirm" :text="__('Confirm')" />
             </div>
         </template>
     </Modal>
 </template>
 
 <script>
-import { Modal, Field, Button, ButtonGroup } from '@statamic/ui';
+import { Modal, Field, Button, ButtonGroup } from '@/components/ui';
 
 export default {
     components: {

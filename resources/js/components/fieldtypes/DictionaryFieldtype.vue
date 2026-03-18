@@ -1,14 +1,16 @@
 <template>
     <Combobox
-        class="w-full"
+        label-html
         searchable
         ignore-filter
-        :disabled="config.disabled || isReadOnly"
+        :disabled="config.disabled"
+        :clearable="config.clearable"
         :max-selections="config.max_items"
+        :model-value="value"
+        :multiple
         :options="normalizedOptions"
         :placeholder="__(config.placeholder)"
-        :multiple
-        :model-value="value"
+        :read-only="isReadOnly"
         @update:modelValue="comboboxUpdated"
         @search="search"
     >
@@ -16,14 +18,14 @@
             This slot is *basically* exactly the same as the default selected-options slot in Combobox. We're just looping
             through the Dictionary Fieldtype's selectedOptions state, rather than the one maintained by the Combobox component.
         -->
-        <template #selected-options="{ disabled, getOptionLabel, getOptionValue, labelHtml, deselect }">
+        <template #selected-options="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"
                 item-class="sortable-item"
                 handle-class="sortable-item"
                 :distance="5"
                 :mirror="false"
-                :disabled
+                :disabled="disabled || readOnly"
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
@@ -38,7 +40,7 @@
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
-                                v-if="!disabled"
+                                v-if="!disabled && !readOnly"
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
                                 :aria-label="__('Deselect option')"
@@ -62,11 +64,12 @@
 </template>
 
 <script>
+import DOMPurify from 'dompurify';
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
-import debounce from '@statamic/util/debounce.js';
-import { Badge, Combobox } from '@statamic/ui';
+import debounce from '@/util/debounce.js';
+import { Badge, Combobox } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -103,14 +106,20 @@ export default {
             return selections.map((value) => {
                 let option = this.selectedOptionData.find((option) => option.value === value);
 
-                if (!option) return { value, label: value };
+                if (!option) return { value, label: escapeHtml(String(value)) };
 
-                return { value: option.value, label: option.label, invalid: option.invalid };
+                return {
+                    value: option.value,
+                    label: DOMPurify.sanitize(option.label, {
+                        USE_PROFILES: { html: true, svg: true },
+                    }),
+                    invalid: option.invalid
+                };
             });
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (!this.showFieldPreviews) return;
 
             return this.selectedOptions.map((option) => option.label).join(', ');
         },

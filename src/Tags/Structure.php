@@ -137,8 +137,8 @@ class Structure extends Tags
                 'count' => $index + 1,
                 'first' => $index === 0,
                 'last' => $index === count($tree) - 1,
-                'is_current' => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
-                'is_parent' => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
+                'is_current' => ! is_null($url) && $url === $this->currentUrl,
+                'is_parent' => $this->isParent($url, $absoluteUrl),
                 'is_external' => URL::isExternal((string) $absoluteUrl),
             ], $this->params->bool('include_parents', true) ? ['parent' => $parent] : []);
         })->filter()->values();
@@ -146,6 +146,23 @@ class Structure extends Tags
         $this->updateIsParent($pages);
 
         return $pages->all();
+    }
+
+    private function isParent(?string $url, ?string $absoluteUrl): bool
+    {
+        if (is_null($url)) {
+            return false;
+        }
+
+        if ($url === '#') {
+            return false;
+        }
+
+        if ($this->siteAbsoluteUrl === $absoluteUrl) {
+            return false;
+        }
+
+        return URL::isAncestorOf($this->currentUrl, $url);
     }
 
     protected function updateIsParent($pages, &$parent = null)

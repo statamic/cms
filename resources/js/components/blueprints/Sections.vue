@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId">
+        <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId" tabindex="-1">
             <BlueprintSection
                 ref="section"
                 v-for="(section, i) in sections"
@@ -9,6 +9,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-collapsible-field="showSectionCollapsibleField"
                 :show-hide-field="showSectionHideField"
                 :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
@@ -24,7 +25,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import BlueprintSection from './Section.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
@@ -67,6 +68,10 @@ export default {
             type: Boolean,
             default: false,
         },
+	    showSectionCollapsibleField: {
+			type: Boolean,
+		    default: false,
+	    },
         showSectionHideField: {
             type: Boolean,
             default: false,
@@ -91,6 +96,8 @@ export default {
                 _id: uniqid(),
                 display: this.newSectionText,
                 instructions: null,
+                collapsible: false,
+                collapsed: false,
                 icon: null,
                 hide: null,
                 handle: snake_case(this.newSectionText),

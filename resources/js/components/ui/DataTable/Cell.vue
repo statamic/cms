@@ -5,9 +5,13 @@ import { cva } from 'cva';
 const variant = inject('dataTableVariant', 'normal');
 
 const props = defineProps({
+    /** Text alignment. <br><br> Options: `left`, `center`, `right` */
     align: { type: String, default: 'left' },
+    /** Function to calculate position for left side rounding */
     position: { type: Function, required: true },
+    /** Function to calculate position for right side rounding */
     rightPosition: { type: Function, required: true },
+    /** Cell index */
     index: { type: Number, required: true },
 });
 

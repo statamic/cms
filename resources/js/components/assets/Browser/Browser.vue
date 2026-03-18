@@ -1,52 +1,6 @@
 <template>
-    <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
-        <Header :title="__(container.title)" icon="assets">
-            <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
-                <DropdownMenu>
-                    <DropdownItem
-                        icon="container-add"
-                        v-if="canCreateContainers"
-                        :text="__('Create Container')"
-                        :href="createContainerUrl"
-                    />
-                    <DropdownItem
-                        icon="cog"
-                        v-if="container.can_edit"
-                        :text="__('Configure Container')"
-                        :href="container.edit_url"
-                    />
-                    <DropdownItem
-                        icon="blueprint-edit"
-                        :text="__('Edit Blueprint')"
-                        :href="container.blueprint_url"
-                    />
-                    <DropdownSeparator v-if="container.can_delete" />
-                    <DropdownItem
-                        icon="trash"
-                        variant="destructive"
-                        v-if="container.can_delete"
-                        :text="__('Delete Container')"
-                        @click="$event.preventDefault(); $refs.deleter.confirm()"
-                    />
-                </DropdownMenu>
-            </Dropdown>
-
-            <resource-deleter
-                ref="deleter"
-                :resource-title="__(container.title)"
-                :route="container.delete_url"
-            />
-
-            <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
-            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="creatingFolder = true" />
-
-            <ui-toggle-group v-model="mode">
-                <ui-toggle-item icon="layout-grid" value="grid" />
-                <ui-toggle-item icon="layout-list" value="table" />
-            </ui-toggle-group>
-        </Header>
-
-        <uploader
+    <div ref="browser" class="h-full" @keydown.shift="shiftDown" @keyup="clearShift">
+        <Uploader
             ref="uploader"
             :container="container.id"
             :path="path"
@@ -56,9 +10,9 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="min-h-screen">
+            <div class="pb-1">
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="m-4 size-12" />
+                    <Icon name="upload-cloud-large" class="m-4 size-13" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
@@ -66,95 +20,166 @@
                     ref="listing"
                     :url="requestUrl"
                     :columns="columns"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
+                    :filters="filters"
                     :action-url="actionUrl"
                     :action-context="actionContext"
+                    :allow-bulk-actions="allowBulkActions"
                     :selections="selectedAssets"
+                    :max-selections="maxFiles"
                     :preferences-prefix="preferencesPrefix"
+                    :additional-parameters="additionalParameters"
                     v-model:search-query="searchQuery"
                     @request-completed="listingRequestCompleted"
+                    @update:selections="$emit('selections-updated', $event)"
                 >
-                    <template #initializing>
-                        <div class="loading">
-                            <loading-graphic />
-                        </div>
-                    </template>
                     <template #default="{ items }">
-                        <div class="flex items-center gap-3 py-3">
-                            <div class="flex flex-1 items-center gap-3">
-                                <ListingSearch />
+                        <slot name="header" v-bind="{ canUpload, openFileBrowser, canCreateFolders, startCreatingFolder, mode, modeChanged }">
+                            <Header :title="__(container.title)" icon="assets">
+                                <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
+                                    <DropdownMenu>
+                                        <DropdownItem
+                                            icon="container-add"
+                                            v-if="canCreateContainers"
+                                            :text="__('Create Container')"
+                                            :href="createContainerUrl"
+                                        />
+                                        <DropdownItem
+                                            icon="cog"
+                                            v-if="container.can_edit"
+                                            :text="__('Configure Container')"
+                                            :href="container.edit_url"
+                                        />
+                                        <DropdownItem
+                                            icon="blueprint-edit"
+                                            :text="__('Edit Blueprint')"
+                                            :href="container.blueprint_url"
+                                        />
+                                        <DropdownSeparator v-if="container.can_delete" />
+                                        <DropdownItem
+                                            icon="trash"
+                                            variant="destructive"
+                                            v-if="container.can_delete"
+                                            :text="__('Delete Container')"
+                                            @click="$event.preventDefault(); $refs.deleter.confirm()"
+                                        />
+                                    </DropdownMenu>
+                                </Dropdown>
+
+                                <resource-deleter
+                                    ref="deleter"
+                                    :resource-title="__(container.title)"
+                                    :route="container.delete_url"
+                                />
+
+                                <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
+                                <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="startCreatingFolder" />
+
+                                <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
+                                    <ToggleItem icon="layout-grid" value="grid" />
+                                    <ToggleItem icon="layout-list" value="table" />
+                                </ToggleGroup>
+                            </Header>
+
+                            <div class="flex items-center gap-2 sm:gap-3 py-3 relative overflow-clip st-overflow-clip-margin">
+                                <div class="flex flex-1 items-center gap-2 sm:gap-3">
+                                    <ListingSearch />
+                                    <ListingFilters @filters-updated="filtersUpdated" />
+                                </div>
+                                <ListingCustomizeColumns v-if="mode === 'table'" />
                             </div>
-                            <ListingCustomizeColumns />
-                        </div>
+                        </slot>
 
                         <div
-                            v-if="containerIsEmpty"
-                            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+                            v-if="containerIsEmpty && !creatingFolder"
+                            class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                             v-text="__('No results')"
                         />
 
-                        <Panel
-                            v-else
-                            :class="{
-                                'relative overflow-x-auto overscroll-x-contain': mode === 'table',
-                            }"
-                        >
-                            <PanelHeader class="flex items-center justify-between p-1!">
-                                <Breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
-                                <Slider
-                                    v-if="mode === 'grid'"
-                                    size="sm"
-                                    class="mr-2 w-24!"
-                                    variant="subtle"
-                                    v-model="gridThumbnailSize"
-                                    :min="60"
-                                    :max="300"
-                                    :step="25"
+                        <Panel v-else :class="{ 'relative overflow-x-auto overscroll-x-contain': mode === 'table' }">
+                            <PanelHeader class="flex items-center justify-between gap-2 px-1!">
+                                <Breadcrumbs
+                                    v-if="!restrictFolderNavigation"
+                                    :path="path"
+                                    @navigated="selectFolder"
                                 />
+                                <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
+                                    <ui-button
+                                        inset
+                                        size="sm"
+                                        variant="ghost"
+                                        icon-only
+                                        :icon="checkerboardIcon"
+                                        v-tooltip="__('Transparency')"
+                                        :aria-label="__('Transparency')"
+                                        @click="cycleCheckerboard"
+                                    />
+                                    <Slider
+                                        size="sm"
+                                        class="w-24!"
+                                        variant="subtle"
+                                        v-model="gridThumbnailSize"
+                                        :min="60"
+                                        :max="300"
+                                        :step="25"
+                                    />
+                                </div>
                             </PanelHeader>
 
-                            <uploads
+                            <Uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
                                 :allow-selecting-existing="allowSelectingExistingUpload"
                                 class="mb-3 rounded-lg"
                                 @existing-selected="existingUploadSelected"
                             />
+
                             <Table
+                                ref="table"
                                 v-if="mode === 'table'"
                                 :assets="items"
                                 :folders="folders"
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
+                                :is-searching="isSearching"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
-                            >
-                            </Table>
+                            />
+
                             <Grid
+                                ref="grid"
                                 v-if="mode === 'grid'"
                                 :assets="items"
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
                                 :selected-assets="selectedAssets"
+                                :show-checkerboard="showCheckerboard"
+                                :checkerboard-mode="checkerboardMode"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
+
                             <PanelFooter>
                                 <ListingPagination />
                             </PanelFooter>
                         </Panel>
+
+                        <slot name="footer" />
                     </template>
                 </Listing>
             </div>
-        </uploader>
+        </Uploader>
 
-        <asset-editor
+        <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
-            :read-only="!canEdit"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
+            @action-started="actionStarted"
+            @action-completed="actionCompleted"
         />
     </div>
 </template>
@@ -164,11 +189,9 @@ import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import Grid from './Grid.vue';
 import Table from './Table.vue';
-import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
-import HasActions from '../../data-list/HasActions';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -181,16 +204,22 @@ import {
     Panel,
     PanelHeader,
     PanelFooter,
+    Listing,
+    ListingTable,
+    ListingPagination,
+    ListingFilters,
     ListingSearch,
     ListingCustomizeColumns,
     Slider,
-} from '@statamic/ui';
-import BulkActions from '@statamic/components/data-list/BulkActions.vue';
-import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
+    Icon,
+    ToggleGroup,
+    ToggleItem,
+} from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
-    mixins: [HasActions, HasPagination, HasPreferences],
+    mixins: [HasPreferences],
 
     components: {
         PanelFooter,
@@ -209,19 +238,25 @@ export default {
         Header,
         Button,
         ButtonGroup,
-        BulkActions,
         Listing,
         ListingTable,
         ListingPagination,
         ListingSearch,
+        ListingFilters,
         ListingCustomizeColumns,
         Breadcrumbs,
         Slider,
+        Icon,
+        ToggleGroup,
+        ToggleItem,
     },
 
     props: {
+        allowBulkActions: {
+            type: Boolean,
+            default: true,
+        },
         allowSelectingExistingUpload: Boolean,
-        autofocusSearch: Boolean,
         autoselectUploads: Boolean,
         canCreateContainers: Boolean,
         createContainerUrl: String,
@@ -232,10 +267,21 @@ export default {
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
+        filters: Array,
         initialColumns: {
             type: Array,
             default: () => [],
         },
+    },
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            showCheckerboard: checkerboard.enabled,
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
     },
 
     data() {
@@ -250,8 +296,10 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
+            activeFilters: {},
             editedAssetId: this.initialEditingAssetId,
             creatingFolder: false,
+            creatingFolderError: false,
             uploads: [],
             page: 1,
             preferencesPrefix: `assets.${this.container.id}`,
@@ -270,7 +318,7 @@ export default {
 
     computed: {
         requestUrl() {
-            return this.searchQuery
+            return this.isSearching
                 ? cp_url(
                       `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
                   ).replace(/\/$/, '')
@@ -281,25 +329,18 @@ export default {
             return { container: this.container.id };
         },
 
-        canCreateFolders() {
-            return (
-                this.folder &&
-                this.container.create_folders &&
-                !this.restrictFolderNavigation &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
+        additionalParameters() {
+            return {
+                queryScopes: this.queryScopes,
+            };
         },
 
-        canEdit() {
-            return this.can('edit ' + this.container.id + ' assets') || this.can('configure asset containers');
+        canCreateFolders() {
+            return this.folder && this.container.can_create_folders && !this.restrictFolderNavigation;
         },
 
         canUpload() {
-            return (
-                this.folder &&
-                this.container.allow_uploads &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
+            return this.folder && this.container.can_upload;
         },
 
         containerIsEmpty() {
@@ -320,8 +361,19 @@ export default {
             return this.selectedAssets.length > 0;
         },
 
-        modeClass() {
-            return 'mode-' + this.mode;
+        hasActiveFilters() {
+            return Object.entries(this.activeFilters).some(([key, value]) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
+                } else if (typeof value === 'object' && value !== null) {
+                    return Object.keys(value).length > 0;
+                }
+                return Boolean(value);
+            });
+        },
+
+        isSearching() {
+            return this.searchQuery || this.hasActiveFilters;
         },
 
         parameters() {
@@ -349,10 +401,6 @@ export default {
             },
         },
 
-        columnShowing(column) {
-            return this.visibleColumns.find(c => c.field === column);
-        },
-
         reachedSelectionLimit() {
             return this.selectedAssets.length >= this.maxFiles;
         },
@@ -364,7 +412,6 @@ export default {
         sharedAssetProps() {
             return {
                 actionUrl: this.actionUrl,
-                canEdit: this.canEdit,
                 containerIsEmpty: this.containerIsEmpty,
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
@@ -372,6 +419,7 @@ export default {
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
+                creatingFolderError: this.creatingFolderError,
             };
         },
 
@@ -383,29 +431,31 @@ export default {
                 'edit-asset': (event) => this.$emit('edit-asset', event),
                 'select-folder': this.selectFolder,
                 'create-folder': this.createFolder,
-                'cancel-creating-folder': () => (this.creatingFolder = false),
+                'cancel-creating-folder': () => {
+                    this.creatingFolder = false;
+                    this.creatingFolderError = false;
+                },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
+                'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
         },
     },
 
-    created() {
-        this.$events.$on('editor-action-started', this.actionStarted);
-        this.$events.$on('editor-action-completed', this.actionCompleted);
-    },
-
     mounted() {
         this.mode = this.getPreference('mode') || 'table';
-    },
 
-    unmounted() {
-        this.$events.$off('editor-action-started', this.actionStarted);
-        this.$events.$off('editor-action-completed', this.actionCompleted);
+        this.addToCommandPalette();
     },
 
     watch: {
         mode(mode) {
             this.setPreference('mode', mode == 'table' ? null : mode);
+        },
+
+        initializing(initializing) {
+              if (initializing === false) {
+                  this.$emit('initialized');
+              }
         },
 
         editedAssetId(editedAssetId) {
@@ -414,12 +464,6 @@ export default {
                 : this.path;
 
             this.$emit('navigated', path);
-        },
-
-        initializing(isInitializing, wasInitializing) {
-            if (wasInitializing && this.autofocusSearch) {
-                this.$nextTick(() => this.$refs.search.focus());
-            }
         },
 
         loading(loading) {
@@ -439,6 +483,13 @@ export default {
             this.page = 1;
         },
 
+        activeFilters: {
+            deep: true,
+            handler() {
+                this.page = 1;
+            },
+        },
+
         selectedPath: {
             immediate: true,
             handler(newPath) {
@@ -456,10 +507,23 @@ export default {
     },
 
     methods: {
+        filtersUpdated(filters) {
+            this.activeFilters = filters;
+        },
+
+        modeChanged(mode) {
+            this.mode = mode;
+        },
+
+        startCreatingFolder() {
+            this.creatingFolder = true;
+            this.creatingFolderError = false;
+        },
+
         listingRequestCompleted({ response }) {
             this.assets = response.data.data;
 
-            if (this.searchQuery) {
+            if (this.isSearching) {
                 this.folder = null;
                 this.folders = [];
             } else {
@@ -474,7 +538,15 @@ export default {
             this.loading = false;
         },
 
-        afterActionSuccessfullyCompleted() {
+        actionStarted() {
+            this.loading = true;
+        },
+
+        actionCompleted() {
+            // Intentionally not completing the loading state here since
+            // the listing will refresh and immediately restart it.
+            // this.loading = false;
+
             this.$refs.listing.refresh();
         },
 
@@ -559,6 +631,7 @@ export default {
                     this.folders.push(response.data);
                     this.folders = sortBy(this.folders, 'title');
                     this.creatingFolder = false;
+                    this.creatingFolderError = false;
 
                     this.$refs.grid?.clearNewFolderName();
                     this.$refs.table?.clearNewFolderName();
@@ -571,10 +644,12 @@ export default {
                             ? this.$toast.error(errors.directory[0])
                             : this.$toast.error(message);
 
+                        this.creatingFolderError = true;
                         this.$refs.grid?.focusNewFolderInput();
                         this.$refs.table?.focusNewFolderInput();
                     } else {
                         this.$toast.error(__('Something went wrong'));
+                        this.creatingFolderError = true;
                     }
                 });
         },
@@ -593,10 +668,6 @@ export default {
 
         folderActions(folder) {
             return folder.actions || this.folder.actions || [];
-        },
-
-        isSelected(id) {
-            return this.selectedAssets.includes(id);
         },
 
         loadAssets() {
@@ -658,7 +729,11 @@ export default {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
 
-                this.selectedAssets.push(asset.id);
+                if (this.maxFiles === 1) {
+                    this.selectedAssets.splice(0, this.selectedAssets.length, asset.id);
+                } else if (!this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset.id);
+                }
                 this.$emit('selections-updated', this.selectedAssets);
             }
 
@@ -674,6 +749,74 @@ export default {
         uploadsUpdated(uploads) {
             this.uploads = uploads;
         },
+
+        addToCommandPalette() {
+            Statamic.$commandPalette.add({
+                when: () => this.canUpload,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Upload'),
+                icon: 'upload',
+                action: () => this.openFileBrowser(),
+                prioritize: true,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.canCreateFolders,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Create Folder'),
+                icon: 'folder-add',
+                action: () => this.startCreatingFolder(),
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle Grid Layout'),
+                icon: 'layout-grid',
+                when: () => this.mode === 'table',
+                action: () => this.mode = 'grid',
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Toggle List Layout'),
+                icon: 'layout-list',
+                when: () => this.mode === 'grid',
+                action: () => this.mode = 'table',
+            });
+
+            if (this.createContainerUrl) {
+                Statamic.$commandPalette.add({
+                    when: () => this.canCreateContainers,
+                    category: Statamic.$commandPalette.category.Actions,
+                    text: __('Create Container'),
+                    icon: 'container-add',
+                    url: this.createContainerUrl,
+                });
+            }
+
+            Statamic.$commandPalette.add({
+                when: () => this.container.can_edit,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Configure Container'),
+                icon: 'cog',
+                url: this.container.edit_url,
+            });
+
+            Statamic.$commandPalette.add({
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Edit Blueprint'),
+                icon: 'blueprint-edit',
+                url: this.container.blueprint_url,
+            });
+
+            Statamic.$commandPalette.add({
+                when: () => this.container.can_delete,
+                category: Statamic.$commandPalette.category.Actions,
+                text: __('Delete Container'),
+                icon: 'trash',
+                action: () => this.$refs.deleter.confirm(),
+            });
+        }
     },
 };
 </script>

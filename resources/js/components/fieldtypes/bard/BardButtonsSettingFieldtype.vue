@@ -8,7 +8,7 @@
                 :class="{ active: enabled(button.name) }"
                 @click="toggleButton(button.name)"
             >
-                <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
+                <ui-icon :name="button.svg" v-if="button.svg" />
                 <div class="flex items-center" v-html="button.html" v-if="button.html"></div>
             </button>
         </div>
