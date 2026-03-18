@@ -241,9 +241,10 @@ class EntryRevisionsTest extends TestCase
         $this->assertFalse($entry->published());
         $this->assertCount(0, $entry->revisions());
 
+        $publishAt = Carbon::parse('2010-12-29 11:00am')->toIso8601String();
         $this
             ->actingAs($user)
-            ->post($entry->createRevisionUrl(), ['message' => 'Test!', 'publish_at' => ['date' => '2010-12-29', 'time' => '11:00am']])
+            ->post($entry->createRevisionUrl(), ['message' => 'Test!', 'publish_at' => $publishAt])
             ->assertOk();
 
         $entry = Entry::find($entry->id());
