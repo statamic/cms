@@ -380,7 +380,7 @@ class UserTags extends Tags
             return null;
         }
 
-        if (! URL::isAbsolute($url) && ! str_starts_with($url, '/')) {
+        if (! preg_match('#^https?://#', $url) && ! str_starts_with($url, '/')) {
             $url = '/'.$url;
         }
 
