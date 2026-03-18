@@ -8,13 +8,13 @@
                         <div class="flex flex-1 items-center py-2">
                             <ui-icon class="size-4 me-2 text-ui-accent-text/80" name="fieldsets" />
                             <div class="flex items-center gap-2">
-                                <a class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" :href="fieldsetEditUrl" v-text="fieldsetTitle" />
+                                <a class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" :href="fieldsetEditUrl" v-text="fieldsetTitle" v-tooltip="__('Edit fieldset')" />
                                 <ui-icon name="link" class="text-gray-400" />
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <ui-button size="sm" icon="cog" variant="subtle" inset @click.prevent="$emit('edit')" v-tooltip="__('Configure')" />
+                            <ui-button size="sm" icon="cog" variant="subtle" inset @click.prevent="$emit('edit')" v-tooltip="__('Configure import')" />
                             <ui-button size="sm" icon="trash" variant="subtle" inset @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                             <ui-stack :open="isEditing" @update:open="editorClosed" inset :show-close-button="false" :wrap-slot="false">
                                 <field-settings
