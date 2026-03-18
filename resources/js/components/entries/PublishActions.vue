@@ -171,6 +171,10 @@ export default {
                 .catch((e) => {});
         },
 
+        submitSchedule() {
+            // todo
+        },
+
         submitUnpublish() {
             const payload = { message: this.revisionMessage };
 
