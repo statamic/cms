@@ -8,8 +8,7 @@
                         <div class="flex flex-1 items-center py-2">
                             <ui-icon class="size-4 me-2 text-ui-accent-text/80" name="fieldsets" />
                             <div class="flex items-center gap-2">
-                            <!-- @TODO: Show fieldset.title -->
-                                <button class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" v-text="field.fieldset" @click="$emit('edit')" />
+                                <button class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" v-text="fieldsetTitle" @click="$emit('edit')" />
                                 <ui-icon name="link" class="text-gray-400" />
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
                             </div>
@@ -50,6 +49,12 @@ export default {
     },
 
     computed: {
+        fieldsetTitle() {
+            const title = this.$page?.props?.fieldsets?.[this.field.fieldset]?.title;
+
+            return title ? __(title) : this.field.fieldset;
+        },
+
         fieldConfig() {
             const { _id, type, ...config } = this.field;
             return config;
