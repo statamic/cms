@@ -13,8 +13,9 @@
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                        <div class="flex items-center">
+                            <ui-button size="sm" icon="edit" variant="subtle" inset :href="fieldsetEditUrl" v-tooltip="__('Edit')" />
+                            <ui-button size="sm" icon="trash" variant="subtle" inset @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                             <ui-stack :open="isEditing" @update:open="editorClosed" inset :show-close-button="false" :wrap-slot="false">
                                 <field-settings
                                     ref="settings"
@@ -53,6 +54,10 @@ export default {
             const title = this.$page?.props?.fieldsets?.[this.field.fieldset]?.title;
 
             return title ? __(title) : this.field.fieldset;
+        },
+
+        fieldsetEditUrl() {
+            return cp_url(`fields/fieldsets/${this.field.fieldset}/edit`);
         },
 
         fieldConfig() {
