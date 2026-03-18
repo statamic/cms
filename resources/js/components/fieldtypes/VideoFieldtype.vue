@@ -44,11 +44,8 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Combobox, Input } from '@statamic/ui';
 
 export default {
-    components: { Combobox, Input },
-
     mixins: [Fieldtype],
 
     data() {
