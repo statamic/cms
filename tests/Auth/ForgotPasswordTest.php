@@ -77,7 +77,7 @@ class ForgotPasswordTest extends TestCase
     }
 
     #[Test]
-    public function it_rejects_unencrypted_restring_reset_url_when_sending_reset_link_email()
+    public function it_rejects_unencrypted_string_reset_url_when_sending_reset_link_email()
     {
         // Unencrypted string that doesn't look like a URL is probably a tampered encrypted string.
         // It might be a relative url without a leading slash, but we won't treat it as that.
