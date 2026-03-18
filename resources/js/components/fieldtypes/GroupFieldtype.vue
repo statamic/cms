@@ -17,6 +17,7 @@
                         <FieldsProvider
                             :fields="fields"
                             :as-config="false"
+                            :read-only="isReadOnly"
                             :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
                             :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >
