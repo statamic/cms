@@ -247,10 +247,15 @@ class URL
 
     /**
      * Check whether a URL is external to whole Statamic application.
+     * Ambiguous URLs are considered external.
      */
     public function isExternalToApplication(?string $url): bool
     {
-        if (Str::startsWith($url, '//')) {
+        if (! $url) {
+            return false;
+        }
+
+        if (! Str::startsWith($url, ['/', 'http://', 'https://', '#', '?']) || Str::startsWith($url, '//')) {
             return true;
         }
 
