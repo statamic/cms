@@ -159,6 +159,7 @@ class FieldsetController extends CpController
             $contents['fields'] = collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
             })->all();
+            unset($contents['sections']);
         }
 
         $fieldset->setContents($contents);

@@ -188,6 +188,54 @@ class UpdateFieldsetTest extends TestCase
     }
 
     #[Test]
+    public function fieldset_sections_are_removed_when_updating_with_flat_fields()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'sections' => [
+                [
+                    'display' => 'SEO',
+                    'fields' => [
+                        ['handle' => 'legacy', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($fieldset, [
+                'title' => 'Updated title',
+                'fields' => [
+                    [
+                        '_id' => 'flat-1',
+                        'handle' => 'meta_title',
+                        'type' => 'inline',
+                        'config' => [
+                            'type' => 'text',
+                            'display' => 'Meta title',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertStatus(204);
+
+        $this->assertEquals([
+            'title' => 'Updated title',
+            'fields' => [
+                [
+                    'handle' => 'meta_title',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => 'Meta title',
+                    ],
+                ],
+            ],
+        ], Facades\Fieldset::find('test')->contents());
+    }
+
+    #[Test]
     public function import_section_behavior_is_saved_when_flattening_sections()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
