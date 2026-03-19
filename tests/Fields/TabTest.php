@@ -277,4 +277,40 @@ class TabTest extends TestCase
         $this->assertEquals('seo_meta_title', $field['handle']);
         $this->assertEquals('seo_', $field['prefix']);
     }
+
+    #[Test]
+    public function it_can_flatten_imported_fieldset_sections_in_place()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ['import' => 'seo', 'section_behavior' => 'flatten'],
+                        ['handle' => 'summary', 'field' => ['type' => 'textarea']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+
+        $this->assertCount(1, $publish['sections']);
+        $this->assertEquals('Main', $publish['sections'][0]['display']);
+        $this->assertEquals(['title', 'meta_title', 'summary'], collect($publish['sections'][0]['fields'])->pluck('handle')->all());
+    }
 }

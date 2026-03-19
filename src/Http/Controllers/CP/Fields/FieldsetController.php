@@ -137,7 +137,7 @@ class FieldsetController extends CpController
         ]);
 
         if ($request->has('sections')) {
-            $contents['sections'] = collect($request->sections)->map(function ($section) {
+            $sections = collect($request->sections)->map(function ($section) {
                 return Arr::removeNullValues([
                     'display' => Arr::get($section, 'display'),
                     'instructions' => Arr::get($section, 'instructions'),
@@ -148,6 +148,13 @@ class FieldsetController extends CpController
                     })->all(),
                 ]);
             })->all();
+
+            if ($this->shouldStoreAsFlatFields($sections)) {
+                $contents['fields'] = Arr::get($sections, '0.fields', []);
+                unset($contents['sections']);
+            } else {
+                $contents['sections'] = $sections;
+            }
         } else {
             $contents['fields'] = collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
@@ -256,5 +263,20 @@ class FieldsetController extends CpController
                 })->all(),
             ];
         })->all();
+    }
+
+    private function shouldStoreAsFlatFields(array $sections): bool
+    {
+        if (count($sections) !== 1) {
+            return false;
+        }
+
+        $section = $sections[0];
+        $display = Arr::get($section, 'display');
+
+        return in_array($display, [null, '', __('Fields')], true)
+            && Arr::get($section, 'instructions') === null
+            && Arr::get($section, 'collapsible') !== true
+            && Arr::get($section, 'collapsed') !== true;
     }
 }

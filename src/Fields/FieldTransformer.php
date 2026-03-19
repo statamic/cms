@@ -21,6 +21,9 @@ class FieldTransformer
         return array_filter([
             'import' => $submitted['fieldset'],
             'prefix' => $submitted['prefix'] ?? null,
+            'section_behavior' => ($submitted['section_behavior'] ?? 'preserve') === 'flatten'
+                ? 'flatten'
+                : null,
         ]);
     }
 
@@ -183,6 +186,7 @@ class FieldTransformer
             'type' => 'import',
             'fieldset' => $field['import'],
             'prefix' => $field['prefix'] ?? null,
+            'section_behavior' => $field['section_behavior'] ?? 'preserve',
         ];
     }
 

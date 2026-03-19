@@ -142,6 +142,10 @@ class Tab
             return false;
         }
 
+        if (($field['section_behavior'] ?? 'preserve') === 'flatten') {
+            return false;
+        }
+
         $fieldset = FieldsetRepository::find($field['import']);
 
         return $fieldset && $fieldset->hasSections();

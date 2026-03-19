@@ -188,6 +188,105 @@ class UpdateFieldsetTest extends TestCase
     }
 
     #[Test]
+    public function import_section_behavior_is_saved_when_flattening_sections()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        (new Fieldset)->setHandle('seo_defaults')->setContents([
+            'title' => 'SEO Defaults',
+            'fields' => [
+                ['handle' => 'canonical_url', 'field' => ['type' => 'text']],
+            ],
+        ])->save();
+
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'fields' => [],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($fieldset, [
+                'sections' => [
+                    [
+                        '_id' => 'section-1',
+                        'display' => 'Main',
+                        'fields' => [
+                            [
+                                '_id' => 'section-1-field-1',
+                                'type' => 'import',
+                                'fieldset' => 'seo_defaults',
+                                'section_behavior' => 'flatten',
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertStatus(204);
+
+        $this->assertEquals([
+            'title' => 'Updated',
+            'fields' => [],
+            'sections' => [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        [
+                            'import' => 'seo_defaults',
+                            'section_behavior' => 'flatten',
+                        ],
+                    ],
+                ],
+            ],
+        ], Facades\Fieldset::find('test')->contents());
+    }
+
+    #[Test]
+    public function single_default_section_is_collapsed_back_to_flat_fields()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $fieldset = (new Fieldset)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'fields' => [],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($fieldset, [
+                'sections' => [
+                    [
+                        '_id' => 'section-1',
+                        'display' => 'Fields',
+                        'fields' => [
+                            [
+                                '_id' => 'section-1-field-1',
+                                'handle' => 'meta_title',
+                                'type' => 'inline',
+                                'config' => [
+                                    'type' => 'text',
+                                    'display' => 'Meta title',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertStatus(204);
+
+        $this->assertEquals([
+            'title' => 'Updated',
+            'fields' => [
+                [
+                    'handle' => 'meta_title',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => 'Meta title',
+                    ],
+                ],
+            ],
+        ], Facades\Fieldset::find('test')->contents());
+    }
+
+    #[Test]
     public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
