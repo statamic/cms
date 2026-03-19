@@ -617,9 +617,10 @@ TEXT;
         $this->assertSame('&lt;?pHp echo "test"; ?>', StringUtilities::sanitizePhp('<?pHp echo "test"; ?>'));
     }
 
-    public function test_sanitize_php_handles_short_echo_tag()
+    public function test_sanitize_php_handles_short_tags()
     {
         $this->assertSame('&lt;?= $var ?>', StringUtilities::sanitizePhp('<?= $var ?>'));
         $this->assertSame('&lt;?="test"?>', StringUtilities::sanitizePhp('<?="test"?>'));
+        $this->assertSame("&lt;? echo 'test' ?>", StringUtilities::sanitizePhp("<? echo 'test' ?>"));
     }
 }
