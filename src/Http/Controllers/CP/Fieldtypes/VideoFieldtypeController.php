@@ -13,6 +13,7 @@ class VideoFieldtypeController extends CpController
         if (! is_null($id = $request->query('id'))) {
             return Video::fromUrl($id);
         }
+
         if (! is_null($url = $request->query('url'))) {
             return Video::fromUrl($url);
         }
