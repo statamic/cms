@@ -88,6 +88,36 @@ trait ProvidesExternalUrls
             'http://this-site.com:8000@evil.com',
             'http://this-site.com:8000@evil.com/path',
             'http://this-site.com:8000@webhook.site/token',
+
+            // Backslash bypass
+            'http://evil.com\@this-site.com',
+            'http://evil.com\@this-site.com/',
+            'http://evil.com\@this-site.com/path',
+            'http://evil.com\@subdomain.this-site.com',
+            'http://evil.com\@absolute-url-resolved-from-request.com',
+            'https://evil.com\@this-site.com',
+            'http://evil.com\\@this-site.com',
+            'http://evil.com\\\@this-site.com',
+
+            // Dangerous URL schemes
+            'javascript:alert(1)',
+            'javascript:alert(document.cookie)',
+            'javascript://this-site.com/%0aalert(1)',
+            'JAVASCRIPT:alert(1)',
+            'data:text/html,<script>alert(1)</script>',
+            'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==',
+            'DATA:text/html,test',
+            'vbscript:msgbox(1)',
+            'file:///etc/passwd',
+
+            // Whitespace bypass
+            ' http://this-site.com',
+            ' http://evil.com',
+            '  http://evil.com',
+            "\thttp://evil.com",
+            "\nhttp://evil.com",
+            "\rhttp://evil.com",
+            "\r\nhttp://evil.com",
         ];
     }
 
