@@ -131,45 +131,6 @@
                                     </div>
                                 </div>
 
-                                <!--
-                                TODO
-                                <div class="flex items-center border-t justify-between px-4 py-2" v-if="!revisionsEnabled">
-                                    <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input v-model="published" />
-                                </div>
-
-                                <div class="border-t p-4" v-if="revisionsEnabled">
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
-                                    <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else="published">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="isWorkingCopy && isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else-if="isWorkingCopy">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                    </div>
-                                    <button
-                                            class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
-                                            <span>{{ __('View History') }}</span>
-                                        </button>
-                                </div>
-                                -->
-
                                 <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
                                     <div
