@@ -88,6 +88,16 @@ trait ProvidesExternalUrls
             'http://this-site.com:8000@evil.com',
             'http://this-site.com:8000@evil.com/path',
             'http://this-site.com:8000@webhook.site/token',
+
+            // Backslash bypass
+            'http://evil.com\@this-site.com',
+            'http://evil.com\@this-site.com/',
+            'http://evil.com\@this-site.com/path',
+            'http://evil.com\@subdomain.this-site.com',
+            'http://evil.com\@absolute-url-resolved-from-request.com',
+            'https://evil.com\@this-site.com',
+            'http://evil.com\\@this-site.com',
+            'http://evil.com\\\@this-site.com',
         ];
     }
 
