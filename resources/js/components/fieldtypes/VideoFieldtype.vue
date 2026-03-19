@@ -29,11 +29,7 @@
             @update:model-value="detailsFromCloudflare"
         />
 
-        <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
-        <div
-            v-if="shouldShowPreview"
-            v-html="embed"
-        ></div>
+        <div v-if="shouldShowPreview" v-html="embed"></div>
     </div>
 </template>
 
@@ -58,29 +54,6 @@ export default {
     computed: {
         shouldShowPreview() {
             return this.embed;
-        },
-
-        isEmbeddable() {
-            const url = this.value || '';
-            const isYoutube = url.includes('youtube') || url.includes('youtu.be');
-            const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
-        },
-
-        isInvalid() {
-            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
-            return htmlRegex.test(this.value || '');
-        },
-
-        isUrl() {
-            const url = this.value || '';
-            return url.startsWith('http://') || url.startsWith('https://');
-        },
-
-        isVideo() {
-            const url = this.value || '';
-            const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
-            return !this.isEmbeddable && isVideo;
         },
 
         providers() {
