@@ -257,9 +257,14 @@ class URL
             return false;
         }
 
-        if (Str::startsWith($url, '//')) {
+        if (! Str::startsWith($url, ['/', 'http://', 'https://', '#', '?']) || Str::startsWith($url, '//')) {
             return self::$externalAppUrlsCache[$url] = true;
         }
+
+        // Normalize backslashes to forward slashes.
+        // Browsers treat \ as / for special schemes (http/https), which can
+        // cause parse_url() to extract a different host than the browser uses.
+        $url = str_replace('\\', '/', $url);
 
         $url = Str::ensureRight($url, '/');
 
