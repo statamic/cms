@@ -81,6 +81,10 @@ class StringUtilities
     {
         $text = str_ireplace('<?php', '&lt;?php', $text);
 
+        // Always replace short echo tags (<?=) — enabled since PHP 5.4
+        // regardless of short_open_tag setting.
+        $text = str_replace('<?=', '&lt;?=', $text);
+
         // Also replace short tags if they're enabled.
         if (ini_get('short_open_tag')) {
             $xmlPlaceholder = '__XML_PLACEHOLDER'.Str::uuid();
