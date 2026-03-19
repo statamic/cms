@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Embera\ProviderCollection\SlimProviderCollection;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Video\Providers;
 use Statamic\Fieldtypes\Video\Video as VideoDetails;
 
 class Video extends Fieldtype
@@ -21,7 +21,7 @@ class Video extends Fieldtype
         }
 
         //otherwise assume it's a Cloudflare ID
-        return str($value)->afterLast('::')->value();
+        return str($value)->afterLast(':')->value();
     }
 
     public function preload()
@@ -66,21 +66,5 @@ class Video extends Fieldtype
                 ],
             ],
         ];
-    }
-}
-
-class Providers extends SlimProviderCollection
-{
-    public static function get(): array
-    {
-        return collect((new static())->providers)
-            ->unique()
-            ->values()
-            ->map(fn (string $class) => ['provider' => class_basename($class)])
-            ->add(['provider' => 'Cloudflare'])
-            ->sortBy('provider')
-            ->add(['provider' => 'Not Supported'])
-            ->values()
-            ->all();
     }
 }

@@ -6,11 +6,20 @@ use Embera\Embera;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 
 class Video implements Arrayable
 {
     public static function fromUrl(string $url): self
     {
+        if (Str::startsWith($url, 'cloudflare:')) {
+            $id = Str::after($url, 'cloudflare:');
+            $embedUrl = "https://iframe.cloudflarestream.com/{$id}";
+            $iframe = "<iframe src='$embedUrl' frameborder='0' allow='fullscreen' style='height: 100%; width: 100%;'></iframe>";
+
+            return new self(id: $id, provider: 'Cloudflare', embed: $iframe);
+        }
+
         if (empty($details = (new Embera(['responsive' => true]))->getUrlData($url))) {
             return static::notSupported();
         }
