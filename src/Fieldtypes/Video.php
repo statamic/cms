@@ -26,17 +26,20 @@ class Video extends Fieldtype
 
     public function preload()
     {
-        $providers = new Providers();
-
-        $video = VideoDetails::fromUrl($this->field()->value());
-
-        /** @todo Fetch these from some repository so folks can add their own */
-        return [
-            'embed' => $video->embed,
-            'provider' => $video->provider,
-            'providers' => $providers->get(),
+        $meta = [
+            'providers' => Providers::get(),
             'url' => cp_route('video.details'),
         ];
+
+        if (! is_null($url = $this->field()->value())) {
+            $video = VideoDetails::fromUrl($url);
+
+            /** @todo Fetch these from some repository so folks can add their own */
+            $meta['embed'] = $video->embed;
+            $meta['provider'] = $video->provider;
+        }
+
+        return $meta;
     }
 
     protected function configFieldItems(): array
@@ -68,9 +71,9 @@ class Video extends Fieldtype
 
 class Providers extends SlimProviderCollection
 {
-    public function get(): array
+    public static function get(): array
     {
-        return collect($this->providers)
+        return collect((new static())->providers)
             ->unique()
             ->values()
             ->map(fn (string $class) => ['provider' => class_basename($class)])

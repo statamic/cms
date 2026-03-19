@@ -23,8 +23,10 @@
 
         <ui-input
             v-else
-            :model-value="videoId"
+            :aria-label="__('Video ID')"
+            input-class="border-s-0"
             :isReadOnly="isReadOnly"
+            :model-value="videoId"
             :prepend="__('ID')"
             @update:model-value="detailsFromCloudflare"
         />
