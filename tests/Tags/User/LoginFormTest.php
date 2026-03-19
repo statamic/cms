@@ -15,7 +15,7 @@ class LoginFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -194,6 +194,42 @@ EOT
 
         $this->assertEquals(['Invalid credentials.'], $errors[1]);
         $this->assertEmpty($success[1]);
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url()
+    {
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_error()
+    {
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'wrong',
+                '_error_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
     }
 
     #[Test]

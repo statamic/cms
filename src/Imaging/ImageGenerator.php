@@ -306,7 +306,7 @@ class ImageGenerator
         }
 
         if (! ImageValidator::isValidImage($extension, $mime)) {
-            throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
+            throw UnableToReadFile::fromLocation($path, "Image [{$path}] does not actually appear to be a valid image.");
         }
     }
 
@@ -326,12 +326,6 @@ class ImageGenerator
 
     private function parseUrl($url)
     {
-        $parsed = parse_url($url);
-
-        return [
-            'path' => Str::after($parsed['path'], '/'),
-            'base' => $parsed['scheme'].'://'.$parsed['host'],
-            'query' => $parsed['query'] ?? null,
-        ];
+        return app(RemoteUrlValidator::class)->parse($url);
     }
 }

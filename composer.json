@@ -98,7 +98,8 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests",
-            "Foo\\Bar\\": "tests/Fixtures/Addon"
+            "Foo\\Bar\\": "tests/Fixtures/Addon",
+            "App\\": "tests/Fixtures/App/"
         }
     }
 }

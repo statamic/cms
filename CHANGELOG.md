@@ -1,5 +1,89 @@
 # Release Notes
 
+## 5.73.14 (2026-03-17)
+
+### What's fixed
+- Prevent term creation via fieldtype without permission [#14274](https://github.com/statamic/cms/issues/14274) by @duncanmcclean
+- Prevent path traversal in file dictionary [#14272](https://github.com/statamic/cms/issues/14272) by @duncanmcclean
+- Sanitize SVGs on asset reupload [#14270](https://github.com/statamic/cms/issues/14270) by @jasonvarga
+
+
+
+## 5.73.13 (2026-03-13)
+
+### What's fixed
+- Relationship endpoint authorization [#14254](https://github.com/statamic/cms/issues/14254) by @jasonvarga
+- Fix ensure field has config [#14195](https://github.com/statamic/cms/issues/14195) by @marcorieser
+- Removed a comment from the js code output of the StaticCacher [#14233](https://github.com/statamic/cms/issues/14233) by @micahhenshaw
+- Acquire stache-warming lock in Duplicates::find [#14176](https://github.com/statamic/cms/issues/14176) by @mmodler
+
+
+
+## 5.73.12 (2026-03-04)
+
+### What's fixed
+- Antlers config backwards compatibility [#14146](https://github.com/statamic/cms/issues/14146) by @jasonvarga
+- Config parsing exclusion [#14152](https://github.com/statamic/cms/issues/14152) by @jasonvarga
+- Fix Antlers parser state restoration [#14151](https://github.com/statamic/cms/issues/14151) by @jasonvarga
+- Support Laravel Debugbar 4 [#14142](https://github.com/statamic/cms/issues/14142) by @jasonvarga
+- Remove pdf css [#14141](https://github.com/statamic/cms/issues/14141) by @jasonvarga
+- More Antlers defaults [#14125](https://github.com/statamic/cms/issues/14125) by @jasonvarga
+
+
+
+## 5.73.11 (2026-02-27)
+
+**This release contains a potentially breaking change for the sake of security.**
+
+### What's fixed
+- Antlers hardening (Breaking: See PR for upgrade notes) [#14092](https://github.com/statamic/cms/issues/14092) by @jasonvarga
+- External Glide URL validation [#14101](https://github.com/statamic/cms/issues/14101) by @jasonvarga
+- Harden redirects [#14099](https://github.com/statamic/cms/issues/14099) by @jasonvarga
+- Harden auth redirects [#14089](https://github.com/statamic/cms/issues/14089) by @duncanmcclean
+- Fix user fieldtype search [#14084](https://github.com/statamic/cms/issues/14084) by @duncanmcclean
+- Fix user name and email logic [#14079](https://github.com/statamic/cms/issues/14079) by @jasonvarga
+- Sanitize SVGs [#14077](https://github.com/statamic/cms/issues/14077) by @jasonvarga
+- Fix CSRF token on pages excluded from static caching [#14056](https://github.com/statamic/cms/issues/14056) by @duncanmcclean
+- Improve PDF Viewer [#14045](https://github.com/statamic/cms/issues/14045) by @duncanmcclean
+- Throw UnableToReadFile for invalid images in ImageGenerator [#14043](https://github.com/statamic/cms/issues/14043) by @mmodler
+- Antlers user content and config [#14058](https://github.com/statamic/cms/issues/14058) by @jasonvarga
+- Block methods in Antlers by default [#14059](https://github.com/statamic/cms/issues/14059) by @jasonvarga
+
+
+
+## 5.73.10 (2026-02-20)
+
+### What's fixed
+- Fixes `shouldUpdateUris` regex adding additional brackets to Antlers [#13995](https://github.com/statamic/cms/issues/13995) by @martyf
+- Validate password reset url [#14023](https://github.com/statamic/cms/issues/14023) [#14008](https://github.com/statamic/cms/issues/14008) by @jasonvarga
+- Harden html rendering [#14006](https://github.com/statamic/cms/issues/14006) by @jasonvarga
+
+
+
+## 5.73.9 (2026-02-18)
+
+### What's fixed
+- Correct test namespaces to avoid PSR-4 warnings [#13989](https://github.com/statamic/cms/issues/13989) by @duncanmcclean
+- Sanitize html in html fieldtype [#13992](https://github.com/statamic/cms/issues/13992) by @jasonvarga
+
+
+
+## 5.73.8 (2026-02-18)
+
+### What's fixed
+- Avoid replacing nocache regions in initial full-measure response [#13953](https://github.com/statamic/cms/issues/13953) by @duncanmcclean
+- Fix Icon fieldtype augment error when value is empty [#13966](https://github.com/statamic/cms/issues/13966) by @jhhazelaar
+- Fix `whereIn()`/`whereNotIn()` error for booleans [#13952](https://github.com/statamic/cms/issues/13952) by @duncanmcclean
+
+
+
+## 5.73.7 (2026-02-13)
+
+### What's fixed
+- Revert etags [#13933](https://github.com/statamic/cms/issues/13933) by @jasonvarga
+
+
+
 ## 5.73.6 (2026-02-11)
 
 ### What's fixed

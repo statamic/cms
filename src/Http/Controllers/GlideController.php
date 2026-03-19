@@ -7,6 +7,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
 use League\Glide\Signatures\SignatureFactory;
+use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -113,6 +114,8 @@ class GlideController extends Controller
 
         try {
             return $this->generator->$method($item, $this->request->all());
+        } catch (InvalidRemoteUrlException $e) {
+            abort(400, $e->getMessage());
         } catch (UnableToReadFile $e) {
             throw new NotFoundHttpException;
         }

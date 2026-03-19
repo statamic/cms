@@ -3,7 +3,6 @@
 namespace Tests\Antlers\Runtime;
 
 use Illuminate\Support\Facades\Log;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -27,7 +26,7 @@ class PhpEnabledTest extends ParserTestCase
 
         $this->assertEquals(
             'Hello wildernessWILDERNESS!',
-            (string) $this->parser($data)->allowPhp()->parse('Hello {{ string }}<?php echo strtoupper($string); echo "!"; ?>', $data)
+            (string) $this->parser($data, false, true)->allowPhp()->parse('Hello {{ string }}<?php echo strtoupper($string); echo "!"; ?>', $data)
         );
     }
 
@@ -52,7 +51,7 @@ EOT;
 
         $data = ['title' => 'Hello, there!'];
         $expected = StringUtilities::normalizeLineEndings($expected);
-        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data)->allowPhp()->parse($template, $data));
+        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data, false, true)->allowPhp()->parse($template, $data));
 
         $this->assertSame($expected, $result);
     }
@@ -89,7 +88,7 @@ Hello, world!
 </ul>
 EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
-        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data)->allowPhp()->parse($template, $data));
+        $result = StringUtilities::normalizeLineEndings((string) $this->parser($data, false, true)->allowPhp()->parse($template, $data));
 
         $this->assertSame($expected, $result);
     }
@@ -140,7 +139,7 @@ EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
         );
 
         $this->assertSame($expected, $results);
@@ -188,7 +187,7 @@ EOT;
         $expected = StringUtilities::normalizeLineEndings($expected);
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->setRuntimeConfiguration($config)->allowPhp()->parse($template, $data)
         );
 
         $this->assertSame($expected, $results);
@@ -317,7 +316,7 @@ EOT;
         }
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->allowPhp()->parse($template, $data)
         );
 
         $expected = StringUtilities::normalizeLineEndings($expected);
@@ -446,7 +445,7 @@ EOT;
         }
 
         $results = StringUtilities::normalizeLineEndings(
-            (string) $this->parser($data)->allowPhp()->parse($template, $data)
+            (string) $this->parser($data, false, true)->allowPhp()->parse($template, $data)
         );
 
         $expected = StringUtilities::normalizeLineEndings($expected);
@@ -460,7 +459,7 @@ EOT;
 {{? $var_1 = 'blog'; $var_2 = 'news'; ?}}ABC{{ var_2 }}
 EOT;
 
-        $this->assertSame('ABCnews', $this->renderString($template));
+        $this->assertSame('ABCnews', $this->renderString($template, [], false, true));
     }
 
     public function test_antlers_php_echo_node()
@@ -470,7 +469,7 @@ EOT;
 <p>Literal Content. {{$ $var $}}<END></p>
 EOT;
 
-        $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template)));
+        $this->assertSame('<p>Literal Content. hi!<END></p>', trim($this->renderString($template, [], false, true)));
     }
 
     public function test_php_node_assignments_within_loops()
@@ -511,7 +510,7 @@ EOT;
 <five><1>
 EOT;
 
-        $this->assertSame($expected, trim($this->renderString($template, $data)));
+        $this->assertSame($expected, trim($this->renderString($template, $data, false, true)));
     }
 
     public function test_assignments_from_php_nodes()
@@ -533,7 +532,7 @@ EOT;
 <value_two: {{ value_two }}>
 EOT;
 
-        $result = $this->renderString($template, [], true);
+        $result = $this->renderString($template, [], true, true);
         $this->assertStringContainsString('<value_one: 1125>', $result);
         $this->assertStringContainsString('<value_two: 1025>', $result);
     }

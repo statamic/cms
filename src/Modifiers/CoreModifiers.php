@@ -31,6 +31,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
@@ -119,7 +120,9 @@ class CoreModifiers extends Modifier
      */
     public function antlers($value, $params, $context)
     {
-        return (string) Antlers::parse($value, $context);
+        $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
+
+        return (string) Antlers::parse($value, $context, $trusted);
     }
 
     /**
@@ -1872,7 +1875,7 @@ class CoreModifiers extends Modifier
 
         $partial = 'partials/'.$name.'.html';
 
-        return Parse::template(File::disk('resources')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value, trusted: true);
     }
 
     /**

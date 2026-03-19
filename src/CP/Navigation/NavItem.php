@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
@@ -200,7 +201,22 @@ class NavItem
     {
         $value = $this->icon() ?? 'entries';
 
-        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+        $svg = Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+
+        return $this->sanitizeSvg($svg);
+    }
+
+    private function sanitizeSvg(string $svg): string
+    {
+        try {
+            $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
+
+            return $sanitizer->sanitize($svg, [
+                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            ]);
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     /**
