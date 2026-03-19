@@ -182,12 +182,17 @@ class FieldTransformer
 
     private static function importFieldToVue($field): array
     {
-        return [
+        $import = [
             'type' => 'import',
             'fieldset' => $field['import'],
             'prefix' => $field['prefix'] ?? null,
-            'section_behavior' => $field['section_behavior'] ?? 'preserve',
         ];
+
+        if (isset($field['section_behavior'])) {
+            $import['section_behavior'] = $field['section_behavior'];
+        }
+
+        return $import;
     }
 
     public static function fieldsetFields()
