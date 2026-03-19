@@ -48,7 +48,7 @@ export default {
             observer: null,
             provider: this.meta.provider,
             savedValue: null,
-            url: this.value,
+            url: null,
             videoId: null,
         };
     },
@@ -76,7 +76,7 @@ export default {
         detailsFromCloudflare(id) {
             if (id == null) return;
 
-            this.savedValue = `cloudflare::${id}`;
+            this.savedValue = `cloudflare:${id}`;
             this.videoId = id;
             this.url = null;
 
@@ -104,9 +104,19 @@ export default {
 
             this.update(this.savedValue);
         },
+
+        setUrlOrId() {
+            if (this.value?.startsWith('cloudflare:')) {
+                this.videoId = this.value.replace('cloudflare:','');
+                return;
+            }
+
+            this.url = this.value;
+        }
     },
 
     mounted() {
+        this.setUrlOrId();
         this.observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
