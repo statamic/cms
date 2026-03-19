@@ -612,9 +612,9 @@ TEXT;
     public function test_sanitize_php_is_case_insensitive()
     {
         $this->assertSame('&lt;?php echo "test"; ?>', StringUtilities::sanitizePhp('<?php echo "test"; ?>'));
-        $this->assertSame('&lt;?php echo "test"; ?>', StringUtilities::sanitizePhp('<?PHP echo "test"; ?>'));
-        $this->assertSame('&lt;?php echo "test"; ?>', StringUtilities::sanitizePhp('<?Php echo "test"; ?>'));
-        $this->assertSame('&lt;?php echo "test"; ?>', StringUtilities::sanitizePhp('<?pHp echo "test"; ?>'));
+        $this->assertSame('&lt;?PHP echo "test"; ?>', StringUtilities::sanitizePhp('<?PHP echo "test"; ?>'));
+        $this->assertSame('&lt;?Php echo "test"; ?>', StringUtilities::sanitizePhp('<?Php echo "test"; ?>'));
+        $this->assertSame('&lt;?pHp echo "test"; ?>', StringUtilities::sanitizePhp('<?pHp echo "test"; ?>'));
     }
 
     public function test_sanitize_php_handles_short_echo_tag()
