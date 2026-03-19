@@ -12,6 +12,10 @@ class EntryRevisionsController extends CpController
 {
     public function index(Request $request, $collection, $entry)
     {
+        if (User::current()->cant('view', $entry)) {
+            abort(403);
+        }
+
         $revisions = $entry
             ->revisions()
             ->reverse()
@@ -39,6 +43,10 @@ class EntryRevisionsController extends CpController
 
     public function store(Request $request, $collection, $entry)
     {
+        if (User::current()->cant('edit', $entry)) {
+            abort(403);
+        }
+
         $entry->createRevision([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
@@ -49,6 +57,10 @@ class EntryRevisionsController extends CpController
 
     public function show(Request $request, $collection, $entry, $revision)
     {
+        if (User::current()->cant('view', $entry)) {
+            abort(403);
+        }
+
         $entry = $entry->makeFromRevision($revision);
 
         // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.
