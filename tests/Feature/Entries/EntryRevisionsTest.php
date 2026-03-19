@@ -46,7 +46,7 @@ class EntryRevisionsTest extends TestCase
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
-        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries', 'publish blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
         $entry = EntryFactory::id('1')
@@ -95,6 +95,49 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('1.revisions.1.message', 'Revision two')
             ->assertJsonPath('1.revisions.1.attributes.data.title', 'Original title')
             ->assertJsonPath('1.revisions.1.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-03')->timestamp);
+    }
+
+    #[Test]
+    public function it_denies_access_to_revisions_without_permission_to_view_entry()
+    {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(true)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
+
+        tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision one');
+            $copy->date(Carbon::parse('2017-02-01'));
+        })->save();
+
+        tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision two');
+            $copy->date(Carbon::parse('2017-02-03'));
+        })->save();
+
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['title'] = 'Title modified in working copy';
+            $attrs['data']['foo'] = 'baz';
+            $copy->attributes($attrs);
+        })->save();
+
+        $this
+            ->actingAs($user)
+            ->get($entry->revisionsUrl())
+            ->assertForbidden();
     }
 
     #[Test]
