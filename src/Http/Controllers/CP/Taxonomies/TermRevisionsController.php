@@ -12,6 +12,8 @@ class TermRevisionsController extends CpController
 {
     public function index(Request $request, $taxonomy, $term)
     {
+        abort(403);
+
         $revisions = $term
             ->revisions()
             ->reverse()
@@ -34,6 +36,8 @@ class TermRevisionsController extends CpController
 
     public function store(Request $request, $taxonomy, $term)
     {
+        abort(403);
+
         $term->createRevision([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
@@ -44,6 +48,8 @@ class TermRevisionsController extends CpController
 
     public function show(Request $request, $taxonomy, $term, $site, $revision)
     {
+        abort(403);
+
         $term = $term->makeFromRevision($revision);
 
         // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.
