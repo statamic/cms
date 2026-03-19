@@ -79,7 +79,7 @@ class StringUtilities
      */
     public static function sanitizePhp($text)
     {
-        $text = str_replace('<?php', '&lt;?php', $text);
+        $text = str_ireplace('<?php', '&lt;?php', $text);
 
         // Also replace short tags if they're enabled.
         if (ini_get('short_open_tag')) {
