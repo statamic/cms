@@ -254,6 +254,11 @@ class URL
             return true;
         }
 
+        // Normalize backslashes to forward slashes.
+        // Browsers treat \ as / for special schemes (http/https), which can
+        // cause parse_url() to extract a different host than the browser uses.
+        $url = str_replace('\\', '/', $url);
+
         $urlDomain = parse_url($url, PHP_URL_HOST);
         $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
 
