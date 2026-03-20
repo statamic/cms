@@ -27,7 +27,7 @@ class ApiController extends Controller
      */
     protected function abortIfUnpublished($item)
     {
-        if (request()->isLivePreview()) {
+        if (request()->isLivePreviewOf($item)) {
             return;
         }
 

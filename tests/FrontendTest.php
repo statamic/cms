@@ -255,6 +255,21 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function drafts_are_not_visible_if_using_live_preview_token_for_different_entry()
+    {
+        $this->withStandardFakeErrorViews();
+
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+        $other = $this->createPage('other');
+
+        LivePreview::tokenize('test-token', $other);
+
+        $this
+            ->get('/about?token=test-token')
+            ->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
