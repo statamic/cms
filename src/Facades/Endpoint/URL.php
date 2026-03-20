@@ -280,8 +280,10 @@ class URL
             return false;
         }
 
+        $cacheKey = $url;
+
         if (! Str::startsWith($url, ['/', 'http://', 'https://', '#', '?']) || Str::startsWith($url, '//')) {
-            return self::$externalAppUrlsCache[$url] = true;
+            return self::$externalAppUrlsCache[$cacheKey] = true;
         }
 
         // Normalize backslashes to forward slashes.
@@ -293,7 +295,7 @@ class URL
         $url = Str::ensureRight($url, '/');
 
         if (Str::startsWith($url, ['/', '?', '#'])) {
-            return self::$externalAppUrlsCache[$url] = false;
+            return self::$externalAppUrlsCache[$cacheKey] = false;
         }
 
         $urlWithoutQuery = Str::of($url)->before('?')->before('#');
@@ -304,12 +306,12 @@ class URL
             ->isEmpty();
 
         if (! $this->hasRelativeSite()) {
-            return self::$externalAppUrlsCache[$url] = $isExternalToSites;
+            return self::$externalAppUrlsCache[$cacheKey] = $isExternalToSites;
         }
 
         $isExternalToCurrentRequestDomain = $urlDomain !== self::getDomainFromAbsolute(url()->to('/'));
 
-        return self::$externalAppUrlsCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
+        return self::$externalAppUrlsCache[$cacheKey] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
 
     /**
