@@ -75,7 +75,7 @@ class EntryQuery extends Query
 
         $entry = $query->limit(1)->get()->first();
 
-        if ($entry && $entry->published() === false && request()->isLivePreview() && ! request()->isLivePreviewOf($entry)) {
+        if ($entry && $entry->status() !== 'published' && request()->isLivePreview() && ! request()->isLivePreviewOf($entry)) {
             return null;
         }
 
