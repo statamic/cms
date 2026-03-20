@@ -43,7 +43,7 @@ class URL
         $url = Path::tidy($url);
 
         // If URL is external to this Statamic application, we'll leave leading/trailing slashes by default.
-        if (! $external && self::isAbsolute($url) && self::isExternalToApplication($url)) {
+        if (! $external && $this->shouldLeaveExternalAbsoluteUrlUntouched($url)) {
             return $url;
         }
 
@@ -106,7 +106,7 @@ class URL
      */
     public function parent(?string $url): string
     {
-        $trailingSlash = self::isAbsolute($url) && self::isExternalToApplication($url)
+        $trailingSlash = $this->shouldLeaveExternalAbsoluteUrlUntouched($url)
             ? self::hasTrailingSlash($url)
             : self::$enforceTrailingSlashes;
 
@@ -190,7 +190,7 @@ class URL
     public function makeAbsolute(?string $url): string
     {
         // If URL is external to this Statamic application, we'll just leave it as-is.
-        if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
+        if ($this->shouldLeaveExternalAbsoluteUrlUntouched($url)) {
             return $url;
         }
 
@@ -210,6 +210,27 @@ class URL
     public function getCurrent(): string
     {
         return self::tidy(request()->path());
+    }
+
+    private function shouldLeaveExternalAbsoluteUrlUntouched(?string $url): bool
+    {
+        if (! self::isAbsolute($url) || ! self::isExternalToApplication($url)) {
+            return false;
+        }
+
+        return ! $this->hostMatchesConfiguredAppUrl($url);
+    }
+
+    private function hostMatchesConfiguredAppUrl(?string $url): bool
+    {
+        if (! $url || ! self::isAbsolute($url)) {
+            return false;
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+        $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        return $host && $appHost && strtolower($host) === strtolower($appHost);
     }
 
     /**
@@ -265,6 +286,7 @@ class URL
         // Browsers treat \ as / for special schemes (http/https), which can
         // cause parse_url() to extract a different host than the browser uses.
         $url = str_replace('\\', '/', $url);
+        $url = preg_replace('/%5c/i', '/', $url);
 
         $url = Str::ensureRight($url, '/');
 
@@ -278,6 +300,14 @@ class URL
         $isExternalToSites = self::getAbsoluteSiteUrls()
             ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
             ->isEmpty();
+
+        $hasRelativeSite = Site::all()->contains(
+            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
+        );
+
+        if (! $hasRelativeSite) {
+            return self::$externalAppUrlsCache[$url] = $isExternalToSites;
+        }
 
         $isExternalToCurrentRequestDomain = $urlDomain !== self::getDomainFromAbsolute(url()->to('/'));
 
