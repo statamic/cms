@@ -88,7 +88,6 @@ class UrlTest extends TestCase
         $this->setSites([
             'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
             'b' => ['name' => 'B', 'locale' => 'en_US', 'url' => 'http://subdomain.this-site.com/'],
-            'c' => ['name' => 'C', 'locale' => 'fr_FR', 'url' => '/fr/'],
         ]);
 
         $this->assertEquals($expected, URL::isExternalToApplication($url));

@@ -99,6 +99,22 @@ trait ProvidesExternalUrls
             'http://evil.com\\@this-site.com',
             'http://evil.com\\\@this-site.com',
 
+            // Percent-encoded backslash bypass
+            'http://evil.com%5c@this-site.com',
+            'http://evil.com%5c@this-site.com/',
+            'http://evil.com%5c@this-site.com/path',
+            'http://evil.com%5c@subdomain.this-site.com',
+            'http://evil.com%5c@absolute-url-resolved-from-request.com',
+            'https://evil.com%5C@this-site.com',
+
+            // Absolute-looking URL with no host (parse_url() returns false)
+            'http:///path',
+
+            // Percent-encoded whitespace bypass
+            '%20http://evil.com',
+            '%09http://evil.com',
+            '%0ahttp://evil.com',
+
             // Dangerous URL schemes
             'javascript:alert(1)',
             'javascript:alert(document.cookie)',

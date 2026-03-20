@@ -251,11 +251,21 @@ class URL
      */
     public function isExternalToApplication(?string $url): bool
     {
-        if (! $url) {
+        if ($url === null || $url === '') {
             return false;
         }
 
-        if (! Str::startsWith($url, ['/', 'http://', 'https://', '#', '?']) || Str::startsWith($url, '//')) {
+        $urlLower = strtolower($url);
+
+        if (Str::startsWith($urlLower, '//')) {
+            return true;
+        }
+
+        if (Str::startsWith($urlLower, ['/', '#', '?'])) {
+            return false;
+        }
+
+        if (! Str::startsWith($urlLower, ['http://', 'https://'])) {
             return true;
         }
 
@@ -263,19 +273,23 @@ class URL
         // Browsers treat \ as / for special schemes (http/https), which can
         // cause parse_url() to extract a different host than the browser uses.
         $url = str_replace('\\', '/', $url);
+        $url = preg_replace('/%5c/i', '/', $url);
 
-        $urlDomain = parse_url($url, PHP_URL_HOST);
+        // If we can't extract a host from an absolute http(s) URL, treat it as external.
+        // Non-http(s) and relative URLs are handled by the guards above.
+        if (! $urlDomain = parse_url($url, PHP_URL_HOST)) {
+            return true;
+        }
+
         $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
 
-        return $urlDomain
-            ? Site::all()
-                ->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST))
-                ->push($currentRequestDomain)
-                ->filter(fn ($siteDomain) => ! is_null($siteDomain))
-                ->unique()
-                ->filter(fn ($siteDomain) => $siteDomain === $urlDomain)
-                ->isEmpty()
-            : false;
+        return Site::all()
+            ->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST))
+            ->push($currentRequestDomain)
+            ->filter(fn ($siteDomain) => ! is_null($siteDomain))
+            ->unique()
+            ->filter(fn ($siteDomain) => $siteDomain === $urlDomain)
+            ->isEmpty();
     }
 
     public function clearExternalUrlCache()
