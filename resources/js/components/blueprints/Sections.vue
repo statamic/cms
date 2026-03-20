@@ -11,6 +11,8 @@
                 :show-handle-field="showSectionHandleField"
                 :show-collapsible-field="showSectionCollapsibleField"
                 :show-hide-field="showSectionHideField"
+                :exclude-fieldset="excludeFieldset"
+                :with-command-palette="withCommandPalette"
                 :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
@@ -77,6 +79,14 @@ export default {
 		    default: false,
 	    },
         showSectionHideField: {
+            type: Boolean,
+            default: false,
+        },
+        excludeFieldset: {
+            type: String,
+            default: null,
+        },
+        withCommandPalette: {
             type: Boolean,
             default: false,
         },

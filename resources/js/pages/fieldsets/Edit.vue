@@ -28,6 +28,8 @@
             tab-id="fieldset"
             :initial-sections="sections"
             :show-section-collapsible-field="true"
+            :exclude-fieldset="fieldset.handle"
+            with-command-palette
             @updated="sections = $event"
         />
     </div>
