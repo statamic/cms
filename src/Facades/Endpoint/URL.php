@@ -15,6 +15,8 @@ class URL
 {
     private static $enforceTrailingSlashes = false;
     private static $absoluteSiteUrlsCache;
+    private static $hasRelativeSiteCache;
+    private static $siteCachesLoaded = false;
     private static $externalSiteUrlsCache;
     private static $externalAppUrlsCache;
 
@@ -301,11 +303,7 @@ class URL
             ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
             ->isEmpty();
 
-        $hasRelativeSite = Site::all()->contains(
-            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
-        );
-
-        if (! $hasRelativeSite) {
+        if (! $this->hasRelativeSite()) {
             return self::$externalAppUrlsCache[$url] = $isExternalToSites;
         }
 
@@ -369,7 +367,9 @@ class URL
      */
     public function clearUrlCache(): void
     {
+        self::$siteCachesLoaded = false;
         self::$absoluteSiteUrlsCache = null;
+        self::$hasRelativeSiteCache = null;
         self::$externalSiteUrlsCache = null;
         self::$externalAppUrlsCache = null;
     }
@@ -402,18 +402,46 @@ class URL
     }
 
     /**
+     * Warm site-derived caches from a single Site::all() call
+     */
+    private function ensureSiteCaches(): void
+    {
+        if (self::$siteCachesLoaded) {
+            return;
+        }
+
+        $sites = Site::all();
+
+        self::$hasRelativeSiteCache = $sites->contains(
+            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
+        );
+
+        self::$absoluteSiteUrlsCache = $sites
+            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
+            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
+            ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
+
+        self::$siteCachesLoaded = true;
+    }
+
+    /**
      * Get and cache absolute site URLs for external checks.
      */
     private function getAbsoluteSiteUrls(): Collection
     {
-        if (self::$absoluteSiteUrlsCache) {
-            return self::$absoluteSiteUrlsCache;
-        }
+        $this->ensureSiteCaches();
 
-        return self::$absoluteSiteUrlsCache = Site::all()
-            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
-            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
-            ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
+        return self::$absoluteSiteUrlsCache;
+    }
+
+    /**
+     * Checks whether there is a site configured with a relative URL.
+     */
+    private function hasRelativeSite(): bool
+    {
+        $this->ensureSiteCaches();
+
+        return self::$hasRelativeSiteCache;
     }
 
     /**
