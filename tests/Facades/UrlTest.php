@@ -248,7 +248,7 @@ class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_determines_if_external_url_to_application_when_only_current_request_domain_matches()
+    public function it_determines_if_external_url_to_application_when_only_current_request_domain_matches_when_theres_a_relative_site_url()
     {
         $this->setSites([
             'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
