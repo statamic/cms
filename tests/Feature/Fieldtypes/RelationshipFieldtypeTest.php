@@ -61,8 +61,40 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_denies_access_to_entries_when_theres_a_collection_the_user_cannot_view()
+    public function it_limits_access_to_entries_from_collections_the_user_can_view()
     {
+        Collection::make('pages')->save();
+        Entry::make()->collection('pages')->slug('home')->data(['title' => 'Home'])->save();
+
+        Collection::make('secret')->save();
+        Entry::make()->collection('secret')->slug('secret-one')->data(['title' => 'Secret One'])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view pages entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'entries',
+            'collections' => ['pages', 'secret'],
+        ]));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJson([
+                'data' => [
+                    ['slug' => 'home'],
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function it_denies_access_to_entries_when_user_cannot_view_any_of_the_collections()
+    {
+        Collection::make('pages')->save();
+        Entry::make()->collection('pages')->slug('home')->data(['title' => 'Home'])->save();
+
         Collection::make('secret')->save();
         Entry::make()->collection('secret')->slug('secret-one')->data(['title' => 'Secret One'])->save();
 
@@ -71,7 +103,7 @@ class RelationshipFieldtypeTest extends TestCase
 
         $config = base64_encode(json_encode([
             'type' => 'entries',
-            'collections' => ['secret'],
+            'collections' => ['pages', 'secret'],
         ]));
 
         $this
@@ -81,8 +113,11 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_forbids_access_to_entries_when_filters_target_a_collection_the_user_cannot_view()
+    public function it_forbids_access_to_entries_when_filters_target_collections_the_user_cannot_view()
     {
+        Collection::make('pages')->save();
+        Entry::make()->collection('pages')->slug('home')->data(['title' => 'Home'])->save();
+
         Collection::make('secret')->save();
         Entry::make()->collection('test')->slug('apple')->data(['title' => 'Apple'])->save();
         Entry::make()->collection('secret')->slug('secret-one')->data(['title' => 'Secret One'])->save();
