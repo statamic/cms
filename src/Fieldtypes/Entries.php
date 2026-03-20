@@ -171,7 +171,7 @@ class Entries extends Relationship
         return $paginate ? $results->setCollection($items) : $items;
     }
 
-    private function authorizeCollectionAccess($collections)
+    private function authorizeCollectionAccess(array $collections): void
     {
         $user = User::current();
 

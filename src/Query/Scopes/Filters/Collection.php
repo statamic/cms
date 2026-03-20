@@ -56,11 +56,11 @@ class Collection extends Filter
             ->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()]);
     }
 
-    private function authorizeCollectionAccess(array $collections)
+    private function authorizeCollectionAccess(array $collections): void
     {
         $user = User::current();
 
-        collect($collections)->each(function ($collectionHandle) use ($user) {
+        collect($collections)->each(function (string $collectionHandle) use ($user) {
             $collection = Facades\Collection::findByHandle($collectionHandle);
 
             throw_if(
