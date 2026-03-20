@@ -281,11 +281,15 @@ class URL
             return true;
         }
 
-        $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
+        $sites = Site::all();
+        $siteDomains = $sites->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST));
 
-        return Site::all()
-            ->map(fn ($site) => parse_url($site->absoluteUrl(), PHP_URL_HOST))
-            ->push($currentRequestDomain)
+        if ($sites->contains(fn ($site) => Str::startsWith((string) $site->url(), '/'))) {
+            $currentRequestDomain = parse_url(url()->to('/'), PHP_URL_HOST);
+            $siteDomains->push($currentRequestDomain);
+        }
+
+        return $siteDomains
             ->filter(fn ($siteDomain) => ! is_null($siteDomain))
             ->unique()
             ->filter(fn ($siteDomain) => $siteDomain === $urlDomain)
