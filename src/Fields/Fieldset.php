@@ -63,12 +63,23 @@ class Fieldset
         return $this;
     }
 
+    /**
+     * Canonical storage: either top-level `fields` (flat) or non-empty `sections`, never both.
+     * Hand-edited YAML or mixed input is normalized on save.
+     */
     public function setContents(array $contents)
     {
-        $contents['fields'] = $this->normalizeFields(Arr::get($contents, 'fields', []));
-
         if (array_key_exists('sections', $contents)) {
             $contents['sections'] = $this->normalizeSections(Arr::get($contents, 'sections', []));
+        }
+
+        $usesSections = array_key_exists('sections', $contents) && ! empty($contents['sections']);
+
+        if ($usesSections) {
+            unset($contents['fields']);
+        } else {
+            unset($contents['sections']);
+            $contents['fields'] = $this->normalizeFields(Arr::get($contents, 'fields', []));
         }
 
         $this->contents = $contents;

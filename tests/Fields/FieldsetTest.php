@@ -156,6 +156,46 @@ class FieldsetTest extends TestCase
     }
 
     #[Test]
+    public function it_drops_empty_sections_when_storing_flat_fields()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'title' => 'Test',
+            'sections' => [],
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('sections', $fieldset->contents());
+        $this->assertEquals('one', $fieldset->fields()->all()->first()->handle());
+    }
+
+    #[Test]
+    public function it_drops_top_level_fields_when_storing_sections()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'sections' => [
+                [
+                    'display' => 'A',
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+            'fields' => [
+                ['handle' => 'stale', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('fields', $fieldset->contents());
+        $this->assertEquals(['one'], $fieldset->fields()->all()->keys()->all());
+    }
+
+    #[Test]
     public function it_normalizes_legacy_section_fields_syntax()
     {
         $fieldset = new Fieldset;

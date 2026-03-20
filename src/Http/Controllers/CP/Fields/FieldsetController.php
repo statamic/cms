@@ -132,37 +132,26 @@ class FieldsetController extends CpController
             'fields' => 'array',
         ]);
 
-        $contents = array_merge($fieldset->contents(), [
-            'title' => $request->title,
-        ]);
+        $base = array_merge(
+            Arr::except($fieldset->contents(), ['fields', 'sections']),
+            ['title' => $request->title],
+        );
 
         if ($request->has('sections')) {
-            $sections = collect($request->sections)->map(function ($section) {
-                return Arr::removeNullValues([
-                    'display' => Arr::get($section, 'display'),
-                    'instructions' => Arr::get($section, 'instructions'),
-                    'collapsible' => ($collapsible = Arr::get($section, 'collapsible')) ?: null,
-                    'collapsed' => ($collapsible && Arr::get($section, 'collapsed')) ?: null,
-                    'fields' => collect(Arr::get($section, 'fields', []))->map(function ($field) {
-                        return FieldTransformer::fromVue($field);
-                    })->all(),
-                ]);
-            })->all();
+            $sections = $this->sectionsFromVueRequest($request->sections);
 
-            if ($this->shouldStoreAsFlatFields($sections)) {
-                $contents['fields'] = Arr::get($sections, '0.fields', []);
-                unset($contents['sections']);
-            } else {
-                $contents['sections'] = $sections;
-            }
+            $fieldset->setContents(
+                $this->shouldStoreAsFlatFields($sections)
+                    ? $base + ['fields' => Arr::get($sections, '0.fields', [])]
+                    : $base + ['sections' => $sections]
+            );
         } else {
-            $contents['fields'] = collect($request->fields)->map(function ($field) {
-                return FieldTransformer::fromVue($field);
-            })->all();
-            unset($contents['sections']);
+            $fieldset->setContents($base + [
+                'fields' => collect($request->fields)
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
         }
-
-        $fieldset->setContents($contents);
 
         $fieldset->validateRecursion();
 
@@ -240,6 +229,21 @@ class FieldsetController extends CpController
         }
 
         return __('My Fieldsets');
+    }
+
+    private function sectionsFromVueRequest(array $sections): array
+    {
+        return collect($sections)->map(function ($section) {
+            return Arr::removeNullValues([
+                'display' => Arr::get($section, 'display'),
+                'instructions' => Arr::get($section, 'instructions'),
+                'collapsible' => ($collapsible = Arr::get($section, 'collapsible')) ?: null,
+                'collapsed' => ($collapsible && Arr::get($section, 'collapsed')) ?: null,
+                'fields' => collect(Arr::get($section, 'fields', []))
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
+        })->all();
     }
 
     private function sectionsToVue(Fieldset $fieldset): array

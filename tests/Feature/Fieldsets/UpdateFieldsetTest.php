@@ -160,9 +160,6 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals([
             'title' => 'Updated title',
             'foo' => 'bar',
-            'fields' => [
-                ['handle' => 'legacy', 'field' => ['type' => 'text']],
-            ],
             'sections' => [
                 [
                     'display' => 'SEO',
@@ -273,7 +270,6 @@ class UpdateFieldsetTest extends TestCase
 
         $this->assertEquals([
             'title' => 'Updated',
-            'fields' => [],
             'sections' => [
                 [
                     'display' => 'Main',
