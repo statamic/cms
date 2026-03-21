@@ -80,25 +80,22 @@ class AssetUploader extends Uploader
 
     public static function getSafeFilename($string)
     {
-        $replacements = array_merge(
-            [
-                ' ' => '-',
-                '#' => '-',
-                ':' => '-',
-                '<' => '-',
-                '>' => '-',
-                '"' => '-',
-                '/' => '-',
-                '\\' => '-',
-                '|' => '-',
-                '?' => '-',
-                '*' => '-',
-                '%' => '-',
-                "'" => '-',
-                '--' => '-',
-            ],
-            config('statamic.assets.additional_filename_replacements', [])
-        );
+        $replacements = array_merge([
+            ' ' => '-',
+            '#' => '-',
+            ':' => '-',
+            '<' => '-',
+            '>' => '-',
+            '"' => '-',
+            '/' => '-',
+            '\\' => '-',
+            '|' => '-',
+            '?' => '-',
+            '*' => '-',
+            '%' => '-',
+            "'" => '-',
+            '--' => '-',
+        ], config('statamic.assets.additional_filename_replacements', []));
 
         return (string) Str::of(urldecode($string))
             ->replace(array_keys($replacements), array_values($replacements))
