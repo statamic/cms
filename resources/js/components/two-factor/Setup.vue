@@ -51,7 +51,7 @@ function complete() {
 }
 
 watch(setupModalOpen, (open) => {
-    if (!open) emit('close');
+    if (!open && !recoveryCodesModalOpen.value) emit('close');
 });
 </script>
 
