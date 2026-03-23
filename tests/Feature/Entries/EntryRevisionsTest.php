@@ -141,6 +141,66 @@ class EntryRevisionsTest extends TestCase
     }
 
     #[Test]
+    public function it_denies_access_to_a_specific_revision_without_permission_to_view_entry()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(true)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
+
+        $revision = tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision one');
+            $copy->date(Carbon::parse('2017-02-01'));
+        });
+        $revision->save();
+
+        $this
+            ->actingAs($user)
+            ->get($entry->revisionsUrl().'/'.$revision->date()->timestamp)
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_denies_creating_a_revision_without_permission_to_edit_entry()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['foo'] = 'foo modified in working copy';
+            $copy->attributes($attrs);
+        })->save();
+
+        $this
+            ->actingAs($user)
+            ->post($entry->createRevisionUrl(), ['message' => 'Test!'])
+            ->assertForbidden();
+    }
+
+    #[Test]
     public function it_publishes_an_entry()
     {
         $now = Carbon::parse('2017-02-03');
