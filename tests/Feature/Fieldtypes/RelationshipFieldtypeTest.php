@@ -115,9 +115,6 @@ class RelationshipFieldtypeTest extends TestCase
     #[Test]
     public function it_forbids_access_to_entries_when_filters_target_collections_the_user_cannot_view()
     {
-        Collection::make('pages')->save();
-        Entry::make()->collection('pages')->slug('home')->data(['title' => 'Home'])->save();
-
         Collection::make('secret')->save();
         Entry::make()->collection('test')->slug('apple')->data(['title' => 'Apple'])->save();
         Entry::make()->collection('secret')->slug('secret-one')->data(['title' => 'Secret One'])->save();
