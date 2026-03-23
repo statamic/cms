@@ -147,8 +147,7 @@ class Entries extends Relationship
                 'collection',
                 collect($configuredCollections)
                     ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
-                    ->filter()
-                    ->filter(fn ($collection) => $user->can('view', $collection))
+                    ->filter(fn ($collection) => $collection && $user->can('view', $collection))
                     ->map->handle()
                     ->all()
             );

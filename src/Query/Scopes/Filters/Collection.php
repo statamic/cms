@@ -52,7 +52,7 @@ class Collection extends Filter
 
         return collect($this->context['collections'])
             ->map(fn ($collection) => Facades\Collection::findByHandle($collection))
-            ->filter(fn ($collection) => $user->can('view', $collection))
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection))
             ->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()]);
     }
 

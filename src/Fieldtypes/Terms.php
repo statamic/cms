@@ -427,8 +427,7 @@ class Terms extends Relationship
 
         $taxonomies = collect($request->taxonomies ?? $this->getConfiguredTaxonomies())
             ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
-            ->filter()
-            ->filter(fn ($taxonomy) => $user->can('view', $taxonomy))
+            ->filter(fn ($taxonomy) => $taxonomy && $user->can('view', $taxonomy))
             ->map->handle()
             ->all();
 
