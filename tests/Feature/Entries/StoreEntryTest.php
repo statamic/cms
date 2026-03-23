@@ -203,6 +203,29 @@ class StoreEntryTest extends TestCase
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/14251
+     **/
+    #[Test]
+    public function date_is_saved_in_app_timezone_if_collection_is_dated()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z']) // 16:30 UTC is 17:30 in Zurich
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('2026-03-23 17:30:00', $entry->date()->format('Y-m-d H:i:s')); // Should be saved in Europe/Zurich, so 17:30.
+    }
+
     #[Test]
     public function it_can_validate_against_published_value()
     {
