@@ -159,7 +159,7 @@ class RelationshipFieldtypeTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->getJson("/cp/fieldtypes/relationship?config={$config}&taxonomies[0]=topics&taxonomies[1]=secret")
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJson([
@@ -187,7 +187,7 @@ class RelationshipFieldtypeTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->getJson("/cp/fieldtypes/relationship?config={$config}&taxonomies[0]=topics&taxonomies[1]=secret")
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
             ->assertForbidden();
     }
 }

@@ -300,9 +300,7 @@ class Terms extends Relationship
 
     protected function getFirstTaxonomyFromRequest($request)
     {
-        return $request->taxonomies
-            ? Facades\Taxonomy::findByHandle($request->taxonomies[0])
-            : Facades\Taxonomy::all()->first();
+        return Facades\Taxonomy::all()->first();
     }
 
     public function getSortColumn($request)
@@ -425,7 +423,7 @@ class Terms extends Relationship
         $query = Term::query();
         $user = User::current();
 
-        $taxonomies = collect($request->taxonomies ?? $this->getConfiguredTaxonomies())
+        $taxonomies = collect($this->getConfiguredTaxonomies())
             ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
             ->filter(fn ($taxonomy) => $taxonomy && $user->can('view', $taxonomy))
             ->map->handle()
