@@ -300,7 +300,13 @@ class Terms extends Relationship
 
     protected function getFirstTaxonomyFromRequest($request)
     {
-        return Facades\Taxonomy::all()->first();
+        $taxonomies = $this->getConfiguredTaxonomies();
+
+        $taxonomy = Taxonomy::findByHandle($taxonomyHandle = Arr::first($taxonomies));
+
+        throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
+
+        return $taxonomy;
     }
 
     public function getSortColumn($request)
