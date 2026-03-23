@@ -136,7 +136,7 @@ class EntryRevisionsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get($entry->revisionsUrl())
+            ->getJson($entry->revisionsUrl())
             ->assertForbidden();
     }
 
@@ -166,7 +166,7 @@ class EntryRevisionsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get($entry->revisionsUrl().'/'.$revision->date()->timestamp)
+            ->getJson($entry->revisionsUrl().'/'.$revision->date()->timestamp)
             ->assertForbidden();
     }
 
@@ -196,7 +196,7 @@ class EntryRevisionsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post($entry->createRevisionUrl(), ['message' => 'Test!'])
+            ->postJson($entry->createRevisionUrl(), ['message' => 'Test!'])
             ->assertForbidden();
     }
 

@@ -12,9 +12,7 @@ class EntryRevisionsController extends CpController
 {
     public function index(Request $request, $collection, $entry)
     {
-        if (User::current()->cant('view', $entry)) {
-            abort(403);
-        }
+        $this->authorize('view', $entry);
 
         $revisions = $entry
             ->revisions()
@@ -43,9 +41,7 @@ class EntryRevisionsController extends CpController
 
     public function store(Request $request, $collection, $entry)
     {
-        if (User::current()->cant('edit', $entry)) {
-            abort(403);
-        }
+        $this->authorize('edit', $entry);
 
         $entry->createRevision([
             'message' => $request->message,
@@ -57,9 +53,7 @@ class EntryRevisionsController extends CpController
 
     public function show(Request $request, $collection, $entry, $revision)
     {
-        if (User::current()->cant('view', $entry)) {
-            abort(403);
-        }
+        $this->authorize('view', $entry);
 
         $entry = $entry->makeFromRevision($revision);
 
