@@ -176,8 +176,7 @@ class Entries extends Relationship
 
         $authorizedCollections = collect($collections)
             ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
-            ->filter()
-            ->filter(fn ($collection) => $user->can('view', $collection));
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection));
 
         throw_if($authorizedCollections->isEmpty(), new AuthorizationException);
     }
