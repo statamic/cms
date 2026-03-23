@@ -171,7 +171,7 @@ class EntryRevisionsTest extends TestCase
     }
 
     #[Test]
-    public function it_denies_creating_a_revision_without_permission_to_edit_entry()
+    public function it_views_a_specific_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
@@ -180,24 +180,24 @@ class EntryRevisionsTest extends TestCase
         $entry = EntryFactory::id('1')
             ->slug('test')
             ->collection('blog')
-            ->published(false)
+            ->published(true)
             ->date('2010-12-25')
             ->data([
                 'blueprint' => 'test',
-                'title' => 'Title',
+                'title' => 'Original title',
                 'foo' => 'bar',
             ])->create();
 
-        tap($entry->makeWorkingCopy(), function ($copy) {
-            $attrs = $copy->attributes();
-            $attrs['data']['foo'] = 'foo modified in working copy';
-            $copy->attributes($attrs);
-        })->save();
+        $revision = tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision one');
+            $copy->date(Carbon::parse('2017-02-01'));
+        });
+        $revision->save();
 
         $this
             ->actingAs($user)
-            ->postJson($entry->createRevisionUrl(), ['message' => 'Test!'])
-            ->assertForbidden();
+            ->getJson($entry->revisionsUrl().'/'.$revision->date()->timestamp)
+            ->assertOk();
     }
 
     #[Test]
@@ -320,6 +320,36 @@ class EntryRevisionsTest extends TestCase
     }
 
     #[Test]
+    public function it_denies_creating_a_revision_without_permission_to_edit_entry()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['foo'] = 'foo modified in working copy';
+            $copy->attributes($attrs);
+        })->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson($entry->createRevisionUrl(), ['message' => 'Test!'])
+            ->assertForbidden();
+    }
+
+    #[Test]
     public function it_creates_a_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
@@ -375,6 +405,29 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('Test!', $revision->message());
         $this->assertEquals('revision', $revision->action());
         $this->assertTrue($entry->hasWorkingCopy());
+    }
+
+    #[Test]
+    public function it_denies_restoring_a_revision_without_permission_to_edit_entry()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('123')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->postJson($entry->restoreRevisionUrl(), ['revision' => '1553546421'])
+            ->assertForbidden();
     }
 
     #[Test]
