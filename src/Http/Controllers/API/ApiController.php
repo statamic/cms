@@ -27,7 +27,7 @@ class ApiController extends Controller
      */
     protected function abortIfUnpublished($item)
     {
-        if (request()->isLivePreview()) {
+        if (request()->isLivePreviewOf($item)) {
             return;
         }
 
@@ -75,19 +75,6 @@ class ApiController extends Controller
         $allowedResources = ResourceAuthorizer::allowedSubResources('api', $this->resourceConfigKey);
 
         return $items->filter(fn ($item) => in_array($item->handle(), $allowedResources));
-    }
-
-    /**
-     * Filter, sort, and paginate query for API resource output.
-     *
-     * @param  \Statamic\Query\Builder  $query
-     * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
-     *
-     * @deprecated
-     */
-    protected function filterSortAndPaginate($query)
-    {
-        return $this->updateAndPaginate($query);
     }
 
     /**

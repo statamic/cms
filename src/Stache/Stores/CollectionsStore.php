@@ -40,6 +40,7 @@ class CollectionsStore extends BasicStore
 
         $collection = Collection::make($handle)
             ->title(Arr::get($data, 'title'))
+            ->icon(Arr::get($data, 'icon'))
             ->routes(Arr::get($data, 'route'))
             ->requiresSlugs(Arr::get($data, 'slugs', true))
             ->titleFormats(Arr::get($data, 'title_format'))
@@ -59,7 +60,8 @@ class CollectionsStore extends BasicStore
             ->taxonomies(Arr::get($data, 'taxonomies'))
             ->propagate(Arr::get($data, 'propagate'))
             ->previewTargets($this->normalizePreviewTargets(Arr::get($data, 'preview_targets', [])))
-            ->autosaveInterval(Arr::get($data, 'autosave'));
+            ->autosaveInterval(Arr::get($data, 'autosave'))
+            ->entryClass(Arr::get($data, 'entry_class'));
 
         if ($dateBehavior = Arr::get($data, 'date_behavior')) {
             $collection

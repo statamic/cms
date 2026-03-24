@@ -59,27 +59,42 @@ class Entries extends Relationship
         'initialOriginMeta' => 'originMeta',
         'initialSite' => 'locale',
         'initialIsWorkingCopy' => 'hasWorkingCopy',
-        'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
-        'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
         'canManagePublishState' => 'canManagePublishState',
-        'collectionHasRoutes' => 'collectionHasRoutes',
     ];
 
     protected function configFieldItems(): array
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                        'width' => 50,
                     ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
+                        'width' => 50,
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -90,6 +105,7 @@ class Entries extends Relationship
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                        'width' => 50,
                     ],
                     'create' => [
                         'display' => __('Allow Creating'),
@@ -99,18 +115,24 @@ class Entries extends Relationship
                         'if' => [
                             'mode' => 'default',
                         ],
+                        'width' => 50,
                     ],
-                    'collections' => [
-                        'display' => __('Collections'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
-                        'type' => 'collections',
-                        'mode' => 'select',
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
-                    'search_index' => [
-                        'display' => __('Search Index'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
-                        'type' => 'text',
-                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
@@ -121,11 +143,6 @@ class Entries extends Relationship
                             ->values()
                             ->all(),
                     ],
-                    'select_across_sites' => [
-                        'display' => __('Select Across Sites'),
-                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
-                        'type' => 'toggle',
-                    ],
                 ],
             ],
         ];
@@ -134,15 +151,23 @@ class Entries extends Relationship
     public function getIndexItems($request)
     {
         $configuredCollections = $this->getConfiguredCollections();
-        $requestedCollections = $this->getRequestedCollections($request, $configuredCollections);
-        $this->authorizeCollectionAccess($requestedCollections);
+        $this->authorizeCollectionAccess($configuredCollections);
 
         $query = $this->getIndexQuery($request);
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $query->whereIn('collection', $configuredCollections);
+            $user = User::current();
+
+            $query->whereIn(
+                'collection',
+                collect($configuredCollections)
+                    ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
+                    ->filter(fn ($collection) => $collection && $user->can('view', $collection))
+                    ->map->handle()
+                    ->all()
+            );
         }
 
         if ($blueprints = $this->config('blueprints')) {
@@ -162,28 +187,15 @@ class Entries extends Relationship
         return $paginate ? $results->setCollection($items) : $items;
     }
 
-    private function getRequestedCollections($request, $configuredCollections)
-    {
-        $filteredCollections = collect($request->input('filters.collection.collections', []))
-            ->filter()
-            ->values()
-            ->all();
-
-        return empty($filteredCollections) ? $configuredCollections : $filteredCollections;
-    }
-
-    private function authorizeCollectionAccess($collections)
+    private function authorizeCollectionAccess(array $collections): void
     {
         $user = User::current();
 
-        collect($collections)->each(function ($collectionHandle) use ($user) {
-            $collection = Collection::findByHandle($collectionHandle);
+        $authorizedCollections = collect($collections)
+            ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection));
 
-            throw_if(
-                ! $collection || ! $user->can('view', $collection),
-                new AuthorizationException
-            );
-        });
+        throw_if($authorizedCollections->isEmpty(), new AuthorizationException);
     }
 
     public function getResourceCollection($request, $items)
@@ -324,7 +336,7 @@ class Entries extends Relationship
 
         $user = User::current();
 
-        return collect($collections)->flatMap(function ($collectionHandle) use ($collections, $user) {
+        return collect($collections)->flatMap(function ($collectionHandle) use ($user) {
             $collection = Collection::findByHandle($collectionHandle);
 
             throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
@@ -337,26 +349,15 @@ class Entries extends Relationship
 
             return $blueprints
                 ->reject->hidden()
-                ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                ->map(function ($blueprint) use ($collection) {
                     return [
-                        'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                        'parent_title' => $collection->title(),
+                        'blueprint' => $blueprint->title(),
+                        'handle' => $blueprint->handle(),
                         'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
                     ];
                 });
         })->all();
-    }
-
-    private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
-    {
-        if ($collectionCount > 1 && $blueprintCount === 1) {
-            return $collection->title();
-        }
-
-        if ($collectionCount > 1 && $blueprintCount > 1) {
-            return $collection->title().': '.$blueprint->title();
-        }
-
-        return $blueprint->title();
     }
 
     protected function toItemArray($id)

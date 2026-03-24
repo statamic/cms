@@ -43,14 +43,15 @@ class Preferences
      */
     public function all()
     {
-        if (auth()->guest()) {
-            return [];
+        $this->resetState();
+
+        if (auth()->check()) {
+            $this
+                ->mergeDottedUserPreferences()
+                ->mergeDottedRolePreferences();
         }
 
         return $this
-            ->resetState()
-            ->mergeDottedUserPreferences()
-            ->mergeDottedRolePreferences()
             ->mergeDottedDefaultPreferences()
             ->getMultiDimensionalPreferences();
     }
@@ -132,10 +133,8 @@ class Preferences
         $preserve = [];
 
         foreach ($this->preventMergingChildren as $dottedKey) {
-            $childData = Arr::pull($array, $dottedKey);
-
-            if (! is_null($childData)) {
-                $preserve[$dottedKey] = $childData;
+            if (Arr::has($array, $dottedKey)) {
+                $preserve[$dottedKey] = Arr::pull($array, $dottedKey);
             }
         }
 

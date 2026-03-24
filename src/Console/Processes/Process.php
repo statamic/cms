@@ -454,4 +454,14 @@ class Process
 
         return $that;
     }
+
+    protected function isWindows()
+    {
+        return PHP_OS_FAMILY === 'Windows';
+    }
+
+    protected function isMac()
+    {
+        return PHP_OS_FAMILY === 'Darwin';
+    }
 }

@@ -1717,12 +1717,10 @@ EOT;
     #[Test]
     public function it_updates_global_sets()
     {
-        $set = Facades\GlobalSet::make('default');
+        $set = Facades\GlobalSet::make('default')->sites(['en', 'fr'])->save();
 
-        $set->addLocalization($set->makeLocalization('en')->data(['pic' => 'norris.jpg']));
-        $set->addLocalization($set->makeLocalization('fr')->data(['pic' => 'hoff.jpg']));
-
-        $set->save();
+        $set->in('en')->data(['pic' => 'norris.jpg'])->save();
+        $set->in('fr')->data(['pic' => 'hoff.jpg'])->save();
 
         $this->setSingleBlueprint('globals.default', [
             'fields' => [
@@ -1865,6 +1863,46 @@ EOT;
 
         $this->assertContains('additional-1', $items);
         $this->assertContains('additional-2', $items);
+    }
+
+    #[Test]
+    public function it_updates_asset_references_in_working_copy()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $collection = tap(Facades\Collection::make('articles')->revisionsEnabled(true))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'hero',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'hero' => 'hoff.jpg',
+        ]))->save();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+        $this->assertFalse($entry->hasWorkingCopy());
+
+        tap($entry->makeWorkingCopy(), function ($workingCopy) {
+            $workingCopy->save();
+        });
+
+        $this->assertTrue($entry->fresh()->hasWorkingCopy());
+        $this->assertEquals('hoff.jpg', $entry->fresh()->workingCopy()->attributes()['data']['hero'] ?? null);
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('hero'));
+        $this->assertEquals('hoff-new.jpg', $entry->fresh()->workingCopy()->attributes()['data']['hero'] ?? null);
     }
 
     protected function setSingleBlueprint($namespace, $blueprintContents)

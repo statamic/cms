@@ -17,7 +17,6 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -38,8 +37,7 @@ class FrontendTest extends TestCase
 
     private function withStandardBlueprints()
     {
-        $this->addToAssertionCount(-1);
-        Blueprint::shouldReceive('in')->withAnyArgs()->zeroOrMoreTimes()->andReturn(collect([new \Statamic\Fields\Blueprint]));
+        Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
     }
 
     #[Test]
@@ -255,6 +253,21 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function drafts_are_not_visible_if_using_live_preview_token_for_different_entry()
+    {
+        $this->withStandardFakeErrorViews();
+
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+        $other = $this->createPage('other');
+
+        LivePreview::tokenize('test-token', $other);
+
+        $this
+            ->get('/about?token=test-token')
+            ->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
@@ -369,7 +382,7 @@ class FrontendTest extends TestCase
         $page->set('protect', 'logged_in')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/about')
             ->assertOk()
             ->assertHeader('X-Statamic-Protected', true);
@@ -408,7 +421,7 @@ class FrontendTest extends TestCase
         $page->set('protect', 'test')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(User::make()->save())
             ->get('/about')
             ->assertOk()
             ->assertHeaderMissing('X-Statamic-Protected');
@@ -588,23 +601,6 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
-    public function disables_floc_through_header_by_default()
-    {
-        $this->createPage('about');
-
-        $this->get('about')->assertHeader('Permissions-Policy', 'interest-cohort=()');
-    }
-
-    #[Test]
-    public function doesnt_disable_floc_through_header_if_disabled()
-    {
-        config(['statamic.system.disable_floc' => false]);
-        $this->createPage('about');
-
-        $this->get('about')->assertHeaderMissing('Permissions-Policy', 'interest-cohort=()');
-    }
-
-    #[Test]
     public function headers_can_be_set_in_content()
     {
         $page = $this->createPage('about', ['with' => [
@@ -743,6 +739,8 @@ class FrontendTest extends TestCase
     #[Test]
     public function it_sets_the_locale()
     {
+        // Frontend localization sets PHP LC_TIME and the translator locale for the site;
+        // Laravel's configured app locale (app()->getLocale()) is left unchanged.
         // You can only set the locale to one that is actually installed on the server.
         // The names are a little different across jobs in the GitHub actions matrix.
         // We'll test against whichever was successfully applied. Finally, we will
@@ -770,16 +768,16 @@ class FrontendTest extends TestCase
 
         (new class extends Tags
         {
-            public static $handle = 'laravel_locale';
+            public static $handle = 'translator_locale';
 
             public function index()
             {
-                return app()->getLocale();
+                return app('translator')->getLocale();
             }
         })->register();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} App Locale: {{ laravel_locale }}');
+        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} Translator Locale: {{ translator_locale }}');
 
         $this->makeCollection()->sites(['english', 'french'])->save();
         tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
@@ -790,7 +788,7 @@ class FrontendTest extends TestCase
 
         $this->get('/fr/le-about')->assertSeeInOrder([
             'PHP Locale: '.$frLocale,
-            'App Locale: fr',
+            'Translator Locale: fr',
         ]);
 
         $this->assertEquals('en', app()->getLocale());
@@ -1060,7 +1058,7 @@ class FrontendTest extends TestCase
         $this->get('/does-not-exist')->assertRedirect('/login?redirect=http://localhost/does-not-exist');
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/does-not-exist')
             ->assertStatus(404);
     }

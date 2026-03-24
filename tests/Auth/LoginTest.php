@@ -2,11 +2,18 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class LoginTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
@@ -17,7 +24,7 @@ class LoginTest extends TestCase
         $this
             ->get(cp_route('login'))
             ->assertOk()
-            ->assertViewIs('statamic::auth.login');
+            ->assertInertia(fn ($page) => $page->component('auth/Login'));
     }
 
     #[Test]
@@ -61,6 +68,29 @@ class LoginTest extends TestCase
             ->assertSessionHasErrors(['email']);
 
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_redirects_to_the_two_factor_challenge_page()
+    {
+        Event::fake();
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->assertGuest()
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+                'remember' => true,
+            ])
+            ->assertRedirect(cp_route('two-factor-challenge'))
+            ->assertSessionHas('login.id', $user->id())
+            ->assertSessionHas('login.remember', true);
+
+        $this->assertGuest();
+
+        Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
@@ -143,5 +173,22 @@ class LoginTest extends TestCase
     private function user()
     {
         return tap(User::make()->makeSuper()->email('david@hasselhoff.com')->password('secret'))->save();
+    }
+
+    private function userWithTwoFactorEnabled()
+    {
+        $user = $this->user();
+
+        $user->merge([
+            'two_factor_confirmed_at' => now()->timestamp,
+            'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                return RecoveryCode::generate();
+            })->all())),
+        ]);
+
+        $user->save();
+
+        return $user;
     }
 }

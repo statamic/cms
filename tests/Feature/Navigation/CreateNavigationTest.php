@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -24,8 +25,7 @@ class CreateNavigationTest extends TestCase
             ->actingAs($user)
             ->visitCreatePage()
             ->assertOk()
-            ->assertViewIs('statamic::navigation.create')
-            ->assertSee('Create Navigation');
+            ->assertInertia(fn (Assert $page) => $page->component('navigation/Create'));
     }
 
     #[Test]

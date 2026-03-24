@@ -12,11 +12,13 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\Factories\EntryFactory;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class PhpEnabledTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     public function test_php_has_access_to_scope_data()
     {
@@ -537,6 +539,104 @@ EOT;
         $this->assertStringContainsString('<value_two: 1025>', $result);
     }
 
+    public function test_updating_variables_within_scope_using_php()
+    {
+        $data = [
+            'blocks' => [
+                [
+                    'type' => 'the_block',
+                ],
+            ],
+        ];
+
+        $outerPartial = <<<'EOT'
+Outer Partial Before: {{ view.blocks }}{{ type }}{{ /view.blocks }}
+{{ partial:inner_partial :blocks="blocks" /}}
+Outer Partial After: {{ view.blocks }}{{ type }}{{ /view.blocks }}
+EOT;
+
+        $innerPartial = <<<'EOT'
+Inner Partial Before: {{ view.blocks }}{{ type }} {{ /view.blocks }}
+
+{{ if view.blocks.0 && view.blocks.0.type != 'hero_block' }}
+    {{?
+        array_unshift($view['blocks'], [
+            'type' => 'hero_block',
+            'simple_bard_field' => [
+                'type' => 'text',
+                'text' => 'The Text',
+            ],
+        ]);
+    ?}}
+{{ /if }}
+
+Inner Partial After: {{ view.blocks }}{{ type }} {{ /view.blocks }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('outer_partial', $outerPartial);
+        $this->viewShouldReturnRaw('inner_partial', $innerPartial);
+
+        $expected = <<<'EXPECTED'
+Outer Partial Before: the_block
+Inner Partial Before: the_block
+
+
+
+
+Inner Partial After: hero_block the_block
+Outer Partial After: the_block
+EXPECTED;
+
+        $this->assertSame(
+            (string) str($expected)->squish(),
+            (string) str($this->renderString('{{ partial:outer_partial :blocks="blocks" /}}', $data))->squish(),
+        );
+    }
+
+    public function test_variables_created_inside_php_do_not_override_injected_values()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'EOT'
+{{? $title = 'The Title'; ?}}
+
+Partial: {{ title }}
+EOT;
+
+        $this->viewShouldReturnRaw('the_partial', $partial);
+
+        $template = <<<'EOT'
+Before: {{ title }}
+{{ partial:the_partial /}}
+After: {{ title }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+Before: The Original Title
+
+
+Partial: The Title
+After: The Original Title
+EXPECTED;
+
+        $this->assertSame(
+            $expected,
+            $this->renderString($template, ['title' => 'The Original Title']),
+        );
+
+        $template = <<<'EOT'
+Before: {{ title }}
+{{ partial:the_partial :title="title" /}}
+After: {{ title }}
+EOT;
+
+        $this->assertSame(
+            $expected,
+            $this->renderString($template, ['title' => 'The Original Title']),
+        );
+    }
+
     public function test_disabled_php_echo_node_inside_user_values()
     {
         $textFieldtype = new Text();
@@ -607,5 +707,20 @@ TEXT;
         $this->assertSame('Text: HELLO, WORLD.', $result);
 
         GlobalRuntimeState::$allowPhpInContent = false;
+    }
+
+    public function test_sanitize_php_is_case_insensitive()
+    {
+        $this->assertSame('&lt;?php echo "test"; ?>', StringUtilities::sanitizePhp('<?php echo "test"; ?>'));
+        $this->assertSame('&lt;?PHP echo "test"; ?>', StringUtilities::sanitizePhp('<?PHP echo "test"; ?>'));
+        $this->assertSame('&lt;?Php echo "test"; ?>', StringUtilities::sanitizePhp('<?Php echo "test"; ?>'));
+        $this->assertSame('&lt;?pHp echo "test"; ?>', StringUtilities::sanitizePhp('<?pHp echo "test"; ?>'));
+    }
+
+    public function test_sanitize_php_handles_short_tags()
+    {
+        $this->assertSame('&lt;?= $var ?>', StringUtilities::sanitizePhp('<?= $var ?>'));
+        $this->assertSame('&lt;?="test"?>', StringUtilities::sanitizePhp('<?="test"?>'));
+        $this->assertSame("&lt;? echo 'test' ?>", StringUtilities::sanitizePhp("<? echo 'test' ?>"));
     }
 }

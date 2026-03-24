@@ -47,13 +47,14 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
-        Searchable,
+        Hookable, Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
@@ -618,7 +619,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
-        $isNew = is_null($this->container()->asset($this->path()));
+        $pathHasChanged = $this->getOriginal('path') !== $this->path();
+        $isNew = $pathHasChanged ? false : is_null($this->container()->asset($this->path()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -743,7 +745,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function rename($filename, $unique = false)
     {
-        $filename = $unique ? $this->ensureUniqueFilename($this->folder(), $filename) : $filename;
+        if ($unique) {
+            return $this->moveUnique($this->folder(), $filename);
+        }
 
         return $this->move($this->folder(), $filename);
     }
@@ -774,6 +778,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
+    }
+
+    /**
+     * Move the asset to a different location with a unique filename.
+     *
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
+     * @return $this
+     */
+    public function moveUnique($folder, $filename = null)
+    {
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
+        $filename = $this->ensureUniqueFilename($folder, $filename);
+
+        return $this->move($folder, $filename);
     }
 
     public function moveQuietly($folder, $filename = null)
@@ -1142,6 +1161,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->title();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'assets';
+    }
+
     public function warmPresets()
     {
         if (! $this->isImage()) {
@@ -1152,7 +1176,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             'cp_thumbnail_small_'.$this->orientation(),
         ] : [];
 
-        return array_merge($this->container->warmPresets(), $cpPresets);
+        $presets = array_merge($this->container->warmPresets(), $cpPresets);
+
+        return $this->runHooks('warm-presets', $presets);
     }
 
     public function cacheStore()

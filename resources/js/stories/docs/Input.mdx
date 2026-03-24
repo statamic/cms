@@ -1,0 +1,51 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as InputStories from '../Input.stories';
+
+<Meta of={InputStories} />
+
+# Input
+The classic form text input.
+<Canvas of={InputStories._DocsIntro} sourceState={'shown'} />
+
+## Labels and Descriptions
+You can assemble your own input field with a label, description, input, and anything else you want.
+<Canvas of={InputStories._LabelsDescriptions} sourceState={'shown'} />
+
+## Types
+Use the browser's various input types for different situations: `text`, `email`, `password`, etc.
+<Canvas of={InputStories._Types} sourceState={'shown'} />
+
+## Icons
+Add an icon to your input by passing the name with the `icon` prop. You can use `icon-append` and `icon-prepend` to add an icon to the input's end and start, respectively.
+<Canvas of={InputStories._Icons} sourceState={'shown'} />
+
+## Sizes
+Use the `size` prop to control the input's height and type scale. The scales match the button sizes to make sure everything lines up nicely.
+<Canvas of={InputStories._Sizes} sourceState={'shown'} />
+
+## Slots
+You can use the `prepend` and `append` slots to have more control over the output, add a button, and so on.
+<Canvas of={InputStories._Slots} sourceState={'shown'} />
+
+## Clearable
+Add a clear button to your input by passing the `clearable` prop.
+<Canvas of={InputStories._Clearable} sourceState={'shown'} />
+
+## Copyable
+Add a copy button to your input by passing the `copyable` prop.
+<Canvas of={InputStories._Copyable} sourceState={'shown'} />
+
+## Viewable
+Add a button to toggle showing a password's text by passing the `viewable` prop.
+<Canvas of={InputStories._Viewable} sourceState={'shown'} />
+
+## Text Prepend and Append
+Prepend or append content to your inputs by using the `prepend` and `append` props, respectively.
+<Canvas of={InputStories._TextPrependAppend} sourceState={'shown'} />
+
+## Character Limit
+Add a character limit indicator to the input with `limit`. This does not set a hard stop, but is rather just for user feedback only.
+<Canvas of={InputStories._CharacterLimit} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={InputStories} />

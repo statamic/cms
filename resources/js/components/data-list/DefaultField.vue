@@ -1,20 +1,19 @@
 <script>
+import { h } from 'vue';
 import striptags from 'striptags';
 
 export default {
-
     props: {
-        value: { required: true }
+        value: { required: true },
     },
 
     data() {
         return {
-            truncateAt: 50
-        }
+            truncateAt: 50,
+        };
     },
 
     computed: {
-
         text() {
             let value = this.value;
 
@@ -31,13 +30,11 @@ export default {
             }
 
             return value;
-        }
-
+        },
     },
 
-    render(h) {
-        return h('div', { domProps: { textContent: this.text }});
-    }
-
-}
+    render() {
+        return h('div', { textContent: this.text });
+    },
+};
 </script>

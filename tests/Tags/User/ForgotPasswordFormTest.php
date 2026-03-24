@@ -3,6 +3,7 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Support\Facades\Password;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
@@ -32,12 +33,39 @@ class ForgotPasswordFormTest extends TestCase
     #[Test]
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" reset_url="/resetting" class="form" id="form" }}{{ /user:forgot_password_form }}');
+        $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:forgot_password_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/password/email" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_reset_url" value="/resetting" />', $output);
+    }
+
+    #[Test]
+    #[DataProvider('resetUrlProvider')]
+    public function it_renders_reset_url($resetUrl, $expectedUrl)
+    {
+        $output = $this->tag('{{ user:forgot_password_form reset_url="'.$resetUrl.'" }}{{ /user:forgot_password_form }}');
+
+        $this->assertMatchesRegularExpression('/<input type="hidden" name="_reset_url" value="(.+)" \/>/', $output);
+        preg_match('/<input type="hidden" name="_reset_url" value="(.+)" \/>/', $output, $matches);
+        $this->assertEquals($expectedUrl, decrypt($matches[1]));
+    }
+
+    public static function resetUrlProvider()
+    {
+        return [
+            '/custom' => ['/custom', '/custom'],
+            'custom' => ['custom', '/custom'],
+            'absolute' => ['https://example.com/custom', 'https://example.com/custom'],
+        ];
+    }
+
+    #[Test]
+    public function it_renders_null_reset_url()
+    {
+        $output = $this->tag('{{ user:forgot_password_form :reset_url="null" }}{{ /user:forgot_password_form }}');
+
+        $this->assertStringNotContainsString('_reset_url', $output);
     }
 
     #[Test]

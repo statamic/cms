@@ -65,4 +65,19 @@ class Terms extends FieldtypeFilter
 
         return $field.': '.$term;
     }
+
+    public function isComplete($values): bool
+    {
+        $values = array_filter($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'term');
+    }
 }
