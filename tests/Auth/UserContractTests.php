@@ -358,6 +358,27 @@ trait UserContractTests
     }
 
     #[Test]
+    #[DataProvider('preferredColorModeProvider')]
+    public function it_gets_preferred_color_mode($stored, $expected)
+    {
+        $user = $this->makeUser();
+        $user->setPreference('color_mode', $stored);
+
+        $this->assertEquals($expected, $user->preferredColorMode());
+    }
+
+    public static function preferredColorModeProvider(): array
+    {
+        return [
+            'null' => [null, 'auto'],
+            'light' => ['light', 'light'],
+            'dark' => ['dark', 'dark'],
+            'auto' => ['auto', 'auto'],
+            'invalid' => ['invalid', 'auto'],
+        ];
+    }
+
+    #[Test]
     public function it_encrypts_a_password()
     {
         $user = $this->user();

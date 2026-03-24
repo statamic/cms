@@ -286,6 +286,14 @@ export default {
             if (this.initializing) return;
             this.$emit('item-data-updated', data);
         },
+
+        items(items, oldItems) {
+            if (items.length > 0 && oldItems.length === 0) {
+                if (this.canReorder) {
+                    this.$nextTick(() => this.makeSortable());
+                }
+            }
+        },
     },
 
     methods: {

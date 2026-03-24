@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -149,12 +150,16 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
+        $configuredCollections = $this->getConfiguredCollections();
+        $requestedCollections = $this->getRequestedCollections($request, $configuredCollections);
+        $this->authorizeCollectionAccess($requestedCollections);
+
         $query = $this->getIndexQuery($request);
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $query->whereIn('collection', $this->getConfiguredCollections());
+            $query->whereIn('collection', $configuredCollections);
         }
 
         if ($blueprints = $this->config('blueprints')) {
@@ -172,6 +177,30 @@ class Entries extends Relationship
         $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
 
         return $paginate ? $results->setCollection($items) : $items;
+    }
+
+    private function getRequestedCollections($request, $configuredCollections)
+    {
+        $filteredCollections = collect($request->input('filters.collection.collections', []))
+            ->filter()
+            ->values()
+            ->all();
+
+        return empty($filteredCollections) ? $configuredCollections : $filteredCollections;
+    }
+
+    private function authorizeCollectionAccess($collections)
+    {
+        $user = User::current();
+
+        collect($collections)->each(function ($collectionHandle) use ($user) {
+            $collection = Collection::findByHandle($collectionHandle);
+
+            throw_if(
+                ! $collection || ! $user->can('view', $collection),
+                new AuthorizationException
+            );
+        });
     }
 
     public function getResourceCollection($request, $items)

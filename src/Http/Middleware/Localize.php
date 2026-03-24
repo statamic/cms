@@ -3,6 +3,7 @@
 namespace Statamic\Http\Middleware;
 
 use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use ReflectionClass;
@@ -32,7 +33,11 @@ class Localize
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
-        Date::setToStringFormat(function (CarbonInterface $date) {
+        Date::setToStringFormat(function (CarbonInterface|CarbonInterval $date) {
+            if ($date instanceof CarbonInterval) {
+                return $date->forHumans();
+            }
+
             return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
         });
 

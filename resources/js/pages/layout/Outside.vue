@@ -6,7 +6,7 @@ import { onMounted } from 'vue';
 import { colorMode } from '@api';
 import PortalTargets from "@/components/portals/PortalTargets.vue";
 
-useBodyClasses('bg-gray-50 dark:bg-gray-900 font-sans leading-normal scheme-light p-2');
+useBodyClasses('bg-gray-50 dark:bg-gray-900 font-sans leading-normal scheme-light p-2 outside');
 const { logos, cmsName } = useStatamicPageProps();
 const customLogo = logos?.light?.outside ?? logos?.dark?.outside ?? null;
 const lightCustomLogo = logos?.light?.outside ?? null;

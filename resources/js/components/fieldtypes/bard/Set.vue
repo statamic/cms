@@ -4,9 +4,11 @@
             ref="container"
             class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
-                'st-set-is-selected': showSelectionHighlight,
+                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
+                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
+                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
+                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
                 'border-red-500': hasError,
-                'st-dropdown-just-closed': dropdownJustClosed,
             }"
             :data-type="config.handle"
             contenteditable="false"
@@ -16,12 +18,14 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
-                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
+                    <Icon name="handles" class="size-4 text-gray-400" />
+                </span>
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
@@ -45,7 +49,7 @@
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
                     <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
-                    <Dropdown @closed="onSetDropdownClosed">
+                    <Dropdown>
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
@@ -73,7 +77,12 @@
                 </div>
             </header>
 
-            <div v-if="index !== undefined" v-show="!collapsed" :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }">
+            <div
+                v-if="index !== undefined && hasFields"
+                v-show="!collapsed"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
+            >
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
@@ -128,12 +137,6 @@ export default {
 
     mixins: [ManagesPreviewText, HasFieldActions],
 
-    data() {
-        return {
-            dropdownJustClosed: false,
-        };
-    },
-
     inject: {
         bard: {},
         bardSets: {},
@@ -143,6 +146,12 @@ export default {
     computed: {
         fields() {
             return this.config.fields;
+        },
+
+        hasFields() {
+            return Array.isArray(this.fields)
+                ? this.fields.length > 0
+                : Object.keys(this.fields || {}).length > 0;
         },
 
         display() {
@@ -166,7 +175,7 @@ export default {
         },
 
         collapsed() {
-            return this.extension.options.bard.meta.collapsed.includes(this.node.attrs.id);
+            return this.extension.options.bard.collapsed.includes(this.node.attrs.id);
         },
 
         config() {
@@ -321,13 +330,17 @@ export default {
             );
         },
 
-        onSetDropdownClosed() {
-            this.dropdownJustClosed = true;
-            if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
-            this._dropdownJustClosedTimeout = setTimeout(() => {
-                this.dropdownJustClosed = false;
-                this._dropdownJustClosedTimeout = null;
-            }, 100);
+        enableDragging() {
+            this._draggableObserver?.disconnect();
+            this.$el.setAttribute('draggable', true);
+
+            document.addEventListener('mouseup', this.disableDragging, { once: true });
+            document.addEventListener('dragend', this.disableDragging, { once: true });
+        },
+
+        disableDragging() {
+            this.$el.setAttribute('draggable', false);
+            this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },
     },
 

@@ -21,7 +21,7 @@
         <div class="flex h-full w-full justify-center rounded-b-md relative" :class="[
             { 'border-b dark:border-gray-700': showFilename },
             canBeTransparent && checkerboardMode !== 'transparent' ? `bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-lg` : '',
-            canBeTransparent && checkerboardMode === 'transparent' ? `bg-checkerboard before:opacity-0 hover:before:opacity-100` : '',
+            canBeTransparent && checkerboardMode === 'transparent' ? `bg-checkerboard before:opacity-0 hover:before:opacity-100 rounded-lg` : '',
         ]">
             <div class="p-1 flex flex-col items-center justify-center h-full">
                 <!-- Solo Bard -->

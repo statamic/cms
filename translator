@@ -36,6 +36,7 @@ $dontTranslate = [
 $additionalStrings = [
     'Author',
     'Content',
+    'Content Search',
     'Groups',
     'Tools',
     'Laptop',

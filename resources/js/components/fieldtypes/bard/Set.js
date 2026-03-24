@@ -116,6 +116,21 @@ export const Set = Node.create({
         };
         return [
             new Plugin({
+                key: new PluginKey('setBlockCharacterInput'),
+                props: {
+                    handleKeyDown(view, event) {
+                        const { selection } = view.state;
+                        if (!(selection instanceof NodeSelection) || selection.node.type !== type) return false;
+
+                        const key = event.key;
+                        if (['Backspace', 'Delete', 'Enter', 'Escape', 'Tab'].includes(key)) return false;
+                        if (key.length === 1) return true;
+
+                        return false;
+                    },
+                },
+            }),
+            new Plugin({
                 key: new PluginKey('setSelectionDecorator'),
                 props: {
                     decorations(state) {

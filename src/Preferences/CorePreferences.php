@@ -6,6 +6,8 @@ use Locale;
 use Statamic\Facades\Preference;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class CorePreferences
 {
     public function boot()
