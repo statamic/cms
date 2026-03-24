@@ -318,7 +318,7 @@ export default {
     },
 
     watch: {
-        linkType() {
+        linkType(type) {
             if (type != 'entry') {
                 this.appends = null;
             }
