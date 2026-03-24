@@ -153,11 +153,11 @@
                     variant="destructive"
                     @click="deleteTreeBranch(branch, removeBranch)"
                 />
-                <template v-if="branch.actions && branch.actions.length">
+                <template v-if="branchTreeActions(branch).length">
                     <DropdownSeparator />
                     <ItemActions
                         :url="entriesActionUrl"
-                        :actions="branch.actions"
+                        :actions="branchTreeActions(branch)"
                         :item="branch.entry"
                         v-slot="{ actions }"
                     >
@@ -413,6 +413,10 @@ export default {
 
         isRedirectBranch(branch) {
             return branch.redirect != null;
+        },
+
+        branchTreeActions(branch) {
+            return (branch.actions || []).filter((action) => action.handle !== 'delete');
         },
 
         createEntry(blueprint, parent) {
