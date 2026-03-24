@@ -1,6 +1,6 @@
 <template>
     <template v-if="!hasMultipleSets">
-        <Primitive @click="singleButtonClicked">
+        <Primitive as-child @click="singleButtonClicked">
             <slot name="trigger" />
         </Primitive>
     </template>
@@ -14,7 +14,7 @@
         class="xl:max-w-3xl 2xl:max-w-page"
     >
         <template #trigger>
-            <Primitive @click.capture="onTriggerClick">
+            <Primitive as-child @click.capture="onTriggerClick">
                 <slot name="trigger" />
             </Primitive>
         </template>
@@ -92,7 +92,7 @@
         inset
     >
         <template #trigger>
-            <Primitive @click.capture="onTriggerClick">
+            <Primitive as-child @click.capture="onTriggerClick">
                 <slot name="trigger" />
             </Primitive>
         </template>
