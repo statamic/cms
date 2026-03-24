@@ -795,7 +795,7 @@ class Bard extends Replicator
 
         switch ($type) {
             case 'entry':
-                if ($entry = Entry::find($ref)) {
+                if ($entry = Entry::find($id)) {
                     $data = [
                         'title' => $entry->get('title'),
                         'permalink' => $entry->absoluteUrl(),
