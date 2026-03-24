@@ -41,8 +41,8 @@
 /* BARD / SELECTION STATE
 =================================================== */
 @layer ui {
-    /* Hide the selection outline when we have a modal or popper open, since the focus outline will no longer be correct. */
-    body:not(:has([data-ui-modal-content], [data-reka-popper-content-wrapper])) {
+    /* Hide the selection outline when we have a modal or combobox open, since the focus outline will no longer be correct. */
+    body:not(:has([data-ui-modal-content], [data-ui-combobox-content])) {
         /* 
         Here we're carefully controlling the “selection outline” when a set is selected with the mouse or keyboard.
         Style the selection outline...
