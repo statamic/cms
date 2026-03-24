@@ -246,16 +246,16 @@ EOT;
 
         $template = 'hello {{ name }} [{{ config:app:name }}] [{{ config:top:secret }}] [{{ config:allowlisted:foo }}]';
 
-        $data = ['name' => 'world', Cascade::instance()->toArray()];
+        $data = ['name' => 'world', Cascade::instance()->hydrate()->toArray()];
+
+        $parsed = (string) Antlers::parse($template, $data);
+        $this->assertStringNotContainsString('123', $parsed, 'Parsed string contains unexpected config value.');
+        $this->assertSame('hello world [test] [] [bar]', $parsed);
 
         $this->viewShouldReturnRaw('template', $template);
         $parsed = (string) View::make('template', $data)->render();
         $this->assertStringContainsString('123', $parsed, 'Parsed view is missing config value.');
         $this->assertSame('hello world [test] [123] [bar]', $parsed);
-
-        $parsed = (string) Antlers::parse($template, $data);
-        $this->assertStringNotContainsString('123', $parsed, 'Parsed string contains unexpected config value.');
-        $this->assertSame('hello world [test] [] [bar]', $parsed);
     }
 
     #[Test]
@@ -279,7 +279,7 @@ EOT;
 
         $value = new Value($template, fieldtype: $textFieldtype);
 
-        $data = ['name' => 'world', Cascade::instance()->toArray(), 'test' => $value];
+        $data = ['name' => 'world', 'test' => $value];
 
         $this->viewShouldReturnRaw('template', '{{ test }}');
         $parsed = (string) View::make('template', $data)->render();
