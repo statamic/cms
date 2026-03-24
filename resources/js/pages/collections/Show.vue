@@ -153,6 +153,24 @@
                     variant="destructive"
                     @click="deleteTreeBranch(branch, removeBranch)"
                 />
+                <template v-if="branch.actions && branch.actions.length">
+                    <DropdownSeparator />
+                    <ItemActions
+                        :url="entriesActionUrl"
+                        :actions="branch.actions"
+                        :item="branch.entry"
+                        v-slot="{ actions }"
+                    >
+                        <DropdownItem
+                            v-for="action in actions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : undefined"
+                            @click="action.run()"
+                        />
+                    </ItemActions>
+                </template>
             </template>
         </page-tree>
 

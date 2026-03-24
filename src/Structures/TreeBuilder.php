@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav;
+use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
 use Statamic\Facades\User;
@@ -91,22 +92,32 @@ class TreeBuilder
             $page = $item['page'];
             $collection = $page->mountedCollection();
             $referenceExists = $page->referenceExists();
+            $entry = $referenceExists ? $page->entry() : null;
+
+            $actionContext = ['view' => 'tree'];
+            if ($collection) {
+                $actionContext['collection'] = $collection->handle();
+            }
+            if ($entry) {
+                $actionContext['site'] = $entry->locale();
+            }
 
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
                 'title' => $page->hasCustomTitle() ? $page->title() : null,
-                'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
-                'entry_blueprint' => $referenceExists ? [
-                    'handle' => $page->entry()->blueprint()->handle(),
-                    'title' => $page->entry()->blueprint()->title(),
+                'entry_title' => $entry ? $entry->value('title') : null,
+                'entry_blueprint' => $entry ? [
+                    'handle' => $entry->blueprint()->handle(),
+                    'title' => $entry->blueprint()->title(),
                 ] : null,
                 'url' => $page->url(),
                 'edit_url' => $page->editUrl(),
-                'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,
+                'can_delete' => $entry ? User::current()->can('delete', $entry) : true,
                 'slug' => $page->slug(),
                 'status' => $referenceExists ? $page->status() : null,
-                'redirect' => $referenceExists ? $page->entry()->get('redirect') : null,
+                'redirect' => $entry ? $entry->get('redirect') : null,
+                'actions' => $entry ? Action::for($entry, $actionContext) : [],
                 'collection' => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),
