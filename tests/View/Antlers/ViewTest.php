@@ -281,8 +281,8 @@ EOT;
 
         $data = ['name' => 'world', 'test' => $value];
 
-        $this->viewShouldReturnRaw('template', '{{ test }}');
+        $this->viewShouldReturnRaw('template', '[view:{{ config:top:secret }}] {{ test }}');
         $parsed = (string) View::make('template', $data)->render();
-        $this->assertSame('hello world [test] [] [bar]', $parsed);
+        $this->assertSame('[view:123] hello world [test] [] [bar]', $parsed);
     }
 }
