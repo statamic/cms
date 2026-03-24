@@ -80,6 +80,16 @@
         <ui-separator :text="__('Advanced Options')" />
 
         <section class="space-y-5">
+            <!-- Append attribute -->
+            <ui-input
+                v-if="linkType === 'entry'"
+                type="text"
+                ref="input"
+                v-model="appends"
+                prepend="Append"
+                :placeholder="__('?query=params#anchor')"
+            />
+
             <!-- Title attribute -->
             <ui-input
                 type="text"
@@ -196,6 +206,7 @@ export default {
             url: {},
             urlData: {},
             itemData: {},
+            appends: null,
             title: null,
             rel: null,
             targetBlank: false,
@@ -308,6 +319,10 @@ export default {
 
     watch: {
         linkType() {
+            if (type != 'entry') {
+                this.appends = null;
+            }
+
             this.autofocus();
         },
 
@@ -349,8 +364,8 @@ export default {
     methods: {
         applyAttrs(attrs) {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
-
-            this.url = { [this.linkType]: attrs.href };
+            this.appends = this.getAppendsForUrl(attrs.href);
+            this.url = { [this.linkType]: attrs.href?.replace(this.appends, '' ) };
             this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
@@ -393,7 +408,7 @@ export default {
             }
 
             this.$emit('updated', {
-                href: this.href,
+                href: this.href + (this.appends ?? ''),
                 rel: this.rel,
                 target: this.canHaveTarget && this.targetBlank ? '_blank' : null,
                 title: this.title,
@@ -494,14 +509,24 @@ export default {
             return this.bard.meta.linkData[ref];
         },
 
+        getAppendsForUrl(urlString) {
+            // appends is only relevant to entry links
+            if (! urlString?.includes('statamic://entry::')) {
+                return null;
+            }
+
+            return urlString.replace(urlString.split(/[?#]/)[0], '');
+        },
+
         parseDataUrl(url) {
             if (!url) {
                 return {};
             }
 
+            const appends = this.getAppendsForUrl(url);
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
-            const matches = url.match(regex);
+            const matches = url.replace(appends, '').match(regex);
             if (!matches) {
                 return {};
             }
