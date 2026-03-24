@@ -47,7 +47,7 @@
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
                     <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
 
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
@@ -117,6 +117,12 @@ import { reveal } from '@api';
 
 export default {
     props: nodeViewProps,
+
+    data() {
+        return {
+            dropdownJustClosed: false,
+        };
+    },
 
     components: {
         Button,
@@ -340,6 +346,15 @@ export default {
             this.$el.setAttribute('draggable', false);
             this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
         },
+
+        onSetDropdownClosed() {
+            this.dropdownJustClosed = true;
+            if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
+            this._dropdownJustClosedTimeout = setTimeout(() => {
+                this.dropdownJustClosed = false;
+                this._dropdownJustClosedTimeout = null;
+            }, 150);
+        },
     },
 
     mounted() {
@@ -372,6 +387,7 @@ export default {
     },
 
     beforeUnmount() {
+        if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
         this._draggableObserver?.disconnect();
     },
 };
