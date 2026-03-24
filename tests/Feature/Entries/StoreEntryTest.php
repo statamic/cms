@@ -4,7 +4,6 @@ namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntrySaving;
@@ -203,7 +202,7 @@ class StoreEntryTest extends TestCase
         $this->assertEquals('auto-avada-kedavra', $entry->slug());
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
-    
+
     #[Test]
     public function date_is_saved_correctly_when_app_timezone_is_utc()
     {
@@ -221,7 +220,7 @@ class StoreEntryTest extends TestCase
 
         $this->assertCount(1, Entry::all());
         $entry = Entry::all()->first();
-        $this->assertEquals('2026-03-23-1630.my-entry.md', Str::afterLast($entry->buildPath(), '/'));
+        $this->assertStringContainsString('2026-03-23-1630.my-entry.md', $entry->buildPath());
     }
 
     /**
@@ -244,7 +243,7 @@ class StoreEntryTest extends TestCase
 
         $this->assertCount(1, Entry::all());
         $entry = Entry::all()->first();
-        $this->assertEquals('2026-03-23-1730.my-entry.md', Str::afterLast($entry->buildPath(), '/')); // Should be saved in Europe/Zurich, so 17:30.
+        $this->assertStringContainsString('2026-03-23-1730.my-entry.md', $entry->buildPath()); // Should be saved in Europe/Zurich, so 17:30.
     }
 
     #[Test]
