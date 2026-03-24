@@ -62,9 +62,9 @@ class LinkMark extends Link
             return $href;
         }
 
-        $ref = str($href)->after('statamic://')->before('?')->before('#');
+        $ref = str($href)->after('statamic://')->before('?')->before('#')->toString();
 
-        if (! $item = Data::find($ref->toString())) {
+        if (! $item = Data::find($ref)) {
             return '';
         }
 
