@@ -788,15 +788,14 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = str($url)->after('statamic://');
+        $ref = str($url)->after('statamic://')->before('?')->before('#')->toString();
         [$type, $id] = explode('::', $ref, 2);
 
         $data = null;
 
         switch ($type) {
             case 'entry':
-                $ref = $ref->before('?')->before('#');
-                if ($entry = Entry::find($ref->after('entry::'))) {
+                if ($entry = Entry::find($ref)) {
                     $data = [
                         'title' => $entry->get('title'),
                         'permalink' => $entry->absoluteUrl(),
