@@ -444,7 +444,7 @@ class UserTags extends Tags
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
         if ($redirect) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="redirect" value="'.e($redirect).'" />';
         }
 
         $html .= $this->parse($data);
