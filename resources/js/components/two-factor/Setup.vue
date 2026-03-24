@@ -4,7 +4,7 @@ import TwoFactorRecoveryCodesModal from '@/components/two-factor/RecoveryCodesMo
 import axios from 'axios';
 import { Modal, ModalClose, Input, Button, Icon } from '@/components/ui';
 
-const emit = defineEmits(['setup-complete', 'cancel', 'close']);
+const emit = defineEmits(['setup-complete', 'close']);
 
 const props = defineProps({
     enableUrl: String,
