@@ -4,6 +4,7 @@ namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntrySaving;
@@ -207,7 +208,7 @@ class StoreEntryTest extends TestCase
      * @see https://github.com/statamic/cms/issues/14251
      **/
     #[Test]
-    public function date_is_saved_in_app_timezone_if_collection_is_dated()
+    public function date_in_path_is_saved_in_app_timezone_if_collection_is_dated()
     {
         config()->set('app.timezone', 'Europe/Zurich');
 
@@ -223,7 +224,7 @@ class StoreEntryTest extends TestCase
 
         $this->assertCount(1, Entry::all());
         $entry = Entry::all()->first();
-        $this->assertEquals('2026-03-23 17:30:00', $entry->date()->format('Y-m-d H:i:s')); // Should be saved in Europe/Zurich, so 17:30.
+        $this->assertEquals('2026-03-23-1730.my-entry.md', Str::afterLast($entry->buildPath(), '/')); // Should be saved in Europe/Zurich, so 17:30.
     }
 
     #[Test]
