@@ -75,6 +75,10 @@ class EntryQuery extends Query
 
         $entry = $query->limit(1)->get()->first();
 
+        if ($entry && $entry->status() !== 'published' && request()->isLivePreview() && ! request()->isLivePreviewOf($entry)) {
+            return null;
+        }
+
         // The `AuthorizeSubResources` middleware will authorize when using `collection` arg,
         // but this is still required when the user queries entry using other args.
         if ($entry && ! in_array($collection = $entry->collection()->handle(), $this->allowedSubResources())) {
