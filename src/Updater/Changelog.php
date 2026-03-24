@@ -70,7 +70,7 @@ abstract class Changelog
                 'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->toIso8601String(),
                 'body' => $release['changelog'],
-                'critical' => $release['critical'] ?? false,
+                'security' => $release['security'] ?? false,
             ];
         });
     }
@@ -88,14 +88,14 @@ abstract class Changelog
     }
 
     /**
-     * Check if any available upgrade is marked as critical.
+     * Check if any available upgrade is marked as a security update.
      *
      * @return bool
      */
-    public function hasCriticalUpdate()
+    public function hasSecurityUpdate()
     {
         return $this->get()->contains(function ($release) {
-            return $release->type === 'upgrade' && $release->critical;
+            return $release->type === 'upgrade' && $release->security;
         });
     }
 

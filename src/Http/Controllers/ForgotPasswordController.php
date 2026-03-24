@@ -2,12 +2,12 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\SendsPasswordResetEmails;
-use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
@@ -32,15 +32,38 @@ class ForgotPasswordController extends Controller
 
     public function sendResetLinkEmail(Request $request)
     {
-        if ($url = $request->_reset_url) {
-            throw_if(URL::isExternalToApplication($url), ValidationException::withMessages([
-                '_reset_url' => trans('validation.url', ['attribute' => '_reset_url']),
-            ]));
-
+        if ($url = $this->getResetFormUrl($request)) {
             PasswordReset::resetFormUrl(URL::makeAbsolute($url));
         }
 
         return $this->traitSendResetLinkEmail($request);
+    }
+
+    private function getResetFormUrl(Request $request): ?string
+    {
+        if (! $url = $request->_reset_url) {
+            return null;
+        }
+
+        if (strlen($url) > 2048) {
+            return null;
+        }
+
+        try {
+            $url = decrypt($url);
+        } catch (DecryptException $e) {
+            if (! str_starts_with($url, '/') || str_starts_with($url, '//')) {
+                return null;
+            }
+
+            if (preg_match('/[\x00-\x1F\x7F]/', $url)) {
+                return null;
+            }
+
+            return $url;
+        }
+
+        return URL::isExternalToApplication($url) ? null : $url;
     }
 
     public function broker()

@@ -38,6 +38,9 @@ setup(async (app) => {
                       lang: 'en',
                   }],
                   selectedSite: 'default',
+                  lang: 'en',
+                  asciiReplaceExtraSymbols: false,
+                  charmap: { currency: {}, currency_short: {} },
               };
 
               return config[key] ?? null;

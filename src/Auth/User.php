@@ -358,7 +358,9 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function preferredColorMode()
     {
-        return $this->getPreference('color_mode') ?? 'auto';
+        $mode = $this->getPreference('color_mode') ?? 'auto';
+
+        return in_array($mode, ['auto', 'light', 'dark'], true) ? $mode : 'auto';
     }
 
     public function isTwoFactorAuthenticationRequired(): bool

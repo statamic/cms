@@ -1,5 +1,63 @@
 # Release Notes
 
+## 6.7.1 (2026-03-18)
+
+### What's fixed
+- Hide "Duplicate Set" when max sets limit has been reached [#14275](https://github.com/statamic/cms/issues/14275) by @duncanmcclean
+- Fix missing top border in read-only Assets fields [#14277](https://github.com/statamic/cms/issues/14277) by @duncanmcclean
+- Hide set bodies when there are no fields [#14282](https://github.com/statamic/cms/issues/14282) by @jackmcdade
+- Fieldset editing improvements [#14283](https://github.com/statamic/cms/issues/14283) by @jackmcdade
+- Harden `URL::isExternalToApplication()` [#14287](https://github.com/statamic/cms/issues/14287) by @duncanmcclean
+- Prevent opening set picker when `max_sets` limit has been reached [#14290](https://github.com/statamic/cms/issues/14290) by @duncanmcclean
+- Harden password reset [#14294](https://github.com/statamic/cms/issues/14294) by @jasonvarga
+
+
+
+## 6.7.0 (2026-03-17)
+
+### What's new
+- Add `Asset::moveUnique()` method [#14236](https://github.com/statamic/cms/issues/14236) by @lwekuiper
+
+### What's fixed
+- Sanitize SVGs on reupload [#14258](https://github.com/statamic/cms/issues/14258) by @duncanmcclean
+- Fix error saving preferences when `theme` translations exist [#14266](https://github.com/statamic/cms/issues/14266) by @duncanmcclean
+- Prevent logging git dependabot errors [#14257](https://github.com/statamic/cms/issues/14257) by @aerni
+- Fix incorrect variable in return doc [#14265](https://github.com/statamic/cms/issues/14265) by @indykoning
+- Fix error on `CreateForm` component in Storybook [#14264](https://github.com/statamic/cms/issues/14264) by @duncanmcclean
+- Allow using SVGs from `vendor`/`node_modules` directories [#14261](https://github.com/statamic/cms/issues/14261) by @duncanmcclean
+- Fix date formats [#14256](https://github.com/statamic/cms/issues/14256) by @jasonvarga
+- Ensure images are refreshed properly after cropping [#14260](https://github.com/statamic/cms/issues/14260) by @duncanmcclean
+- Handle validation rules on Files fieldtype [#14262](https://github.com/statamic/cms/issues/14262) by @duncanmcclean
+- Make stacks smoother [#14210](https://github.com/statamic/cms/issues/14210) by @jaygeorge
+- Fix TimePicker resetting to AM when typing [#14259](https://github.com/statamic/cms/issues/14259) by @duncanmcclean
+- Rename to security [#14276](https://github.com/statamic/cms/issues/14276) by @jasonvarga
+- Prevent path traversal in file dictionary [#14272](https://github.com/statamic/cms/issues/14272) by @duncanmcclean
+- Prevent term creation via fieldtype without permission [#14274](https://github.com/statamic/cms/issues/14274) by @duncanmcclean
+
+
+
+## 6.6.3 (2026-03-13)
+
+### What's fixed
+- Alphabetically order listing/publish container context lists & document `isDirty()` [#14245](https://github.com/statamic/cms/issues/14245) by @duncanmcclean
+- Relationship endpoint authorization [#14254](https://github.com/statamic/cms/issues/14254) by @jasonvarga
+- Replicator fieldtype endpoint hardening [#14255](https://github.com/statamic/cms/issues/14255) by @jasonvarga
+- Show "Drop to Upload" on top when dragging file onto Asset field [#14250](https://github.com/statamic/cms/issues/14250) by @duncanmcclean
+- Avoid globe cursor when dragging & dropping Bard sets [#14248](https://github.com/statamic/cms/issues/14248) by @duncanmcclean
+
+
+
+## 6.6.2 (2026-03-12)
+
+### What's fixed
+- Fix color mode preference values [#14242](https://github.com/statamic/cms/issues/14242) by @jasonvarga
+- Add `outside` class to outside layout [#14240](https://github.com/statamic/cms/issues/14240) by @duncanmcclean
+- Only remove Bard set when backspace key is hit [#14189](https://github.com/statamic/cms/issues/14189) by @duncanmcclean
+- Removed a comment from the js code output of the StaticCacher [#14233](https://github.com/statamic/cms/issues/14233) by @micahhenshaw
+- French translations [#14243](https://github.com/statamic/cms/issues/14243) by @ebeauchamps
+
+
+
 ## 6.6.1 (2026-03-12)
 
 ### What's fixed

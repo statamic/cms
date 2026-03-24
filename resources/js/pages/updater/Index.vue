@@ -6,7 +6,7 @@ import { computed } from 'vue';
 
 const props = defineProps(['requestError', 'statamic', 'addons']);
 
-const criticalUpdateAvailable = computed(() => props.statamic.critical || props.addons.some(addon => addon.critical));
+const securityUpdateAvailable = computed(() => props.statamic.security || props.addons.some(addon => addon.security));
 </script>
 
 <template>
@@ -15,7 +15,7 @@ const criticalUpdateAvailable = computed(() => props.statamic.critical || props.
     <div class="max-w-page mx-auto">
         <Header :title="__('Updates')" icon="updates">
             <template #actions>
-                <Badge v-if="criticalUpdateAvailable" :text="__('Critical update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <Badge v-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
             </template>
         </Header>
 
@@ -48,7 +48,7 @@ const criticalUpdateAvailable = computed(() => props.statamic.critical || props.
                                 <Badge
                                     size="sm"
                                     :text="__n('1 update|:count updates', statamic.availableUpdatesCount)"
-                                    :color="statamic.critical ? 'red' : 'amber'"
+                                    :color="statamic.security ? 'red' : 'amber'"
                                 />
                             </TableCell>
                             <TableCell v-else class="text-right">{{ __('Up to date') }}</TableCell>
@@ -77,7 +77,7 @@ const criticalUpdateAvailable = computed(() => props.statamic.critical || props.
                                 <Badge
                                     size="sm"
                                     :text="__n('1 update|:count updates', addon.availableUpdatesCount)"
-                                    :color="addon.critical ? 'red' : 'amber'"
+                                    :color="addon.security ? 'red' : 'amber'"
                                 />
                             </TableCell>
                             <TableCell v-else class="text-right">{{ __('Up to date') }}</TableCell>
