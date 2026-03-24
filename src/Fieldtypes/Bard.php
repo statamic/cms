@@ -812,7 +812,7 @@ class Bard extends Replicator
                 break;
         }
 
-        return [$ref->toString() => $data];
+        return [$ref => $data];
     }
 
     private function wrapInlineValue($value)
