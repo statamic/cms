@@ -175,6 +175,6 @@ class GetContentTagTest extends TestCase
 
     private function assertParseEquals($expected, $template, $context = [])
     {
-        $this->assertEquals($expected, (string) Antlers::parse($template, $context));
+        $this->assertEquals($expected, (string) Antlers::parse($template, $context, true));
     }
 }

@@ -37,9 +37,4 @@ class FoldersController extends CpController
 
         return $container->assetFolder($path)->save();
     }
-
-    public function update(Request $request, $container, $folder)
-    {
-        return $container->assetFolder($folder)->save();
-    }
 }

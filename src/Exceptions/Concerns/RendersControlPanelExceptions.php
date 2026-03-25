@@ -3,6 +3,7 @@
 namespace Statamic\Exceptions\Concerns;
 
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
+use Statamic\Facades\URL;
 
 trait RendersControlPanelExceptions
 {
@@ -21,7 +22,7 @@ trait RendersControlPanelExceptions
 
         // If we came to this URL from another, we'll send them back, but not
         // if it was the login page otherwise there'd be a redirect loop.
-        if ($referrer && $referrer != cp_route('login')) {
+        if ($referrer && $referrer != cp_route('login') && ! URL::isExternalToApplication($referrer)) {
             return $referrer;
         }
 

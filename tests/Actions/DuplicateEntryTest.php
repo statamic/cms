@@ -66,6 +66,28 @@ class DuplicateEntryTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_last_modified()
+    {
+        $originalUser = User::make()->email('alfa@romeo.test')->save();
+        $duplicateUser = User::make()->email('alfa-1@romeo.test')->save();
+
+        $this->actingAs($duplicateUser);
+
+        Collection::make('test')->save();
+        $originalEntry = EntryFactory::id('alfa-id')->collection('test')->slug('alfa')->data(['title' => 'Alfa', 'updated_at' => 123, 'updated_by' => $originalUser->id()])->create();
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), []);
+
+        $duplicatedEntry = Entry::query()->where('slug', 'alfa-1')->first();
+
+        $this->assertEquals($duplicatedEntry->lastModifiedBy()->id(), $duplicateUser->id());
+        $this->assertNotEquals($originalEntry->lastModifiedBy()->id(), $duplicatedEntry->lastModifiedBy()->id());
+        $this->assertNotEquals($originalEntry->lastModified(), $duplicatedEntry->lastModified());
+    }
+
+    #[Test]
     #[DataProvider('authorizationProvider')]
     public function it_authorizes(
         bool $isMultisite,
@@ -542,7 +564,7 @@ class DuplicateEntryTest extends TestCase
             $arr = [
                 'slug' => $entry->slug(),
                 'published' => $entry->published(),
-                'data' => $entry->data()->all(),
+                'data' => $entry->data()->except(['updated_at', 'updated_by'])->all(),
             ];
 
             if (Site::hasMultiple()) {

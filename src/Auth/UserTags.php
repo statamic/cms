@@ -352,7 +352,7 @@ class UserTags extends Tags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if ($resetUrl = $this->params->get('reset_url')) {
+        if ($resetUrl = $this->getPasswordResetUrl($this->params->get('reset_url'))) {
             $params['reset_url'] = $resetUrl;
         }
 
@@ -372,6 +372,19 @@ class UserTags extends Tags
         $html .= $this->formClose();
 
         return $html;
+    }
+
+    private function getPasswordResetUrl(?string $url = null): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        if (! preg_match('#^https?://#', $url) && ! str_starts_with($url, '/')) {
+            $url = '/'.$url;
+        }
+
+        return encrypt($url);
     }
 
     /**
@@ -431,7 +444,7 @@ class UserTags extends Tags
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
         if ($redirect) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="redirect" value="'.e($redirect).'" />';
         }
 
         $html .= $this->parse($data);

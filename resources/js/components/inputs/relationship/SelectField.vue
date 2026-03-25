@@ -6,7 +6,7 @@
             label="title"
             append-to-body
             :calculate-position="positionOptions"
-            :close-on-select="true"
+            :close-on-select="!multiple"
             :disabled="readOnly"
             :multiple="multiple"
             :options="options"

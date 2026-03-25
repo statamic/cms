@@ -51,7 +51,7 @@ class Impersonate extends Action
 
             $guard->login($users->first());
             session()->put('statamic_impersonated_by', $impersonator->getKey());
-            Toast::success(__('You are now impersonating').' '.$impersonated->name());
+            Toast::success(__('You are now impersonating').' '.($impersonated->name() ?? $impersonated->email()));
 
             ImpersonationStarted::dispatch($impersonator, $impersonated);
         } finally {

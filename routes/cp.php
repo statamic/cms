@@ -83,12 +83,10 @@ use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
-use Statamic\Http\Controllers\CP\Taxonomies\RestoreTermRevisionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomiesController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyBlueprintsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
-use Statamic\Http\Controllers\CP\Taxonomies\TermRevisionsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
 use Statamic\Http\Controllers\CP\Updater\UpdateProductController;
 use Statamic\Http\Controllers\CP\Updater\UpdaterController;
@@ -202,12 +200,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('/', [PublishedTermsController::class, 'store'])->name('taxonomies.terms.published.store');
             Route::delete('/', [PublishedTermsController::class, 'destroy'])->name('taxonomies.terms.published.destroy');
 
-            Route::resource('revisions', TermRevisionsController::class, [
-                'as' => 'taxonomies.terms',
-                'only' => ['index', 'store', 'show'],
-            ]);
-
-            Route::post('restore-revision', RestoreTermRevisionController::class)->name('taxonomies.terms.restore-revision');
             Route::post('preview', [TermPreviewController::class, 'edit'])->name('taxonomies.terms.preview.edit');
             Route::get('preview', [TermPreviewController::class, 'show'])->name('taxonomies.terms.preview.popout');
             Route::patch('/', [TermsController::class, 'update'])->name('taxonomies.terms.update');
@@ -229,7 +221,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::resource('asset-containers', AssetContainersController::class);
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
-    Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
     Route::get('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.blueprint.edit');
     Route::patch('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.blueprint.update');
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');

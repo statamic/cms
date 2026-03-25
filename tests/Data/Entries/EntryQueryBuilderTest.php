@@ -92,6 +92,66 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_in_with_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'category' => 'news'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'category' => 'blog'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // category is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'category' => 'news'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create(); // category is null
+
+        $entries = Entry::query()->whereIn('category', ['news', null])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 4', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_in_with_booleans()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'featured' => true])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'featured' => false])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // featured is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'featured' => true])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'featured' => false])->create();
+
+        $entries = Entry::query()->whereIn('featured', [false, null])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 3', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_not_in_with_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'category' => 'news'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'category' => 'blog'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // category is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'category' => 'news'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create(); // category is null
+
+        $entries = Entry::query()->whereNotIn('category', ['news', null])->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_not_in_with_booleans()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'featured' => true])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'featured' => false])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // featured is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'featured' => true])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'featured' => false])->create();
+
+        $entries = Entry::query()->whereNotIn('featured', [false, null])->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_where_date()
     {
         $this->createWhereDateTestEntries();
@@ -766,6 +826,116 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => 'id-2',
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => 'id-1',
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_not_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_relation()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereRelation('entries_field', 'title', 'Post 2')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
     }
 
     #[Test]

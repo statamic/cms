@@ -69,6 +69,10 @@ class Icon extends Fieldtype
 
     public function augment($value)
     {
+        if (! $value) {
+            return null;
+        }
+
         [$path] = $this->resolveParts();
 
         return File::get($path.'/'.$value.'.svg');

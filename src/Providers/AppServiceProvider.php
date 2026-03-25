@@ -96,6 +96,18 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        Request::macro('isLivePreviewOf', function ($item) {
+            $token = $this->statamicToken();
+
+            if (! $token || $token->handler() !== LivePreview::class) {
+                return false;
+            }
+
+            $previewItem = \Facades\Statamic\CP\LivePreview::item($token);
+
+            return $item && $previewItem && method_exists($item, 'reference') && $previewItem->reference() === $item->reference();
+        });
+
         TrimStrings::skipWhen(function (Request $request) {
             $route = config('statamic.cp.route');
 
@@ -104,7 +116,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->addAboutCommandInfo();
 
-        $this->app->make(Schedule::class)->job(new HandleEntrySchedule)->everyMinute();
+        $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
     }
 
     public function register()
@@ -150,7 +162,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
-                ->setDirectory(resource_path('blueprints'))
+                ->setDirectories(config('statamic.system.blueprints_path'))
                 ->setFallback('default', function () {
                     return \Statamic\Facades\Blueprint::makeFromFields([
                         'content' => ['type' => 'markdown', 'localizable' => true],
@@ -160,7 +172,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
-                ->setDirectory(resource_path('fieldsets'));
+                ->setDirectory(config('statamic.system.fieldsets_path'));
         });
 
         $this->app->singleton(FieldsetRecursionStack::class);

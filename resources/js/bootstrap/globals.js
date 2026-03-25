@@ -1,4 +1,5 @@
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { translate, translateChoice } from '../translations/translator';
 import uid from 'uniqid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
@@ -68,7 +69,7 @@ export function tailwind_width_class(width) {
 }
 
 export function markdown(value) {
-    return marked(value);
+    return DOMPurify.sanitize(marked(value));
 };
 
 export function __(string, replacements) {

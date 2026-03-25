@@ -92,6 +92,7 @@
 
 <script>
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 export default {
 
@@ -270,7 +271,7 @@ export default {
                 renderer: renderer
             });
 
-            return marked(text);
+            return DOMPurify.sanitize(marked(text));
         },
 
         metaLoaded() {

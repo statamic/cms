@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class UrlTest extends TestCase
 {
+    use Concerns\ProvidesExternalUrls;
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
@@ -77,6 +79,31 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('#anchor'));
         $this->assertFalse(URL::isExternal(''));
         $this->assertFalse(URL::isExternal(null));
+    }
+
+    #[Test]
+    #[DataProvider('externalUrlProvider')]
+    public function it_determines_if_external_url_to_application($url, $expected)
+    {
+        $this->setSites([
+            'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
+            'b' => ['name' => 'B', 'locale' => 'en_US', 'url' => 'http://subdomain.this-site.com/'],
+            'c' => ['name' => 'C', 'locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $this->assertEquals($expected, URL::isExternalToApplication($url));
+    }
+
+    #[Test]
+    public function it_does_not_trust_current_request_domain_when_no_sites_are_relative()
+    {
+        $this->setSites([
+            'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
+            'b' => ['name' => 'B', 'locale' => 'en_US', 'url' => 'http://subdomain.this-site.com/'],
+        ]);
+
+        $this->assertTrue(URL::isExternalToApplication('http://absolute-url-resolved-from-request.com/'));
+        $this->assertFalse(URL::isExternalToApplication('http://this-site.com/'));
     }
 
     #[Test]

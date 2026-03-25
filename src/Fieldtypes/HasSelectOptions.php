@@ -181,7 +181,7 @@ trait HasSelectOptions
             'resolve' => function ($item, $args, $context, $info) {
                 $resolved = $item->resolveGqlValue($info->fieldName);
 
-                return is_null($resolved->value()) ? null : $resolved;
+                return is_null($resolved?->value()) ? null : $resolved;
             },
         ];
     }

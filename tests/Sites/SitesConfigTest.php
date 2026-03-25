@@ -133,6 +133,7 @@ class SitesConfigTest extends TestCase
         ]);
 
         Config::set('statamic.some_addon.theme', 'sunset');
+        Config::set('statamic.system.view_config_allowlist', ['@default', 'app.faker_locale', 'statamic.some_addon.theme']);
 
         Site::setSites([
             'default' => [

@@ -5,6 +5,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { data_get } from  '../bootstrap/globals.js'
+import DOMPurify from 'dompurify';
 
 export default {
 
@@ -53,13 +54,13 @@ export default {
         evaluateIcon() {
             if (this.customIcon) {
                 return defineAsyncComponent(() => {
-                    return new Promise(resolve => resolve({ template: this.customIcon }));
+                    return new Promise(resolve => resolve({ template: DOMPurify.sanitize(this.customIcon) }));
                 });
             }
 
             if (this.name.startsWith('<svg')) {
                 return defineAsyncComponent(() => {
-                    return new Promise(resolve => resolve({ template: this.name }));
+                    return new Promise(resolve => resolve({ template: DOMPurify.sanitize(this.name) }));
                 });
             }
 

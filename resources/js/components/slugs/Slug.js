@@ -113,7 +113,7 @@ export default class Slug {
         this.#controller = new AbortController;
 
         let aborted = false;
-        return axios.post(cp_url('slug'), payload, { signal: this.#controller.signal })
+        return axios.post(cp_url('slug'), payload, { signal: this.#controller.signal, transformResponse: [(data) => data] })
             .then(response => response.data)
             .catch(e => {
                 if (axios.isCancel(e)) {

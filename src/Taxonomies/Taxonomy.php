@@ -27,7 +27,6 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -43,7 +42,6 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $sites = [];
     protected $collection;
     protected $defaultPublishState = true;
-    protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
     protected $template;
@@ -322,20 +320,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             ->args(func_get_args());
     }
 
+    /** @deprecated */
     public function revisionsEnabled($enabled = null)
     {
-        return $this
-            ->fluentlyGetOrSet('revisions')
-            ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
-                    return false;
-                }
-
-                return false; // TODO
-
-                return $enabled;
-            })
-            ->args(func_get_args());
+        return func_num_args() === 0 ? false : $this;
     }
 
     public function url()

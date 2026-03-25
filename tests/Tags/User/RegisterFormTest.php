@@ -19,7 +19,7 @@ class RegisterFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -321,6 +321,29 @@ EOT
         $this->assertEmpty($success[1]);
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expected, $inlineErrors[1]);
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url_on_error()
+    {
+        $this
+            ->post('/!/auth/register', [
+                '_error_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
     }
 
     #[Test]

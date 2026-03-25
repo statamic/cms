@@ -130,14 +130,15 @@ class NavTest extends TestCase
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::utilities('Test')
-            ->icon('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
+            ->icon('<svg onerror="foo"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
 
         $item = $this->build()->get('Utilities')->last();
 
-        $expected = '<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
+        $expectedIcon = '<svg onerror="foo"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
+        $this->assertEquals($expectedIcon, $item->icon());
 
-        $this->assertEquals($expected, $item->icon());
-        $this->assertEquals($expected, $item->svg());
+        $expectedSvg = '<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/></svg>';
+        $this->assertEquals($expectedSvg, $item->svg());
     }
 
     #[Test]

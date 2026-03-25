@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -930,7 +931,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->syncOriginal()
             ->save();
 
-        AssetUploaded::dispatch($this);
+        AssetUploaded::dispatch($this, $file->getClientOriginalName());
 
         AssetCreated::dispatch($this);
 
@@ -945,10 +946,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $file->writeTo($this->disk()->filesystem(), $this->path());
 
+        if ($this->isSvg() && config('statamic.assets.svg_sanitization_on_upload', true)) {
+            $contents = $this->disk()->get($this->path());
+
+            $this->disk()->put(
+                $this->path(),
+                (new DOMSanitizer(DOMSanitizer::SVG))->sanitize($contents, [
+                    'remove-xml-tags' => ! Str::startsWith($contents, '<?xml'),
+                ])
+            );
+        }
+
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
 
-        AssetReuploaded::dispatch($this);
+        AssetReuploaded::dispatch($this, $file->basename());
 
         return $this;
     }

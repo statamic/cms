@@ -14,13 +14,14 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Concerns\QueriesRelationships;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use AppliesScopes, FakesQueries;
+    use AppliesScopes, FakesQueries, QueriesRelationships;
 
     protected $columns;
     protected $limit;

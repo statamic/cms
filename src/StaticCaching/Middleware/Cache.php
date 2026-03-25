@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
@@ -196,6 +197,10 @@ class Cache
         }
 
         if ($request->statamicToken()) {
+            return false;
+        }
+
+        if ($this->cacher instanceof AbstractCacher && $this->cacher->isExcluded($this->cacher->getUrl($request))) {
             return false;
         }
 

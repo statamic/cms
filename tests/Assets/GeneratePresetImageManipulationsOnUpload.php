@@ -28,10 +28,10 @@ class GeneratePresetImageManipulationsOnUpload extends TestCase
 
     #[Test]
     #[DataProvider('presetProvider')]
-    public function presets_are_generated_for_images($event, $extension, $shouldGenerate)
+    public function presets_are_generated_for_images($event, $basename, $shouldGenerate)
     {
         $generator = Mockery::mock(PresetGenerator::class);
-        $asset = (new Asset)->path('foo.'.$extension);
+        $asset = (new Asset)->path($basename);
 
         if ($shouldGenerate) {
             $generator->shouldReceive('generate')->once()->with($asset);
@@ -41,19 +41,19 @@ class GeneratePresetImageManipulationsOnUpload extends TestCase
 
         $listener = new GeneratePresetImageManipulations($generator);
 
-        $listener->handle(new $event($asset));
+        $listener->handle(new $event($asset, $basename));
     }
 
     public static function presetProvider()
     {
         return [
-            [AssetUploaded::class, 'jpg', true],
-            [AssetUploaded::class, 'svg', false],
-            [AssetUploaded::class, 'txt', false],
+            [AssetUploaded::class, 'foo.jpg', true],
+            [AssetUploaded::class, 'foo.svg', false],
+            [AssetUploaded::class, 'foo.txt', false],
 
-            [AssetReuploaded::class, 'jpg', true],
-            [AssetReuploaded::class, 'svg', false],
-            [AssetReuploaded::class, 'txt', false],
+            [AssetReuploaded::class, 'foo.jpg', true],
+            [AssetReuploaded::class, 'foo.svg', false],
+            [AssetReuploaded::class, 'foo.txt', false],
         ];
     }
 }

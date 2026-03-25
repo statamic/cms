@@ -31,6 +31,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
 
 class CoreModifiers extends Modifier
@@ -119,7 +120,9 @@ class CoreModifiers extends Modifier
      */
     public function antlers($value, $params, $context)
     {
-        return (string) Antlers::parse($value, $context);
+        $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
+
+        return (string) Antlers::parse($value, $context, $trusted);
     }
 
     /**
@@ -283,6 +286,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -291,8 +295,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -1866,7 +1875,7 @@ class CoreModifiers extends Modifier
 
         $partial = 'partials/'.$name.'.html';
 
-        return Parse::template(File::disk('resources')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value, trusted: true);
     }
 
     /**
@@ -3275,6 +3284,10 @@ class CoreModifiers extends Modifier
 
     private function carbon($value)
     {
+        if (! $value) {
+            return optional();
+        }
+
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }

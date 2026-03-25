@@ -2081,6 +2081,22 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_uploaded_filenames_but_passes_the_original_name_into_the_event()
+    {
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/Sanitize This Asset © Photographer.JPG');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('Sanitize This Asset © Photographer.JPG'));
+
+        Storage::disk('test')->assertExists('path/to/sanitize-this-asset--photographer.jpg');
+        $this->assertEquals('path/to/sanitize-this-asset--photographer.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset && $event->originalFilename === 'Sanitize This Asset © Photographer.JPG';
+        });
+    }
+
+    #[Test]
     public function it_lowercases_uploaded_filenames_by_default()
     {
         Event::fake();
@@ -2162,6 +2178,76 @@ class AssetTest extends TestCase
 
         Event::assertNotDispatched(AssetReuploaded::class);
         Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    #[Test]
+    public function it_sanitizes_svgs_on_reupload()
+    {
+        Event::fake();
+
+        // Create and upload an initial clean SVG
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"></svg>'));
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+
+        // Place a malicious SVG in the local disk for reupload
+        $uploadDisk = Storage::fake('local');
+        $maliciousSvg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>';
+        $uploadDisk->put('path/to/malicious.svg', $maliciousSvg);
+        $uploadDisk->assertExists('path/to/malicious.svg');
+
+        $file = new ReplacementFile('path/to/malicious.svg');
+
+        $return = $asset->reupload($file);
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+
+        // Ensure the inline scripts were stripped out
+        $this->assertStringNotContainsString('<script', $asset->contents());
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringNotContainsString('</script>', $asset->contents());
+
+        Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
+            return $event->asset->id() === $asset->id();
+        });
+    }
+
+    #[Test]
+    public function it_does_not_sanitize_svgs_on_reupload_when_behaviour_is_disabled()
+    {
+        Event::fake();
+
+        config()->set('statamic.assets.svg_sanitization_on_upload', false);
+
+        // Create and upload an initial clean SVG
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"></svg>'));
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+
+        // Place a malicious SVG in the local disk for reupload
+        $uploadDisk = Storage::fake('local');
+        $maliciousSvg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>';
+        $uploadDisk->put('path/to/malicious.svg', $maliciousSvg);
+        $uploadDisk->assertExists('path/to/malicious.svg');
+
+        $file = new ReplacementFile('path/to/malicious.svg');
+
+        $return = $asset->reupload($file);
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+
+        // Ensure the inline scripts were NOT stripped out when disabled
+        $this->assertStringContainsString('<script', $asset->contents());
+        $this->assertStringContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringContainsString('</script>', $asset->contents());
+
+        Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
+            return $event->asset->id() === $asset->id();
+        });
     }
 
     #[Test]
@@ -2437,14 +2523,14 @@ class AssetTest extends TestCase
         $container->shouldReceive('url')->andReturn('/container');
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
-        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset]));
+        $this->assertEquals('/container/path/to/test.txt', Antlers::parse('{{ asset }}', ['asset' => $asset], true));
 
-        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset]));
+        $this->assertEquals('path/to/test.txt', Antlers::parse('{{ asset }}{{ path }}{{ /asset }}', ['asset' => $asset], true));
 
-        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset]));
+        $this->assertEquals('test.txt', Antlers::parse('{{ asset:basename }}', ['asset' => $asset], true));
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
-        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+        $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset], true));
     }
 
     #[Test]
