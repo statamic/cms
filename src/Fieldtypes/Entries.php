@@ -17,6 +17,9 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Types\DynamicEntryUnionType;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\EntryType;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderBy;
@@ -455,10 +458,44 @@ class Entries extends Relationship
 
     public function toGqlType()
     {
-        $type = GraphQL::type('EntryInterface');
+        // If the fieldtype isn't constrained to specific collections, return the generic EntryInterface.
+        if (empty($this->config('collections'))) {
+            $type = GraphQL::type(EntryInterface::NAME);
+
+            if ($this->config('max_items') !== 1) {
+                $type = GraphQL::listOf(GraphQL::nonNull($type));
+            }
+
+            return $type;
+        }
+
+        $configuredCollections = $this->getConfiguredCollections();
+
+        $combinations = collect($configuredCollections)->flatMap(function ($collectionHandle) {
+            $collection = Collection::find($collectionHandle);
+
+            if (! $collection) {
+                return [];
+            }
+
+            return $collection->entryBlueprints()->map(fn ($blueprint) => [
+                'collection' => $collection,
+                'blueprint' => $blueprint,
+            ]);
+        })->values()->all();
+
+        if (count($combinations) === 1) {
+            $collection = $combinations[0]['collection'];
+            $blueprint = $combinations[0]['blueprint'];
+            $type = GraphQL::type(EntryType::buildName($collection, $blueprint));
+        } else {
+            $newType = new DynamicEntryUnionType($combinations);
+            GraphQL::addType($newType);
+            $type = GraphQL::type($newType->name);
+        }
 
         if ($this->config('max_items') !== 1) {
-            $type = GraphQL::listOf($type);
+            $type = GraphQL::listOf(GraphQL::nonNull($type));
         }
 
         return $type;
