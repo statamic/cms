@@ -7,8 +7,8 @@
         <template #actions>
             <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
             <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
-            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
-            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
+            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" />
+            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
     </StackHeader>
 
@@ -318,6 +318,13 @@ export default {
             });
         },
 
+        // Nested field: saves and closes only the current stack.
+        commitAndSaveTopStack() {
+            this.commit({
+                shouldSaveRoot: true,
+            });
+        },
+
         saveRootForm() {
             // The "root form" could be the blueprint or fieldset forms.
             this.$events.$emit('root-form-save');
@@ -325,7 +332,7 @@ export default {
 
         handleSaveShortcut() {
             this.isNestedField
-                ? this.commitAndSaveAll()
+                ? this.commitAndSaveTopStack()
                 : this.commitAndSave();
         },
 
