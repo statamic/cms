@@ -278,6 +278,7 @@ class Term implements TermContract
         return "term::{$this->id()}";
     }
 
+    /** @deprecated */
     public function revisionsEnabled()
     {
         return $this->taxonomy()->revisionsEnabled();

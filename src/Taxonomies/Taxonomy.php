@@ -322,6 +322,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             ->args(func_get_args());
     }
 
+    /** @deprecated */
     public function revisionsEnabled($enabled = null)
     {
         return $this

@@ -235,39 +235,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         });
     }
 
-    protected function revisionKey()
-    {
-        return vsprintf('taxonomies/%s/%s/%s', [
-            $this->taxonomyHandle(),
-            $this->locale(),
-            $this->slug(),
-        ]);
-    }
-
-    protected function revisionAttributes()
-    {
-        return [
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'published' => $this->published(),
-            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
-        ];
-    }
-
+    /** @deprecated */
     public function makeFromRevision($revision)
     {
-        $entry = clone $this;
-
-        if (! $revision) {
-            return $entry;
-        }
-
-        $attrs = $revision->attributes();
-
-        return $entry
-            ->published($attrs['published'])
-            ->data($attrs['data'])
-            ->slug($attrs['slug']);
+        //
     }
 
     public function origin()
@@ -289,6 +260,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return $this->locale;
     }
 
+    /** @deprecated */
     public function revisionsEnabled($enabled = null)
     {
         if (func_num_args() === 0) {
@@ -320,19 +292,22 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return $this->cpUrl('taxonomies.terms.published.destroy');
     }
 
+    /** @deprecated */
     public function revisionsUrl()
     {
-        return $this->cpUrl('taxonomies.terms.revisions.index');
+        return null;
     }
 
+    /** @deprecated */
     public function createRevisionUrl()
     {
-        return $this->cpUrl('taxonomies.terms.revisions.store');
+        return null;
     }
 
+    /** @deprecated */
     public function restoreRevisionUrl()
     {
-        return $this->cpUrl('taxonomies.terms.restore-revision');
+        return null;
     }
 
     public function livePreviewUrl()
