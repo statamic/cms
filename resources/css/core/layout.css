@@ -156,12 +156,11 @@ main.nav-closed {
 =================================================== */
 .content-card-resize-handle {
     --resize-width: 10px;
-    --needle-width: 5px;
 
     position: absolute;
     z-index: var(--z-index-above);
     top: 0;
-    inset-inline-start: 0;
+    inset-inline-start: calc(0% - var(--resize-width) / 2);
     width: var(--resize-width);
     height: 100%;
     cursor: col-resize;
