@@ -21,7 +21,7 @@ class RevisableTest extends TestCase
     {
         parent::setUp();
         config(['statamic.revisions.path' => __DIR__.'/__fixtures__']);
-        $this->repo = (new RevisionRepository);
+        $this->repo = app(RevisionRepository::class);
     }
 
     #[Test]
