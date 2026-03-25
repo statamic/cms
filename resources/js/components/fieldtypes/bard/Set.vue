@@ -86,6 +86,7 @@
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
+                    :read-only="isReadOnly"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >
