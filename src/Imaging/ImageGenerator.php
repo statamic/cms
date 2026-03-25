@@ -15,6 +15,7 @@ use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 class ImageGenerator
@@ -87,12 +88,12 @@ class ImageGenerator
         );
     }
 
-    private function doGenerateByPath($path, array $params)
+    private function doGenerateByPath($path, array $params, $sourceFilesystemRoot = null)
     {
         $this->path = $path;
         $this->setParams($params);
 
-        $this->server->setSource($this->pathSourceFilesystem());
+        $this->server->setSource($this->pathSourceFilesystem($sourceFilesystemRoot));
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('paths');
 
@@ -129,6 +130,24 @@ class ImageGenerator
     }
 
     /**
+     * @param  \Statamic\Contracts\Assets\Asset  $asset
+     */
+    public function generateVideoThumbnail($asset, array $params)
+    {
+        if ($path = app(ThumbnailExtractor::class)->generateThumbnail($asset)) {
+            $this->skip_validation = true;
+
+            return $this->doGenerateByPath(
+                basename($path),
+                $params,
+                config('statamic.assets.ffmpeg.cache_path'),
+            );
+        }
+
+        return '';
+    }
+
+    /**
      * Generate a manipulated image by an asset.
      *
      * @param  \Statamic\Contracts\Assets\Asset  $asset
@@ -136,6 +155,10 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
+        if (ThumbnailExtractor::enabled() && $asset->isVideo()) {
+            return $this->generateVideoThumbnail($asset, $params);
+        }
+
         $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
         $manifestCacheKey = static::assetCacheManifestKey($asset);
 
@@ -208,7 +231,7 @@ class ImageGenerator
             return [$item->disk()->filesystem()->getDriver(), $item->path()];
         }
 
-        if (Str::startsWith($item, ['http://', 'https://'])) {
+        if (URL::isAbsolute($item)) {
             $parsed = $this->parseUrl($item);
 
             return [$this->guzzleSourceFilesystem($parsed['base']), $parsed['path']];
@@ -310,9 +333,11 @@ class ImageGenerator
         }
     }
 
-    private function pathSourceFilesystem()
+    private function pathSourceFilesystem($root = null)
     {
-        return Storage::build(['driver' => 'local', 'root' => public_path()])->getDriver();
+        $root ??= public_path();
+
+        return Storage::build(['driver' => 'local', 'root' => $root])->getDriver();
     }
 
     private function guzzleSourceFilesystem($base)

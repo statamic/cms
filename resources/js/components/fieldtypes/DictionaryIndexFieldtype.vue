@@ -3,10 +3,10 @@
 </template>
 
 <script>
+import IndexFieldtype from './IndexFieldtype.vue';
 import DOMPurify from 'dompurify';
 
 export default {
-
     mixins: [IndexFieldtype],
 
     computed: {

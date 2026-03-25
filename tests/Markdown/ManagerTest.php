@@ -105,7 +105,6 @@ class ManagerTest extends TestCase
     #[Test]
     public function it_throws_an_exception_if_extending_without_returning_a_parser()
     {
-        $this->expectNotToPerformAssertions();
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('A ['.Markdown\Parser::class.'] instance is expected.');
 

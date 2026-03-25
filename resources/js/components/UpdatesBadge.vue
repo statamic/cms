@@ -1,50 +1,46 @@
 <template>
-    <span v-if="count" class="badge-sm bg-red-500 dark:bg-blue-900">
-        {{ count }}
-    </span>
+    <Badge v-if="count" :text="String(count)" :color="security ? 'red' : 'amber'" size="sm" pill />
 </template>
 
 <script>
-    export default {
+import { ref } from 'vue';
+import { Badge } from '@/components/ui';
 
-        computed: {
-            count() {
-                return this.$store.state.updates.count;
-            }
+const countRef = ref(null);
+const securityRef = ref(false);
+const requested = ref(false);
+
+export default {
+    components: {
+        Badge,
+    },
+
+    computed: {
+        count() {
+            return countRef.value;
         },
-
-        created() {
-            this.registerVuexModule();
-
-            this.getCount();
+        security() {
+            return securityRef.value;
         },
+    },
 
-        methods: {
-            registerVuexModule() {
-                if (this.$store.state.updates) return;
+    created() {
+        this.getCount();
+    },
 
-                this.$store.registerModule('updates', {
-                    namespaced: true,
-                    state: {
-                        count: 0,
-                        requested: false,
-                    },
-                    mutations: {
-                        count: (state, count) => state.count = count,
-                        requested: (state) => state.requested = true,
-                    }
-                })
-            },
+    methods: {
+        getCount() {
+            if (requested.value) return;
 
-            getCount() {
-                if (this.$store.state.updates.requested) return;
+            this.$axios
+                .get(cp_url('updater/count'))
+                .then((response) => {
+                    countRef.value = response.data?.count ?? 0;
+                    securityRef.value = response.data?.security ?? false;
+                });
 
-                this.$axios
-                    .get(cp_url('updater/count'))
-                    .then(response => this.$store.commit('updates/count', !isNaN(response.data) ? response.data : 0));
-
-                this.$store.commit('updates/requested');
-            },
-        }
-    }
+            requested.value = true;
+        },
+    },
+};
 </script>

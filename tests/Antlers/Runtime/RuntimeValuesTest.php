@@ -78,7 +78,7 @@ EXPECTED;
         BlueprintRepository::shouldReceive('find')->with('globals.the_global')->andReturn($blueprint);
 
         $global = GlobalSet::make('the_global');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
 
         $variables->set('the_text', 'The Value');
         $theText = $variables->toDeferredAugmentedArray()['the_text'];

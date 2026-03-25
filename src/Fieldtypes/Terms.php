@@ -31,12 +31,13 @@ use function Statamic\trans as __;
 
 class Terms extends Relationship
 {
+    use UpdatesReferences;
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
     protected $statusIcons = false;
     protected $taggable = true;
-    protected $icon = 'taxonomy';
+    protected $icon = 'fieldtype-taxonomy';
     protected $formComponent = 'term-publish-form';
 
     protected $formComponentProps = [
@@ -54,10 +55,8 @@ class Terms extends Relationship
         'initialOriginMeta' => 'originMeta',
         'initialSite' => 'locale',
         'initialIsWorkingCopy' => 'hasWorkingCopy',
-        'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
-        'breadcrumbs' => 'breadcrumbs',
         'taxonomyHandle' => 'taxonomy',
     ];
 
@@ -65,14 +64,27 @@ class Terms extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
+                    'taxonomies' => [
+                        'display' => __('Taxonomies'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.taxonomies'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
+                        'width' => '50',
                     ],
+                    'create' => [
+                        'display' => __('Allow Creating New Terms'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -84,20 +96,29 @@ class Terms extends Relationship
                             'typeahead' => __('Typeahead Field'),
                         ],
                     ],
-                    'create' => [
-                        'display' => __('Allow Creating'),
-                        'instructions' => __('statamic::fieldtypes.terms.config.create'),
-                        'type' => 'toggle',
-                        'default' => true,
-                        'if' => [
-                            'mode' => 'default',
-                        ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
-                    'taxonomies' => [
-                        'display' => __('Taxonomies'),
-                        'instructions' => __('statamic::fieldtypes.terms.config.taxonomies'),
-                        'type' => 'taxonomies',
-                        'mode' => 'select',
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'show_query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
+                        'type' => 'revealer',
+                        'input_label' => __('Apply Query Scopes'),
+                        'default' => false,
+                        'width' => '50',
                     ],
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
@@ -108,6 +129,10 @@ class Terms extends Relationship
                             ->map->handle()
                             ->values()
                             ->all(),
+                        'width' => '50',
+                        'if' => [
+                            'show_query_scopes' => 'true',
+                        ],
                     ],
                 ],
             ],
@@ -348,7 +373,7 @@ class Terms extends Relationship
 
         $user = User::current();
 
-        return collect($taxonomies)->flatMap(function ($taxonomyHandle) use ($taxonomies, $user) {
+        return collect($taxonomies)->flatMap(function ($taxonomyHandle) use ($user) {
             $taxonomy = Taxonomy::findByHandle($taxonomyHandle);
 
             throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
@@ -359,26 +384,14 @@ class Terms extends Relationship
 
             $blueprints = $taxonomy->termBlueprints();
 
-            return $blueprints->map(function ($blueprint) use ($taxonomy, $taxonomies, $blueprints) {
+            return $blueprints->map(function ($blueprint) use ($taxonomy) {
                 return [
-                    'title' => $this->getCreatableTitle($taxonomy, $blueprint, count($taxonomies), $blueprints->count()),
+                    'parent_title' => $taxonomy->title(),
+                    'blueprint' => $blueprint->title(),
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]).'?blueprint='.$blueprint->handle(),
                 ];
             });
         })->all();
-    }
-
-    private function getCreatableTitle($taxonomy, $blueprint, $taxonomyCount, $blueprintCount)
-    {
-        if ($taxonomyCount > 1 && $blueprintCount === 1) {
-            return $taxonomy->title();
-        }
-
-        if ($taxonomyCount > 1 && $blueprintCount > 1) {
-            return $taxonomy->title().': '.$blueprint->title();
-        }
-
-        return $blueprint->title();
     }
 
     protected function toItemArray($id)
@@ -552,5 +565,27 @@ class Terms extends Relationship
         return collect([
             count($this->getConfiguredTaxonomies()) > 1 ? __($item->taxonomy()->title()) : null,
         ])->filter()->implode(' • ');
+    }
+
+    public function replaceTermReferences($data, ?string $newValue, string $oldValue, string $taxonomy)
+    {
+        $configuredTaxonomies = Arr::wrap($this->config('taxonomies'));
+
+        if (count($configuredTaxonomies) > 0) {
+            if (! in_array($taxonomy, $configuredTaxonomies)) {
+                return $data;
+            }
+
+            return is_string($data)
+                ? $this->replaceValue($data, $newValue, $oldValue)
+                : $this->replaceValuesInArray($data, $newValue, $oldValue);
+        }
+
+        $scopedOldValue = "{$taxonomy}::{$oldValue}";
+        $scopedNewValue = $newValue !== null ? "{$taxonomy}::{$newValue}" : null;
+
+        return is_string($data)
+            ? $this->replaceValue($data, $scopedNewValue, $scopedOldValue)
+            : $this->replaceValuesInArray($data, $scopedNewValue, $scopedOldValue);
     }
 }

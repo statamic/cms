@@ -34,6 +34,14 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function name_falls_back_to_handle()
+    {
+        $site = new Site('en', []);
+
+        $this->assertEquals('en', $site->name());
+    }
+
+    #[Test]
     public function gets_locale()
     {
         $site = new Site('en', ['locale' => 'en_US']);

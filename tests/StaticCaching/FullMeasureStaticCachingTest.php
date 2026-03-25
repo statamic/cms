@@ -5,6 +5,7 @@ namespace Tests\StaticCaching;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\FakesViews;
@@ -136,15 +137,16 @@ class FullMeasureStaticCachingTest extends TestCase
     }
 
     #[Test]
-    public function it_should_add_the_javascript_if_there_is_a_csrf_token()
+    public function it_adds_the_csrf_and_nocache_scripts()
     {
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
+        $this->viewShouldReturnRaw('layout', '<html><head></head><body>{{ template_content }}</body></html>');
         $this->viewShouldReturnRaw('default', '{{ csrf_token }}');
 
         $this->createPage('about');
 
-        StaticCache::nocacheJs('js here');
+        $csrfTokenScript = '<script>'.app(Cacher::class)->getCsrfTokenJs().'</script>';
+        $nocacheScript = '<script>'.app(Cacher::class)->getNocacheJs().'</script>';
 
         $this->assertFalse(file_exists($this->dir.'/about_.html'));
 
@@ -153,11 +155,25 @@ class FullMeasureStaticCachingTest extends TestCase
             ->assertOk();
 
         // Initial response should have the placeholder and the javascript, NOT the real token.
-        $this->assertEquals('<html><body>STATAMIC_CSRF_TOKEN<script>js here</script></body></html>', $response->getContent());
+        $this->assertEquals(vsprintf("<html><head>{$csrfTokenScript}</head><body>STATAMIC_CSRF_TOKEN%s</body></html>", [
+            $nocacheScript,
+        ]), $response->getContent());
 
         // The cached response should be the same as the initial response.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
-        $this->assertEquals('<html><body>STATAMIC_CSRF_TOKEN<script>js here</script></body></html>', file_get_contents($this->dir.'/about_.html'));
+        $this->assertEquals(vsprintf("<html><head>{$csrfTokenScript}</head><body>STATAMIC_CSRF_TOKEN%s</body></html>", [
+            $nocacheScript,
+        ]), file_get_contents($this->dir.'/about_.html'));
+    }
+
+    #[Test]
+    public function it_can_override_the_csrf_and_nocache_scripts()
+    {
+        StaticCache::nocacheJs('nocache');
+        StaticCache::csrfTokenJs('csrf');
+
+        $this->assertEquals(app(Cacher::class)->getNocacheJs(), 'nocache');
+        $this->assertEquals(app(Cacher::class)->getCsrfTokenJs(), 'csrf');
     }
 
     #[Test]

@@ -2,7 +2,8 @@
 
 namespace Statamic\Http\Middleware;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use ReflectionClass;
@@ -23,23 +24,26 @@ class Localize
         $originalLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $site->locale());
 
-        // The sites lang is used for your translations. (eg. if you set your site's lang
-        // to "fr_FR", the translator will look for "fr_FR" files rather than "fr" files
-        // but if not set the translator will look for "fr" files rather than "fr_FR"
-        // files.) Again, we'll save the original locale so we can reset it later.
-        $originalAppLocale = app()->getLocale();
-        app()->setLocale($site->lang());
+        // Use the site's lang for translations.
+        $originalTranslatorLocale = app('translator')->getLocale();
+        app('translator')->setLocale($site->lang());
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
-        Date::setToStringFormat(Statamic::dateFormat());
+        Date::setToStringFormat(function (CarbonInterface|CarbonInterval $date) {
+            if ($date instanceof CarbonInterval) {
+                return $date->forHumans();
+            }
+
+            return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
+        });
 
         $response = $next($request);
 
         // Reset everything back to their originals. This allows everything
         // not within the scope of the request to be the "defaults".
         setlocale(LC_TIME, $originalLocale);
-        app()->setLocale($originalAppLocale);
+        app('translator')->setLocale($originalTranslatorLocale);
         Date::setToStringFormat($originalToStringFormat);
 
         return $response;
@@ -51,21 +55,11 @@ class Localize
      *
      * @throws \ReflectionException
      */
-    private function getToStringFormat(): ?string
+    private function getToStringFormat(): string|\Closure|null
     {
         $reflection = new ReflectionClass($date = Date::now());
 
-        // Carbon 2.x
-        if ($reflection->hasProperty('toStringFormat')) {
-            $format = $reflection->getProperty('toStringFormat');
-            $format->setAccessible(true);
-
-            return $format->getValue();
-        }
-
-        // Carbon 3.x
         $factory = $reflection->getMethod('getFactory');
-        $factory->setAccessible(true);
 
         return Arr::get($factory->invoke($date)->getSettings(), 'toStringFormat');
     }

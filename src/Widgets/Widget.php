@@ -53,4 +53,14 @@ abstract class Widget
     {
         return Str::removeRight(static::traitHandle(), '_widget');
     }
+
+    public function component()
+    {
+        //
+    }
+
+    public function html()
+    {
+        //
+    }
 }

@@ -104,18 +104,9 @@ final class InstallableModule extends Module
      */
     protected function installableFiles(): Collection
     {
-        $installableFromExportPaths = $this
+        return $this
             ->exportPaths()
             ->flatMap(fn ($path) => $this->expandExportDirectoriesToFiles($path));
-
-        $installableFromExportAsPaths = $this
-            ->exportAsPaths()
-            ->flip()
-            ->flatMap(fn ($to, $from) => $this->expandExportDirectoriesToFiles($to, $from));
-
-        return collect()
-            ->merge($installableFromExportPaths)
-            ->merge($installableFromExportAsPaths);
     }
 
     /**
@@ -196,7 +187,6 @@ final class InstallableModule extends Module
     {
         $this
             ->exportPaths()
-            ->merge($this->exportAsPaths())
             ->reject(fn ($path) => $this->files->exists($this->installableFilesPath($path)))
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");

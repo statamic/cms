@@ -6,6 +6,13 @@ use Statamic\Facades\User;
 
 class UserPolicy
 {
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function index($authed)
     {
         $authed = User::fromUser($authed);

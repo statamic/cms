@@ -3,6 +3,8 @@
 namespace Tests\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Icon;
+use Statamic\Facades\Path;
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Sets;
@@ -59,6 +61,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'image' => null,
                         'hide' => true,
                         'fields' => [
                             [
@@ -66,7 +69,7 @@ class SetsTest extends TestCase
                                 'handle' => 'field_one',
                                 'type' => 'inline',
                                 'fieldtype' => 'text',
-                                'icon' => 'text',
+                                'icon' => 'fieldtype-text',
                                 'config' => [
                                     'type' => 'text',
                                     'width' => 100,
@@ -90,6 +93,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
+                        'image' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -97,7 +101,7 @@ class SetsTest extends TestCase
                                 'handle' => 'field_two',
                                 'type' => 'inline',
                                 'fieldtype' => 'text',
-                                'icon' => 'text',
+                                'icon' => 'fieldtype-text',
                                 'config' => [
                                     'type' => 'text',
                                     'width' => 100,
@@ -141,6 +145,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'image' => null,
                         'hide' => null,
                         'fields' => [
                             [
@@ -148,7 +153,7 @@ class SetsTest extends TestCase
                                 'handle' => 'field_one',
                                 'type' => 'inline',
                                 'fieldtype' => 'text',
-                                'icon' => 'text',
+                                'icon' => 'fieldtype-text',
                                 'config' => [
                                     'type' => 'text',
                                     'width' => 100,
@@ -223,19 +228,19 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
-                                'sortable' => true,
                                 'visibility' => 'visible',
+                                'sortable' => true,
                                 'replicator_preview' => true,
                                 'duplicate' => true,
-                                'revisable' => true,
+                                'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
-                                'placeholder' => null,
-                                'default' => null,
-                                'character_limit' => 0,
+                                'character_limit' => null,
                                 'autocomplete' => null,
+                                'placeholder' => null,
                                 'prepend' => null,
                                 'append' => null,
+                                'default' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
@@ -246,6 +251,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'alfa',
@@ -261,19 +267,20 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
-                                'sortable' => true,
                                 'visibility' => 'visible',
+                                'sortable' => true,
                                 'replicator_preview' => true,
                                 'duplicate' => true,
                                 'revisable' => true,
+                                'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
-                                'placeholder' => null,
-                                'default' => null,
-                                'character_limit' => 0,
+                                'character_limit' => null,
                                 'autocomplete' => null,
+                                'placeholder' => null,
                                 'prepend' => null,
                                 'append' => null,
+                                'default' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
@@ -284,6 +291,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'two',
                         'id' => 'two',
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'bravo',
@@ -322,19 +330,20 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
-                                'sortable' => true,
                                 'visibility' => 'visible',
+                                'sortable' => true,
                                 'replicator_preview' => true,
                                 'duplicate' => true,
                                 'revisable' => true,
+                                'actions' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
-                                'placeholder' => null,
-                                'default' => null,
-                                'character_limit' => 0,
+                                'character_limit' => null,
                                 'autocomplete' => null,
+                                'placeholder' => null,
                                 'prepend' => null,
                                 'append' => null,
+                                'default' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
@@ -345,6 +354,7 @@ class SetsTest extends TestCase
                         ],
                         'handle' => 'one',
                         'id' => 'one',
+                        'image' => null,
                     ],
                 ],
                 'handle' => 'main',
@@ -405,6 +415,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'image' => null,
                         'hide' => false,
                         'fields' => [
                             [
@@ -422,44 +433,13 @@ class SetsTest extends TestCase
     }
 
     #[Test]
-    public function it_provides_statamic_plump_icons_to_script_by_default()
-    {
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertNull($jsonVariables['setIconsDirectory']);
-        $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
-    }
-
-    #[Test]
-    public function it_can_provide_custom_user_icons_subfolder()
-    {
-        Sets::setIconsDirectory(folder: 'light');
-
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertNull($jsonVariables['setIconsDirectory']);
-        $this->assertEquals('light', $jsonVariables['setIconsFolder']);
-    }
-
-    #[Test]
     public function it_can_provide_custom_user_icons_directory()
     {
-        Sets::setIconsDirectory($customDir = resource_path());
+        Sets::useIcons('foo', $customDir = resource_path());
 
         $jsonVariables = Statamic::jsonVariables(request());
 
-        $this->assertEquals($customDir, $jsonVariables['setIconsDirectory']);
-        $this->assertEquals(null, $jsonVariables['setIconsFolder']);
-    }
-
-    #[Test]
-    public function it_can_provide_custom_user_icons_directory_and_sub_folder()
-    {
-        Sets::setIconsDirectory($customDir = base_path(), $customSubFolder = 'resources');
-
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertEquals($customDir, $jsonVariables['setIconsDirectory']);
-        $this->assertEquals($customSubFolder, $jsonVariables['setIconsFolder']);
+        $this->assertEquals('foo', $jsonVariables['replicatorSetIcons']);
+        $this->assertEquals(Path::tidy($customDir), Icon::get('foo')->directory());
     }
 }

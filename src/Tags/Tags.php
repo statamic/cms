@@ -18,12 +18,16 @@ abstract class Tags
 
     protected static $binding = 'tags';
 
+    public static $isolated = false;
+
     /**
      * The content written between the tags (when a tag pair).
      *
      * @public string
      */
     public $content;
+
+    public $isolatedContext;
 
     /**
      * The variable context around which this tag is positioned.
@@ -124,6 +128,14 @@ abstract class Tags
     public function setContext($context)
     {
         $this->context = new Context($context);
+
+        return $this;
+    }
+
+    public function setIsolatedContext($context)
+    {
+        $this->isolatedContext = new Context($context);
+        $this->context = new Context();
 
         return $this;
     }

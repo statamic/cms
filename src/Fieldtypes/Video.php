@@ -12,16 +12,21 @@ class Video extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
+                'fields' => [
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'text',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
                 'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'text',
-                    ],
-                    'placeholder' => [
-                        'display' => __('Placeholder'),
-                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
                     ],
                 ],

@@ -3,6 +3,14 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MaxRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
+use Statamic\Fieldtypes\Assets\MimetypesRule;
+use Statamic\Fieldtypes\Assets\MinRule;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Files extends Fieldtype
 {
@@ -48,5 +56,33 @@ class Files extends Fieldtype
         }
 
         return $rules;
+    }
+
+    public function fieldRules()
+    {
+        $classes = [
+            'dimensions' => DimensionsRule::class,
+            'image' => ImageRule::class,
+            'max_filesize' => MaxRule::class,
+            'mimes' => MimesRule::class,
+            'mimetypes' => MimetypesRule::class,
+            'min_filesize' => MinRule::class,
+        ];
+
+        return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
+            if (! is_string($rule)) {
+                return $rule;
+            }
+
+            $name = Str::before($rule, ':');
+
+            if ($class = Arr::get($classes, $name)) {
+                $parameters = explode(',', Str::after($rule, ':'));
+
+                return new $class($parameters);
+            }
+
+            return $rule;
+        })->all();
     }
 }
