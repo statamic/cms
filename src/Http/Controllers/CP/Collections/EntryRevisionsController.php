@@ -15,6 +15,8 @@ class EntryRevisionsController extends CpController
 
     public function index(Request $request, $collection, $entry)
     {
+        $this->authorize('view', $entry);
+
         $revisions = $entry
             ->revisions()
             ->reverse()
@@ -42,6 +44,8 @@ class EntryRevisionsController extends CpController
 
     public function store(Request $request, $collection, $entry)
     {
+        $this->authorize('edit', $entry);
+
         $data = [
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
@@ -56,6 +60,8 @@ class EntryRevisionsController extends CpController
 
     public function show(Request $request, $collection, $entry, $revision)
     {
+        $this->authorize('view', $entry);
+
         $entry = $entry->makeFromRevision($revision);
 
         // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.

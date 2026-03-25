@@ -17,7 +17,7 @@ defineProps({
                         <td class="py-1 pr-4 leading-tight">
                             <Link :href="update.url" class="flex items-center gap-2" v-text="update.name" />
                         </td>
-                        <td>
+                        <td class="text-right">
                             <Badge
                                 pill
                                 :text="update.count"

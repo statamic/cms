@@ -97,15 +97,14 @@
                         v-model="assets"
                         :animate="false"
                         :constrain-dimensions="true"
-                        :disabled="config.disabled"
+                        :disabled="config.disabled || isReadOnly"
                         :distance="5"
-                        :read-only="isReadOnly"
                         @dragend="$emit('blur')"
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-gray-700"
-                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
@@ -125,7 +124,11 @@
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                        v-if="displayMode === 'list'"
+                    >
                         <table class="table-fixed w-full">
                             <thead class="sr-only">
                                 <tr>
@@ -137,10 +140,9 @@
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :disabled="config.disabled"
+                                :disabled="config.disabled || isReadOnly"
                                 :distance="5"
                                 :mirror="false"
-                                :read-only="isReadOnly"
                                 :vertical="true"
                             >
                                 <tbody ref="assets">

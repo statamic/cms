@@ -253,6 +253,21 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function drafts_are_not_visible_if_using_live_preview_token_for_different_entry()
+    {
+        $this->withStandardFakeErrorViews();
+
+        $page = tap($this->createPage('about')->published(false)->set('content', 'Testing 123'))->save();
+        $other = $this->createPage('other');
+
+        LivePreview::tokenize('test-token', $other);
+
+        $this
+            ->get('/about?token=test-token')
+            ->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
@@ -724,6 +739,8 @@ class FrontendTest extends TestCase
     #[Test]
     public function it_sets_the_locale()
     {
+        // Frontend localization sets PHP LC_TIME and the translator locale for the site;
+        // Laravel's configured app locale (app()->getLocale()) is left unchanged.
         // You can only set the locale to one that is actually installed on the server.
         // The names are a little different across jobs in the GitHub actions matrix.
         // We'll test against whichever was successfully applied. Finally, we will
@@ -751,16 +768,16 @@ class FrontendTest extends TestCase
 
         (new class extends Tags
         {
-            public static $handle = 'laravel_locale';
+            public static $handle = 'translator_locale';
 
             public function index()
             {
-                return app()->getLocale();
+                return app('translator')->getLocale();
             }
         })->register();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} App Locale: {{ laravel_locale }}');
+        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} Translator Locale: {{ translator_locale }}');
 
         $this->makeCollection()->sites(['english', 'french'])->save();
         tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
@@ -771,7 +788,7 @@ class FrontendTest extends TestCase
 
         $this->get('/fr/le-about')->assertSeeInOrder([
             'PHP Locale: '.$frLocale,
-            'App Locale: fr',
+            'Translator Locale: fr',
         ]);
 
         $this->assertEquals('en', app()->getLocale());

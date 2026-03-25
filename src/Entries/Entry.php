@@ -540,7 +540,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 $format .= 's';
             }
 
-            $prefix = $this->date->format($format).'.';
+            $prefix = $this->date->copy()->setTimezone(config('app.timezone'))->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
