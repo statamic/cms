@@ -154,15 +154,14 @@ main.nav-closed {
 
 /* GROUP RESIZEABLE NAVS / RESIZE NEEDLE
 =================================================== */
-.nav-resize-handle {
-    --resize-width: 10px;
+.content-card-resize-handle {
+    --resize-width: 12px;
     --needle-width: 5px;
 
     position: absolute;
     z-index: var(--z-index-above);
     top: 0;
-    inset-inline-end: 0;
-    /* inset-inline-end: 0; */
+    inset-inline-start: 0;
     width: var(--resize-width);
     height: 100%;
     cursor: col-resize;
@@ -172,10 +171,10 @@ main.nav-closed {
         content: '';
         position: absolute;
         top: 0;
-        inset-inline-end: 0;
+        inset-inline-start: 0;
         width: var(--needle-width);
         height: 100%;
-        @apply bg-transparent transition-colors;
+        @apply bg-transparent transition-colors rounded-lg;
     }
 
     &:hover::after {
@@ -199,7 +198,7 @@ main.nav-closed {
         transition: none;
     }
 
-    & .nav-resize-handle::after {
+    & .content-card-resize-handle::after {
         background: var(--theme-color-global-header-bg);
     }
 }
