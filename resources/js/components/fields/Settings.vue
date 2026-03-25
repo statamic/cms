@@ -7,7 +7,7 @@
         <template #actions>
             <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
             <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
-            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" />
+            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllTooltipText" />
             <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
     </StackHeader>
@@ -196,18 +196,27 @@ export default {
         isNestedField() {
             return this.isInsideSet || this.isInsideConfigFields;
         },
+
+        saveAllTooltipText() {
+            return this.saveAllShortcutLabel;
+        },
+
+        saveAllShortcutLabel() {
+            const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
+            return isMac ? 'Cmd+Shift+S' : 'Ctrl+Shift+S';
+        },
     },
 
     created() {
         this.load();
 
-        // Add keyboard shortcut for Cmd+S / Ctrl+S only when this component is focused
-        this.saveBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+        // Add keyboard shortcuts only when this component is focused.
+        this.saveBinding = this.$keys.bindGlobal(['mod+s', 'mod+shift+s'], (e) => {
             // Only handle if this component is currently visible/focused
             if (this.$el && this.$el.offsetParent !== null) {
                 e.preventDefault();
                 e.stopPropagation();
-                this.handleSaveShortcut();
+                this.handleSaveShortcut(e);
             }
         });
     },
@@ -337,8 +346,19 @@ export default {
             this.$events.$emit('root-form-save');
         },
 
-        handleSaveShortcut() {
+        handleSaveShortcut(event) {
+            if (event?.key?.toLowerCase() === 's' && event?.shiftKey) {
+                this.saveAllShortcut();
+                return;
+            }
+
             this.softSave();
+        },
+
+        saveAllShortcut() {
+            this.isNestedField
+                ? this.commitAndSaveAll()
+                : this.commitAndSave();
         },
 
         handleAxiosError(e) {
