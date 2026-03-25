@@ -1,10 +1,6 @@
 import { CalendarDate, CalendarDateTime, fromDate, getLocalTimeZone, startOfWeek, endOfWeek } from '@internationalized/date';
 import DateFormatter from '@/components/DateFormatter.js';
 
-export function formatDateString(date) {
-    return new Date(date.year, date.month - 1, date.day).toISOString().split('T')[0];
-}
-
 export function getWeekDates(currentDate) {
     if (!currentDate) {
         throw new Error('getWeekDates called with undefined currentDate');

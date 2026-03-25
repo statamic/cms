@@ -1,7 +1,6 @@
 export default class DateFormatter {
     #date;
     #options;
-    #locale = navigator.language;
     #presets = {
         datetime: {
             year: 'numeric',
@@ -104,7 +103,7 @@ export default class DateFormatter {
     }
 
     get locale() {
-        return this.#locale;
+        return DateFormatter.defaultLocale ?? Intl.DateTimeFormat().resolvedOptions().locale;
     }
 
     #normalizeDate(date) {

@@ -1,5 +1,69 @@
 # Release Notes
 
+## 6.7.2 (2026-03-24)
+
+### What's fixed
+- DatePicker dates can't be strings [#14295](https://github.com/statamic/cms/issues/14295) by @edalzell
+- Fix updated widget badge alignment [#14303](https://github.com/statamic/cms/issues/14303) by @jackmcdade
+- Fix PHP sanitization edge cases [#14300](https://github.com/statamic/cms/issues/14300) by @duncanmcclean
+- Fix Replicator Drag & Drop when multiple fields share the same handle [#14310](https://github.com/statamic/cms/issues/14310) by @duncanmcclean
+- Fix live preview token scope [#14304](https://github.com/statamic/cms/issues/14304) by @jasonvarga
+- Handle more cases in external url detection [#14315](https://github.com/statamic/cms/issues/14315) by @jasonvarga
+- Allow external redirects from Form::getSubmissionRedirect [#14318](https://github.com/statamic/cms/issues/14318) by @jasonvarga
+- Fix closure validation rules with Files fieldtype [#14319](https://github.com/statamic/cms/issues/14319) by @duncanmcclean
+- Relationship fieldtype authorization tweaks [#14307](https://github.com/statamic/cms/issues/14307) by @duncanmcclean
+- Add CSP header to svg route [#14325](https://github.com/statamic/cms/issues/14325) by @jasonvarga
+- Add authorization to revision routes [#14301](https://github.com/statamic/cms/issues/14301) by @duncanmcclean
+- Restrict markdown preview endpoint [#14326](https://github.com/statamic/cms/issues/14326) by @jasonvarga
+- Sanitize password reset form redirect value [#14327](https://github.com/statamic/cms/issues/14327) by @jasonvarga
+- Fix config through Antlers views [#14328](https://github.com/statamic/cms/issues/14328) by @jasonvarga
+- Long dropdowns should be scrollable [#14333](https://github.com/statamic/cms/issues/14333) by @duncanmcclean
+- Fix set picker position [#14332](https://github.com/statamic/cms/issues/14332) by @duncanmcclean
+- Fix various timezone issues [#14322](https://github.com/statamic/cms/issues/14322) by @duncanmcclean
+- Fix translator locale [#14323](https://github.com/statamic/cms/issues/14323) by @jasonvarga
+- Fix 2FA setup modal not re-opening [#14309](https://github.com/statamic/cms/issues/14309) by @duncanmcclean
+- Fix logo z-index in Outside.vue [#14299](https://github.com/statamic/cms/issues/14299) by @SteveEdson
+- Fix `translator` error with Symfony Console 8 [#14330](https://github.com/statamic/cms/issues/14330) by @duncanmcclean
+- Don't autofocus on non-root fields with "title" or "alt" name [#14329](https://github.com/statamic/cms/issues/14329) by @hivokas
+
+
+
+## 6.7.1 (2026-03-18)
+
+### What's fixed
+- Hide "Duplicate Set" when max sets limit has been reached [#14275](https://github.com/statamic/cms/issues/14275) by @duncanmcclean
+- Fix missing top border in read-only Assets fields [#14277](https://github.com/statamic/cms/issues/14277) by @duncanmcclean
+- Hide set bodies when there are no fields [#14282](https://github.com/statamic/cms/issues/14282) by @jackmcdade
+- Fieldset editing improvements [#14283](https://github.com/statamic/cms/issues/14283) by @jackmcdade
+- Harden `URL::isExternalToApplication()` [#14287](https://github.com/statamic/cms/issues/14287) by @duncanmcclean
+- Prevent opening set picker when `max_sets` limit has been reached [#14290](https://github.com/statamic/cms/issues/14290) by @duncanmcclean
+- Harden password reset [#14294](https://github.com/statamic/cms/issues/14294) by @jasonvarga
+
+
+
+## 6.7.0 (2026-03-17)
+
+### What's new
+- Add `Asset::moveUnique()` method [#14236](https://github.com/statamic/cms/issues/14236) by @lwekuiper
+
+### What's fixed
+- Sanitize SVGs on reupload [#14258](https://github.com/statamic/cms/issues/14258) by @duncanmcclean
+- Fix error saving preferences when `theme` translations exist [#14266](https://github.com/statamic/cms/issues/14266) by @duncanmcclean
+- Prevent logging git dependabot errors [#14257](https://github.com/statamic/cms/issues/14257) by @aerni
+- Fix incorrect variable in return doc [#14265](https://github.com/statamic/cms/issues/14265) by @indykoning
+- Fix error on `CreateForm` component in Storybook [#14264](https://github.com/statamic/cms/issues/14264) by @duncanmcclean
+- Allow using SVGs from `vendor`/`node_modules` directories [#14261](https://github.com/statamic/cms/issues/14261) by @duncanmcclean
+- Fix date formats [#14256](https://github.com/statamic/cms/issues/14256) by @jasonvarga
+- Ensure images are refreshed properly after cropping [#14260](https://github.com/statamic/cms/issues/14260) by @duncanmcclean
+- Handle validation rules on Files fieldtype [#14262](https://github.com/statamic/cms/issues/14262) by @duncanmcclean
+- Make stacks smoother [#14210](https://github.com/statamic/cms/issues/14210) by @jaygeorge
+- Fix TimePicker resetting to AM when typing [#14259](https://github.com/statamic/cms/issues/14259) by @duncanmcclean
+- Rename to security [#14276](https://github.com/statamic/cms/issues/14276) by @jasonvarga
+- Prevent path traversal in file dictionary [#14272](https://github.com/statamic/cms/issues/14272) by @duncanmcclean
+- Prevent term creation via fieldtype without permission [#14274](https://github.com/statamic/cms/issues/14274) by @duncanmcclean
+
+
+
 ## 6.6.3 (2026-03-13)
 
 ### What's fixed

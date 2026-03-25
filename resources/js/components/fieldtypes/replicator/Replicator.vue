@@ -147,11 +147,11 @@ export default {
         },
 
         sortableItemClass() {
-            return `${this.name}-sortable-item`;
+            return `${this.fieldId}-sortable-item`;
         },
 
         sortableHandleClass() {
-            return `${this.name}-sortable-handle`;
+            return `${this.fieldId}-sortable-handle`;
         },
 
         replicatorPreview() {
@@ -290,6 +290,8 @@ export default {
         },
 
         duplicateSet(old_id) {
+            if (!this.canAddSet) return;
+
             const index = this.value.findIndex((v) => v._id === old_id);
             const old = this.value[index];
             const set = {
