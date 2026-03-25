@@ -155,7 +155,7 @@ main.nav-closed {
 /* GROUP RESIZEABLE NAVS / RESIZE NEEDLE
 =================================================== */
 .content-card-resize-handle {
-    --resize-width: 12px;
+    --resize-width: 10px;
     --needle-width: 5px;
 
     position: absolute;
@@ -166,20 +166,6 @@ main.nav-closed {
     height: 100%;
     cursor: col-resize;
     @apply hidden lg:block;
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        inset-inline-start: 0;
-        width: var(--needle-width);
-        height: 100%;
-        @apply bg-transparent transition-colors rounded-lg;
-    }
-
-    &:hover::after {
-        background: var(--theme-color-global-header-bg);
-    }
 }
 
 .nav-resizing {
@@ -196,10 +182,6 @@ main.nav-closed {
     & .nav-main {
         /* Disables transitions while dragging, specifically to prevent jank/animated layout changes from the existing sidebar + main transitions in layout.css (the sidebar open/close transition and the main padding transition). */
         transition: none;
-    }
-
-    & .content-card-resize-handle::after {
-        background: var(--theme-color-global-header-bg);
     }
 }
 
