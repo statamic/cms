@@ -66,13 +66,11 @@
 
             const introspectionEnabled = {{ \Statamic\Support\Str::bool($introspection) }};
 
+            const authToken = {{ Js::from($authToken) }};
+
             const fetcher = createGraphiQLFetcher({
                 url: '{{ $url }}',
-                @if ($authToken)
-                headers: {
-                    'Authorization': 'Bearer {{ $authToken }}',
-                },
-                @endif
+                ...(authToken ? { headers: { 'Authorization': `Bearer ${authToken}` } } : {}),
             });
 
             let plugins = [HISTORY_PLUGIN];
