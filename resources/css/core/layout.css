@@ -1,10 +1,15 @@
+:root {
+    --nav-width: 12rem;
+}
+
 /* GROUP THE MAIN NAV (LEFT SIDEBAR)
 =================================================== */
 .nav-main {
     @apply flex flex-col gap-6 py-6 px-2 sm:px-3 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
-    @apply overflow-y-auto fixed top-14 start-0 w-48;
+    @apply overflow-y-auto fixed top-14 start-0;
+    width: var(--nav-width);
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
     .page-fully-loaded & {
@@ -109,10 +114,8 @@
     }
 }
 
-
-
-
-/* Mobile nav behavior */
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / MOBILE BEHAVIOR
+=================================================== */
 @media (width < theme(--breakpoint-lg)) {
     .nav-main {
         /* Always visible but off-screen by default */
@@ -128,7 +131,10 @@
 
 
 main {
-    @apply ps-0 lg:ps-46;
+    padding-inline-start: 0;
+    @media (width >= theme(--breakpoint-lg)) {
+        padding-inline-start: var(--nav-width);
+    }
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
     .page-fully-loaded & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
@@ -144,6 +150,58 @@ main {
 main.nav-closed {
     @apply ps-0;
     @apply lg:ps-0;
+}
+
+/* GROUP RESIZEABLE NAVS / RESIZE NEEDLE
+=================================================== */
+.nav-resize-handle {
+    --resize-width: 10px;
+    --needle-width: 5px;
+
+    position: absolute;
+    z-index: var(--z-index-above);
+    top: 0;
+    inset-inline-end: 0;
+    /* inset-inline-end: 0; */
+    width: var(--resize-width);
+    height: 100%;
+    cursor: col-resize;
+    @apply hidden lg:block;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        inset-inline-end: 0;
+        width: var(--needle-width);
+        height: 100%;
+        @apply bg-transparent transition-colors;
+    }
+
+    &:hover::after {
+        background: var(--theme-color-global-header-bg);
+    }
+}
+
+.nav-resizing {
+    cursor: col-resize;
+    /* Prevents any text selection while dragging (otherwise you could end up selecting menu text while dragging the resize handle). */
+    user-select: none;
+
+    & * {
+        /* Ensures that if you move the pointer over a child element inside the nav (icons, links, spans), the cursor doesn't revert back to the default pointer/hand. */
+        cursor: col-resize;
+    }
+
+    & main,
+    & .nav-main {
+        /* Disables transitions while dragging, specifically to prevent jank/animated layout changes from the existing sidebar + main transitions in layout.css (the sidebar open/close transition and the main padding transition). */
+        transition: none;
+    }
+
+    & .nav-resize-handle::after {
+        background: var(--theme-color-global-header-bg);
+    }
 }
 
 /* ==========================================================================
