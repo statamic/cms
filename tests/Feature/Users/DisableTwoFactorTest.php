@@ -89,6 +89,20 @@ class DisableTwoFactorTest extends TestCase
         Event::assertNotDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
+    #[Test]
+    public function it_returns_404_when_two_factor_is_disabled()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->withActiveElevatedSession()
+            ->delete(cp_route('users.two-factor.disable'))
+            ->assertNotFound();
+    }
+
     private function user()
     {
         return tap(User::make()->makeSuper()->email('david@hasselhoff.com'))->save();

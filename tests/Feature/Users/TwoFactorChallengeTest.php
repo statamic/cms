@@ -227,6 +227,24 @@ class TwoFactorChallengeTest extends TestCase
             ->assertOk();
     }
 
+    #[Test]
+    public function it_returns_404_when_two_factor_is_disabled()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session(['login.id' => $user->id()])
+            ->get(cp_route('two-factor-challenge'))
+            ->assertNotFound();
+
+        $this
+            ->session(['login.id' => $user->id()])
+            ->post(cp_route('two-factor-challenge'), ['code' => '123456'])
+            ->assertNotFound();
+    }
+
     private function user()
     {
         return tap(User::make()->makeSuper())->save();

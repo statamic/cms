@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
@@ -18,6 +19,8 @@ class TwoFactorSetupController extends Controller
 
     public function __invoke(Request $request)
     {
+        abort_unless(TwoFactor::enabled(), 404);
+
         $user = User::fromUser($request->user());
 
         if ($user->hasEnabledTwoFactorAuthentication()) {

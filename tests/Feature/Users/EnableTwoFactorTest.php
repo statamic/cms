@@ -195,6 +195,26 @@ class EnableTwoFactorTest extends TestCase
         $this->assertNull($user->two_factor_confirmed_at);
     }
 
+    #[Test]
+    public function it_returns_404_when_two_factor_is_disabled()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+
+        $user = $this->user();
+
+        $this
+            ->actingAs($user)
+            ->withActiveElevatedSession()
+            ->get(cp_route('users.two-factor.enable'))
+            ->assertNotFound();
+
+        $this
+            ->actingAs($user)
+            ->withActiveElevatedSession()
+            ->post(cp_route('users.two-factor.confirm'), ['code' => '123456'])
+            ->assertNotFound();
+    }
+
     private function user()
     {
         return tap(User::make()->makeSuper()->email('david@hasselhoff.com'))->save();

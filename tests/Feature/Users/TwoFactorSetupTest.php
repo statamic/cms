@@ -56,6 +56,17 @@ class TwoFactorSetupTest extends TestCase
             ->assertRedirect(route('statamic.site'));
     }
 
+    #[Test]
+    public function it_returns_404_when_two_factor_is_disabled()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+
+        $this
+            ->actingAs($this->user())
+            ->get(cp_route('two-factor-setup'))
+            ->assertNotFound();
+    }
+
     private function user()
     {
         return tap(User::make()->makeSuper())->save();
