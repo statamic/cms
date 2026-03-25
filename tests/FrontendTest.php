@@ -739,8 +739,6 @@ class FrontendTest extends TestCase
     #[Test]
     public function it_sets_the_locale()
     {
-        // Frontend localization sets PHP LC_TIME and the translator locale for the site;
-        // Laravel's configured app locale (app()->getLocale()) is left unchanged.
         // You can only set the locale to one that is actually installed on the server.
         // The names are a little different across jobs in the GitHub actions matrix.
         // We'll test against whichever was successfully applied. Finally, we will
@@ -768,16 +766,16 @@ class FrontendTest extends TestCase
 
         (new class extends Tags
         {
-            public static $handle = 'translator_locale';
+            public static $handle = 'laravel_locale';
 
             public function index()
             {
-                return app('translator')->getLocale();
+                return app()->getLocale();
             }
         })->register();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} Translator Locale: {{ translator_locale }}');
+        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} App Locale: {{ laravel_locale }}');
 
         $this->makeCollection()->sites(['english', 'french'])->save();
         tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
@@ -788,7 +786,7 @@ class FrontendTest extends TestCase
 
         $this->get('/fr/le-about')->assertSeeInOrder([
             'PHP Locale: '.$frLocale,
-            'Translator Locale: fr',
+            'App Locale: fr',
         ]);
 
         $this->assertEquals('en', app()->getLocale());
