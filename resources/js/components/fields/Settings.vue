@@ -5,8 +5,8 @@
 
     <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
         <template #actions>
-            <Button variant="default" @click.prevent="commit" :text="__('Apply')" />
-            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="__('Apply & Save')" />
+            <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
             <Button v-if="isNestedField" variant="default" @click.prevent="commitAndCloseAll" :text="__('Apply & Close All')" />
             <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveAll" icon="save" :text="__('Save & Close All')" />
         </template>
@@ -90,6 +90,10 @@ export default {
         fields: Array,
         suggestableConditionFields: Array,
         isInsideSet: Boolean,
+        showSaveOnlyAtTopLevel: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     provide() {
