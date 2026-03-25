@@ -236,6 +236,18 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     }
 
     /** @deprecated */
+    protected function revisionKey()
+    {
+        //
+    }
+
+    /** @deprecated */
+    protected function revisionAttributes()
+    {
+        //
+    }
+
+    /** @deprecated */
     public function makeFromRevision($revision)
     {
         //
