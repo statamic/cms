@@ -5,6 +5,7 @@ namespace Tests\Feature\Users;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
@@ -228,21 +229,15 @@ class TwoFactorChallengeTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_404_when_two_factor_is_disabled()
+    #[DefineEnvironment('disableTwoFactor')]
+    public function two_factor_challenge_routes_are_not_registered_when_two_factor_is_disabled()
     {
-        config()->set('statamic.users.two_factor_enabled', false);
+        $this->assertFalse(Route::has('statamic.cp.two-factor-challenge'));
+    }
 
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->session(['login.id' => $user->id()])
-            ->get(cp_route('two-factor-challenge'))
-            ->assertNotFound();
-
-        $this
-            ->session(['login.id' => $user->id()])
-            ->post(cp_route('two-factor-challenge'), ['code' => '123456'])
-            ->assertNotFound();
+    protected function disableTwoFactor($app)
+    {
+        $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 
     private function user()

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
-use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
@@ -25,8 +24,6 @@ class TwoFactorChallengeController extends Controller
 
     public function index(TwoFactorChallengeRequest $request)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         if (! $request->hasChallengedUser()) {
             throw new HttpResponseException(redirect()->route('statamic.cp.login'));
         }
@@ -41,8 +38,6 @@ class TwoFactorChallengeController extends Controller
 
     public function store(TwoFactorChallengeRequest $request)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         $user = $request->challengedUser();
 
         if ($code = $request->validRecoveryCode()) {

@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
-use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -13,15 +12,11 @@ class TwoFactorRecoveryCodesController extends CpController
 {
     public function show(Request $request)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         return ['recovery_codes' => User::current()->twoFactorRecoveryCodes()];
     }
 
     public function store(Request $request, GenerateNewRecoveryCodes $generateRecoveryCodes)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         $user = User::current();
 
         $generateRecoveryCodes($user);
@@ -31,8 +26,6 @@ class TwoFactorRecoveryCodesController extends CpController
 
     public function download(Request $request)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         $user = User::current();
 
         $filename = Str::slug(config('app.name')).'-recovery-codes.txt';

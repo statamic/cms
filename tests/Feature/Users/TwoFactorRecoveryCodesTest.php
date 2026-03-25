@@ -3,6 +3,8 @@
 namespace Tests\Feature\Users;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -122,29 +124,17 @@ class TwoFactorRecoveryCodesTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_404_when_two_factor_is_disabled()
+    #[DefineEnvironment('disableTwoFactor')]
+    public function two_factor_recovery_code_routes_are_not_registered_when_two_factor_is_disabled()
     {
-        config()->set('statamic.users.two_factor_enabled', false);
+        $this->assertFalse(Route::has('statamic.cp.users.two-factor.recovery-codes.show'));
+        $this->assertFalse(Route::has('statamic.cp.users.two-factor.recovery-codes.generate'));
+        $this->assertFalse(Route::has('statamic.cp.users.two-factor.recovery-codes.download'));
+    }
 
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->actingAs($user)
-            ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.show'))
-            ->assertNotFound();
-
-        $this
-            ->actingAs($user)
-            ->withActiveElevatedSession()
-            ->post(cp_route('users.two-factor.recovery-codes.generate'))
-            ->assertNotFound();
-
-        $this
-            ->actingAs($user)
-            ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.download'))
-            ->assertNotFound();
+    protected function disableTwoFactor($app)
+    {
+        $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 
     private function user()

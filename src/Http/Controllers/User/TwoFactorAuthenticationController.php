@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\DisableTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
-use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -14,8 +13,6 @@ class TwoFactorAuthenticationController extends CpController
 {
     public function enable(Request $request, EnableTwoFactorAuthentication $enable)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         $user = User::current();
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
@@ -36,8 +33,6 @@ class TwoFactorAuthenticationController extends CpController
 
     public function confirm(Request $request, ConfirmTwoFactorAuthentication $confirm)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         $user = User::current();
 
         $confirm($user, $request->input('code'));
@@ -47,8 +42,6 @@ class TwoFactorAuthenticationController extends CpController
 
     public function disable(Request $request, DisableTwoFactorAuthentication $disable)
     {
-        abort_unless(TwoFactor::enabled(), 404);
-
         $user = User::current();
 
         $disable($user);
