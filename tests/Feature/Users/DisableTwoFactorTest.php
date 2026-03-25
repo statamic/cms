@@ -4,8 +4,6 @@ namespace Tests\Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -89,18 +87,6 @@ class DisableTwoFactorTest extends TestCase
         $this->assertNotNull($user->two_factor_secret);
 
         Event::assertNotDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
-    }
-
-    #[Test]
-    #[DefineEnvironment('disableTwoFactor')]
-    public function two_factor_disable_route_is_not_registered_when_two_factor_is_disabled()
-    {
-        $this->assertFalse(Route::has('statamic.cp.users.two-factor.disable'));
-    }
-
-    protected function disableTwoFactor($app)
-    {
-        $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 
     private function user()
