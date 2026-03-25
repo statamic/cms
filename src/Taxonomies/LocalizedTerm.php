@@ -31,7 +31,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
-use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
@@ -39,7 +38,7 @@ use Statamic\Support\Str;
 
 class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
-    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $locale;
     protected $term;
@@ -235,24 +234,6 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         });
     }
 
-    /** @deprecated */
-    protected function revisionKey()
-    {
-        //
-    }
-
-    /** @deprecated */
-    protected function revisionAttributes()
-    {
-        //
-    }
-
-    /** @deprecated */
-    public function makeFromRevision($revision)
-    {
-        //
-    }
-
     public function origin()
     {
         return $this->inDefaultLocale();
@@ -275,13 +256,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     /** @deprecated */
     public function revisionsEnabled($enabled = null)
     {
-        if (func_num_args() === 0) {
-            return $this->term->revisionsEnabled();
-        }
-
-        $this->term->revisionsEnabled($enabled);
-
-        return $this;
+        return func_num_args() === 0 ? false : $this;
     }
 
     public function editUrl()
@@ -302,24 +277,6 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function unpublishUrl()
     {
         return $this->cpUrl('taxonomies.terms.published.destroy');
-    }
-
-    /** @deprecated */
-    public function revisionsUrl()
-    {
-        return null;
-    }
-
-    /** @deprecated */
-    public function createRevisionUrl()
-    {
-        return null;
-    }
-
-    /** @deprecated */
-    public function restoreRevisionUrl()
-    {
-        return null;
     }
 
     public function livePreviewUrl()

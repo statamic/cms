@@ -281,7 +281,7 @@ class Term implements TermContract
     /** @deprecated */
     public function revisionsEnabled()
     {
-        return $this->taxonomy()->revisionsEnabled();
+        return false;
     }
 
     public function dataForLocale($locale, $data = null)
