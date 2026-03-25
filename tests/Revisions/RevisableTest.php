@@ -76,7 +76,7 @@ class RevisableTest extends TestCase
 
         $this->assertEquals(
             collect([
-                'revisable' => 'overridden',
+                'revisable' => 'override me',
                 'non_revisable' => "don't override me",
             ]),
             $entry->makeFromRevision($revision)->data()
