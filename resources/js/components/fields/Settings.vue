@@ -262,7 +262,7 @@ export default {
         },
 
         commit(params = {}) {
-            let { shouldCommitParent, shouldSaveRoot } = params;
+            let { shouldCommitParent, shouldSaveRoot, shouldClose = true } = params;
 
             this.clearErrors();
 
@@ -281,7 +281,7 @@ export default {
                     if (shouldCommitParent && this.commitParentField) {
 						this.$nextTick(() => {
 							this.commitParentField(params);
-							this.close();
+							if (shouldClose) this.close();
 						});
 
                         return;
@@ -291,7 +291,7 @@ export default {
                         this.saveRootForm();
                     }
 
-                    this.close();
+                    if (shouldClose) this.close();
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
@@ -325,15 +325,20 @@ export default {
             });
         },
 
+        softSave() {
+            this.commit({
+                shouldSaveRoot: true,
+                shouldClose: false,
+            });
+        },
+
         saveRootForm() {
             // The "root form" could be the blueprint or fieldset forms.
             this.$events.$emit('root-form-save');
         },
 
         handleSaveShortcut() {
-            this.isNestedField
-                ? this.commitAndSaveTopStack()
-                : this.commitAndSave();
+            this.softSave();
         },
 
         handleAxiosError(e) {
