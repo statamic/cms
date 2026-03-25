@@ -53,7 +53,7 @@ class EntryRevisionsTest extends TestCase
                 ],
             ]
         );
-        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
         $entry = EntryFactory::id('1')
@@ -87,7 +87,7 @@ class EntryRevisionsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get($entry->revisionsUrl())
+            ->get(ray()->pass($entry->revisionsUrl()))
             ->assertOk()
             ->assertJsonPath('0.revisions.0.action', 'revision')
             ->assertJsonPath('0.revisions.0.message', 'Revision one')
