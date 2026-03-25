@@ -1,5 +1,33 @@
 # Release Notes
 
+## 6.7.2 (2026-03-24)
+
+### What's fixed
+- DatePicker dates can't be strings [#14295](https://github.com/statamic/cms/issues/14295) by @edalzell
+- Fix updated widget badge alignment [#14303](https://github.com/statamic/cms/issues/14303) by @jackmcdade
+- Fix PHP sanitization edge cases [#14300](https://github.com/statamic/cms/issues/14300) by @duncanmcclean
+- Fix Replicator Drag & Drop when multiple fields share the same handle [#14310](https://github.com/statamic/cms/issues/14310) by @duncanmcclean
+- Fix live preview token scope [#14304](https://github.com/statamic/cms/issues/14304) by @jasonvarga
+- Handle more cases in external url detection [#14315](https://github.com/statamic/cms/issues/14315) by @jasonvarga
+- Allow external redirects from Form::getSubmissionRedirect [#14318](https://github.com/statamic/cms/issues/14318) by @jasonvarga
+- Fix closure validation rules with Files fieldtype [#14319](https://github.com/statamic/cms/issues/14319) by @duncanmcclean
+- Relationship fieldtype authorization tweaks [#14307](https://github.com/statamic/cms/issues/14307) by @duncanmcclean
+- Add CSP header to svg route [#14325](https://github.com/statamic/cms/issues/14325) by @jasonvarga
+- Add authorization to revision routes [#14301](https://github.com/statamic/cms/issues/14301) by @duncanmcclean
+- Restrict markdown preview endpoint [#14326](https://github.com/statamic/cms/issues/14326) by @jasonvarga
+- Sanitize password reset form redirect value [#14327](https://github.com/statamic/cms/issues/14327) by @jasonvarga
+- Fix config through Antlers views [#14328](https://github.com/statamic/cms/issues/14328) by @jasonvarga
+- Long dropdowns should be scrollable [#14333](https://github.com/statamic/cms/issues/14333) by @duncanmcclean
+- Fix set picker position [#14332](https://github.com/statamic/cms/issues/14332) by @duncanmcclean
+- Fix various timezone issues [#14322](https://github.com/statamic/cms/issues/14322) by @duncanmcclean
+- Fix translator locale [#14323](https://github.com/statamic/cms/issues/14323) by @jasonvarga
+- Fix 2FA setup modal not re-opening [#14309](https://github.com/statamic/cms/issues/14309) by @duncanmcclean
+- Fix logo z-index in Outside.vue [#14299](https://github.com/statamic/cms/issues/14299) by @SteveEdson
+- Fix `translator` error with Symfony Console 8 [#14330](https://github.com/statamic/cms/issues/14330) by @duncanmcclean
+- Don't autofocus on non-root fields with "title" or "alt" name [#14329](https://github.com/statamic/cms/issues/14329) by @hivokas
+
+
+
 ## 6.7.1 (2026-03-18)
 
 ### What's fixed

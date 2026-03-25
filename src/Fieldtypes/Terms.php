@@ -288,9 +288,7 @@ class Terms extends Relationship
             return collect();
         }
 
-        $this->authorizeTaxonomyAccess(
-            $this->getRequestedTaxonomies($request, $this->getConfiguredTaxonomies())
-        );
+        $this->authorizeTaxonomyAccess($this->getConfiguredTaxonomies());
 
         $query = $this->getIndexQuery($request);
 
@@ -301,25 +299,16 @@ class Terms extends Relationship
         return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
     }
 
-    private function getRequestedTaxonomies($request, $configuredTaxonomies)
-    {
-        $requestedTaxonomies = collect($request->taxonomies)->filter()->values()->all();
-
-        return empty($requestedTaxonomies) ? $configuredTaxonomies : $requestedTaxonomies;
-    }
-
-    private function authorizeTaxonomyAccess($taxonomies)
+    private function authorizeTaxonomyAccess(array $taxonomies): void
     {
         $user = User::current();
 
-        collect($taxonomies)->each(function ($taxonomyHandle) use ($user) {
-            $taxonomy = Taxonomy::findByHandle($taxonomyHandle);
+        $authorizedTaxonomies = collect($taxonomies)
+            ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
+            ->filter()
+            ->filter(fn ($taxonomy) => $user->can('view', $taxonomy));
 
-            throw_if(
-                ! $taxonomy || ! $user->can('view', $taxonomy),
-                new AuthorizationException
-            );
-        });
+        throw_if($authorizedTaxonomies->isEmpty(), new AuthorizationException);
     }
 
     public function getResourceCollection($request, $items)
@@ -336,9 +325,13 @@ class Terms extends Relationship
 
     protected function getFirstTaxonomyFromRequest($request)
     {
-        return $request->taxonomies
-            ? Facades\Taxonomy::findByHandle($request->taxonomies[0])
-            : Facades\Taxonomy::all()->first();
+        $taxonomies = $this->getConfiguredTaxonomies();
+
+        $taxonomy = Taxonomy::findByHandle($taxonomyHandle = Arr::first($taxonomies));
+
+        throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
+
+        return $taxonomy;
     }
 
     public function getSortColumn($request)
@@ -447,10 +440,15 @@ class Terms extends Relationship
     protected function getIndexQuery($request)
     {
         $query = Term::query();
+        $user = User::current();
 
-        if ($taxonomies = $request->taxonomies) {
-            $query->whereIn('taxonomy', $taxonomies);
-        }
+        $taxonomies = collect($this->getConfiguredTaxonomies())
+            ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
+            ->filter(fn ($taxonomy) => $taxonomy && $user->can('view', $taxonomy))
+            ->map->handle()
+            ->all();
+
+        $query->whereIn('taxonomy', $taxonomies);
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');

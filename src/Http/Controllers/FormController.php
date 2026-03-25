@@ -148,9 +148,7 @@ class FormController extends Controller
             ]);
         }
 
-        $response = $redirect && ! \Statamic\Facades\URL::isExternalToApplication($redirect)
-            ? redirect($redirect)
-            : back();
+        $response = $redirect ? redirect($redirect) : back();
 
         if (! \Statamic\Facades\URL::isExternal($redirect)) {
             session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
@@ -163,8 +161,14 @@ class FormController extends Controller
 
     private function formSuccessRedirect($params, $submission)
     {
-        if (! $redirect = Form::getSubmissionRedirect($submission)) {
-            $redirect = Arr::get($params, '_redirect');
+        if ($redirect = Form::getSubmissionRedirect($submission)) {
+            return $redirect;
+        }
+
+        $redirect = Arr::get($params, '_redirect');
+
+        if ($redirect && \Statamic\Facades\URL::isExternalToApplication($redirect)) {
+            return null;
         }
 
         return $redirect;
