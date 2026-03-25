@@ -32,6 +32,94 @@ provide('layout', {
 // Focus management: focus main element if no input has auto-focus
 let navigationListener = null;
 
+// Resizable sidebar (handle lives on the left edge of the content card)
+const navWidthStorageKey = 'statamic.nav.width';
+const MIN_NAV_WIDTH = 150;
+const MAX_NAV_WIDTH = 400;
+const mainContentRef = ref(null);
+const contentCardRef = ref(null);
+
+let isResizing = false;
+let currentWidthPx = null;
+let contentInsetPx = 0;
+let pointerMoveListener = null;
+let pointerUpListener = null;
+
+function clampNavWidthPx(widthPx) {
+    return Math.min(Math.max(widthPx, MIN_NAV_WIDTH), MAX_NAV_WIDTH);
+}
+
+function setNavWidthPx(widthPx) {
+    document.documentElement.style.setProperty('--nav-width', `${widthPx}px`);
+}
+
+function restoreSavedNavWidth() {
+    const saved = localStorage.getItem(navWidthStorageKey);
+    if (!saved) return;
+
+    const widthPx = Number(saved);
+    if (!Number.isFinite(widthPx)) return;
+
+    setNavWidthPx(clampNavWidthPx(widthPx));
+}
+
+function stopResize({ persist = true } = {}) {
+    if (!isResizing) return;
+
+    isResizing = false;
+    document.documentElement.classList.remove('nav-resizing');
+
+    if (pointerMoveListener) document.removeEventListener('pointermove', pointerMoveListener);
+    if (pointerUpListener) document.removeEventListener('pointerup', pointerUpListener);
+    pointerMoveListener = null;
+    pointerUpListener = null;
+
+    if (persist && currentWidthPx !== null) {
+        localStorage.setItem(navWidthStorageKey, Math.round(currentWidthPx));
+    }
+
+    currentWidthPx = null;
+}
+
+function startResize(event) {
+    if (isResizing || !mainContentRef.value || !contentCardRef.value) return;
+
+    isResizing = true;
+    document.documentElement.classList.add('nav-resizing');
+
+    // Prevent losing the drag if the pointer leaves the handle.
+    event?.currentTarget?.setPointerCapture?.(event.pointerId);
+
+    const dir = getComputedStyle(document.documentElement).direction;
+    const isRtl = dir === 'rtl';
+
+    const mainContentRect = mainContentRef.value.getBoundingClientRect();
+    const contentCardRect = contentCardRef.value.getBoundingClientRect();
+    contentInsetPx = isRtl
+        ? (mainContentRect.right - contentCardRect.right)
+        : (contentCardRect.left - mainContentRect.left);
+
+    pointerMoveListener = (e) => {
+        const proposedWidth = isRtl
+            ? (window.innerWidth - e.clientX - contentInsetPx)
+            : (e.clientX - contentInsetPx);
+
+        currentWidthPx = clampNavWidthPx(proposedWidth);
+        setNavWidthPx(currentWidthPx);
+    };
+
+    pointerUpListener = () => stopResize({ persist: true });
+
+    document.addEventListener('pointermove', pointerMoveListener);
+    document.addEventListener('pointerup', pointerUpListener);
+}
+
+function resetNavWidth() {
+    stopResize({ persist: false });
+    localStorage.removeItem(navWidthStorageKey);
+    document.documentElement.style.removeProperty('--nav-width');
+}
+
 function focusMain() {
     // Wait for components to mount and autofocus to process
     nextTick(() => {
@@ -63,6 +151,7 @@ function focusMain() {
 
 onMounted(() => {
     navigationListener = router.on('success', focusMain);
+    restoreSavedNavWidth();
     focusMain();
 });
 
@@ -70,6 +159,8 @@ onUnmounted(() => {
     if (navigationListener) {
         navigationListener();
     }
+
+    stopResize({ persist: false });
 });
 </script>
 
@@ -82,8 +173,13 @@ onUnmounted(() => {
         <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
-            <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
-                <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
+            <div ref="mainContentRef" id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
+                <div ref="contentCardRef" id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
+                    <div
+                        class="content-card-resize-handle"
+                        @pointerdown.prevent="startResize"
+                        @dblclick="resetNavWidth"
+                    />
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                     <div class="w-full min-w-0 mx-auto max-w-page" data-max-width-wrapper>
                         <slot />

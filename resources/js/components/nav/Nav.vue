@@ -151,44 +151,6 @@ Statamic.$keys.bind(['command+\\', ['[']], (e) => {
 });
 
 Statamic.$events.$on('nav.toggle', toggle);
-
-// Resizable sidebar
-const navWidthKey = 'statamic.nav.width';
-const MIN_NAV_WIDTH = 150;
-const MAX_NAV_WIDTH = 400;
-
-const savedNavWidth = localStorage.getItem(navWidthKey);
-if (savedNavWidth) {
-    document.documentElement.style.setProperty('--nav-width', savedNavWidth + 'px');
-}
-
-function startResize(event) {
-    const dir = getComputedStyle(document.documentElement).direction;
-    document.documentElement.classList.add('nav-resizing');
-
-    const onPointerMove = (e) => {
-        const rect = navRef.value.getBoundingClientRect();
-        const width = dir === 'rtl' ? rect.right - e.clientX : e.clientX - rect.left;
-        const clamped = Math.min(Math.max(width, MIN_NAV_WIDTH), MAX_NAV_WIDTH);
-        document.documentElement.style.setProperty('--nav-width', clamped + 'px');
-    };
-
-    const onPointerUp = () => {
-        document.documentElement.classList.remove('nav-resizing');
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-        const currentWidth = Math.round(navRef.value.getBoundingClientRect().width);
-        localStorage.setItem(navWidthKey, currentWidth);
-    };
-
-    document.addEventListener('pointermove', onPointerMove);
-    document.addEventListener('pointerup', onPointerUp);
-}
-
-function resetWidth() {
-    localStorage.removeItem(navWidthKey);
-    document.documentElement.style.removeProperty('--nav-width');
-}
 </script>
 
 <template>
@@ -229,10 +191,5 @@ function resetWidth() {
                 </li>
             </ul>
         </div>
-        <div
-            class="nav-resize-handle"
-            @pointerdown.prevent="startResize"
-            @dblclick="resetWidth"
-        />
     </nav>
 </template>
