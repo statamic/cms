@@ -87,8 +87,6 @@ class TermsController extends CpController
     {
         $this->authorize('view', $term);
 
-        $term = $term->fromWorkingCopy();
-
         $blueprint = $term->blueprint();
 
         [$values, $meta] = $this->extractFromFields($term, $blueprint);
@@ -105,9 +103,6 @@ class TermsController extends CpController
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
                 'unpublish' => $term->unpublishUrl(),
-                'revisions' => $term->revisionsUrl(),
-                'restore' => $term->restoreRevisionUrl(),
-                'createRevision' => $term->createRevisionUrl(),
                 'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
@@ -138,9 +133,7 @@ class TermsController extends CpController
                     'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
             })->all(),
-            'hasWorkingCopy' => $term->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
-            'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
@@ -165,8 +158,6 @@ class TermsController extends CpController
         $term = $term->in($site->handle());
 
         $this->authorize('update', $term);
-
-        $term = $term->fromWorkingCopy();
 
         $term->term()->syncOriginal();
 
@@ -197,18 +188,9 @@ class TermsController extends CpController
 
         $term->slug($request->slug);
 
-        if ($term->revisionsEnabled() && $term->published()) {
-            $term
-                ->makeWorkingCopy()
-                ->user(User::current())
-                ->save();
-        } else {
-            if (! $term->revisionsEnabled()) {
-                $term->published($request->published);
-            }
+        $term->published($request->published);
 
-            $saved = $term->updateLastModified(User::current())->save();
-        }
+        $saved = $term->updateLastModified(User::current())->save();
 
         [$values] = $this->extractFromFields($term, $term->blueprint());
 
@@ -315,14 +297,7 @@ class TermsController extends CpController
             ->data($values)
             ->slug($slug);
 
-        if ($term->revisionsEnabled()) {
-            $term->store([
-                'message' => $request->message,
-                'user' => User::current(),
-            ]);
-        } else {
-            $saved = $term->updateLastModified(User::current())->save();
-        }
+        $saved = $term->updateLastModified(User::current())->save();
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
