@@ -22,6 +22,7 @@ class EntryRevisionsTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $dir;
+
     private $collection;
 
     public function setUp(): void
@@ -87,7 +88,7 @@ class EntryRevisionsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(ray()->pass($entry->revisionsUrl()))
+            ->get($entry->revisionsUrl())
             ->assertOk()
             ->assertJsonPath('0.revisions.0.action', 'revision')
             ->assertJsonPath('0.revisions.0.message', 'Revision one')
