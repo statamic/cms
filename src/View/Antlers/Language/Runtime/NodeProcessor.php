@@ -1078,10 +1078,34 @@ class NodeProcessor
     public function guardRuntimeTag($tagCheck)
     {
         if (GlobalRuntimeState::$isEvaluatingUserData) {
+            $allowList = GlobalRuntimeState::$allowedContentTagPaths;
             $guardList = GlobalRuntimeState::$bannedContentTagPaths;
-        } else {
-            $guardList = GlobalRuntimeState::$bannedTagPaths;
+
+            $isAllowed = Str::is($allowList, $tagCheck);
+            $isBlocked = ! empty($guardList) && Str::is($guardList, $tagCheck);
+
+            if (! $isAllowed || $isBlocked) {
+                Log::warning('Runtime Access Violation: '.$tagCheck, [
+                    'tag' => $tagCheck,
+                    'file' => GlobalRuntimeState::$currentExecutionFile,
+                    'trace' => GlobalRuntimeState::$templateFileStack,
+                ]);
+
+                if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::RUNTIME_PROTECTED_TAG_ACCESS,
+                        null,
+                        'Protected tag access.'
+                    );
+                }
+
+                return false;
+            }
+
+            return true;
         }
+
+        $guardList = GlobalRuntimeState::$bannedTagPaths;
 
         if (empty($guardList)) {
             return true;

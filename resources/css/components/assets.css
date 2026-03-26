@@ -172,9 +172,8 @@
   ========================================================================== */
 
 .asset-editor {
-
     .loading {
-        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-white/70;
+        @apply absolute inset-0 flex items-center justify-center rounded-sm bg-gray-800 dark:bg-gray-900;
         z-index: var(--z-index-portal);
     }
 

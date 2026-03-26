@@ -16,6 +16,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 use Statamic\Query\Scopes\Filter;
@@ -24,6 +25,7 @@ use Statamic\Support\Str;
 
 class Assets extends Fieldtype
 {
+    use UpdatesReferences;
     protected $categories = ['media', 'relationship'];
     protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
     protected $selectableInForms = true;
@@ -506,5 +508,29 @@ class Assets extends Fieldtype
         return $this->config('max_files') === 1
             ? collect($value)->first()
             : collect($value)->filter()->all();
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->configuredContainerHandle() !== $container) {
+            return $data;
+        }
+
+        return is_string($data)
+            ? $this->replaceValue($data, $newValue, $oldValue)
+            : $this->replaceValuesInArray($data, $newValue, $oldValue);
+    }
+
+    protected function configuredContainerHandle(): ?string
+    {
+        if ($container = $this->config('container')) {
+            return $container;
+        }
+
+        $containers = AssetContainer::all();
+
+        return $containers->count() === 1
+            ? $containers->first()->handle()
+            : null;
     }
 }

@@ -180,6 +180,7 @@ import { data_get } from "@/bootstrap/globals.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
+let commandPaletteCallbackRegistered = false;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -395,6 +396,17 @@ export default {
 
         this.pageHeader = document.querySelector('.global-header');
 
+        if (!commandPaletteCallbackRegistered) {
+            commandPaletteCallbackRegistered = true;
+
+            Statamic.$commandPalette.preventIf(() => {
+                const selection = window.getSelection();
+                const node = selection?.anchorNode;
+                const isInBard = node?.parentElement?.closest('.bard-editor') !== null;
+                return isInBard && selection?.toString().length > 0;
+            });
+        }
+
         this.$nextTick(() => {
             let el = document.querySelector(`label[for="${this.fieldId}"]`);
             if (el) {
@@ -528,7 +540,7 @@ export default {
                 const field = this.bardFieldPath();
                 const setCacheKey = `${field}.${set}`;
                 const reference = this.publishContainer.reference;
-                const blueprint = this.publishContainer.blueprint.fqh;
+                const token = this.publishContainer.blueprint.token;
 
 	            if (this.meta.new?.hasOwnProperty(set)) {
 		            let meta = this.meta.new[set];
@@ -543,7 +555,7 @@ export default {
                     return;
                 }
 
-                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
                     .then(response => {
                         this.setsCache[setCacheKey] = response.data;
                         resolve(response.data);

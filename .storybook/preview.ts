@@ -14,6 +14,7 @@ import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
 import Portal from '@/components/portals/Portal.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import {keys, portals, slug, stacks} from '@api';
+import useGlobalEventBus from '@/composables/global-event-bus';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -36,6 +37,9 @@ setup(async (app) => {
                       lang: 'en',
                   }],
                   selectedSite: 'default',
+                  lang: 'en',
+                  asciiReplaceExtraSymbols: false,
+                  charmap: { currency: {}, currency_short: {} },
               };
 
               return config[key] ?? null;
@@ -46,6 +50,7 @@ setup(async (app) => {
               //
           }
       },
+      $events: useGlobalEventBus(),
       $progress: {
           loading(name, loading) {
               //

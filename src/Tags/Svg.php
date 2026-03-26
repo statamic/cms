@@ -31,6 +31,7 @@ class Svg extends Tags
             public_path('svg'),
             public_path(),
             statamic_path('resources/svg/icons'),
+            base_path(),
         ];
 
         $svg = null;

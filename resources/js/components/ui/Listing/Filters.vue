@@ -15,23 +15,28 @@ import DataListFilter from './Filter.vue';
 
 const { filters, activeFilters, activeFilterBadges, activeFilterBadgeCount, setFilter, reorderable } = injectListingContext();
 
+const emit = defineEmits(['filters-updated']);
+
 const open = ref(false);
 const filtersButtonWrapperRef = ref(null);
 
-const fieldFilter = computed(() => filters.value.find((filter) => filter.is_fields));
-const fieldFilterHandle = computed(() => fieldFilter.value?.handle);
-const fieldFilterBadges = computed(() => activeFilterBadges.value[fieldFilterHandle.value] || {});
 const standardFilters = computed(() => filters.value.filter((filter) => !filter.is_fields));
+const standardFilterHandles = computed(() => standardFilters.value.map(filter => filter.handle));
+const standardBadges = computed(() => Object.fromEntries(
+    Object.entries(activeFilterBadges.value).filter(([handle]) => standardFilterHandles.value.includes(handle))
+));
 
-const standardBadges = computed(() => {
-    const { [fieldFilterHandle.value]: fields, ...badges } = activeFilterBadges.value;
-    return badges;
-});
+const fieldFilters = computed(() => filters.value.filter((filter) => filter.is_fields));
+const fieldFilterHandles = computed(() => fieldFilters.value.map(filter => filter.handle));
+const fieldFilterBadges = computed(() => Object.entries(activeFilterBadges.value)
+    .filter(([filter]) => fieldFilterHandles.value.includes(filter))
+    .flatMap(([filter, badges]) => Object.entries(badges).map(([handle, badge]) => ({ filter, handle, badge })))
+);
 
-function removeFieldFilter(handle) {
-    const fields = { ...activeFilters.value[fieldFilterHandle.value] };
-    delete fields[handle];
-    setFilter(fieldFilterHandle.value, fields);
+function removeFieldFilter(filterHandle, fieldHandle) {
+    const fields = { ...activeFilters.value[filterHandle] };
+    delete fields[fieldHandle];
+    setFilter(filterHandle, fields);
 }
 
 function isActive(handle) {
@@ -80,6 +85,10 @@ watch(open, async (isOpen) => {
     focusComboboxWhenReady();
 });
 
+watch(activeFilters, () => {
+    emit('filters-updated', activeFilters.value);
+}, { deep: true });
+
 function handleStackClosed() {
     // Clean up observer if active
     if (comboboxObserver.value) {
@@ -124,16 +133,19 @@ function handleStackClosed() {
         >
             <div ref="stackContentRef" class="">
                 <div class="space-y-4">
-                    <Panel v-if="fieldFilter">
+                    <Panel
+                        v-for="filter in fieldFilters"
+                        :key="filter.handle"
+                    >
                         <PanelHeader class="flex items-center justify-between">
-                            <Heading :text="__('Fields')" />
-                            <Button v-if="isActive(fieldFilterHandle)" size="sm" :text="__('Clear')" @click="setFilter(fieldFilterHandle, null)" />
+                            <Heading :text="filter.title" />
+                            <Button v-if="isActive(filter.handle)" size="sm" :text="__('Clear')" @click="setFilter(filter.handle, null)" />
                         </PanelHeader>
                         <Card>
                             <FieldFilter
-                                :config="fieldFilter"
-                                :values="activeFilters.fields || {}"
-                                @changed="setFilter(fieldFilterHandle, $event)"
+                                :config="filter"
+                                :values="activeFilters[filter.handle] || {}"
+                                @changed="setFilter(filter.handle, $event)"
                             />
                         </Card>
                     </Panel>
@@ -160,13 +172,13 @@ function handleStackClosed() {
         </Stack>
 
         <Button
-            v-for="(badge, handle, index) in fieldFilterBadges"
-            :key="handle"
+            v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
+            :key="`${filter}-${handle}`"
             variant="filled"
             :icon-append="reorderable ? null : 'x'"
             :disabled="reorderable"
             class="last:me-12"
-            @click="removeFieldFilter(handle)"
+            @click="removeFieldFilter(filter, handle)"
         >
             <template v-if="handle == 'date'">
                 {{ badge.field }}

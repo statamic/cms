@@ -14,15 +14,17 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
-    use HasRequestedColumns, RedirectsToFirstAssetContainer;
+    use HasRequestedColumns, QueriesFilters, RedirectsToFirstAssetContainer;
 
     private $columns;
 
@@ -85,6 +87,7 @@ class BrowserController extends CpController
             ],
             'folder' => $path,
             'columns' => $this->columns,
+            'filters' => Scope::filters('assets', ['container' => $container->handle(), 'folder' => $path]),
             'canCreateContainers' => User::current()->can('create', \Statamic\Contracts\Assets\AssetContainer::class),
             'createContainerUrl' => cp_route('asset-containers.create'),
         ];
@@ -167,13 +170,21 @@ class BrowserController extends CpController
         ];
     }
 
-    public function search(Request $request, $container, $path = null)
+    /**
+     * Search and filter through all assets in the container, ignoring folders.
+     * This is used for the global search and when listing filters are applied.
+     */
+    public function search(FilteredRequest $request, $container, $path = null)
     {
         $this->authorize('view', $container);
 
-        $query = $container->hasSearchIndex()
-            ? $container->searchIndex()->ensureExists()->search($request->search)
-            : $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+        if ($request->search && $container->hasSearchIndex()) {
+            $query = $container->searchIndex()->ensureExists()->search($request->search);
+        } elseif ($request->search) {
+            $query = $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+        } else {
+            $query = $container->queryAssets();
+        }
 
         if ($path) {
             $query->where('folder', $path);
@@ -185,15 +196,25 @@ class BrowserController extends CpController
 
         $this->applyQueryScopes($query, $request->all());
 
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'container' => $container->handle(),
+            'folder' => $path,
+        ]);
+
         $assets = $query->paginate(request('perPage'));
 
-        if ($container->hasSearchIndex()) {
+        if ($request->search && $container->hasSearchIndex()) {
             $assets->setCollection($assets->getCollection()->map->getSearchable());
         }
 
         return (new SearchedAssetsCollection($assets))
             ->blueprint($container->blueprint())
-            ->columnPreferenceKey("assets.{$container->handle()}.columns");
+            ->columnPreferenceKey("assets.{$container->handle()}.columns")
+            ->additional([
+                'meta' => [
+                    'activeFilterBadges' => $activeFilterBadges,
+                ],
+            ]);
     }
 
     protected function applyQueryScopes($query, $params)

@@ -18,17 +18,17 @@ const slots = useSlots();
 const emit = defineEmits(['update:open', 'opened', 'dismissed']);
 
 const props = defineProps({
-	/** When `true`, the modal's backdrop will be blurred */
+    /** When `true`, the modal's backdrop will be blurred */
     blur: { type: Boolean, default: false },
-	/** Title displayed at the top of the modal */
+    /** Title displayed at the top of the modal */
     title: { type: String, default: '' },
-	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: [String, null], default: null },
-	/** The controlled open state of the modal. */
+    /** The controlled open state of the modal. */
     open: { type: Boolean, default: false },
-	/** Callback that fires before the modal closes. */
-	beforeClose: { type: Function, default: () => true },
-	/** When `true`, clicking outside the modal will dismiss it. */
+    /** Callback that fires before the modal closes. */
+    beforeClose: { type: Function, default: () => true },
+    /** When `true`, clicking outside the modal will dismiss it. */
     dismissible: { type: Boolean, default: true },
 });
 
@@ -52,6 +52,7 @@ const modalClasses = cva({
 })({});
 
 const modal = ref(null);
+const modalContent = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const escBinding = ref(null);
@@ -69,13 +70,31 @@ function open() {
 
     nextTick(() => {
         mounted.value = true;
-	    updateOpen(true);
+        updateOpen(true);
 
-	    nextTick(() => {
-		    visible.value = true;
-			emit('opened');
-	    });
+        nextTick(() => {
+            visible.value = true;
+            emit('opened');
+            nextTick(() => focusFirstFocusable());
+        });
     });
+}
+
+const FOCUSABLE_SELECTOR = [
+    'button:not([disabled])',
+    '[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+].join(', ');
+
+function focusFirstFocusable() {
+    const first = modalContent.value?.querySelector(FOCUSABLE_SELECTOR);
+    if (first instanceof HTMLElement) {
+        first.focus();
+    } else {
+        modalContent.value?.focus();
+    }
 }
 
 function close() {
@@ -93,31 +112,31 @@ function close() {
 
 function dismiss() {
     if (!props.dismissible) return;
-	if (!runCloseCallback()) return;
+    if (!runCloseCallback()) return;
 
     emit('dismissed');
     close();
 }
 
 function updateOpen(value) {
-	if (isUsingOpenProp.value && props.open !== value) {
+    if (isUsingOpenProp.value && props.open !== value) {
         emit('update:open', value);
     }
 }
 
 function runCloseCallback() {
-	const shouldClose = props.beforeClose();
+    const shouldClose = props.beforeClose();
 
-	if (!shouldClose) return false;
+    if (!shouldClose) return false;
 
-	close();
+    close();
 
-	return true;
+    return true;
 }
 
 function cleanup() {
-	modal.value?.destroy();
-	escBinding.value?.destroy();
+    modal.value?.destroy();
+    escBinding.value?.destroy();
 }
 
 watch(
@@ -136,7 +155,7 @@ onBeforeUnmount(() => {
 defineExpose({
     open,
     close,
-	runCloseCallback,
+    runCloseCallback,
 });
 
 provide('closeModal', close);
@@ -166,7 +185,7 @@ provide('closeModal', close);
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95"
             >
-                <div v-if="visible" :class="[modalClasses, attrs.class]" data-ui-modal-content>
+                <div ref="modalContent" v-if="visible" :class="[modalClasses, attrs.class]" data-ui-modal-content>
                     <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
                         <div v-if="!hasModalTitleComponent && (title || icon)" data-ui-modal-title class="flex items-center gap-2">
                             <Icon :name="icon" v-if="icon" class="size-4" />
