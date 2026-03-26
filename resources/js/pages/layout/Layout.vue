@@ -6,8 +6,8 @@ import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import Tooltips from '@/components/Tooltips.vue';
-import { provide, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { provide, watch, ref, onMounted, onUnmounted, nextTick, computed } from 'vue';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
 import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
@@ -17,6 +17,11 @@ useBodyClasses('bg-global-header-bg font-sans leading-normal text-gray-900 dark:
 const props = defineProps({
     additionalBreadcrumbs: { type: Array, default: () => [] },
 });
+
+const page = usePage();
+const isFormsRoute = computed(() => (page.url || '').startsWith('/cp/forms'));
+const enableCpSidebarEnd = computed(() => Boolean(page.props.enableCpSidebarEnd ?? page.props.enableRightSidebar) || isFormsRoute.value);
+const cpSidebarEnd = computed(() => page.props.cpSidebarEnd ?? page.props.rightSidebar ?? null);
 
 const additionalBreadcrumbs = ref(props.additionalBreadcrumbs);
 watch(() => props.additionalBreadcrumbs, (newVal) => additionalBreadcrumbs.value = newVal);
@@ -34,10 +39,15 @@ let navigationListener = null;
 
 // Resizable sidebar (handle lives on the left edge of the content card)
 const navWidthStorageKey = 'statamic.nav.width';
+const cpSidebarEndWidthStorageKey = 'statamic.cp-sidebar-end.width';
+const legacyRightSidebarWidthStorageKey = 'statamic.right-sidebar.width';
 const MIN_NAV_WIDTH = 150;
 const MAX_NAV_WIDTH = 400;
+const MIN_CP_SIDEBAR_END_WIDTH = MIN_NAV_WIDTH;
+const MAX_CP_SIDEBAR_END_WIDTH = MAX_NAV_WIDTH;
 const mainContentRef = ref(null);
 const contentCardRef = ref(null);
+const cpSidebarEndRef = ref(null);
 
 let isResizing = false;
 let currentWidthPx = null;
@@ -53,6 +63,10 @@ function setNavWidthPx(widthPx) {
     document.documentElement.style.setProperty('--nav-width', `${widthPx}px`);
 }
 
+function setCpSidebarEndWidthPx(widthPx) {
+    document.documentElement.style.setProperty('--sidebar-end-width', `${widthPx}px`);
+}
+
 function restoreSavedNavWidth() {
     const saved = localStorage.getItem(navWidthStorageKey);
     if (!saved) return;
@@ -61,6 +75,17 @@ function restoreSavedNavWidth() {
     if (!Number.isFinite(widthPx)) return;
 
     setNavWidthPx(clampNavWidthPx(widthPx));
+}
+
+function restoreSavedCpSidebarEndWidth() {
+    const saved = localStorage.getItem(cpSidebarEndWidthStorageKey) ?? localStorage.getItem(legacyRightSidebarWidthStorageKey);
+    if (!saved) return;
+
+    const widthPx = Number(saved);
+    if (!Number.isFinite(widthPx)) return;
+
+    const clamped = Math.min(Math.max(widthPx, MIN_CP_SIDEBAR_END_WIDTH), MAX_CP_SIDEBAR_END_WIDTH);
+    setCpSidebarEndWidthPx(clamped);
 }
 
 function stopResize({ persist = true } = {}) {
@@ -79,6 +104,29 @@ function stopResize({ persist = true } = {}) {
     }
 
     currentWidthPx = null;
+}
+
+let isCpSidebarEndResizing = false;
+let cpSidebarEndWidthPx = null;
+let cpSidebarEndPointerMoveListener = null;
+let cpSidebarEndPointerUpListener = null;
+
+function stopCpSidebarEndResize({ persist = true } = {}) {
+    if (!isCpSidebarEndResizing) return;
+
+    isCpSidebarEndResizing = false;
+    document.documentElement.classList.remove('nav-resizing');
+
+    if (cpSidebarEndPointerMoveListener) document.removeEventListener('pointermove', cpSidebarEndPointerMoveListener);
+    if (cpSidebarEndPointerUpListener) document.removeEventListener('pointerup', cpSidebarEndPointerUpListener);
+    cpSidebarEndPointerMoveListener = null;
+    cpSidebarEndPointerUpListener = null;
+
+    if (persist && cpSidebarEndWidthPx !== null) {
+        localStorage.setItem(cpSidebarEndWidthStorageKey, Math.round(cpSidebarEndWidthPx));
+    }
+
+    cpSidebarEndWidthPx = null;
 }
 
 function startResize(event) {
@@ -120,6 +168,35 @@ function resetNavWidth() {
     document.documentElement.style.removeProperty('--nav-width');
 }
 
+function startCpSidebarEndResize(event) {
+    if (!enableCpSidebarEnd.value || isCpSidebarEndResizing) return;
+
+    isCpSidebarEndResizing = true;
+    document.documentElement.classList.add('nav-resizing');
+    event?.currentTarget?.setPointerCapture?.(event.pointerId);
+
+    const dir = getComputedStyle(document.documentElement).direction;
+    const isRtl = dir === 'rtl';
+
+    cpSidebarEndPointerMoveListener = (e) => {
+        const proposedWidth = isRtl ? e.clientX : window.innerWidth - e.clientX;
+        cpSidebarEndWidthPx = Math.min(Math.max(proposedWidth, MIN_CP_SIDEBAR_END_WIDTH), MAX_CP_SIDEBAR_END_WIDTH);
+        setCpSidebarEndWidthPx(cpSidebarEndWidthPx);
+    };
+
+    cpSidebarEndPointerUpListener = () => stopCpSidebarEndResize({ persist: true });
+
+    document.addEventListener('pointermove', cpSidebarEndPointerMoveListener);
+    document.addEventListener('pointerup', cpSidebarEndPointerUpListener);
+}
+
+function resetCpSidebarEndWidth() {
+    stopCpSidebarEndResize({ persist: false });
+    localStorage.removeItem(cpSidebarEndWidthStorageKey);
+    localStorage.removeItem(legacyRightSidebarWidthStorageKey);
+    document.documentElement.style.removeProperty('--sidebar-end-width');
+}
+
 function focusMain() {
     // Wait for components to mount and autofocus to process
     nextTick(() => {
@@ -152,6 +229,7 @@ function focusMain() {
 onMounted(() => {
     navigationListener = router.on('success', focusMain);
     restoreSavedNavWidth();
+    restoreSavedCpSidebarEndWidth();
     focusMain();
 });
 
@@ -161,6 +239,7 @@ onUnmounted(() => {
     }
 
     stopResize({ persist: false });
+    stopCpSidebarEndResize({ persist: false });
 });
 </script>
 
@@ -170,7 +249,7 @@ onUnmounted(() => {
         <LicensingAlert />
         <Header />
 
-        <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
+        <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]" :class="{ 'cp-sidebar-end-is-open': enableCpSidebarEnd }">
             <Nav />
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div ref="mainContentRef" id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
@@ -186,6 +265,40 @@ onUnmounted(() => {
                     </div>
                 </div>
             </div>
+            <aside v-if="enableCpSidebarEnd" ref="cpSidebarEndRef" class="cp-sidebar-end">
+                <div
+                    class="cp-sidebar-end-resize-handle"
+                    @pointerdown.prevent="startCpSidebarEndResize"
+                    @dblclick="resetCpSidebarEndWidth"
+                />
+                <div id="right-sidebar-content" class="cp-sidebar-end-content">
+                    <div
+                        v-if="cpSidebarEnd"
+                        class="rounded-lg border border-gray-300/80 dark:border-gray-700 bg-white dark:bg-gray-925 p-3"
+                    >
+                        <h2
+                            class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2"
+                            v-text="cpSidebarEnd.title"
+                        />
+                        <ul class="flex flex-col gap-1.5">
+                            <li v-for="(item, i) in cpSidebarEnd.links ?? []" :key="i">
+                                <Link
+                                    v-if="item.url"
+                                    :href="item.url"
+                                    class="flex items-center gap-2 rounded-md px-2 py-1 text-sm text-gray-700 hover:bg-gray-400/15 dark:text-gray-300"
+                                >
+                                    <span v-text="item.text" />
+                                </Link>
+                                <span
+                                    v-else
+                                    class="flex items-center gap-2 rounded-md px-2 py-1 text-sm text-gray-500 dark:text-gray-400"
+                                    v-text="item.text"
+                                />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
         </main>
 
         <Component

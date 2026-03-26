@@ -1,5 +1,6 @@
 :root {
     --nav-width: 11.5rem;
+    --sidebar-end-width: var(--nav-width);
 }
 
 /* GROUP THE MAIN NAV (LEFT SIDEBAR)
@@ -142,6 +143,25 @@ main {
     }
 }
 
+.cp-sidebar-end-is-open {
+    padding-inline-end: var(--sidebar-end-width);
+}
+
+.cp-sidebar-end {
+    display: block;
+    position: fixed;
+    top: 3.5rem;
+    inset-inline-end: 0;
+    bottom: 0;
+    width: var(--sidebar-end-width);
+    border-inline-start: 1px solid var(--theme-color-body-border);
+    background: var(--theme-color-body-bg);
+}
+
+.cp-sidebar-end-content {
+    @apply h-full overflow-y-auto p-2;
+}
+
 .nav-closed .nav-main {
     /* Start off-screen to the left */
     @apply -start-50;
@@ -167,6 +187,18 @@ main.nav-closed {
     @apply hidden lg:block;
 }
 
+.cp-sidebar-end-resize-handle {
+    --resize-width: 10px;
+
+    position: absolute;
+    z-index: var(--z-index-above);
+    top: 0;
+    inset-inline-start: calc(0% - var(--resize-width) / 2);
+    width: var(--resize-width);
+    height: 100%;
+    cursor: col-resize;
+}
+
 .nav-resizing {
     cursor: col-resize;
     /* Prevents any text selection while dragging (otherwise you could end up selecting menu text while dragging the resize handle). */
@@ -178,7 +210,8 @@ main.nav-closed {
     }
 
     & main,
-    & .nav-main {
+    & .nav-main,
+    & .cp-sidebar-end {
         /* Disables transitions while dragging, specifically to prevent jank/animated layout changes from the existing sidebar + main transitions in layout.css (the sidebar open/close transition and the main padding transition). */
         transition: none;
     }
