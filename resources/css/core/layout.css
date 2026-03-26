@@ -1,6 +1,6 @@
 :root {
     --nav-width: 11.5rem;
-    --sidebar-end-width: var(--nav-width);
+    --sidebar-end-width: 11.5rem;
 }
 
 /* GROUP THE MAIN NAV (LEFT SIDEBAR)
