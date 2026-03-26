@@ -1,5 +1,19 @@
 # Release Notes
 
+## 6.7.3 (2026-03-25)
+
+### What's fixed
+- Fix header z-index when creating a new nav [#14337](https://github.com/statamic/cms/issues/14337) by @jaygeorge
+- Remove fixed height from SVGs in UI labels to prevent flickering [#14338](https://github.com/statamic/cms/issues/14338) by @jaygeorge
+- Correct the Bard full-screen width [#14348](https://github.com/statamic/cms/issues/14348) by @jaygeorge
+- Fix duplicate translation for "Edit Fieldset" [#14349](https://github.com/statamic/cms/issues/14349) by @duncanmcclean
+- Delete unused `moment` translations [#14354](https://github.com/statamic/cms/issues/14354) by @duncanmcclean
+- Revert "Fix translator locale" [#14358](https://github.com/statamic/cms/issues/14358) by @jasonvarga
+- French translations [#14339](https://github.com/statamic/cms/issues/14339) by @ebeauchamps
+- German translations [#14352](https://github.com/statamic/cms/issues/14352) by @helloDanuk
+
+
+
 ## 6.7.2 (2026-03-24)
 
 ### What's fixed
