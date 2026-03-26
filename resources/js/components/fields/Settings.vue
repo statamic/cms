@@ -202,7 +202,10 @@ export default {
         },
 
         saveAllShortcutLabel() {
-            const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
+            const platform = typeof navigator !== 'undefined'
+                ? (navigator.userAgentData?.platform || navigator.platform || '')
+                : '';
+            const isMac = /Mac|iPhone|iPad|iPod/i.test(platform);
             return isMac ? 'Cmd+Shift+S' : 'Ctrl+Shift+S';
         },
     },
@@ -309,13 +312,6 @@ export default {
         commitAndSave() {
             this.commit({
                 shouldSaveRoot: true,
-            });
-        },
-
-        // Nested field: saves the current field and any parents.
-        commitAndCloseAll() {
-            this.commit({
-                shouldCommitParent: true,
             });
         },
 
