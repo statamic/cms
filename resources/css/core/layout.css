@@ -4,7 +4,7 @@
 
 /* GROUP THE MAIN NAV (LEFT SIDEBAR)
 =================================================== */
-.nav-main {
+.cp-sidebar-start {
     @apply flex flex-col gap-6 py-6 px-2 sm:px-3 sm:pe-1 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
@@ -51,7 +51,7 @@
 
 /* GROUP THE MAIN NAV (LEFT SIDEBAR) / ACTIVE STATES
 =================================================== */
-.nav-main {
+.cp-sidebar-start {
     @supports not (anchor-name: --my-anchor) {
         ul li ul li {
             a.active {
@@ -117,13 +117,13 @@
 /* GROUP THE MAIN NAV (LEFT SIDEBAR) / MOBILE BEHAVIOR
 =================================================== */
 @media (width < theme(--breakpoint-lg)) {
-    .nav-main {
+    .cp-sidebar-start {
         /* Always visible but off-screen by default */
         @apply flex;
         @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 
-    .nav-open .nav-main {
+    .nav-open .cp-sidebar-start {
         /* Slide in from the left */
         @apply start-0 shadow-2xl;
     }
@@ -142,7 +142,7 @@ main {
     }
 }
 
-.nav-closed .nav-main {
+.nav-closed .cp-sidebar-start {
     /* Start off-screen to the left */
     @apply -start-50;
 }
@@ -178,7 +178,8 @@ main.nav-closed {
     }
 
     & main,
-    & .nav-main {
+    & .cp-sidebar-start,
+    & .cp-sidebar-end {
         /* Disables transitions while dragging, specifically to prevent jank/animated layout changes from the existing sidebar + main transitions in layout.css (the sidebar open/close transition and the main padding transition). */
         transition: none;
     }

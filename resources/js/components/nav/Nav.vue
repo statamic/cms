@@ -154,7 +154,7 @@ Statamic.$events.$on('nav.toggle', toggle);
 </script>
 
 <template>
-    <nav ref="navRef" class="nav-main">
+    <nav ref="navRef" class="cp-sidebar-start">
         <div v-for="(section, i) in nav" :key="i">
             <div
                 class="section-title"
