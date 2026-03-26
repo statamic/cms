@@ -19,6 +19,7 @@ import VueComponentDebug from 'vue-component-debug';
 import { registerIconSetFromStrings } from '@ui';
 import Layout from '@/pages/layout/Layout.vue';
 import { setTranslations, setLocale } from '@/translations/translator.js';
+import { setDefaultLocale as setFormattingLocale } from '@/components/FormattingLocale.js';
 import {
     keys,
     components,
@@ -183,11 +184,9 @@ export default {
 
         const formattingLocale = this.initialConfig.user?.preferences?.formatting_locale;
         if (formattingLocale === 'language') {
-            dateFormatter.setDefaultLocale(this.initialConfig.translationLocale);
-            numberFormatter.setDefaultLocale(this.initialConfig.translationLocale);
+            setFormattingLocale(this.initialConfig.translationLocale);
         } else if (formattingLocale) {
-            dateFormatter.setDefaultLocale(formattingLocale);
-            numberFormatter.setDefaultLocale(formattingLocale);
+            setFormattingLocale(formattingLocale);
         }
 
         bootingCallbacks.forEach((callback) => callback(this));

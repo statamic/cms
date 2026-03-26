@@ -1,3 +1,5 @@
+import { getLocale, getDefaultLocale, setDefaultLocale } from './FormattingLocale.js';
+
 export default class NumberFormatter {
     #number;
     #options;
@@ -45,23 +47,31 @@ export default class NumberFormatter {
         return this.number(number).options(options).toString();
     }
 
+    static get defaultLocale() {
+        return getDefaultLocale();
+    }
+
+    static set defaultLocale(locale) {
+        setDefaultLocale(locale);
+    }
+
     withLocale(locale, callback) {
-        const previousLocale = NumberFormatter.defaultLocale;
-        this.setDefaultLocale(locale);
+        const previousLocale = getDefaultLocale();
+        setDefaultLocale(locale);
 
         try {
             return callback(this);
         } finally {
-            this.setDefaultLocale(previousLocale);
+            setDefaultLocale(previousLocale);
         }
     }
 
     setDefaultLocale(locale) {
-        NumberFormatter.defaultLocale = locale;
+        setDefaultLocale(locale);
     }
 
     get locale() {
-        return NumberFormatter.defaultLocale ?? Intl.NumberFormat().resolvedOptions().locale;
+        return getLocale();
     }
 
     #normalizeNumber(number) {
