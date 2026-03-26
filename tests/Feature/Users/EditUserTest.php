@@ -102,7 +102,10 @@ class EditUserTest extends TestCase
             ->actingAsWithElevatedSession($me)
             ->get($user->editUrl())
             ->assertOk()
-            ->assertViewHas('twoFactor', fn ($twoFactor) => $twoFactor === null);
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('users/Edit')
+                ->where('twoFactor', null)
+            );
     }
 
     protected function disableTwoFactor($app)
