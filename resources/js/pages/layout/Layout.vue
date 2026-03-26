@@ -43,8 +43,6 @@ const cpSidebarEndWidthStorageKey = 'statamic.cp-sidebar-end.width';
 const legacyRightSidebarWidthStorageKey = 'statamic.right-sidebar.width';
 const MIN_NAV_WIDTH = 150;
 const MAX_NAV_WIDTH = 400;
-const MIN_CP_SIDEBAR_END_WIDTH = MIN_NAV_WIDTH;
-const MAX_CP_SIDEBAR_END_WIDTH = MAX_NAV_WIDTH;
 const mainContentRef = ref(null);
 const contentCardRef = ref(null);
 const cpSidebarEndRef = ref(null);
@@ -84,7 +82,7 @@ function restoreSavedCpSidebarEndWidth() {
     const widthPx = Number(saved);
     if (!Number.isFinite(widthPx)) return;
 
-    const clamped = Math.min(Math.max(widthPx, MIN_CP_SIDEBAR_END_WIDTH), MAX_CP_SIDEBAR_END_WIDTH);
+    const clamped = Math.min(Math.max(widthPx, MIN_NAV_WIDTH), MAX_NAV_WIDTH);
     setCpSidebarEndWidthPx(clamped);
 }
 
@@ -189,7 +187,7 @@ function startCpSidebarEndResize(event) {
         const proposedWidth = isRtl
             ? (e.clientX - cpSidebarEndInsetPx)
             : (window.innerWidth - e.clientX - cpSidebarEndInsetPx);
-        cpSidebarEndWidthPx = Math.min(Math.max(proposedWidth, MIN_CP_SIDEBAR_END_WIDTH), MAX_CP_SIDEBAR_END_WIDTH);
+        cpSidebarEndWidthPx = Math.min(Math.max(proposedWidth, MIN_NAV_WIDTH), MAX_NAV_WIDTH);
         setCpSidebarEndWidthPx(cpSidebarEndWidthPx);
     };
 
