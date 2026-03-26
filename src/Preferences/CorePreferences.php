@@ -14,7 +14,7 @@ class CorePreferences
     {
         Preference::register('locale', [
             'type' => 'select',
-            'display' => __('Locale'),
+            'display' => __('Language'),
             'instructions' => __('statamic::messages.preference_locale_instructions'),
             'clearable' => true,
             'label_html' => true,

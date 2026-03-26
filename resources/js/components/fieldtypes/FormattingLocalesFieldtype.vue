@@ -48,7 +48,7 @@ const options = computed(() => {
     });
 
     return [
-        { value: 'locale', label: __('Same as locale') },
+        { value: 'language', label: __('Same as language') },
         ...formatted,
     ];
 });
