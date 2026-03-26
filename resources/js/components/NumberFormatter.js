@@ -2,6 +2,7 @@ import { getLocale, getDefaultLocale, setDefaultLocale } from './FormattingLocal
 
 export default class NumberFormatter {
     #number;
+    #rangeEnd;
     #options;
     #presets = {
         decimal: {
@@ -13,7 +14,13 @@ export default class NumberFormatter {
     };
 
     constructor(number, options) {
-        this.#number = this.#normalizeNumber(number);
+        if (Array.isArray(number)) {
+            this.#number = this.#normalizeNumber(number[0]);
+            this.#rangeEnd = this.#normalizeNumber(number[1]);
+        } else {
+            this.#number = this.#normalizeNumber(number);
+        }
+
         this.#options = this.#normalizeOptions(options);
     }
 
@@ -22,18 +29,18 @@ export default class NumberFormatter {
     }
 
     options(options) {
-        return new NumberFormatter(this.#number, options);
+        const value = this.#rangeEnd !== undefined ? [this.#number, this.#rangeEnd] : this.#number;
+
+        return new NumberFormatter(value, options);
     }
 
     toString() {
-        const n = this.#number;
-
-        if (typeof n !== 'number' || Number.isNaN(n)) {
-            return 'Invalid Number';
-        }
-
         try {
-            return Intl.NumberFormat(this.locale, this.#options).format(n);
+            if (this.#rangeEnd !== undefined) {
+                return Intl.NumberFormat(this.locale, this.#options).formatRange(this.#number, this.#rangeEnd);
+            }
+
+            return Intl.NumberFormat(this.locale, this.#options).format(this.#number);
         } catch (e) {
             return 'Invalid Number';
         }
@@ -45,6 +52,14 @@ export default class NumberFormatter {
 
     format(number, options) {
         return this.number(number).options(options).toString();
+    }
+
+    formatRange(start, end, options) {
+        return this.number([start, end]).options(options ?? this.#options).toString();
+    }
+
+    static formatRange(start, end, options) {
+        return new NumberFormatter([start, end], options).toString();
     }
 
     static get defaultLocale() {
@@ -77,11 +92,11 @@ export default class NumberFormatter {
     #normalizeNumber(number) {
         if (number === null || number === undefined) return 0;
 
-        if (typeof number === 'string') return Number(number);
+        const n = Number(number);
 
-        if (typeof number === 'number') return number;
+        if (Number.isNaN(n)) throw new Error('Invalid Number');
 
-        return Number(number);
+        return n;
     }
 
     #normalizeOptions(options) {

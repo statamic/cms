@@ -84,16 +84,6 @@ describe('numbers can be provided in various ways', () => {
             expected: expectedZero,
         },
         {
-            name: 'constructor with NaN',
-            value: () => new NumberFormatter(NaN),
-            expected: 'Invalid Number',
-        },
-        {
-            name: 'constructor with invalid string',
-            value: () => new NumberFormatter('foo'),
-            expected: 'Invalid Number',
-        },
-        {
             name: 'number with number literal',
             value: () => new NumberFormatter().number(n),
             expected: expectedFormat,
@@ -107,16 +97,6 @@ describe('numbers can be provided in various ways', () => {
             name: 'number with null',
             value: () => new NumberFormatter().number(null),
             expected: expectedZero,
-        },
-        {
-            name: 'number with NaN',
-            value: () => new NumberFormatter().number(NaN),
-            expected: 'Invalid Number',
-        },
-        {
-            name: 'number with invalid string',
-            value: () => new NumberFormatter().number('foo'),
-            expected: 'Invalid Number',
         },
         {
             name: 'format with number literal',
@@ -134,16 +114,6 @@ describe('numbers can be provided in various ways', () => {
             expected: expectedZero,
         },
         {
-            name: 'format with NaN',
-            value: () => new NumberFormatter().format(NaN),
-            expected: 'Invalid Number',
-        },
-        {
-            name: 'format with invalid string',
-            value: () => new NumberFormatter().format('foo'),
-            expected: 'Invalid Number',
-        },
-        {
             name: 'static format with number literal',
             value: () => NumberFormatter.format(n),
             expected: expectedFormat,
@@ -158,20 +128,23 @@ describe('numbers can be provided in various ways', () => {
             value: () => NumberFormatter.format(null),
             expected: expectedZero,
         },
-        {
-            name: 'static format with NaN',
-            value: () => NumberFormatter.format(NaN),
-            expected: 'Invalid Number',
-        },
-        {
-            name: 'static format with invalid string',
-            value: () => NumberFormatter.format('foo'),
-            expected: 'Invalid Number',
-        },
     ])('by $name', ({ value, expected }) => {
         value = value();
         expect(`${value}`).toBe(expected);
     });
+});
+
+test.each([
+    ['constructor with NaN', () => new NumberFormatter(NaN)],
+    ['constructor with invalid string', () => new NumberFormatter('foo')],
+    ['number() with NaN', () => new NumberFormatter().number(NaN)],
+    ['number() with invalid string', () => new NumberFormatter().number('foo')],
+    ['format() with NaN', () => new NumberFormatter().format(NaN)],
+    ['format() with invalid string', () => new NumberFormatter().format('foo')],
+    ['static format with NaN', () => NumberFormatter.format(NaN)],
+    ['static format with invalid string', () => NumberFormatter.format('foo')],
+])('it throws for invalid number: %s', (label, fn) => {
+    expect(fn).toThrow('Invalid Number');
 });
 
 test('it can get the locale', () => {
@@ -198,4 +171,71 @@ test.each([
 
 test('an invalid preset throws an error', () => {
     expect(() => new NumberFormatter().options('foo')).toThrow('Invalid number format: foo');
+});
+
+describe('formatRange', () => {
+    test('it can format a range with default options', () => {
+        expect(new NumberFormatter().formatRange(1000, 5000)).toBe('1,000–5,000');
+    });
+
+    test('it can format a range with a preset', () => {
+        expect(new NumberFormatter().formatRange(0.1, 0.85, 'percent')).toBe('10% – 85%');
+    });
+
+    test('it can format a range with custom options', () => {
+        expect(new NumberFormatter().formatRange(100, 999.99, { style: 'currency', currency: 'USD' })).toBe('$100.00 – $999.99');
+    });
+
+    test('it uses the instance options when none are provided', () => {
+        expect(new NumberFormatter(0, 'percent').formatRange(0.1, 0.5)).toBe('10% – 50%');
+    });
+
+    test('it can format a range with a different locale', () => {
+        NumberFormatter.defaultLocale = 'de';
+        expect(new NumberFormatter().formatRange(1000, 5000)).toBe('1.000–5.000');
+    });
+
+    test('it can statically format a range', () => {
+        expect(NumberFormatter.formatRange(1000, 5000)).toBe('1,000–5,000');
+        expect(NumberFormatter.formatRange(0.1, 0.85, 'percent')).toBe('10% – 85%');
+    });
+
+    test('it normalizes string inputs', () => {
+        expect(new NumberFormatter().formatRange('1000', '5000')).toBe('1,000–5,000');
+    });
+});
+
+describe('range via array syntax', () => {
+    test('it formats a range when an array is provided to the constructor', () => {
+        expect(new NumberFormatter([1, 2]).toString()).toBe('1–2');
+    });
+
+    test('it formats a range when an array is provided to number()', () => {
+        expect(new NumberFormatter().number([1, 2]).toString()).toBe('1–2');
+    });
+
+    test('it can use a preset while formatting a range', () => {
+        expect(new NumberFormatter([0.1, 0.2], 'percent').toString()).toBe('10% – 20%');
+    });
+
+    test('it preserves range when options() is chained', () => {
+        expect(new NumberFormatter([1234.5, 1234.9]).options({ minimumFractionDigits: 2, maximumFractionDigits: 2 }).toString()).toBe('1,234.50–1,234.90');
+    });
+
+    test('it resets locale after withLocale callback throws', () => {
+        const formatter = new NumberFormatter();
+        NumberFormatter.defaultLocale = 'en-us';
+
+        expect(() => formatter.withLocale('de', (instance) => {
+            expect(instance.number([1234.567, 1234.9]).toString()).toBe('1.234,567–1.234,9');
+            throw new Error('boom');
+        })).toThrow('boom');
+
+        expect(NumberFormatter.defaultLocale).toBe('en-us');
+    });
+
+    test('it throws for NaN range endpoints', () => {
+        expect(() => new NumberFormatter([NaN, 2])).toThrow('Invalid Number');
+        expect(() => new NumberFormatter([1, 'foo'])).toThrow('Invalid Number');
+    });
 });
