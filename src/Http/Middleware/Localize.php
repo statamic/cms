@@ -17,16 +17,21 @@ class Localize
     {
         $site = Site::current();
 
-        // Dates, Carbon, etc expect the full locale. (eg. "fr_FR" or whatever is
+        // PHP date-formatting functions expect the full locale. (eg. "fr_FR" or whatever is
         // installed on your actual server. You can check by running `locale -a`).
         // We'll save the original locale so we can reset it later. Of course,
         // you can get the locale by calling the setlocale method. Logical.
         $originalLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $site->locale());
 
-        // Use the site's lang for translations.
-        $originalTranslatorLocale = app('translator')->getLocale();
-        app('translator')->setLocale($site->lang());
+        // The sites lang is used for your translations.
+        // e.g. If you set your lang to "fr" it'll look for "fr" translations.
+        // If not explicitly set, a site's lang will fall back to the "short locale"
+        // e.g. If your site's locale is "fr_FR", the lang would be "fr".
+        // Note that Carbon does also use this for some things.
+        // Again, we'll save the original locale so we can reset it later.
+        $originalAppLocale = app()->getLocale();
+        app()->setLocale($site->lang());
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
@@ -43,7 +48,7 @@ class Localize
         // Reset everything back to their originals. This allows everything
         // not within the scope of the request to be the "defaults".
         setlocale(LC_TIME, $originalLocale);
-        app('translator')->setLocale($originalTranslatorLocale);
+        app()->setLocale($originalAppLocale);
         Date::setToStringFormat($originalToStringFormat);
 
         return $response;
