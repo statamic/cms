@@ -193,10 +193,11 @@ main.nav-closed {
     position: absolute;
     z-index: var(--z-index-above);
     top: 0;
-    inset-inline-start: calc(0% - var(--resize-width) / 2);
+    inset-inline-end: calc(0% - var(--resize-width) / 2);
     width: var(--resize-width);
     height: 100%;
     cursor: col-resize;
+    @apply hidden lg:block;
 }
 
 .nav-resizing {

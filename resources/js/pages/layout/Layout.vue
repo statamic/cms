@@ -110,6 +110,7 @@ let isCpSidebarEndResizing = false;
 let cpSidebarEndWidthPx = null;
 let cpSidebarEndPointerMoveListener = null;
 let cpSidebarEndPointerUpListener = null;
+let cpSidebarEndInsetPx = 0;
 
 function stopCpSidebarEndResize({ persist = true } = {}) {
     if (!isCpSidebarEndResizing) return;
@@ -169,7 +170,7 @@ function resetNavWidth() {
 }
 
 function startCpSidebarEndResize(event) {
-    if (!enableCpSidebarEnd.value || isCpSidebarEndResizing) return;
+    if (!enableCpSidebarEnd.value || isCpSidebarEndResizing || !mainContentRef.value || !contentCardRef.value) return;
 
     isCpSidebarEndResizing = true;
     document.documentElement.classList.add('nav-resizing');
@@ -178,8 +179,16 @@ function startCpSidebarEndResize(event) {
     const dir = getComputedStyle(document.documentElement).direction;
     const isRtl = dir === 'rtl';
 
+    const mainContentRect = mainContentRef.value.getBoundingClientRect();
+    const contentCardRect = contentCardRef.value.getBoundingClientRect();
+    cpSidebarEndInsetPx = isRtl
+        ? (contentCardRect.left - mainContentRect.left)
+        : (mainContentRect.right - contentCardRect.right);
+
     cpSidebarEndPointerMoveListener = (e) => {
-        const proposedWidth = isRtl ? e.clientX : window.innerWidth - e.clientX;
+        const proposedWidth = isRtl
+            ? (e.clientX - cpSidebarEndInsetPx)
+            : (window.innerWidth - e.clientX - cpSidebarEndInsetPx);
         cpSidebarEndWidthPx = Math.min(Math.max(proposedWidth, MIN_CP_SIDEBAR_END_WIDTH), MAX_CP_SIDEBAR_END_WIDTH);
         setCpSidebarEndWidthPx(cpSidebarEndWidthPx);
     };
@@ -259,6 +268,12 @@ onUnmounted(() => {
                         @pointerdown.prevent="startResize"
                         @dblclick="resetNavWidth"
                     />
+                    <div
+                        v-if="enableCpSidebarEnd"
+                        class="cp-sidebar-end-resize-handle"
+                        @pointerdown.prevent="startCpSidebarEndResize"
+                        @dblclick="resetCpSidebarEndWidth"
+                    />
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                     <div class="w-full min-w-0 mx-auto max-w-page" data-max-width-wrapper>
                         <slot />
@@ -266,11 +281,6 @@ onUnmounted(() => {
                 </div>
             </div>
             <aside v-if="enableCpSidebarEnd" ref="cpSidebarEndRef" class="cp-sidebar-end">
-                <div
-                    class="cp-sidebar-end-resize-handle"
-                    @pointerdown.prevent="startCpSidebarEndResize"
-                    @dblclick="resetCpSidebarEndWidth"
-                />
                 <div id="right-sidebar-content" class="cp-sidebar-end-content">
                     <div
                         v-if="cpSidebarEnd"
