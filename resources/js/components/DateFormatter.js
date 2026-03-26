@@ -102,6 +102,21 @@ export default class DateFormatter {
         return this.date(date).options(options).toString();
     }
 
+    withLocale(locale, callback) {
+        const previousLocale = DateFormatter.defaultLocale;
+        this.setDefaultLocale(locale);
+
+        try {
+            return callback(this);
+        } finally {
+            this.setDefaultLocale(previousLocale);
+        }
+    }
+
+    setDefaultLocale(locale) {
+        DateFormatter.defaultLocale = locale;
+    }
+
     get locale() {
         return DateFormatter.defaultLocale ?? Intl.DateTimeFormat().resolvedOptions().locale;
     }

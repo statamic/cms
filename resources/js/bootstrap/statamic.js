@@ -176,6 +176,13 @@ export default {
         contrast.initialize(this.initialConfig.user?.preferences?.strict_accessibility);
         preferences.initialize(this.initialConfig.user?.preferences, this.initialConfig.defaultPreferences);
 
+        const formattingLocale = this.initialConfig.user?.preferences?.formatting_locale;
+        if (formattingLocale === 'locale') {
+            dateFormatter.setDefaultLocale(this.initialConfig.translationLocale);
+        } else if (formattingLocale) {
+            dateFormatter.setDefaultLocale(formattingLocale);
+        }
+
         bootingCallbacks.forEach((callback) => callback(this));
         bootingCallbacks = [];
 

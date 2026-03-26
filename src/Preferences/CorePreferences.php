@@ -21,6 +21,12 @@ class CorePreferences
             'options' => $this->localeOptions(),
         ]);
 
+        Preference::register('formatting_locale', [
+            'type' => 'formatting_locales',
+            'display' => __('Formatting Locale'),
+            'instructions' => __('statamic::messages.preference_formatting_locale_instructions'),
+        ]);
+
         Preference::register('start_page', [
             'type' => 'text',
             'display' => __('Start Page'),
