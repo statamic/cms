@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Facades\Action;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 
@@ -43,6 +44,11 @@ class FolderAsset extends JsonResource
             'editable' => User::current()->can('edit', $this->resource),
 
             $this->merge($this->values()),
+
+            'actions' => Action::for($this->resource, [
+                'container' => $this->container()->handle(),
+                'folder' => $this->folder(),
+            ]),
 
             $this->merge($this->thumbnails()),
         ];

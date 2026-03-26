@@ -326,7 +326,7 @@ export default {
         },
 
         actionContext() {
-            return { container: this.container.id, folder: this.path || '/' };
+            return { container: this.container.id };
         },
 
         additionalParameters() {
