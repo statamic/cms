@@ -154,42 +154,44 @@ Statamic.$events.$on('nav.toggle', toggle);
 </script>
 
 <template>
-    <nav ref="navRef" class="cp-sidebar-start">
-        <div v-for="(section, i) in nav" :key="i">
-            <div
-                class="section-title"
-                v-if="section.display !== 'Top Level'"
-                v-text="__(section.display)"
-            />
-            <ul>
-                <li v-for="(item, i) in section.items" :key="i">
-                    <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
-                    <template v-else>
-                        <component
-                            :is="shouldRenderAsInertiaLink(item) ? Link : 'a'"
-                            :href="item.url"
-                            v-bind="item.attributes"
-                            :class="{ 'active': item.active }"
-                            @click="handleParentClick($event, item)"
-                        >
-                            <Icon :name="item.icon ?? 'fieldtype-spacer'" />
-                            <span v-text="__(item.display)" />
-                        </component>
-                        <ul v-if="item.children.length && item.active">
-                            <li v-for="(child, i) in item.children" :key="i">
-                                <component
-                                    :is="shouldRenderAsInertiaLink(child) ? Link : 'a'"
-                                    :href="child.url"
-                                    v-bind="child.attributes"
-                                    v-text="__(child.display)"
-                                    :class="{ 'active': child.active }"
-                                    @click="handleChildClick($event, item, child)"
-                                />
-                            </li>
-                        </ul>
-                    </template>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    <div class="cp-sidebar-start">
+        <nav ref="navRef" class="cp-sidebar-star cp-sidebar-nav-main">
+            <div v-for="(section, i) in nav" :key="i">
+                <div
+                    class="section-title"
+                    v-if="section.display !== 'Top Level'"
+                    v-text="__(section.display)"
+                />
+                <ul>
+                    <li v-for="(item, i) in section.items" :key="i">
+                        <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
+                        <template v-else>
+                            <component
+                                :is="shouldRenderAsInertiaLink(item) ? Link : 'a'"
+                                :href="item.url"
+                                v-bind="item.attributes"
+                                :class="{ 'active': item.active }"
+                                @click="handleParentClick($event, item)"
+                            >
+                                <Icon :name="item.icon ?? 'fieldtype-spacer'" />
+                                <span v-text="__(item.display)" />
+                            </component>
+                            <ul v-if="item.children.length && item.active">
+                                <li v-for="(child, i) in item.children" :key="i">
+                                    <component
+                                        :is="shouldRenderAsInertiaLink(child) ? Link : 'a'"
+                                        :href="child.url"
+                                        v-bind="child.attributes"
+                                        v-text="__(child.display)"
+                                        :class="{ 'active': child.active }"
+                                        @click="handleChildClick($event, item, child)"
+                                    />
+                                </li>
+                            </ul>
+                        </template>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
 </template>

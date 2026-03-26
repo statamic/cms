@@ -3,15 +3,15 @@
     --sidebar-end-width: 11.5rem;
 }
 
-/* GROUP THE MAIN NAV (LEFT SIDEBAR)
+/* GROUP LEFT SIDEBAR
 =================================================== */
+/* This class controls the layout rather than aesthetics, which is left to classes like .cp-sidebar-nav-main */
 .cp-sidebar-start {
     @apply flex flex-col gap-6 py-6 px-2 sm:px-3 sm:pe-1 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
     @apply overflow-y-auto fixed top-14 start-0;
     width: var(--nav-width);
-    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
     .page-fully-loaded & {
         /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
@@ -20,6 +20,14 @@
     /* On mobile, hide by default and overlay on top */
     z-index: var(--z-index-draggable);
     @apply lg:flex;
+}
+
+/* GROUP LEFT SIDEBAR / MAIN NAV
+=================================================== */
+.cp-sidebar-nav-main {
+    @apply flex flex-col gap-6;
+
+    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
 
     ul {
         @apply flex flex-col gap-0;
@@ -50,7 +58,7 @@
     }
 }
 
-/* GROUP THE MAIN NAV (LEFT SIDEBAR) / ACTIVE STATES
+/* GROUP LEFT SIDEBAR / ACTIVE STATES
 =================================================== */
 .cp-sidebar-start {
     @supports not (anchor-name: --my-anchor) {
@@ -115,7 +123,7 @@
     }
 }
 
-/* GROUP THE MAIN NAV (LEFT SIDEBAR) / MOBILE BEHAVIOR
+/* GROUP LEFT SIDEBAR / MOBILE BEHAVIOR
 =================================================== */
 @media (width < theme(--breakpoint-lg)) {
     .cp-sidebar-start {
