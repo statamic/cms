@@ -172,7 +172,7 @@ main.nav-closed {
     @apply lg:ps-0;
 }
 
-/* GROUP RESIZEABLE NAVS / RESIZE NEEDLE
+/* GROUP RESIZABLE NAVS / RESIZE HANDLE
 =================================================== */
 .content-card-resize-handle {
     --resize-width: 10px;
