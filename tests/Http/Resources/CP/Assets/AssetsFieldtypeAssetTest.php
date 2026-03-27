@@ -72,5 +72,4 @@ class AssetsFieldtypeAssetTest extends TestCase
         $this->assertFalse($resource['isEditable']);
         $this->assertTrue($resource['isViewable']);
     }
-
 }
