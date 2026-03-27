@@ -1,8 +1,7 @@
 <script setup>
 import FormLayout from './Layout.vue';
 import { Button } from '@ui';
-import LeftPanel from '@/pages/layout/LeftPanel.vue';
-import RightPanel from '@/pages/layout/RightPanel.vue';
+import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 
 const props = defineProps({
     form: Object,
@@ -15,7 +14,7 @@ const props = defineProps({
             <Button class="ms-2" :text="__('Save')" variant="primary" />
         </template>
 
-        <LeftPanel>
+        <LayoutPanel side="left">
             <div style="--graph-paper-y-offset: 2.5rem;" class="bg-graph-paper [&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
                 <ul class="px-0.5 grid gap-8">
                     <li>
@@ -104,14 +103,14 @@ const props = defineProps({
                     </li>
                 </ul>
             </div>
-        </LeftPanel>
+        </LayoutPanel>
 
         <div class="py-4">
             <p>TODO: Form Builder</p>
         </div>
 
-        <RightPanel>
+        <LayoutPanel side="right">
             <p>Settings</p>
-        </RightPanel>
+        </LayoutPanel>
     </FormLayout>
 </template>

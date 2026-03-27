@@ -9,7 +9,6 @@ import Tooltips from '@/components/Tooltips.vue';
 import { provide, watch, ref, onMounted, onUnmounted, nextTick, useTemplateRef } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
-import useStatamicPageProps from '@/composables/page-props.js';
 import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
 import useResizable from '@/composables/use-resizable.js';
 
@@ -116,7 +115,7 @@ onUnmounted(() => {
                         <slot />
                     </div>
                 </div>
-                <div v-show="rightPanelActive" ref="rightPanel" id="right-panel" tabindex="-1" class="focus:outline-none relative layout-right-panel grid min-h-full mx-auto min-w-2">
+                <div v-show="rightPanelActive" ref="rightPanel" id="right-panel" tabindex="-1" class="focus:outline-none relative layout-right-panel grid min-h-full mx-auto">
                     <!-- Panel contents will be injected via <Teleport> -->
                 </div>
             </div>
