@@ -83,7 +83,7 @@ class SubmitForm
             ->validator();
     }
 
-    protected static function extraRules($fields): array
+    private static function extraRules($fields): array
     {
         return $fields->all()
             ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
@@ -99,7 +99,7 @@ class SubmitForm
      * The assets fieldtype expects arrays, even for `max_files: 1`,
      * but we don't want to force that on the front end.
      */
-    protected function normalizeFiles(Form $form, array $files): array
+    private function normalizeFiles(Form $form, array $files): array
     {
         $assetFields = $form->blueprint()->fields()->all()
             ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']))
@@ -119,7 +119,7 @@ class SubmitForm
      *
      * Triggered by a validation exception or silent failure.
      */
-    protected function removeUploadedAssets(array $assets): void
+    private function removeUploadedAssets(array $assets): void
     {
         collect($assets)
             ->flatten()
