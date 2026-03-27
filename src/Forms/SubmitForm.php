@@ -17,7 +17,7 @@ use Statamic\Support\Arr;
 
 class SubmitForm
 {
-    public function __invoke(
+    public function submit(
         Form $form,
         array $data = [],
         array $files = [],

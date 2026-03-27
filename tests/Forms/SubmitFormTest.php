@@ -50,7 +50,7 @@ class SubmitFormTest extends TestCase
     {
         Bus::fake();
 
-        $submission = app(SubmitForm::class)(
+        $submission = app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['name' => 'Test User', 'email' => 'test@example.com', 'message' => 'Hello'],
         );
@@ -68,7 +68,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertEmpty($this->form->submissions());
 
-        app(SubmitForm::class)(
+        app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['email' => 'test@example.com'],
         );
@@ -85,7 +85,7 @@ class SubmitFormTest extends TestCase
         $this->form->store(false);
         $this->form->save();
 
-        app(SubmitForm::class)(
+        app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['email' => 'test@example.com'],
         );
@@ -99,7 +99,7 @@ class SubmitFormTest extends TestCase
     {
         $this->expectException(SilentFormFailureException::class);
 
-        app(SubmitForm::class)(
+        app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
         );
@@ -109,7 +109,7 @@ class SubmitFormTest extends TestCase
     public function it_includes_submission_in_silent_failure_exception()
     {
         try {
-            app(SubmitForm::class)(
+            app(SubmitForm::class)->submit(
                 form: $this->form,
                 data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
             );
@@ -127,7 +127,7 @@ class SubmitFormTest extends TestCase
         Bus::fake();
         Event::fake([FormSubmitted::class]);
 
-        app(SubmitForm::class)(
+        app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['email' => 'test@example.com'],
         );
@@ -145,7 +145,7 @@ class SubmitFormTest extends TestCase
         });
 
         try {
-            app(SubmitForm::class)(
+            app(SubmitForm::class)->submit(
                 form: $this->form,
                 data: ['email' => 'test@example.com'],
             );
@@ -165,7 +165,7 @@ class SubmitFormTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        app(SubmitForm::class)(
+        app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['email' => 'test@example.com'],
         );
@@ -176,7 +176,7 @@ class SubmitFormTest extends TestCase
     {
         Bus::fake();
 
-        app(SubmitForm::class)(
+        app(SubmitForm::class)->submit(
             form: $this->form,
             data: ['email' => 'test@example.com'],
             site: Site::default(),
@@ -209,6 +209,17 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_throws_validation_exception_when_validation_fails()
+    {
+        $this->expectException(ValidationException::class);
+
+        app(SubmitForm::class)->submit(
+            form: $this->form,
+            data: ['name' => 'Test'], // missing required email
+        );
+    }
+
+    #[Test]
     public function it_uploads_files()
     {
         Bus::fake();
@@ -219,7 +230,7 @@ class SubmitFormTest extends TestCase
         $form->blueprint()->ensureField('email', ['type' => 'text', 'validate' => 'required|email'])->save();
         $form->blueprint()->ensureField('avatar', ['type' => 'assets', 'container' => 'avatars'])->save();
 
-        $submission = app(SubmitForm::class)(
+        $submission = app(SubmitForm::class)->submit(
             form: $form,
             data: ['email' => 'test@example.com'],
             files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
@@ -241,7 +252,7 @@ class SubmitFormTest extends TestCase
         $form->blueprint()->ensureField('avatar', ['type' => 'assets', 'container' => 'avatars'])->save();
 
         try {
-            app(SubmitForm::class)(
+            app(SubmitForm::class)->submit(
                 form: $form,
                 data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
                 files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
@@ -268,7 +279,7 @@ class SubmitFormTest extends TestCase
         });
 
         try {
-            app(SubmitForm::class)(
+            app(SubmitForm::class)->submit(
                 form: $form,
                 data: ['email' => 'test@example.com'],
                 files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
@@ -295,7 +306,7 @@ class SubmitFormTest extends TestCase
         });
 
         try {
-            app(SubmitForm::class)(
+            app(SubmitForm::class)->submit(
                 form: $form,
                 data: ['email' => 'test@example.com'],
                 files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],

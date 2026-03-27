@@ -34,7 +34,7 @@ class FormController extends Controller
             ->all();
 
         try {
-            $submission = app(SubmitForm::class)(
+            $submission = app(SubmitForm::class)->submit(
                 form: $form,
                 data: $request->all(),
                 files: $request->assets(),
