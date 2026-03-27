@@ -22,6 +22,11 @@
     @apply lg:flex;
 }
 
+/* Optional width variants for view-specific sidebar sizing. */
+.cp-sidebar-start--large {
+    --nav-width: 30rem;
+}
+
 /* GROUP LEFT SIDEBAR / MAIN NAV
 =================================================== */
 .cp-sidebar-nav-main {

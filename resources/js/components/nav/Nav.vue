@@ -1,8 +1,8 @@
 <script setup>
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { Badge, Icon } from '@ui';
+import { Badge, Button, Icon } from '@ui';
 import useNavigation from './navigation.js';
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
@@ -154,8 +154,23 @@ Statamic.$events.$on('nav.toggle', toggle);
 </script>
 
 <template>
-    <div class="cp-sidebar-start">
-        <nav ref="navRef" class="cp-sidebar-star cp-sidebar-nav-main">
+    <div class="cp-sidebar-start" :class="sidebarStartSizeClass">
+        <nav class="[&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal">
+            <ul class="px-0.5">
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Heading')" />
+                        </li>
+                        <li>
+                            <Button :text="__('Paragraph')" />
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <nav ref="navRef" class="cp-sidebar-nav-main">
             <div v-for="(section, i) in nav" :key="i">
                 <div
                     class="section-title"
