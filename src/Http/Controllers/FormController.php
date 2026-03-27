@@ -7,14 +7,11 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Events\FormSubmitted;
-use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
-use Statamic\Forms\SendEmails;
+use Statamic\Forms\SubmitForm;
 use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -29,57 +26,26 @@ class FormController extends Controller
     public function submit(FrontendFormRequest $request, $form)
     {
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
-        $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = $request->all();
 
-        $values = array_merge($values, $assets = $request->assets());
-        $params = collect($request->all())->filter(function ($value, $key) {
-            return Str::startsWith($key, '_');
-        })->all();
-
-        $fields = $fields->addValues($values);
-
-        $submission = $form->makeSubmission();
+        $params = collect($request->all())
+            ->filter(fn ($value, string $key) => Str::startsWith($key, '_'))
+            ->all();
 
         try {
-            throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
-
-            $uploadedAssets = $submission->uploadFiles($assets);
-
-            $values = array_merge($values, $uploadedAssets);
-
-            $submission->data(
-                $fields->addValues($values)->process()->values()
+            $submission = app(SubmitForm::class)(
+                form: $form,
+                data: $request->all(),
+                files: $request->assets(),
+                site: $site,
             );
 
-            // If any event listeners return false, we'll do a silent failure.
-            // If they want to add validation errors, they can throw an exception.
-            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
-        } catch (ValidationException $e) {
-            $this->removeUploadedAssets($uploadedAssets);
-
-            return $this->formFailure($params, $e->errors(), $form->handle());
+            return $this->formSuccess($params, $submission);
         } catch (SilentFormFailureException $e) {
-            if (isset($uploadedAssets)) {
-                $this->removeUploadedAssets($uploadedAssets);
-            }
-
-            return $this->formSuccess($params, $submission, true);
+            return $this->formSuccess($params, $e->submission(), silentFailure: true);
+        } catch (ValidationException $e) {
+            return $this->formFailure($params, $e->errors(), $form->handle());
         }
-
-        if ($form->store()) {
-            $submission->save();
-        } else {
-            // When the submission is saved, this same created event will be dispatched.
-            // We'll also fire it here if submissions are not configured to be stored
-            // so that developers may continue to listen and modify it as needed.
-            SubmissionCreated::dispatch($submission);
-        }
-
-        SendEmails::dispatch($submission, $site);
-
-        return $this->formSuccess($params, $submission);
     }
 
     private function validateContentType($request, $form)
@@ -172,21 +138,5 @@ class FormController extends Controller
         }
 
         return $redirect;
-    }
-
-    /**
-     * Remove any uploaded assets
-     *
-     * Triggered by a validation exception or silent failure
-     */
-    private function removeUploadedAssets(array $assets)
-    {
-        collect($assets)
-            ->flatten()
-            ->each(function ($id) {
-                if ($asset = Asset::find($id)) {
-                    $asset->delete();
-                }
-            });
     }
 }
