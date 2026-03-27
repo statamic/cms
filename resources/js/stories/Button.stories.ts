@@ -301,3 +301,67 @@ export const ButtonGroups: Story = {
         `,
     }),
 };
+
+export const ButtonGroupOverflowStack: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <ButtonGroup overflow="stack">
+                        <Button text="Option A" />
+                        <Button text="Option B" />
+                        <Button text="Option C" />
+                        <Button text="Option D" />
+                        <Button text="Option E" />
+                    </ButtonGroup>
+                `,
+            },
+        },
+    },
+    render: () => ({
+        components: { ButtonGroup, Button },
+        template: `
+            <div class="w-72">
+                <ButtonGroup overflow="stack">
+                    <Button text="Option A" />
+                    <Button text="Option B" />
+                    <Button text="Option C" />
+                    <Button text="Option D" />
+                    <Button text="Option E" />
+                </ButtonGroup>
+            </div>
+        `,
+    }),
+};
+
+export const ButtonGroupOverflowGap: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <ButtonGroup overflow="gap">
+                        <Button text="Option A" />
+                        <Button text="Option B" />
+                        <Button text="Option C" />
+                        <Button text="Option D" />
+                        <Button text="Option E" />
+                    </ButtonGroup>
+                `,
+            },
+        },
+    },
+    render: () => ({
+        components: { ButtonGroup, Button },
+        template: `
+            <div class="w-72">
+                <ButtonGroup overflow="gap">
+                    <Button text="Option A" />
+                    <Button text="Option B" />
+                    <Button text="Option C" />
+                    <Button text="Option D" />
+                    <Button text="Option E" />
+                </ButtonGroup>
+            </div>
+        `,
+    }),
+};

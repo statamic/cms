@@ -43,5 +43,12 @@ When using `ghost` or `subtle` button variants, you can use the `inset` prop to 
 You can combine multiple buttons into a "button group".
 <Canvas of={ButtonStories.ButtonGroups} sourceState={'shown'} />
 
+### Overflow
+By default, when buttons don't fit on one line, it switches to a vertical "stacked" layout.
+<Canvas of={ButtonStories.ButtonGroupOverflowStack} sourceState={'shown'} />
+
+Alternatively, use `overflow="gap"` to use separated buttons with gaps.
+<Canvas of={ButtonStories.ButtonGroupOverflowGap} sourceState={'shown'} />
+
 ## Arguments
 <ArgTypes of={ButtonStories} />
