@@ -33,7 +33,8 @@ let navigationListener = null;
 
 // Resizable sidebar (handle lives on the left edge of the content card)
 const page = usePage();
-const isEditingForm = computed(() => page.url.includes('/forms/'));
+// const isEditingForm = computed(() => page.url.includes('/forms/'));
+const isEditingForm = computed(() => false);
 
 const navWidthStorageKey = computed(() => isEditingForm.value ? 'statamic.nav.width.forms' : 'statamic.nav.width');
 const minNavWidth = computed(() => isEditingForm.value ? 480 : 150);
