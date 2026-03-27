@@ -16,7 +16,7 @@ const props = defineProps({
     /* When 'stack', switch to vertical layout when overflowing. When 'gap', switch to normal buttons with gaps when overflowing. */
     overflow: {
         type: String,
-        default: 'stack',
+        default: null,
         validator: (v) => [null, 'stack', 'gap'].includes(v),
     },
     orientation: {
