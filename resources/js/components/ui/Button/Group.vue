@@ -39,6 +39,8 @@ const measuringOverflow = ref(false);
 
 const groupClasses = computed(() => {
     const collapseHorizontally = [
+        '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
+        '[&>:not(:first-child):not(:last-child)_[data-ui-group-target]]:rounded-none',
         '[&>[data-ui-group-target]:first-child:not(:last-child)]:rounded-e-none',
         '[&>:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
         '[&>[data-ui-group-target]:last-child:not(:first-child)]:rounded-s-none',
@@ -49,6 +51,8 @@ const groupClasses = computed(() => {
 
     const collapseVertically = [
         'flex-col',
+        '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
+        '[&>:not(:first-child):not(:last-child)_[data-ui-group-target]]:rounded-none',
         '[&>[data-ui-group-target]:first-child:not(:last-child)]:rounded-b-none',
         '[&>:first-child:not(:last-child)_[data-ui-group-target]]:rounded-b-none',
         '[&>[data-ui-group-target]:last-child:not(:first-child)]:rounded-t-none',
@@ -62,8 +66,6 @@ const groupClasses = computed(() => {
             'group/button inline-flex flex-wrap relative',
             'dark:[&_button]:ring-0',
             'rounded-lg shadow-ui-sm [&_[data-ui-group-target]]:shadow-none',
-            '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
-            '[&>:not(:first-child):not(:last-child)_[data-ui-group-target]]:rounded-none',
         ],
         variants: {
             orientation: {
