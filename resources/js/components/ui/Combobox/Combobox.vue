@@ -19,6 +19,7 @@ import Button from '../Button/Button.vue';
 import Icon from '../Icon/Icon.vue';
 import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
+import DOMPurify from 'dompurify';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import Scrollbar from "@ui/Combobox/Scrollbar.vue";
 
@@ -148,7 +149,15 @@ const selectedOption = computed(() => {
     return selectedOptions.value[0];
 });
 
-const getOptionLabel = (option) => option?.[props.optionLabel];
+const getOptionLabel = (option) => {
+    const label = option?.[props.optionLabel];
+    if (props.labelHtml) {
+        return DOMPurify.sanitize(label ?? '', {
+            USE_PROFILES: { html: true, svg: true },
+        });
+    }
+    return label;
+};
 const getOptionValue = (option) => option?.[props.optionValue];
 const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
 

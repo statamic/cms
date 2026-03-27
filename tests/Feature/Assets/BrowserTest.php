@@ -250,6 +250,72 @@ class BrowserTest extends TestCase
     }
 
     #[Test]
+    public function it_filters_assets()
+    {
+        $containerOne = AssetContainer::make('one')->disk('test')->save();
+        $containerTwo = AssetContainer::make('two')->disk('test')->save();
+
+        $containerOne
+            ->makeAsset('asset-one.txt')
+            ->upload(UploadedFile::fake()->create('asset-one.txt'));
+        $containerOne
+            ->makeAsset('asset-two.jpg')
+            ->upload(UploadedFile::fake()->image('asset-two.jpg', 100, 200));
+        $containerOne
+            ->makeAsset('nested/asset-three.jpg')
+            ->upload(UploadedFile::fake()->image('asset-three.jpg', 200, 100));
+        $containerTwo
+            ->makeAsset('asset-four.txt')
+            ->upload(UploadedFile::fake()->create('asset-four.txt'));
+        $containerTwo
+            ->makeAsset('nested/asset-five.jpg')
+            ->upload(UploadedFile::fake()->image('asset-five.jpg', 200, 100))
+            ->set('alt', 'An image')
+            ->save();
+
+        $txtFilter = ['asset_properties' => ['extension' => ['operator' => '=', 'value' => 'txt']]];
+        $imageFilter = ['asset_properties' => ['type' => ['operator' => '=', 'value' => 'image']]];
+        $widthFilter = ['asset_properties' => ['dimensions' => ['dimension' => 'width', 'operator' => '>', 'value' => 100]]];
+        $altFilter = ['fields' => ['alt' => ['operator' => 'like', 'value' => 'image']]];
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($txtFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($imageFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-two.jpg')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($widthFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one/nested?filters='.base64_encode(json_encode($imageFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/two?filters='.base64_encode(json_encode($altFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'two::nested/asset-five.jpg');
+    }
+
+    #[Test]
     public function it_shows_an_assets_edit_page()
     {
         $container = AssetContainer::make('test')->disk('test')->save();

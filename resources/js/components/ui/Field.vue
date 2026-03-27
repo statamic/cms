@@ -110,7 +110,7 @@ const hasErrors = computed(() => {
                 </slot>
                 <slot name="actions" />
             </div>
-            <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-1.5'">
+            <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-2'">
                 <slot v-if="!$slots.actions" name="label">
                     <Label v-if="label" v-bind="labelProps" class="flex-1" />
                 </slot>

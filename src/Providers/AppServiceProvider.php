@@ -103,6 +103,18 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        Request::macro('isLivePreviewOf', function ($item) {
+            $token = $this->statamicToken();
+
+            if (! $token || $token->handler() !== LivePreview::class) {
+                return false;
+            }
+
+            $previewItem = \Facades\Statamic\CP\LivePreview::item($token);
+
+            return $item && $previewItem && method_exists($item, 'reference') && $previewItem->reference() === $item->reference();
+        });
+
         TrimStrings::skipWhen(function (Request $request) {
             $route = config('statamic.cp.route');
 

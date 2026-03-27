@@ -275,6 +275,8 @@ class EntryRepositoryTest extends TestCase
             ->collection(Collection::findByHandle('custom_class'))
             ->slug('custom');
 
+        $this->unlinkAfter($this->directory.'/custom_class/custom.md');
+
         $this->repo->save($temp);
         $entry = $this->repo->find('custom');
 

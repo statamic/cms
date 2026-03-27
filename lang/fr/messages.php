@@ -61,6 +61,8 @@ return [
     'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées. Apprenez-en plus dans la [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Le sens de tri par défaut.',
     'collections_taxonomies_instructions' => 'Reliez les entrées de cette collection à des taxonomies. Les champs seront automatiquement ajoutés aux formulaires.',
+    'crop_save_as_copy_confirm' => 'Enregistrer l’image recadrée comme une nouvelle copie ?',
+    'crop_save_copy_or_replace' => 'Souhaitez-vous enregistrer ceci comme une nouvelle copie ou remplacer l’image originale ?',
     'dictionaries_countries_emojis_instructions' => 'Inclure les émojis de drapeaux dans les étiquettes ?',
     'dictionaries_countries_region_instructions' => 'Filtrez éventuellement les pays par région.',
     'dirty_navigation_warning' => 'Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter cette page ?',

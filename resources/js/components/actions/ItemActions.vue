@@ -2,6 +2,7 @@
 import { ref, computed, useTemplateRef, watch, useSlots } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
+import useSkeletonDelay from '@/composables/skeleton-delay.js';
 import axios from 'axios';
 
 const props = defineProps({
@@ -19,11 +20,17 @@ const { prepareActions, runServerAction } = useActions();
 const confirmableActions = useTemplateRef('confirmableActions');
 const actions = ref(props.actions);
 const actionsLoaded = ref(props.actions !== undefined);
+const loading = ref(false);
+const shouldShowSkeleton = useSkeletonDelay(loading);
+let loadActionsRequest = null;
 
 watch(
-	() => props.actions,
-	() => actions.value = props.actions,
-	{ deep: true }
+    () => props.actions,
+    () => {
+        actions.value = props.actions;
+        actionsLoaded.value = props.actions !== undefined;
+    },
+    { deep: true }
 );
 
 let preparedActions = computed(() => {
@@ -31,7 +38,7 @@ let preparedActions = computed(() => {
 });
 
 let preparedQuickActions = computed(() => {
-	return prepareActions(actions.value?.filter(action => action.quick), confirmableActions.value);
+    return prepareActions(actions.value?.filter((action) => action.quick), confirmableActions.value);
 });
 
 let errors = ref({});
@@ -56,7 +63,11 @@ function runAction(action, values, onSuccess, onError) {
 
 function loadActions() {
     if (actionsLoaded.value) {
-        return;
+        return Promise.resolve(actions.value);
+    }
+
+    if (loading.value) {
+        return loadActionsRequest;
     }
 
     let params = {
@@ -67,9 +78,22 @@ function loadActions() {
         params.context = props.context;
     }
 
-    axios.post(props.url + '/list', params).then((response) => (actions.value = response.data));
+    loading.value = true;
 
-    actionsLoaded.value = true;
+    loadActionsRequest = axios
+        .post(props.url + '/list', params)
+        .then((response) => {
+            actions.value = response.data;
+            actionsLoaded.value = true;
+
+            return response.data;
+        })
+        .finally(() => {
+            loading.value = false;
+            loadActionsRequest = null;
+        });
+
+    return loadActionsRequest;
 }
 
 const slots = useSlots();
@@ -91,6 +115,11 @@ defineExpose({
         :is-dirty="isDirty"
         @confirmed="runAction"
     />
-    <slot :actions="preparedActions" :load-actions="loadActions" />
-	<slot v-if="showQuickActions" name="quick" :actions="preparedQuickActions" />
+    <slot
+        :actions="preparedActions"
+        :load-actions="loadActions"
+        :loading="loading"
+        :should-show-skeleton="shouldShowSkeleton"
+    />
+    <slot v-if="showQuickActions" name="quick" :actions="preparedQuickActions" />
 </template>

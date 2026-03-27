@@ -2,11 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Data;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -18,13 +20,25 @@ class ReplicatorSetController extends CpController
     public function __invoke(Request $request)
     {
         $request->validate([
-            'blueprint' => ['required', 'string'],
+            'token' => ['required', 'string'],
             'reference' => ['nullable', 'string'],
             'field' => ['required', 'string'],
             'set' => ['required', 'string'],
         ]);
 
-        $blueprint = Facades\Blueprint::find($request->blueprint);
+        try {
+            $tokenPayload = decrypt($request->token);
+        } catch (DecryptException $e) {
+            abort(403);
+        }
+
+        if (! is_array($tokenPayload)
+            || ! is_string($tokenPayload['fqh'] ?? null)
+            || ($tokenPayload['user_id'] ?? null) !== User::current()?->id()) {
+            abort(403);
+        }
+
+        $blueprint = Facades\Blueprint::find($tokenPayload['fqh']);
 
         if (! $blueprint) {
             throw new NotFoundHttpException();

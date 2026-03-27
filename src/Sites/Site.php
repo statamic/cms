@@ -4,6 +4,7 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Facades\Parse;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -117,6 +118,8 @@ class Site implements Augmentable
                 ->map(fn ($element) => $this->resolveAntlersValue($element))
                 ->all();
         }
+
+        $value = Parse::config($value);
 
         $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;

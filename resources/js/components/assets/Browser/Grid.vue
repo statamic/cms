@@ -1,5 +1,5 @@
 <template>
-    <ui-card :class="{
+    <ui-card class="asset-browser-grid" :class="{
         'space-y-8': folders.length || assets.length || creatingFolder,
         '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
     }">
@@ -102,10 +102,11 @@
                         <template #trigger>
                             <div
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
-                                :class="{
-                                    'bg-checkerboard!': asset.can_be_transparent,
-                                    'opacity-50!': draggingAsset === asset.id,
-                                }"
+                                :class="[
+                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
+                                    asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
+                                ]"
                             >
                                 <button
                                     class="size-full"
@@ -227,6 +228,8 @@ export default {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
+        showCheckerboard: { type: Boolean, default: false },
+        checkerboardMode: { type: String, default: 'transparent' },
     },
 
     data() {
