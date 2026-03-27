@@ -122,6 +122,22 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_dispatches_form_submitted_event()
+    {
+        Bus::fake();
+        Event::fake([FormSubmitted::class]);
+
+        app(SubmitForm::class)(
+            form: $this->form,
+            data: ['email' => 'test@example.com'],
+        );
+
+        Event::assertDispatched(FormSubmitted::class, function ($event) {
+            return $event->submission->get('email') === 'test@example.com';
+        });
+    }
+
+    #[Test]
     public function it_throws_silent_failure_exception_when_event_listener_returns_false()
     {
         Event::listen(FormSubmitted::class, function () {
@@ -228,6 +244,33 @@ class SubmitFormTest extends TestCase
             app(SubmitForm::class)(
                 form: $form,
                 data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+    }
+
+    #[Test]
+    public function it_removes_uploaded_assets_when_event_listener_returns_false()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads'), fn ($f) => $f->save());
+        $form->blueprint()->ensureField('email', ['type' => 'text'])->save();
+        $form->blueprint()->ensureField('avatar', ['type' => 'assets', 'container' => 'avatars'])->save();
+
+        Event::listen(FormSubmitted::class, function () {
+            return false;
+        });
+
+        try {
+            app(SubmitForm::class)(
+                form: $form,
+                data: ['email' => 'test@example.com'],
                 files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
             );
         } catch (SilentFormFailureException $e) {
