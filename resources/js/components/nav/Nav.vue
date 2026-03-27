@@ -1,13 +1,11 @@
 <script setup>
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { Badge, Button, Icon } from '@ui';
+import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
-// temp
-const page = usePage();
 const localStorageKey = 'statamic.nav';
 const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
 const navRef = ref(null);
@@ -15,13 +13,6 @@ const isMobile = ref(false);
 const collapsedByViewport = ref(false);
 let clickListenerActive = false;
 let navigateEventListener = null;
-
-// temp
-const showPrototypeNavBlock = computed(() => {
-    const path = (page.url || '').split('?')[0];
-
-    return path.endsWith('/fields');
-});
 
 onMounted(() => {
     // Check if screen is less than lg breakpoint (1024px)
@@ -47,15 +38,15 @@ onMounted(() => {
             collapsedByViewport.value = false;
         }
     };
-    
+
     mediaQuery.addEventListener('change', handleMediaChange);
-    
+
     nextTick(() => {
         watch(isOpen, (isOpen) => {
             const el = document.getElementById('main');
             el.classList.toggle('nav-closed', !isOpen);
             el.classList.toggle('nav-open', isOpen);
-            
+
             // Delay enabling the click-outside listener to avoid catching the toggle click
             if (isOpen) {
                 setTimeout(() => {
@@ -78,7 +69,7 @@ onMounted(() => {
 
     // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
-    
+
     // Close nav on mobile when navigating to a different page
     navigateEventListener = router.on('navigate', () => {
         if (isMobile.value && isOpen.value) {
@@ -86,7 +77,7 @@ onMounted(() => {
             localStorage.setItem(localStorageKey, 'closed');
         }
     });
-    
+
     onUnmounted(() => {
         document.removeEventListener('click', handleClickOutside);
         mediaQuery.removeEventListener('change', handleMediaChange);
@@ -114,7 +105,7 @@ function toggle() {
 }
 
 function handleParentClick(event, item) {
-	if (event.defaultPrevented) return;
+    if (event.defaultPrevented) return;
 
     // Prevent opening in a new tab from updating the active state.
     if (event.ctrlKey || event.metaKey || event.which === 2) return;
@@ -129,7 +120,7 @@ function handleParentClick(event, item) {
 }
 
 function handleChildClick(event, item, child) {
-	if (event.defaultPrevented) return;
+    if (event.defaultPrevented) return;
 
     // Prevent opening in a new tab from updating the active state.
     if (event.ctrlKey || event.metaKey || event.which === 2) return;
@@ -163,59 +154,42 @@ Statamic.$events.$on('nav.toggle', toggle);
 </script>
 
 <template>
-    <div class="cp-sidebar-start" :class="sidebarStartSizeClass">
-        <nav v-if="showPrototypeNavBlock" class="[&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal">
-            <ul class="px-0.5">
-                <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
-                    <ul class="grid gap-2 grid-cols-2">
-                        <li>
-                            <Button :text="__('Heading')" />
-                        </li>
-                        <li>
-                            <Button :text="__('Paragraph')" />
-                        </li>
-                    </ul>
+    <nav ref="navRef" class="nav-main">
+        <div v-for="(section, i) in nav" :key="i">
+            <div
+                class="section-title"
+                v-if="section.display !== 'Top Level'"
+                v-text="__(section.display)"
+            />
+            <ul>
+                <li v-for="(item, i) in section.items" :key="i">
+                    <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
+                    <template v-else>
+                        <component
+                            :is="shouldRenderAsInertiaLink(item) ? Link : 'a'"
+                            :href="item.url"
+                            v-bind="item.attributes"
+                            :class="{ 'active': item.active }"
+                            @click="handleParentClick($event, item)"
+                        >
+                            <Icon :name="item.icon ?? 'fieldtype-spacer'" />
+                            <span v-text="__(item.display)" />
+                        </component>
+                        <ul v-if="item.children.length && item.active">
+                            <li v-for="(child, i) in item.children" :key="i">
+                                <component
+                                    :is="shouldRenderAsInertiaLink(child) ? Link : 'a'"
+                                    :href="child.url"
+                                    v-bind="child.attributes"
+                                    v-text="__(child.display)"
+                                    :class="{ 'active': child.active }"
+                                    @click="handleChildClick($event, item, child)"
+                                />
+                            </li>
+                        </ul>
+                    </template>
                 </li>
             </ul>
-        </nav>
-        <nav v-else ref="navRef" class="cp-sidebar-nav-main">
-            <div v-for="(section, i) in nav" :key="i">
-                <div
-                    class="section-title"
-                    v-if="section.display !== 'Top Level'"
-                    v-text="__(section.display)"
-                />
-                <ul>
-                    <li v-for="(item, i) in section.items" :key="i">
-                        <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
-                        <template v-else>
-                            <component
-                                :is="shouldRenderAsInertiaLink(item) ? Link : 'a'"
-                                :href="item.url"
-                                v-bind="item.attributes"
-                                :class="{ 'active': item.active }"
-                                @click="handleParentClick($event, item)"
-                            >
-                                <Icon :name="item.icon ?? 'fieldtype-spacer'" />
-                                <span v-text="__(item.display)" />
-                            </component>
-                            <ul v-if="item.children.length && item.active">
-                                <li v-for="(child, i) in item.children" :key="i">
-                                    <component
-                                        :is="shouldRenderAsInertiaLink(child) ? Link : 'a'"
-                                        :href="child.url"
-                                        v-bind="child.attributes"
-                                        v-text="__(child.display)"
-                                        :class="{ 'active': child.active }"
-                                        @click="handleChildClick($event, item, child)"
-                                    />
-                                </li>
-                            </ul>
-                        </template>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </div>
+        </div>
+    </nav>
 </template>

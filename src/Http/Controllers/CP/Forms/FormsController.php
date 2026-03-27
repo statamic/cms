@@ -52,16 +52,6 @@ class FormsController extends CpController
             'canCreate' => User::current()->can('create', FormContract::class),
             'createUrl' => cp_route('forms.create'),
             'configureEmailUrl' => cp_route('utilities.email'),
-            'enableCpSidebarEnd' => true,
-            'cpSidebarEnd' => [
-                'title' => __('Forms'),
-                'links' => collect([
-                    User::current()->can('create', FormContract::class)
-                        ? ['text' => __('Create Form'), 'url' => cp_route('forms.create')]
-                        : null,
-                    ['text' => __('Configure Email'), 'url' => cp_route('utilities.email')],
-                ])->filter()->values(),
-            ],
         ]);
     }
 
@@ -98,19 +88,6 @@ class FormsController extends CpController
                 'downloadUrl' => $exporter->downloadUrl(),
             ])->values(),
             'redirectUrl' => cp_route('forms.index'),
-            'enableCpSidebarEnd' => true,
-            'cpSidebarEnd' => [
-                'title' => __($form->title()),
-                'links' => collect([
-                    ['text' => __('All Forms'), 'url' => cp_route('forms.index')],
-                    User::current()->can('edit', $form)
-                        ? ['text' => __('Configure Form'), 'url' => $form->editUrl()]
-                        : null,
-                    User::current()->can('configure form fields', $form)
-                        ? ['text' => __('Edit Blueprint'), 'url' => cp_route('blueprints.forms.edit', $form->handle())]
-                        : null,
-                ])->filter()->values(),
-            ],
         ]);
     }
 
@@ -152,13 +129,6 @@ class FormsController extends CpController
 
         return Inertia::render('forms/Create', [
             'submitUrl' => cp_route('forms.store'),
-            'enableCpSidebarEnd' => true,
-            'cpSidebarEnd' => [
-                'title' => __('Forms'),
-                'links' => [
-                    ['text' => __('All Forms'), 'url' => cp_route('forms.index')],
-                ],
-            ],
         ]);
     }
 

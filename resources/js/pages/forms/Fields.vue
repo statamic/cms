@@ -5,6 +5,8 @@ import { Button } from '@ui';
 const props = defineProps({
     form: Object,
 });
+
+// TODO: Tell Vue to hide the sidebar (it should act as an overlay, like on mobile)
 </script>
 
 <template>

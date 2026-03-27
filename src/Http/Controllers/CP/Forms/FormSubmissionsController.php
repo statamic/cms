@@ -94,14 +94,6 @@ class FormSubmissionsController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-            'enableCpSidebarEnd' => true,
-            'cpSidebarEnd' => [
-                'title' => __($form->title()),
-                'links' => [
-                    ['text' => __('Back to Form'), 'url' => cp_route('forms.show', $form->handle())],
-                    ['text' => __('All Forms'), 'url' => cp_route('forms.index')],
-                ],
-            ],
         ]);
     }
 }

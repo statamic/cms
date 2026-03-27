@@ -1,17 +1,11 @@
-:root {
-    --nav-width: 11.5rem;
-    --sidebar-end-width: 11.5rem;
-}
-
-/* GROUP LEFT SIDEBAR
+/* GROUP THE MAIN NAV (LEFT SIDEBAR)
 =================================================== */
-/* This class controls the layout rather than aesthetics, which is left to classes like .cp-sidebar-nav-main */
-.cp-sidebar-start {
-    @apply flex flex-col gap-6 py-6 px-2 sm:px-3 sm:pe-1 text-sm antialiased select-none;
+.nav-main {
+    @apply flex flex-col gap-6 py-6 px-2 sm:px-3 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
-    @apply overflow-y-auto fixed top-14 start-0;
-    width: var(--nav-width);
+    @apply overflow-y-auto fixed top-14 start-0 w-48;
+    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
     .page-fully-loaded & {
         /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
@@ -20,19 +14,6 @@
     /* On mobile, hide by default and overlay on top */
     z-index: var(--z-index-draggable);
     @apply lg:flex;
-}
-
-/* Optional width variants for view-specific sidebar sizing. */
-.cp-sidebar-start--large {
-    --nav-width: 30rem;
-}
-
-/* GROUP LEFT SIDEBAR / MAIN NAV
-=================================================== */
-.cp-sidebar-nav-main {
-    @apply flex flex-col gap-6;
-
-    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
 
     ul {
         @apply flex flex-col gap-0;
@@ -63,9 +44,9 @@
     }
 }
 
-/* GROUP LEFT SIDEBAR / ACTIVE STATES
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / ACTIVE STATES
 =================================================== */
-.cp-sidebar-start {
+.nav-main {
     @supports not (anchor-name: --my-anchor) {
         ul li ul li {
             a.active {
@@ -128,27 +109,26 @@
     }
 }
 
-/* GROUP LEFT SIDEBAR / MOBILE BEHAVIOR
-=================================================== */
-@media (width < theme(--breakpoint-lg)) {
-    .cp-sidebar-start {
-        /* Always visible but off-screen by default */
-        @apply flex;
-        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
-    }
 
-    .nav-open .cp-sidebar-start {
-        /* Slide in from the left */
-        @apply start-0 shadow-2xl;
-    }
+
+
+/* Mobile nav behavior */
+@media (width < theme(--breakpoint-lg)) {
+.nav-main {
+    /* Always visible but off-screen by default */
+    @apply flex;
+    @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
+}
+
+.nav-open .nav-main {
+    /* Slide in from the left */
+    @apply start-0 shadow-2xl;
+}
 }
 
 
 main {
-    padding-inline-start: 0;
-    @media (width >= theme(--breakpoint-lg)) {
-        padding-inline-start: var(--nav-width);
-    }
+    @apply ps-0 lg:ps-46;
     /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
     .page-fully-loaded & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
@@ -156,26 +136,7 @@ main {
     }
 }
 
-.cp-sidebar-end-is-open {
-    padding-inline-end: var(--sidebar-end-width);
-}
-
-.cp-sidebar-end {
-    display: block;
-    position: fixed;
-    top: 3.5rem;
-    inset-inline-end: 0;
-    bottom: 0;
-    width: var(--sidebar-end-width);
-    border-inline-start: 1px solid var(--theme-color-body-border);
-    background: var(--theme-color-body-bg);
-}
-
-.cp-sidebar-end-content {
-    @apply h-full overflow-y-auto p-2;
-}
-
-.nav-closed .cp-sidebar-start {
+.nav-closed .nav-main {
     /* Start off-screen to the left */
     @apply -start-50;
 }
@@ -183,52 +144,6 @@ main {
 main.nav-closed {
     @apply ps-0;
     @apply lg:ps-0;
-}
-
-/* GROUP RESIZABLE NAVS / RESIZE HANDLE
-=================================================== */
-.content-card-resize-handle {
-    --resize-width: 10px;
-
-    position: absolute;
-    z-index: var(--z-index-above);
-    top: 0;
-    inset-inline-start: calc(0% - var(--resize-width) / 2);
-    width: var(--resize-width);
-    height: 100%;
-    cursor: col-resize;
-    @apply hidden lg:block;
-}
-
-.cp-sidebar-end-resize-handle {
-    --resize-width: 10px;
-
-    position: absolute;
-    z-index: var(--z-index-above);
-    top: 0;
-    inset-inline-end: calc(0% - var(--resize-width) / 2);
-    width: var(--resize-width);
-    height: 100%;
-    cursor: col-resize;
-    @apply hidden lg:block;
-}
-
-.nav-resizing {
-    cursor: col-resize;
-    /* Prevents any text selection while dragging (otherwise you could end up selecting menu text while dragging the resize handle). */
-    user-select: none;
-
-    & * {
-        /* Ensures that if you move the pointer over a child element inside the nav (icons, links, spans), the cursor doesn't revert back to the default pointer/hand. */
-        cursor: col-resize;
-    }
-
-    & main,
-    & .cp-sidebar-start,
-    & .cp-sidebar-end {
-        /* Disables transitions while dragging, specifically to prevent jank/animated layout changes from the existing sidebar + main transitions in layout.css (the sidebar open/close transition and the main padding transition). */
-        transition: none;
-    }
 }
 
 /* ==========================================================================
