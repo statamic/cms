@@ -270,7 +270,7 @@ export default {
         },
 
         commit(params = {}) {
-            let { shouldCommitParent, shouldSaveRoot, shouldClose = true, shouldEmitCommitted = true } = params;
+            let { shouldCommitParent, shouldSaveRoot, shouldClose = true } = params;
 
             this.clearErrors();
 
@@ -284,10 +284,7 @@ export default {
                 })
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
-
-                    if (shouldEmitCommitted) {
-                        this.$emit('committed', response.data, this.editedFields);
-                    }
+                    this.$emit('committed', response.data, this.editedFields);
 
                     if (shouldCommitParent && this.commitParentField) {
 						this.$nextTick(() => {
