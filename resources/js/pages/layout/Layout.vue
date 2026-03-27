@@ -33,21 +33,15 @@ let navigationListener = null;
 
 // Resizable sidebar (handle lives on the left edge of the content card)
 const page = usePage();
+const isEditingForm = computed(() => page.url.includes('/forms/'));
 
-const navWidthStorageKey = computed(() => {
-    // if (page.url.includes('/forms/')) {
-    //     return 'statamic.nav.width.forms';
-    // }
-
-    return 'statamic.nav.width';
-});
-
-watch(navWidthStorageKey, () => restoreSavedNavWidth());
-
-const minNavWidth = 150;
-const maxNavWidth = 400;
+const navWidthStorageKey = computed(() => isEditingForm.value ? 'statamic.nav.width.forms' : 'statamic.nav.width');
+const minNavWidth = computed(() => isEditingForm.value ? 480 : 150);
+const maxNavWidth = computed(() => isEditingForm.value ? 1000 : 300);
 const mainContentRef = useTemplateRef('mainContent');
 const contentCardRef = useTemplateRef('contentCard');
+
+watch(navWidthStorageKey, restoreSavedNavWidth);
 
 let isResizing = false;
 let currentWidthPx = null;
@@ -56,7 +50,7 @@ let pointerMoveListener = null;
 let pointerUpListener = null;
 
 function clampNavWidthPx(widthPx) {
-    return Math.min(Math.max(widthPx, minNavWidth), maxNavWidth);
+    return Math.min(Math.max(widthPx, minNavWidth.value), maxNavWidth.value);
 }
 
 function setNavWidthPx(widthPx) {
