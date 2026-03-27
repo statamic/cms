@@ -192,7 +192,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choices</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choice</h2>
                     <ul class="grid gap-2 grid-cols-2">
                         <li>
                             <Button :text="__('Dropdown')" icon="fieldtype-select" />
@@ -205,6 +205,48 @@ Statamic.$events.$on('nav.toggle', toggle);
                         </li>
                         <li>
                             <Button :text="__('Toggle')" icon="fieldtype-toggle" />
+                        </li>
+                        <li>
+                            <Button :text="__('Star Rating')" icon="star" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Number</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Number')" icon="number" />
+                        </li>
+                        <li>
+                            <Button :text="__('Currency')" icon="currency" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Date and Time</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Date Picker')" icon="calendar" />
+                        </li>
+                        <li>
+                            <Button :text="__('Time Picker')" icon="time-clock" />
+                        </li>
+                        <li>
+                            <Button :text="__('Range')" icon="calendar-range" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Name')" icon="user-avatar-flush" />
+                        </li>
+                        <li>
+                            <Button :text="__('Phone')" icon="mail-sign-hashtag" />
+                        </li>
+                        <li>
+                            <Button :text="__('Email')" icon="mail-sign-at" />
                         </li>
                     </ul>
                 </li>

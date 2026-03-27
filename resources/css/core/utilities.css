@@ -359,9 +359,9 @@
         position: absolute;
         top: var(--graph-paper-y-offset);
         z-index: var(--z-index-below);
-        opacity: 0.8;
+        opacity: 0.7;
         width: calc(100% - 2px);
-        height: 100%;
+        height: calc(100% - var(--graph-paper-y-offset));
 
         /* https://css-pattern.com/graph-paper/ */
         /* control the size */
