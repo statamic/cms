@@ -34,7 +34,7 @@ class SubmitForm
         $uploadedAssets = [];
         $files = $this->normalizeFiles($form, $files);
 
-        $this->withLocale($site->lang(), fn () => static::validator($form, $data, $files)->validate());
+        $this->withLocale($site->lang(), fn () => $this->validator($form, $data, $files)->validate());
 
         $submission = $form->makeSubmission();
 
@@ -72,18 +72,18 @@ class SubmitForm
         return $submission;
     }
 
-    public static function validator(Form $form, array $data, array $files = []): Validator
+    public function validator(Form $form, array $data, array $files = []): Validator
     {
         $values = array_merge($data, $files);
         $fields = $form->blueprint()->fields()->addValues($values);
 
         return $fields
             ->validator()
-            ->withRules(static::extraRules($fields))
+            ->withRules($this->extraRules($fields))
             ->validator();
     }
 
-    private static function extraRules($fields): array
+    private function extraRules($fields): array
     {
         return $fields->all()
             ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')

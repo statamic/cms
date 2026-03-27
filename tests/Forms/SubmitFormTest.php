@@ -188,7 +188,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_creates_a_validator()
     {
-        $validator = SubmitForm::validator(
+        $validator = app(SubmitForm::class)->validator(
             form: $this->form,
             data: ['name' => 'Test'],
         );
@@ -200,7 +200,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function validator_passes_with_valid_data()
     {
-        $validator = SubmitForm::validator(
+        $validator = app(SubmitForm::class)->validator(
             form: $this->form,
             data: ['email' => 'test@example.com'],
         );
