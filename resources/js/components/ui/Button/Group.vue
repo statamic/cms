@@ -38,6 +38,8 @@ const needsOverflowObserver = computed(() => props.overflow === 'stack' || props
 const measuringOverflow = ref(false);
 
 const groupClasses = computed(() => {
+    const groupShadow = 'rounded-lg shadow-ui-sm [&_[data-ui-group-target]]:shadow-none';
+
     const collapseHorizontally = [
         '[&>[data-ui-group-target]:not(:first-child):not(:last-child)]:rounded-none',
         '[&>:not(:first-child):not(:last-child)_[data-ui-group-target]]:rounded-none',
@@ -65,7 +67,6 @@ const groupClasses = computed(() => {
         base: [
             'group/button inline-flex flex-wrap relative',
             'dark:[&_button]:ring-0',
-            'rounded-lg shadow-ui-sm [&_[data-ui-group-target]]:shadow-none',
         ],
         variants: {
             orientation: {
@@ -76,11 +77,11 @@ const groupClasses = computed(() => {
             },
         },
         compoundVariants: [
-            { overflow: 'stack', hasOverflow: false, class: collapseHorizontally },
-            { overflow: 'stack', hasOverflow: true, class: collapseVertically },
+            { overflow: 'stack', hasOverflow: false, class: [...collapseHorizontally, groupShadow] },
+            { overflow: 'stack', hasOverflow: true, class: [...collapseVertically, groupShadow] },
             { overflow: 'gap', hasOverflow: true, class: 'gap-1' },
-            { overflow: 'gap', hasOverflow: false, class: collapseHorizontally },
-            { overflow: null, orientation: 'horizontal', gap: false, class: collapseHorizontally },
+            { overflow: 'gap', hasOverflow: false, class: [...collapseHorizontally, groupShadow] },
+            { overflow: null, orientation: 'horizontal', gap: false, class: [...collapseHorizontally, groupShadow] },
         ],
     })({
         gap: props.gap,
