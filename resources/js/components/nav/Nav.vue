@@ -206,8 +206,19 @@ Statamic.$events.$on('nav.toggle', toggle);
                         <li>
                             <Button :text="__('Toggle')" icon="fieldtype-toggle" />
                         </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Rate</h2>
+                    <ul class="grid gap-2 grid-cols-2">
                         <li>
                             <Button :text="__('Star Rating')" icon="star" />
+                        </li>
+                        <li>
+                            <Button :text="__('Ranking')" icon="rank" />
+                        </li>
+                        <li>
+                            <Button :text="__('Opinion Scale')" icon="scale-up" />
                         </li>
                     </ul>
                 </li>
@@ -243,10 +254,33 @@ Statamic.$events.$on('nav.toggle', toggle);
                             <Button :text="__('Name')" icon="user-avatar-flush" />
                         </li>
                         <li>
+                            <Button :text="__('Email')" icon="mail-sign-at" />
+                        </li>
+                        <li>
+                            <Button :text="__('Website')" icon="website" />
+                        </li>
+                        <li>
                             <Button :text="__('Phone')" icon="mail-sign-hashtag" />
                         </li>
                         <li>
-                            <Button :text="__('Email')" icon="mail-sign-at" />
+                            <Button :text="__('Address')" icon="location-pin" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Media</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Image Choice')" icon="image-select" />
+                        </li>
+                        <li>
+                            <Button :text="__('Video')" icon="video" />
+                        </li>
+                        <li>
+                            <Button :text="__('Audio')" icon="media-music-sound-equalizer" />
+                        </li>
+                        <li>
+                            <Button :text="__('Upload')" icon="upload-arrow-up" />
                         </li>
                     </ul>
                 </li>
