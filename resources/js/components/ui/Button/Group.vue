@@ -99,7 +99,8 @@ let resizeObserver = null;
 async function checkOverflow() {
     if (!group.value?.children.length) return;
 
-    // Enter measuring mode: force horizontal wrap
+    // Measure in collapsed state to avoid hysteresis from gap spacing
+    hasOverflow.value = false;
     measuringOverflow.value = true;
     await nextTick();
 
