@@ -7,7 +7,7 @@
         <template #actions>
             <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
             <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" />
-            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllTooltipText" />
+            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllShortcutLabel" />
             <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
     </StackHeader>
@@ -197,10 +197,6 @@ export default {
             return this.isInsideSet || this.isInsideConfigFields;
         },
 
-        saveAllTooltipText() {
-            return this.saveAllShortcutLabel;
-        },
-
         saveAllShortcutLabel() {
             const platform = typeof navigator !== 'undefined'
                 ? (navigator.userAgentData?.platform || navigator.platform || '')
@@ -326,13 +322,13 @@ export default {
         // Nested field: saves and closes only the current stack.
         commitAndSaveTopStack() {
             this.commit({
-                shouldSaveRoot: true,
+                shouldSaveRoot: !this.isNestedField,
             });
         },
 
         softSave() {
             this.commit({
-                shouldSaveRoot: true,
+                shouldSaveRoot: !this.isNestedField,
                 shouldClose: false,
             });
         },
