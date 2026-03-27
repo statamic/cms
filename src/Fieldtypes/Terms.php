@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
@@ -244,8 +245,13 @@ class Terms extends Relationship
                     $id = $this->createTermFromString($id, $taxonomy);
                 }
 
+                if (! $id) {
+                    return null;
+                }
+
                 return explode('::', $id, 2)[1];
             })
+                ->filter()
                 ->unique()
                 ->values()
                 ->all();
@@ -282,6 +288,8 @@ class Terms extends Relationship
             return collect();
         }
 
+        $this->authorizeTaxonomyAccess($this->getConfiguredTaxonomies());
+
         $query = $this->getIndexQuery($request);
 
         if ($sort = $this->getSortColumn($request)) {
@@ -289,6 +297,18 @@ class Terms extends Relationship
         }
 
         return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+    }
+
+    private function authorizeTaxonomyAccess(array $taxonomies): void
+    {
+        $user = User::current();
+
+        $authorizedTaxonomies = collect($taxonomies)
+            ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
+            ->filter()
+            ->filter(fn ($taxonomy) => $user->can('view', $taxonomy));
+
+        throw_if($authorizedTaxonomies->isEmpty(), new AuthorizationException);
     }
 
     public function getResourceCollection($request, $items)
@@ -305,9 +325,13 @@ class Terms extends Relationship
 
     protected function getFirstTaxonomyFromRequest($request)
     {
-        return $request->taxonomies
-            ? Facades\Taxonomy::findByHandle($request->taxonomies[0])
-            : Facades\Taxonomy::all()->first();
+        $taxonomies = $this->getConfiguredTaxonomies();
+
+        $taxonomy = Taxonomy::findByHandle($taxonomyHandle = Arr::first($taxonomies));
+
+        throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
+
+        return $taxonomy;
     }
 
     public function getSortColumn($request)
@@ -416,10 +440,15 @@ class Terms extends Relationship
     protected function getIndexQuery($request)
     {
         $query = Term::query();
+        $user = User::current();
 
-        if ($taxonomies = $request->taxonomies) {
-            $query->whereIn('taxonomy', $taxonomies);
-        }
+        $taxonomies = collect($this->getConfiguredTaxonomies())
+            ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
+            ->filter(fn ($taxonomy) => $taxonomy && $user->can('view', $taxonomy))
+            ->map->handle()
+            ->all();
+
+        $query->whereIn('taxonomy', $taxonomies);
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');
@@ -472,9 +501,15 @@ class Terms extends Relationship
         $slug = Str::slug($string, '-', $lang);
 
         if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            $taxonomy = Facades\Taxonomy::findByHandle($taxonomy);
+
+            if (User::current()->cant('create', [TermContract::class, $taxonomy])) {
+                return null;
+            }
+
             $term = Facades\Term::make()
                 ->slug($slug)
-                ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
+                ->taxonomy($taxonomy)
                 ->set('title', $string);
 
             $term->save();

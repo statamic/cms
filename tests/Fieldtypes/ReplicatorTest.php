@@ -803,10 +803,15 @@ class ReplicatorTest extends TestCase
         Facades\Blueprint::partialMock();
         Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
         $response = $this
-            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->actingAs($user)
             ->postJson(cp_route('replicator-fieldtype.set'), [
-                'blueprint' => 'collections.pages.default',
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
                 'field' => 'content',
                 'set' => 'text',
             ])
@@ -913,10 +918,15 @@ class ReplicatorTest extends TestCase
         Facades\Blueprint::partialMock();
         Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
         $response = $this
-            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->actingAs($user)
             ->postJson(cp_route('replicator-fieldtype.set'), [
-                'blueprint' => 'collections.pages.default',
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
                 'field' => 'page_builder.article.bard_field.cards.cards',
                 'set' => 'card',
             ])
@@ -1006,10 +1016,15 @@ class ReplicatorTest extends TestCase
         Facades\Blueprint::partialMock();
         Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
         $response = $this
-            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->actingAs($user)
             ->postJson(cp_route('replicator-fieldtype.set'), [
-                'blueprint' => 'collections.pages.default',
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
                 'field' => 'page_builder.cards_slider.cards_slider.slider.cards',
                 'set' => 'card',
             ])
@@ -1086,10 +1101,15 @@ class ReplicatorTest extends TestCase
         Facades\Blueprint::partialMock();
         Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
         $response = $this
-            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->actingAs($user)
             ->postJson(cp_route('replicator-fieldtype.set'), [
-                'blueprint' => 'collections.pages.default',
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
                 'field' => 'page_builder.cards_slider.cards_slider.cards',
                 'set' => 'card',
             ])
@@ -1138,10 +1158,15 @@ class ReplicatorTest extends TestCase
         Facades\Blueprint::partialMock();
         Facades\Blueprint::shouldReceive('find')->with('collections.pages.default')->andReturn($blueprint);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
         $response = $this
-            ->actingAs(tap(Facades\User::make()->makeSuper())->save())
+            ->actingAs($user)
             ->postJson(cp_route('replicator-fieldtype.set'), [
-                'blueprint' => 'collections.pages.default',
+                'token' => encrypt([
+                    'fqh' => 'collections.pages.default',
+                    'user_id' => $user->id(),
+                ]),
                 'field' => 'content',
                 'set' => 'video',
             ])

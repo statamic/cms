@@ -204,6 +204,49 @@ class StoreEntryTest extends TestCase
     }
 
     #[Test]
+    public function date_is_saved_correctly_when_app_timezone_is_utc()
+    {
+        config()->set('app.timezone', 'UTC');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z'])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertStringContainsString('2026-03-23-1630.my-entry.md', $entry->buildPath());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/14251
+     **/
+    #[Test]
+    public function date_is_saved_correctly_when_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z']) // 16:30 UTC is 17:30 in Zurich
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertStringContainsString('2026-03-23-1730.my-entry.md', $entry->buildPath()); // Should be saved in Europe/Zurich, so 17:30.
+    }
+
+    #[Test]
     public function it_can_validate_against_published_value()
     {
         [$user, $collection] = $this->seedUserAndCollection();

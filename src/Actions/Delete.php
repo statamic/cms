@@ -86,7 +86,15 @@ class Delete extends Action
             }
         }
 
-        return trans_choice('Item deleted|Items deleted', $total);
+        $ids = $items
+            ->map(fn ($item) => method_exists($item, 'id') ? $item->id() : null)
+            ->filter()
+            ->values();
+
+        return [
+            'message' => trans_choice('Item deleted|Items deleted', $total),
+            'callback' => $ids->isNotEmpty() ? ['removeFromSelections', $ids] : null,
+        ];
     }
 
     public function redirect($items, $values)

@@ -8,12 +8,14 @@ import './theme.css';
 import {translate} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
+import NumberFormatter from '@/components/NumberFormatter';
 import cleanCodeSnippet from './clean-code-snippet';
 import PortalVue from 'portal-vue';
 import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
 import Portal from '@/components/portals/Portal.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import {keys, portals, slug, stacks} from '@api';
+import useGlobalEventBus from '@/composables/global-event-bus';
 
 // Intercept Inertia navigation and log to Actions tab.
 router.on('before', (event) => {
@@ -36,6 +38,9 @@ setup(async (app) => {
                       lang: 'en',
                   }],
                   selectedSite: 'default',
+                  lang: 'en',
+                  asciiReplaceExtraSymbols: false,
+                  charmap: { currency: {}, currency_short: {} },
               };
 
               return config[key] ?? null;
@@ -46,6 +51,7 @@ setup(async (app) => {
               //
           }
       },
+      $events: useGlobalEventBus(),
       $progress: {
           loading(name, loading) {
               //
@@ -58,6 +64,7 @@ setup(async (app) => {
 
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.$date = new DateFormatter;
+  app.config.globalProperties.$number = new NumberFormatter;
   app.config.globalProperties.cp_url = (url) => url;
   app.config.globalProperties.$portals = portals;
   app.config.globalProperties.$stacks = stacks;

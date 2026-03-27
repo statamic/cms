@@ -198,6 +198,8 @@ return [
     'phpinfo_utility_description' => 'Check PHP configuration settings and installed modules.',
     'plus_count_more' => '+ :count more',
     'preference_confirm_dirty_navigation_instructions' => 'Whether you should get a warning when trying to leave the page when there are unsaved changes.',
+    'preference_formatting_locale_invalid' => 'Please enter a valid locale code.',
+    'preference_formatting_locale_instructions' => 'The locale used for formatting values in the control panel, such as dates and numbers.',
     'preference_locale_instructions' => 'The preferred language for the control panel.',
     'preference_start_page_instructions' => 'The page to be shown when logging into the control panel.',
     'preference_strict_accessibility_instructions' => 'We\'ve designed the control panel with accessibility in mind, aiming to meet WCAG 2.2 guidelines where possible. Enable this option to apply stricter accessibility rules by increasing form border contrast.',

@@ -1,5 +1,5 @@
 <template>
-    <Badge v-if="count" :text="String(count)" :color="critical ? 'red' : 'amber'" size="sm" pill />
+    <Badge v-if="count" :text="String(count)" :color="security ? 'red' : 'amber'" size="sm" pill />
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import { ref } from 'vue';
 import { Badge } from '@/components/ui';
 
 const countRef = ref(null);
-const criticalRef = ref(false);
+const securityRef = ref(false);
 const requested = ref(false);
 
 export default {
@@ -19,8 +19,8 @@ export default {
         count() {
             return countRef.value;
         },
-        critical() {
-            return criticalRef.value;
+        security() {
+            return securityRef.value;
         },
     },
 
@@ -36,7 +36,7 @@ export default {
                 .get(cp_url('updater/count'))
                 .then((response) => {
                     countRef.value = response.data?.count ?? 0;
-                    criticalRef.value = response.data?.critical ?? false;
+                    securityRef.value = response.data?.security ?? false;
                 });
 
             requested.value = true;
