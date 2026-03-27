@@ -1,9 +1,11 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** The element or component this component should render as */
@@ -35,6 +37,7 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
 });
 
+const attrs = useAttrs();
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
@@ -109,13 +112,19 @@ const buttonClasses = computed(() => {
         iconOnly: iconOnly.value,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, attrs.class);
+});
+
+const restAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
 });
 </script>
 
 <template>
     <component
         :is="tag"
+        v-bind="restAttrs"
         :class="buttonClasses"
         :disabled="disabled || loading"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
