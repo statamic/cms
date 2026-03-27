@@ -24,7 +24,7 @@ class FormController extends Controller
      *
      * @return mixed
      */
-    public function submit(Request $request, $form)
+    public function submit(Request $request, $form, SubmitForm $submitForm)
     {
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $this->validateContentType($request, $form);
@@ -34,7 +34,7 @@ class FormController extends Controller
             ->all();
 
         try {
-            $submission = app(SubmitForm::class)->submit(
+            $submission = $submitForm->submit(
                 form: $form,
                 data: $request->all(),
                 files: $request->allFiles(),
