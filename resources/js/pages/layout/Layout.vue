@@ -6,10 +6,9 @@ import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import Tooltips from '@/components/Tooltips.vue';
-import { provide, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { provide, watch, ref, onMounted, onUnmounted, nextTick, computed } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
-import useStatamicPageProps from '@/composables/page-props.js';
 import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
 
 useBodyClasses('bg-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
@@ -33,7 +32,18 @@ provide('layout', {
 let navigationListener = null;
 
 // Resizable sidebar (handle lives on the left edge of the content card)
-const navWidthStorageKey = 'statamic.nav.width';
+const page = usePage();
+
+const navWidthStorageKey = computed(() => {
+    // if (page.url.includes('/forms/')) {
+    //     return 'statamic.nav.width.forms';
+    // }
+
+    return 'statamic.nav.width';
+});
+
+watch(navWidthStorageKey, () => restoreSavedNavWidth());
+
 const MIN_NAV_WIDTH = 150;
 const MAX_NAV_WIDTH = 400;
 const mainContentRef = ref(null);
@@ -54,11 +64,18 @@ function setNavWidthPx(widthPx) {
 }
 
 function restoreSavedNavWidth() {
-    const saved = localStorage.getItem(navWidthStorageKey);
-    if (!saved) return;
+    const saved = localStorage.getItem(navWidthStorageKey.value);
+
+    if (!saved) {
+        document.documentElement.style.removeProperty('--nav-width');
+        return;
+    }
 
     const widthPx = Number(saved);
-    if (!Number.isFinite(widthPx)) return;
+    if (!Number.isFinite(widthPx)) {
+        document.documentElement.style.removeProperty('--nav-width');
+        return;
+    }
 
     setNavWidthPx(clampNavWidthPx(widthPx));
 }
@@ -75,7 +92,7 @@ function stopResize({ persist = true } = {}) {
     pointerUpListener = null;
 
     if (persist && currentWidthPx !== null) {
-        localStorage.setItem(navWidthStorageKey, Math.round(currentWidthPx));
+        localStorage.setItem(navWidthStorageKey.value, Math.round(currentWidthPx));
     }
 
     currentWidthPx = null;
@@ -116,7 +133,7 @@ function startResize(event) {
 
 function resetNavWidth() {
     stopResize({ persist: false });
-    localStorage.removeItem(navWidthStorageKey);
+    localStorage.removeItem(navWidthStorageKey.value);
     document.documentElement.style.removeProperty('--nav-width');
 }
 
