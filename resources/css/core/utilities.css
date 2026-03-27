@@ -331,6 +331,54 @@
     }
 }
 
+/* UTILITIES / DECORATION / GRAPH PAPER
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/forms/ > editing experience
+
+    What does it do?
+    ----------------
+    - Add a background image of graph paper to the element.
+
+*/
+/* HTML Example...
+
+    <div class="content-card bg-graph-paper"> <-- background graph paper added to this element
+    </div>
+
+*/
+@utility bg-graph-paper {
+    position: relative;
+
+    &::before {
+        border-radius: inherit;
+        content: '';
+        position: absolute;
+        top: var(--graph-paper-y-offset);
+        z-index: var(--z-index-below);
+        opacity: 0.7;
+        width: calc(100% - 2px);
+        height: calc(100% - var(--graph-paper-y-offset));
+
+        /* https://css-pattern.com/graph-paper/ */
+        /* control the size */
+        --s: 120px;
+        --c1: var(--color-gray-200);
+        --c2: transparent;
+        --_g: #0000 90deg,var(--c1) 0;
+        background:
+          conic-gradient(from 90deg at 1px 1px,var(--_g)),
+          conic-gradient(from 90deg at 1px 1px,var(--_g)),
+          var(--c2);
+        background-size: var(--s) var(--s), calc(var(--s)/5) calc(var(--s)/5);
+        /* Effectively remove the border */
+        background-position: -1px;
+    }
+}
+
 /* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
 
