@@ -165,7 +165,7 @@ Statamic.$events.$on('nav.toggle', toggle);
 <template>
     <div class="cp-sidebar-start" :class="sidebarStartSizeClass">
         <nav v-if="showPrototypeNavBlock" style="--graph-paper-y-offset: 2.5rem;" class="bg-graph-paper [&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
-            <ul class="px-0.5 grid gap-6">
+            <ul class="px-0.5 grid gap-8">
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
                     <ul class="grid gap-2 grid-cols-2">
@@ -181,16 +181,30 @@ Statamic.$events.$on('nav.toggle', toggle);
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Content</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Text</h2>
                     <ul class="grid gap-2 grid-cols-2">
                         <li>
-                            <Button :text="__('Heading')" icon="heading" />
+                            <Button :text="__('Short Answer')" icon="text-short" />
                         </li>
                         <li>
-                            <Button :text="__('Paragraph')" icon="text-long" />
+                            <Button :text="__('Long Answer')" icon="text-long" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choices</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Dropdown')" icon="fieldtype-select" />
                         </li>
                         <li>
-                            <Button :text="__('Banner')" icon="banner" />
+                            <Button :text="__('Multi Choice')" icon="fieldtype-radio" />
+                        </li>
+                        <li>
+                            <Button :text="__('Checkboxes')" icon="fieldtype-checkboxes" />
+                        </li>
+                        <li>
+                            <Button :text="__('Toggle')" icon="fieldtype-toggle" />
                         </li>
                     </ul>
                 </li>
