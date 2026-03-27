@@ -9,6 +9,7 @@ import {
 	Stack,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
+import { dateFormatter } from '@/api';
 import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
@@ -41,7 +42,16 @@ function removeFieldFilter(filterHandle, fieldHandle) {
 
 function getFieldFilterBadgeLabel(handle, badge) {
     if (handle === 'date') {
-        return [badge.field, badge.translatedOperator].filter(Boolean).join(' ');
+        const df = dateFormatter.options('date');
+        const parts = [badge.field, badge.translatedOperator];
+
+        if (badge.operator === 'between') {
+            parts.push(df.date(badge.value.start), __('and'), df.date(badge.value.end));
+        } else {
+            parts.push(df.date(badge.value));
+        }
+
+        return parts.filter(Boolean).join(' ');
     }
 
     return badge;
@@ -191,22 +201,7 @@ function handleStackClosed() {
             class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
             :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
         >
-            <div class="flex items-center gap-1.5 whitespace-nowrap">
-                <template v-if="handle == 'date'">
-                    {{ badge.field }}
-                    {{ badge.translatedOperator }}
-                    <template v-if="badge.operator === 'between'">
-                        <date-time :of="badge.value.start" options="date" />
-                        {{ __('and') }}
-                        <date-time :of="badge.value.end" options="date" />
-                    </template>
-                    <date-time v-else :of="badge.value" options="date" />
-                </template>
-
-                <template v-else>
-                    {{ badge }}
-                </template>
-            </div>
+            <span class="whitespace-nowrap" v-text="getFieldFilterBadgeLabel(handle, badge)" />
 
             <Button
                 v-if="!reorderable"
