@@ -6,6 +6,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
+// temp
+const page = usePage();
 const localStorageKey = 'statamic.nav';
 const isOpen = ref(localStorage.getItem(localStorageKey) !== 'closed');
 const navRef = ref(null);
@@ -13,6 +15,13 @@ const isMobile = ref(false);
 const collapsedByViewport = ref(false);
 let clickListenerActive = false;
 let navigateEventListener = null;
+
+// temp
+const showPrototypeNavBlock = computed(() => {
+    const path = (page.url || '').split('?')[0];
+
+    return path.endsWith('/fields');
+});
 
 onMounted(() => {
     // Check if screen is less than lg breakpoint (1024px)
@@ -155,7 +164,7 @@ Statamic.$events.$on('nav.toggle', toggle);
 
 <template>
     <div class="cp-sidebar-start" :class="sidebarStartSizeClass">
-        <nav class="[&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal">
+        <nav v-if="showPrototypeNavBlock" class="[&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal">
             <ul class="px-0.5">
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
@@ -170,7 +179,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
             </ul>
         </nav>
-        <nav ref="navRef" class="cp-sidebar-nav-main">
+        <nav v-else ref="navRef" class="cp-sidebar-nav-main">
             <div v-for="(section, i) in nav" :key="i">
                 <div
                     class="section-title"
