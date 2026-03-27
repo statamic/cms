@@ -61,14 +61,14 @@ function restoreSavedNavWidth() {
     const saved = localStorage.getItem(navWidthStorageKey.value);
 
     if (!saved) {
-        document.documentElement.style.removeProperty('--nav-width');
+        setNavWidthPx(minNavWidth.value);
         return;
     }
 
     const widthPx = Number(saved);
 
     if (!Number.isFinite(widthPx)) {
-        document.documentElement.style.removeProperty('--nav-width');
+        setNavWidthPx(minNavWidth.value);
         return;
     }
 
@@ -129,7 +129,7 @@ function startResize(event) {
 function resetNavWidth() {
     stopResize({ persist: false });
     localStorage.removeItem(navWidthStorageKey.value);
-    document.documentElement.style.removeProperty('--nav-width');
+    setNavWidthPx(minNavWidth.value);
 }
 
 function focusMain() {
