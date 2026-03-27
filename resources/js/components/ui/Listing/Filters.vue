@@ -188,7 +188,8 @@ function handleStackClosed() {
             variant="filled"
             v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
             :key="`${filter}-${handle}`"
-            class="cursor-default ps-4 pe-2 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
         >
             <div class="flex items-center gap-1.5 whitespace-nowrap">
                 <template v-if="handle == 'date'">
@@ -224,7 +225,8 @@ function handleStackClosed() {
             variant="filled"
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"
-            class="cursor-default ps-4 pe-2 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
         >
             <span class="whitespace-nowrap">{{ badge }}</span>
             <Button
