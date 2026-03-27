@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
-use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Scope;
@@ -191,6 +190,8 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
+        $blueprint = $this->editFormBlueprint($form);
+
         $values = array_merge($form->data()->all(), [
             'handle' => $form->handle(),
             'title' => __($form->title()),
@@ -199,11 +200,18 @@ class FormsController extends CpController
             'email' => $form->email(),
         ]);
 
-        return PublishForm::make($this->editFormBlueprint($form))
-            ->title(__('Configure Form'))
-            ->values($values)
-            ->asConfig()
-            ->submittingTo(cp_route('forms.update', $form->handle()));
+        $fields = $blueprint
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        return Inertia::render('forms/Edit', [
+            'form' => $form,
+            'blueprint' => $blueprint->toPublishArray(),
+            'initialValues' => $fields->values(),
+            'initialMeta' => $fields->meta(),
+            'action' => cp_route('forms.update', $form->handle()),
+        ]);
     }
 
     public function update($form, Request $request)

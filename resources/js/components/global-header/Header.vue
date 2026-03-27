@@ -18,11 +18,13 @@ import UserDropdown from './UserDropdown.vue';
             {{ __('Skip to content') }}
         </a>
         <div
-            class="dark flex items-center gap-3.5 [&:has(img)]:gap-3 text-[0.8125rem] text-white/85 w-full"
+            class="dark flex-1 min-w-0 flex items-center gap-3.5 [&:has(img)]:gap-3 text-[0.8125rem] text-white/85"
         >
             <Logo />
             <Breadcrumbs />
         </div>
+
+        <div id="global-header-slot" class="flex items-center justify-center" />
 
         <div class="dark flex-1 flex gap-1 md:gap-2 lg:gap-2 sm:gap-3 items-center justify-end shrink-0">
             <SiteSelector />
