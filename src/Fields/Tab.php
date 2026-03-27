@@ -110,7 +110,9 @@ class Tab
             $bufferedFields = [];
 
             foreach ($fields as $field) {
-                if (! $this->isSectionedFieldsetImport($field)) {
+                $importedFieldset = $this->sectionedFieldsetImport($field);
+
+                if (! $importedFieldset) {
                     $bufferedFields[] = $field;
 
                     continue;
@@ -121,9 +123,7 @@ class Tab
                     $bufferedFields = [];
                 }
 
-                $importedSections = FieldsetRepository::find($field['import'])->sections();
-
-                foreach ($importedSections as $importedSection) {
+                foreach ($importedFieldset->sections() as $importedSection) {
                     $carry->push($this->toImportedPublishSection($importedSection, $field));
                 }
             }
@@ -136,19 +136,19 @@ class Tab
         }, collect())->all();
     }
 
-    private function isSectionedFieldsetImport(array $field): bool
+    private function sectionedFieldsetImport(array $field): ?Fieldset
     {
         if (! isset($field['import'])) {
-            return false;
+            return null;
         }
 
         if (($field['section_behavior'] ?? 'preserve') === 'flatten') {
-            return false;
+            return null;
         }
 
         $fieldset = FieldsetRepository::find($field['import']);
 
-        return $fieldset && $fieldset->hasSections();
+        return $fieldset && $fieldset->hasSections() ? $fieldset : null;
     }
 
     private function toImportedPublishSection(array $section, array $import): array
