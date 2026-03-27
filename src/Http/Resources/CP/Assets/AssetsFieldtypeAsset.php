@@ -13,7 +13,7 @@ class AssetsFieldtypeAsset extends JsonResource
     public function toArray($request)
     {
         $data = [
-            'id' => $this->resource->id,
+            'id' => $this->id(),
             'basename' => $this->basename(),
             'extension' => $this->extension(),
             'size' => Str::fileSizeForHumans($this->size()),
