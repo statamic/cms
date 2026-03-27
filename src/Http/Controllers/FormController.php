@@ -15,6 +15,7 @@ use Statamic\Forms\SubmitForm;
 use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class FormController extends Controller
 {
@@ -48,7 +49,7 @@ class FormController extends Controller
         }
     }
 
-    private function validateContentType($request, $form)
+    private function validateContentType($request, $form): void
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
@@ -57,15 +58,7 @@ class FormController extends Controller
         }
     }
 
-    /**
-     * The steps for a failed form submission.
-     *
-     * @param  array  $params
-     * @param  array  $errors
-     * @param  string  $form
-     * @return Response|RedirectResponse
-     */
-    private function formFailure($params, $errors, $form)
+    private function formFailure(array $params, array $errors, string $form): Response|RedirectResponse
     {
         $request = request();
 
@@ -91,17 +84,7 @@ class FormController extends Controller
         return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 
-    /**
-     * The steps for a successful form submission.
-     *
-     * Used for actual success and by honeypot.
-     *
-     * @param  array  $params
-     * @param  Submission  $submission
-     * @param  bool  $silentFailure
-     * @return Response
-     */
-    private function formSuccess($params, $submission, $silentFailure = false)
+    private function formSuccess(array $params, Submission $submission, bool $silentFailure = false): Response|RedirectResponse
     {
         $redirect = $this->formSuccessRedirect($params, $submission);
 
@@ -125,7 +108,7 @@ class FormController extends Controller
         return $response;
     }
 
-    private function formSuccessRedirect($params, $submission)
+    private function formSuccessRedirect(array $params, Submission $submission): ?string
     {
         if ($redirect = Form::getSubmissionRedirect($submission)) {
             return $redirect;
