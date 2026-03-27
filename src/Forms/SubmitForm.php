@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
@@ -17,18 +18,23 @@ use Statamic\Support\Arr;
 
 class SubmitForm
 {
+    use Localizable;
+
     public function submit(
         Form $form,
         array $data = [],
         array $files = [],
         ?Site $site = null,
     ): Submission {
-        $uploadedAssets = [];
-
         $values = array_merge($data, $files);
         $fields = $form->blueprint()->fields();
         $fields = $fields->addValues($values);
         $site = $site ?? Facades\Site::default();
+
+        $uploadedAssets = [];
+        $files = $this->normalizeFiles($form, $files);
+
+        $this->withLocale($site->lang(), fn () => static::validator($form, $data, $files)->validate());
 
         $submission = $form->makeSubmission();
 
@@ -85,6 +91,27 @@ class SubmitForm
                 return [$field->handle().'.*' => ['file', new AllowedFile]];
             })
             ->all();
+    }
+
+    /**
+     * Normalize uploaded files to arrays.
+     *
+     * The assets fieldtype expects arrays, even for `max_files: 1`,
+     * but we don't want to force that on the front end.
+     */
+    protected function normalizeFiles(Form $form, array $files): array
+    {
+        $assetFields = $form->blueprint()->fields()->all()
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']))
+            ->keys();
+
+        foreach ($assetFields as $handle) {
+            if (isset($files[$handle])) {
+                $files[$handle] = Arr::wrap($files[$handle]);
+            }
+        }
+
+        return $files;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
@@ -12,7 +13,6 @@ use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SubmitForm;
-use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,7 +24,7 @@ class FormController extends Controller
      *
      * @return mixed
      */
-    public function submit(FrontendFormRequest $request, $form)
+    public function submit(Request $request, $form)
     {
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $this->validateContentType($request, $form);
@@ -37,7 +37,7 @@ class FormController extends Controller
             $submission = app(SubmitForm::class)->submit(
                 form: $form,
                 data: $request->all(),
-                files: $request->assets(),
+                files: $request->allFiles(),
                 site: $site,
             );
 
@@ -49,11 +49,11 @@ class FormController extends Controller
         }
     }
 
-    private function validateContentType($request, $form): void
+    private function validateContentType(Request $request, $form): void
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->allFiles()) {
             throw new FileContentTypeRequiredException;
         }
     }
