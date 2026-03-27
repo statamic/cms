@@ -183,10 +183,12 @@ function handleStackClosed() {
             </div>
         </Stack>
 
-        <div
+        <Button
+            as="div"
+            variant="filled"
             v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
             :key="`${filter}-${handle}`"
-            class="relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-gray-950/5 ps-4 pe-2 text-sm font-medium text-gray-900 last:me-12 gap-1 dark:bg-white/4 dark:text-gray-200 [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white"
+            class="cursor-default ps-4 pe-2 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
         >
             <div class="flex items-center gap-1.5 whitespace-nowrap">
                 <template v-if="handle == 'date'">
@@ -216,11 +218,13 @@ function handleStackClosed() {
                 :aria-label="getClearFilterLabel(getFieldFilterBadgeLabel(handle, badge))"
                 @click="removeFieldFilter(filter, handle)"
             />
-        </div>
-        <div
+        </Button>
+        <Button
+            as="div"
+            variant="filled"
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"
-            class="relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg bg-gray-950/5 ps-4 pe-2 text-sm font-medium text-gray-900 last:me-12 gap-1 dark:bg-white/4 dark:text-gray-200 [&_svg]:shrink-0 [&_svg]:text-gray-925 [&_svg]:opacity-60 dark:[&_svg]:text-white"
+            class="cursor-default ps-4 pe-2 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
         >
             <span class="whitespace-nowrap">{{ badge }}</span>
             <Button
@@ -234,6 +238,6 @@ function handleStackClosed() {
                 :aria-label="getClearFilterLabel(badge)"
                 @click="setFilter(handle, null)"
             />
-        </div>
+        </Button>
     </div>
 </template>
