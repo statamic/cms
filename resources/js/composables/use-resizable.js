@@ -12,6 +12,9 @@ export default function useResizable() {
                     const panel = panelRef.value;
                     if (!panel) return;
 
+                    const isRtl = document.documentElement.dir === 'rtl';
+                    const resolvedEdge = isRtl ? (edge === 'right' ? 'left' : 'right') : edge;
+
                     if (defaultWidth) {
                         panel.style.width = `${defaultWidth}px`;
                     }
@@ -23,7 +26,7 @@ export default function useResizable() {
                     handle.style.width = '5px';
                     handle.style.cursor = 'col-resize';
                     handle.style.zIndex = '10';
-                    handle.style[edge] = '-2px';
+                    handle.style[resolvedEdge] = '-2px';
 
                     panel.style.position = 'relative';
                     panel.appendChild(handle);
@@ -37,7 +40,7 @@ export default function useResizable() {
                         document.body.style.userSelect = 'none';
 
                         const onMove = (e) => {
-                            const diff = edge === 'right' ? e.clientX - startX : startX - e.clientX;
+                            const diff = resolvedEdge === 'right' ? e.clientX - startX : startX - e.clientX;
                             const newWidth = Math.min(maxWidth, Math.max(minWidth, startWidth + diff));
                             panel.style.width = `${newWidth}px`;
                         };
