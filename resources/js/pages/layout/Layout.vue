@@ -6,7 +6,7 @@ import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import Tooltips from '@/components/Tooltips.vue';
-import { provide, watch, ref, onMounted, onUnmounted, nextTick, computed } from 'vue';
+import { provide, watch, ref, onMounted, onUnmounted, nextTick, computed, useTemplateRef } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
 import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
@@ -44,10 +44,10 @@ const navWidthStorageKey = computed(() => {
 
 watch(navWidthStorageKey, () => restoreSavedNavWidth());
 
-const MIN_NAV_WIDTH = 150;
-const MAX_NAV_WIDTH = 400;
-const mainContentRef = ref(null);
-const contentCardRef = ref(null);
+const minNavWidth = 150;
+const maxNavWidth = 400;
+const mainContentRef = useTemplateRef('mainContent');
+const contentCardRef = useTemplateRef('contentCard');
 
 let isResizing = false;
 let currentWidthPx = null;
@@ -56,7 +56,7 @@ let pointerMoveListener = null;
 let pointerUpListener = null;
 
 function clampNavWidthPx(widthPx) {
-    return Math.min(Math.max(widthPx, MIN_NAV_WIDTH), MAX_NAV_WIDTH);
+    return Math.min(Math.max(widthPx, minNavWidth), maxNavWidth);
 }
 
 function setNavWidthPx(widthPx) {
@@ -72,6 +72,7 @@ function restoreSavedNavWidth() {
     }
 
     const widthPx = Number(saved);
+
     if (!Number.isFinite(widthPx)) {
         document.documentElement.style.removeProperty('--nav-width');
         return;
@@ -190,8 +191,8 @@ onUnmounted(() => {
         <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
-            <div ref="mainContentRef" id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
-                <div ref="contentCardRef" id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
+            <div ref="mainContent" id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
+                <div ref="contentCard" id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
                     <div
                         class="content-card-resize-handle"
                         @pointerdown.prevent="startResize"
