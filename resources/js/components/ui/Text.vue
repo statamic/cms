@@ -31,6 +31,7 @@ const textClasses = computed(() => {
                 warning: 'text-amber-600 dark:text-amber-400',
             },
             size: {
+                xs: 'text-2xs',
                 sm: 'text-xs',
                 base: 'text-sm',
                 lg: 'text-base',
