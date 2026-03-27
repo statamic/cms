@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
@@ -75,7 +76,7 @@ class LoginController extends CpController
 
         $user = User::fromUser($this->validateCredentials($request));
 
-        if ($user->hasEnabledTwoFactorAuthentication()) {
+        if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
         }
 

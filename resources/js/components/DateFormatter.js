@@ -1,3 +1,5 @@
+import { getLocale, getDefaultLocale, setDefaultLocale } from './FormattingLocale.js';
+
 export default class DateFormatter {
     #date;
     #options;
@@ -102,8 +104,31 @@ export default class DateFormatter {
         return this.date(date).options(options).toString();
     }
 
+    static get defaultLocale() {
+        return getDefaultLocale();
+    }
+
+    static set defaultLocale(locale) {
+        setDefaultLocale(locale);
+    }
+
+    withLocale(locale, callback) {
+        const previousLocale = getDefaultLocale();
+        setDefaultLocale(locale);
+
+        try {
+            return callback(this);
+        } finally {
+            setDefaultLocale(previousLocale);
+        }
+    }
+
+    setDefaultLocale(locale) {
+        setDefaultLocale(locale);
+    }
+
     get locale() {
-        return DateFormatter.defaultLocale ?? Intl.DateTimeFormat().resolvedOptions().locale;
+        return getLocale();
     }
 
     #normalizeDate(date) {
