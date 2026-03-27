@@ -6,11 +6,12 @@ import SessionExpiry from '@/components/SessionExpiry.vue';
 import LicensingAlert from '@/components/LicensingAlert.vue';
 import PortalTargets from '@/components/portals/PortalTargets.vue';
 import Tooltips from '@/components/Tooltips.vue';
-import { provide, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { provide, watch, ref, onMounted, onUnmounted, nextTick, useTemplateRef } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useBodyClasses from './body-classes.js';
 import useStatamicPageProps from '@/composables/page-props.js';
 import useMaxWidthToggle from '@/composables/use-max-width-toggle.js';
+import useResizable from '@/composables/use-resizable.js';
 
 useBodyClasses('bg-global-header-bg font-sans leading-normal text-gray-900 dark:text-white');
 
@@ -61,6 +62,20 @@ function focusMain() {
     });
 }
 
+const leftPanelRef = useTemplateRef('leftPanel');
+const rightPanelRef = useTemplateRef('rightPanel');
+
+const leftPanelActive = ref(false);
+const rightPanelActive = ref(false);
+
+provide('leftPanelActive', leftPanelActive);
+provide('rightPanelActive', rightPanelActive);
+
+const { makeResizable } = useResizable();
+
+makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: 240, maxWidth: 480, defaultWidth: 480 });
+makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: 240, maxWidth: 480, defaultWidth: 480 });
+
 onMounted(() => {
     navigationListener = router.on('success', focusMain);
     focusMain();
@@ -71,6 +86,8 @@ onUnmounted(() => {
         navigationListener();
     }
 });
+
+// TODO: Make the nav an overlay
 </script>
 
 <template>
@@ -82,12 +99,25 @@ onUnmounted(() => {
         <main id="main" class="flex bg-body-bg dark:border-t dark:border-body-border rounded-t-2xl fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]">
             <Nav />
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
-            <div id="main-content" class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
-                <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
+            <div
+                id="main-content"
+                class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl"
+                :class="{
+                    'flex': leftPanelActive || rightPanelActive,
+                }"
+                :data-max-width-enabled="isMaxWidthEnabled"
+            >
+                <div v-show="leftPanelActive" ref="leftPanel" id="left-panel" tabindex="-1" class="focus:outline-none relative layout-left-panel grid min-h-full mx-auto">
+                    <!-- Panel contents will be injected via <Teleport> -->
+                </div>
+                <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                     <div class="w-full min-w-0 mx-auto max-w-page" data-max-width-wrapper>
                         <slot />
                     </div>
+                </div>
+                <div v-show="rightPanelActive" ref="rightPanel" id="right-panel" tabindex="-1" class="focus:outline-none relative layout-right-panel grid min-h-full mx-auto min-w-2">
+                    <!-- Panel contents will be injected via <Teleport> -->
                 </div>
             </div>
         </main>

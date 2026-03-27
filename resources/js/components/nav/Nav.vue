@@ -151,6 +151,16 @@ Statamic.$keys.bind(['command+\\', ['[']], (e) => {
 });
 
 Statamic.$events.$on('nav.toggle', toggle);
+
+Statamic.$events.$on('nav.open', () => {
+    if (isOpen.value) return;
+    toggle();
+});
+
+Statamic.$events.$on('nav.close', () => {
+    if (!isOpen.value) return;
+    toggle();
+});
 </script>
 
 <template>
