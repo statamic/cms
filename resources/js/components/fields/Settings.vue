@@ -110,7 +110,7 @@ export default {
             default: false
         },
         commitParentField: {
-            default: () => {}
+            default: null
         }
     },
 
@@ -270,7 +270,7 @@ export default {
         },
 
         commit(params = {}) {
-            let { shouldCommitParent, shouldSaveRoot, shouldClose = true } = params;
+            let { shouldCommitParent, shouldSaveRoot, shouldClose = true, shouldEmitCommitted = true } = params;
 
             this.clearErrors();
 
@@ -284,7 +284,10 @@ export default {
                 })
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
-                    this.$emit('committed', response.data, this.editedFields);
+
+                    if (shouldEmitCommitted) {
+                        this.$emit('committed', response.data, this.editedFields);
+                    }
 
                     if (shouldCommitParent && this.commitParentField) {
 						this.$nextTick(() => {
@@ -327,8 +330,14 @@ export default {
         },
 
         softSave() {
+            if (this.config.isNew) {
+                this.isNestedField ? this.commitAndSaveTopStack() : this.commitAndSave();
+                return;
+            }
+
             this.commit({
-                shouldSaveRoot: !this.isNestedField,
+                shouldCommitParent: this.isNestedField,
+                shouldSaveRoot: true,
                 shouldClose: false,
             });
         },
