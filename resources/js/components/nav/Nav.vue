@@ -164,16 +164,33 @@ Statamic.$events.$on('nav.toggle', toggle);
 
 <template>
     <div class="cp-sidebar-start" :class="sidebarStartSizeClass">
-        <nav v-if="showPrototypeNavBlock" class="[&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal">
-            <ul class="px-0.5">
+        <nav v-if="showPrototypeNavBlock" class="[&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.25">
+            <ul class="px-0.5 grid gap-6">
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
                     <ul class="grid gap-2 grid-cols-2">
                         <li>
-                            <Button :text="__('Heading')" />
+                            <Button :text="__('Heading')" icon="heading" />
                         </li>
                         <li>
-                            <Button :text="__('Paragraph')" />
+                            <Button :text="__('Paragraph')" icon="text-long" />
+                        </li>
+                        <li>
+                            <Button :text="__('Banner')" icon="banner" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Content</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Heading')" icon="heading" />
+                        </li>
+                        <li>
+                            <Button :text="__('Paragraph')" icon="text-long" />
+                        </li>
+                        <li>
+                            <Button :text="__('Banner')" icon="banner" />
                         </li>
                     </ul>
                 </li>
