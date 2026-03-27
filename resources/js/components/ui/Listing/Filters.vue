@@ -48,7 +48,7 @@ function getFieldFilterBadgeLabel(handle, badge) {
 }
 
 function getClearFilterLabel(label) {
-    return `${__('Clear')} ${label}`;
+    return __('Clear :filter', { filter: label });
 }
 
 function isActive(handle) {
