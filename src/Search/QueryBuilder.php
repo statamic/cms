@@ -23,6 +23,11 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $this->index = $index;
     }
 
+    public function arguments(): array
+    {
+        return $this->arguments;
+    }
+
     public function query($query)
     {
         $this->query = $query;
