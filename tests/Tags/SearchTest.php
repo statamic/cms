@@ -69,9 +69,8 @@ class SearchTest extends TestCase
         $entryA = EntryFactory::id('a')->collection('test')->data(['title' => 'entry a'])->create();
         $entryB = EntryFactory::id('b')->collection('test')->data(['title' => 'entry b'])->create();
 
-        $builder = $this->mock(QueryBuilder::class);
+        $builder = $this->mock(QueryBuilder::class)->makePartial();
         $builder->shouldReceive('ensureExists', 'search', 'withData', 'limit', 'offset', 'where')->andReturnSelf();
-        $builder->shouldReceive('withArguments')->with(['filters' => ['category' => 'A'], 'sort' => 'distance:asc'])->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$entryA, $entryB]));
 
         Search::shouldReceive('index')->with(null)->once()->andReturn($builder);
@@ -85,5 +84,7 @@ class SearchTest extends TestCase
                 ['get' => ['q' => 'foo', 'filters' => ['category' => 'A'], 'sort' => 'distance:asc']]
             )
         );
+
+        $this->assertEquals(['filters' => ['category' => 'A'], 'sort' => 'distance:asc'], $builder->arguments());
     }
 }
