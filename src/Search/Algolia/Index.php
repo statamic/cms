@@ -4,7 +4,6 @@ namespace Statamic\Search\Algolia;
 
 use Algolia\AlgoliaSearch\Api\SearchClient;
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
-use Algolia\AlgoliaSearch\Model\Search\SearchParams;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
 use Statamic\Search\Documents;
