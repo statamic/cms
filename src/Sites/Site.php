@@ -4,11 +4,14 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Facades\Parse;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\TextDirection;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
+use Statamic\View\Cascade;
 
 class Site implements Augmentable
 {
@@ -116,7 +119,16 @@ class Site implements Augmentable
                 ->all();
         }
 
-        return (string) app(RuntimeParser::class)->parse($value, ['config' => config()->all()]);
+        $value = Parse::config($value);
+
+        $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = true;
+
+        try {
+            return (string) app(RuntimeParser::class)->parse($value, ['config' => Cascade::config()]);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $isEvaluatingUserData;
+        }
     }
 
     private function removePath($url)

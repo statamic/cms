@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\URL;
 use Statamic\Facades\WebAuthn;
 use Statamic\Support\Str;
 
@@ -43,6 +44,8 @@ class PasskeyLoginController
     {
         $referer = request('referer');
 
-        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : cp_route('index');
+        return Str::contains($referer, '/'.config('statamic.cp.route')) && ! URL::isExternalToApplication($referer)
+            ? $referer
+            : cp_route('index');
     }
 }

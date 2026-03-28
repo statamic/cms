@@ -196,7 +196,7 @@ return [
     'terms.title' => 'Taxonomy Terms',
     'text.config.append' => 'Add text after (to the right of) the input.',
     'text.config.autocomplete' => 'Set the autocomplete attribute.',
-    'text.config.character_limit' => 'Set the maximum number of enterable characters.',
+    'text.config.character_limit' => 'Set the recommended maximum number of enterable characters. To enforce a hard limit, use the [`max`](https://laravel.com/docs/master/validation#rule-max) validation rule.',
     'text.config.input_type' => 'Set the HTML5 input type.',
     'text.config.placeholder' => 'Set placeholder text.',
     'text.config.prepend' => 'Add text before (to the left of) the input.',

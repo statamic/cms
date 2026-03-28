@@ -45,6 +45,17 @@ class TwoFactorSetupTest extends TestCase
             ->assertInertia(fn ($page) => $page->where('redirect', 'http://localhost/cp/collections'));
     }
 
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_frontend_route()
+    {
+        $this
+            ->actingAs($this->userWithTwoFactorEnabled())
+            ->get(route('statamic.two-factor-setup', [
+                'redirect' => 'https://evil.com',
+            ]))
+            ->assertRedirect(route('statamic.site'));
+    }
+
     private function user()
     {
         return tap(User::make()->makeSuper())->save();

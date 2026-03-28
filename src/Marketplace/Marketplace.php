@@ -11,12 +11,14 @@ use Statamic\Statamic;
 
 class Marketplace
 {
+    private static $packagesCache = [];
+
     public function packages(array $packages)
     {
         $uri = 'packages';
         $hash = md5(json_encode($packages));
 
-        return Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $packages) {
+        return static::$packagesCache[$hash] ??= Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $packages) {
             try {
                 $response = Client::post($uri, ['packages' => $packages]);
 

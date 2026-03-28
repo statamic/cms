@@ -41,37 +41,38 @@ export default {
 ### Available keys
 `injectPublishContext()` exposes the following:
 
-- `name`
-- `parentContainer` — The parent component, if nested.
+- `asConfig` — Returns `true` when it's a config publish form, which renders slightly differently.
 - `blueprint` — The blueprint's publish array.
-- `reference` — The reference of the item being edited (eg. `entry::the-entry-id`)
-- `values` — The current form values.
-- `extraValues` — Extra values made available to field conditions.
-- `visibleValues` — Values for currently visible fields.
-- `originValues` — Values from the origin localization.
-- `hiddenFields` — Array of hidden field handles.
-- `revealerFields` — Array of revealer field handles.
-- `revealerValues` — Values of revealer fields.
-- `localizedFields` — Array of localized field handles.
-- `meta` — Fieldtype meta.
-- `site` — The site handle of the active localization.
+- `components` — Components pushed by addons (eg. the Collaboration addon displays a list of collaborators).
+- `desyncField(path)` — Desync a field from its origin value.
 - `direction` — Text direction (`ltr` or `rtl`).
 - `errors` — Validation errors.
-- `readOnly`
-- `previews` — Bard/Replicator set previews.
-- `syncField(path)` — Sync a field with its origin value.
-- `desyncField(path)` — Desync a field from its origin value.
-- `components` — Components pushed by addons (eg. the Collaboration addon displays a list of collaborators).
-- `asConfig` — Returns `true` when it's a config publish form, which renders slightly differently.
-- `rememberTab` — Returns `true` when the active tab should be remembered in the URL hash.
+- `extraValues` — Extra values made available to field conditions.
+- `hiddenFields` — Array of hidden field handles.
+- `isDirty()` - Returns `true` when the publish container's values are dirty
 - `isTrackingOriginValues` — Returns `true` when editing a localization.
-- `setValues(newValues)` — Replace all values.
-- `setFieldValue(path, value)` — Update a field's value.
+- `localizedFields` — Array of localized field handles.
+- `meta` — Fieldtype meta.
+- `name`
+- `originValues` — Values from the origin localization.
+- `parentContainer` — The parent component, if nested.
+- `previews` — Bard/Replicator set previews.
+- `readOnly`
+- `reference` — The reference of the item being edited (eg. `entry::the-entry-id`)
+- `rememberTab` — Returns `true` when the active tab should be remembered in the URL hash.
+- `revealerFields` — Array of revealer field handles.
+- `revealerValues` — Values of revealer fields.
 - `setFieldMeta(path, value)` — Update a field's metadata.
 - `setFieldPreviewValue(path, value)` — Update a field's Bard/Replicator preview.
-- `setRevealerField(path)` — Mark field as a revealer.
-- `unsetRevealerField(path)` — Unmark a field as a revealer.
+- `setFieldValue(path, value)` — Update a field's value.
 - `setHiddenField(field)` — Mark field as hidden.
+- `setRevealerField(path)` — Mark field as a revealer.
+- `setValues(newValues)` — Replace all values.
+- `site` — The site handle of the active localization.
+- `syncField(path)` — Sync a field with its origin value.
+- `unsetRevealerField(path)` — Unmark a field as a revealer.
+- `values` — The current form values.
+- `visibleValues` — Values for currently visible fields.
 - `withoutDirtying()` — Run a callback without marking the form as dirty.
 - Any other keys provided by the publish form (eg. entry publish form provides `isWorkingCopy` and `revisionsEnabled`)
 
