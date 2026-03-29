@@ -14,6 +14,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AssetsCacheClear::class,
         Commands\AssetsGeneratePresets::class,
         Commands\AssetsMeta::class,
+        Commands\AssetsMetaClean::class,
         Commands\AssetsMigrateLocalizable::class,
         Commands\GlideClear::class,
         Commands\Install::class,

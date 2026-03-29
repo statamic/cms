@@ -83,6 +83,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\FieldDisplay::class,
         Fieldtypes\Files::class,
         Fieldtypes\Floatval::class,
+        Fieldtypes\FormattingLocales::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,
@@ -154,6 +155,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $scopes = [
+        Scopes\Filters\AssetProperties::class,
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,

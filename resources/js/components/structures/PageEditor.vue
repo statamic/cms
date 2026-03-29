@@ -20,7 +20,7 @@
             <div v-if="!loading" class="flex-1 overflow-auto px-1 pt-4">
                 <div
                     v-if="saving"
-                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-gray-600"
                 >
                     <Icon name="loading" />
                 </div>
@@ -42,7 +42,7 @@
 
             <div
                 v-if="!loading && (!readOnly || type === 'entry')"
-                class="flex flex-wrap flex-row-reverse gap-2 items-end justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-600"
+                class="flex flex-wrap flex-row-reverse gap-2 items-end justify-between border-t bg-gray-200 p-4 dark:border-gray-900 dark:bg-gray-700"
             >
                 <div class="flex flex-wrap justify-end" v-if="!readOnly">
                     <Button variant="ghost" class="me-2" :text="__('Cancel')" @click="confirmClose" />

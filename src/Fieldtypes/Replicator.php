@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
@@ -16,7 +17,7 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
-    use AddsEntryValidationReplacements;
+    use AddsEntryValidationReplacements, UpdatesReferences;
 
     protected $categories = ['structured'];
     protected $keywords = ['builder', 'page builder', 'content'];
@@ -228,10 +229,43 @@ class Replicator extends Fieldtype
             return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
+        // Most of the time, these values will be fetched over AJAX.
+        // However, if the blueprint doesn't have a FQH, we need to fallback here.
+        if ($this->shouldProcessNewValues()) {
+            $blink = md5(json_encode($this->flattenedSetsConfig()));
+
+            $defaults = Blink::once($blink.'-defaults', function () {
+                return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                    return $this->fields($handle)->all()->map(function ($field) {
+                        return $field->fieldtype()->preProcess($field->defaultValue());
+                    })->all();
+                })->all();
+            });
+
+            $new = Blink::once($blink.'-new', function () use ($defaults) {
+                return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                    return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+                })->toArray();
+            });
+        }
+
         return [
             'existing' => $existing,
+            'new' => $new ?? null,
+            'defaults' => $defaults ?? null,
             'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
         ];
+    }
+
+    private function shouldProcessNewValues(): bool
+    {
+        $parent = $this->field()->parent();
+
+        if (! $parent || ! method_exists($parent, 'blueprint')) {
+            return true;
+        }
+
+        return is_null($parent->blueprint()->fullyQualifiedHandle());
     }
 
     public function flattenedSetsConfig()
@@ -318,5 +352,21 @@ class Replicator extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
+    }
+
+    public function iterateReferenceFields($data, NestedFieldUpdater $updater): void
+    {
+        if (! is_array($data)) {
+            return;
+        }
+
+        collect($data)->each(function ($set, $setKey) use ($updater) {
+            $setHandle = Arr::get($set, 'type');
+            $fields = Arr::get($this->flattenedSetsConfig(), "{$setHandle}.fields");
+
+            if ($setHandle && $fields) {
+                $updater->update(new Fields($fields), "{$setKey}.");
+            }
+        });
     }
 }

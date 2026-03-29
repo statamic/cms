@@ -8,7 +8,7 @@ export default {
         DocsCallout,
     },
 
-    props: ['container', 'folder', 'columns', 'canCreateContainers', 'createContainerUrl', 'editing'],
+    props: ['container', 'folder', 'columns', 'filters', 'canCreateContainers', 'createContainerUrl', 'editing'],
 
     data() {
         return {
@@ -103,6 +103,7 @@ export default {
             :selected-path="path"
             :selected-assets="selectedAssets"
             :initial-columns="columns"
+            :filters="filters"
             @navigated="navigate"
             @selections-updated="updateSelections"
             @edit-asset="editAsset"

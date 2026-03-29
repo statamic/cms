@@ -8,6 +8,7 @@ export const {
     IndexFieldtypeMixin,
     InlineEditForm,
     DateFormatter,
+    NumberFormatter,
     ItemActions,
     RelatedItem,
     RestoreRevision,

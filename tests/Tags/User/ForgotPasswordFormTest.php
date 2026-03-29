@@ -3,6 +3,7 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Support\Facades\Password;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
@@ -16,7 +17,7 @@ class ForgotPasswordFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -32,12 +33,39 @@ class ForgotPasswordFormTest extends TestCase
     #[Test]
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" reset_url="/resetting" class="form" id="form" }}{{ /user:forgot_password_form }}');
+        $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:forgot_password_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/password/email" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_reset_url" value="/resetting" />', $output);
+    }
+
+    #[Test]
+    #[DataProvider('resetUrlProvider')]
+    public function it_renders_reset_url($resetUrl, $expectedUrl)
+    {
+        $output = $this->tag('{{ user:forgot_password_form reset_url="'.$resetUrl.'" }}{{ /user:forgot_password_form }}');
+
+        $this->assertMatchesRegularExpression('/<input type="hidden" name="_reset_url" value="(.+)" \/>/', $output);
+        preg_match('/<input type="hidden" name="_reset_url" value="(.+)" \/>/', $output, $matches);
+        $this->assertEquals($expectedUrl, decrypt($matches[1]));
+    }
+
+    public static function resetUrlProvider()
+    {
+        return [
+            '/custom' => ['/custom', '/custom'],
+            'custom' => ['custom', '/custom'],
+            'absolute' => ['https://example.com/custom', 'https://example.com/custom'],
+        ];
+    }
+
+    #[Test]
+    public function it_renders_null_reset_url()
+    {
+        $output = $this->tag('{{ user:forgot_password_form :reset_url="null" }}{{ /user:forgot_password_form }}');
+
+        $this->assertStringNotContainsString('_reset_url', $output);
     }
 
     #[Test]
@@ -210,6 +238,37 @@ EOT
         $this->assertEquals([__(Password::INVALID_USER)], $errors[1]);
         $this->assertEmpty($success[1]);
         $this->assertEmpty($emailSent[1]);
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->simulateSuccessfulPasswordResetEmail();
+
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->from('/forgot-password')
+            ->post('/!/auth/password/email', [
+                'email' => 'san@holo.com',
+                '_redirect' => 'https://external-site.com/phishing',
+            ])
+            ->assertLocation('/forgot-password');
+    }
+
+    #[Test]
+    public function it_wont_follow_redirect_to_external_url_on_error()
+    {
+        $this
+            ->from('/forgot-password')
+            ->post('/!/auth/password/email', [
+                'email' => 'nonexistent@test.com',
+                '_error_redirect' => 'https://external-site.com/phishing',
+            ])
+            ->assertLocation('/forgot-password');
     }
 
     #[Test]

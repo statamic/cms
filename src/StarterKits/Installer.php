@@ -253,6 +253,11 @@ final class Installer
                     $version = '@dev';
                 }
 
+                // Allow dev stability when installing from local repo
+                if (! $version && $this->fromLocalRepo) {
+                    $version = '@dev';
+                }
+
                 $package = $version
                     ? "{$this->package}:{$version}"
                     : $this->package;
@@ -460,7 +465,7 @@ final class Installer
         }
 
         if (confirm('Create a super user?', false)) {
-            $this->console->call('make:user', ['--super' => true]);
+            $this->console->call('statamic:make:user', ['--super' => true]);
         }
 
         return $this;

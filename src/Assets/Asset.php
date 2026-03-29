@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -934,7 +935,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
-        $isNew = is_null($this->container()->asset($this->path()));
+        $pathHasChanged = $this->getOriginal('path') !== $this->path();
+        $isNew = $pathHasChanged ? false : is_null($this->container()->asset($this->path()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -1065,7 +1067,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function rename($filename, $unique = false)
     {
-        $filename = $unique ? $this->ensureUniqueFilename($this->folder(), $filename) : $filename;
+        if ($unique) {
+            return $this->moveUnique($this->folder(), $filename);
+        }
 
         return $this->move($this->folder(), $filename);
     }
@@ -1096,6 +1100,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
+    }
+
+    /**
+     * Move the asset to a different location with a unique filename.
+     *
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
+     * @return $this
+     */
+    public function moveUnique($folder, $filename = null)
+    {
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
+        $filename = $this->ensureUniqueFilename($folder, $filename);
+
+        return $this->move($folder, $filename);
     }
 
     public function moveQuietly($folder, $filename = null)
@@ -1267,6 +1286,17 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        if ($this->isSvg() && config('statamic.assets.svg_sanitization_on_upload', true)) {
+            $contents = $this->disk()->get($this->path());
+
+            $this->disk()->put(
+                $this->path(),
+                (new DOMSanitizer(DOMSanitizer::SVG))->sanitize($contents, [
+                    'remove-xml-tags' => ! Str::startsWith($contents, '<?xml'),
+                ])
+            );
+        }
 
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
