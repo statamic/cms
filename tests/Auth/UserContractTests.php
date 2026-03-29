@@ -670,6 +670,23 @@ trait UserContractTests
     }
 
     #[Test]
+    public function it_does_not_require_two_factor_when_globally_disabled_even_if_user_has_setup()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $user = $this->makeUser()
+            ->makeSuper()
+            ->set('two_factor_secret', 'secret')
+            ->set('two_factor_confirmed_at', now()->timestamp);
+
+        $user->save();
+
+        $this->assertTrue($user->hasEnabledTwoFactorAuthentication());
+        $this->assertFalse($user->isTwoFactorAuthenticationRequired());
+    }
+
+    #[Test]
     public function it_gets_recovery_codes()
     {
         $user = $this->makeUser()

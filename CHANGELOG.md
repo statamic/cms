@@ -1,5 +1,26 @@
 # Release Notes
 
+## 6.8.0 (2026-03-27)
+
+### What's new
+- GraphQL API Authentication [#14292](https://github.com/statamic/cms/issues/14292) by @duncanmcclean
+- Ability to disable two-factor authentication [#14263](https://github.com/statamic/cms/issues/14263) by @duncanmcclean
+- Ability to select the date formatting locale [#14372](https://github.com/statamic/cms/issues/14372) by @jasonvarga
+- Number formatter [#14373](https://github.com/statamic/cms/issues/14373) by @jasonvarga
+
+### What's fixed
+- Omit application name and URL from support:details [#14359](https://github.com/statamic/cms/issues/14359) by @jasonvarga
+- Fix CP Nav active state when trailing slashes are enforced [#14363](https://github.com/statamic/cms/issues/14363) by @duncanmcclean
+- Only change date for localizations with an explicit date set [#14362](https://github.com/statamic/cms/issues/14362) by @duncanmcclean
+- Bring back responsive button groups [#13336](https://github.com/statamic/cms/issues/13336) by @daun
+- Merge external class attrs through twMerge in UI components [#14379](https://github.com/statamic/cms/issues/14379) by @jasonvarga
+- Reduce amount of data provided in Assets fieldtype meta [#14366](https://github.com/statamic/cms/issues/14366) by @duncanmcclean
+- Filters can only be removed by clicking cross [#14220](https://github.com/statamic/cms/issues/14220) by @jaygeorge
+- Bump reka-ui [#14368](https://github.com/statamic/cms/issues/14368) by @jasonvarga
+- Bump picomatch from 2.3.1 to 2.3.2 [#14360](https://github.com/statamic/cms/issues/14360) by @dependabot
+
+
+
 ## 6.7.3 (2026-03-25)
 
 ### What's fixed

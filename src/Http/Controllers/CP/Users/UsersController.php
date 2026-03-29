@@ -11,6 +11,7 @@ use Statamic\Facades\Action;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
@@ -277,7 +278,7 @@ class UsersController extends CpController
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
-            'twoFactor' => $isCurrentUser ? [
+            'twoFactor' => $isCurrentUser && TwoFactor::enabled() ? [
                 'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
                 'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
                 'routes' => [

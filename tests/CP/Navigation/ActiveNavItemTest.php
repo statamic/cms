@@ -12,6 +12,7 @@ use Statamic\CP\Navigation\NavBuilder;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -33,6 +34,13 @@ class ActiveNavItemTest extends TestCase
 
         // TODO: Other tests are leaving behind forms without titles that are causing failures here?
         Facades\Form::shouldReceive('all')->andReturn(collect());
+    }
+
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+
+        parent::tearDown();
     }
 
     protected function resolveApplicationConfiguration($app)
@@ -406,6 +414,34 @@ class ActiveNavItemTest extends TestCase
         $this->assertInstanceOf(Collection::class, $seoPro->children());
         $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
         $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    #[Test]
+    public function it_properly_handles_is_active_checks_when_trailing_slashes_are_enforced()
+    {
+        URL::enforceTrailingSlashes();
+
+        Nav::clearCachedUrls();
+
+        $parent = Nav::create('parent')
+            ->section('test')
+            ->url('http://localhost/cp/parent')
+            ->children([
+                $hello = Nav::create('hello')->url('http://localhost/cp/hello'),
+                $world = Nav::create('world')->url('http://localhost/cp/world'),
+            ]);
+
+        // Test active status with trailing slash in request URL
+        Request::swap(Request::create('http://localhost/cp/hello/'));
+        $this->assertTrue($parent->isActive());
+        $this->assertTrue($hello->isActive());
+        $this->assertFalse($world->isActive());
+
+        // Test active status on descendant with trailing slash
+        Request::swap(Request::create('http://localhost/cp/hello/nested/path/'));
+        $this->assertTrue($parent->isActive());
+        $this->assertTrue($hello->isActive());
+        $this->assertFalse($world->isActive());
     }
 
     #[Test]
