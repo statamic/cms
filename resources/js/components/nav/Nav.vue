@@ -274,7 +274,24 @@ Statamic.$events.$on('nav.toggle', toggle);
                             <Button :text="__('Image Choice')" icon="image-select" />
                         </li>
                         <li>
-                            <Button :text="__('Video')" icon="video" />
+                            <Button :text="__('Video')" icon="fieldtype-video" />
+                        </li>
+                        <li>
+                            <Button :text="__('Audio')" icon="media-music-sound-equalizer" />
+                        </li>
+                        <li>
+                            <Button :text="__('Upload')" icon="upload-arrow-up" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Payment</h2>
+                    <ul class="grid gap-2 grid-cols-2">
+                        <li>
+                            <Button :text="__('Stripe')" icon="stripe-logo" />
+                        </li>
+                        <li>
+                            <Button :text="__('PayPal')" icon="paypal-logo" />
                         </li>
                         <li>
                             <Button :text="__('Audio')" icon="media-music-sound-equalizer" />
