@@ -360,7 +360,8 @@
         top: var(--graph-paper-y-offset);
         z-index: var(--z-index-below);
         opacity: 0.7;
-        width: calc(100% - 2px);
+        /* Effectively remove the right border */
+        width: calc(100% - 7px);
         height: calc(100% - var(--graph-paper-y-offset));
 
         /* https://css-pattern.com/graph-paper/ */
@@ -374,7 +375,7 @@
           conic-gradient(from 90deg at 1px 1px,var(--_g)),
           var(--c2);
         background-size: var(--s) var(--s), calc(var(--s)/5) calc(var(--s)/5);
-        /* Effectively remove the border */
+        /* Effectively remove the left border */
         background-position: -1px;
     }
 }
