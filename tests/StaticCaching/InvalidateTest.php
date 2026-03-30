@@ -9,6 +9,7 @@ use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Form;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Invalidate;
 use Statamic\StaticCaching\Invalidator;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -29,27 +30,35 @@ class InvalidateTest extends TestCase
             return $form->handle() === 'contact';
         })->getMock();
 
-        $invalidate = new Invalidate($invalidator);
+        $invalidate = new Invalidate($invalidator, Mockery::mock(Cacher::class));
 
         $invalidate->invalidateByBlueprint($event);
+    }
+
+    private function mockEntry(string $url): Entry
+    {
+        $entry = Mockery::mock(Entry::class);
+        $entry->shouldReceive('descendants')->andReturn(collect());
+        $entry->shouldReceive('isRedirect')->andReturn(false);
+        $entry->shouldReceive('absoluteUrl')->andReturn($url);
+
+        return $entry;
     }
 
     #[Test]
     public function it_invalidates_removed_entries_when_collection_tree_is_saving()
     {
-        $entry1 = Mockery::mock(Entry::class);
-        $entry2 = Mockery::mock(Entry::class);
-
-        EntryFacade::shouldReceive('find')->with('entry-1')->andReturn($entry1);
-        EntryFacade::shouldReceive('find')->with('entry-2')->andReturn($entry2);
+        EntryFacade::shouldReceive('find')->with('entry-1')->andReturn($this->mockEntry('http://example.com/entry-1'));
+        EntryFacade::shouldReceive('find')->with('entry-2')->andReturn($this->mockEntry('http://example.com/entry-2'));
 
         $event = new CollectionTreeEntriesMovedOrRemoved(removed: ['entry-1', 'entry-2'], moved: []);
 
-        $invalidator = Mockery::mock(Invalidator::class);
-        $invalidator->shouldReceive('invalidate')->with($entry1)->once();
-        $invalidator->shouldReceive('invalidate')->with($entry2)->once();
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldReceive('invalidateUrls')
+            ->with(['http://example.com/entry-1', 'http://example.com/entry-2'])
+            ->once();
 
-        $invalidate = new Invalidate($invalidator);
+        $invalidate = new Invalidate(Mockery::mock(Invalidator::class), $cacher);
 
         $invalidate->invalidateMovedOrRemovedEntries($event);
     }
@@ -57,16 +66,16 @@ class InvalidateTest extends TestCase
     #[Test]
     public function it_invalidates_entries_with_changed_ancestry_when_collection_tree_is_saving()
     {
-        $entry = Mockery::mock(Entry::class);
-
-        EntryFacade::shouldReceive('find')->with('entry-1')->andReturn($entry);
+        EntryFacade::shouldReceive('find')->with('entry-1')->andReturn($this->mockEntry('http://example.com/entry-1'));
 
         $event = new CollectionTreeEntriesMovedOrRemoved(removed: [], moved: ['entry-1']);
 
-        $invalidator = Mockery::mock(Invalidator::class);
-        $invalidator->shouldReceive('invalidate')->with($entry)->once();
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldReceive('invalidateUrls')
+            ->with(['http://example.com/entry-1'])
+            ->once();
 
-        $invalidate = new Invalidate($invalidator);
+        $invalidate = new Invalidate(Mockery::mock(Invalidator::class), $cacher);
 
         $invalidate->invalidateMovedOrRemovedEntries($event);
     }
@@ -76,10 +85,10 @@ class InvalidateTest extends TestCase
     {
         $event = new CollectionTreeEntriesMovedOrRemoved(removed: [], moved: []);
 
-        $invalidator = Mockery::mock(Invalidator::class);
-        $invalidator->shouldNotReceive('invalidate');
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldNotReceive('invalidateUrls');
 
-        $invalidate = new Invalidate($invalidator);
+        $invalidate = new Invalidate(Mockery::mock(Invalidator::class), $cacher);
 
         $invalidate->invalidateMovedOrRemovedEntries($event);
     }
@@ -91,10 +100,10 @@ class InvalidateTest extends TestCase
 
         $event = new CollectionTreeEntriesMovedOrRemoved(removed: ['missing-entry'], moved: []);
 
-        $invalidator = Mockery::mock(Invalidator::class);
-        $invalidator->shouldNotReceive('invalidate');
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldNotReceive('invalidateUrls');
 
-        $invalidate = new Invalidate($invalidator);
+        $invalidate = new Invalidate(Mockery::mock(Invalidator::class), $cacher);
 
         $invalidate->invalidateMovedOrRemovedEntries($event);
     }

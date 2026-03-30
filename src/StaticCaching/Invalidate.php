@@ -23,12 +23,12 @@ use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
 {
     protected $invalidator;
+    protected $cacher;
 
     protected $events = [
         AssetSaved::class => 'refreshAsset',
@@ -53,9 +53,10 @@ class Invalidate implements ShouldQueue
         BlueprintDeleted::class => 'invalidateByBlueprint',
     ];
 
-    public function __construct(Invalidator $invalidator)
+    public function __construct(Invalidator $invalidator, Cacher $cacher)
     {
         $this->invalidator = $invalidator;
+        $this->cacher = $cacher;
     }
 
     public function subscribe($dispatcher)
@@ -127,10 +128,8 @@ class Invalidate implements ShouldQueue
 
     public function invalidateMovedOrRemovedEntries($event)
     {
-        foreach (array_merge($event->removed, $event->moved) as $id) {
-            if ($entry = Entry::find($id)) {
-                $this->invalidator->invalidate($entry);
-            }
+        if ($urls = array_merge($event->removedUrls, $event->movedUrls)) {
+            $this->cacher->invalidateUrls($urls);
         }
     }
 
