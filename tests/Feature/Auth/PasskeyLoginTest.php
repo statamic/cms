@@ -123,6 +123,21 @@ class PasskeyLoginTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_redirect_to_external_cp_referer()
+    {
+        $user = $this->createUser();
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->loginRequest(['referer' => 'https://evil.com/cp/collections'])
+            ->assertOk()
+            ->assertJson(['redirect' => cp_route('index')]);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
     public function it_fails_when_validation_throws_exception()
     {
         $user = $this->createUser();

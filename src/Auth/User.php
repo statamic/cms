@@ -19,6 +19,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -40,6 +41,7 @@ use Statamic\Events\UserDeleting;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;
+use Statamic\Facades\TwoFactor;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
@@ -85,13 +87,13 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function initials()
     {
+        if (! $name = $this->name()) {
+            return '?';
+        }
+
         $surname = '';
-        if ($name = $this->get('name')) {
-            if (Str::contains($name, ' ')) {
-                [$name, $surname] = explode(' ', $name);
-            }
-        } else {
-            $name = (string) $this->email();
+        if (Str::contains($name, ' ')) {
+            [$name, $surname] = explode(' ', $name, 2);
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
@@ -328,7 +330,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             return $name;
         }
 
-        return $this->email();
+        return null;
     }
 
     public function defaultAugmentedArrayKeys()
@@ -358,11 +360,17 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function preferredColorMode()
     {
-        return $this->getPreference('color_mode') ?? 'auto';
+        $mode = $this->getPreference('color_mode') ?? 'auto';
+
+        return in_array($mode, ['auto', 'light', 'dark'], true) ? $mode : 'auto';
     }
 
     public function isTwoFactorAuthenticationRequired(): bool
     {
+        if (! TwoFactor::enabled()) {
+            return false;
+        }
+
         $enforcedRoles = config('statamic.users.two_factor_enforced_roles', []);
 
         if (in_array('*', $enforcedRoles)) {
@@ -408,7 +416,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $this->set('two_factor_recovery_codes', encrypt(str_replace(
             $code,
-            TwoFactor\RecoveryCode::generate(),
+            RecoveryCode::generate(),
             decrypt($this->two_factor_recovery_codes)
         )))->save();
 

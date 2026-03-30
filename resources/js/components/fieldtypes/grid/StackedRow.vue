@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
+        class="@container/panel bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
         :class="[sortableItemClass, { 'opacity-50': isExcessive, 'ring-red-500': hasError }]"
         :data-error="hasError ?? undefined"
     >

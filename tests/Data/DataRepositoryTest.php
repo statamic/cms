@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
 use Statamic\Facades\Collection;
+use Statamic\Facades\URL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -30,6 +31,8 @@ class DataRepositoryTest extends TestCase
 
     public function tearDown(): void
     {
+        URL::enforceTrailingSlashes(false);
+
         parent::tearDown();
         static::$functions = null;
     }
@@ -189,6 +192,34 @@ class DataRepositoryTest extends TestCase
             'fr dir with query' => ['http://localhost/fr/le-foo?a=b', 'le-foo'],
             'fr dir with query and slash' => ['http://localhost/fr/le-foo/?a=b', 'le-foo'],
         ];
+    }
+
+    #[Test]
+    #[DataProvider('findByRequestUrlProvider')]
+    public function it_finds_by_request_url_with_trailing_slash_enforcement($requestUrl, $entryId)
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->setSites([
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    #[Test]
+    #[DataProvider('findByRequestUrlNoRootSiteProvider')]
+    public function it_finds_by_request_url_with_no_root_site_and_trailing_slash_enforcement($requestUrl, $entryId)
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->setSites([
+            'english' => ['url' => 'http://localhost/en/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
     }
 
     private function findByRequestUrlTest($requestUrl, $entryId)

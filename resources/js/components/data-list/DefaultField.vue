@@ -1,5 +1,6 @@
 <script>
 import { h } from 'vue';
+import striptags from 'striptags';
 
 export default {
     props: {
@@ -22,11 +23,10 @@ export default {
 
             if (typeof value !== 'string') return JSON.stringify(value);
 
-            // Basic html stripping. https://stackoverflow.com/a/5002161
-            value = value.replace(/<\/?[^>]+(>|$)/g, '');
+            value = striptags(value);
 
             if (value.length > this.truncateAt) {
-                value = value.substring(0, this.truncateAt) + '&hellip;';
+                value = value.substring(0, this.truncateAt) + '\u2026';
             }
 
             return value;
@@ -34,7 +34,7 @@ export default {
     },
 
     render() {
-        return h('div', { innerHTML: this.text });
+        return h('div', { textContent: this.text });
     },
 };
 </script>

@@ -2,10 +2,13 @@
     <ui-panel>
         <ui-panel-header class="flex items-center justify-between">
             <div>
-                <ui-heading :text="release.version" />
+                <div class="flex items-center gap-2">
+                    <ui-heading :text="release.version" />
+                    <ui-badge v-if="release.security" :text="__('Security')" color="red" size="sm" />
+                </div>
                 <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>
-            <ui-modal :title="__('Update to :version', { version: release.version })">
+            <ui-modal :title="__('Update to :version', { version: release.version })" blur>
                 <template #trigger>
                     <ui-button
                         ref="getCommandButton"
