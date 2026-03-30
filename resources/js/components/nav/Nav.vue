@@ -229,6 +229,29 @@ Statamic.$events.$on('nav.toggle', toggle);
                     </ul>
                 </li>
                 <li>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <li>
+                            <Button :text="__('Name')" icon="user-avatar-flush" />
+                        </li>
+                        <li>
+                            <Button :text="__('Email')" icon="mail-sign-at" />
+                        </li>
+                        <li>
+                            <Button :text="__('Website')" icon="website" />
+                        </li>
+                        <li>
+                            <Button :text="__('Phone')" icon="mail-sign-hashtag" />
+                        </li>
+                        <li>
+                            <Button :text="__('Address')" icon="location-pin" />
+                        </li>
+                        <li>
+                            <Button :text="__('Signature')" icon="edit-pen-draw-scribble" />
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Number</h2>
                     <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
@@ -253,29 +276,6 @@ Statamic.$events.$on('nav.toggle', toggle);
                         </li>
                         <li>
                             <Button :text="__('SavvyCal')" icon="calendar" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
-                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Name')" icon="user-avatar-flush" />
-                        </li>
-                        <li>
-                            <Button :text="__('Email')" icon="mail-sign-at" />
-                        </li>
-                        <li>
-                            <Button :text="__('Website')" icon="website" />
-                        </li>
-                        <li>
-                            <Button :text="__('Phone')" icon="mail-sign-hashtag" />
-                        </li>
-                        <li>
-                            <Button :text="__('Address')" icon="location-pin" />
-                        </li>
-                        <li>
-                            <Button :text="__('Signature')" icon="edit-pen-draw-scribble" />
                         </li>
                     </ul>
                 </li>
