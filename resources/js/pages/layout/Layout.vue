@@ -72,8 +72,8 @@ provide('rightPanelActive', rightPanelActive);
 
 const { makeResizable } = useResizable();
 
-makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: 240, maxWidth: 450, defaultWidth: 325 });
-makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: 240, maxWidth: 450, defaultWidth: 325 });
+makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: 240, maxWidth: 450, defaultWidth: 320 });
+makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: 240, maxWidth: 450, defaultWidth: 320 });
 
 onMounted(() => {
     navigationListener = router.on('success', focusMain);
