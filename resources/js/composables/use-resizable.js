@@ -31,7 +31,22 @@ export default function useResizable() {
                     panel.style.position = 'relative';
                     panel.appendChild(handle);
 
+                    const resetToDefaultWidth = () => {
+                        if (defaultWidth) {
+                            const width = Math.min(maxWidth, Math.max(minWidth, defaultWidth));
+                            panel.style.width = `${width}px`;
+                            return;
+                        }
+
+                        panel.style.width = '';
+                    };
+
                     const onPointerDown = (e) => {
+                        if (e.detail === 2) {
+                            resetToDefaultWidth();
+                            return;
+                        }
+
                         e.preventDefault();
                         const startX = e.clientX;
                         const startWidth = panel.offsetWidth;
@@ -56,10 +71,16 @@ export default function useResizable() {
                         document.addEventListener('pointerup', onUp);
                     };
 
+                    const onDoubleClick = () => {
+                        resetToDefaultWidth();
+                    };
+
                     handle.addEventListener('pointerdown', onPointerDown);
+                    handle.addEventListener('dblclick', onDoubleClick);
 
                     cleanup = () => {
                         handle.removeEventListener('pointerdown', onPointerDown);
+                        handle.removeEventListener('dblclick', onDoubleClick);
                         handle.remove();
                     };
                 });
