@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\Fieldtypes;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Entries;
 use Statamic\Query\Scopes\Scope;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -186,6 +190,41 @@ class RelationshipFieldtypeTest extends TestCase
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}")
             ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_filters_creatable_blueprints_using_create_blueprints_config()
+    {
+        $article = Blueprint::makeFromFields([])->setHandle('article')->setNamespace('collections.test');
+        $page = Blueprint::makeFromFields([])->setHandle('page')->setNamespace('collections.test');
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'article' => $article,
+            'page' => $page,
+        ]));
+
+        $this->setTestRoles(['test' => ['access cp', 'view test entries', 'create test entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $this->actingAs($user);
+
+        $fieldtype = $this->entriesFieldtype([
+            'collections' => ['test'],
+            'create_blueprints' => ['article'],
+        ]);
+
+        $creatables = $fieldtype->preload()['creatables'];
+
+        $this->assertCount(1, $creatables);
+        $this->assertStringContainsString('blueprint=article', $creatables[0]['url']);
+    }
+
+    private function entriesFieldtype($config = [])
+    {
+        $field = new Field('test', array_merge(['type' => 'entries'], $config));
+
+        return (new Entries)->setField($field);
     }
 }
 

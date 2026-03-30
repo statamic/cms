@@ -330,6 +330,12 @@ class Entries extends Relationship
 
             $blueprints = $collection->entryBlueprints();
 
+            if ($createBlueprints = $this->config('create_blueprints')) {
+                $blueprints = $blueprints->filter(
+                    fn ($blueprint) => in_array($blueprint->handle(), $createBlueprints)
+                );
+            }
+
             return $blueprints
                 ->reject->hidden()
                 ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
