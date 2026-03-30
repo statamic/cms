@@ -153,7 +153,7 @@ main.nav-closed {
         /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
         box-shadow 0s ease-out 1s
     ;
-    @apply shadow-2xl;
+    @apply shadow-xl;
 }
 
 /* If the left panel exists with content */
