@@ -52,6 +52,8 @@ export default {
                     img.src = url;
                 });
             }
+
+            Statamic.$events.emit('bustAndReloadImageCaches', urls);
         });
 
         Statamic.$callbacks.add('removeFromSelections', function (ids) {
