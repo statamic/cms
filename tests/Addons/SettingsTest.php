@@ -146,6 +146,22 @@ class SettingsTest extends TestCase
             'test' => ['a' => 'A', 'b' => 'B'],
             'statamic.system.view_config_allowlist' => ['@default', 'test.a', 'test.b'],
         ]);
+
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'api_key', 'field' => ['type' => 'text', 'default' => 'my-default-key']],
+                                ['handle' => 'another_field', 'field' => ['type' => 'text', 'default' => 'default-value']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
         $addon = $this->makeFromPackage();
         $settings = new Settings($addon, ['foo' => 'bar']);
 
@@ -158,6 +174,8 @@ class SettingsTest extends TestCase
         ]);
 
         $this->assertEquals([
+            'api_key' => 'my-default-key',
+            'another_field' => 'default-value',
             'alfa' => 'bravo',
             'charlie' => 'A',
             'delta' => ['echo' => 'B'],

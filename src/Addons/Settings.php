@@ -19,8 +19,7 @@ abstract class Settings implements Contract
     public function __construct(Addon $addon, array $settings = [])
     {
         $this->addon = $addon;
-        $this->rawSettings = $settings;
-        $this->settings = $this->resolveAntlers($this->applyBlueprintDefaults($settings));
+        $this->setValues($settings);
     }
 
     public function addon(): Addon
@@ -59,7 +58,7 @@ abstract class Settings implements Contract
     private function setValues(array $values): self
     {
         $this->rawSettings = $values;
-        $this->settings = $this->resolveAntlers($values);
+        $this->settings = $this->resolveAntlers($this->applyBlueprintDefaults($values));
 
         return $this;
     }
