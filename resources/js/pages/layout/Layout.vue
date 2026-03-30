@@ -106,7 +106,7 @@ onUnmounted(() => {
                 }"
                 :data-max-width-enabled="isMaxWidthEnabled"
             >
-                <div v-show="leftPanelActive" ref="leftPanel" id="left-panel" tabindex="-1" class="focus:outline-none relative layout-left-panel grid pe-2 min-h-full mx-auto">
+                <div v-show="leftPanelActive" ref="leftPanel" id="left-panel" tabindex="-1" class="focus:outline-none relative layout-left-panel overflow-scroll overflow-x-clip grid pe-2 min-h-full mx-auto">
                     <!-- Panel contents will be injected via <Teleport> -->
                 </div>
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">

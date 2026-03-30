@@ -16,7 +16,7 @@ const props = defineProps({
 
         <LayoutPanel side="left">
             <div style="--graph-paper-y-offset: 2.5rem;" class="bg-graph-paper [&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
-                <ul class="px-0.5 grid gap-8 @container">
+                <ul class="px-0.5 grid gap-8 @container py-10">
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
                         <ul class="grid gap-2 @min-[250px]:grid-cols-2">
