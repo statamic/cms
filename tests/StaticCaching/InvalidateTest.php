@@ -60,7 +60,7 @@ class InvalidateTest extends TestCase
 
         $invalidate = new Invalidate($invalidator);
 
-        $invalidate->invalidateMovedOrRemovedCollectionEntries($event);
+        $invalidate->invalidateMovedOrRemovedEntries($event);
     }
 
     #[Test]
@@ -84,7 +84,7 @@ class InvalidateTest extends TestCase
 
         $invalidate = new Invalidate($invalidator);
 
-        $invalidate->invalidateMovedOrRemovedCollectionEntries($event);
+        $invalidate->invalidateMovedOrRemovedEntries($event);
     }
 
     #[Test]
@@ -104,7 +104,7 @@ class InvalidateTest extends TestCase
 
         $invalidate = new Invalidate($invalidator);
 
-        $invalidate->invalidateMovedOrRemovedCollectionEntries($event);
+        $invalidate->invalidateMovedOrRemovedEntries($event);
     }
 
     #[Test]
@@ -126,6 +126,6 @@ class InvalidateTest extends TestCase
 
         $invalidate = new Invalidate($invalidator);
 
-        $invalidate->invalidateMovedOrRemovedCollectionEntries($event);
+        $invalidate->invalidateMovedOrRemovedEntries($event);
     }
 }
