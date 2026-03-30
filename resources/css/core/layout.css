@@ -109,23 +109,19 @@
     }
 }
 
-
-
-
 /* Mobile nav behavior */
 @media (width < theme(--breakpoint-lg)) {
-.nav-main {
-    /* Always visible but off-screen by default */
-    @apply flex;
-    @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
-}
+    .nav-main {
+        /* Always visible but off-screen by default */
+        @apply flex;
+        @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
+    }
 
-.nav-open .nav-main {
-    /* Slide in from the left */
-    @apply start-0 shadow-2xl;
+    .nav-open .nav-main {
+        /* Slide in from the left */
+        @apply start-0 shadow-2xl;
+    }
 }
-}
-
 
 main {
     @apply ps-0 lg:ps-46;
@@ -144,6 +140,28 @@ main {
 main.nav-closed {
     @apply ps-0;
     @apply lg:ps-0;
+}
+
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THIRD PANEL STATES
+=================================================== */
+/* When the left panel exists, e.g. Form Builder with fields */
+
+/* If the left panel exists with content */
+.main-content:has([data-left-panel]:not(:empty)) {
+    border-inline-start: 1px solid transparent;
+    transition:
+        /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
+        box-shadow 0s ease-out 1s
+    ;
+    @apply shadow-2xl;
+}
+
+/* If the left panel exists with content */
+.nav-open:has([data-left-panel]:not(:empty)) {
+    /* Add separation between the nav and the left panel, when the nav is open */
+    .main-content {
+        border-inline-start: 1px solid var(--color-gray-300);
+    }
 }
 
 /* ==========================================================================
