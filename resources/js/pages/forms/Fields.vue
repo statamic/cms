@@ -19,7 +19,7 @@ const props = defineProps({
                 <ul class="px-0.5 grid gap-8 @container py-10">
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Heading')" icon="heading" />
                             </li>
@@ -36,7 +36,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Text</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Short Answer')" icon="text-short" />
                             </li>
@@ -47,7 +47,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choice</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Dropdown')" icon="fieldtype-select" />
                             </li>
@@ -67,7 +67,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Rate</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Star Rating')" icon="star" />
                             </li>
@@ -81,7 +81,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Name')" icon="user-avatar-flush" />
                             </li>
@@ -104,7 +104,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Number</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Number')" icon="number" />
                             </li>
@@ -115,7 +115,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Date and Time</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Date Picker')" icon="calendar" />
                             </li>
@@ -132,7 +132,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Media</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Image Choice')" icon="image-select" />
                             </li>
@@ -149,7 +149,7 @@ const props = defineProps({
                     </li>
                     <li>
                         <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Payment</h2>
-                        <ul class="grid gap-2 @min-[250px]:grid-cols-2">
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                             <li>
                                 <Button :text="__('Stripe')" icon="credit-card" />
                             </li>
