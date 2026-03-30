@@ -23,7 +23,7 @@ export default function useResizable() {
                     handle.style.position = 'absolute';
                     handle.style.top = '0';
                     handle.style.bottom = '0';
-                    handle.style.width = '5px';
+                    handle.style.width = '7px';
                     handle.style.cursor = 'col-resize';
                     handle.style.zIndex = '10';
                     handle.style[resolvedEdge] = '-2px';
