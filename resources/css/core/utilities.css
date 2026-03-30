@@ -361,7 +361,7 @@
         z-index: var(--z-index-below);
         opacity: 0.7;
         /* Effectively remove the right border */
-        width: calc(100% - 7px);
+        width: calc(100% - 6px);
         height: calc(100% - var(--graph-paper-y-offset));
 
         /* https://css-pattern.com/graph-paper/ */
