@@ -164,11 +164,11 @@ Statamic.$events.$on('nav.toggle', toggle);
 
 <template>
     <div class="cp-sidebar-start" :class="sidebarStartSizeClass">
-        <nav v-if="showPrototypeNavBlock" style="--graph-paper-y-offset: 1.75rem;" class="bg-graph-paper [&_button]:rounded-xl [&_button]:w-full [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
-            <ul class="px-0.5 grid gap-8">
+        <nav v-if="showPrototypeNavBlock" style="--graph-paper-y-offset: 1.75rem;" class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
+            <ul class="px-0.5 grid gap-8 @container">
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Heading')" icon="heading" />
                         </li>
@@ -185,7 +185,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Text</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Short Answer')" icon="text-short" />
                         </li>
@@ -196,7 +196,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choice</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Dropdown')" icon="fieldtype-select" />
                         </li>
@@ -216,7 +216,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Rate</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Star Rating')" icon="star" />
                         </li>
@@ -230,7 +230,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Number</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Number')" icon="number" />
                         </li>
@@ -241,7 +241,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Date and Time</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Date Picker')" icon="calendar" />
                         </li>
@@ -258,7 +258,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Name')" icon="user-avatar-flush" />
                         </li>
@@ -281,7 +281,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Media</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Image Choice')" icon="image-select" />
                         </li>
@@ -298,7 +298,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                 </li>
                 <li>
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Payment</h2>
-                    <ul class="grid gap-2 grid-cols-2">
+                    <ul class="grid gap-2 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Stripe')" icon="credit-card" />
                         </li>
