@@ -179,7 +179,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                             <Button :text="__('Banner')" icon="banner" />
                         </li>
                         <li>
-                            <Button :text="__('Legal')" icon="list" />
+                            <Button :text="__('Legal')" icon="legal" />
                         </li>
                     </ul>
                 </li>
