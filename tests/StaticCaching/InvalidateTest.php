@@ -6,13 +6,11 @@ use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Events\BlueprintSaved;
-use Statamic\Events\CollectionTreeSaving;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Form;
 use Statamic\StaticCaching\Invalidate;
 use Statamic\StaticCaching\Invalidator;
-use Statamic\Structures\CollectionTree;
-use Statamic\Structures\CollectionTreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -45,14 +43,7 @@ class InvalidateTest extends TestCase
         EntryFacade::shouldReceive('find')->with('entry-1')->andReturn($entry1);
         EntryFacade::shouldReceive('find')->with('entry-2')->andReturn($entry2);
 
-        $diff = Mockery::mock(CollectionTreeDiff::class);
-        $diff->shouldReceive('removed')->andReturn(['entry-1', 'entry-2']);
-        $diff->shouldReceive('ancestryChanged')->andReturn([]);
-
-        $tree = Mockery::mock(CollectionTree::class);
-        $tree->shouldReceive('diff')->andReturn($diff);
-
-        $event = new CollectionTreeSaving($tree);
+        $event = new CollectionTreeEntriesMovedOrRemoved(removed: ['entry-1', 'entry-2'], moved: []);
 
         $invalidator = Mockery::mock(Invalidator::class);
         $invalidator->shouldReceive('invalidate')->with($entry1)->once();
@@ -70,14 +61,7 @@ class InvalidateTest extends TestCase
 
         EntryFacade::shouldReceive('find')->with('entry-1')->andReturn($entry);
 
-        $diff = Mockery::mock(CollectionTreeDiff::class);
-        $diff->shouldReceive('removed')->andReturn([]);
-        $diff->shouldReceive('ancestryChanged')->andReturn(['entry-1']);
-
-        $tree = Mockery::mock(CollectionTree::class);
-        $tree->shouldReceive('diff')->andReturn($diff);
-
-        $event = new CollectionTreeSaving($tree);
+        $event = new CollectionTreeEntriesMovedOrRemoved(removed: [], moved: ['entry-1']);
 
         $invalidator = Mockery::mock(Invalidator::class);
         $invalidator->shouldReceive('invalidate')->with($entry)->once();
@@ -90,14 +74,7 @@ class InvalidateTest extends TestCase
     #[Test]
     public function it_does_not_invalidate_entries_only_reordered_within_same_parent_when_collection_tree_is_saving()
     {
-        $diff = Mockery::mock(CollectionTreeDiff::class);
-        $diff->shouldReceive('removed')->andReturn([]);
-        $diff->shouldReceive('ancestryChanged')->andReturn([]);
-
-        $tree = Mockery::mock(CollectionTree::class);
-        $tree->shouldReceive('diff')->andReturn($diff);
-
-        $event = new CollectionTreeSaving($tree);
+        $event = new CollectionTreeEntriesMovedOrRemoved(removed: [], moved: []);
 
         $invalidator = Mockery::mock(Invalidator::class);
         $invalidator->shouldNotReceive('invalidate');
@@ -112,14 +89,7 @@ class InvalidateTest extends TestCase
     {
         EntryFacade::shouldReceive('find')->with('missing-entry')->andReturn(null);
 
-        $diff = Mockery::mock(CollectionTreeDiff::class);
-        $diff->shouldReceive('removed')->andReturn(['missing-entry']);
-        $diff->shouldReceive('ancestryChanged')->andReturn([]);
-
-        $tree = Mockery::mock(CollectionTree::class);
-        $tree->shouldReceive('diff')->andReturn($diff);
-
-        $event = new CollectionTreeSaving($tree);
+        $event = new CollectionTreeEntriesMovedOrRemoved(removed: ['missing-entry'], moved: []);
 
         $invalidator = Mockery::mock(Invalidator::class);
         $invalidator->shouldNotReceive('invalidate');
