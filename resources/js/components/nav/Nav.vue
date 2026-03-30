@@ -173,10 +173,13 @@ Statamic.$events.$on('nav.toggle', toggle);
                             <Button :text="__('Heading')" icon="heading" />
                         </li>
                         <li>
-                            <Button :text="__('Paragraph')" icon="text-long" />
+                            <Button :text="__('Paragraph')" icon="text-short" />
                         </li>
                         <li>
                             <Button :text="__('Banner')" icon="banner" />
+                        </li>
+                        <li>
+                            <Button :text="__('Legal')" icon="list" />
                         </li>
                     </ul>
                 </li>
@@ -196,6 +199,9 @@ Statamic.$events.$on('nav.toggle', toggle);
                     <ul class="grid gap-2 grid-cols-2">
                         <li>
                             <Button :text="__('Dropdown')" icon="fieldtype-select" />
+                        </li>
+                        <li>
+                            <Button :text="__('Yes/No')" icon="like" />
                         </li>
                         <li>
                             <Button :text="__('Multi Choice')" icon="fieldtype-radio" />
@@ -245,6 +251,9 @@ Statamic.$events.$on('nav.toggle', toggle);
                         <li>
                             <Button :text="__('Range')" icon="calendar-range" />
                         </li>
+                        <li>
+                            <Button :text="__('SavvyCal')" icon="calendar" />
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -264,6 +273,9 @@ Statamic.$events.$on('nav.toggle', toggle);
                         </li>
                         <li>
                             <Button :text="__('Address')" icon="location-pin" />
+                        </li>
+                        <li>
+                            <Button :text="__('Signature')" icon="edit-pen-draw-scribble" />
                         </li>
                     </ul>
                 </li>
@@ -288,16 +300,10 @@ Statamic.$events.$on('nav.toggle', toggle);
                     <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Payment</h2>
                     <ul class="grid gap-2 grid-cols-2">
                         <li>
-                            <Button :text="__('Stripe')" icon="stripe-logo" />
+                            <Button :text="__('Stripe')" icon="credit-card" />
                         </li>
                         <li>
-                            <Button :text="__('PayPal')" icon="paypal-logo" />
-                        </li>
-                        <li>
-                            <Button :text="__('Audio')" icon="media-music-sound-equalizer" />
-                        </li>
-                        <li>
-                            <Button :text="__('Upload')" icon="upload-arrow-up" />
+                            <Button :text="__('PayPal')" icon="credit-card" />
                         </li>
                     </ul>
                 </li>
