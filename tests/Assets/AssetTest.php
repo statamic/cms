@@ -1261,7 +1261,7 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_moved_uniquely_to_another_folder_when_conflict_exists()
+    public function it_can_be_moved_to_another_folder_with_a_unique_filename_when_conflict_exists()
     {
         Storage::fake('local');
         $disk = Storage::disk('local');
@@ -1274,7 +1274,7 @@ class AssetTest extends TestCase
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
 
-        $return = $asset->moveUnique('new');
+        $return = $asset->move('new', null, true);
 
         $this->assertEquals($asset, $return);
         $disk->assertMissing('old/asset.txt');
@@ -1283,7 +1283,7 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_moved_uniquely_to_another_folder_without_renaming_when_no_conflict()
+    public function it_can_be_moved_to_another_folder_with_a_unique_filename_without_renaming_when_no_conflict()
     {
         Storage::fake('local');
         $disk = Storage::disk('local');
@@ -1294,7 +1294,7 @@ class AssetTest extends TestCase
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
 
-        $return = $asset->moveUnique('new');
+        $return = $asset->move('new', null, true);
 
         $this->assertEquals($asset, $return);
         $disk->assertMissing('old/asset.txt');
