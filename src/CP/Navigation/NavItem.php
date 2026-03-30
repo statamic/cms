@@ -149,6 +149,7 @@ class NavItem
         $cpUrl = url(config('statamic.cp.route')).'/';
 
         $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+        $relativeUrl = rtrim($relativeUrl, '/');
 
         return $relativeUrl.'(/(.*)?|$)';
     }

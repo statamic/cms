@@ -155,7 +155,10 @@ function getRange(start, end) {
     <div class="flex">
         <div class="flex flex-1 items-center">
             <div class="text-sm text-gray-600 dark:text-gray-500" v-if="showTotals && totalItems > 0">
-                {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
+                {{ __(':range of :total', {
+                    range: $number.formatRange(fromItem, toItem),
+                    total: $number.format(totalItems)
+                }) }}
             </div>
         </div>
 
