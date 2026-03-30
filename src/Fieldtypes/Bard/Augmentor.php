@@ -172,11 +172,27 @@ class Augmentor
     {
         static::$currentBardConfig = $this->fieldtype->config();
 
-        $html = $this->editor()->setContent($value)->getHTML();
+        $html = $this->editor()->setContent($this->normalizeProsemirrorContent($value))->getHTML();
 
         static::$currentBardConfig = [];
 
         return $html;
+    }
+
+    private function normalizeProsemirrorContent(array $node): array
+    {
+        if (isset($node['content'])) {
+            if (! is_array($node['content'])) {
+                unset($node['content']);
+            } else {
+                $node['content'] = array_values(array_map(
+                    fn ($child) => $this->normalizeProsemirrorContent($child),
+                    $node['content']
+                ));
+            }
+        }
+
+        return $node;
     }
 
     private function editor()

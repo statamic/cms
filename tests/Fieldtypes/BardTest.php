@@ -989,6 +989,47 @@ EOT;
     }
 
     #[Test]
+    public function it_pre_processes_index_with_string_node_content()
+    {
+        $bard = $this->bard(['sets' => null]);
+
+        // A node with a string "content" value (e.g. empty string) instead of an array
+        // should not throw a foreach error when rendered to HTML.
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => '',
+            ],
+        ];
+
+        $this->assertEquals('<p></p>', $bard->preProcessIndex($data));
+    }
+
+    #[Test]
+    public function it_pre_processes_index_with_deeply_nested_string_node_content()
+    {
+        $bard = $this->bard(['sets' => null]);
+
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'Hello',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => '',
+            ],
+        ];
+
+        $this->assertEquals('<p>Hello</p><p></p>', $bard->preProcessIndex($data));
+    }
+
+    #[Test]
     public function it_converts_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
         $data = [
