@@ -9,6 +9,7 @@ use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
+use Statamic\Events\CollectionTreeSaving;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntryScheduleReached;
@@ -22,6 +23,7 @@ use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
@@ -42,6 +44,7 @@ class Invalidate implements ShouldQueue
         NavDeleted::class => 'invalidateNav',
         FormSaved::class => 'refreshForm',
         FormDeleted::class => 'invalidateForm',
+        CollectionTreeSaving::class => 'invalidateMovedOrRemovedEntries',
         CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
         NavTreeSaved::class => 'refreshNavByTree',
@@ -120,6 +123,19 @@ class Invalidate implements ShouldQueue
     public function refreshForm($event)
     {
         $this->invalidator->refresh($event->form);
+    }
+
+    public function invalidateMovedOrRemovedEntries($event)
+    {
+        $diff = $event->tree->diff();
+
+        $entryIds = array_merge($diff->removed(), $diff->ancestryChanged());
+
+        foreach ($entryIds as $id) {
+            if ($entry = Entry::find($id)) {
+                $this->invalidator->invalidate($entry);
+            }
+        }
     }
 
     public function invalidateCollectionByTree($event)
