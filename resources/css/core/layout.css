@@ -171,19 +171,18 @@ main.nav-closed {
     /* Needed to position the save button (.global-header-nav-actions) */
     position: relative;
     background: var(--color-gray-950);
-    background: oklch(14.1% 0.005 285.823);
-    border-radius: 10px;
+    @apply rounded-lg;
 }
 
 /* Used for three panel layouts */
 .global-header-nav {
-    --item-padding: 1rem;
+    --item-padding: calc(var(--spacing) * 4);
     ul {
         display: flex;
     }
     li {
-        padding: 0.7rem 1.25rem;
-        font-size: 13px;
+        padding: 0.75rem calc(var(--item-padding) + 0.2rem);
+        @apply text-xs;
     }
     a {
         position: relative;
@@ -195,7 +194,6 @@ main.nav-closed {
     }
     @supports not (anchor-name: --my-anchor) {
         a.active {
-            background: red;
             :where(.dark) &::before {
                 @apply border-s-gray-400;
             }
@@ -206,14 +204,13 @@ main.nav-closed {
         ul:has(.active) {
             /* [1] Add a little vertical line to indicate the "active" subnav item that moves with anchor positioning */
             &::before {
-                --height-increase: 1rem;
+                --height-increase: calc(var(--spacing) * 4.5);
                 content: '';
                 position: absolute;
-                /* z-index: var(--z-index-below); */
                 width: calc(anchor-size(width) + var(--item-padding) * 2);
                 height: calc(anchor-size(height) + var(--height-increase));
                 background: var(--theme-color-global-header-bg);
-                border-radius: 5px;
+                @apply rounded-sm;
                 position-anchor: --active;
                 left: calc(anchor(left) - var(--item-padding));
                 top: calc(anchor(top) - var(--height-increase) / 2);
