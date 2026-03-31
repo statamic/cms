@@ -31,16 +31,18 @@ const items = computed(() => {
 
 <template>
     <Teleport to="#global-header-slot">
-        <nav class="global-header-nav flex gap-x-2">
-            <Link
-                v-for="item in items"
-                :key="item.href"
-                :href="item.href"
-                :class="{ active: item.active }"
-                :aria-current="item.active ? 'page' : undefined"
-            >
-                {{ item.label }}
-            </Link>
+        <nav class="global-header-nav">
+            <ul class="flex gap-x-2">
+                <li v-for="item in items" :key="item.href">
+                    <Link
+                        :href="item.href"
+                        :class="{ active: item.active }"
+                        :aria-current="item.active ? 'page' : undefined"
+                    >
+                        {{ item.label }}
+                    </Link>
+                </li>
+            </ul>
         </nav>
         <slot name="actions" />
     </Teleport>
