@@ -19,7 +19,7 @@ const isActive = (href) => page.url === new URL(href, window.location.origin).pa
 <template>
     <Teleport to="#global-header-slot">
         <nav class="global-header-nav">
-            <ul class="flex gap-x-2">
+            <ul>
                 <li v-for="navItem in navItems" :key="navItem.href">
                     <Link
                         :href="navItem.href"
@@ -31,7 +31,7 @@ const isActive = (href) => page.url === new URL(href, window.location.origin).pa
                 </li>
             </ul>
         </nav>
-        <div id="form-layout-actions" class="contents" />
+        <div id="form-layout-actions" class="contents global-header-nav-actions" />
     </Teleport>
 
     <slot />

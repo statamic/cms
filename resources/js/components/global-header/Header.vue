@@ -24,7 +24,7 @@ import UserDropdown from './UserDropdown.vue';
             <Breadcrumbs />
         </div>
 
-        <div id="global-header-slot" class="flex items-center justify-center" />
+        <div id="global-header-slot" class="global-header-slot flex items-center justify-center" />
 
         <div class="dark flex-1 flex gap-1 md:gap-2 lg:gap-2 sm:gap-3 items-center justify-end shrink-0">
             <SiteSelector />

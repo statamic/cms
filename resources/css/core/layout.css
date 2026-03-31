@@ -167,8 +167,32 @@ main.nav-closed {
 
 /* GROUP GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
 =================================================== */
+.global-header-slot {
+    /* Needed to position the save button (.global-header-nav-actions) */
+    position: relative;
+    background: var(--color-gray-950);
+    background: oklch(14.1% 0.005 285.823);
+    border-radius: 10px;
+}
+
 /* Used for three panel layouts */
 .global-header-nav {
+    --item-padding: 1rem;
+    ul {
+        display: flex;
+    }
+    li {
+        padding: 0.7rem 1.25rem;
+        font-size: 13px;
+    }
+    a {
+        position: relative;
+        color: var(--color-gray-400);
+        &.active {
+            color: white;
+            anchor-name: --active;
+        }
+    }
     @supports not (anchor-name: --my-anchor) {
         a.active {
             background: red;
@@ -185,14 +209,16 @@ main.nav-closed {
                 --height-increase: 1rem;
                 content: '';
                 position: absolute;
-                width: anchor-size(height);
+                /* z-index: var(--z-index-below); */
+                width: calc(anchor-size(width) + var(--item-padding) * 2);
                 height: calc(anchor-size(height) + var(--height-increase));
-                background: red;
+                background: var(--theme-color-global-header-bg);
+                border-radius: 5px;
                 position-anchor: --active;
-                left: calc(anchor(left) + 0.25rem - 0.5px);
+                left: calc(anchor(left) - var(--item-padding));
                 top: calc(anchor(top) - var(--height-increase) / 2);
                 transition-property: top, left;
-                transition-duration: 0.2s;
+                transition-duration: 0.5s;
                 transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
             }
             :where(.dark) &::before {
@@ -207,14 +233,24 @@ main.nav-closed {
                     @apply border-s-gray-500;
                 }
             }
-            a.active {
-                border: 3px solid blue!important;
-                anchor-name: --active;
-            }
         }
     }
 }
 
+.global-header-nav-actions {
+    position: relative;
+    button {
+        position: absolute;
+        right: 0;
+        transform: translateX(calc(100% + 1rem));
+        opacity: 0;
+    }
+    &:has(button) {
+        button {
+            opacity: 1;
+        }
+    }
+}
 
 /* ==========================================================================
    DRAGGABLE MIRRORS
