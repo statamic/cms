@@ -164,6 +164,58 @@ main.nav-closed {
     }
 }
 
+
+/* GROUP GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
+=================================================== */
+/* Used for three panel layouts */
+.global-header-nav {
+    @supports not (anchor-name: --my-anchor) {
+        a.active {
+            background: red;
+            :where(.dark) &::before {
+                @apply border-s-gray-400;
+            }
+        }
+    }
+
+    @supports (anchor-name: --my-anchor) {
+        ul:has(.active) {
+            /* [1] Add a little vertical line to indicate the "active" subnav item that moves with anchor positioning */
+            &::before {
+                --height-increase: 1rem;
+                content: '';
+                position: absolute;
+                width: anchor-size(height);
+                height: calc(anchor-size(height) + var(--height-increase));
+                background: red;
+                position-anchor: --active;
+                left: calc(anchor(left) + 0.25rem - 0.5px);
+                top: calc(anchor(top) - var(--height-increase) / 2);
+                transition-property: top, left;
+                transition-duration: 0.2s;
+                transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
+            }
+            :where(.dark) &::before {
+                @apply border-s-gray-400;
+            }
+            &:has(li:only-child) {
+                /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
+                &::before {
+                    @apply border-s-gray-400;
+                }
+                :where(.dark) &::before {
+                    @apply border-s-gray-500;
+                }
+            }
+            a.active {
+                border: 3px solid blue!important;
+                anchor-name: --active;
+            }
+        }
+    }
+}
+
+
 /* ==========================================================================
    DRAGGABLE MIRRORS
    ========================================================================== */
