@@ -3,7 +3,9 @@
 namespace Statamic\Auth;
 
 use Illuminate\Support\Collection;
+use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
 use Statamic\Contracts\Auth\Role;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
@@ -102,7 +104,7 @@ class UserTags extends Tags
     {
         $data = $this->getFormSession();
 
-        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect', 'two_factor_challenge_url', 'two_factor_setup_url'];
 
         $action = route('statamic.login');
         $method = 'POST';
@@ -115,6 +117,14 @@ class UserTags extends Tags
 
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        if ($twoFactorChallengeUrl = $this->params->get('two_factor_challenge_url')) {
+            $params['two_factor_challenge_url'] = $twoFactorChallengeUrl;
+        }
+
+        if ($twoFactorSetupUrl = $this->params->get('two_factor_setup_url')) {
+            $params['two_factor_setup_url'] = $twoFactorSetupUrl;
         }
 
         if (! $this->canParseContents()) {
@@ -637,6 +647,265 @@ class UserTags extends Tags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/user/'.$url
         );
+    }
+
+    /**
+     * Output a two-factor challenge form for login verification.
+     *
+     * Maps to {{ user:two_factor_challenge_form }}
+     *
+     * @return string|array
+     */
+    public function twoFactorChallengeForm()
+    {
+        if (
+            ! TwoFactor::enabled()
+            || session()->missing('login.id')
+        ) {
+            return;
+        }
+
+        $params = [];
+
+        $data = $this->getFormSession();
+
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $method = 'POST';
+        $action = route('statamic.two-factor-challenge');
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
+     * Output a two-factor setup form.
+     *
+     * Maps to {{ user:two_factor_setup_form }}
+     *
+     * @return string|array
+     */
+    public function twoFactorSetupForm()
+    {
+        $user = User::current();
+
+        if (
+            ! TwoFactor::enabled()
+            || ! $user->hasEnabledTwoFactorAuthentication()
+        ) {
+            return;
+        }
+
+        $params = [];
+
+        $data = $this->getFormSession();
+
+        if (empty($user->two_factor_secret)) {
+            app(EnableTwoFactorAuthentication::class)($user);
+            $user = User::current();
+        }
+
+        $data['qr_code'] = $user->twoFactorQrCodeSvg();
+        $data['qr_code_url'] = 'data:image/svg+xml;base64,'.base64_encode($user->twoFactorQrCodeSvg());
+        $data['secret_key'] = $user->twoFactorSecretKey();
+
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $method = 'POST';
+        $action = route('statamic.users.two-factor.confirm');
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
+     * Output the user's two-factor recovery codes.
+     *
+     * Maps to {{ user:two_factor_recovery_codes }}
+     *
+     * @return array|string
+     */
+    public function twoFactorRecoveryCodes()
+    {
+        $user = User::current();
+
+        if (
+            ! TwoFactor::enabled()
+            || ! $user->hasEnabledTwoFactorAuthentication()
+        ) {
+            return $this->parser ? null : [];
+        }
+
+        $codes = collect($user->twoFactorRecoveryCodes())->map(fn ($code) => ['code' => $code]);
+
+        return $this->parser ? $this->parseLoop($codes) : $codes->all();
+    }
+
+    /**
+     * Outputs a URL to download two-factor recovery codes.
+     *
+     * Maps to {{ user:two_factor_recovery_codes_download_url }}
+     *
+     * @return string
+     */
+    public function twoFactorRecoveryCodesDownloadUrl()
+    {
+        $user = User::current();
+
+        if (
+            ! TwoFactor::enabled()
+            || ! $user->hasEnabledTwoFactorAuthentication()
+        ) {
+            return;
+        }
+
+        return route('statamic.users.two-factor.recovery-codes.download');
+    }
+
+    /**
+     * Output a form to regenerate two-factor recovery codes.
+     *
+     * Maps to {{ user:reset_two_factor_recovery_codes_form }}
+     *
+     * @return string|array
+     */
+    public function resetTwoFactorRecoveryCodesForm()
+    {
+        $user = User::current();
+
+        if (
+            ! TwoFactor::enabled()
+            || ! $user?->hasEnabledTwoFactorAuthentication()
+        ) {
+            return;
+        }
+
+        $params = [];
+
+        $data = $this->getFormSession();
+
+        $knownParams = ['redirect', 'allow_request_redirect'];
+
+        $method = 'POST';
+        $action = route('statamic.users.two-factor.recovery-codes.generate');
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
+     * Output a form to disable two-factor authentication.
+     *
+     * Maps to {{ user:disable_two_factor_form }}
+     *
+     * @return string|array
+     */
+    public function disableTwoFactorForm()
+    {
+        $user = User::current();
+
+        if (
+            ! TwoFactor::enabled()
+            || ! $user?->hasEnabledTwoFactorAuthentication()
+        ) {
+            return;
+        }
+
+        $params = [];
+
+        $data = $this->getFormSession();
+
+        $knownParams = ['redirect', 'allow_request_redirect', 'setup_url'];
+
+        $method = 'DELETE';
+        $action = route('statamic.users.two-factor.disable');
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if ($setupUrl = $this->params->get('setup_url')) {
+            $params['setup_url'] = $setupUrl;
+        }
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
     }
 
     /**

@@ -27,11 +27,27 @@ class LoginController extends Controller
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
+        if ($setupUrl = $request->input('_two_factor_setup_url')) {
+            if (! URL::isExternalToApplication($setupUrl)) {
+                $request->session()->put('login.two_factor_setup_url', $setupUrl);
+            }
+        }
+
+        if ($redirect = $request->input('_redirect')) {
+            if (! URL::isExternalToApplication($redirect)) {
+                $request->session()->put('login.redirect', $redirect);
+            }
+        }
+
         $this->authenticate($request, $user);
 
-        $redirect = $request->input('_redirect', '/');
+        $redirect = $request->input('_redirect');
 
-        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect)->withSuccess(__('Login successful.'));
+        $url = $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
+
+        return redirect($url)->withSuccess(__('Login successful.'));
     }
 
     protected function twoFactorChallengeRedirect(): string
@@ -76,9 +92,13 @@ class LoginController extends Controller
     {
         Auth::logout();
 
-        $redirect = request()->get('redirect', '/');
+        $redirect = request()->get('redirect');
 
-        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
+        $url = $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
+
+        return redirect($url);
     }
 
     protected function username()

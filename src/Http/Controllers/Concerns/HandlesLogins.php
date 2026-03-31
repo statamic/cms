@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Contracts\Auth\User;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
+use Statamic\Facades\URL;
 
 trait HandlesLogins
 {
@@ -59,16 +60,41 @@ trait HandlesLogins
 
     protected function twoFactorChallengeResponse(Request $request, User $user)
     {
-        $request->session()->put([
+        $session = [
             'login.id' => $user->getKey(),
             'login.remember' => $request->boolean('remember'),
-        ]);
+        ];
+
+        if ($challengeUrl = $request->input('_two_factor_challenge_url')) {
+            if (! URL::isExternalToApplication($challengeUrl)) {
+                $session['login.two_factor_challenge_url'] = $challengeUrl;
+            }
+        }
+
+        if ($setupUrl = $request->input('_two_factor_setup_url')) {
+            if (! URL::isExternalToApplication($setupUrl)) {
+                $session['login.two_factor_setup_url'] = $setupUrl;
+            }
+        }
+
+        if ($redirect = $request->input('_redirect')) {
+            if (! URL::isExternalToApplication($redirect)) {
+                $session['login.redirect'] = $redirect;
+            }
+        }
+
+        $request->session()->put($session);
 
         TwoFactorAuthenticationChallenged::dispatch($user);
 
+        $challengeRedirect = ($challengeUrl = $request->input('_two_factor_challenge_url'))
+            && ! URL::isExternalToApplication($challengeUrl)
+            ? $challengeUrl
+            : $this->twoFactorChallengeRedirect();
+
         return $request->wantsJson()
             ? response()->json(['two_factor' => true])
-            : redirect($this->twoFactorChallengeRedirect());
+            : redirect($challengeRedirect);
     }
 
     abstract protected function twoFactorChallengeRedirect(): string;

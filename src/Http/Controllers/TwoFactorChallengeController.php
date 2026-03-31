@@ -18,7 +18,7 @@ class TwoFactorChallengeController extends Controller
     public function __construct(Request $request)
     {
         $this->middleware('throttle:two-factor');
-        $this->middleware(HandleInertiaRequests::class);
+        $this->middleware(HandleInertiaRequests::class)->except('store');
         $this->middleware(RedirectIfAuthenticated::class);
     }
 
@@ -45,20 +45,49 @@ class TwoFactorChallengeController extends Controller
         } elseif (! $request->hasValidCode()) {
             TwoFactorAuthenticationFailed::dispatch($user);
 
-            return $request->sendFailedTwoFactorChallengeResponse();
+            return $this->sendFailedResponse($request);
         }
 
         ValidTwoFactorAuthenticationCodeProvided::dispatch($user);
 
         Auth::guard()->login($user, $request->remember());
 
+        $this->clearTwoFactorSession($request);
+
         $request->session()->elevate();
 
         $request->session()->regenerate();
 
-        return $request->expectsJson()
-            ? response('Authenticated')
-            : redirect()->intended($this->redirectPath());
+        if ($request->inertia() || $request->expectsJson()) {
+            return $request->inertia()
+                ? Inertia::location($this->redirectPath($request))
+                : response('Authenticated');
+        }
+
+        return redirect()->intended($this->redirectPath($request));
+    }
+
+    protected function sendFailedResponse(TwoFactorChallengeRequest $request)
+    {
+        if ($errorRedirect = $request->input('_error_redirect')) {
+            if (! URL::isExternalToApplication($errorRedirect)) {
+                return $request->sendFailedTwoFactorChallengeResponse($errorRedirect);
+            }
+        }
+
+        if ($challengeUrl = $request->session()->get('login.two_factor_challenge_url')) {
+            return $request->sendFailedTwoFactorChallengeResponse($challengeUrl);
+        }
+
+        return $request->sendFailedTwoFactorChallengeResponse($this->failedRedirectPath());
+    }
+
+    protected function clearTwoFactorSession(Request $request): void
+    {
+        $request->session()->forget([
+            'login.two_factor_challenge_url',
+            'login.two_factor_setup_url',
+        ]);
     }
 
     protected function formAction()
@@ -68,10 +97,23 @@ class TwoFactorChallengeController extends Controller
 
     protected function redirectPath()
     {
-        $redirect = request('redirect');
+        if ($redirect = $request->input('_redirect')) {
+            if (! URL::isExternalToApplication($redirect)) {
+                return $redirect;
+            }
+        }
 
-        return $redirect && ! URL::isExternalToApplication($redirect)
-            ? $redirect
-            : route('statamic.site');
+        if ($redirect = $request->session()->pull('login.redirect')) {
+            if (! URL::isExternalToApplication($redirect)) {
+                return $redirect;
+            }
+        }
+
+        return route('statamic.site');
+    }
+
+    protected function failedRedirectPath()
+    {
+        return route('statamic.two-factor-challenge');
     }
 }
