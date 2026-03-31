@@ -182,7 +182,7 @@ main.nav-closed {
     }
     li {
         padding: 0.7rem calc(var(--item-padding) + 0.2rem);
-        @apply text-xs min-h-10;
+        @apply text-xs min-h-10 shadow-ui-md;
     }
     a {
         position: relative;
