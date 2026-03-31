@@ -4,42 +4,29 @@ import { Link, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
 const form = computed(() => page.props.form);
-const basePath = computed(() => cp_url(`forms/${form.value.handle}`));
 
-const normalizePath = (url) => {
-    const withOrigin = url.startsWith('http') ? url : `${window.location.origin}${url}`;
-    const pathname = new URL(withOrigin).pathname;
+const navItems = [
+    { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/fields`) },
+    { label: __('Logic'), href: cp_url(`forms/${form.value.handle}/logic`) },
+    { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
+    { label: __('Results'), href: cp_url(`forms/${form.value.handle}`) },
+    { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
+];
 
-    return pathname.replace(/\/+$/, '') || '/';
-};
-
-const currentPath = computed(() => normalizePath(page.url));
-
-const items = computed(() => {
-    const base = normalizePath(basePath.value);
-    const is = (path) => currentPath.value === path || currentPath.value.startsWith(`${path}/`);
-
-    return [
-        { label: __('Edit'), href: `${base}/fields`, active: is(`${base}/fields`) },
-        { label: __('Logic'), href: `${base}/logic`, active: is(`${base}/logic`) },
-        { label: __('Connect'), href: `${base}/connect`, active: is(`${base}/connect`) },
-        { label: __('Results'), href: base, active: currentPath.value === base },
-        { label: __('Configure'), href: `${base}/edit`, active: is(`${base}/edit`) },
-    ];
-});
+const isActive = (href) => page.url === new URL(href, window.location.origin).pathname;
 </script>
 
 <template>
     <Teleport to="#global-header-slot">
         <nav class="global-header-nav">
             <ul class="flex gap-x-2">
-                <li v-for="item in items" :key="item.href">
+                <li v-for="navItem in navItems" :key="navItem.href">
                     <Link
-                        :href="item.href"
-                        :class="{ active: item.active }"
-                        :aria-current="item.active ? 'page' : undefined"
+                        :href="navItem.href"
+                        :class="{ active: isActive(navItem.href) }"
+                        :aria-current="isActive(navItem.href) ? 'page' : undefined"
                     >
-                        {{ item.label }}
+                        {{ navItem.label }}
                     </Link>
                 </li>
             </ul>
