@@ -223,10 +223,16 @@ main.nav-closed {
 }
 
 .global-header-nav-actions {
+    top: 0;
+    opacity: 0;
+    transition: opacity 0.1s ease-in 0s;
+    &:has(button) {
+        opacity: 1;
+    }
     button {
         position: absolute;
-        right: 0;
-        transform: translateX(calc(100% + calc(var(--spacing) * 3)));
+        top: 50%;
+        translate: var(--spacing) -50%;
     }
 }
 
