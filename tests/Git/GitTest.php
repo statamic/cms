@@ -3,6 +3,7 @@
 namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
@@ -12,6 +13,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Git;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
+use Statamic\Git\CommitJob;
 use Tests\TestCase;
 
 class GitTest extends TestCase
@@ -57,13 +59,13 @@ class GitTest extends TestCase
     }
 
     #[Test]
-    public function it_wont_run_if_git_integration_is_not_enabled()
+    public function it_wont_run_commit_if_git_integration_is_not_enabled()
     {
         Config::set('statamic.git.enabled', false);
 
         $this->expectExceptionMessage('Statamic Git integration is disabled.');
 
-        Git::anything();
+        Git::commit();
     }
 
     #[Test]
@@ -393,7 +395,7 @@ EOT;
 
         Git::dispatchCommit();
 
-        Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
+        Queue::assertPushed(CommitJob::class, 1);
     }
 
     #[Test]
@@ -536,6 +538,90 @@ EOT;
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
 
         Git::commit();
+    }
+
+    #[Test]
+    public function it_can_parse_diff_output_into_changes()
+    {
+        $output = implode("\n", [
+            'M	content/collections/blog/post.md',
+            'A	content/collections/news/article.md',
+            'D	content/taxonomies/tags/laravel.yaml',
+        ]);
+
+        $changes = Git::parseDiffOutput($output);
+
+        $this->assertCount(3, $changes);
+
+        $this->assertEquals(['status' => 'M', 'path' => 'content/collections/blog/post.md'], $changes[0]);
+        $this->assertEquals(['status' => 'A', 'path' => 'content/collections/news/article.md'], $changes[1]);
+        $this->assertEquals(['status' => 'D', 'path' => 'content/taxonomies/tags/laravel.yaml'], $changes[2]);
+    }
+
+    #[Test]
+    public function it_normalizes_rename_lines_into_delete_and_add()
+    {
+        $output = "R100\tcontent/collections/blog/old-name.md\tcontent/collections/blog/new-name.md";
+
+        $changes = Git::parseDiffOutput($output);
+
+        $this->assertCount(2, $changes);
+        $this->assertEquals(['status' => 'D', 'path' => 'content/collections/blog/old-name.md'], $changes[0]);
+        $this->assertEquals(['status' => 'A', 'path' => 'content/collections/blog/new-name.md'], $changes[1]);
+    }
+
+    #[Test]
+    public function it_returns_empty_collection_for_empty_diff_output()
+    {
+        $this->assertCount(0, Git::parseDiffOutput(''));
+        $this->assertCount(0, Git::parseDiffOutput('   '));
+    }
+
+    #[Test]
+    public function it_reads_and_writes_the_stache_ref_file()
+    {
+        $refFile = storage_path('statamic/.stache-git-ref');
+
+        if (file_exists($refFile)) {
+            unlink($refFile);
+        }
+
+        $this->assertNull(Git::getStacheRef());
+
+        Git::setStacheRef('abc1234');
+
+        $this->assertFileExists($refFile);
+        $this->assertEquals('abc1234', Git::getStacheRef());
+
+        unlink($refFile);
+    }
+
+    #[Test]
+    public function it_returns_null_stache_diff_when_no_ref_file_exists()
+    {
+        $refFile = storage_path('statamic/.stache-git-ref');
+
+        if (file_exists($refFile)) {
+            unlink($refFile);
+        }
+
+        $this->assertNull(Git::stacheDiff());
+    }
+
+    #[Test]
+    public function it_returns_empty_collection_when_no_changes_since_ref()
+    {
+        $sha = Git::currentSha();
+
+        Git::setStacheRef($sha);
+
+        $actions = Git::stacheDiff();
+
+        // No changes since HEAD — should be an empty collection.
+        $this->assertInstanceOf(Collection::class, $actions);
+        $this->assertCount(0, $actions);
+
+        unlink(storage_path('statamic/.stache-git-ref'));
     }
 
     private function showLastCommit($path)

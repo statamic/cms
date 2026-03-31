@@ -50,6 +50,48 @@ class Git extends Process
     }
 
     /**
+     * Get git diff --name-status between two refs.
+     *
+     * @param  string  $from  Base commit SHA or ref
+     * @param  string  $to  Target commit SHA or ref (e.g. 'HEAD')
+     * @return string
+     */
+    public function diff(string $from, string $to = 'HEAD')
+    {
+        return $this->runGitCommand('diff', '--name-status', $from, $to);
+    }
+
+    /**
+     * Get git diff --name-status for dirty (unstaged) files.
+     *
+     * @return string
+     */
+    public function diffDirty()
+    {
+        return $this->runGitCommand('diff', '--name-status', 'HEAD');
+    }
+
+    /**
+     * Get git diff --name-status for staged (cached) files.
+     *
+     * @return string
+     */
+    public function diffStaged()
+    {
+        return $this->runGitCommand('diff', '--name-status', '--cached', 'HEAD');
+    }
+
+    /**
+     * Get the current HEAD commit SHA.
+     *
+     * @return string
+     */
+    public function currentSha()
+    {
+        return $this->runGitCommand('rev-parse', 'HEAD');
+    }
+
+    /**
      * Run git command.
      *
      * @param  mixed  $parts

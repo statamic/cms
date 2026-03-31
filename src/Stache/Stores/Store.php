@@ -15,16 +15,27 @@ use Statamic\Support\Str;
 abstract class Store
 {
     protected $directory;
+
     protected $valueIndex = Indexes\Value::class;
+
     protected $customIndexes = [];
+
     protected $defaultIndexes = ['id', 'path'];
+
     protected $storeIndexes = [];
+
     protected $usedIndexes;
+
     protected $fileChangesHandled = false;
+
     protected $paths;
+
     protected $fileItems;
+
     protected $shouldCacheFileItems = false;
+
     protected $modified;
+
     protected $keys;
 
     /**
@@ -277,6 +288,39 @@ abstract class Store
         });
 
         $this->modified = $modified;
+    }
+
+    /**
+     * Update the stache cache for a single file that was added or modified on disk.
+     * This is a read-only stache operation — it does not write to disk.
+     */
+    public function updateItemFromPath(string $path): void
+    {
+        $item = $this->makeItemFromFile($path, File::get($path));
+        $key = $this->getItemKey($item);
+
+        $this->forgetItem($key);
+        $this->setPath($key, $item->path());
+        $this->cacheItem($item);
+        $this->handleModifiedItem($item);
+
+        $this->resolveIndexes()->filter->isCached()->each(function ($index) use ($item) {
+            $index->updateItem($item);
+        });
+    }
+
+    /**
+     * Remove a single item from the stache cache by its file path.
+     * Used when a file has been deleted from disk.
+     */
+    public function forgetItemByPath(string $path): void
+    {
+        collect($this->getKeyFromPath($path))->each(function ($key) use ($path) {
+            $this->forgetItem($key);
+            $this->forgetPath($key);
+            $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
+            $this->handleDeletedItem($path, $key);
+        });
     }
 
     protected function handleModifiedItem($item)

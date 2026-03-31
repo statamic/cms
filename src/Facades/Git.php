@@ -13,6 +13,12 @@ use Statamic\Contracts\Auth\User as UserContract;
  * @method static void dispatchCommit(string $message = null)
  * @method static string gitUserName()
  * @method static string gitUserEmail()
+ * @method static bool isRepo()
+ * @method static string currentSha()
+ * @method static string|null getStacheRef()
+ * @method static void setStacheRef(string $sha)
+ * @method static \Illuminate\Support\Collection parseDiffOutput(?string $output)
+ * @method static \Illuminate\Support\Collection|null stacheDiff(bool $includeDirty = false)
  *
  * @see \Statamic\Git\Git
  */
