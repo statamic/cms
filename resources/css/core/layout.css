@@ -218,34 +218,15 @@ main.nav-closed {
                 transition-duration: 0.5s;
                 transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
             }
-            :where(.dark) &::before {
-                @apply border-s-gray-400;
-            }
-            &:has(li:only-child) {
-                /* [/2] Make the "active" subnav item less distracting for single-subnav items such as Assets/assets */
-                &::before {
-                    @apply border-s-gray-400;
-                }
-                :where(.dark) &::before {
-                    @apply border-s-gray-500;
-                }
-            }
         }
     }
 }
 
 .global-header-nav-actions {
-    position: relative;
     button {
         position: absolute;
         right: 0;
-        transform: translateX(calc(100% + 1rem));
-        opacity: 0;
-    }
-    &:has(button) {
-        button {
-            opacity: 1;
-        }
+        transform: translateX(calc(100% + calc(var(--spacing) * 3)));
     }
 }
 
