@@ -181,8 +181,8 @@ main.nav-closed {
         display: flex;
     }
     li {
-        padding: 0.75rem calc(var(--item-padding) + 0.2rem);
-        @apply text-xs;
+        padding: 0.7rem calc(var(--item-padding) + 0.2rem);
+        @apply text-xs min-h-10;
     }
     a {
         position: relative;
@@ -204,13 +204,13 @@ main.nav-closed {
         ul:has(.active) {
             /* [1] Add a little vertical line to indicate the "active" subnav item that moves with anchor positioning */
             &::before {
-                --height-increase: calc(var(--spacing) * 4.5);
+                --height-increase: calc(var(--spacing) * 4.25);
                 content: '';
                 position: absolute;
                 width: calc(anchor-size(width) + var(--item-padding) * 2);
                 height: calc(anchor-size(height) + var(--height-increase));
                 background: var(--theme-color-global-header-bg);
-                @apply rounded-sm;
+                border-radius: 5px;
                 position-anchor: --active;
                 left: calc(anchor(left) - var(--item-padding));
                 top: calc(anchor(top) - var(--height-increase) / 2);
