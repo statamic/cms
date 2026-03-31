@@ -8,7 +8,7 @@ const form = computed(() => page.props.form);
 
 <template>
     <Teleport to="#global-header-slot">
-        <nav class="flex gap-x-2">
+        <nav class="global-header-nav flex gap-x-2">
             <Link :href="cp_url(`forms/${form.handle}/fields`)">{{ __('Edit') }}</Link>
             <Link :href="cp_url(`forms/${form.handle}/logic`)">{{ __('Logic') }}</Link>
             <Link :href="cp_url(`forms/${form.handle}/connect`)">{{ __('Connect') }}</Link>
