@@ -31,7 +31,7 @@ const isActive = (href) => page.url === new URL(href, window.location.origin).pa
                 </li>
             </ul>
         </nav>
-        <slot name="actions" />
+        <div id="form-layout-actions" class="contents" />
     </Teleport>
 
     <slot />

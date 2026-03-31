@@ -4,7 +4,10 @@ import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
 import { PublishContainer as Container, PublishTabs as Tabs } from '@/components/ui';
-import FormLayout from './Layout.vue';
+import Layout from '@/pages/layout/Layout.vue';
+import FormsLayout from './Layout.vue';
+
+defineOptions({ layout: [Layout, FormsLayout] });
 
 const props = defineProps({
     blueprint: {
@@ -61,23 +64,21 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <FormLayout>
-        <template #actions>
-            <Button class="ms-2" :text="__('Save')" variant="primary" @click="save" :disabled="saving" />
-        </template>
+    <Teleport to="#form-layout-actions">
+        <Button class="ms-2" :text="__('Save')" variant="primary" @click="save" :disabled="saving" />
+    </Teleport>
 
-        <Header :title="__('Configure Form')" icon="cog">
-            <Button variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
-        </Header>
-        <Container
-            ref="container"
-            :blueprint
-            :meta
-            :errors
-            as-config
-            v-model="values"
-        >
-            <Tabs />
-        </Container>
-    </FormLayout>
+    <Header :title="__('Configure Form')" icon="cog">
+        <Button variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
+    </Header>
+    <Container
+        ref="container"
+        :blueprint
+        :meta
+        :errors
+        as-config
+        v-model="values"
+    >
+        <Tabs />
+    </Container>
 </template>
