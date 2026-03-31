@@ -225,7 +225,8 @@ main.nav-closed {
 .global-header-nav-actions {
     top: 0;
     opacity: 0;
-    transition: opacity 0.1s ease-in 0s;
+    /* Soft fade in e.g. "Save" button */
+    transition: opacity 0.075s ease-in;
     &:has(button) {
         opacity: 1;
     }
