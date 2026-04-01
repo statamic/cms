@@ -60,14 +60,6 @@ class FakeSubmissionGenerator
             return null;
         }
 
-        if ($yesNo = $this->yesNoOptionValues($options)) {
-            return $yesNo[random_int(0, 1)];
-        }
-
-        if ($weighted = $this->semanticOptionWeights($field, $options)) {
-            return $this->pickWeightedOption($weighted);
-        }
-
         return $options[array_rand($options)];
     }
 
@@ -77,26 +69,6 @@ class FakeSubmissionGenerator
 
         if (empty($options)) {
             return [];
-        }
-
-        if ($yesNo = $this->yesNoOptionValues($options)) {
-            return random_int(0, 1) === 1 ? [$yesNo[0]] : [$yesNo[1]];
-        }
-
-        if ($weighted = $this->semanticOptionWeights($field, $options)) {
-            $max = min(3, count($weighted));
-            $count = random_int(1, $max);
-            $picked = [];
-
-            while (count($picked) < $count) {
-                $candidate = $this->pickWeightedOption($weighted);
-
-                if (! in_array($candidate, $picked, true)) {
-                    $picked[] = $candidate;
-                }
-            }
-
-            return $picked;
         }
 
         shuffle($options);
@@ -119,98 +91,6 @@ class FakeSubmissionGenerator
         return array_values(array_map(function ($option) {
             return is_array($option) ? Arr::get($option, 'value') : $option;
         }, $options));
-    }
-
-    private function yesNoOptionValues(array $options): ?array
-    {
-        if (count($options) !== 2) {
-            return null;
-        }
-
-        $normalized = array_map(fn ($option) => Str::lower(trim((string) $option)), $options);
-        $truthy = ['yes', 'true', '1', 'y', 'on'];
-        $falsey = ['no', 'false', '0', 'n', 'off'];
-
-        if (
-            (in_array($normalized[0], $truthy, true) && in_array($normalized[1], $falsey, true))
-            || (in_array($normalized[1], $truthy, true) && in_array($normalized[0], $falsey, true))
-        ) {
-            return $options;
-        }
-
-        return null;
-    }
-
-    private function semanticOptionWeights(Field $field, array $options): ?array
-    {
-        $weights = [];
-        $fieldContext = $this->normalizedFieldContext($field);
-
-        foreach ($options as $option) {
-            $normalized = Str::lower((string) $option);
-            $weight = 1;
-
-            if (str_contains($fieldContext, 'country') && $this->containsAny($normalized, ['united states', 'usa', 'canada', 'uk'])) {
-                $weight += 3;
-            }
-
-            if (str_contains($fieldContext, 'state') && $this->containsAny($normalized, ['california', 'new york', 'texas', 'florida'])) {
-                $weight += 3;
-            }
-
-            if (str_contains($fieldContext, 'priority') && $this->containsAny($normalized, ['medium', 'normal'])) {
-                $weight += 4;
-            }
-
-            if (str_contains($fieldContext, 'status') && $this->containsAny($normalized, ['active', 'open', 'pending'])) {
-                $weight += 3;
-            }
-
-            if (str_contains($fieldContext, 'size') && $this->containsAny($normalized, ['medium', 'm'])) {
-                $weight += 4;
-            }
-
-            if (str_contains($fieldContext, 'rating') && $this->containsAny($normalized, ['4', '5', 'good', 'great', 'excellent'])) {
-                $weight += 3;
-            }
-
-            if (str_contains($fieldContext, 'plan') && $this->containsAny($normalized, ['pro', 'standard', 'plus'])) {
-                $weight += 3;
-            }
-
-            $weights[] = ['value' => $option, 'weight' => $weight];
-        }
-
-        $allDefault = collect($weights)->every(fn ($item) => $item['weight'] === 1);
-
-        return $allDefault ? null : $weights;
-    }
-
-    private function pickWeightedOption(array $weightedOptions): mixed
-    {
-        $total = array_sum(array_column($weightedOptions, 'weight'));
-        $roll = random_int(1, max($total, 1));
-
-        foreach ($weightedOptions as $option) {
-            $roll -= $option['weight'];
-
-            if ($roll <= 0) {
-                return $option['value'];
-            }
-        }
-
-        return $weightedOptions[array_key_last($weightedOptions)]['value'];
-    }
-
-    private function containsAny(string $haystack, array $needles): bool
-    {
-        foreach ($needles as $needle) {
-            if (str_contains($haystack, Str::lower($needle))) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function word(): string
