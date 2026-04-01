@@ -343,6 +343,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
+    Route::post('forms/{form}/submissions/generate-fake', [FormSubmissionsController::class, 'generateFake'])->name('forms.submissions.generate-fake');
     Route::resource('forms', FormsController::class);
     Route::resource('forms.submissions', FormSubmissionsController::class);
     Route::get('forms/{form}/fields', FormFieldsController::class)->name('forms.fields.index');

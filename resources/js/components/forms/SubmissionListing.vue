@@ -1,5 +1,6 @@
 <template>
     <Listing
+        ref="listing"
         :url="requestUrl"
         :columns="columns"
         :action-url="actionUrl"
@@ -41,6 +42,12 @@ export default {
             preferencesPrefix: `forms.${this.form}`,
             requestUrl: cp_url(`forms/${this.form}/submissions`),
         };
+    },
+
+    methods: {
+        refresh() {
+            this.$refs.listing?.refresh();
+        },
     },
 };
 </script>

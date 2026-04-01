@@ -223,6 +223,10 @@ class Form implements Arrayable, Augmentable, FormContract
             $data['store'] = false;
         }
 
+        if ($this->get('generate_fake_submissions') === false) {
+            $data['generate_fake_submissions'] = false;
+        }
+
         File::put($this->path(), YAML::dump($data));
 
         foreach ($afterSaveCallbacks as $callback) {
