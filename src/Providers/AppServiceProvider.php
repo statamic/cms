@@ -259,6 +259,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Taxonomies\Taxonomy::class,
             \Statamic\Taxonomies\LocalizedTerm::class,
             \Statamic\Taxonomies\Term::class,
+            \Illuminate\Support\Carbon::class,
             \Illuminate\Support\Collection::class,
         ];
 
