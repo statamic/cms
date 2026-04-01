@@ -26,13 +26,30 @@ const deletingFakeSubmissions = ref(false);
 const submissionListing = ref(null);
 const exportModalOpen = ref(false);
 const exportingSubmissions = ref(false);
-const exportFormat = ref('csv');
+const exportFormat = ref('');
 const exportScope = ref('all');
 
-const exportFormats = [
-    { value: 'csv', label: __('CSV') },
-    { value: 'json', label: __('JSON') },
-];
+const exportFormats = computed(() => {
+    const seen = new Set();
+
+    return props.exporters.reduce((formats, exporter) => {
+        const handle = String(exporter?.handle ?? '').trim();
+        const normalizedHandle = normalizedValue(handle);
+
+        if (!normalizedHandle || seen.has(normalizedHandle)) {
+            return formats;
+        }
+
+        seen.add(normalizedHandle);
+
+        formats.push({
+            value: handle,
+            label: exporter.title || handle.toUpperCase(),
+        });
+
+        return formats;
+    }, []);
+});
 
 const exportScopeOptions = [
     {
@@ -103,9 +120,9 @@ async function deleteFakeSubmissions() {
 }
 
 function openExportModal() {
-    const firstAvailableFormat = exportFormats.find(({ value }) => Boolean(findExporterByFormat(value)));
+    const firstAvailableFormat = exportFormats.value[0];
 
-    exportFormat.value = firstAvailableFormat?.value ?? 'csv';
+    exportFormat.value = firstAvailableFormat?.value ?? '';
     exportScope.value = 'all';
     exportModalOpen.value = true;
 }
@@ -149,6 +166,10 @@ function appendParamsToUrl(url, params) {
 }
 
 function exportSubmissions() {
+    if (!selectedExporter.value) {
+        return;
+    }
+
     exportingSubmissions.value = true;
 
     const params = exportScope.value === 'filtered' ? getSubmissionListingParameters() : {};
@@ -298,8 +319,6 @@ function exportSubmissions() {
                             :key="option.value"
                             :value="option.value"
                             :label="option.label"
-                            :description="findExporterByFormat(option.value) ? null : __('No exporter configured for this format.')"
-                            :disabled="!findExporterByFormat(option.value)"
                         />
                     </RadioGroup>
                 </div>
