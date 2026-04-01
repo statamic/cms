@@ -242,6 +242,8 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $classes = [
+            \Statamic\Auth\File\User::class,
+            \Statamic\Assets\Asset::class,
             \Statamic\Assets\AssetContainer::class,
             \Statamic\Entries\Collection::class,
             \Statamic\Entries\Entry::class,
@@ -249,6 +251,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Forms\Submission::class,
             \Statamic\Globals\GlobalSet::class,
             \Statamic\Globals\Variables::class,
+            \Statamic\Revisions\Revision::class,
             \Statamic\Structures\Nav::class,
             \Statamic\Structures\NavTree::class,
             \Statamic\Structures\CollectionTree::class,
