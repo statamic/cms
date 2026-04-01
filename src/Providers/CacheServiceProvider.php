@@ -45,12 +45,7 @@ class CacheServiceProvider extends ServiceProvider
 
             Cache::extend('file', function ($app, $config) {
                 return Cache::repository(
-                    (new FileStore(
-                        $app['files'],
-                        $config['path'],
-                        $config['permission'] ?? null,
-                        $app['config']['cache.serializable_classes'] ?? null
-                    ))
+                    (new FileStore($app['files'], $config['path'], $config['permission'] ?? null))
                         ->setLockDirectory($config['lock_path'] ?? null),
                     $config
                 );
