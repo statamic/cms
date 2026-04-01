@@ -229,6 +229,40 @@ class AppServiceProvider extends ServiceProvider
                 ->finalNewline(config('statamic.templates.style.final_newline', false))
                 ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
+
+        $this->registerSerializableClasses();
+    }
+
+    private function registerSerializableClasses()
+    {
+        $existing = $this->app['config']->get('cache.serializable_classes');
+
+        if ($existing === true) {
+            return;
+        }
+
+        $classes = [
+            \Statamic\Assets\AssetContainer::class,
+            \Statamic\Entries\Collection::class,
+            \Statamic\Entries\Entry::class,
+            \Statamic\Forms\Form::class,
+            \Statamic\Forms\Submission::class,
+            \Statamic\Globals\GlobalSet::class,
+            \Statamic\Globals\Variables::class,
+            \Statamic\Structures\Nav::class,
+            \Statamic\Structures\NavTree::class,
+            \Statamic\Structures\CollectionTree::class,
+            \Statamic\Structures\CollectionStructure::class,
+            \Statamic\Taxonomies\Taxonomy::class,
+            \Statamic\Taxonomies\LocalizedTerm::class,
+            \Statamic\Taxonomies\Term::class,
+            \Illuminate\Support\Collection::class,
+        ];
+
+        $this->app['config']->set('cache.serializable_classes', array_merge(
+            is_array($existing) ? $existing : [],
+            $classes
+        ));
     }
 
     protected function registerMiddlewareGroup()
