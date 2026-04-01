@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, CommandPaletteItem } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, CommandPaletteItem, Modal, ModalClose, Radio, RadioGroup } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -24,6 +24,33 @@ const deleter = ref(null);
 const generatingFakeSubmission = ref(false);
 const deletingFakeSubmissions = ref(false);
 const submissionListing = ref(null);
+const exportModalOpen = ref(false);
+const exportingSubmissions = ref(false);
+const exportFormat = ref('csv');
+const exportScope = ref('all');
+
+const exportFormats = [
+    { value: 'csv', label: __('CSV') },
+    { value: 'json', label: __('JSON') },
+];
+
+const exportScopeOptions = [
+    {
+        value: 'all',
+        label: __('All Submissions'),
+    },
+    {
+        value: 'filtered',
+        label: __('Filtered Submissions'),
+    },
+];
+
+const selectedExporter = computed(() => findExporterByFormat(exportFormat.value));
+const hasFilteredScope = computed(() => {
+    const parameters = getSubmissionListingParameters();
+
+    return Boolean(parameters.search || parameters.filters);
+});
 
 async function generateFakeSubmission(mode) {
     if (generatingFakeSubmission.value) {
@@ -73,6 +100,68 @@ async function deleteFakeSubmissions() {
     } finally {
         deletingFakeSubmissions.value = false;
     }
+}
+
+function openExportModal() {
+    const firstAvailableFormat = exportFormats.find(({ value }) => Boolean(findExporterByFormat(value)));
+
+    exportFormat.value = firstAvailableFormat?.value ?? 'csv';
+    exportScope.value = 'all';
+    exportModalOpen.value = true;
+}
+
+function normalizedValue(value) {
+    return String(value ?? '').toLowerCase();
+}
+
+function findExporterByFormat(format) {
+    const normalizedFormat = normalizedValue(format);
+
+    return props.exporters.find((exporter) => {
+        const handle = normalizedValue(exporter.handle);
+        const title = normalizedValue(exporter.title);
+        const downloadUrl = normalizedValue(exporter.downloadUrl);
+        const exporterValue = `${handle} ${title} ${downloadUrl}`;
+
+        return exporterValue.includes(normalizedFormat);
+    }) || null;
+}
+
+function getSubmissionListingParameters() {
+    const parameters = submissionListing.value?.getParameters?.() ?? {};
+
+    return {
+        sort: parameters.sort,
+        order: parameters.order,
+        search: parameters.search,
+        filters: parameters.filters,
+    };
+}
+
+function appendParamsToUrl(url, params) {
+    const result = new URL(url, window.location.origin);
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') {
+            return;
+        }
+
+        result.searchParams.set(key, value);
+    });
+
+    return result.toString();
+}
+
+function exportSubmissions() {
+    exportingSubmissions.value = true;
+
+    const params = exportScope.value === 'filtered' ? getSubmissionListingParameters() : {};
+    const exportUrl = appendParamsToUrl(selectedExporter.value.downloadUrl, params);
+
+    window.open(exportUrl, '_blank', 'noopener,noreferrer');
+
+    exportModalOpen.value = false;
+    exportingSubmissions.value = false;
 }
 </script>
 
@@ -129,20 +218,7 @@ async function deleteFakeSubmissions() {
                 :redirect="redirectUrl"
             />
 
-            <Dropdown v-if="exporters.length">
-                <template #trigger>
-                    <Button :text="__('Export Submissions')" />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem
-                        v-for="exporter in exporters"
-                        :key="exporter.downloadUrl"
-                        :text="exporter.title"
-                        :href="exporter.downloadUrl"
-                        target="_blank"
-                    />
-                </DropdownMenu>
-            </Dropdown>
+            <Button v-if="exporters.length" :text="__('Export Submissions')" @click="openExportModal" />
 
             <Dropdown v-if="form.canGenerateFakeSubmissions">
                 <template #trigger>
@@ -197,12 +273,11 @@ async function deleteFakeSubmissions() {
             />
 
             <CommandPaletteItem
-                v-for="exporter in exporters"
-                :key="exporter.downloadUrl"
+                v-if="exporters.length"
                 category="Actions"
-                :text="[__('Export Submissions'), exporter.title]"
+                :text="__('Export Submissions')"
                 icon="save"
-                :url="exporter.downloadUrl"
+                :action="openExportModal"
                 prioritize
             />
         </Header>
@@ -216,5 +291,53 @@ async function deleteFakeSubmissions() {
             :columns="columns"
             :filters="filters"
         />
+
+        <Modal v-model:open="exportModalOpen" :title="__('Export Submissions')" blur class="max-w-xl!">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <p class="text-sm font-medium">{{ __('Format') }}</p>
+                    <RadioGroup v-model="exportFormat" :name="`form-export-format-${form.handle}`">
+                        <Radio
+                            v-for="option in exportFormats"
+                            :key="option.value"
+                            :value="option.value"
+                            :label="option.label"
+                            :description="findExporterByFormat(option.value) ? null : __('No exporter configured for this format.')"
+                            :disabled="!findExporterByFormat(option.value)"
+                        />
+                    </RadioGroup>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-sm font-medium">{{ __('Scope') }}</p>
+                    <RadioGroup v-model="exportScope" :name="`form-export-scope-${form.handle}`">
+                        <Radio
+                            v-for="option in exportScopeOptions"
+                            :key="option.value"
+                            :value="option.value"
+                            :label="option.label"
+                            :description="option.value === 'filtered' && !hasFilteredScope
+                                ? __('No active filters are set right now. This will export all submissions.')
+                                : option.description"
+                        />
+                    </RadioGroup>
+                </div>
+
+            </div>
+                <template #footer>
+                    <div class="flex items-center justify-end gap-2 pt-3 pb-1">
+                        <ModalClose asChild>
+                            <Button variant="ghost" :text="__('Cancel')" />
+                        </ModalClose>
+                        <Button
+                            variant="primary"
+                            :text="__('Export')"
+                            :loading="exportingSubmissions"
+                            :disabled="!selectedExporter"
+                            @click="exportSubmissions"
+                        />
+                    </div>
+                </template>
+        </Modal>
     </div>
 </template>

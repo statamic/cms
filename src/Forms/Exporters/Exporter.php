@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Exporters;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -15,6 +16,7 @@ abstract class Exporter
     protected array $config;
     protected string $handle;
     protected Form $form;
+    protected ?Collection $submissions = null;
 
     abstract public function export(): string;
 
@@ -39,6 +41,13 @@ abstract class Exporter
         return $this;
     }
 
+    public function setSubmissions(Collection $submissions)
+    {
+        $this->submissions = $submissions;
+
+        return $this;
+    }
+
     public function contentType(): string
     {
         return 'text/plain';
@@ -52,6 +61,11 @@ abstract class Exporter
     public function title(): string
     {
         return __($this->config['title'] ?? static::$title);
+    }
+
+    public function handle(): string
+    {
+        return $this->handle;
     }
 
     public function allowedOnForm(Form $form)
@@ -82,5 +96,10 @@ abstract class Exporter
         File::put($path, $content);
 
         return response()->download($path)->deleteFileAfterSend();
+    }
+
+    protected function submissions(): Collection
+    {
+        return $this->submissions ?? $this->form->submissions();
     }
 }

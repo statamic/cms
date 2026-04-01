@@ -86,6 +86,7 @@ class FormsController extends CpController
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
             'generateFakeSubmissionUrl' => cp_route('forms.submissions.generate-fake', $form->handle()),
             'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'handle' => $exporter->handle(),
                 'title' => $exporter->title(),
                 'downloadUrl' => $exporter->downloadUrl(),
             ])->values(),

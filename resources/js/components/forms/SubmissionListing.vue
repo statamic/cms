@@ -48,6 +48,10 @@ export default {
         refresh() {
             this.$refs.listing?.refresh();
         },
+
+        getParameters() {
+            return this.$refs.listing?.getParameters?.() ?? {};
+        },
     },
 };
 </script>
