@@ -36,7 +36,7 @@ class DeleteFakeSubmissions extends Action
             throw new Exception(__('statamic::messages.form_fake_submissions_form_not_found'));
         }
 
-        $fakeSubmissions = $form->submissions()->filter(fn ($submission) => (bool) $submission->get('fake'));
+        $fakeSubmissions = $form->submissions()->filter(fn ($submission) => (bool) $submission->get('_fake'));
         $currentUser = request()->user() ? User::fromUser(request()->user()) : null;
         $requiredPermission = "delete {$form->handle()} form submissions";
         $isSuper = $currentUser && method_exists($currentUser, 'isSuper') && $currentUser->isSuper();

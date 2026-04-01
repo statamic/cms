@@ -121,7 +121,7 @@ class FormSubmissionsController extends CpController
         $submission = $form->makeSubmission();
         $submission->data(
             $fields->process()->values()->merge([
-                'fake' => true,
+                '_fake' => true,
             ])
         );
 

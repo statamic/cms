@@ -28,12 +28,12 @@ class DeleteFakeSubmissionsActionTest extends TestCase
         $form = $this->makeForm('contact');
         $user = $this->userWithSubmissionPermissions($form->handle());
 
-        $this->makeSubmission($form, ['name' => 'Real', 'fake' => false]);
-        $this->makeSubmission($form, ['name' => 'Fake 1', 'fake' => true]);
-        $this->makeSubmission($form, ['name' => 'Fake 2', 'fake' => true]);
+        $this->makeSubmission($form, ['name' => 'Real', '_fake' => false]);
+        $this->makeSubmission($form, ['name' => 'Fake 1', '_fake' => true]);
+        $this->makeSubmission($form, ['name' => 'Fake 2', '_fake' => true]);
 
         $this->assertCount(3, $form->querySubmissions()->get());
-        $this->assertCount(2, $form->querySubmissions()->where('fake', true)->get());
+        $this->assertCount(2, $form->querySubmissions()->where('_fake', true)->get());
 
         $this
             ->actingAs($user)
@@ -49,7 +49,7 @@ class DeleteFakeSubmissionsActionTest extends TestCase
             ]);
 
         $this->assertCount(1, $form->querySubmissions()->get());
-        $this->assertCount(0, $form->querySubmissions()->where('fake', true)->get());
+        $this->assertCount(0, $form->querySubmissions()->where('_fake', true)->get());
     }
 
     #[Test]
@@ -58,8 +58,8 @@ class DeleteFakeSubmissionsActionTest extends TestCase
         $form = $this->makeForm('contact');
         $user = $this->userWithViewOnlyPermission($form->handle());
 
-        $this->makeSubmission($form, ['name' => 'Fake 1', 'fake' => true]);
-        $this->makeSubmission($form, ['name' => 'Fake 2', 'fake' => true]);
+        $this->makeSubmission($form, ['name' => 'Fake 1', '_fake' => true]);
+        $this->makeSubmission($form, ['name' => 'Fake 2', '_fake' => true]);
 
         $this
             ->actingAs($user)
@@ -74,7 +74,7 @@ class DeleteFakeSubmissionsActionTest extends TestCase
                 'success' => false,
             ]);
 
-        $this->assertCount(2, $form->querySubmissions()->where('fake', true)->get());
+        $this->assertCount(2, $form->querySubmissions()->where('_fake', true)->get());
     }
 
     private function makeForm(string $handle)

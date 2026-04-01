@@ -40,7 +40,7 @@ class GenerateFakeSubmissionTest extends TestCase
             ->assertOk();
 
         $this->assertEquals(1, $form->querySubmissions()->count());
-        $this->assertTrue((bool) $form->querySubmissions()->first()->get('fake'));
+        $this->assertTrue((bool) $form->querySubmissions()->first()->get('_fake'));
     }
 
     #[Test]
