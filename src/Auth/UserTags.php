@@ -630,6 +630,55 @@ class UserTags extends Tags
     }
 
     /**
+     * Output an elevated session form.
+     *
+     * Maps to {{ user:elevated_session_form }}
+     *
+     * @return string
+     */
+    public function elevatedSessionForm()
+    {
+        if (! ($user = User::current())) {
+            return;
+        }
+
+        $method = $user->getElevatedSessionMethod();
+
+        if ($method === 'passkey') {
+            // TODO: Implement frontend passkey support for elevated sessions
+            throw new \Exception('Passkey authentication for elevated sessions is not yet supported on the frontend.');
+        }
+
+        if ($method === 'verification_code') {
+            session()->sendElevatedSessionVerificationCodeIfRequired();
+        }
+
+        $data = [
+            ...$this->getFormSession('user.elevated_session'),
+            'method' => $method,
+            'resend_code_url' => route('statamic.elevated-session.resend-code'),
+        ];
+
+        $action = route('statamic.elevated-session.confirm');
+        $method = 'POST';
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method),
+                'params' => $this->formMetaPrefix($this->formParams($method)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function eventUrl($url, $relative = false)

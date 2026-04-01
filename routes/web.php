@@ -21,6 +21,7 @@ use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
 use Statamic\Http\Controllers\User\TwoFactorAuthenticationController;
 use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
+use Statamic\Http\Controllers\Auth\ElevatedSessionController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
@@ -50,6 +51,12 @@ Route::name('statamic.')->group(function () {
             Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+
+            Route::middleware('auth')->group(function () {
+                Route::get('elevated-session', [ElevatedSessionController::class, 'showForm'])->name('elevated-session')->middleware([HandleInertiaRequests::class]);
+                Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
+                Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+            });
 
             if (TwoFactor::enabled()) {
                 Route::get('two-factor-setup', TwoFactorSetupController::class)->name('two-factor-setup');

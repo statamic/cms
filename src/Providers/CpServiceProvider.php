@@ -2,14 +2,10 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
@@ -19,7 +15,6 @@ use Statamic\Http\Middleware\CP\StartSession;
 use Statamic\Http\View\Composers\JavascriptComposer;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
-use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\View\Components\OutsideLogo;
 
 class CpServiceProvider extends ServiceProvider
@@ -45,8 +40,6 @@ class CpServiceProvider extends ServiceProvider
         });
 
         $this->registerMiddlewareGroups();
-
-        $this->registerElevatedSessionMacros();
 
         $this->bootSelfClosingUiTags();
     }
@@ -111,50 +104,6 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
             \Statamic\Http\Middleware\CP\HandleAuthenticatedInertiaRequests::class,
         ]);
-    }
-
-    private function registerElevatedSessionMacros()
-    {
-        Request::macro('hasElevatedSession', function () {
-            return $this->getElevatedSessionExpiry() > now()->timestamp;
-        });
-
-        Request::macro('getElevatedSessionExpiry', function () {
-            if (! $lastElevated = session()->get('statamic_elevated_session')) {
-                return null;
-            }
-
-            return Carbon::createFromTimestamp($lastElevated)
-                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
-                ->timestamp;
-        });
-
-        Request::macro('getElevatedSessionVerificationCode', function () {
-            return session()->get('statamic_elevated_session_verification_code')['code'] ?? null;
-        });
-
-        Session::macro('elevate', function () {
-            $this->put('statamic_elevated_session', now()->timestamp);
-        });
-
-        Session::macro('sendElevatedSessionVerificationCodeIfRequired', function () {
-            if ($timestamp = session()->get('statamic_elevated_session_verification_code')['generated_at'] ?? null) {
-                if ($timestamp > now()->subMinutes(5)->timestamp) {
-                    return;
-                }
-            }
-
-            $this->sendElevatedSessionVerificationCode();
-        });
-
-        Session::macro('sendElevatedSessionVerificationCode', function () {
-            session()->put(
-                key: 'statamic_elevated_session_verification_code',
-                value: ['code' => $verificationCode = Str::random(20), 'generated_at' => now()->timestamp],
-            );
-
-            User::current()->notify(new ElevatedSessionVerificationCode($verificationCode));
-        });
     }
 
     private function bootSelfClosingUiTags()
