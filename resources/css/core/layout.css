@@ -181,8 +181,8 @@ main.nav-closed {
         display: flex;
     }
     li {
-        padding: 0.7rem calc(var(--item-padding) + 0.2rem);
-        @apply text-xs min-h-10 shadow-ui-md;
+        padding: 0.75rem calc(var(--item-padding) + 0.2rem);
+        @apply text-xs;
     }
     a {
         position: relative;
@@ -204,7 +204,7 @@ main.nav-closed {
         ul:has(.active) {
             /* [1] Add a little vertical line to indicate the "active" subnav item that moves with anchor positioning */
             &::before {
-                --height-increase: calc(var(--spacing) * 4.25);
+                --height-increase: calc(var(--spacing) * 4.5);
                 content: '';
                 position: absolute;
                 width: calc(anchor-size(width) + var(--item-padding) * 2);
