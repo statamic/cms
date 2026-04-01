@@ -181,7 +181,7 @@ main.nav-closed {
         display: flex;
     }
     li {
-        padding: 0.75rem calc(var(--item-padding) + 0.2rem);
+        padding: 0.75rem var(--item-padding);
         @apply text-xs;
     }
     a {
