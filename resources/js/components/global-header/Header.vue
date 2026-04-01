@@ -29,7 +29,7 @@ import UserDropdown from './UserDropdown.vue';
         <div class="dark flex-1 flex gap-1 md:gap-2 lg:gap-2 sm:gap-3 items-center justify-end shrink-0">
             <div
                 id="form-layout-actions"
-                class="global-header-nav-actions flex items-center shrink-0 me-auto -translate-x-4"
+                class="global-header-nav-actions flex items-center shrink-0 me-auto -translate-x-5"
             />
             <SiteSelector />
             <div class="flex items-center">
