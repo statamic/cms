@@ -119,11 +119,7 @@ function findExporterByFormat(format) {
 
     return props.exporters.find((exporter) => {
         const handle = normalizedValue(exporter.handle);
-        const title = normalizedValue(exporter.title);
-        const downloadUrl = normalizedValue(exporter.downloadUrl);
-        const exporterValue = `${handle} ${title} ${downloadUrl}`;
-
-        return exporterValue.includes(normalizedFormat);
+        return handle === normalizedFormat;
     }) || null;
 }
 
