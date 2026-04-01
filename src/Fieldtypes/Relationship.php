@@ -7,8 +7,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
-use Statamic\Query\OrderBy;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\OrderBy;
 
 abstract class Relationship extends Fieldtype
 {
