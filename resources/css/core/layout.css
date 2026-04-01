@@ -164,7 +164,6 @@ main.nav-closed {
     }
 }
 
-
 /* GROUP GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
 =================================================== */
 .global-header-slot {
@@ -172,6 +171,19 @@ main.nav-closed {
     position: relative;
     background: var(--color-gray-950);
     @apply rounded-lg;
+
+    /* When .global-header-slot has stuff */
+    header:has(&:not(:empty)) {
+        /* Make the search bar small */
+        [data-global-header-search] {
+            width: calc(var(--spacing) * 9);
+            overflow: clip;
+            /* Hide everything except the search icon */
+            > *:not(svg) {
+                display: none;
+            }
+        }
+    }
 }
 
 /* Used for three panel layouts */
