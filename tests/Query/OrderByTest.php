@@ -5,6 +5,7 @@ namespace Tests\Query;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Query\OrderBy;
+use Statamic\Tags\Concerns\QueriesOrderBys;
 use Tests\TestCase;
 
 class OrderByTest extends TestCase
@@ -67,5 +68,23 @@ class OrderByTest extends TestCase
             'empty_string' => ['', null],
             'null' => [null, null],
         ];
+    }
+
+    #[Test]
+    public function it_filters_unsafe_columns_from_order_bys()
+    {
+        $tag = new class
+        {
+            use QueriesOrderBys;
+
+            public $params = [];
+        };
+
+        $tag->params = ['sort' => "title|foo'; DROP TABLE entries;--|date"];
+
+        $method = new \ReflectionMethod($tag, 'parseOrderBys');
+        $orderBys = $method->invoke($tag);
+
+        $this->assertEquals(['title', 'date'], $orderBys->map->sort->values()->all());
     }
 }
