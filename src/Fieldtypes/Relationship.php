@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
+use Statamic\Query\OrderBy;
 use Statamic\Fields\Fieldtype;
 
 abstract class Relationship extends Fieldtype
@@ -307,7 +308,7 @@ abstract class Relationship extends Fieldtype
 
     public function getSortColumn($request)
     {
-        return $request->get('sort');
+        return OrderBy::column($request->get('sort'));
     }
 
     public function getSortDirection($request)
