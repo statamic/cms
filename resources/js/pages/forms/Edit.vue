@@ -65,7 +65,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Teleport to="#form-layout-actions">
-        <Button class="ms-2" :text="__('Save')" variant="primary" @click="save" :disabled="saving" />
+        <Button :text="__('Save')" variant="primary" @click="save" :disabled="saving" />
     </Teleport>
 
     <Header :title="__('Configure Form')" icon="cog">

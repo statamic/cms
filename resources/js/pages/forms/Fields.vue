@@ -13,7 +13,7 @@ const props = defineProps({
 
 <template>
     <Teleport to="#form-layout-actions">
-        <Button class="ms-2" :text="__('Save')" variant="primary" />
+        <Button :text="__('Save')" variant="primary" />
     </Teleport>
 
     <LayoutPanel side="left">

@@ -167,7 +167,6 @@ main.nav-closed {
 /* GROUP GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
 =================================================== */
 .global-header-slot {
-    /* Needed to position the save button (.global-header-nav-actions) */
     position: relative;
     background: var(--color-gray-950);
     @apply rounded-lg;
@@ -234,17 +233,10 @@ main.nav-closed {
 }
 
 .global-header-nav-actions {
-    top: 0;
     opacity: 0;
-    /* Soft fade in e.g. "Save" button */
     transition: opacity 0.075s ease-in;
     &:has(button) {
         opacity: 1;
-    }
-    button {
-        position: absolute;
-        top: 50%;
-        translate: var(--spacing) -50%;
     }
 }
 
