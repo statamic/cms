@@ -77,12 +77,14 @@ class FormsController extends CpController
                 'canEdit' => User::current()->can('edit', $form),
                 'canDelete' => User::current()->can('delete', $form),
                 'canConfigureFields' => User::current()->can('configure form fields'),
+                'canGenerateFakeSubmissions' => (bool) $form->get('generate_fake_submissions', true),
             ],
             'columns' => $columns,
             'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
             ]),
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
+            'generateFakeSubmissionUrl' => cp_route('forms.submissions.generate-fake', $form->handle()),
             'exporters' => $form->exporters()->map(fn ($exporter) => [
                 'title' => $exporter->title(),
                 'downloadUrl' => $exporter->downloadUrl(),
@@ -168,6 +170,7 @@ class FormsController extends CpController
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),
+            'generate_fake_submissions' => (bool) $form->get('generate_fake_submissions', true),
         ]);
 
         $fields = $blueprint
@@ -256,6 +259,12 @@ class FormsController extends CpController
                         'display' => __('Store Submissions'),
                         'type' => 'toggle',
                         'instructions' => __('statamic::messages.form_configure_store_instructions'),
+                    ],
+                    'generate_fake_submissions' => [
+                        'display' => __('Enable Fake Submission Generator'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'instructions' => __('statamic::messages.form_configure_generate_fake_submissions_instructions'),
                     ],
                 ],
             ],

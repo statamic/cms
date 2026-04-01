@@ -30,6 +30,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyAssetUrl::class,
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
+        Actions\DeleteFakeSubmissions::class,
         Actions\DeleteMultisiteEntry::class,
         Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
