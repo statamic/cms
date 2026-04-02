@@ -1,5 +1,27 @@
 # Release Notes
 
+## 6.9.0 (2026-04-01)
+
+### What's new
+- Add a Text component [#14247](https://github.com/statamic/cms/issues/14247) by @jaygeorge
+- Emit `asset.saved` event from asset editor [#14392](https://github.com/statamic/cms/issues/14392) by @duncanmcclean
+
+### What's fixed
+- Fix collection whereStatus logic [#14380](https://github.com/statamic/cms/issues/14380) by @jackmcdade
+- Implement whereStatus() on search query builder [#14387](https://github.com/statamic/cms/issues/14387) by @ryanmitchell
+- Blueprint button order changes [#14365](https://github.com/statamic/cms/issues/14365) by @jaygeorge
+- Fix address bar overlapping bottom of content (typically on iOS) [#14399](https://github.com/statamic/cms/issues/14399) by @jaygeorge
+- Fix nested Bard toolbar focus issues [#14396](https://github.com/statamic/cms/issues/14396) by @jaygeorge
+- Fix nav section border radius [#14409](https://github.com/statamic/cms/issues/14409) by @jaygeorge
+- Fix conditional field borders [#14407](https://github.com/statamic/cms/issues/14407) by @thomasvantuycom
+- Fix collection listing dates from wrapping [#14415](https://github.com/statamic/cms/issues/14415) by @jaygeorge
+- Fix Parameters make method [#14418](https://github.com/statamic/cms/issues/14418) by @jasonvarga
+- Prevent npm packages from executing malicious code via `postinstall` [#14417](https://github.com/statamic/cms/issues/14417) by @duncanmcclean
+- French translations [#14393](https://github.com/statamic/cms/issues/14393) by @ebeauchamps
+- Bump brace-expansion from 2.0.2 to 2.0.3 [#14383](https://github.com/statamic/cms/issues/14383) by @dependabot
+
+
+
 ## 6.8.0 (2026-03-27)
 
 ### What's new
