@@ -4,10 +4,10 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
@@ -42,7 +42,7 @@ class FrontendFormRequest extends FormRequest
         $url = $this->redirector->getUrlGenerator();
 
         if ($redirect = $this->input('_error_redirect')) {
-            return $url->to($redirect);
+            return URL::isExternalToApplication($redirect) ? $url->previous() : $url->to($redirect);
         }
 
         return $url->previous();

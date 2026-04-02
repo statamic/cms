@@ -204,6 +204,49 @@ class StoreEntryTest extends TestCase
     }
 
     #[Test]
+    public function date_is_saved_correctly_when_app_timezone_is_utc()
+    {
+        config()->set('app.timezone', 'UTC');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z'])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertStringContainsString('2026-03-23-1630.my-entry.md', $entry->buildPath());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/14251
+     **/
+    #[Test]
+    public function date_is_saved_correctly_when_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'date' => '2026-03-23T16:30:00.000Z']) // 16:30 UTC is 17:30 in Zurich
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertStringContainsString('2026-03-23-1730.my-entry.md', $entry->buildPath()); // Should be saved in Europe/Zurich, so 17:30.
+    }
+
+    #[Test]
     public function it_can_validate_against_published_value()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -216,6 +259,88 @@ class StoreEntryTest extends TestCase
             ->actingAs($user)
             ->submit($collection, ['title' => 'Test', 'slug' => 'manually-entered-slug', 'published' => true])
             ->assertStatus(422);
+    }
+
+    #[Test]
+    public function user_without_publish_permission_cannot_create_published_entry()
+    {
+        // User has create permission but NOT publish permission
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'published' => true])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('My Entry', $entry->value('title'));
+        $this->assertEquals('my-entry', $entry->slug());
+        $this->assertFalse($entry->published(), 'Entry should be created as draft when user lacks publish permission');
+    }
+
+    #[Test]
+    public function user_with_publish_permission_can_create_published_entry()
+    {
+        // User has both create and publish permissions
+        $this->setTestRoles(['test' => ['access cp', 'create test entries', 'publish test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'published' => true])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('My Entry', $entry->value('title'));
+        $this->assertEquals('my-entry', $entry->slug());
+        $this->assertTrue($entry->published(), 'Entry should be published when user has publish permission');
+    }
+
+    #[Test]
+    public function user_with_publish_permission_can_create_draft_entry()
+    {
+        // User has both create and publish permissions but chooses to create a draft
+        $this->setTestRoles(['test' => ['access cp', 'create test entries', 'publish test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'My Entry', 'slug' => 'my-entry', 'published' => false])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('My Entry', $entry->value('title'));
+        $this->assertEquals('my-entry', $entry->slug());
+        $this->assertFalse($entry->published(), 'Entry should be draft when user explicitly sets published to false');
+    }
+
+    #[Test]
+    public function user_without_publish_permission_gets_initial_published_false_even_when_collection_defaults_to_published()
+    {
+        // Edge case: User lacks publish permission AND collection defaults to published
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test')->defaultPublishState(true))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson(cp_route('collections.entries.create', [$collection->handle(), 'en']))
+            ->assertOk();
+
+        $this->assertFalse($response->json('values.published'), 'Initial published value should be false when user lacks publish permission, even if collection defaults to published');
     }
 
     private function seedUserAndCollection()

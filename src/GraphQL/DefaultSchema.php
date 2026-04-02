@@ -6,6 +6,7 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use Rebing\GraphQL\Support\Contracts\ConfigConvertible;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\CacheResponse;
+use Statamic\GraphQL\Middleware\HandleAuthentication;
 use Statamic\GraphQL\Queries\AssetContainerQuery;
 use Statamic\GraphQL\Queries\AssetContainersQuery;
 use Statamic\GraphQL\Queries\AssetQuery;
@@ -45,7 +46,7 @@ class DefaultSchema implements ConfigConvertible
     {
         return [
             'query' => $this->getQueries(),
-            'mutation' => [],
+            'mutation' => $this->getMutations(),
             'middleware' => $this->getMiddleware(),
             'method' => ['GET', 'POST'],
         ];
@@ -77,9 +78,14 @@ class DefaultSchema implements ConfigConvertible
     private function getMiddleware()
     {
         return array_merge(
-            [CacheResponse::class],
+            [HandleAuthentication::class, CacheResponse::class],
             config('statamic.graphql.middleware', []),
             GraphQL::getExtraMiddleware()
         );
+    }
+
+    private function getMutations()
+    {
+        return config('statamic.graphql.mutations', []);
     }
 }

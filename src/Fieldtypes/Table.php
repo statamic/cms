@@ -13,20 +13,44 @@ class Table extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'table',
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'table',
+                    ],
+                ],
             ],
-            'max_rows' => [
-                'display' => __('Max Rows'),
-                'instructions' => __('statamic::fieldtypes.table.config.max_rows'),
-                'type' => 'integer',
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_rows' => [
+                        'display' => __('Max Rows'),
+                        'instructions' => __('statamic::fieldtypes.table.config.max_rows'),
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                    'max_columns' => [
+                        'display' => __('Max Columns'),
+                        'instructions' => __('statamic::fieldtypes.table.config.max_columns'),
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                ],
             ],
-            'max_columns' => [
-                'display' => __('Max Columns'),
-                'instructions' => __('statamic::fieldtypes.table.config.max_columns'),
-                'type' => 'integer',
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
+                    ],
+                ],
             ],
         ];
     }

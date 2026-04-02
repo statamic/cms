@@ -32,4 +32,6 @@ interface Result extends Augmentable
     public function getCpUrl(): string;
 
     public function getCpBadge(): string;
+
+    public function getCpIcon(): string;
 }

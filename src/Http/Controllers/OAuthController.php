@@ -8,6 +8,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -15,7 +16,7 @@ class OAuthController
 {
     public function redirectToProvider(Request $request, string $provider)
     {
-        $referer = $request->headers->get('referer');
+        $referer = $request->headers->get('referer') ?? '';
         $guard = config('statamic.users.guards.web', 'web');
 
         if (! OAuth::providers()->has($provider)) {
@@ -59,6 +60,8 @@ class OAuthController
             Auth::guard($request->session()->get('statamic.oauth.guard'))
                 ->login($user, config('statamic.oauth.remember_me', true));
 
+            session()->elevate();
+
             return redirect()->to($this->successRedirectUrl());
         }
 
@@ -77,7 +80,9 @@ class OAuthController
 
         parse_str($query, $query);
 
-        return Arr::get($query, 'redirect', $default);
+        $redirect = Arr::get($query, 'redirect', $default);
+
+        return URL::isExternalToApplication($redirect) ? $default : $redirect;
     }
 
     protected function unauthorizedRedirectUrl()

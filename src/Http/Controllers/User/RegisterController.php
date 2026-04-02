@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserRegisterRequest;
 use Statamic\Support\Arr;
@@ -52,7 +53,8 @@ class RegisterController
 
     private function successfulResponse(bool $silentFailure = false)
     {
-        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+        $redirect = request()->get('_redirect');
+        $response = $redirect && ! URL::isExternalToApplication($redirect) ? redirect($redirect) : back();
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
@@ -85,7 +87,8 @@ class RegisterController
             return (new ValidationException($validator))->errorBag(new MessageBag($errors));
         }
 
-        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
+        $errorRedirect = request()->input('_error_redirect');
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect) ? redirect($errorRedirect) : back();
 
         return $errorResponse->withInput()->withErrors($errors, 'user.register');
     }

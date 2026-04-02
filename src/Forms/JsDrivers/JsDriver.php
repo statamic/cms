@@ -14,5 +14,5 @@ interface JsDriver
 
     public function render($html);
 
-    public function copyShowFieldToFormData($fields);
+    public function copyShowFieldToFormData(array $fields): array;
 }

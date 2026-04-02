@@ -6,6 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\StaticCache;
+use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
@@ -148,6 +151,39 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_serializes_and_unserializes_regions_through_cache()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        $cached = StaticCache::cacheStore()->get('nocache::region.'.$region->key());
+        $this->assertIsString($cached, 'Region should be stored as a serialized string, not an object.');
+
+        $retrieved = $session->region($region->key());
+
+        $this->assertInstanceOf(StringRegion::class, $retrieved);
+        $this->assertEquals($region->key(), $retrieved->key());
+        $this->assertEquals(['foo' => 'bar'], $retrieved->context());
+    }
+
+    #[Test]
+    public function it_throws_region_not_found_when_cached_region_is_an_incomplete_class()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        // Simulate what happens when serializable_classes enforcement
+        // turns a cached Region object into __PHP_Incomplete_Class.
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), new \__PHP_Incomplete_Class);
+
+        $this->expectException(RegionNotFound::class);
+
+        $session->region($region->key());
+    }
+
+    #[Test]
     public function a_singleton_is_bound_in_the_container()
     {
         $this->get('/test?foo=bar&bar=baz');
@@ -169,6 +205,23 @@ class NoCacheSessionTest extends TestCase
 
         $this->assertInstanceOf(Session::class, $session);
         $this->assertEquals('http://localhost/test', $session->url());
+    }
+
+    #[Test]
+    public function it_normalizes_query_string()
+    {
+        // Mock the Cacher to return a non-normalized URL.
+        // In tests, it always returns the current URL, so we have to mock it.
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldReceive('getUrl')
+            ->andReturn('http://localhost/test?utm_source=linkedin.com&utm_medium=referral&utm_campaign=foo');
+
+        $this->app->instance(Cacher::class, $cacher);
+
+        $session = $this->app->make(Session::class);
+
+        $this->assertInstanceOf(Session::class, $session);
+        $this->assertEquals('http://localhost/test?utm_campaign=foo&utm_medium=referral&utm_source=linkedin.com', $session->url());
     }
 
     #[Test]

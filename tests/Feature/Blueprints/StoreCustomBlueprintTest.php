@@ -74,7 +74,7 @@ class StoreCustomBlueprintTest extends TestCase
     private function submit($namespace, $blueprint, $params = [])
     {
         return $this->patch(
-            cp_route('blueprints.update', [$namespace, $blueprint]),
+            cp_route('blueprints.additional.update', [$namespace, $blueprint]),
             $this->validParams($params)
         );
     }

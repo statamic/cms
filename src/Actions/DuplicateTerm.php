@@ -8,6 +8,8 @@ use Statamic\Facades\Term as Terms;
 
 class DuplicateTerm extends Action
 {
+    protected $icon = 'duplicate';
+
     private $newItems;
 
     public static function title()

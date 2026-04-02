@@ -1,9 +1,9 @@
 <label>
-    <input type="hidden" name="{{ handle }}" value="0">
+    <input type="hidden" name="{{ name }}" value="0">
     <input
         id="{{ id }}"
         type="checkbox"
-        name="{{ handle }}"
+        name="{{ name }}"
         value="1"
         {{ if js_driver }}{{ js_attributes }}{{ /if }}
         {{ if value && value !== '0' }}checked{{ /if }}

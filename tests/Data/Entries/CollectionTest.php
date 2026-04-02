@@ -20,7 +20,6 @@ use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
@@ -501,9 +500,11 @@ class CollectionTest extends TestCase
 
         Facades\Collection::shouldReceive('save')->with($collection)->once();
         Facades\Collection::shouldReceive('handleExists')->with('test')->once();
+        Facades\Blink::shouldReceive('forget')->with('collection-test-structure')->once();
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
         Facades\Blink::shouldReceive('forget')->with('mounted-collections')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
+        Facades\Blink::shouldReceive('once')->with('collection-test-structure', \Mockery::any())->andReturnNull();
 
         $return = $collection->save();
 
@@ -811,12 +812,12 @@ class CollectionTest extends TestCase
 
         $this->assertEquals('test', Antlers::parse('{{ collection }}', ['collection' => $collection]));
 
-        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection]));
+        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection], true));
 
         $this->assertEquals('test', Antlers::parse('{{ collection:handle }}', ['collection' => $collection]));
 
         try {
-            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
+            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection], true);
             $this->fail('Exception not thrown');
         } catch (CollectionNotFoundException $e) {
             $this->assertEquals('Collection [somewhere] not found', $e->getMessage());

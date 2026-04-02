@@ -31,23 +31,24 @@ class CreateNavigationPageTest extends TestCase
 
     private function mockTextFieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('text')
-            ->andReturn(new class extends Fieldtype
+        $ft = new class extends Fieldtype
+        {
+            public function preProcess($value)
             {
-                public function preProcess($value)
-                {
-                    if (! $value) {
-                        return;
-                    }
-
-                    return $value.' (preprocessed)';
+                if (! $value) {
+                    return;
                 }
 
-                public function preload()
-                {
-                    return ['hello' => 'world'];
-                }
-            });
+                return $value.' (preprocessed)';
+            }
+
+            public function preload()
+            {
+                return ['hello' => 'world'];
+            }
+        };
+        FieldtypeRepository::shouldReceive('find')->with('text')->andReturn($ft);
+        FieldtypeRepository::shouldReceive('find')->with('slug')->andReturn($ft);
     }
 
     #[Test]
@@ -79,7 +80,6 @@ class CreateNavigationPageTest extends TestCase
                 'originValues' => null,
                 'originMeta' => null,
                 'localizedFields' => [],
-                'syncableFields' => [],
             ]);
     }
 
@@ -96,13 +96,14 @@ class CreateNavigationPageTest extends TestCase
             'foo' => ['type' => 'text'],
             'bar' => ['type' => 'text'],
             'baz' => ['type' => 'text'],
-            'qux' => ['type' => 'text'],
+            'qux' => ['type' => 'text'], // Not in nav
         ]);
 
         $navBlueprint = Blueprint::makeFromFields([
             'foo' => ['type' => 'text'],
             'bar' => ['type' => 'text'],
             'baz' => ['type' => 'text'],
+            'alfa' => ['type' => 'text'], // Not in entry
         ]);
 
         BlueprintRepository::partialMock();
@@ -139,24 +140,11 @@ class CreateNavigationPageTest extends TestCase
                 ],
                 'originValues' => [
                     'title' => 'entry title (preprocessed)',
-                    'foo' => 'entry foo (preprocessed)',
-                    'bar' => 'entry bar (preprocessed)',
-                    'baz' => null,
                 ],
                 'originMeta' => [
                     'title' => ['hello' => 'world'],
-                    'url' => ['hello' => 'world'],
-                    'foo' => ['hello' => 'world'],
-                    'bar' => ['hello' => 'world'],
-                    'baz' => ['hello' => 'world'],
                 ],
                 'localizedFields' => [],
-                'syncableFields' => [
-                    'title',
-                    'foo',
-                    'bar',
-                    'baz',
-                ],
             ]);
     }
 }

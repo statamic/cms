@@ -32,6 +32,10 @@ class ActionRepository
 
     public function forBulk($items, $context = [])
     {
+        if ($items->count() === 1) {
+            return $this->for($items->first(), $context);
+        }
+
         return $this->all()
             ->each->items($items)
             ->each->context($context)

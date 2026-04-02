@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -46,13 +47,14 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
-        Searchable,
+        Hookable, Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
@@ -617,7 +619,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
-        $isNew = is_null($this->container()->asset($this->path()));
+        $pathHasChanged = $this->getOriginal('path') !== $this->path();
+        $isNew = $pathHasChanged ? false : is_null($this->container()->asset($this->path()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -742,7 +745,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function rename($filename, $unique = false)
     {
-        $filename = $unique ? $this->ensureUniqueFilename($this->folder(), $filename) : $filename;
+        if ($unique) {
+            return $this->moveUnique($this->folder(), $filename);
+        }
 
         return $this->move($this->folder(), $filename);
     }
@@ -775,6 +780,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this;
     }
 
+    /**
+     * Move the asset to a different location with a unique filename.
+     *
+     * @param  string  $folder  The folder relative to the container.
+     * @param  string|null  $filename  The new filename, if renaming.
+     * @return $this
+     */
+    public function moveUnique($folder, $filename = null)
+    {
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
+        $filename = $this->ensureUniqueFilename($folder, $filename);
+
+        return $this->move($folder, $filename);
+    }
+
     public function moveQuietly($folder, $filename = null)
     {
         $this->withEvents = false;
@@ -794,13 +814,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         // until after the `AssetReplaced` event is fired. We still want to fire events
         // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
         // get triggered (for cache invalidation, clearing of glide cache, etc.)
-        UpdateAssetReferencesSubscriber::disable();
+        app(UpdateAssetReferencesSubscriber::class)::disable();
 
         if ($deleteOriginal) {
             $originalAsset->delete();
         }
 
-        UpdateAssetReferencesSubscriber::enable();
+        app(UpdateAssetReferencesSubscriber::class)::enable();
 
         AssetReplaced::dispatch($originalAsset, $this);
 
@@ -930,7 +950,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->syncOriginal()
             ->save();
 
-        AssetUploaded::dispatch($this);
+        AssetUploaded::dispatch($this, $file->getClientOriginalName());
 
         AssetCreated::dispatch($this);
 
@@ -945,10 +965,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $file->writeTo($this->disk()->filesystem(), $this->path());
 
+        if ($this->isSvg() && config('statamic.assets.svg_sanitization_on_upload', true)) {
+            $contents = $this->disk()->get($this->path());
+
+            $this->disk()->put(
+                $this->path(),
+                (new DOMSanitizer(DOMSanitizer::SVG))->sanitize($contents, [
+                    'remove-xml-tags' => ! Str::startsWith($contents, '<?xml'),
+                ])
+            );
+        }
+
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
 
-        AssetReuploaded::dispatch($this);
+        AssetReuploaded::dispatch($this, $file->basename());
 
         return $this;
     }
@@ -1130,6 +1161,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->title();
     }
 
+    public function getCpSearchResultIcon()
+    {
+        return 'assets';
+    }
+
     public function warmPresets()
     {
         if (! $this->isImage()) {
@@ -1140,7 +1176,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             'cp_thumbnail_small_'.$this->orientation(),
         ] : [];
 
-        return array_merge($this->container->warmPresets(), $cpPresets);
+        $presets = array_merge($this->container->warmPresets(), $cpPresets);
+
+        return $this->runHooks('warm-presets', $presets);
     }
 
     public function cacheStore()
