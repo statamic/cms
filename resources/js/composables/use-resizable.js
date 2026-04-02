@@ -14,9 +14,13 @@ export default function useResizable() {
 
                     const isRtl = document.documentElement.dir === 'rtl';
                     const resolvedEdge = isRtl ? (edge === 'right' ? 'left' : 'right') : edge;
+                    const resolveDefaultWidth = () =>
+                        typeof defaultWidth === 'function' ? defaultWidth() : defaultWidth;
 
-                    if (defaultWidth) {
-                        panel.style.width = `${defaultWidth}px`;
+                    const initialDefaultWidth = resolveDefaultWidth();
+
+                    if (initialDefaultWidth !== null && initialDefaultWidth !== undefined) {
+                        panel.style.width = `${initialDefaultWidth}px`;
                     }
 
                     const handle = document.createElement('div');
@@ -32,8 +36,9 @@ export default function useResizable() {
                     panel.appendChild(handle);
 
                     const resetToDefaultWidth = () => {
-                        if (defaultWidth) {
-                            const width = Math.min(maxWidth, Math.max(minWidth, defaultWidth));
+                        const currentDefaultWidth = resolveDefaultWidth();
+                        if (currentDefaultWidth !== null && currentDefaultWidth !== undefined) {
+                            const width = Math.min(maxWidth, Math.max(minWidth, currentDefaultWidth));
                             panel.style.width = `${width}px`;
                             return;
                         }

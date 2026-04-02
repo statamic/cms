@@ -72,18 +72,55 @@ provide('rightPanelActive', rightPanelActive);
 
 const { makeResizable } = useResizable();
 
-makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: 175, maxWidth: 450, defaultWidth: 320 });
-makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: 175, maxWidth: 450, defaultWidth: 320 });
+const sidebarMinWidth = 175;
+const sidebarMaxWidth = 450;
+const desktopSidebarDefaultWidth = 320;
+
+const getSidebarDefaultWidth = () => {
+    // When the viewport is narrow, start the sidebar at its minimum width.
+    if (typeof window === 'undefined') return desktopSidebarDefaultWidth;
+    return window.innerWidth < 1200 ? sidebarMinWidth : desktopSidebarDefaultWidth;
+};
+
+makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getSidebarDefaultWidth });
+makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getSidebarDefaultWidth });
+
+const applyBreakpointDefaults = () => {
+    if (typeof window === 'undefined') return;
+
+    const narrow = window.innerWidth < 1200;
+    const target = narrow ? sidebarMinWidth : desktopSidebarDefaultWidth;
+    const narrowPx = `${sidebarMinWidth}px`;
+    const desktopPx = `${desktopSidebarDefaultWidth}px`;
+
+    const applyIfUnmodified = (panelEl) => {
+        if (!panelEl) return;
+        const current = panelEl.style.width;
+
+        // Only apply if it currently equals our prior "default", meaning the user hasn't dragged it.
+        if (!current || current === narrowPx || current === desktopPx) {
+            panelEl.style.width = `${target}px`;
+        }
+    };
+
+    if (leftPanelActive.value) applyIfUnmodified(leftPanelRef.value);
+    if (rightPanelActive.value) applyIfUnmodified(rightPanelRef.value);
+};
 
 onMounted(() => {
     navigationListener = router.on('success', focusMain);
     focusMain();
+
+    // Apply once immediately, then on resize.
+    applyBreakpointDefaults();
+    window.addEventListener('resize', applyBreakpointDefaults);
 });
 
 onUnmounted(() => {
     if (navigationListener) {
         navigationListener();
     }
+    window.removeEventListener('resize', applyBreakpointDefaults);
 });
 
 // TODO: Make the nav an overlay
