@@ -244,21 +244,21 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / LEFT PANEL
 =================================================== */
-.form-builder-popover {
-    .form-builder-popover__menu {
+.left-panel-popover {
+    .left-panel-popover__menu {
         overscroll-behavior-y: contain;
         height: calc(100% + 3.5rem);
 
         display: none;
 
         &, 
-        & .form-builder-popover__close-button {
+        & .left-panel-popover__close-button {
             opacity: 0;
             transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
         }
 
         &:popover-open,
-        &:popover-open .form-builder-popover__close-button {
+        &:popover-open .left-panel-popover__close-button {
             display: block;
             opacity: 1;
 
@@ -277,12 +277,12 @@ main.nav-closed {
         ;
     }
 
-    #anchor-form-builder-mobile {
-        anchor-name: --anchor-form-builder-mobile;
+    #anchor-left-panel {
+        anchor-name: --anchor-left-panel;
     }
 
-    #popover-form-builder-mobile {
-        position-anchor: --anchor-form-builder-mobile;
+    #popover-left-panel {
+        position-anchor: --anchor-left-panel;
         top: 3.5rem;
         width: 33.33%;
         &:not(:popover-open) {
@@ -290,14 +290,13 @@ main.nav-closed {
         }
     }
 
-    .form-builder-popover__menu-button {
-        padding: var(--spacing-lg);
+    .left-panel-popover__menu-button {
         background: var(--dropdown-nav-background-color);
         border-radius: 15px;
         font-size: 0.85em;
     }
 
-    .form-builder-popover__close-button {
+    .left-panel-popover__close-button {
         position: fixed;
         left: 33.33%;
         top: 3.5rem;
