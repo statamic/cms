@@ -284,16 +284,17 @@ body > .draggable-mirror {
 
 
 
-/* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / API
-=================================================== */
-/* @layer components { */
 .c-nav-with-popover-api {
-    --dropdown-nav-background-color: white;
-
     nav {
+        overflow: scroll;
+        overscroll-behavior-y: contain;
+        height: 100%;
+
         display: none;
         opacity: 0;
         transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
+
+        border-inline-end: 1px solid gray;
 
         &:popover-open {
             display: block;
@@ -306,54 +307,27 @@ body > .draggable-mirror {
             }
         }
     }
+
     #anchor-form-builder-mobile {
         anchor-name: --anchor-form-builder-mobile;
     }
-    #anchor-mobile-1 {
-        anchor-name: --anchor-mobile-1;
-    }
-    #anchor-mobile-2 {
-        anchor-name: --anchor-mobile-2;
-    }
+
     #popover-form-builder-mobile {
         position-anchor: --anchor-form-builder-mobile;
+        position-area: bottom span-right;
+        box-shadow: var(--box-shadow-light);
+        &:not(:popover-open) {
+            pointer-events: none;
+        }
     }
-    #popover-mobile-1 {
-        position-anchor: --anchor-mobile-1;
-        inset-block-start: anchor(--anchor-mobile-1 bottom);
-        inset-inline-start: anchor(--anchor-mobile-1 left);
-    }
-    #popover-mobile-2 {
-        position-anchor: --anchor-mobile-2;
-        inset-block-start: anchor(--anchor-mobile-2 bottom);
-        inset-inline-start: anchor(--anchor-mobile-2 left);
-    }
-    #anchor-desktop-1 {
-        anchor-name: --anchor-desktop-1;
-    }
-    #anchor-desktop-2 {
-        anchor-name: --anchor-desktop-2;
-    }
-    #popover-desktop-1 {
-        position-anchor: --anchor-desktop-1;
-        inset-block-start: anchor(--anchor-desktop-1 bottom);
-        inset-inline-start: anchor(--anchor-desktop-1 left);
-    }
-    #popover-desktop-2 {
-        position-anchor: --anchor-desktop-2;
-        inset-block-start: anchor(--anchor-desktop-2 bottom);
-        inset-inline-start: anchor(--anchor-desktop-2 left);
-    }
-    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / MOBILE NAV BUTTON
-    =================================================== */
+
     .c-nav-with-popover-api__mobile-button {
         padding: var(--spacing-lg);
         background: var(--dropdown-nav-background-color);
         border-radius: 15px;
         font-size: 0.85em;
     }
-    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / CLOSE BUTTON
-    =================================================== */
+
     .c-nav-with-popover-api__close-button {
         position: sticky;
         z-index: 1;
@@ -368,124 +342,4 @@ body > .draggable-mirror {
             inline-size: unset;
         }
     }
-    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / NAV STYLING
-    =================================================== */
-    nav {
-        overflow: scroll;
-        overscroll-behavior-y: contain;
-        height: 100%;
-
-        & * {
-            line-height: 1.5;
-            color: black;
-        }
-
-        & ul {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-3xs);
-            font-size: var(--font-size-xs);
-            /* Increase */
-            outline-offset: 5px;
-
-            & li {
-                padding-block-end: 0;
-
-                & button {
-                    text-align: left;
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: center;
-                    gap: var(--spacing-sm);
-                    /* Reset */
-                    margin-inline-end: 0;
-                    padding: 0;
-                    cursor: pointer;
-                    & svg {
-                        font-size: 0.6em;
-                    }
-                }
-            }
-        }
-        & a:not(.o-current-menu-item) {
-            /* https://app.typographychecklist.com/ - 43. Links that are clearly part of navigation usually don't need a special link treatment. */
-            text-decoration: none;
-        }
-    }
-    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / MQS
-    =================================================== */
-    /* --mq-nav-open-before */
-    @media (width < 1000px) {
-        .c-nav-with-popover-api__desktop {
-            /* Prevent a lag in seeing the desktop nav collapse if you pull the window in  */
-            transition: unset;
-        }
-        #popover-form-builder-mobile {
-            /* position-area: bottom span-right; */
-            margin-block-start: 3.5rem;
-            box-shadow: var(--box-shadow-light);
-            &:not(:popover-open) {
-                pointer-events: none;
-            }
-        }
-        nav {
-            background: var(--dropdown-nav-background-color);
-            border-inline-end: 1px solid gray;
-            /* min-width: 85%; */
-            /* border-top-right-radius: 20px; */
-            &::backdrop {
-                transition: all 0.5s var(--animation-timing-function-hipster) 0s;
-            }
-            /* &:popover-open::backdrop {
-                backdrop-filter: blur(3px);
-                background: hsl(0deg 0% 0% / 80%);
-            } */
-            & ul {
-                padding: var(--spacing-lg);
-                & ul {
-                    padding-block: var(--spacing-2xs);
-                }
-            }
-        }
-    }
-    /* --mq-nav-open-after */
-    @media (width >= 1000px) {
-        .c-nav-with-popover-api__mobile {
-            /* Prevent a lag in seeing the mobile nav collapse if you pull the window out  */
-            transition: unset;
-        }
-        --dropdown-nav-background-color: unset;
-        nav {
-            /* Override `popover`'s default position:fixed; */
-            position: relative;
-            display: block;
-            opacity: 1;
-            inline-size: 100%;
-            max-width: var(--max-width-1);
-            margin-inline: auto;
-            padding-block-end: var(--spacing-xl);
-            & > ul {
-                flex-direction: row;
-                gap: var(--spacing-lg);
-                :is(a, button):not(ul ul *) {
-                    padding: var(--spacing-md);
-                    /* Pull the outline back in to counter padding */
-                    outline-offset: -10px;
-                }
-            }
-            & ul ul {
-                /* Need to cut this short a little to force scrolling when there are a lot of items. */
-                max-height: 70vh;
-                background: var(--dropdown-nav-background-color);
-                border-radius: 15px;
-                font-size: 0.95em;
-            }
-        }
-        .c-nav-with-popover-api__mobile-button {
-            opacity: 0;
-            pointer-events: none;
-        }
-    }
 }
-/* } */
