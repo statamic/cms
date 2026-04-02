@@ -30,6 +30,11 @@ class CopyPasswordResetLink extends Action
         return $authed->can('sendPasswordReset', $user);
     }
 
+    public function requiresElevatedSession(): bool
+    {
+        return true;
+    }
+
     public function confirmationText()
     {
         /** @translation */

@@ -2,6 +2,7 @@
 
 namespace Tests\Permissions;
 
+use Facades\Statamic\Auth\CorePermissions;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Permissions;
@@ -134,6 +135,25 @@ class PermissionsTest extends TestCase
         $names = $permissions->all()->keys()->all();
 
         $this->assertEquals(['three', 'one', 'two'], $names);
+    }
+
+    #[Test]
+    public function booting_is_only_done_once()
+    {
+        CorePermissions::shouldReceive('boot')->once();
+
+        $permissions = new Permissions;
+
+        $callbackCount = 0;
+        $permissions->extend(function ($arg) use ($permissions, &$callbackCount) {
+            $this->assertEquals($permissions, $arg);
+            $callbackCount = true;
+        });
+
+        $returned = $permissions->boot()->boot()->boot()->boot();
+
+        $this->assertSame($permissions, $returned);
+        $this->assertEquals(1, $callbackCount);
     }
 
     #[Test]
@@ -283,6 +303,34 @@ class PermissionsTest extends TestCase
             'replaced child {placeholder}',
             'replaced nested child {placeholder}',
         ])->sort()->values()->all(), $all->keys()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function it_gets_all_permissions_with_placeholders_resolved_in_a_flat_array()
+    {
+        $this->setupComplicatedTest($permissions = new Permissions);
+
+        $resolved = $permissions->flattened();
+
+        $this->assertEquals(collect([
+            'one',
+            'child-one',
+            'child-two',
+
+            'two',
+            'child-three',
+            'nested-child',
+
+            'three',
+
+            'four first',
+            'replaced child first',
+            'replaced nested child first',
+
+            'four second',
+            'replaced child second',
+            'replaced nested child second',
+        ])->all(), $resolved->map->value()->all());
     }
 
     #[Test]

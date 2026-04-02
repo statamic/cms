@@ -11,7 +11,7 @@ class DatabaseSession extends Session
 
     public function restore()
     {
-        $regions = DatabaseRegion::where('url', $this->url)->get(['key']);
+        $regions = DatabaseRegion::where('url', md5($this->url))->get(['key']);
 
         $this->regions = $regions->map->key;
 
@@ -30,7 +30,7 @@ class DatabaseSession extends Session
             throw new RegionNotFound($key);
         }
 
-        return unserialize($region->region);
+        return unserialize($region->region, ['allowed_classes' => true]);
     }
 
     protected function cacheRegion(Region $region)
@@ -38,7 +38,7 @@ class DatabaseSession extends Session
         DatabaseRegion::updateOrCreate([
             'key' => $region->key(),
         ], [
-            'url' => $this->url,
+            'url' => md5($this->url),
             'region' => serialize($region),
         ]);
     }

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Support\Facades\Password;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserPasswordRequest;
 
@@ -21,7 +22,8 @@ class PasswordController
 
     private function successfulResponse()
     {
-        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+        $redirect = request()->get('_redirect');
+        $response = $redirect && ! URL::isExternalToApplication($redirect) ? redirect($redirect) : back();
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([

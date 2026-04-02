@@ -13,7 +13,7 @@ class Range extends Fieldtype
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'min' => [
                         'display' => __('Min'),
@@ -21,6 +21,7 @@ class Range extends Fieldtype
                         'type' => 'text',
                         'input_type' => 'number',
                         'default' => 0,
+                        'width' => 50,
                     ],
                     'max' => [
                         'display' => __('Max'),
@@ -28,6 +29,7 @@ class Range extends Fieldtype
                         'type' => 'text',
                         'input_type' => 'number',
                         'default' => 100,
+                        'width' => 50,
                     ],
                     'step' => [
                         'display' => __('Step'),
@@ -35,13 +37,7 @@ class Range extends Fieldtype
                         'type' => 'text',
                         'input_type' => 'number',
                         'default' => 1,
-                    ],
-                    'default' => [
-                        'display' => __('Default Value'),
-                        'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'text',
-                        'input_type' => 'number',
-                        'default' => null,
+                        'width' => 50,
                     ],
                 ],
             ],
@@ -52,11 +48,25 @@ class Range extends Fieldtype
                         'display' => __('Prepend'),
                         'instructions' => __('statamic::fieldtypes.range.config.prepend'),
                         'type' => 'text',
+                        'width' => 50,
                     ],
                     'append' => [
                         'display' => __('Append'),
                         'instructions' => __('statamic::fieldtypes.range.config.append'),
                         'type' => 'text',
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'text',
+                        'input_type' => 'number',
+                        'default' => null,
                     ],
                 ],
             ],

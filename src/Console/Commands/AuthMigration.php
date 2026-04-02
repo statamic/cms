@@ -48,6 +48,8 @@ class AuthMigration extends Command
         $this->createGroupsTable();
         $this->createRolesTable();
 
+        $this->createWebauthTable();
+
         $this->composer->dumpAutoloads();
     }
 
@@ -59,6 +61,7 @@ class AuthMigration extends Command
 
         $from = __DIR__.'/stubs/auth/statamic_groups_table.php.stub';
         $file = Carbon::now()->format('Y_m_d_His').'_statamic_groups_table';
+
         $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
 
         $contents = File::get($from);
@@ -83,6 +86,22 @@ class AuthMigration extends Command
         $contents = File::get($from);
 
         $contents = str_replace('ROLES_TABLE', config('statamic.users.tables.roles', 'roles'), $contents);
+
+        File::put($to, $contents);
+
+        $this->components->info("Migration [$file] created successfully.");
+    }
+
+    private function createWebauthTable()
+    {
+        $from = __DIR__.'/stubs/auth/statamic_webauthn_table.php.stub';
+        $file = Carbon::now()->format('Y_m_d_His').'_statamic_webauthn_table';
+
+        $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
+
+        $contents = File::get($from);
+
+        $contents = str_replace('WEBAUTHN_TABLE', config('statamic.users.tables.webauthn', 'webauthn'), $contents);
 
         File::put($to, $contents);
 

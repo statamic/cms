@@ -26,7 +26,7 @@ class EditCollectionTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.edit', $collection->handle()))
             ->assertSuccessful()
-            ->assertViewHas('collection', $collection);
+            ->assertSee('Configure Collection');
     }
 
     #[Test]

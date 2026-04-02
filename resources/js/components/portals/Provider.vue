@@ -1,8 +1,7 @@
 <script>
 export default {
-
     props: {
-        variables: Object
+        variables: Object,
     },
 
     provide() {
@@ -10,8 +9,7 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({});
-    }
-
-}
+        return this.$slots.default({})[0];
+    },
+};
 </script>

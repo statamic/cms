@@ -2,10 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Inertia\Inertia;
 use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class FormSubmissionsController extends CpController
@@ -26,7 +28,7 @@ class FormSubmissionsController extends CpController
             'form' => $form->handle(),
         ]);
 
-        $sortField = request('sort', 'date');
+        $sortField = OrderBy::column(request('sort'), 'date');
         $sortDirection = request('order', $sortField === 'date' ? 'desc' : 'asc');
 
         if ($sortField) {
@@ -86,13 +88,13 @@ class FormSubmissionsController extends CpController
         $blueprint = $submission->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
-        return view('statamic::forms.submission', [
-            'form' => $form,
-            'submission' => $submission,
+        return Inertia::render('forms/Submission', [
+            'id' => $submission->id(),
+            'formTitle' => $form->title(),
+            'date' => $submission->date()->toIso8601String(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-            'title' => $submission->formattedDate(),
         ]);
     }
 }

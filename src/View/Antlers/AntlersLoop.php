@@ -2,6 +2,8 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+
 class AntlersLoop extends AntlersString
 {
     protected $parser;
@@ -9,17 +11,31 @@ class AntlersLoop extends AntlersString
     protected $variables;
     protected $supplement;
     protected $context;
+    protected $trusted;
 
-    public function __construct($parser, $string, $variables, $supplement, $context)
+    public function __construct($parser, $string, $variables, $supplement, $context, $trusted = false)
     {
         $this->parser = $parser;
         $this->string = $string;
         $this->variables = $variables;
         $this->supplement = $supplement;
         $this->context = $context;
+        $this->trusted = $trusted;
     }
 
     public function __toString()
+    {
+        $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = ! $this->trusted;
+
+        try {
+            return $this->renderLoopContent();
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
+        }
+    }
+
+    private function renderLoopContent()
     {
         $total = count($this->variables);
         $i = 0;

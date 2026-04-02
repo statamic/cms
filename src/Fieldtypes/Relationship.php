@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\OrderBy;
 
 abstract class Relationship extends Fieldtype
 {
@@ -32,14 +33,8 @@ abstract class Relationship extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -50,6 +45,17 @@ abstract class Relationship extends Fieldtype
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],
@@ -75,7 +81,7 @@ abstract class Relationship extends Fieldtype
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $this->statusIcons() ? $item->published() : null,
+                'status' => $this->statusIcons() ? $item->status() : null,
             ];
         });
     }
@@ -307,7 +313,7 @@ abstract class Relationship extends Fieldtype
 
     public function getSortColumn($request)
     {
-        return $request->get('sort');
+        return OrderBy::column($request->get('sort'));
     }
 
     public function getSortDirection($request)
