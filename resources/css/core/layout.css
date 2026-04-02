@@ -173,7 +173,11 @@ main.nav-closed {
 
     /* When .global-header-slot has stuff */
     header:has(&:not(:empty)) {
-        /* Make the search bar small */
+        /* [1] Hide the breadcrumbs at lower MQs */
+        [data-global-header-breadcrumbs] {
+            @apply max-[1350px]:hidden;
+        }
+        /* [2] Make the search bar small */
         [data-global-header-search] {
             width: calc(var(--spacing) * 9);
             overflow: clip;
