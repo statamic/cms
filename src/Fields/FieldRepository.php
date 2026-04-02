@@ -36,7 +36,7 @@ class FieldRepository
         $this->computedDefaultCallbacks[$key] = $callback;
     }
 
-    public function resolveComputedDefault(string $key): mixed
+    public function resolveComputedDefault(string $key, mixed $payload = null): mixed
     {
         if (! array_key_exists($key, $this->computedDefaultCallbacks)) {
             throw new \RuntimeException("No computed default registered for key [{$key}].");
