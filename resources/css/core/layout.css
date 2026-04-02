@@ -288,23 +288,9 @@ body > .draggable-mirror {
 =================================================== */
 /* @layer components { */
 .c-nav-with-popover-api {
-    --dropdown-nav-item-padding: var(--spacing-2xs);
     --dropdown-nav-background-color: white;
-    --dropdown-nav-subnav-background-color: #151515;
-    /* --mq-nav-open-after */
-    @media (width >= 1000px) {
-        /* Darker */
-        --dropdown-nav-subnav-background-color: #111;
-    }
 
-    padding-inline: var(--spacing-xl);
-    nav,
-    nav [popover] {
-        /* Reset */
-        margin: 0;
-        padding: 0;
-        border: 0;
-
+    nav {
         display: none;
         opacity: 0;
         transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
@@ -316,28 +302,11 @@ body > .draggable-mirror {
             @starting-style {
                 opacity: 0;
                 margin-block-start: 0;
-                /* --mq-nav-open-before */
-                @media (width < 1000px) {
-                    margin-inline-start: -50%;
-                }
-                &::backdrop {
-                    /* Needed to get the popover backdrop to fade in when opening */
-                    opacity: 0;
-                }
+                margin-inline-start: -50%;
             }
         }
     }
-    nav {
-        /* Override the default background color of the popover */
-        background: inherit;
-        [popover] {
-            max-width: 14rem;
-            &:popover-open {
-                margin-block-start: var(--spacing-3xs);
-            }
-        }
-    }
-    #anchor-nav-mobile {
+    #anchor-form-builder-mobile {
         anchor-name: --anchor-nav-mobile;
     }
     #anchor-mobile-1 {
@@ -436,30 +405,6 @@ body > .draggable-mirror {
                     & svg {
                         font-size: 0.6em;
                     }
-                }
-
-                & a, button, span {
-                    /* Increase the pointer targets a little to improve usability */
-                    padding: var(--dropdown-nav-item-padding);
-                    /* --mq-nav-open-before */
-                    @media (width < 1000px) {
-                        display: inline-block;
-                    }
-                }
-            }
-
-            /* Subnav */
-            & ul[popover] {
-                &:popover-open {
-                    display: flex;
-                }
-                padding: var(--spacing-lg);
-                /* Just clear the outline state of the parent so it looks cleaner when tabbing through with a keyboard */
-                margin-block-start: var(--spacing-3xs);
-                background: var(--dropdown-nav-subnav-background-color);
-                letter-spacing: 1px;
-                & a, button {
-                    outline-offset: unset;
                 }
             }
         }
