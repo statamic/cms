@@ -25,7 +25,7 @@ class Fields
     /** @var array<string,Closure> */
     protected static array $computedFieldDefaultCallbacks = [];
 
-    public static function default(string $key, Closure $callback): void
+    public static function computedDefault(string $key, Closure $callback): void
     {
         static::$computedFieldDefaultCallbacks[$key] = $callback;
     }

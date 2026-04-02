@@ -494,7 +494,7 @@ class FieldTest extends TestCase
                 }
             });
 
-        Fields::default('computed-value', fn () => 'computed defined default');
+        Fields::computedDefault('computed-value', fn () => 'computed defined default');
 
         $field = (new Field('test', ['default' => 'computed:computed-value', 'type' => 'fieldtype']));
 
