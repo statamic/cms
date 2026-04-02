@@ -278,43 +278,21 @@ body > .draggable-mirror {
 
 
 
-
-
-
-.form-builder-popover__close-button {
-    opacity: 0;
-    transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
-}
-
-.form-builder-popover .form-builder-popover__menu:popover-open .form-builder-popover__close-button {
-    display: block;
-    opacity: 1;
-
-    @starting-style {
-        opacity: 0;
-        margin-block-start: 0;
-        margin-inline-start: -50%;
-    }
-}
-
-
 .form-builder-popover {
     .form-builder-popover__menu {
         overscroll-behavior-y: contain;
         height: calc(100% + 3.5rem);
 
         display: none;
-        opacity: 0;
-        transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
 
-        background: var(--theme-color-body-bg);
-        @apply
-            px-2
-            border-r border-gray-200 dark:border-gray-700
-            shadow-2xl
-        ;
+        &, 
+        & .form-builder-popover__close-button {
+            opacity: 0;
+            transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
+        }
 
-        &:popover-open {
+        &:popover-open,
+        &:popover-open .form-builder-popover__close-button {
             display: block;
             opacity: 1;
 
@@ -324,6 +302,13 @@ body > .draggable-mirror {
                 margin-inline-start: -50%;
             }
         }
+
+        background: var(--theme-color-body-bg);
+        @apply
+            px-2
+            border-r border-gray-200 dark:border-gray-700
+            shadow-2xl
+        ;
     }
 
     #anchor-form-builder-mobile {
