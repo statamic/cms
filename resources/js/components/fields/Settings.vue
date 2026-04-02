@@ -396,7 +396,8 @@ export default {
                     this.meta = { ...response.data.meta };
                     this.originValues = response.data.originValues;
                     this.originMeta = response.data.originMeta;
-                });
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
     },
 };
