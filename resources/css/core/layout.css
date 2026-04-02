@@ -251,7 +251,7 @@ main.nav-closed {
 
         display: none;
 
-        &, 
+        &,
         & .left-panel-popover__close-button {
             opacity: 0;
             transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;

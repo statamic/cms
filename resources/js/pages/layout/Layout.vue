@@ -144,7 +144,7 @@ onUnmounted(() => {
                 :data-max-width-enabled="isMaxWidthEnabled"
             >
                 <!-- Panel contents will be injected via <Teleport> -->
-                <div v-show="leftPanelActive" data-left-panel ref="leftPanel" id="left-panel" tabindex="-1" class="focus:outline-none relative layout-left-panel overflow-y-scroll overflow-x-clip grid max-sm:ps-2 pe-2 min-h-full mx-auto">
+                <div v-show="leftPanelActive" data-left-panel ref="leftPanel" id="left-panel" tabindex="-1" class="max-[1000px]:!w-0 max-[1000px]:!p-0 focus:outline-none relative layout-left-panel overflow-y-scroll overflow-x-clip grid max-sm:ps-2 pe-2 min-h-full mx-auto">
                 </div>
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
