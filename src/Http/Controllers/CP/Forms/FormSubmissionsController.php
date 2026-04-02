@@ -12,6 +12,7 @@ use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class FormSubmissionsController extends CpController
@@ -32,7 +33,7 @@ class FormSubmissionsController extends CpController
             'form' => $form->handle(),
         ]);
 
-        $sortField = request('sort', 'date');
+        $sortField = OrderBy::column(request('sort'), 'date');
         $sortDirection = request('order', $sortField === 'date' ? 'desc' : 'asc');
 
         if ($sortField) {
