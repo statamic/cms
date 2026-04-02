@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Closure;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
@@ -21,23 +20,6 @@ class Fields
     protected $filled = [];
     protected $withValidatableValues = false;
     protected $withComputedValues = false;
-
-    /** @var array<string,Closure> */
-    protected static array $computedFieldDefaultCallbacks = [];
-
-    public static function computedDefault(string $key, Closure $callback): void
-    {
-        static::$computedFieldDefaultCallbacks[$key] = $callback;
-    }
-
-    public static function resolveDefault(string $key): mixed
-    {
-        if (! array_key_exists($key, static::$computedFieldDefaultCallbacks)) {
-            throw new \RuntimeException("No computed default registered for key [{$key}].");
-        }
-
-        return static::$computedFieldDefaultCallbacks[$key]();
-    }
 
     public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null)
     {

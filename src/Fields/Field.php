@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
+use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
@@ -298,7 +299,7 @@ class Field implements Arrayable
     public function defaultValue()
     {
         if ($this->hasComputedDefault()) {
-            return Fields::resolveDefault(Str::chopStart($this->config['default'], 'computed:'));
+            return FieldFacade::resolveComputedDefault(Str::chopStart($this->config['default'], 'computed:'));
         }
 
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
