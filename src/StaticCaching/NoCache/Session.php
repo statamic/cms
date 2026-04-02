@@ -51,7 +51,13 @@ class Session
     public function region(string $key): Region
     {
         if ($this->regions->contains($key) && ($region = StaticCache::cacheStore()->get('nocache::region.'.$key))) {
-            return $region instanceof Region ? $region : unserialize($region, ['allowed_classes' => true]);
+            if ($region instanceof Region) {
+                return $region;
+            }
+
+            if (is_string($region)) {
+                return unserialize($region, ['allowed_classes' => true]);
+            }
         }
 
         throw new RegionNotFound($key);
