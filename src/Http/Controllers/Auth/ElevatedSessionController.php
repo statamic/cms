@@ -62,7 +62,8 @@ class ElevatedSessionController extends Controller
             ? __('Password confirmed')
             : __('Code verified');
 
-        $redirect = redirect()->intended(route('statamic.site'));
+        $default = $request->input('_redirect') ?? route('statamic.site');
+        $redirect = redirect()->intended($default);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -94,7 +95,7 @@ class ElevatedSessionController extends Controller
 
         session()->sendElevatedSessionVerificationCode();
 
-        return back()->with('success', __('statamic::messages.elevated_session_verification_code_sent'));
+        return back()->with('status', __('statamic::messages.elevated_session_verification_code_sent'));
     }
 
     private function validatePasswordConfirmation(Request $request, $user): void

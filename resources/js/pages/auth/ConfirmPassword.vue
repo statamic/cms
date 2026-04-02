@@ -54,7 +54,7 @@ async function confirmWithPasskey() {
 
                 <Button
                     v-if="isUsingVerificationCode"
-                    as="href"
+                    as="a"
                     class="flex-1"
                     :href="resendUrl"
                     :text="__('Resend code')"

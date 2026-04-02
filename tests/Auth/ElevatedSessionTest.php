@@ -378,7 +378,7 @@ class ElevatedSessionTest extends TestCase
             ->from('/original')
             ->get(cp_route('elevated-session.resend-code'))
             ->assertRedirect('/original')
-            ->assertSessionHas('success')
+            ->assertSessionHas('status')
             ->assertSessionHas('statamic_elevated_session_verification_code', [
                 'code' => 'abc',
                 'generated_at' => now()->timestamp,
@@ -402,12 +402,12 @@ class ElevatedSessionTest extends TestCase
                 ->get(cp_route('elevated-session.resend-code'));
         };
 
-        $request()->assertRedirect('/original')->assertSessionHas('success');
+        $request()->assertRedirect('/original')->assertSessionHas('status');
         $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
         $this->travel(30)->seconds();
         $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
         $this->travel(1)->minute();
-        $request()->assertRedirect('/original')->assertSessionHas('success');
+        $request()->assertRedirect('/original')->assertSessionHas('status');
 
         Notification::assertCount(2);
     }
@@ -701,7 +701,7 @@ class ElevatedSessionTest extends TestCase
             ->from('/original')
             ->get('/!/auth/elevated-session/resend-code')
             ->assertRedirect('/original')
-            ->assertSessionHas('success')
+            ->assertSessionHas('status')
             ->assertSessionHas('statamic_elevated_session_verification_code', [
                 'code' => 'abc',
                 'generated_at' => now()->timestamp,
