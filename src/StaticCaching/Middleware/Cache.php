@@ -89,7 +89,7 @@ class Cache
 
             $this->nocache->write();
 
-            if ($response instanceof Request && ! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
+            if ($this->cacher instanceof FileCacher && $response instanceof Request && ! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
                 $response->makeCacheControlCacheable();
                 $response->isNotModified($request);
             }
@@ -144,7 +144,9 @@ class Cache
             $this->makeReplacements($response);
 
             $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
-            $response->makeCacheControlCacheable();
+            if ($this->cacher instanceof FileCacher) {
+                $response->makeCacheControlCacheable();
+            }
 
             return $response;
         }
