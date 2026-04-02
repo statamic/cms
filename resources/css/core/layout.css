@@ -221,12 +221,12 @@ main.nav-closed {
                 --height-increase: calc(var(--spacing) * 4.5);
                 content: '';
                 position: absolute;
-                width: calc(anchor-size(width) + var(--item-padding) * 1.6);
+                width: calc(anchor-size(width) + var(--item-padding) * 1.5);
                 height: calc(anchor-size(height) + var(--height-increase));
                 background: var(--theme-color-global-header-bg);
                 border-radius: 5px;
                 position-anchor: --active;
-                left: calc(anchor(left) - var(--item-padding) * 1.6 / 2);
+                left: calc(anchor(left) - var(--item-padding) * 1.5 / 2);
                 top: calc(anchor(top) - var(--height-increase) / 2);
                 transition-property: top, left;
                 transition-duration: 0.5s;
