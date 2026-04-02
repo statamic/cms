@@ -20,8 +20,8 @@ const props = defineProps({
         <div style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
 
 
-            <div class="form-builder-popover">
-                <button class="min-[1000px]:hidden form-builder-popover__menu-button" id="anchor-form-builder-mobile" popovertarget="popover-form-builder-mobile">
+            <div class="form-builder-popover min-[1000px]:hidden">
+                <button class="form-builder-popover__menu-button" id="anchor-form-builder-mobile" popovertarget="popover-form-builder-mobile">
                     Form Builder
                 </button>
                 <div id="popover-form-builder-mobile" class="form-builder-popover__menu" popover>
