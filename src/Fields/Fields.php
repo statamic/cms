@@ -32,6 +32,10 @@ class Fields
 
     public static function resolveDefault(string $key): mixed
     {
+        if (! array_key_exists($key, static::$computedFieldDefaultCallbacks)) {
+            throw new \RuntimeException("No computed default registered for key [{$key}].");
+        }
+
         return static::$computedFieldDefaultCallbacks[$key]();
     }
 
