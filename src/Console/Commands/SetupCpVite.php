@@ -63,14 +63,14 @@ class SetupCpVite extends Command
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                return Process::path(base_path())->run('npm install');
+                return Process::path(base_path())->run('npm install --ignore-scripts');
             },
             message: 'Installing dependencies...'
         );
 
         if ($result->failed()) {
             $this->line($result->errorOutput() ?: $result->output());
-            $this->components->error('Failed to install dependencies. You need to run "npm install" manually.');
+            $this->components->error('Failed to install dependencies. You need to run "npm install --ignore-scripts" manually.');
 
             return $this;
         }
