@@ -307,7 +307,7 @@ body > .draggable-mirror {
         }
     }
     #anchor-form-builder-mobile {
-        anchor-name: --anchor-nav-mobile;
+        anchor-name: --anchor-form-builder-mobile;
     }
     #anchor-mobile-1 {
         anchor-name: --anchor-mobile-1;
@@ -315,8 +315,8 @@ body > .draggable-mirror {
     #anchor-mobile-2 {
         anchor-name: --anchor-mobile-2;
     }
-    #popover-nav-mobile {
-        position-anchor: --anchor-nav-mobile;
+    #popover-form-builder-mobile {
+        position-anchor: --anchor-form-builder-mobile;
     }
     #popover-mobile-1 {
         position-anchor: --anchor-mobile-1;
@@ -421,7 +421,7 @@ body > .draggable-mirror {
             /* Prevent a lag in seeing the desktop nav collapse if you pull the window in  */
             transition: unset;
         }
-        #popover-nav-mobile {
+        #popover-form-builder-mobile {
             /* position-area: bottom span-right; */
             margin-block-start: 3.5rem;
             box-shadow: var(--box-shadow-light);
