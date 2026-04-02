@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import TwoFactorRecoveryCodesModal from '@/components/two-factor/RecoveryCodesModal.vue';
 import axios from 'axios';
-import { Modal, Input, Button, Icon } from '@/components/ui';
+import { Modal, ModalClose, Input, Button, Icon } from '@/components/ui';
 
-const emit = defineEmits(['setup-complete', 'cancel', 'close']);
+const emit = defineEmits(['setup-complete', 'close']);
 
 const props = defineProps({
     enableUrl: String,
@@ -49,10 +49,14 @@ function complete() {
     recoveryCodesModalOpen.value = false;
     emit('setup-complete');
 }
+
+watch(setupModalOpen, (open) => {
+    if (!open && !recoveryCodesModalOpen.value) emit('close');
+});
 </script>
 
 <template>
-    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" blur open @update:model-value="$emit('cancel')">
+    <Modal v-model:open="setupModalOpen" :title="__('Set up Two Factor Authentication')" blur>
         <div>
             <div v-if="loading" class="flex items-center justify-center text-center">
                 <Icon name="loading" />
@@ -88,11 +92,12 @@ function complete() {
 
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <Button
-                    variant="ghost"
-                    @click="$emit('close')"
-                    :text="__('Cancel')"
-                />
+                <ModalClose>
+                    <Button
+                        variant="ghost"
+                        :text="__('Cancel')"
+                    />
+                </ModalClose>
                 <Button
                     :disabled="!code"
                     variant="primary"

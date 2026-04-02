@@ -166,6 +166,20 @@ class FilesTest extends TestCase
         $this->assertEquals('required', $replaced[0]);
     }
 
+    #[Test]
+    public function it_passes_through_closure_rules()
+    {
+        $closure = function ($attribute, $value, $fail) {
+            // custom validation
+        };
+
+        $replaced = $this->fieldtype(['validate' => [$closure]])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertSame($closure, $replaced[0]);
+    }
+
     private function fieldtype($config = [])
     {
         return (new Files)->setField(new Field('test', array_merge([

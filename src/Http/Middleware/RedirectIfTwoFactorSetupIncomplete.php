@@ -4,6 +4,7 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 
 class RedirectIfTwoFactorSetupIncomplete
@@ -11,7 +12,8 @@ class RedirectIfTwoFactorSetupIncomplete
     public function handle(Request $request, Closure $next)
     {
         if (
-            ($user = User::fromUser($request->user()))
+            TwoFactor::enabled()
+            && ($user = User::fromUser($request->user()))
             && $user->isTwoFactorAuthenticationRequired()
             && ! $user->hasEnabledTwoFactorAuthentication()
         ) {

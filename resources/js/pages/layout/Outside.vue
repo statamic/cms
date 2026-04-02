@@ -22,7 +22,7 @@ onMounted(() => {
 <template>
     <div class="relative mx-auto max-w-[400px] items-center justify-center">
         <div class="flex items-center justify-center py-6">
-            <div class="logo relative z-10 max-w-3/4 md:pt-18">
+            <div class="logo max-w-3/4 md:pt-18">
                 <template v-if="customLogo">
                     <img
                         :src="lightCustomLogo"

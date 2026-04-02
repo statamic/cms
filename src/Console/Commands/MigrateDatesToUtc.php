@@ -45,6 +45,8 @@ class MigrateDatesToUtc extends Command
     {
         $this->currentTimezone = $this->argument('timezone');
 
+        config(['app.timezone' => 'UTC']);
+
         $this->components->warn('This command makes changes to content. Please make a backup before running.');
         $this->components->info('This operation converts content dates to UTC for storage purposes only. System functionality is identical whether you proceed or not – do so only if specifically desired.');
 
@@ -118,6 +120,12 @@ class MigrateDatesToUtc extends Command
                     && empty($dottedPrefix)
                     && $field->handle() === 'date'
                 ) {
+                    // Skip localized entries that inherit their date from the origin.
+                    // The origin will be migrated separately and the inheritance will continue to work.
+                    if (! $item->hasExplicitDate()) {
+                        return;
+                    }
+
                     // When entries are constructed, the datestamp from the filename would be provided but treated as UTC.
                     // We need them to be adjusted back to the existing timezone.
                     $item->date(Carbon::createFromFormat(

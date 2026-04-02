@@ -1,5 +1,103 @@
 # Release Notes
 
+## 6.9.0 (2026-04-01)
+
+### What's new
+- Add a Text component [#14247](https://github.com/statamic/cms/issues/14247) by @jaygeorge
+- Emit `asset.saved` event from asset editor [#14392](https://github.com/statamic/cms/issues/14392) by @duncanmcclean
+
+### What's fixed
+- Fix collection whereStatus logic [#14380](https://github.com/statamic/cms/issues/14380) by @jackmcdade
+- Implement whereStatus() on search query builder [#14387](https://github.com/statamic/cms/issues/14387) by @ryanmitchell
+- Blueprint button order changes [#14365](https://github.com/statamic/cms/issues/14365) by @jaygeorge
+- Fix address bar overlapping bottom of content (typically on iOS) [#14399](https://github.com/statamic/cms/issues/14399) by @jaygeorge
+- Fix nested Bard toolbar focus issues [#14396](https://github.com/statamic/cms/issues/14396) by @jaygeorge
+- Fix nav section border radius [#14409](https://github.com/statamic/cms/issues/14409) by @jaygeorge
+- Fix conditional field borders [#14407](https://github.com/statamic/cms/issues/14407) by @thomasvantuycom
+- Fix collection listing dates from wrapping [#14415](https://github.com/statamic/cms/issues/14415) by @jaygeorge
+- Fix Parameters make method [#14418](https://github.com/statamic/cms/issues/14418) by @jasonvarga
+- Prevent npm packages from executing malicious code via `postinstall` [#14417](https://github.com/statamic/cms/issues/14417) by @duncanmcclean
+- French translations [#14393](https://github.com/statamic/cms/issues/14393) by @ebeauchamps
+- Bump brace-expansion from 2.0.2 to 2.0.3 [#14383](https://github.com/statamic/cms/issues/14383) by @dependabot
+
+
+
+## 6.8.0 (2026-03-27)
+
+### What's new
+- GraphQL API Authentication [#14292](https://github.com/statamic/cms/issues/14292) by @duncanmcclean
+- Ability to disable two-factor authentication [#14263](https://github.com/statamic/cms/issues/14263) by @duncanmcclean
+- Ability to select the date formatting locale [#14372](https://github.com/statamic/cms/issues/14372) by @jasonvarga
+- Number formatter [#14373](https://github.com/statamic/cms/issues/14373) by @jasonvarga
+
+### What's fixed
+- Omit application name and URL from support:details [#14359](https://github.com/statamic/cms/issues/14359) by @jasonvarga
+- Fix CP Nav active state when trailing slashes are enforced [#14363](https://github.com/statamic/cms/issues/14363) by @duncanmcclean
+- Only change date for localizations with an explicit date set [#14362](https://github.com/statamic/cms/issues/14362) by @duncanmcclean
+- Bring back responsive button groups [#13336](https://github.com/statamic/cms/issues/13336) by @daun
+- Merge external class attrs through twMerge in UI components [#14379](https://github.com/statamic/cms/issues/14379) by @jasonvarga
+- Reduce amount of data provided in Assets fieldtype meta [#14366](https://github.com/statamic/cms/issues/14366) by @duncanmcclean
+- Filters can only be removed by clicking cross [#14220](https://github.com/statamic/cms/issues/14220) by @jaygeorge
+- Bump reka-ui [#14368](https://github.com/statamic/cms/issues/14368) by @jasonvarga
+- Bump picomatch from 2.3.1 to 2.3.2 [#14360](https://github.com/statamic/cms/issues/14360) by @dependabot
+
+
+
+## 6.7.3 (2026-03-25)
+
+### What's fixed
+- Fix header z-index when creating a new nav [#14337](https://github.com/statamic/cms/issues/14337) by @jaygeorge
+- Remove fixed height from SVGs in UI labels to prevent flickering [#14338](https://github.com/statamic/cms/issues/14338) by @jaygeorge
+- Correct the Bard full-screen width [#14348](https://github.com/statamic/cms/issues/14348) by @jaygeorge
+- Fix duplicate translation for "Edit Fieldset" [#14349](https://github.com/statamic/cms/issues/14349) by @duncanmcclean
+- Delete unused `moment` translations [#14354](https://github.com/statamic/cms/issues/14354) by @duncanmcclean
+- Revert "Fix translator locale" [#14358](https://github.com/statamic/cms/issues/14358) by @jasonvarga
+- French translations [#14339](https://github.com/statamic/cms/issues/14339) by @ebeauchamps
+- German translations [#14352](https://github.com/statamic/cms/issues/14352) by @helloDanuk
+
+
+
+## 6.7.2 (2026-03-24)
+
+### What's fixed
+- DatePicker dates can't be strings [#14295](https://github.com/statamic/cms/issues/14295) by @edalzell
+- Fix updated widget badge alignment [#14303](https://github.com/statamic/cms/issues/14303) by @jackmcdade
+- Fix PHP sanitization edge cases [#14300](https://github.com/statamic/cms/issues/14300) by @duncanmcclean
+- Fix Replicator Drag & Drop when multiple fields share the same handle [#14310](https://github.com/statamic/cms/issues/14310) by @duncanmcclean
+- Fix live preview token scope [#14304](https://github.com/statamic/cms/issues/14304) by @jasonvarga
+- Handle more cases in external url detection [#14315](https://github.com/statamic/cms/issues/14315) by @jasonvarga
+- Allow external redirects from Form::getSubmissionRedirect [#14318](https://github.com/statamic/cms/issues/14318) by @jasonvarga
+- Fix closure validation rules with Files fieldtype [#14319](https://github.com/statamic/cms/issues/14319) by @duncanmcclean
+- Relationship fieldtype authorization tweaks [#14307](https://github.com/statamic/cms/issues/14307) by @duncanmcclean
+- Add CSP header to svg route [#14325](https://github.com/statamic/cms/issues/14325) by @jasonvarga
+- Add authorization to revision routes [#14301](https://github.com/statamic/cms/issues/14301) by @duncanmcclean
+- Restrict markdown preview endpoint [#14326](https://github.com/statamic/cms/issues/14326) by @jasonvarga
+- Sanitize password reset form redirect value [#14327](https://github.com/statamic/cms/issues/14327) by @jasonvarga
+- Fix config through Antlers views [#14328](https://github.com/statamic/cms/issues/14328) by @jasonvarga
+- Long dropdowns should be scrollable [#14333](https://github.com/statamic/cms/issues/14333) by @duncanmcclean
+- Fix set picker position [#14332](https://github.com/statamic/cms/issues/14332) by @duncanmcclean
+- Fix various timezone issues [#14322](https://github.com/statamic/cms/issues/14322) by @duncanmcclean
+- Fix translator locale [#14323](https://github.com/statamic/cms/issues/14323) by @jasonvarga
+- Fix 2FA setup modal not re-opening [#14309](https://github.com/statamic/cms/issues/14309) by @duncanmcclean
+- Fix logo z-index in Outside.vue [#14299](https://github.com/statamic/cms/issues/14299) by @SteveEdson
+- Fix `translator` error with Symfony Console 8 [#14330](https://github.com/statamic/cms/issues/14330) by @duncanmcclean
+- Don't autofocus on non-root fields with "title" or "alt" name [#14329](https://github.com/statamic/cms/issues/14329) by @hivokas
+
+
+
+## 6.7.1 (2026-03-18)
+
+### What's fixed
+- Hide "Duplicate Set" when max sets limit has been reached [#14275](https://github.com/statamic/cms/issues/14275) by @duncanmcclean
+- Fix missing top border in read-only Assets fields [#14277](https://github.com/statamic/cms/issues/14277) by @duncanmcclean
+- Hide set bodies when there are no fields [#14282](https://github.com/statamic/cms/issues/14282) by @jackmcdade
+- Fieldset editing improvements [#14283](https://github.com/statamic/cms/issues/14283) by @jackmcdade
+- Harden `URL::isExternalToApplication()` [#14287](https://github.com/statamic/cms/issues/14287) by @duncanmcclean
+- Prevent opening set picker when `max_sets` limit has been reached [#14290](https://github.com/statamic/cms/issues/14290) by @duncanmcclean
+- Harden password reset [#14294](https://github.com/statamic/cms/issues/14294) by @jasonvarga
+
+
+
 ## 6.7.0 (2026-03-17)
 
 ### What's new
