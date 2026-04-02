@@ -284,7 +284,7 @@ body > .draggable-mirror {
 
 
 
-.c-nav-with-popover-api {
+.form-builder-popover {
     nav {
         overflow: scroll;
         overscroll-behavior-y: contain;
@@ -321,14 +321,14 @@ body > .draggable-mirror {
         }
     }
 
-    .c-nav-with-popover-api__mobile-button {
+    .form-builder-popover__mobile-button {
         padding: var(--spacing-lg);
         background: var(--dropdown-nav-background-color);
         border-radius: 15px;
         font-size: 0.85em;
     }
 
-    .c-nav-with-popover-api__close-button {
+    .form-builder-popover__close-button {
         position: sticky;
         z-index: 1;
         left: 100%;

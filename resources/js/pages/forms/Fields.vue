@@ -20,15 +20,17 @@ const props = defineProps({
         <div style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
 
 
-            <div class="c-nav-with-popover-api">
-                <button class="c-nav-with-popover-api__mobile-button" id="anchor-form-builder-mobile" popovertarget="popover-form-builder-mobile">Form Builder</button>
-                <nav id="popover-form-builder-mobile" class="c-nav-with-popover-api__mobile u-hide-on-desktop" popover>
-                    <button class="c-nav-with-popover-api__close-button" title="Close" popovertarget="popover-form-builder-mobile">
+            <div class="form-builder-popover">
+                <button class="min-[1000px]:hidden form-builder-popover__mobile-button" id="anchor-form-builder-mobile" popovertarget="popover-form-builder-mobile">
+                    Form Builder
+                </button>
+                <nav id="popover-form-builder-mobile" class="form-builder-popover__mobile" popover>
+                    <button class="form-builder-popover__close-button" title="Close" popovertarget="popover-form-builder-mobile">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
                     <ul>
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Getting Started</span>
+                            <span class="form-builder-popover-category-heading">Getting Started</span>
                             <ul>
                                 <li><a href="/">Requirements</a></li>
                                 <li><a href="/">Quickstart Guide</a></li>
@@ -40,7 +42,7 @@ const props = defineProps({
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Core Concepts</span>
+                            <span class="form-builder-popover-category-heading">Core Concepts</span>
                             <ul>
                                 <li><a href="/">Overview</a></li>
                                 <li><a href="/">Assets</a></li>
@@ -57,7 +59,7 @@ const props = defineProps({
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Diving Deeper</span>
+                            <span class="form-builder-popover-category-heading">Diving Deeper</span>
                             <ul>
                                 <li><a href="/">Augmentation</a></li>
                                 <li><a href="/">CLI</a></li>
@@ -74,7 +76,7 @@ const props = defineProps({
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Frontend</span>
+                            <span class="form-builder-popover-category-heading">Frontend</span>
                             <ul>
                                 <li><a href="/">Overview</a></li>
                                 <li><a href="/">Antlers Templates</a></li>
@@ -96,7 +98,7 @@ const props = defineProps({
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Case Studies</span>
+                            <span class="form-builder-popover-category-heading">Case Studies</span>
                             <ul>
                                 <li><a href="/">Dashboard</a></li>
                                 <li><a href="/">Navigation</a></li>
@@ -114,14 +116,14 @@ const props = defineProps({
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Addons</span>
+                            <span class="form-builder-popover-category-heading">Addons</span>
                             <ul>
                                 <li><a href="/">Overview</a></li>
                             </ul>
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Starter Kits</span>
+                            <span class="form-builder-popover-category-heading">Starter Kits</span>
                             <ul>
                                 <li><a href="/">Overview</a></li>
                                 <li><a href="/">Installing</a></li>
@@ -130,7 +132,7 @@ const props = defineProps({
                         </li>
 
                         <li>
-                            <span class="c-nav-with-popover-api-category-heading">Resources</span>
+                            <span class="form-builder-popover-category-heading">Resources</span>
                             <ul>
                                 <li><a href="/">Content Manager's Guide</a></li>
                                 <li><a href="/">WordPress to Statamic</a></li>
