@@ -286,346 +286,261 @@ body > .draggable-mirror {
 
 /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / API
 =================================================== */
-@layer components {
-    .c-nav-with-popover-api {
-        --dropdown-nav-item-padding: var(--spacing-2xs);
-        --dropdown-nav-background-color: #111;
-        --dropdown-nav-subnav-background-color: #151515;
-        /* --mq-nav-open-after */
-        @media (width >= 1000px) {
-            /* Darker */
-            --dropdown-nav-subnav-background-color: #111;
+/* @layer components { */
+.c-nav-with-popover-api {
+    --dropdown-nav-item-padding: var(--spacing-2xs);
+    --dropdown-nav-background-color: white;
+    --dropdown-nav-subnav-background-color: #151515;
+    /* --mq-nav-open-after */
+    @media (width >= 1000px) {
+        /* Darker */
+        --dropdown-nav-subnav-background-color: #111;
+    }
+
+    padding-inline: var(--spacing-xl);
+    nav,
+    nav [popover] {
+        /* Reset */
+        margin: 0;
+        padding: 0;
+        border: 0;
+
+        display: none;
+        opacity: 0;
+        transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
+
+        &:popover-open {
+            display: block;
+            opacity: 1;
+
+            @starting-style {
+                opacity: 0;
+                margin-block-start: 0;
+                /* --mq-nav-open-before */
+                @media (width < 1000px) {
+                    margin-inline-start: -50%;
+                }
+                &::backdrop {
+                    /* Needed to get the popover backdrop to fade in when opening */
+                    opacity: 0;
+                }
+            }
+        }
+    }
+    nav {
+        /* Override the default background color of the popover */
+        background: inherit;
+        [popover] {
+            max-width: 14rem;
+            &:popover-open {
+                margin-block-start: var(--spacing-3xs);
+            }
+        }
+    }
+    #anchor-nav-mobile {
+        anchor-name: --anchor-nav-mobile;
+    }
+    #anchor-mobile-1 {
+        anchor-name: --anchor-mobile-1;
+    }
+    #anchor-mobile-2 {
+        anchor-name: --anchor-mobile-2;
+    }
+    #popover-nav-mobile {
+        position-anchor: --anchor-nav-mobile;
+    }
+    #popover-mobile-1 {
+        position-anchor: --anchor-mobile-1;
+        inset-block-start: anchor(--anchor-mobile-1 bottom);
+        inset-inline-start: anchor(--anchor-mobile-1 left);
+    }
+    #popover-mobile-2 {
+        position-anchor: --anchor-mobile-2;
+        inset-block-start: anchor(--anchor-mobile-2 bottom);
+        inset-inline-start: anchor(--anchor-mobile-2 left);
+    }
+    #anchor-desktop-1 {
+        anchor-name: --anchor-desktop-1;
+    }
+    #anchor-desktop-2 {
+        anchor-name: --anchor-desktop-2;
+    }
+    #popover-desktop-1 {
+        position-anchor: --anchor-desktop-1;
+        inset-block-start: anchor(--anchor-desktop-1 bottom);
+        inset-inline-start: anchor(--anchor-desktop-1 left);
+    }
+    #popover-desktop-2 {
+        position-anchor: --anchor-desktop-2;
+        inset-block-start: anchor(--anchor-desktop-2 bottom);
+        inset-inline-start: anchor(--anchor-desktop-2 left);
+    }
+    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / MOBILE NAV BUTTON
+    =================================================== */
+    .c-nav-with-popover-api__mobile-button {
+        padding: var(--spacing-lg);
+        background: var(--dropdown-nav-background-color);
+        border-radius: 15px;
+        font-size: 0.85em;
+    }
+    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / CLOSE BUTTON
+    =================================================== */
+    .c-nav-with-popover-api__close-button {
+        position: sticky;
+        z-index: 1;
+        left: 100%;
+        top: 0.25rem;
+        width: initial;
+        height: initial;
+        cursor: pointer;
+        padding: 1rem;
+        & svg {
+            font-size: 1rem;
+            inline-size: unset;
+        }
+    }
+    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / NAV STYLING
+    =================================================== */
+    nav {
+        overflow: scroll;
+        overscroll-behavior-y: contain;
+        height: 100%;
+
+        & * {
+            line-height: 1.5;
+            color: black;
         }
 
-        padding-inline: var(--spacing-xl);
-        nav,
-        nav [popover] {
-            /* Reset */
-            margin: 0;
-            padding: 0;
-            border: 0;
+        & ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3xs);
+            font-size: var(--font-size-xs);
+            /* Increase */
+            outline-offset: 5px;
 
-            display: none;
-            opacity: 0;
-            transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
+            & li {
+                padding-block-end: 0;
 
-            &:popover-open {
-                display: block;
-                opacity: 1;
+                & button {
+                    text-align: left;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: var(--spacing-sm);
+                    /* Reset */
+                    margin-inline-end: 0;
+                    padding: 0;
+                    cursor: pointer;
+                    & svg {
+                        font-size: 0.6em;
+                    }
+                }
 
-                @starting-style {
-                    opacity: 0;
-                    margin-block-start: 0;
+                & a, button, span {
+                    /* Increase the pointer targets a little to improve usability */
+                    padding: var(--dropdown-nav-item-padding);
                     /* --mq-nav-open-before */
                     @media (width < 1000px) {
-                        margin-inline-start: -50%;
-                    }
-                    &::backdrop {
-                        /* Needed to get the popover backdrop to fade in when opening */
-                        opacity: 0;
+                        display: inline-block;
                     }
                 }
             }
-        }
-        nav {
-            /* Override the default background color of the popover */
-            background: inherit;
-            [popover] {
-                max-width: 14rem;
+
+            /* Subnav */
+            & ul[popover] {
                 &:popover-open {
-                    margin-block-start: var(--spacing-3xs);
+                    display: flex;
+                }
+                padding: var(--spacing-lg);
+                /* Just clear the outline state of the parent so it looks cleaner when tabbing through with a keyboard */
+                margin-block-start: var(--spacing-3xs);
+                background: var(--dropdown-nav-subnav-background-color);
+                letter-spacing: 1px;
+                & a, button {
+                    outline-offset: unset;
                 }
             }
         }
-        #anchor-nav-mobile {
-            anchor-name: --anchor-nav-mobile;
+        & a:not(.o-current-menu-item) {
+            /* https://app.typographychecklist.com/ - 43. Links that are clearly part of navigation usually don't need a special link treatment. */
+            text-decoration: none;
         }
-        #anchor-mobile-1 {
-            anchor-name: --anchor-mobile-1;
-        }
-        #anchor-mobile-2 {
-            anchor-name: --anchor-mobile-2;
+    }
+    /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / MQS
+    =================================================== */
+    /* --mq-nav-open-before */
+    @media (width < 1000px) {
+        .c-nav-with-popover-api__desktop {
+            /* Prevent a lag in seeing the desktop nav collapse if you pull the window in  */
+            transition: unset;
         }
         #popover-nav-mobile {
-            position-anchor: --anchor-nav-mobile;
-        }
-        #popover-mobile-1 {
-            position-anchor: --anchor-mobile-1;
-            inset-block-start: anchor(--anchor-mobile-1 bottom);
-            inset-inline-start: anchor(--anchor-mobile-1 left);
-        }
-        #popover-mobile-2 {
-            position-anchor: --anchor-mobile-2;
-            inset-block-start: anchor(--anchor-mobile-2 bottom);
-            inset-inline-start: anchor(--anchor-mobile-2 left);
-        }
-        #anchor-desktop-1 {
-            anchor-name: --anchor-desktop-1;
-        }
-        #anchor-desktop-2 {
-            anchor-name: --anchor-desktop-2;
-        }
-        #popover-desktop-1 {
-            position-anchor: --anchor-desktop-1;
-            inset-block-start: anchor(--anchor-desktop-1 bottom);
-            inset-inline-start: anchor(--anchor-desktop-1 left);
-        }
-        #popover-desktop-2 {
-            position-anchor: --anchor-desktop-2;
-            inset-block-start: anchor(--anchor-desktop-2 bottom);
-            inset-inline-start: anchor(--anchor-desktop-2 left);
-        }
-        /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / MOBILE NAV BUTTON
-        =================================================== */
-        .c-nav-with-popover-api__mobile-button {
-            padding: var(--spacing-lg);
-            background: var(--dropdown-nav-background-color);
-            color: white;
-            border-radius: 15px;
-            /* --mq-nav-open-before */
-            @media (width < 1000px) {
-                position: fixed;
-                top: var(--spacing-xl);
-                left: var(--spacing-xl);
-                margin-inline-end: 0;
-            }
-        }
-        /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / CLOSE BUTTON
-        =================================================== */
-        .c-nav-with-popover-api__close-button {
-            position: absolute;
-            z-index: 1;
-            right: 1.5rem;
-            top: 1.5rem;
-            & svg {
-                font-size: 1rem;
-                inline-size: unset;
-            }
-        }
-        /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / NAV STYLING
-        =================================================== */
-        nav {
-            & * {
-                line-height: 1.5;
-                color: white;
-                letter-spacing: 1px;
-            }
-
-            & ul {
-                list-style: none;
-                display: flex;
-                flex-direction: column;
-                gap: var(--spacing-3xs);
-                font-size: var(--font-size-xs);
-                overflow: scroll;
-                overscroll-behavior-y: contain;
-                /* Need to cut this short a little to force scrolling when there are a lot of items. */
-                max-height: calc(100vh - var(--spacing-md));
-                /* Increase */
-                outline-offset: 5px;
-
-                & li {
-                    padding-block-end: 0;
-
-                    & button {
-                        text-align: left;
-                        display: flex;
-                        flex-wrap: wrap;
-                        align-items: center;
-                        gap: var(--spacing-sm);
-                        /* Reset */
-                        margin-inline-end: 0;
-                        padding: 0;
-                        cursor: pointer;
-                        & svg {
-                            font-size: 0.6em;
-                        }
-                    }
-
-                    & a, button, span {
-                        /* Increase the pointer targets a little to improve usability */
-                        padding: var(--dropdown-nav-item-padding);
-                        /* --mq-nav-open-before */
-                        @media (width < 1000px) {
-                            display: inline-block;
-                        }
-                    }
-                }
-
-                /* Subnav */
-                & ul[popover] {
-                    &:popover-open {
-                        display: flex;
-                    }
-                    padding: var(--spacing-lg);
-                    /* Just clear the outline state of the parent so it looks cleaner when tabbing through with a keyboard */
-                    margin-block-start: var(--spacing-3xs);
-                    background: var(--dropdown-nav-subnav-background-color);
-                    letter-spacing: 1px;
-                    & a, button {
-                        outline-offset: unset;
-                    }
-                }
-            }
-            & a:not(.o-current-menu-item) {
-                /* https://app.typographychecklist.com/ - 43. Links that are clearly part of navigation usually don't need a special link treatment. */
-                text-decoration: none;
-            }
-        }
-        /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / MQS
-        =================================================== */
-        /* --mq-nav-open-before */
-        @media (width < 1000px) {
-            .c-nav-with-popover-api__desktop {
-                /* Prevent a lag in seeing the desktop nav collapse if you pull the window in  */
-                transition: unset;
-            }
-            #popover-nav-mobile {
-                /* position-area: bottom span-right; */
-                margin-block-start: var(--spacing-md);
-                box-shadow: var(--box-shadow-light);
-                &:not(:popover-open) {
-                    pointer-events: none;
-                }
-            }
-            nav {
-                background: var(--dropdown-nav-background-color);
-                min-width: 85%;
-                border-top-right-radius: 20px;
-                &::backdrop {
-                    transition: all 0.5s var(--animation-timing-function-hipster) 0s;
-                }
-                &:popover-open::backdrop {
-                    backdrop-filter: blur(3px);
-                    background: hsl(0deg 0% 0% / 80%);
-                }
-                & ul {
-                    padding: var(--spacing-lg);
-                    & ul {
-                        padding-block: var(--spacing-2xs);
-                    }
-                }
-            }
-        }
-        /* --mq-nav-open-after */
-        @media (width >= 1000px) {
-            .c-nav-with-popover-api__mobile {
-                /* Prevent a lag in seeing the mobile nav collapse if you pull the window out  */
-                transition: unset;
-            }
-            --dropdown-nav-background-color: unset;
-            nav {
-                /* Override `popover`'s default position:fixed; */
-                position: relative;
-                display: block;
-                opacity: 1;
-                inline-size: 100%;
-                max-width: var(--max-width-1);
-                margin-inline: auto;
-                padding-block-end: var(--spacing-xl);
-                & > ul {
-                    flex-direction: row;
-                    gap: var(--spacing-lg);
-                    :is(a, button):not(ul ul *) {
-                        padding: var(--spacing-md);
-                        /* Pull the outline back in to counter padding */
-                        outline-offset: -10px;
-                    }
-                }
-                & ul ul {
-                    /* Need to cut this short a little to force scrolling when there are a lot of items. */
-                    max-height: 70vh;
-                    background: var(--dropdown-nav-background-color);
-                    border-radius: 15px;
-                    font-size: 0.95em;
-                }
-            }
-            .c-nav-with-popover-api__mobile-button {
-                opacity: 0;
+            /* position-area: bottom span-right; */
+            margin-block-start: 3.5rem;
+            box-shadow: var(--box-shadow-light);
+            &:not(:popover-open) {
                 pointer-events: none;
             }
         }
-        /* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / EXTRA DEMO STYLING
-        =================================================== */
         nav {
-            * {
-                text-transform: uppercase;
+            background: var(--dropdown-nav-background-color);
+            border-inline-end: 1px solid gray;
+            /* min-width: 85%; */
+            /* border-top-right-radius: 20px; */
+            &::backdrop {
+                transition: all 0.5s var(--animation-timing-function-hipster) 0s;
             }
-            /* --mq-nav-open-after */
-            @media (width >= 1000px) {
-                @supports (position-anchor: --my-anchor) {
-                    margin-block-start: var(--spacing-xl);
+            /* &:popover-open::backdrop {
+                backdrop-filter: blur(3px);
+                background: hsl(0deg 0% 0% / 80%);
+            } */
+            & ul {
+                padding: var(--spacing-lg);
+                & ul {
+                    padding-block: var(--spacing-2xs);
                 }
             }
         }
     }
-}
-/* GROUP COMPONENTS / NAV DROPDOWN WITH POPOVER API AND ANCHOR POSITIONING / CSS based fallback for browsers that don't support anchor positioning
-=================================================== */
-@supports not (position-anchor: --my-anchor) {
-    @layer scope {
-        .c-nav-with-popover-api {
-            --dropdown-nav-subnav-background-color: unset;
-            & nav {
-                /* Pull the nav to the right */
-                margin-inline-start: auto;
-                /* Center the popover */
-                [popover]:popover-open {
-                    margin: auto;
-                    max-width: none;
+    /* --mq-nav-open-after */
+    @media (width >= 1000px) {
+        .c-nav-with-popover-api__mobile {
+            /* Prevent a lag in seeing the mobile nav collapse if you pull the window out  */
+            transition: unset;
+        }
+        --dropdown-nav-background-color: unset;
+        nav {
+            /* Override `popover`'s default position:fixed; */
+            position: relative;
+            display: block;
+            opacity: 1;
+            inline-size: 100%;
+            max-width: var(--max-width-1);
+            margin-inline: auto;
+            padding-block-end: var(--spacing-xl);
+            & > ul {
+                flex-direction: row;
+                gap: var(--spacing-lg);
+                :is(a, button):not(ul ul *) {
+                    padding: var(--spacing-md);
+                    /* Pull the outline back in to counter padding */
+                    outline-offset: -10px;
                 }
-                /* Fill the height of the screen when the popover is open to also allow the subnav to fill the screen */
-                &:has(ul ul:popover-open) {
-                    background: white;
-                    height: 100%;
-                }
-                /* Some styling */
-                & ul ul * {
-                    text-transform: none;
-                    letter-spacing: 0;
-                    font-size: var(--font-size-lg);
-                }
+            }
+            & ul ul {
+                /* Need to cut this short a little to force scrolling when there are a lot of items. */
+                max-height: 70vh;
+                background: var(--dropdown-nav-background-color);
+                border-radius: 15px;
+                font-size: 0.95em;
             }
         }
-        /* --mq-nav-open-before */
-        @media (width < 1100px) {
-            .c-nav-with-popover-api {
-                /* Add a blanket background _just_ when the submenus are open because anchor positioning isn't supported */
-                nav:has([popover]:popover-open) {
-                    inline-size: 100%;
-                    background: hsl(0deg 0% 0%/ 50%);
-                    -webkit-backdrop-filter: blur(20px);
-                    backdrop-filter: blur(10px);
-                    & ul:not(ul ul) {
-                        opacity: 0;
-                    }
-                    ul li :is(a, button):not(ul ul *) {
-                        pointer-events: none;
-                    }
-                }
-            }
-            html:has(.c-nav-with-popover-api ul ul:popover-open) {
-                /* Disable scrolling the website when the subnav is open */
-                overflow: clip;
-            }
-        }
-        /* --mq-nav-open-after */
-        @media (width >= 1100px) {
-            /* Add a blanket background to the whole website when the submenus are open because anchor positioning isn't supported */
-            html:has(.c-nav-with-popover-api ul ul:popover-open) {
-                &::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: hsl(0deg 0% 0%/ 95%);
-                    -webkit-backdrop-filter: blur(10px);
-                    backdrop-filter: blur(10px);
-                    z-index: var(--z-index-nav);
-                }
-                /* Disable scrolling the website when the subnav is open */
-                overflow: clip;
-            }
+        .c-nav-with-popover-api__mobile-button {
+            opacity: 0;
+            pointer-events: none;
         }
     }
 }
-
+/* } */
