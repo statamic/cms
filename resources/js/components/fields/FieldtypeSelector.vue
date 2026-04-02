@@ -232,7 +232,7 @@ export default {
         this.$axios.get(url)
             .then((response) => (loadedFieldtypes.value = response.data))
             .catch((e) => {
-                this.$toast.error(e.response.data.message);
+                this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 this.close();
             });
     },

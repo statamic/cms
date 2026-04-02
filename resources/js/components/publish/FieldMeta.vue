@@ -68,9 +68,9 @@ export default {
                     this.loading = false;
                     this.$emit('loaded');
                 })
-                .catch(() => {
+                .catch((e) => {
                     this.loading = false;
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 });
         },
 

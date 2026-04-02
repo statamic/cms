@@ -366,7 +366,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error(__('Something went wrong'));
+                this.$toast.error(e.response?.data?.message || __('Something went wrong'));
             }
         },
 
@@ -397,7 +397,10 @@ export default {
                     this.originValues = response.data.originValues;
                     this.originMeta = response.data.originMeta;
                 })
-                .catch((e) => this.handleAxiosError(e));
+                .catch((e) => {
+                    this.loading = false;
+                    this.handleAxiosError(e);
+                });
         },
     },
 };
