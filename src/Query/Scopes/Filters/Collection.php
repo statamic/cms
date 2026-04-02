@@ -2,7 +2,9 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades;
+use Statamic\Facades\User;
 use Statamic\Query\Scopes\Filter;
 
 class Collection extends Filter
@@ -29,6 +31,8 @@ class Collection extends Filter
 
     public function apply($query, $values)
     {
+        $this->authorizeCollectionAccess($values['collections']);
+
         $query->whereIn('collection', $values['collections']);
     }
 
@@ -44,8 +48,25 @@ class Collection extends Filter
 
     protected function options()
     {
-        return collect($this->context['collections'])->mapWithKeys(function ($collection) {
-            return [$collection => Facades\Collection::findByHandle($collection)->title()];
+        $user = User::current();
+
+        return collect($this->context['collections'])
+            ->map(fn ($collection) => Facades\Collection::findByHandle($collection))
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection))
+            ->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()]);
+    }
+
+    private function authorizeCollectionAccess(array $collections): void
+    {
+        $user = User::current();
+
+        collect($collections)->each(function (string $collectionHandle) use ($user) {
+            $collection = Facades\Collection::findByHandle($collectionHandle);
+
+            throw_if(
+                ! $collection || ! $user->can('view', $collection),
+                new AuthorizationException
+            );
         });
     }
 }

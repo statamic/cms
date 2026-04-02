@@ -440,7 +440,7 @@ EOT;
         $this->repo->findOrFail('does-not-exist');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_blueprint_from_split_repository()
     {
         $repo = (new BlueprintRepository())

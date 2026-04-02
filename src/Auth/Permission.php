@@ -20,6 +20,9 @@ class Permission
     protected $description;
     protected $group;
 
+    /**
+     * @return ($value is null ? string|string[] : static)
+     */
     public function value(?string $value = null)
     {
         if (func_num_args() > 0) {
@@ -41,6 +44,9 @@ class Permission
         return $this->label;
     }
 
+    /**
+     * @return ($label is null ? string|null : static)
+     */
     public function label(?string $label = null)
     {
         if (func_num_args() > 0) {
@@ -51,7 +57,9 @@ class Permission
 
         $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
 
-        return __($label, [$this->placeholder => $this->placeholderLabel]);
+        return $this->placeholder
+            ? __($label, [$this->placeholder => $this->placeholderLabel])
+            : __($label);
     }
 
     public function placeholder(?string $placeholder = null)
@@ -102,6 +110,50 @@ class Permission
             }
 
             return $replaced;
+        })->values();
+    }
+
+    public function flattened()
+    {
+        if (! $this->callback) {
+            return [
+                $this,
+                ...$this->children()->map(function ($child) {
+                    return (new self)
+                        ->value($child->value())
+                        ->label($child->label())
+                        ->placeholder($this->placeholder)
+                        ->placeholderLabel($this->placeholderLabel)
+                        ->placeholderValue($this->placeholderValue)
+                        ->children($child->children()->all())
+                        ->group($this->group());
+                })->flatMap->flattened()->all(),
+            ];
+        }
+
+        $items = call_user_func($this->callback);
+
+        return collect($items)->flatMap(function ($replacement) {
+            $replaced = (new self)
+                ->value($this->value)
+                ->label($this->label)
+                ->placeholder($this->placeholder)
+                ->placeholderLabel($replacement['label'])
+                ->placeholderValue($replacement['value'])
+                ->group($this->group());
+
+            $children = $this->children()->map(function ($child) use ($replacement) {
+                return (new self)
+                    ->value($child->originalValue())
+                    ->label($child->originalLabel())
+                    ->placeholder($this->placeholder)
+                    ->placeholderLabel($replacement['label'])
+                    ->placeholderValue($replacement['value'])
+                    ->children($child->children()->all())
+                    ->group($this->group());
+            });
+
+            return [$replaced, ...$children->flatMap->flattened()->all()];
         })->values();
     }
 

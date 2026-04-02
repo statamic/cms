@@ -2,7 +2,8 @@
 
 namespace Statamic\Data;
 
-use Statamic\Fields\Fields;
+use Statamic\Facades\Blink;
+use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
 
@@ -27,6 +28,11 @@ abstract class DataReferenceUpdater
      * @var bool
      */
     protected $updated;
+
+    /**
+     * @var bool
+     */
+    protected $shouldSave = true;
 
     /**
      * Instantiate data reference updater.
@@ -88,7 +94,34 @@ abstract class DataReferenceUpdater
     abstract protected function recursivelyUpdateFields($fields, $dottedPrefix = null);
 
     /**
-     * Update nested field values.
+     * Get fieldtypes that use the UpdatesReferences trait, filtered by cheap string type check.
+     *
+     * @param  \Illuminate\Support\Collection  $fields
+     * @return \Illuminate\Support\Collection
+     */
+    protected function fieldsWithReferenceUpdates($fields)
+    {
+        $handles = Blink::once('fieldtypes-with-reference-updates', fn () => app('statamic.fieldtypes')
+            ->filter(fn ($class) => in_array(UpdatesReferences::class, class_uses_recursive($class)))
+            ->keys()->all()
+        );
+
+        return $fields->filter(fn ($field) => in_array($field->type(), $handles));
+    }
+
+    /**
+     * Process nested fields for reference updates at the given dotted prefix.
+     *
+     * @param  \Statamic\Fields\Fields  $fields
+     * @param  string  $dottedPrefix
+     */
+    public function processNestedFields($fields, $dottedPrefix): void
+    {
+        $this->recursivelyUpdateFields($fields->all(), $dottedPrefix);
+    }
+
+    /**
+     * Update nested field values by delegating to fieldtype iterateReferenceFields.
      *
      * @param  \Illuminate\Support\Collection  $fields
      * @param  null|string  $dottedPrefix
@@ -96,124 +129,34 @@ abstract class DataReferenceUpdater
      */
     protected function updateNestedFieldValues($fields, $dottedPrefix)
     {
-        $fields
-            ->filter(function ($field) {
-                return in_array($field->type(), ['replicator', 'grid', 'group', 'bard']);
-            })
+        $this->fieldsWithReferenceUpdates($fields)
             ->each(function ($field) use ($dottedPrefix) {
-                $method = 'update'.ucfirst($field->type()).'Children';
-                $dottedKey = $dottedPrefix.$field->handle();
+                $fieldKey = $dottedPrefix.$field->handle();
+                $fieldData = Arr::get($this->item->data()->all(), $fieldKey);
 
-                $this->{$method}($field, $dottedKey);
+                if ($fieldData === null) {
+                    return;
+                }
+
+                $field->fieldtype()->iterateReferenceFields(
+                    $fieldData,
+                    new NestedFieldUpdater($this, $fieldKey)
+                );
             });
 
         return $this;
     }
 
     /**
-     * Update replicator field children.
+     * Disable saving after updating references.
      *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  string  $dottedKey
+     * @return $this
      */
-    protected function updateReplicatorChildren($field, $dottedKey)
+    public function withoutSaving()
     {
-        $data = $this->item->data();
+        $this->shouldSave = false;
 
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $setHandle = Arr::get($set, 'type');
-            $fields = Arr::get($field->fieldtype()->flattenedSetsConfig(), "{$setHandle}.fields");
-
-            if ($setHandle && $fields) {
-                $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
-            }
-        });
-    }
-
-    /**
-     * Update grid field children.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  string  $dottedKey
-     */
-    protected function updateGridChildren($field, $dottedKey)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.";
-            $fields = Arr::get($field->config(), 'fields');
-
-            if ($fields) {
-                $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
-            }
-        });
-    }
-
-    /**
-     * Update group field children.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  string  $dottedKey
-     */
-    protected function updateGroupChildren($field, $dottedKey)
-    {
-        $data = $this->item->data();
-
-        $dottedPrefix = "{$dottedKey}.";
-        $fields = Arr::get($field->config(), 'fields');
-
-        if ($fields) {
-            $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
-        }
-    }
-
-    /**
-     * Update bard field children.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  string  $dottedKey
-     */
-    protected function updateBardChildren($field, $dottedKey)
-    {
-        $data = $this->item->data();
-
-        $sets = Arr::get($data, $dottedKey);
-
-        collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
-            $dottedPrefix = "{$dottedKey}.{$setKey}.attrs.values.";
-            $setHandle = Arr::get($set, 'attrs.values.type');
-            $fields = Arr::get($field->fieldtype()->flattenedSetsConfig(), "{$setHandle}.fields");
-
-            if ($setHandle && $fields) {
-                $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
-            }
-        });
-    }
-
-    /**
-     * Get original value.
-     *
-     * @return mixed
-     */
-    protected function originalValue()
-    {
-        return $this->originalValue;
-    }
-
-    /**
-     * Get new value.
-     *
-     * @return mixed
-     */
-    protected function newValue()
-    {
-        return $this->newValue;
+        return $this;
     }
 
     /**
@@ -227,101 +170,14 @@ abstract class DataReferenceUpdater
     }
 
     /**
-     * Determine if field has string value.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  null|string  $dottedPrefix
-     * @return bool
-     */
-    protected function hasStringValue($field, $dottedPrefix)
-    {
-        $data = $this->item->data()->all();
-
-        $dottedKey = $dottedPrefix.$field->handle();
-
-        return is_string(Arr::get($data, $dottedKey));
-    }
-
-    /**
-     * Update string value on item.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  null|string  $dottedPrefix
-     */
-    protected function updateStringValue($field, $dottedPrefix)
-    {
-        $data = $this->item->data()->all();
-
-        $dottedKey = $dottedPrefix.$field->handle();
-
-        if (Arr::get($data, $dottedKey) !== $this->originalValue()) {
-            return;
-        }
-
-        if ($this->isRemovingValue()) {
-            Arr::forget($data, $dottedKey);
-        } else {
-            Arr::set($data, $dottedKey, $this->newValue());
-        }
-
-        $this->item->data($data);
-
-        $this->updated = true;
-    }
-
-    /**
-     * Update array value on item.
-     *
-     * @param  \Statamic\Fields\Field  $field
-     * @param  null|string  $dottedPrefix
-     */
-    protected function updateArrayValue($field, $dottedPrefix)
-    {
-        $data = $this->item->data()->all();
-
-        $dottedKey = $dottedPrefix.$field->handle();
-
-        $fieldData = Arr::get($data, $dottedKey, []);
-
-        if (! $fieldData) {
-            return;
-        }
-
-        $fieldData = collect(Arr::dot($fieldData));
-
-        if (! $fieldData->contains($this->originalValue())) {
-            return;
-        }
-
-        $fieldData = $fieldData
-            ->map(function ($value) {
-                if ($value === $this->originalValue() && $this->isRemovingValue()) {
-                    return null;
-                } elseif ($value === $this->originalValue()) {
-                    return $this->newValue();
-                } else {
-                    return $value;
-                }
-            })
-            ->filter()
-            ->values();
-
-        if ($fieldData->isEmpty()) {
-            Arr::forget($data, $dottedKey);
-        } else {
-            Arr::set($data, $dottedKey, $fieldData->all());
-        }
-
-        $this->item->data($data);
-
-        $this->updated = true;
-    }
-
-    /**
      * Save item without triggering individual git commits, as these should be batched into one larger commit.
      */
     protected function saveItem()
     {
+        if (! $this->shouldSave) {
+            return;
+        }
+
         GitSubscriber::withoutListeners(function () {
             $this->item->save();
         });

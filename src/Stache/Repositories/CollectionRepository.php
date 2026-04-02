@@ -8,7 +8,6 @@ use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Entry;
 use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
@@ -50,8 +49,8 @@ class CollectionRepository implements RepositoryContract
 
         return Blink::once('mounted-collections', fn () => $this
             ->all()
-            ->keyBy(fn ($collection) => $collection->mount()?->id())
-            ->filter()
+            ->keyBy(fn ($collection) => $collection->mount()?->id() ?? '__nomount')
+            ->filter(fn ($collection, $mountId) => $mountId !== '__nomount')
         )->get($mount->id());
     }
 
@@ -95,26 +94,6 @@ class CollectionRepository implements RepositoryContract
     public function delete(Collection $collection)
     {
         $this->store->delete($collection);
-    }
-
-    /**
-     * @deprecated Use Entry::updateUris($collection, $ids)
-     */
-    public function updateEntryUris(Collection $collection, $ids = null)
-    {
-        Entry::updateUris($collection, $ids);
-    }
-
-    /** @deprecated Use Entry::updateOrders($collection, $ids) */
-    public function updateEntryOrder(Collection $collection, $ids = null)
-    {
-        Entry::updateOrders($collection, $ids);
-    }
-
-    /** @deprecated Use Entry::updateParents($collection, $ids) */
-    public function updateEntryParent(Collection $collection, $ids = null)
-    {
-        Entry::updateParents($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

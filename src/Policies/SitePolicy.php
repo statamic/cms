@@ -7,6 +7,13 @@ use Statamic\Facades\User;
 
 class SitePolicy
 {
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function view($user, $site)
     {
         if (! Site::multiEnabled()) {

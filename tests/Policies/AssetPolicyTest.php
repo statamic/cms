@@ -32,11 +32,8 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_stored_v6()
+    public function it_can_be_stored()
     {
-        // The v6 way doesn't need to check the container for allowUploads() because it'll be removed.
-        config(['statamic.assets.v6_permissions' => true]);
-
         $user = $this->userWithPermissions(['upload alfa assets']);
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
@@ -46,29 +43,8 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_stored()
+    public function it_can_be_moved()
     {
-        $user = $this->userWithPermissions([
-            'upload alfa assets',
-            'upload charlie assets',
-        ]);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
-        $containerC = tap(AssetContainer::make('charlie')->allowUploads(false))->save();
-        $containerD = tap(AssetContainer::make('delta')->allowUploads(false))->save();
-
-        $this->assertTrue($user->can('store', [Asset::class, $containerA]));
-        $this->assertFalse($user->can('store', [Asset::class, $containerB]));
-        $this->assertFalse($user->can('store', [Asset::class, $containerC]));
-        $this->assertFalse($user->can('store', [Asset::class, $containerD]));
-    }
-
-    #[Test]
-    public function it_can_be_moved_v6()
-    {
-        // The v6 way doesn't need to check the container for allowMoving() because it'll be removed.
-        config(['statamic.assets.v6_permissions' => true]);
-
         $user = $this->userWithPermissions(['move alfa assets']);
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
@@ -78,53 +54,14 @@ class AssetPolicyTest extends PolicyTestCase
     }
 
     #[Test]
-    public function it_can_be_moved()
+    public function it_can_be_renamed()
     {
-        $user = $this->userWithPermissions([
-            'move alfa assets',
-            'move charlie assets',
-        ]);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
-        $containerC = tap(AssetContainer::make('charlie')->allowMoving(false))->save();
-        $containerD = tap(AssetContainer::make('delta')->allowMoving(false))->save();
-
-        $this->assertTrue($user->can('move', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('move', $containerB->makeAsset('test.txt')));
-        $this->assertFalse($user->can('move', $containerC->makeAsset('test.txt')));
-        $this->assertFalse($user->can('move', $containerD->makeAsset('test.txt')));
-    }
-
-    #[Test]
-    public function it_can_be_renamed_v6()
-    {
-        // The v6 way doesn't need to check the container for allowRenaming() because it'll be removed.
-        config(['statamic.assets.v6_permissions' => true]);
-
         $user = $this->userWithPermissions(['rename alfa assets']);
         $containerA = tap(AssetContainer::make('alfa'))->save();
         $containerB = tap(AssetContainer::make('bravo'))->save();
 
         $this->assertTrue($user->can('rename', $containerA->makeAsset('test.txt')));
         $this->assertFalse($user->can('rename', $containerB->makeAsset('test.txt')));
-    }
-
-    #[Test]
-    public function it_can_be_renamed()
-    {
-        $user = $this->userWithPermissions([
-            'rename alfa assets',
-            'rename charlie assets',
-        ]);
-        $containerA = tap(AssetContainer::make('alfa'))->save();
-        $containerB = tap(AssetContainer::make('bravo'))->save();
-        $containerC = tap(AssetContainer::make('charlie')->allowRenaming(false))->save();
-        $containerD = tap(AssetContainer::make('delta')->allowRenaming(false))->save();
-
-        $this->assertTrue($user->can('rename', $containerA->makeAsset('test.txt')));
-        $this->assertFalse($user->can('rename', $containerB->makeAsset('test.txt')));
-        $this->assertFalse($user->can('rename', $containerC->makeAsset('test.txt')));
-        $this->assertFalse($user->can('rename', $containerD->makeAsset('test.txt')));
     }
 
     #[Test]

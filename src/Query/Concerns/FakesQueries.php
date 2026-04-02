@@ -20,7 +20,7 @@ trait FakesQueries
         $time = round((microtime(true) - $startTime) * 1000, 2);
 
         event(new QueryExecuted(
-            ($sql = new Dumper($this))->dump(),
+            ($sql = $this->dumper())->dump(),
             $sql->bindings()->all(),
             $time,
             $sql->connection()
@@ -38,5 +38,48 @@ trait FakesQueries
             'limit' => $this->limit,
             'offset' => $this->offset,
         ];
+    }
+
+    public function toSql(): string
+    {
+        return $this->dumper()->dump();
+    }
+
+    public function toRawSql(): string
+    {
+        $sql = ($dumper = $this->dumper())->dump();
+        $bindings = $dumper->bindings()->all();
+        $connection = $dumper->connection();
+
+        return $connection
+            ->query()
+            ->getGrammar()
+            ->substituteBindingsIntoRawSql($sql, $connection->prepareBindings($bindings));
+    }
+
+    public function dumpRawSql(): static
+    {
+        dump($this->toRawSql());
+
+        return $this;
+    }
+
+    public function ddRawSql(): void
+    {
+        dd($this->toRawSql());
+    }
+
+    public function ray(): static
+    {
+        throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
+
+        ray($this->toRawSql());
+
+        return $this;
+    }
+
+    private function dumper(): Dumper
+    {
+        return new Dumper($this);
     }
 }

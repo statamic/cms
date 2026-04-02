@@ -60,7 +60,7 @@ class GitTest extends TestCase
     {
         Config::set('statamic.git.enabled', false);
 
-        $this->expectExceptionMessage('Statamic Git integration is currently disabled.');
+        $this->expectExceptionMessage('Statamic Git integration is disabled.');
 
         Git::anything();
     }

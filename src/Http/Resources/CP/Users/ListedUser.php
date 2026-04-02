@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\CP\Users;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
 class ListedUser extends JsonResource
@@ -34,6 +33,7 @@ class ListedUser extends JsonResource
                 'email' => $this->email(),
                 'roles' => $this->roles()->map->handle()->all(),
                 'groups' => $this->groups()->map->handle()->all(),
+                'two_factor' => $this->hasEnabledTwoFactorAuthentication(),
             ])),
             'super' => $this->isSuper(),
             'edit_url' => $this->editUrl(),
@@ -41,7 +41,6 @@ class ListedUser extends JsonResource
             'initials' => $this->initials(),
             'editable' => User::current()->can('edit', $this->resource),
             'deleteable' => User::current()->can('delete', $this->resource),
-            'actions' => Action::for($this->resource),
         ];
     }
 

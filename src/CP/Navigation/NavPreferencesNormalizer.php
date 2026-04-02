@@ -73,20 +73,19 @@ class NavPreferencesNormalizer
     {
         $navConfig = collect($this->preferences);
 
+        $normalized = collect()->put('reorder', (bool) $reorder = $navConfig->get('reorder', false));
+
         $sections = collect($navConfig->get('sections') ?? $navConfig->except('reorder'));
 
-        $normalized = collect();
-
-        $sections = collect($sections)
+        $sections = $this
+            ->normalizeToInheritsFromReorder($sections, $reorder)
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
-            ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section));
+            ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
+            ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
+            ->map(fn ($config) => $this->removeInheritFromConfig($config))
+            ->all();
 
-        $normalized->put('reorder', $this->normalizeReorder(
-            $navConfig->get('reorder', false),
-            $sections->reject(fn ($section, $key) => $key === 'top_level'),
-        ));
-
-        $normalized->put('sections', $this->rejectInherits($sections)->all());
+        $normalized->put('sections', $sections);
 
         $allowedKeys = ['reorder', 'sections'];
 
@@ -118,24 +117,42 @@ class NavPreferencesNormalizer
 
         $normalized->put('display', $sectionConfig->get('display', false));
 
+        $normalized->put('reorder', (bool) $reorder = $sectionConfig->get('reorder', false));
+
         $items = collect($sectionConfig->get('items') ?? $sectionConfig->except([
             'action',
             'display',
             'reorder',
         ]));
 
-        $items = $items
+        $items = $this
+            ->normalizeToInheritsFromReorder($items, $reorder)
             ->map(fn ($config, $itemId) => $this->normalizeItemConfig($itemId, $config, $sectionKey))
             ->keyBy(fn ($config, $itemId) => $this->normalizeItemId($itemId, $config))
-            ->filter();
+            ->filter()
+            ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
+            ->all();
 
-        $normalized->put('reorder', $this->normalizeReorder($sectionConfig->get('reorder', false), $items));
-
-        $normalized->put('items', $this->rejectInherits($items)->all());
+        $normalized->put('items', $items);
 
         $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_SECTION_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
+    }
+
+    /**
+     * Remove inherit action from config.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function removeInheritFromConfig($config)
+    {
+        if ($config['action'] === '@inherit') {
+            $config['action'] = false;
+        }
+
+        return $config;
     }
 
     /**
@@ -173,19 +190,21 @@ class NavPreferencesNormalizer
             }
         }
 
-        // Normalize `children`.
-        $children = collect($normalized->get('children', []))
-            ->map(fn ($childConfig, $childId) => $this->normalizeChildItemConfig($childId, $childConfig, $sectionKey))
-            ->keyBy(fn ($childConfig, $childId) => $this->normalizeItemId($childId, $childConfig));
-
-        // Only output `reorder` if there are any `children`.
-        if ($children->isNotEmpty() && $reorder = $normalized->get('reorder', false)) {
-            $normalized->put('reorder', $this->normalizeReorder($reorder, $children));
+        // Normalize `reorder` bool.
+        if ($reorder = $normalized->get('reorder', false)) {
+            $normalized->put('reorder', (bool) $reorder);
         }
 
-        // Only output `children` if there are any.
-        $children->isNotEmpty()
-            ? $normalized->put('children', $this->rejectInherits($children)->all())
+        // Normalize `children`.
+        $children = $this
+            ->normalizeToInheritsFromReorder($normalized->get('children', []), $reorder)
+            ->map(fn ($childConfig, $childId) => $this->normalizeChildItemConfig($childId, $childConfig, $sectionKey))
+            ->keyBy(fn ($childConfig, $childId) => $this->normalizeItemId($childId, $childConfig))
+            ->all();
+
+        // Only output `children` in normalized output if there are any.
+        $children
+            ? $normalized->put('children', $children)
             : $normalized->forget('children');
 
         $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
@@ -249,7 +268,9 @@ class NavPreferencesNormalizer
             return false;
         }
 
-        return collect(static::ALLOWED_NAV_ITEM_MODIFICATIONS)
+        $possibleModifications = array_merge(static::ALLOWED_NAV_ITEM_MODIFICATIONS);
+
+        return collect($possibleModifications)
             ->intersect(array_keys($config))
             ->isNotEmpty();
     }
@@ -267,23 +288,18 @@ class NavPreferencesNormalizer
     }
 
     /**
-     * Normalize legacy `reorder: true` boolean to array, introduced to sidestep ordering issues in SQL.
+     * Normalize to legacy style inherits from new `reorder: []` array schema, introduced to sidestep ordering issues in SQL.
      */
-    protected function normalizeReorder(array|bool $reorder, array|Collection $items): array|bool
+    protected function normalizeToInheritsFromReorder(array|Collection $items, array|bool $reorder): Collection
     {
-        if ($reorder === true) {
-            $reorder = collect($items)->keys()->all();
+        if (! is_array($reorder)) {
+            return collect($items);
         }
 
-        return $reorder;
-    }
-
-    /**
-     * Reject items with inherit actions.
-     */
-    protected function rejectInherits(Collection $items): Collection
-    {
-        return $items->reject(fn ($item) => Arr::get($item, 'action') === '@inherit');
+        return collect($reorder)
+            ->flip()
+            ->map(fn () => '@inherit')
+            ->merge($items);
     }
 
     /**

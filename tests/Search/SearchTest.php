@@ -19,6 +19,7 @@ class SearchTest extends TestCase
     {
         $index = Mockery::mock(Index::class);
         $item = Mockery::mock(Searchable::class);
+        $item->shouldReceive('getSearchReference')->andReturn('a');
 
         $updateMock($index, $item);
 
@@ -37,7 +38,7 @@ class SearchTest extends TestCase
                 function ($mock, $entry) {
                     $mock->shouldReceive('shouldIndex')->with($entry)->andReturnTrue();
                     $mock->shouldReceive('exists')->andReturnTrue();
-                    $mock->shouldReceive('insert')->once()->with($entry);
+                    $mock->shouldReceive('insert')->once()->with($entry->getSearchReference());
                 },
             ],
 

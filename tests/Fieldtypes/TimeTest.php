@@ -117,6 +117,53 @@ class TimeTest extends TestCase
         ];
     }
 
+    #[Test]
+    #[DataProvider('augmentProvider')]
+    public function it_augments($config, $value, $expected)
+    {
+        $this->assertSame($expected, $this->fieldtype($config)->augment($value));
+    }
+
+    public static function augmentProvider()
+    {
+        return [
+            'null without format' => [
+                [],
+                null,
+                null,
+            ],
+            'null with format' => [
+                ['augment_format' => 'g:ia'],
+                null,
+                null,
+            ],
+            'time without format returns as-is' => [
+                [],
+                '14:30',
+                '14:30',
+            ],
+            'time with format' => [
+                ['augment_format' => 'g:ia'],
+                '14:30',
+                '2:30pm',
+            ],
+            'time with seconds and format' => [
+                ['augment_format' => 'g:i:sa'],
+                '14:30:45',
+                '2:30:45pm',
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_does_not_apply_timezone_when_augmenting()
+    {
+        config()->set('statamic.system.display_timezone', 'Europe/Berlin');
+        config()->set('statamic.system.localize_dates_in_modifiers', true);
+
+        $this->assertSame('2:30pm', $this->fieldtype(['augment_format' => 'g:ia'])->augment('14:30'));
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_replace([

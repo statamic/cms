@@ -42,7 +42,7 @@ class ClearAssetGlideCacheTest extends TestCase
         $asset = Mockery::mock(Asset::class);
         Glide::shouldReceive('clearAsset')->with($asset)->once();
 
-        app(ClearAssetGlideCache::class)->handleReuploaded(new AssetReuploaded($asset));
+        app(ClearAssetGlideCache::class)->handleReuploaded(new AssetReuploaded($asset, 'foo.jpg'));
     }
 
     #[Test]
