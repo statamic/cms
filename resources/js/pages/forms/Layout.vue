@@ -1,9 +1,8 @@
 <script setup>
-import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
-const form = computed(() => page.props.form);
+const form = page.props.form;
 
 const navItems = [
     { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/fields`) },
@@ -13,7 +12,7 @@ const navItems = [
     { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
 ];
 
-const isActive = (href) => page.url === new URL(href, window.location.origin).pathname;
+const isActive = (href) => page.url.split('?')[0] === href;
 </script>
 
 <template>
