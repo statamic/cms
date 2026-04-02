@@ -25,7 +25,7 @@ export default function useResizable() {
                     handle.style.bottom = '0';
                     handle.style.width = '7px';
                     handle.style.cursor = 'col-resize';
-                    handle.style.zIndex = '10';
+                    handle.style.zIndex = 'var(--z-index-draggable)';
                     handle.style[resolvedEdge] = '-2px';
 
                     panel.style.position = 'relative';
