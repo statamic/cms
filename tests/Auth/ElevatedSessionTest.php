@@ -594,7 +594,7 @@ class ElevatedSessionTest extends TestCase
         $this
             ->withElevatedSession(now()->subMinutes(16))
             ->get('/requires-elevated-session')
-            ->assertRedirect('/!/auth/elevated-session');
+            ->assertRedirect('/!/auth/confirm-password');
     }
 
     #[Test]
@@ -616,7 +616,7 @@ class ElevatedSessionTest extends TestCase
 
         $this
             ->actingAs($this->user)
-            ->get('/!/auth/elevated-session')
+            ->get('/!/auth/confirm-password')
             ->assertRedirect('/custom-elevated-session');
     }
 
@@ -627,7 +627,7 @@ class ElevatedSessionTest extends TestCase
 
         $this
             ->actingAs($this->user)
-            ->get('/!/auth/elevated-session')
+            ->get('/!/auth/confirm-password')
             ->assertInertia(fn ($page) => $page
                 ->component('auth/ConfirmPassword')
                 ->where('outside', true)
@@ -679,7 +679,7 @@ class ElevatedSessionTest extends TestCase
 
         $this
             ->actingAs($user = tap(User::make()->email('foo@bar.com')->makeSuper())->save())
-            ->get('/!/auth/elevated-session')
+            ->get('/!/auth/confirm-password')
             ->assertSessionHas('statamic_elevated_session_verification_code', [
                 'code' => 'abc',
                 'generated_at' => now()->timestamp,

@@ -53,7 +53,7 @@ Route::name('statamic.')->group(function () {
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
 
             Route::middleware('auth')->group(function () {
-                Route::get('elevated-session', [ElevatedSessionController::class, 'showForm'])->name('elevated-session')->middleware([HandleInertiaRequests::class]);
+                Route::get('confirm-password', [ElevatedSessionController::class, 'showForm'])->name('elevated-session')->middleware([HandleInertiaRequests::class]);
                 Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
                 Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
             });
