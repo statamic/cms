@@ -106,6 +106,38 @@ class RangeFieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_processes_as_float_with_string_decimal_config()
+    {
+        $fieldtype = (new Range())->setField(new Field('test', [
+            'type' => 'range',
+            'min' => '0',
+            'max' => '100',
+            'step' => '0.5',
+        ]));
+
+        $result = $fieldtype->process('7.5');
+
+        $this->assertIsFloat($result);
+        $this->assertEquals(7.5, $result);
+    }
+
+    #[Test]
+    public function it_processes_as_integer_with_string_integer_config()
+    {
+        $fieldtype = (new Range())->setField(new Field('test', [
+            'type' => 'range',
+            'min' => '0',
+            'max' => '100',
+            'step' => '1',
+        ]));
+
+        $result = $fieldtype->process('7');
+
+        $this->assertIsInt($result);
+        $this->assertEquals(7, $result);
+    }
+
+    #[Test]
     public function it_returns_int_graphql_type_with_integer_config()
     {
         $fieldtype = (new Range())->setField(new Field('test', [
