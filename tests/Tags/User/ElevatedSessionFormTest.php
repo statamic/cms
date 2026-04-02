@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Passkey;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Statamic\Facades\WebAuthn;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;

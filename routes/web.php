@@ -7,6 +7,7 @@ use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectContr
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Http\Controllers\ActivateAccountController;
+use Statamic\Http\Controllers\Auth\ElevatedSessionController;
 use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
 use Statamic\Http\Controllers\FrontendController;
@@ -21,7 +22,6 @@ use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
 use Statamic\Http\Controllers\User\TwoFactorAuthenticationController;
 use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
-use Statamic\Http\Controllers\Auth\ElevatedSessionController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
