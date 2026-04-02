@@ -142,7 +142,7 @@ main.nav-closed {
     @apply lg:ps-0;
 }
 
-/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THIRD PANEL STATES
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
 =================================================== */
 /* When the left panel exists, e.g. Form Builder with fields */
 
@@ -164,7 +164,7 @@ main.nav-closed {
     }
 }
 
-/* GROUP GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
+/* GROUP THREE PANEL STATES / GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
 =================================================== */
 .global-header-slot {
     position: relative;
@@ -209,9 +209,7 @@ main.nav-closed {
     }
     @supports not (anchor-name: --my-anchor) {
         a.active {
-            :where(.dark) &::before {
-                @apply border-s-gray-400;
-            }
+            background: var(--theme-color-global-header-bg);
         }
     }
 
@@ -244,40 +242,8 @@ main.nav-closed {
     }
 }
 
-/* ==========================================================================
-   DRAGGABLE MIRRORS
-   ========================================================================== */
-
-.draggable-mirror {
-    position: relative;
-    z-index: var(--z-index-modal);
-}
-
-.draggable-source--is-dragging {
-    opacity: 0.5;
-}
-
-/* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
-body > .draggable-mirror {
-    z-index: var(--z-index-draggable);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* GROUP THREE PANEL STATES / LEFT PANEL
+=================================================== */
 .form-builder-popover {
     .form-builder-popover__menu {
         overscroll-behavior-y: contain;
@@ -344,4 +310,22 @@ body > .draggable-mirror {
             inline-size: unset;
         }
     }
+}
+
+/* ==========================================================================
+   DRAGGABLE MIRRORS
+   ========================================================================== */
+
+.draggable-mirror {
+    position: relative;
+    z-index: var(--z-index-modal);
+}
+
+.draggable-source--is-dragging {
+    opacity: 0.5;
+}
+
+/* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
+body > .draggable-mirror {
+    z-index: var(--z-index-draggable);
 }
