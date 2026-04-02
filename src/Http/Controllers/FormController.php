@@ -118,7 +118,9 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_error_redirect');
 
-        $response = $redirect ? redirect($redirect) : back();
+        $response = $redirect && ! \Statamic\Facades\URL::isExternalToApplication($redirect)
+            ? redirect($redirect)
+            : back();
 
         return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
@@ -159,8 +161,14 @@ class FormController extends Controller
 
     private function formSuccessRedirect($params, $submission)
     {
-        if (! $redirect = Form::getSubmissionRedirect($submission)) {
-            $redirect = Arr::get($params, '_redirect');
+        if ($redirect = Form::getSubmissionRedirect($submission)) {
+            return $redirect;
+        }
+
+        $redirect = Arr::get($params, '_redirect');
+
+        if ($redirect && \Statamic\Facades\URL::isExternalToApplication($redirect)) {
+            return null;
         }
 
         return $redirect;

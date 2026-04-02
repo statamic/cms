@@ -10,6 +10,7 @@ use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
+use Statamic\Exceptions\InvalidRemoteUrlException;
 
 class GuzzleAdapter implements FilesystemAdapter
 {
@@ -148,7 +149,9 @@ class GuzzleAdapter implements FilesystemAdapter
     protected function get($path)
     {
         try {
-            $response = $this->client->get($this->base.$path);
+            $response = $this->client->get($this->base.$path, $this->requestOptions());
+        } catch (InvalidRemoteUrlException $e) {
+            throw $e;
         } catch (BadResponseException $e) {
             return false;
         }
@@ -173,7 +176,7 @@ class GuzzleAdapter implements FilesystemAdapter
         }
 
         try {
-            $response = $this->client->head($this->base.$path);
+            $response = $this->client->head($this->base.$path, $this->requestOptions());
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() === 405) {
                 $this->supportsHead = false;
@@ -182,6 +185,8 @@ class GuzzleAdapter implements FilesystemAdapter
             }
 
             return false;
+        } catch (InvalidRemoteUrlException $e) {
+            throw $e;
         } catch (BadResponseException $e) {
             return false;
         }
@@ -191,5 +196,16 @@ class GuzzleAdapter implements FilesystemAdapter
         }
 
         return $response;
+    }
+
+    protected function requestOptions()
+    {
+        return [
+            'allow_redirects' => [
+                'on_redirect' => function ($request, $response, $uri) {
+                    app(RemoteUrlValidator::class)->validate((string) $uri);
+                },
+            ],
+        ];
     }
 }

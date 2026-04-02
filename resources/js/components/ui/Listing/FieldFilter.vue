@@ -1,5 +1,4 @@
 <script setup>
-import { sortBy } from 'lodash-es';
 import { Combobox, CardPanel } from '@ui';
 import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import FieldFilterRow from './FieldFilterRow.vue';
@@ -44,14 +43,12 @@ const hasAvailableFieldFilters = computed(() => {
 });
 
 const fieldComboboxOptions = computed(() => {
-    let options = availableFieldFilters.value.map((filter) => {
+    return availableFieldFilters.value.map((filter) => {
         return {
             value: filter.handle,
             label: filter.display,
         };
     });
-
-    return sortBy(options, (option) => option.label);
 });
 
 async function createFilter(newField) {

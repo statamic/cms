@@ -502,6 +502,21 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function live_preview_token_for_different_entry_doesnt_bypass_status_check()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        tap(Facades\Entry::make()->collection('pages')->id('dance')->published(false)->set('title', 'Dance')->slug('dance'))->save();
+        $otherEntry = tap(Facades\Entry::make()->collection('pages')->id('sing')->published(true)->set('title', 'Sing')->slug('sing'))->save();
+
+        LivePreview::tokenize('test-token', $otherEntry);
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'message' => 'Not found.',
+        ]);
+    }
+
+    #[Test]
     public function it_replaces_terms_using_live_preview_token()
     {
         Facades\Config::set('statamic.api.resources.taxonomies', true);

@@ -50,7 +50,7 @@ JSON);
             ->artisan('statamic:setup-cp-vite')
             ->expectsOutputToContain('Installed dependencies');
 
-        Process::assertRan('npm install');
+        Process::assertRan('npm install --ignore-scripts');
 
         $this->assertStringContainsString(<<<'JSON'
     "dependencies": {

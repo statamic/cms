@@ -253,6 +253,11 @@ final class Installer
                     $version = '@dev';
                 }
 
+                // Allow dev stability when installing from local repo
+                if (! $version && $this->fromLocalRepo) {
+                    $version = '@dev';
+                }
+
                 $package = $version
                     ? "{$this->package}:{$version}"
                     : $this->package;

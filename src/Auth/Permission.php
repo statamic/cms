@@ -45,7 +45,7 @@ class Permission
     }
 
     /**
-     * @return ($value is null ? string|null : static)
+     * @return ($label is null ? string|null : static)
      */
     public function label(?string $label = null)
     {

@@ -237,6 +237,10 @@ watch(
     }
 );
 
+const removeFromSelections = (ids) => selections.value = selections.value.filter(selection => !ids.includes(selection));
+Statamic.$events.$on('removeFromSelections', removeFromSelections);
+onBeforeUnmount(() => Statamic.$events.$off('removeFromSelections', removeFromSelections));
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,

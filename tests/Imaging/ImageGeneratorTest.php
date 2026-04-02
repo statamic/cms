@@ -16,11 +16,13 @@ use League\Glide\Server;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
+use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\RemoteUrlValidator;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -34,6 +36,16 @@ class ImageGeneratorTest extends TestCase
         parent::setUp();
 
         $this->clearGlideCache();
+
+        $this->app->bind(RemoteUrlValidator::class, function () {
+            return new RemoteUrlValidator(function ($host) {
+                return match ($host) {
+                    'example.com' => [['ip' => '93.184.216.34']],
+                    'internal.test' => [['ip' => '127.0.0.1']],
+                    default => [],
+                };
+            });
+        });
     }
 
     #[Test]
@@ -276,6 +288,24 @@ class ImageGeneratorTest extends TestCase
         $this->assertContains($expectedPath, $paths);
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_blocks_external_urls_that_target_non_public_ip_ranges()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->makeGenerator()->generateByUrl('http://169.254.169.254/latest/meta-data/', ['w' => 100]);
+    }
+
+    #[Test]
+    public function it_blocks_watermark_urls_that_target_non_public_ip_ranges()
+    {
+        $this->expectException(InvalidRemoteUrlException::class);
+        $this->expectExceptionMessage('Destination IP is not publicly routable.');
+
+        $this->makeGenerator()->setParams(['mark' => 'http://127.0.0.1/watermark.png']);
     }
 
     #[Test]

@@ -105,7 +105,6 @@ async function loadDocument() {
     const [pdfjsLib, { default: pdfjsWorkerUrl }] = await Promise.all([
         import('pdfjs-dist/build/pdf.mjs'),
         import('pdfjs-dist/build/pdf.worker.min.mjs?worker&url'),
-        import('pdfjs-dist/web/pdf_viewer.css'),
     ]);
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;

@@ -17,6 +17,16 @@ class FieldtypeFilter
         $this->fieldtype = $fieldtype;
     }
 
+    public function handle()
+    {
+        return $this->fieldtype->field()->handle();
+    }
+
+    public function display()
+    {
+        return $this->fieldtype->field()->display();
+    }
+
     public function fieldItems()
     {
         return [

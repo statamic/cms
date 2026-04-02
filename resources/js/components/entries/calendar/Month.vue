@@ -3,8 +3,9 @@ import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, Cale
 import CalendarEntry from './MonthEntry.vue';
 import CreateEntryButton from '../CreateEntryButton.vue';
 import { Button } from '@ui';
-import { formatDateString, isToday, getCreateUrlDateParam } from './calendar.js';
+import { isToday, getCreateUrlDateParam } from './calendar.js';
 import DateFormatter from '@/components/DateFormatter.js';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const props = defineProps({
     weekDays: { type: Array, required: true },
@@ -29,10 +30,10 @@ const isCurrentDay = (dayIndex) => {
 };
 
 const getEntriesForDate = (date) => {
-    const dateStr = formatDateString(date);
+    const dateStr = date.toString();
     return props.entries.filter(entry => {
-        const entryDate = new Date(entry.date?.date || entry.date);
-        return entryDate.toISOString().split('T')[0] === dateStr;
+        const entryDate = parseAbsoluteToLocal(entry.date?.date || entry.date);
+        return entryDate.toString().split('T')[0] === dateStr;
     });
 };
 
