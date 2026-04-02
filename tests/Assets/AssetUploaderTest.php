@@ -36,8 +36,17 @@ class AssetUploaderTest extends TestCase
             'double dash' => ['one--two--three.jpg', 'one-two-three.jpg'],
             'ascii' => ['fòô-bàř', 'foo-bar'],
             'additional config' => [
+                'one,two(6)',
+                'onetwo6',
+                [
+                    ',' => '',
+                    '(' => '',
+                    ')' => '',
+                ],
+            ],
+            'additional config does not override native replacements' => [
                 'one,two%three-(6)',
-                'onetwo_three-6',
+                'onetwo-three-6',
                 [
                     ',' => '',
                     '(' => '',
