@@ -285,8 +285,8 @@ body > .draggable-mirror {
 
 
 .form-builder-popover {
+    background: var(--theme-color-body-bg);
     .form-builder-popover__menu {
-        overflow: scroll;
         overscroll-behavior-y: contain;
         height: 100%;
 
@@ -294,7 +294,11 @@ body > .draggable-mirror {
         opacity: 0;
         transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
 
-        border-inline-end: 1px solid gray;
+        @apply
+            px-2
+            border-r border-gray-200 dark:border-gray-700
+            shadow-2xl
+        ;
 
         &:popover-open {
             display: block;
@@ -316,7 +320,6 @@ body > .draggable-mirror {
         position-anchor: --anchor-form-builder-mobile;
         top: 3.5rem;
         width: 33.33%;
-        box-shadow: var(--box-shadow-light);
         &:not(:popover-open) {
             pointer-events: none;
         }
