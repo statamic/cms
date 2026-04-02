@@ -49,6 +49,10 @@ class CollectionTree extends Tree implements TreeContract
 
     protected function dispatchSavingEvent()
     {
+        if (CollectionTreeSaving::dispatch($this) === false) {
+            return false;
+        }
+
         $diff = $this->diff();
         $removed = $diff->removed();
         $moved = $diff->ancestryChanged();
@@ -56,8 +60,6 @@ class CollectionTree extends Tree implements TreeContract
         if ($removed || $moved) {
             CollectionTreeEntriesMovedOrRemoved::dispatch($removed, $moved);
         }
-
-        return CollectionTreeSaving::dispatch($this);
     }
 
     protected function dispatchDeletedEvent()
