@@ -314,7 +314,8 @@ body > .draggable-mirror {
 
     #popover-form-builder-mobile {
         position-anchor: --anchor-form-builder-mobile;
-        position-area: bottom span-right;
+        top: 3.5rem;
+        width: 33.33%;
         box-shadow: var(--box-shadow-light);
         &:not(:popover-open) {
             pointer-events: none;
@@ -329,10 +330,10 @@ body > .draggable-mirror {
     }
 
     .form-builder-popover__close-button {
-        position: sticky;
-        z-index: 1;
-        left: 100%;
-        top: 0.25rem;
+        position: fixed;
+        z-index: 999;
+        left: 33.33%;
+        top: 3.5rem;
         width: initial;
         height: initial;
         cursor: pointer;
