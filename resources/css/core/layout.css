@@ -285,7 +285,7 @@ body > .draggable-mirror {
 
 
 .form-builder-popover {
-    nav {
+    .form-builder-popover__menu {
         overflow: scroll;
         overscroll-behavior-y: contain;
         height: 100%;
@@ -321,7 +321,7 @@ body > .draggable-mirror {
         }
     }
 
-    .form-builder-popover__mobile-button {
+    .form-builder-popover__menu-button {
         padding: var(--spacing-lg);
         background: var(--dropdown-nav-background-color);
         border-radius: 15px;

@@ -21,10 +21,10 @@ const props = defineProps({
 
 
             <div class="form-builder-popover">
-                <button class="min-[1000px]:hidden form-builder-popover__mobile-button" id="anchor-form-builder-mobile" popovertarget="popover-form-builder-mobile">
+                <button class="min-[1000px]:hidden form-builder-popover__menu-button" id="anchor-form-builder-mobile" popovertarget="popover-form-builder-mobile">
                     Form Builder
                 </button>
-                <nav id="popover-form-builder-mobile" class="form-builder-popover__mobile" popover>
+                <div id="popover-form-builder-mobile" class="form-builder-popover__menu" popover>
                     <button class="form-builder-popover__close-button" title="Close" popovertarget="popover-form-builder-mobile">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
@@ -145,7 +145,7 @@ const props = defineProps({
                             </ul>
                         </li>
                     </ul>
-                </nav>
+                </div>
             </div>
 
 
