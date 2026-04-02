@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
@@ -146,6 +147,23 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
         $this->assertEquals('http://localhost/cp', $cascade['cp_url']);
+    }
+
+    #[Test]
+    public function it_serializes_and_unserializes_regions_through_cache()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+
+        $cached = StaticCache::cacheStore()->get('nocache::region.'.$region->key());
+        $this->assertIsString($cached, 'Region should be stored as a serialized string, not an object.');
+
+        $retrieved = $session->region($region->key());
+
+        $this->assertInstanceOf(StringRegion::class, $retrieved);
+        $this->assertEquals($region->key(), $retrieved->key());
+        $this->assertEquals(['foo' => 'bar'], $retrieved->context());
     }
 
     #[Test]
