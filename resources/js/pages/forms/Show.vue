@@ -24,6 +24,7 @@ const deleter = ref(null);
 const generatingFakeSubmission = ref(false);
 const deletingFakeSubmissions = ref(false);
 const submissionListing = ref(null);
+const submissionListingParameters = ref({});
 const exportModalOpen = ref(false);
 const exportingSubmissions = ref(false);
 const exportFormat = ref('');
@@ -64,7 +65,7 @@ const exportScopeOptions = [
 
 const selectedExporter = computed(() => findExporterByFormat(exportFormat.value));
 const hasFilteredScope = computed(() => {
-    const parameters = getSubmissionListingParameters();
+    const parameters = submissionListingParameters.value;
 
     return Boolean(parameters.search || parameters.filters);
 });
@@ -120,6 +121,8 @@ async function deleteFakeSubmissions() {
 }
 
 function openExportModal() {
+    updateSubmissionListingParameters();
+
     const firstAvailableFormat = exportFormats.value[0];
 
     exportFormat.value = firstAvailableFormat?.value ?? '';
@@ -141,13 +144,19 @@ function findExporterByFormat(format) {
 }
 
 function getSubmissionListingParameters() {
-    const parameters = submissionListing.value?.getParameters?.() ?? {};
-
     return {
-        sort: parameters.sort,
-        order: parameters.order,
-        search: parameters.search,
-        filters: parameters.filters,
+        ...submissionListingParameters.value,
+    };
+}
+
+function updateSubmissionListingParameters(parameters = null) {
+    const latestParameters = parameters ?? submissionListing.value?.getParameters?.() ?? {};
+
+    submissionListingParameters.value = {
+        sort: latestParameters.sort,
+        order: latestParameters.order,
+        search: latestParameters.search,
+        filters: latestParameters.filters,
     };
 }
 
@@ -171,6 +180,7 @@ function exportSubmissions() {
     }
 
     exportingSubmissions.value = true;
+    updateSubmissionListingParameters();
 
     const params = exportScope.value === 'filtered' ? getSubmissionListingParameters() : {};
     const exportUrl = appendParamsToUrl(selectedExporter.value.downloadUrl, params);
@@ -307,6 +317,7 @@ function exportSubmissions() {
             sort-direction="desc"
             :columns="columns"
             :filters="filters"
+            @request-completed="({ parameters }) => updateSubmissionListingParameters(parameters)"
         />
 
         <Modal v-model:open="exportModalOpen" :title="__('Export Submissions')" blur class="max-w-xl!">
