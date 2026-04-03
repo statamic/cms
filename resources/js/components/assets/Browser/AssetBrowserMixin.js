@@ -6,6 +6,10 @@ export default {
         folderActionUrl: String,
         folders: Array,
         path: String,
+        selectedAssets: {
+            type: Array,
+            default: () => [],
+        },
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
         creatingFolderError: Boolean,
@@ -82,25 +86,52 @@ export default {
             return folder.actions.some((action) => action.handle === 'move_asset_folder');
         },
 
+        getDraggingAssetSelections() {
+            const selectedAssetIds = Array.isArray(this.selectedAssets) ? this.selectedAssets : [];
+
+            if (selectedAssetIds.includes(this.draggingAsset)) {
+                return selectedAssetIds;
+            }
+
+            return this.draggingAsset ? [this.draggingAsset] : [];
+        },
+
         handleFolderDrop(destinationFolder) {
             if (this.draggingAsset) {
                 let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
                 let action = asset.actions.find((action) => action.handle === 'move_asset');
+                const selections = this.getDraggingAssetSelections();
 
-                if (!action) {
+                if (!action || selections.length === 0) {
                     return;
                 }
 
                 const payload = {
                     action: action.handle,
                     context: action.context,
-                    selections: [this.draggingAsset],
+                    selections,
                     values: { folder: destinationFolder.path },
                 };
 
                 this.$axios
                     .post(this.actionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
+                    .then(({ data }) => {
+                        if (data.success === false && data.conflict?.type === 'asset_move') {
+                            this.$emit('asset-move-conflict', {
+                                action,
+                                asset,
+                                destinationFolder,
+                                selections,
+                                message: data.message,
+                                conflict: data.conflict,
+                            });
+
+                            return;
+                        }
+
+                        this.$emit('action-completed', data.success !== false, data);
+                    })
+                    .catch((error) => this.$emit('action-completed', false, error.response?.data || {}))
                     .finally(() => this.draggingAsset = null);
             }
 
@@ -121,7 +152,8 @@ export default {
 
                 this.$axios
                     .post(this.folderActionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
+                    .then(({ data }) => this.$emit('action-completed', data.success !== false, data))
+                    .catch((error) => this.$emit('action-completed', false, error.response?.data || {}))
                     .finally(() => this.draggingFolder = null);
             }
         },

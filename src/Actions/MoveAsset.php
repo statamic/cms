@@ -3,8 +3,12 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Exceptions\AssetConflictException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Glide;
+use Statamic\Facades\Path;
+use Statamic\Support\Str;
 
 class MoveAsset extends Action
 {
@@ -39,7 +43,75 @@ class MoveAsset extends Action
 
     public function run($assets, $values)
     {
-        $ids = $assets->each->move($values['folder'])->map->id()->all();
+        $folder = $values['folder'];
+        $strategy = $this->context['conflict'] ?? 'cancel';
+        $timestamp = now()->timestamp;
+        $ids = [];
+
+        foreach ($assets as $index => $asset) {
+            $destinationPath = Str::removeLeft(Path::tidy($folder.'/'.$asset->basename()), '/');
+            $conflicts = $asset->path() !== $destinationPath && $asset->disk()->exists($destinationPath);
+
+            if ($conflicts) {
+                $existingAsset = $asset->container()->asset($destinationPath);
+                $sourceLastModified = $asset->disk()->lastModified($asset->path());
+                $destinationLastModified = $asset->disk()->lastModified($destinationPath);
+                $movingAge = $sourceLastModified >= $destinationLastModified
+                    ? __('statamic::messages.asset_conflict_newer')
+                    : __('statamic::messages.asset_conflict_older');
+                $existingDescriptor = $sourceLastModified >= $destinationLastModified
+                    ? __('statamic::messages.asset_conflict_a_newer')
+                    : __('statamic::messages.asset_conflict_an_older');
+                $existingAge = $sourceLastModified >= $destinationLastModified
+                    ? __('statamic::messages.asset_conflict_older')
+                    : __('statamic::messages.asset_conflict_newer');
+
+                if ($strategy === 'overwrite') {
+                    $assetForGlideCacheClear = $existingAsset ?? $asset->container()->makeAsset($destinationPath);
+                    Glide::clearAsset($assetForGlideCacheClear);
+                    $ids[] = $asset->move($folder)->id();
+
+                    continue;
+                }
+
+                if ($strategy === 'timestamp') {
+                    $filename = $asset->filename().'-'.$timestamp;
+
+                    if ($index > 0) {
+                        $filename .= '-'.$index;
+                    }
+
+                    $ids[] = $asset->moveUnique($folder, $filename)->id();
+
+                    continue;
+                }
+
+                throw new AssetConflictException(
+                    __('statamic::messages.asset_conflict_message', [
+                        'filename' => $asset->basename(),
+                        'existing_descriptor' => $existingDescriptor,
+                        'moving_age' => $movingAge,
+                        'existing_age' => $existingAge,
+                    ]),
+                    [
+                        'conflict' => [
+                            'type' => 'asset_move',
+                            'asset' => [
+                                'id' => $asset->id(),
+                                'basename' => $asset->basename(),
+                            ],
+                            'existing' => [
+                                'preview' => $existingAsset ? ($existingAsset->container()->accessible() ? $existingAsset->url() : $existingAsset->thumbnailUrl()) : null,
+                                'thumbnail' => $existingAsset?->thumbnailUrl('small'),
+                            ],
+                            'destination' => $folder,
+                        ],
+                    ],
+                );
+            }
+
+            $ids[] = $asset->move($folder)->id();
+        }
 
         return [
             'ids' => $ids,

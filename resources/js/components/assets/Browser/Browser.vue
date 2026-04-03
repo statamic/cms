@@ -181,6 +181,53 @@
             @action-started="actionStarted"
             @action-completed="actionCompleted"
         />
+
+        <Modal
+            :open="showMoveConflictModal"
+            :title="__('messages.asset_conflict_title')"
+            @update:open="showMoveConflictModal = $event"
+        >
+            <p>{{ moveConflictMessage }}</p>
+
+            <template #footer>
+                <div class="flex items-center justify-between gap-2 p-2">
+                    <Checkbox
+                        v-if="showMoveConflictApplyToAll"
+                        :model-value="moveConflictApplyToAll"
+                        :label="__('messages.asset_conflict_apply_to_all')"
+                        @update:model-value="moveConflictApplyToAll = $event"
+                    />
+                    <div class="flex items-center gap-2">
+                        <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolveMoveConflict('cancel')" />
+                        <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolveMoveConflict('timestamp')" />
+                        <Button variant="danger" :text="__('messages.asset_conflict_overwrite')" @click="resolveMoveConflict('overwrite')" />
+                    </div>
+                </div>
+            </template>
+        </Modal>
+
+        <Modal
+            :open="showUploadConflictModal"
+            :title="__('messages.asset_conflict_title')"
+            @update:open="showUploadConflictModal = $event"
+        >
+            <p>{{ uploadConflictMessage }}</p>
+
+            <template #footer>
+                <div class="flex items-center justify-between gap-2 p-2">
+                    <Checkbox
+                        :model-value="uploadConflictApplyToAll"
+                        :label="__('messages.asset_conflict_apply_to_all')"
+                        @update:model-value="uploadConflictApplyToAll = $event"
+                    />
+                    <div class="flex items-center gap-2">
+                        <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolveUploadConflict('cancel')" />
+                        <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolveUploadConflict('timestamp')" />
+                        <Button variant="danger" :text="__('messages.asset_conflict_overwrite')" @click="resolveUploadConflict('overwrite')" />
+                    </div>
+                </div>
+            </template>
+        </Modal>
     </div>
 </template>
 
@@ -214,6 +261,8 @@ import {
     Icon,
     ToggleGroup,
     ToggleItem,
+    Modal,
+    Checkbox,
 } from '@ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
@@ -249,6 +298,8 @@ export default {
         Icon,
         ToggleGroup,
         ToggleItem,
+        Modal,
+        Checkbox,
     },
 
     props: {
@@ -301,6 +352,17 @@ export default {
             creatingFolder: false,
             creatingFolderError: false,
             uploads: [],
+            uploadConflictPolicy: null,
+            uploadConflictApplyToAll: false,
+            uploadConflictUploadId: null,
+            uploadConflictMessage: '',
+            showUploadConflictModal: false,
+            uploadConflictQueue: [],
+            moveConflictContext: null,
+            moveConflictMessage: '',
+            showMoveConflictModal: false,
+            moveConflictApplyToAll: false,
+            moveConflictPolicy: null,
             page: 1,
             preferencesPrefix: `assets.${this.container.id}`,
             meta: {},
@@ -418,6 +480,7 @@ export default {
                 folders: this.folders,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
+                selectedAssets: this.selectedAssets,
                 creatingFolder: this.creatingFolder,
                 creatingFolderError: this.creatingFolderError,
             };
@@ -435,9 +498,14 @@ export default {
                     this.creatingFolder = false;
                     this.creatingFolderError = false;
                 },
+                'asset-move-conflict': this.openMoveConflictModal,
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
                 'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
+        },
+
+        showMoveConflictApplyToAll() {
+            return (this.moveConflictContext?.pendingSelections?.length || 0) > 1;
         },
     },
 
@@ -542,12 +610,23 @@ export default {
             this.loading = true;
         },
 
-        actionCompleted() {
+        actionCompleted(successful = null, response = {}) {
+            if (successful === true && response.message !== false) {
+                this.$toast.success(response.message || __('Action completed'));
+            } else if (successful === false) {
+                this.$toast.error(response.message || __('Action failed'));
+            }
+
             // Intentionally not completing the loading state here since
             // the listing will refresh and immediately restart it.
             // this.loading = false;
 
             this.$refs.listing.refresh();
+        },
+
+        actionFailed(response = {}) {
+            this.loading = false;
+            this.$toast.error(response.message || __('Action failed'));
         },
 
         assetSaved() {
@@ -724,7 +803,15 @@ export default {
             this.lastItemClicked = index;
         },
 
-        uploadCompleted(asset) {
+        uploadCompleted(asset, uploads, upload) {
+            if (['overwrite', 'timestamp'].includes(upload?.resolution)) {
+                const urls = this.getUploadConflictCacheBustUrls(upload);
+
+                if (urls.length) {
+                    Statamic.$callbacks.call('bustAndReloadImageCaches', urls);
+                }
+            }
+
             if (this.autoselectUploads) {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
@@ -743,11 +830,289 @@ export default {
 
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$toast.error(upload.errorMessage);
+
+            if (upload.errorStatus !== 409) {
+                this.$toast.error(upload.errorMessage);
+                return;
+            }
+
+            if (this.uploadConflictPolicy) {
+                this.applyUploadConflict(upload, this.uploadConflictPolicy);
+                return;
+            }
+
+            this.enqueueUploadConflict(upload.id);
+            this.openNextUploadConflictFromQueue();
         },
 
         uploadsUpdated(uploads) {
             this.uploads = uploads;
+
+            if (uploads.length === 0) {
+                this.uploadConflictPolicy = null;
+                this.uploadConflictApplyToAll = false;
+                this.uploadConflictQueue = [];
+                this.uploadConflictUploadId = null;
+                this.showUploadConflictModal = false;
+            } else {
+                const uploadIds = new Set(uploads.map((upload) => upload.id));
+                this.uploadConflictQueue = this.uploadConflictQueue.filter((id) => uploadIds.has(id));
+            }
+        },
+
+        getUploadById(id) {
+            return this.uploads.find((upload) => upload.id === id);
+        },
+
+        openUploadConflictModal(upload) {
+            this.uploadConflictUploadId = upload.id;
+            this.uploadConflictMessage = __('messages.asset_upload_conflict_message', {
+                filename: upload.basename,
+            });
+            this.showUploadConflictModal = true;
+        },
+
+        resolveUploadConflict(strategy) {
+            const currentConflictUploadId = this.uploadConflictUploadId;
+            const upload = this.getUploadById(this.uploadConflictUploadId);
+
+            if (this.uploadConflictApplyToAll) {
+                this.uploadConflictPolicy = strategy;
+
+                this.uploads
+                    .filter((item) => item.errorStatus === 409)
+                    .forEach((item) => this.applyUploadConflict(item, strategy));
+
+                this.uploadConflictQueue = [];
+                this.uploadConflictUploadId = null;
+                this.uploadConflictMessage = '';
+                this.showUploadConflictModal = false;
+            } else if (upload) {
+                this.applyUploadConflict(upload, strategy);
+                this.dequeueUploadConflict(currentConflictUploadId);
+                this.uploadConflictUploadId = null;
+                this.uploadConflictMessage = '';
+
+                // Keep the same modal open and dynamically swap to the next conflict.
+                const hasNextConflict = this.openNextUploadConflictFromQueue();
+
+                if (!hasNextConflict) {
+                    this.showUploadConflictModal = false;
+                }
+            } else {
+                this.showUploadConflictModal = false;
+            }
+
+            this.uploadConflictApplyToAll = false;
+        },
+
+        applyUploadConflict(upload, strategy) {
+            if (strategy === 'cancel') {
+                upload.skip();
+                return;
+            }
+
+            upload.retry({
+                option: strategy,
+            }, {
+                conflict: upload.conflict,
+                resolution: strategy,
+            });
+        },
+
+        getUploadConflictCacheBustUrls(upload) {
+            if (upload?.conflict?.existing) {
+                return [upload.conflict.existing.preview, upload.conflict.existing.thumbnail].filter(Boolean);
+            }
+
+            const folderPath = (this.folder?.path || '').replace(/^\/+|\/+$/g, '');
+            const basename = upload?.basename || '';
+            const fullPath = [folderPath, basename].filter(Boolean).join('/');
+            const existingAsset = this.assets.find((asset) => {
+                if (asset.path === fullPath) {
+                    return true;
+                }
+
+                return folderPath === '' && asset.basename === basename;
+            });
+
+            if (!existingAsset) {
+                return [];
+            }
+
+            return [existingAsset.preview, existingAsset.thumbnail].filter(Boolean);
+        },
+
+        enqueueUploadConflict(id) {
+            if (!id || this.uploadConflictQueue.includes(id)) {
+                return;
+            }
+
+            this.uploadConflictQueue.push(id);
+        },
+
+        dequeueUploadConflict(id) {
+            if (!id) {
+                return;
+            }
+
+            this.uploadConflictQueue = this.uploadConflictQueue.filter((queuedId) => queuedId !== id);
+        },
+
+        openNextUploadConflictFromQueue() {
+            if (this.showUploadConflictModal || this.uploadConflictPolicy) {
+                if (!this.uploadConflictUploadId) {
+                    // Modal is visible but no active conflict selected yet.
+                    // Continue to resolve the next queued conflict.
+                } else {
+                    return false;
+                }
+            }
+
+            while (this.uploadConflictQueue.length > 0) {
+                const nextConflictId = this.uploadConflictQueue[0];
+                const nextConflict = this.getUploadById(nextConflictId);
+
+                if (!nextConflict || nextConflict.errorStatus !== 409) {
+                    this.uploadConflictQueue.shift();
+                    continue;
+                }
+
+                this.openUploadConflictModal(nextConflict);
+                return true;
+            }
+
+            return false;
+        },
+
+        openMoveConflictModal({ action, asset, destinationFolder, selections, message, conflict }) {
+            this.moveConflictContext = {
+                action,
+                asset,
+                destinationFolder,
+                pendingSelections: Array.from(new Set((selections || [asset?.id]).filter(Boolean))),
+                conflict,
+            };
+            this.moveConflictMessage = message;
+            this.showMoveConflictModal = true;
+        },
+
+        async resolveMoveConflict(strategy) {
+            const conflictContext = this.moveConflictContext;
+            this.showMoveConflictModal = false;
+            this.moveConflictContext = null;
+
+            if (!conflictContext) {
+                return;
+            }
+
+            if (this.moveConflictApplyToAll && strategy !== 'cancel') {
+                this.moveConflictPolicy = strategy;
+            }
+
+            this.moveConflictApplyToAll = false;
+            this.actionStarted();
+            await this.continueMoveConflictResolution(conflictContext, strategy);
+        },
+
+        async continueMoveConflictResolution(context, strategy = null) {
+            const conflictAssetId = context.conflict?.asset?.id;
+            const resolution = strategy ?? this.moveConflictPolicy;
+
+            if (conflictAssetId) {
+                context.pendingSelections = context.pendingSelections.filter((id) => id !== conflictAssetId);
+            }
+
+            if (strategy && strategy !== 'cancel' && conflictAssetId) {
+                const resolutionResult = await this.runMoveConflictAction(context, [conflictAssetId], strategy);
+
+                if (resolutionResult.success === false) {
+                    this.moveConflictPolicy = null;
+                    this.actionFailed(resolutionResult);
+                    return;
+                }
+
+                if (strategy === 'overwrite') {
+                    const originalPreview = context.conflict?.existing?.preview;
+                    const originalThumbnail = context.conflict?.existing?.thumbnail;
+                    Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
+                }
+            }
+
+            while (context.pendingSelections.length > 0) {
+                const response = await this.runMoveConflictAction(context, context.pendingSelections, null);
+
+                if (response.success !== false) {
+                    this.moveConflictPolicy = null;
+                    this.actionCompleted(true, response);
+                    return;
+                }
+
+                if (response.conflict?.type !== 'asset_move') {
+                    this.moveConflictPolicy = null;
+                    this.actionFailed(response);
+                    return;
+                }
+
+                context.conflict = response.conflict;
+                this.moveConflictMessage = response.message;
+
+                const currentConflictAssetId = response.conflict?.asset?.id;
+
+                if (!currentConflictAssetId) {
+                    this.moveConflictPolicy = null;
+                    this.actionFailed(response);
+                    return;
+                }
+
+                if (resolution) {
+                    await this.continueMoveConflictResolution(context, resolution);
+                    return;
+                }
+
+                this.moveConflictContext = context;
+                this.showMoveConflictModal = true;
+                return;
+            }
+
+            this.moveConflictPolicy = null;
+            this.actionCompleted(true, {
+                message: false,
+            });
+        },
+
+        async runMoveConflictAction(context, selections, strategy = null) {
+            const selectedAssetIds = Array.from(new Set((selections || []).filter(Boolean)));
+
+            if (selectedAssetIds.length === 0) {
+                return {
+                    success: true,
+                    message: false,
+                };
+            }
+
+            const payload = {
+                action: context.action.handle,
+                context: {
+                    ...context.action.context,
+                    ...(strategy ? { conflict: strategy } : {}),
+                },
+                selections: selectedAssetIds,
+                values: {
+                    folder: context.destinationFolder.path,
+                },
+            };
+
+            try {
+                const { data } = await this.$axios.post(this.actionUrl, payload);
+
+                return data || {};
+            } catch ({ response }) {
+                return response?.data || {
+                    success: false,
+                    message: __('Action failed'),
+                };
+            }
         },
 
         addToCommandPalette() {
