@@ -861,8 +861,8 @@ class PathDataManager
             $this->unlockData();
         }
 
-        if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {
-            $this->reducedVar = call_user_func_array([$this->reducedVar, Str::camel($varPath)], []);
+        if (is_object($this->reducedVar) && method_exists($this->reducedVar, $camelVar = Str::camel($varPath)) && (new \ReflectionMethod($this->reducedVar, $camelVar))->isPublic()) {
+            $this->reducedVar = call_user_func_array([$this->reducedVar, $camelVar], []);
             $this->resolvedPath[] = '{method:'.$varPath.'}';
 
             if ($doCompact) {

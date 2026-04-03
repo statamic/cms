@@ -149,6 +149,48 @@ class DataRetrieverTest extends ParserTestCase
         $this->assertSame('no', $value);
     }
 
+    public function test_non_public_methods_are_not_called()
+    {
+        $data = [
+            'object' => new class
+            {
+                protected function protectedMethod()
+                {
+                    return 'Protected Method';
+                }
+
+                private function privateMethod()
+                {
+                    return 'Private Method';
+                }
+            },
+        ];
+
+        $value = $this->getPathValue('object.protected_method', $data);
+        $this->assertNull($value);
+
+        $value = $this->getPathValue('object.private_method', $data);
+        $this->assertNull($value);
+    }
+
+    public function test_public_property_is_used_when_non_public_method_shares_name()
+    {
+        $data = [
+            'object' => new class
+            {
+                public string $label = 'My Widget';
+
+                protected function label()
+                {
+                    return strtoupper($this->label);
+                }
+            },
+        ];
+
+        $value = $this->getPathValue('object.label', $data);
+        $this->assertSame('My Widget', $value);
+    }
+
     public function test_objects_with_no_matching_property_or_method_are_returned_as_null()
     {
         $data = [
