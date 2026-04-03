@@ -190,13 +190,15 @@
             <p>{{ moveConflictMessage }}</p>
 
             <template #footer>
-                <div class="flex items-center justify-between gap-2 p-2">
-                    <Checkbox
-                        v-if="showMoveConflictApplyToAll"
-                        :model-value="moveConflictApplyToAll"
-                        :label="__('messages.asset_conflict_apply_to_all')"
-                        @update:model-value="moveConflictApplyToAll = $event"
-                    />
+                <div class="flex items-center justify-between gap-2 ps-2 pt-3 pb-1">
+                    <div>
+                        <Checkbox
+                            v-if="showMoveConflictApplyToAll"
+                            :model-value="moveConflictApplyToAll"
+                            :label="__('messages.asset_conflict_apply_to_all')"
+                            @update:model-value="moveConflictApplyToAll = $event"
+                        />
+                    </div>
                     <div class="flex items-center gap-2">
                         <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolveMoveConflict('cancel')" />
                         <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolveMoveConflict('timestamp')" />
@@ -214,13 +216,15 @@
             <p>{{ uploadConflictMessage }}</p>
 
             <template #footer>
-                <div class="flex items-center justify-between gap-2 p-2">
-                    <Checkbox
-                        v-if="showUploadConflictApplyToAll"
-                        :model-value="uploadConflictApplyToAll"
-                        :label="__('messages.asset_conflict_apply_to_all')"
-                        @update:model-value="uploadConflictApplyToAll = $event"
-                    />
+                <div class="flex items-center justify-between gap-2 ps-2 pt-3 pb-1">
+                    <div>
+                        <Checkbox
+                            v-if="showUploadConflictApplyToAll"
+                            :model-value="uploadConflictApplyToAll"
+                            :label="__('messages.asset_conflict_apply_to_all')"
+                            @update:model-value="uploadConflictApplyToAll = $event"
+                        />
+                    </div>
                     <div class="flex items-center gap-2">
                         <Button variant="ghost" :text="__('messages.asset_conflict_cancel')" @click="resolveUploadConflict('cancel')" />
                         <Button variant="default" :text="__('messages.asset_conflict_keep_both')" @click="resolveUploadConflict('timestamp')" />
