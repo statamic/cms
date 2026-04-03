@@ -1,13 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import DateFormatter from '@/components/DateFormatter.js';
 
-function setNavigatorLanguage(lang) {
-    Object.defineProperty(navigator, 'language', {
-        value: lang,
-        writable: true,
-    });
-}
-
 let originalDate;
 function setMockDate(dateString) {
     originalDate = Date; // Store the original Date object
@@ -24,7 +17,7 @@ function setMockDate(dateString) {
 
 beforeEach(() => {
     process.env.TZ = 'UTC';
-    setNavigatorLanguage('en-us');
+    DateFormatter.defaultLocale = 'en-us';
     setMockDate('2021-12-25T12:13:14Z');
 });
 
@@ -52,6 +45,27 @@ test('it can pass the date separately', () => {
 test('it can statically format', () => {
     expect(DateFormatter.format('1995-03-13T22:45:19Z')).toBe('3/13/1995, 10:45 PM');
     expect(DateFormatter.format('1995-03-13T22:45:19Z', { year: 'numeric' })).toBe('1995');
+});
+
+test('it can temporarily format with locale using callback', () => {
+    const formatter = new DateFormatter();
+    DateFormatter.defaultLocale = 'en-us';
+
+    const result = formatter.withLocale('de', (instance) => instance.format('2021-12-25T12:13:14Z', 'datetime'));
+
+    expect(result).toBe('25.12.2021, 12:13');
+    expect(DateFormatter.defaultLocale).toBe('en-us');
+});
+
+test('it resets locale after withLocale callback throws', () => {
+    const formatter = new DateFormatter();
+    DateFormatter.defaultLocale = 'en-us';
+
+    expect(() => formatter.withLocale('de', () => {
+        throw new Error('boom');
+    })).toThrow('boom');
+
+    expect(DateFormatter.defaultLocale).toBe('en-us');
 });
 
 test('it can format on the instance', () => {
@@ -189,8 +203,14 @@ describe('dates can be provided in various ways', () => {
 
 test('it can get the locale', () => {
     expect(new DateFormatter().locale).toBe('en-us');
-    setNavigatorLanguage('fr');
+    DateFormatter.defaultLocale = 'fr';
     expect(new DateFormatter().locale).toBe('fr');
+});
+
+test('it can set the default locale via setDefaultLocale', () => {
+    new DateFormatter().setDefaultLocale('de');
+    expect(DateFormatter.defaultLocale).toBe('de');
+    expect(new DateFormatter().locale).toBe('de');
 });
 
 test.each([
@@ -201,7 +221,7 @@ test.each([
     ['de', 'time', '12:13'],
     ['de', 'datetime', '25.12.2021, 12:13'],
 ])('it has format presets (%s %s)', (locale, preset, expected) => {
-    setNavigatorLanguage(locale);
+    DateFormatter.defaultLocale = locale;
     expect(new DateFormatter().options(preset).toString()).toBe(expected);
 });
 
@@ -308,6 +328,6 @@ test.each([
         'December 20, 2021 at 12:13:14 PM UTC',
     ],
 ])('it can use relative format (%s)', (label, locale, options, date, expected) => {
-    setNavigatorLanguage(locale);
+    DateFormatter.defaultLocale = locale;
     expect(new DateFormatter().format(date, options)).toBe(expected);
 });

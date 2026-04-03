@@ -27,6 +27,7 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -453,6 +454,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
             'fqh' => $this->fullyQualifiedHandle(),
+            'token' => encrypt([
+                'fqh' => $this->fullyQualifiedHandle(),
+                'user_id' => User::current()->id(),
+            ]),
         ];
     }
 

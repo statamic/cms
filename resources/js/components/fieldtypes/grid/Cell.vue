@@ -1,6 +1,6 @@
 <template>
     <td class="grid-cell" :class="classes" :width="width">
-        <Field :config="field" />
+        <Field :config="field" :inline="false" />
     </td>
 </template>
 

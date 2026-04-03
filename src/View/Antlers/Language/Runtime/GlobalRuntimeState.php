@@ -77,7 +77,7 @@ class GlobalRuntimeState
      *
      * @var bool
      */
-    public static $isEvaluatingUserData = false;
+    public static $isEvaluatingUserData = true;
 
     public static $isEvaluatingData = false;
 
@@ -164,6 +164,13 @@ class GlobalRuntimeState
     public static $bannedContentTagPaths = [];
 
     /**
+     * A list of all allowed content tag paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentTagPaths = [];
+
+    /**
      * A list of all invalid modifier paths.
      *
      * @var string[]
@@ -178,11 +185,25 @@ class GlobalRuntimeState
     public static $bannedContentModifierPaths = [];
 
     /**
+     * A list of all allowed content modifier paths.
+     *
+     * @var string[]
+     */
+    public static $allowedContentModifierPaths = [];
+
+    /**
      * Controls if PHP is evaluated in user content.
      *
      * @var bool
      */
     public static $allowPhpInContent = false;
+
+    /**
+     * Controls if method invocations are evaluated in user content.
+     *
+     * @var bool
+     */
+    public static $allowMethodsInContent = false;
 
     /**
      * Maintains a list of all field prefixes that have been encountered.
@@ -264,6 +285,9 @@ class GlobalRuntimeState
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         self::$abandonedNodes = [];
+        self::$isEvaluatingUserData = true;
+        self::$isEvaluatingData = false;
+        self::$userContentEvalState = null;
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();

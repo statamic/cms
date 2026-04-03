@@ -17,6 +17,16 @@ class FieldtypeFilter
         $this->fieldtype = $fieldtype;
     }
 
+    public function handle()
+    {
+        return $this->fieldtype->field()->handle();
+    }
+
+    public function display()
+    {
+        return $this->fieldtype->field()->display();
+    }
+
     public function fieldItems()
     {
         return [
@@ -74,6 +84,14 @@ class FieldtypeFilter
     {
         $values = array_filter($values);
 
-        return Arr::has($values, 'operator') && Arr::has($values, 'value');
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'value');
     }
 }

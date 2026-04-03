@@ -13,6 +13,7 @@
                     size="sm"
                     :icon="hidden ? 'eye-closed' : 'eye'"
                     variant="ghost"
+                    v-tooltip="hideDisplayTooltip"
                     @click="toggleHidden"
                 />
             </template>
@@ -33,6 +34,9 @@ export default {
     computed: {
         hidden() {
             return this.getFieldSettingsValue('hide_display');
+        },
+        hideDisplayTooltip() {
+            return this.hidden ? __('Show Display Label') : __('Hide Display Label');
         },
     },
 

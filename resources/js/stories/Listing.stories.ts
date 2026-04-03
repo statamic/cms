@@ -14,7 +14,9 @@ import {
     ListingTable,
     ListingTableBody,
     ListingTableHead,
-    ListingToggleAll
+    ListingToggleAll,
+    Panel,
+    PanelFooter,
 } from '@ui';
 
 const meta = {
@@ -207,5 +209,66 @@ export const _WithActions: Story = {
     render: () => ({
         components: { Listing, Badge, DropdownItem },
         template: actionsCode,
+    }),
+};
+
+const customLayoutCode = `
+<Listing 
+    :items="[
+        { id: 1, name: 'Jack McDade', location: 'USA 🇺🇸', role: 'Founder' },
+        { id: 2, name: 'Jason Varga', location: 'USA 🇺🇸', role: 'Lead Developer' },
+        { id: 3, name: 'Joshua Blum', location: 'Germany 🇩🇪', role: 'Support' },
+        { id: 4, name: 'Duncan McClean', location: 'Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿', role: 'Developer' },
+        { id: 5, name: 'Jay George', location: 'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿️', role: 'Developer' },
+        { id: 6, name: 'David Hasselhoff', location: 'USA 🇺🇸', role: 'The Hoff' },
+    ]"
+    :columns="[
+        { field: 'name', label: 'Name', sortable: true },
+        { field: 'location', label: 'Location', sortable: true },
+        { field: 'role', label: 'Role', sortable: true },
+    ]"
+    v-slot="{ items, isColumnVisible, loading }"
+>
+    <div class="relative flex flex-1 items-center gap-3">
+        <ListingSearch />
+        <ListingFilters />
+        <ListingCustomizeColumns />
+    </div>
+
+    <span v-if="!items.length" v-text="__('No results')" />
+
+    <Panel v-else>
+        <ListingTable>
+            <template #prepended-row-actions="{ row: entry }">
+                <DropdownItem text="Visit Profile" href="#" icon="eye" target="_blank" />
+                <DropdownItem text="Edit" href="#" icon="edit" />
+            </template>
+        </ListingTable>
+    </Panel>
+</Listing>
+`;
+
+export const _CustomLayout: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: customLayoutCode }
+        }
+    },
+    render: () => ({
+        components: {
+            Listing,
+            ListingPresets,
+            ListingSearch,
+            ListingFilters,
+            ListingCustomizeColumns,
+            ListingTable,
+            ListingPagination,
+            Panel,
+            PanelFooter,
+            Badge,
+            DropdownItem,
+        },
+        template: customLayoutCode,
     }),
 };

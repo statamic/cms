@@ -15,6 +15,8 @@ class URL
 {
     private static $enforceTrailingSlashes = false;
     private static $absoluteSiteUrlsCache;
+    private static $hasRelativeSiteCache;
+    private static $siteCachesLoaded = false;
     private static $externalSiteUrlsCache;
     private static $externalAppUrlsCache;
 
@@ -43,7 +45,7 @@ class URL
         $url = Path::tidy($url);
 
         // If URL is external to this Statamic application, we'll leave leading/trailing slashes by default.
-        if (! $external && self::isAbsolute($url) && self::isExternalToApplication($url)) {
+        if (! $external && $this->shouldLeaveExternalAbsoluteUrlUntouched($url)) {
             return $url;
         }
 
@@ -106,7 +108,7 @@ class URL
      */
     public function parent(?string $url): string
     {
-        $trailingSlash = self::isAbsolute($url) && self::isExternalToApplication($url)
+        $trailingSlash = $this->shouldLeaveExternalAbsoluteUrlUntouched($url)
             ? self::hasTrailingSlash($url)
             : self::$enforceTrailingSlashes;
 
@@ -190,7 +192,7 @@ class URL
     public function makeAbsolute(?string $url): string
     {
         // If URL is external to this Statamic application, we'll just leave it as-is.
-        if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
+        if ($this->shouldLeaveExternalAbsoluteUrlUntouched($url)) {
             return $url;
         }
 
@@ -210,6 +212,27 @@ class URL
     public function getCurrent(): string
     {
         return self::tidy(request()->path());
+    }
+
+    private function shouldLeaveExternalAbsoluteUrlUntouched(?string $url): bool
+    {
+        if (! self::isAbsolute($url) || ! self::isExternalToApplication($url)) {
+            return false;
+        }
+
+        return ! $this->hostMatchesConfiguredAppUrl($url);
+    }
+
+    private function hostMatchesConfiguredAppUrl(?string $url): bool
+    {
+        if (! $url || ! self::isAbsolute($url)) {
+            return false;
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+        $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        return $host && $appHost && strtolower($host) === strtolower($appHost);
     }
 
     /**
@@ -257,19 +280,38 @@ class URL
             return false;
         }
 
+        $cacheKey = $url;
+
+        if (! Str::startsWith($url, ['/', 'http://', 'https://', '#', '?']) || Str::startsWith($url, '//')) {
+            return self::$externalAppUrlsCache[$cacheKey] = true;
+        }
+
+        // Normalize backslashes to forward slashes.
+        // Browsers treat \ as / for special schemes (http/https), which can
+        // cause parse_url() to extract a different host than the browser uses.
+        $url = str_replace('\\', '/', $url);
+        $url = preg_replace('/%5c/i', '/', $url);
+
         $url = Str::ensureRight($url, '/');
 
         if (Str::startsWith($url, ['/', '?', '#'])) {
-            return self::$externalAppUrlsCache[$url] = false;
+            return self::$externalAppUrlsCache[$cacheKey] = false;
         }
 
+        $urlWithoutQuery = Str::of($url)->before('?')->before('#');
+        $urlDomain = self::getDomainFromAbsolute($urlWithoutQuery);
+
         $isExternalToSites = self::getAbsoluteSiteUrls()
-            ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
+            ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
             ->isEmpty();
 
-        $isExternalToCurrentRequestDomain = ! Str::startsWith($url, self::getDomainFromAbsolute(url()->to('/')));
+        if (! $this->hasRelativeSite()) {
+            return self::$externalAppUrlsCache[$cacheKey] = $isExternalToSites;
+        }
 
-        return self::$externalAppUrlsCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
+        $isExternalToCurrentRequestDomain = $urlDomain !== self::getDomainFromAbsolute(url()->to('/'));
+
+        return self::$externalAppUrlsCache[$cacheKey] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
 
     /**
@@ -327,7 +369,9 @@ class URL
      */
     public function clearUrlCache(): void
     {
+        self::$siteCachesLoaded = false;
         self::$absoluteSiteUrlsCache = null;
+        self::$hasRelativeSiteCache = null;
         self::$externalSiteUrlsCache = null;
         self::$externalAppUrlsCache = null;
     }
@@ -360,18 +404,46 @@ class URL
     }
 
     /**
+     * Warm site-derived caches from a single Site::all() call
+     */
+    private function ensureSiteCaches(): void
+    {
+        if (self::$siteCachesLoaded) {
+            return;
+        }
+
+        $sites = Site::all();
+
+        self::$hasRelativeSiteCache = $sites->contains(
+            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
+        );
+
+        self::$absoluteSiteUrlsCache = $sites
+            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
+            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
+            ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
+
+        self::$siteCachesLoaded = true;
+    }
+
+    /**
      * Get and cache absolute site URLs for external checks.
      */
     private function getAbsoluteSiteUrls(): Collection
     {
-        if (self::$absoluteSiteUrlsCache) {
-            return self::$absoluteSiteUrlsCache;
-        }
+        $this->ensureSiteCaches();
 
-        return self::$absoluteSiteUrlsCache = Site::all()
-            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
-            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
-            ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
+        return self::$absoluteSiteUrlsCache;
+    }
+
+    /**
+     * Checks whether there is a site configured with a relative URL.
+     */
+    private function hasRelativeSite(): bool
+    {
+        $this->ensureSiteCaches();
+
+        return self::$hasRelativeSiteCache;
     }
 
     /**
@@ -379,7 +451,7 @@ class URL
      */
     private function getDomainFromAbsolute(string $url): string
     {
-        return preg_replace('/(https*:\/\/[^\/]+)(.*)/', '$1', $url);
+        return parse_url($url, PHP_URL_HOST) ?? $url;
     }
 
     /**

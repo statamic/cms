@@ -9,14 +9,158 @@ A full-featured data listing component with sorting, searching, pagination, colu
 
 ## Customizing the cells
 Customize how individual cells are rendered using cell slots. Use the pattern `#cell-{fieldName}` to target specific columns.
+
 <Canvas of={ListingStories._CustomCells} sourceState={'shown'} />
+
+The cell slots expose a few props:
+- `row` - the current row's data
+- `value` - the current column's value
+- `isColumnVisible(column)` - determine whether a column is currently visible
 
 ## With Actions
 You can add your own dropdown items via the `prepended-row-actions` slot.
 <Canvas of={ListingStories._WithActions} sourceState={'shown'} />
 
+## Customizing the layout
+The `Listing` component includes a sensible default layout, but you can fully control the structure by providing your own markup in the default slot.
+
+Inside the slot, you can compose your layout using the provided `Listing` sub-components, which automatically connect to the parent `Listing` via shared context.
+
+If you need to customize table columns or row actions, you can do so inside the `ListingTable` component's slots.
+
+<Canvas of={ListingStories._CustomLayout} sourceState={'shown'} />
+
+### Available components
+You can use the following components to build your own layout:
+
+- `ListingCustomizeColumns`
+- `ListingFilters`
+- `ListingPagination`
+- `ListingPresets`
+- `ListingSearch`
+- `ListingTable`
+
+### Slot props
+The default slot exposes a few props:
+
+- `isColumnVisible(column)` - determine whether a column is currently visible
+- `items` - the items for the current page
+- `loading` - whether results are being fetched from the server
+
 ## Using a JSON endpoint
-The `Listing` component can pull data from a JSON endpoint. Simply specify a `url` and return an [API Resource](https://laravel.com/docs/12.x/eloquent-resources#main-content) from your controller.
+The `Listing` component can pull data from a JSON endpoint.
+
+1. You'll need to make a controller to query your data. The Listing component will provide `page`, `perPage`, `sort`, `order`, `search`, `columns` and `filters` as query parameters.
+
+    You may also want to make a [JSON resource](https://laravel.com/docs/master/eloquent-resources#main-content) to have more control over the response.
+
+    ```php
+    use Illuminate\Http\Request;
+
+    public function json(Request $request)
+    {
+        $query = TeamMember::query();
+
+        if ($search $request->input('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $query->orderBy(
+            $request->input('sort', 'name'), // column
+            $request->input('order', 'asc') // direction
+        );
+
+        return TeamMemberResource::collection($query->paginate($request->input('perPage')));
+    }
+    ```
+
+2. Create a route and provide the `url` prop instead of `items`:
+
+    ```php
+    Route::get('team-members/json', [TeamMemberController::class, 'json']);
+    ```
+
+    ```vue
+    <Listing
+        :url="cp_url('team-members/json')"
+        ...
+    />
+    ```
+
+### Actions
+To enable [actions](https://statamic.dev/backend-apis/actions), you'll need to make another controller. It should extend Statamic's `ActionController`.
+
+The `$key` should match what's returned by [action's `visibleTo` method](https://statamic.dev/backend-apis/actions#filtering-actions). Inside `getSelectedItems`, you should lookup items via their IDs:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\TeamMember;
+use Statamic\Http\Controllers\CP\ActionController as Controller;
+
+class TeamMemberActionController extends Controller
+{
+    protected static $key = 'team-members';
+
+    protected function getSelectedItems($items, $context)
+    {
+        return $items->map(function ($item) {
+            return TeamMember::find($item);
+        });
+    }
+}
+```
+
+Next, add two routes pointing to the controller:
+
+```php
+Route::get('team-members/actions', [TeamMemberActionController::class, 'run']);
+Route::get('team-members/actions/list', [TeamMemberActionController::class, 'bulkActions']);
+```
+
+Finally, pass the URL for the first route to the `actionUrl` prop:
+
+```vue
+<Listing
+    :url="cp_url('team-members/json')"
+    :action-url="cp_url('team-members/actions')"
+    ...
+/>
+```
+
+### Filtering
+To enable filters on your listing, you'll need to call `Scope::filters()` in your controller and pass it to the `Listing` component on your page.
+
+The `Scope::filters()` method expects a key (which should match what's returned by the [filter's `visibleTo` method](https://statamic.dev/backend-apis/query-scopes-and-filters#filters) along with any additional context you wish to provide.
+
+```php
+return Interia::render('team-members/Index', [
+    'filters' => Scope::filters('team-members', [
+        'company' => 'Statamic',
+    ]),
+    // ...
+]);
+```
+
+```js
+<script setup>
+defineProps({
+    filters: Object,
+    // ...
+});
+</script>
+```
+```html
+<template>
+    <Listing
+        :url="cp_url('team-members/json')"
+        :filters="filters"
+        ...
+    />
+</template>
+```
 
 ## Arguments
 <ArgTypes of={ListingStories} />
