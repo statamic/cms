@@ -145,7 +145,7 @@ function exportSubmissions() {
                     <label class="text-sm font-medium mb-1.5 block">{{ __('Submissions') }}</label>
                     <RadioGroup v-model="exportScope">
                         <Radio value="all" :label="__('All Submissions')" />
-                        <Radio value="filtered" :label="__('Filtered Submissions')" :disabled="!hasFilteredScope" />
+                        <Radio value="filtered" :label="__('Filtered Submissions')" :description="__('statamic::messages.form_export_filtered_description')" :disabled="!hasFilteredScope" />
                     </RadioGroup>
                 </div>
             </div>
