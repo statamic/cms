@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Exporters;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -15,6 +16,7 @@ abstract class Exporter
     protected array $config;
     protected string $handle;
     protected Form $form;
+    protected ?Collection $submissions = null;
 
     abstract public function export(): string;
 
@@ -37,6 +39,23 @@ abstract class Exporter
         $this->form = $form;
 
         return $this;
+    }
+
+    public function setSubmissions(Collection $submissions)
+    {
+        $this->submissions = $submissions;
+
+        return $this;
+    }
+
+    public function handle(): string
+    {
+        return $this->handle;
+    }
+
+    protected function submissions(): Collection
+    {
+        return $this->submissions ?? $this->form->submissions();
     }
 
     public function contentType(): string
