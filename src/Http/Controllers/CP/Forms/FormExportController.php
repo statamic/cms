@@ -6,6 +6,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class FormExportController extends CpController
@@ -42,7 +43,7 @@ class FormExportController extends CpController
 
         $this->applySubmissionSearch($query, $form, $request->input('search'));
 
-        if ($sort = $request->input('sort')) {
+        if ($sort = OrderBy::column($request->input('sort'))) {
             $query->orderBy($sort, $request->input('order', 'asc'));
         }
 
