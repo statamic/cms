@@ -83,7 +83,7 @@ class Submission implements Augmentable, SubmissionContract
     /**
      * Get the form fields.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection<string, array>
      */
     public function fields()
     {
