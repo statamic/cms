@@ -44,12 +44,12 @@ export default {
         };
     },
 
-    methods: {
-        getParameters() {
-            return this.$refs.listing?.getParameters();
+    computed: {
+        parameters() {
+            return this.$refs.listing?.parameters;
         },
     },
 
-    expose: ['getParameters'],
+    expose: ['parameters'],
 };
 </script>

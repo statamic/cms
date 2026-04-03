@@ -28,7 +28,7 @@ const hasFilteredScope = computed(() => {
 });
 
 function openExportModal() {
-    listingParameters.value = submissionListing.value?.getParameters() ?? {};
+    listingParameters.value = submissionListing.value?.parameters ?? {};
     exportFormat.value = props.exporters[0]?.handle ?? null;
     exportScope.value = 'all';
     exportModalOpen.value = true;
