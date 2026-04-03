@@ -27,6 +27,11 @@ abstract class Exporter
         return $this;
     }
 
+    public function handle(): string
+    {
+        return $this->handle;
+    }
+
     public function setConfig(array $config)
     {
         $this->config = $config;
@@ -46,11 +51,6 @@ abstract class Exporter
         $this->submissions = $submissions;
 
         return $this;
-    }
-
-    public function handle(): string
-    {
-        return $this->handle;
     }
 
     protected function submissions(): Collection
