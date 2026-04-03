@@ -1017,7 +1017,7 @@ export default {
 
         async continueMoveConflictResolution(context, strategy = null) {
             const conflictAssetId = context.conflict?.asset?.id;
-            const resolution = strategy ?? this.moveConflictPolicy;
+            const resolution = this.moveConflictPolicy;
 
             if (conflictAssetId) {
                 context.pendingSelections = context.pendingSelections.filter((id) => id !== conflictAssetId);
