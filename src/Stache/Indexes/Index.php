@@ -161,6 +161,7 @@ abstract class Index
         Stache::cacheStore()->forget($this->cacheKey());
     }
 
+    /** @deprecated */
     public static function currentlyLoading()
     {
         return end(static::$loadingStack) ?: null;
