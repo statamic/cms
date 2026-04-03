@@ -21,16 +21,6 @@ const exportFormat = ref(null);
 const exportScope = ref('all');
 const listingParameters = ref({});
 
-const exportFormats = computed(() => {
-    const seen = new Set();
-    return props.exporters.filter((e) => {
-        const handle = e.handle.toLowerCase();
-        if (seen.has(handle)) return false;
-        seen.add(handle);
-        return true;
-    });
-});
-
 const hasFilteredScope = computed(() => {
     const params = listingParameters.value;
     return !!(params.search || params.filters);
@@ -38,7 +28,7 @@ const hasFilteredScope = computed(() => {
 
 function openExportModal() {
     listingParameters.value = submissionListing.value?.getParameters() ?? {};
-    exportFormat.value = exportFormats.value[0]?.handle ?? null;
+    exportFormat.value = props.exporters[0]?.handle ?? null;
     exportScope.value = 'all';
     exportModalOpen.value = true;
 }
@@ -146,7 +136,7 @@ function exportSubmissions() {
                 <div>
                     <label class="text-sm font-medium mb-1.5 block">{{ __('Format') }}</label>
                     <RadioGroup v-model="exportFormat" inline>
-                        <Radio v-for="format in exportFormats" :key="format.handle" :value="format.handle" :label="format.title" />
+                        <Radio v-for="format in exporters" :key="format.handle" :value="format.handle" :label="format.title" />
                     </RadioGroup>
                 </div>
 
