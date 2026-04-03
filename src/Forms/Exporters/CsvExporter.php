@@ -29,13 +29,8 @@ class CsvExporter extends Exporter
 
         $headers = $this->form->fields()
             ->map(fn ($field) => $key === 'display' ? $field->display() : $field->handle())
+            ->push($key === 'display' ? __('Date') : 'date')
             ->values()->all();
-
-        $dateHeader = $key === 'display' ? __('Date') : 'date';
-
-        if (! in_array($dateHeader, $headers)) {
-            $headers[] = $dateHeader;
-        }
 
         $this->writer->insertOne($headers);
     }
