@@ -44,7 +44,7 @@ class FormExportController extends CpController
         $this->applySubmissionSearch($query, $form, $request->input('search'));
 
         if ($sort = OrderBy::column($request->input('sort'))) {
-            $query->orderBy($sort, $request->input('order', 'asc'));
+            $query->orderBy($sort, $request->input('order', $sort === 'date' ? 'desc' : 'asc'));
         }
 
         return $query->get();
