@@ -868,10 +868,8 @@ class PathDataManager
             if ($doCompact) {
                 $this->compact($path->isFinal);
             }
-        } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $camelVar = Str::camel($varPath))) {
-            $reflectionProperty = new \ReflectionProperty($this->reducedVar, $camelVar);
-
-            $this->reducedVar = $reflectionProperty->isPublic() ? $this->reducedVar->{$camelVar} : null;
+        } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $camelVar = Str::camel($varPath)) && (new \ReflectionProperty($this->reducedVar, $camelVar))->isPublic()) {
+            $this->reducedVar = $this->reducedVar->{$camelVar};
             $this->resolvedPath[] = '{property:'.$varPath.'}';
 
             if ($doCompact) {

@@ -208,6 +208,45 @@ class DataRetrieverTest extends ParserTestCase
         $this->assertSame('no', $value);
     }
 
+    public function test_non_public_properties_report_not_found()
+    {
+        $data = [
+            'view' => [
+                'object' => new class
+                {
+                    protected string $protectedProperty = 'Hello Protected World!';
+
+                    private string $privateProperty = 'Hello Private World!';
+                },
+            ],
+        ];
+
+        [$found, $value] = $this->getPathValueWithExistence('view.object.protected_property', $data);
+        $this->assertFalse($found);
+        $this->assertNull($value);
+
+        [$found, $value] = $this->getPathValueWithExistence('view.object.private_property', $data);
+        $this->assertFalse($found);
+        $this->assertNull($value);
+    }
+
+    public function test_non_public_properties_short_circuit_deeper_paths()
+    {
+        $data = [
+            'object' => new class
+            {
+                protected string $protectedProperty = 'Hello Protected World!';
+            },
+        ];
+
+        $value = $this->getPathValue('object.protected_property.deeper.path', $data);
+        $this->assertNull($value);
+
+        [$found, $value] = $this->getPathValueWithExistence('object.protected_property.deeper.path', $data);
+        $this->assertFalse($found);
+        $this->assertNull($value);
+    }
+
     public function test_objects_with_no_matching_property_or_method_report_not_found()
     {
         $data = [
