@@ -879,6 +879,8 @@ class PathDataManager
             }
         } elseif (is_object($this->reducedVar)) {
             $this->reducedVar = null;
+            $this->didFind = false;
+            $this->doBreak = true;
 
             if ($doCompact) {
                 $this->compact($path->isFinal);

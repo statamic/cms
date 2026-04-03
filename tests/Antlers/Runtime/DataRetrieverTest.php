@@ -16,6 +16,13 @@ class DataRetrieverTest extends ParserTestCase
         return $dataRetriever->getData($this->parsePath($path), $data);
     }
 
+    private function getPathValueWithExistence($path, $data)
+    {
+        $dataRetriever = new PathDataManager();
+
+        return $dataRetriever->getDataWithExistence($this->parsePath($path), $data);
+    }
+
     public function test_simple_data_is_retrieved()
     {
         $data = [
@@ -157,5 +164,35 @@ class DataRetrieverTest extends ParserTestCase
 
         $value = (string) Antlers::parse('{{ if object:no_existent }}yes{{ else }}no{{ /if }}');
         $this->assertSame('no', $value);
+    }
+
+    public function test_objects_with_no_matching_property_or_method_report_not_found()
+    {
+        $data = [
+            'object' => new class
+            {
+            },
+        ];
+
+        [$found, $value] = $this->getPathValueWithExistence('object.no_existent', $data);
+        $this->assertFalse($found);
+        $this->assertNull($value);
+    }
+
+    public function test_objects_with_no_matching_property_short_circuit_deeper_paths()
+    {
+        $data = [
+            'object' => new class
+            {
+                public string $name = 'Hello';
+            },
+        ];
+
+        $value = $this->getPathValue('object.no_existent.deeper.path', $data);
+        $this->assertNull($value);
+
+        [$found, $value] = $this->getPathValueWithExistence('object.no_existent.deeper.path', $data);
+        $this->assertFalse($found);
+        $this->assertNull($value);
     }
 }
