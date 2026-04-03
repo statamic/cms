@@ -185,7 +185,7 @@
         <Modal
             :open="showMoveConflictModal"
             :title="__('messages.asset_conflict_title')"
-            @update:open="showMoveConflictModal = $event"
+            @update:open="onMoveConflictModalOpenUpdated"
         >
             <p>{{ moveConflictMessage }}</p>
 
@@ -209,13 +209,14 @@
         <Modal
             :open="showUploadConflictModal"
             :title="__('messages.asset_conflict_title')"
-            @update:open="showUploadConflictModal = $event"
+            @update:open="onUploadConflictModalOpenUpdated"
         >
             <p>{{ uploadConflictMessage }}</p>
 
             <template #footer>
                 <div class="flex items-center justify-between gap-2 p-2">
                     <Checkbox
+                        v-if="showUploadConflictApplyToAll"
                         :model-value="uploadConflictApplyToAll"
                         :label="__('messages.asset_conflict_apply_to_all')"
                         @update:model-value="uploadConflictApplyToAll = $event"
@@ -507,6 +508,10 @@ export default {
         showMoveConflictApplyToAll() {
             return (this.moveConflictContext?.pendingSelections?.length || 0) > 1;
         },
+
+        showUploadConflictApplyToAll() {
+            return this.uploads.filter((upload) => upload.errorStatus === 409).length > 1;
+        },
     },
 
     mounted() {
@@ -575,6 +580,32 @@ export default {
     },
 
     methods: {
+        onMoveConflictModalOpenUpdated(open) {
+            if (open) {
+                this.showMoveConflictModal = true;
+                return;
+            }
+
+            if (!this.showMoveConflictModal) {
+                return;
+            }
+
+            this.resolveMoveConflict('cancel');
+        },
+
+        onUploadConflictModalOpenUpdated(open) {
+            if (open) {
+                this.showUploadConflictModal = true;
+                return;
+            }
+
+            if (!this.showUploadConflictModal) {
+                return;
+            }
+
+            this.resolveUploadConflict('cancel');
+        },
+
         filtersUpdated(filters) {
             this.activeFilters = filters;
         },
@@ -1016,30 +1047,40 @@ export default {
         },
 
         async continueMoveConflictResolution(context, strategy = null) {
-            const conflictAssetId = context.conflict?.asset?.id;
-            const resolution = this.moveConflictPolicy;
+            let nextStrategy = strategy;
 
-            if (conflictAssetId) {
-                context.pendingSelections = context.pendingSelections.filter((id) => id !== conflictAssetId);
-            }
+            while (true) {
+                const conflictAssetId = context.conflict?.asset?.id;
+                const resolution = this.moveConflictPolicy;
 
-            if (strategy && strategy !== 'cancel' && conflictAssetId) {
-                const resolutionResult = await this.runMoveConflictAction(context, [conflictAssetId], strategy);
+                if (conflictAssetId) {
+                    context.pendingSelections = context.pendingSelections.filter((id) => id !== conflictAssetId);
+                }
 
-                if (resolutionResult.success === false) {
+                if (nextStrategy && nextStrategy !== 'cancel' && conflictAssetId) {
+                    const resolutionResult = await this.runMoveConflictAction(context, [conflictAssetId], nextStrategy);
+
+                    if (resolutionResult.success === false) {
+                        this.moveConflictPolicy = null;
+                        this.actionFailed(resolutionResult);
+                        return;
+                    }
+
+                    if (nextStrategy === 'overwrite') {
+                        const originalPreview = context.conflict?.existing?.preview;
+                        const originalThumbnail = context.conflict?.existing?.thumbnail;
+                        Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
+                    }
+                }
+
+                if (context.pendingSelections.length === 0) {
                     this.moveConflictPolicy = null;
-                    this.actionFailed(resolutionResult);
+                    this.actionCompleted(true, {
+                        message: false,
+                    });
                     return;
                 }
 
-                if (strategy === 'overwrite') {
-                    const originalPreview = context.conflict?.existing?.preview;
-                    const originalThumbnail = context.conflict?.existing?.thumbnail;
-                    Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
-                }
-            }
-
-            while (context.pendingSelections.length > 0) {
                 const response = await this.runMoveConflictAction(context, context.pendingSelections, null);
 
                 if (response.success !== false) {
@@ -1066,19 +1107,14 @@ export default {
                 }
 
                 if (resolution) {
-                    await this.continueMoveConflictResolution(context, resolution);
-                    return;
+                    nextStrategy = resolution;
+                    continue;
                 }
 
                 this.moveConflictContext = context;
                 this.showMoveConflictModal = true;
                 return;
             }
-
-            this.moveConflictPolicy = null;
-            this.actionCompleted(true, {
-                message: false,
-            });
         },
 
         async runMoveConflictAction(context, selections, strategy = null) {

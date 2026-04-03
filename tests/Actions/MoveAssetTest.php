@@ -52,6 +52,42 @@ class MoveAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_moves_asset_when_no_conflict_exists(): void
+    {
+        $this->createAsset('source/logo.svg', 'new');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->move('source/logo.svg', 'target')
+            ->assertOk()
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        Storage::disk('test')->assertMissing('source/logo.svg');
+        Storage::disk('test')->assertExists('target/logo.svg');
+        $this->assertEquals('new', Storage::disk('test')->get('target/logo.svg'));
+    }
+
+    #[Test]
+    public function it_is_a_no_op_when_moving_to_the_same_folder(): void
+    {
+        $this->createAsset('source/logo.svg', 'contents');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->move('source/logo.svg', 'source')
+            ->assertOk()
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        Storage::disk('test')->assertExists('source/logo.svg');
+        Storage::disk('test')->assertMissing('target/logo.svg');
+        $this->assertEquals('contents', Storage::disk('test')->get('source/logo.svg'));
+    }
+
+    #[Test]
     public function it_blocks_conflicting_move_without_strategy(): void
     {
         $this->createAsset('source/logo.svg', 'new');
@@ -71,6 +107,30 @@ class MoveAssetTest extends TestCase
 
         Storage::disk('test')->assertExists('source/logo.svg');
         Storage::disk('test')->assertExists('target/logo.svg');
+        $this->assertEquals('existing', Storage::disk('test')->get('target/logo.svg'));
+    }
+
+    #[Test]
+    public function it_blocks_conflicting_move_with_explicit_cancel_strategy(): void
+    {
+        $this->createAsset('source/logo.svg', 'new');
+        $this->createAsset('target/logo.svg', 'existing');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->move('source/logo.svg', 'target', 'cancel')
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+                'conflict' => [
+                    'type' => 'asset_move',
+                    'destination' => 'target',
+                ],
+            ]);
+
+        Storage::disk('test')->assertExists('source/logo.svg');
+        Storage::disk('test')->assertExists('target/logo.svg');
+        $this->assertEquals('new', Storage::disk('test')->get('source/logo.svg'));
         $this->assertEquals('existing', Storage::disk('test')->get('target/logo.svg'));
     }
 
