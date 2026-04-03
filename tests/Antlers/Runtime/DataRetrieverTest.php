@@ -276,4 +276,27 @@ class DataRetrieverTest extends ParserTestCase
         $this->assertFalse($found);
         $this->assertNull($value);
     }
+
+    public function test_exact_name_non_public_properties_are_not_accessed()
+    {
+        $data = [
+            'object' => new class
+            {
+                public string $name = 'Public';
+
+                protected string $secret = 'Protected';
+
+                private string $hidden = 'Private';
+            },
+        ];
+
+        $value = $this->getPathValue('object.name', $data);
+        $this->assertSame('Public', $value);
+
+        $value = $this->getPathValue('object.secret', $data);
+        $this->assertNull($value);
+
+        $value = $this->getPathValue('object.hidden', $data);
+        $this->assertNull($value);
+    }
 }

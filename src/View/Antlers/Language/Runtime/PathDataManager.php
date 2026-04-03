@@ -700,7 +700,7 @@ class PathDataManager
 
                 if ($this->reducedVar instanceof Model) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
-                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name)) {
+                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name) && (new \ReflectionProperty($this->reducedVar, $pathItem->name))->isPublic()) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
                 } else {
                     $this->reduceVar($pathItem, $data);
