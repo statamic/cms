@@ -23,7 +23,8 @@ const listingParameters = ref({});
 
 const hasFilteredScope = computed(() => {
     const params = listingParameters.value;
-    return !!(params.search || params.filters);
+    const hasSortOverride = (params.sort && params.sort !== 'datestamp') || (params.order && params.order !== 'desc');
+    return !!(params.search || params.filters || hasSortOverride);
 });
 
 function openExportModal() {
