@@ -70,23 +70,25 @@ abstract class Index
 
         static::$loadingStack[] = $loadingKey;
 
-        $this->loaded = true;
+        try {
+            $this->loaded = true;
 
-        if (Statamic::isWorker() && ! $currentlyLoadingThis) {
-            $this->loaded = false;
+            if (Statamic::isWorker() && ! $currentlyLoadingThis) {
+                $this->loaded = false;
+            }
+
+            debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
+
+            $this->items = Stache::cacheStore()->get($this->cacheKey());
+
+            if ($this->items === null) {
+                $this->update();
+            }
+
+            $this->store->cacheIndexUsage($this);
+        } finally {
+            array_pop(static::$loadingStack);
         }
-
-        debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
-
-        $this->items = Stache::cacheStore()->get($this->cacheKey());
-
-        if ($this->items === null) {
-            $this->update();
-        }
-
-        $this->store->cacheIndexUsage($this);
-
-        array_pop(static::$loadingStack);
 
         return $this;
     }
