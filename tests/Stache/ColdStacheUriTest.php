@@ -43,7 +43,7 @@ class ColdStacheUriTest extends TestCase
             ->whereStatus('published')
             ->get();
 
-        $this->assertGreaterThanOrEqual(2, $entries->count(), 'Expected at least 2 entries with URI on cold stache');
+        $this->assertCount(2, $entries);
     }
 
     #[Test]
@@ -73,6 +73,6 @@ class ColdStacheUriTest extends TestCase
             ->whereStatus('published')
             ->get();
 
-        $this->assertGreaterThanOrEqual(1, $entries->count(), 'Expected at least 1 entry with URI on cold stache');
+        $this->assertCount(2, $entries);
     }
 }
