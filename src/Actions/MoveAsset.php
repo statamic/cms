@@ -60,8 +60,8 @@ class MoveAsset extends Action
                     ? __('statamic::messages.asset_conflict_newer')
                     : __('statamic::messages.asset_conflict_older');
                 $existingDescriptor = $sourceLastModified >= $destinationLastModified
-                    ? __('statamic::messages.asset_conflict_a_newer')
-                    : __('statamic::messages.asset_conflict_an_older');
+                    ? __('statamic::messages.asset_conflict_an_older')
+                    : __('statamic::messages.asset_conflict_a_newer');
                 $existingAge = $sourceLastModified >= $destinationLastModified
                     ? __('statamic::messages.asset_conflict_older')
                     : __('statamic::messages.asset_conflict_newer');
