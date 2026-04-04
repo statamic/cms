@@ -57,4 +57,30 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Tags
+    |--------------------------------------------------------------------------
+    |
+    | Any tag pattern that appears in this list will be allowed in
+    | any Antlers template, including any user-supplied values.
+    |
+    */
+
+    'allowedContentTags' => [
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Modifiers
+    |--------------------------------------------------------------------------
+    |
+    | Any modifier pattern that appears in this list will be allowed
+    | in any Antlers template, including any user-supplied values.
+    |
+    */
+
+    'allowedContentModifiers' => [],
+
 ];
