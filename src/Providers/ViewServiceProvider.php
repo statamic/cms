@@ -104,6 +104,7 @@ class ViewServiceProvider extends ServiceProvider
             $runtimeConfig->guardedContentTagPatterns = config('statamic.antlers.guardedContentTags', []);
             $runtimeConfig->guardedContentModifiers = config('statamic.antlers.guardedContentModifiers', []);
             $runtimeConfig->allowedContentTagPatterns = config('statamic.antlers.allowedContentTags', [
+                'link:*',
                 'obfuscate:*',
                 'trans:*',
                 'trans_choice:*',
