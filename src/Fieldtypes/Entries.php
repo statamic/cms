@@ -19,6 +19,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -215,7 +216,7 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->sort ?? 'title';
+        $column = OrderBy::column($request->sort, 'title');
 
         if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();

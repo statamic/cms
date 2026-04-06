@@ -8,6 +8,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -259,7 +260,9 @@ class ApiController extends Controller
                     $order = 'desc';
                 }
 
-                $query->orderBy($sort, $order);
+                if ($sort = OrderBy::column($sort)) {
+                    $query->orderBy($sort, $order);
+                }
             });
 
         return $this;

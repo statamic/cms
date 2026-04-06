@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.73.18 (2026-04-02)
+
+### What's fixed
+- Harden OrderBys [#14421](https://github.com/statamic/cms/issues/14421) by @jasonvarga
+
+
+
 ## 5.73.17 (2026-03-25)
 
 ### What's fixed

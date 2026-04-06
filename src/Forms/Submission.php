@@ -83,7 +83,7 @@ class Submission implements Augmentable, SubmissionContract
     /**
      * Get the form fields.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection<string, array>
      */
     public function fields()
     {
@@ -91,9 +91,9 @@ class Submission implements Augmentable, SubmissionContract
     }
 
     /**
-     * Get or set the columns.
+     * Get the columns.
      *
-     * @return array
+     * @return \Statamic\CP\Columns
      */
     public function columns()
     {

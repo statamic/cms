@@ -234,9 +234,7 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
-
-        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+        if (! Index::isLoading() && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
