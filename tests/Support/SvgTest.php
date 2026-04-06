@@ -144,4 +144,17 @@ class SvgTest extends TestCase
 
         $this->assertStringStartsWith('<svg', $result);
     }
+
+    #[Test]
+    public function it_sanitizes_css_inside_cdata_sections()
+    {
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg"><style><![CDATA[@import url("https://evil.com/track.css"); .cls-1 { fill: url(https://evil.com/bg.gif); }]]></style><rect class="cls-1"/></svg>';
+
+        $result = Svg::sanitize($svg);
+
+        $this->assertStringNotContainsString('@import', $result);
+        $this->assertStringNotContainsString('evil.com', $result);
+        $this->assertStringContainsString('.cls-1', $result);
+        $this->assertStringContainsString('fill:', $result);
+    }
 }
