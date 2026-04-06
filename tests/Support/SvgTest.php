@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Support\Svg;
 use Tests\TestCase;
@@ -9,96 +10,96 @@ use Tests\TestCase;
 class SvgTest extends TestCase
 {
     #[Test]
-    public function it_strips_import_with_url()
+    #[DataProvider('sanitizeCssProvider')]
+    public function it_sanitizes_css(string $input, string $expected)
     {
-        $this->assertSame('', trim(Svg::sanitizeCss('@import url("https://evil.com/x.css");')));
+        $this->assertSame($expected, trim(Svg::sanitizeCss($input)));
     }
 
-    #[Test]
-    public function it_strips_import_with_bare_string()
+    public static function sanitizeCssProvider()
     {
-        $this->assertSame('', trim(Svg::sanitizeCss('@import "https://evil.com/x.css";')));
-    }
-
-    #[Test]
-    public function it_strips_import_with_protocol_relative_url()
-    {
-        $this->assertSame('', trim(Svg::sanitizeCss('@import url(//evil.com/x.css);')));
-    }
-
-    #[Test]
-    public function it_strips_import_without_semicolon()
-    {
-        $this->assertSame('', trim(Svg::sanitizeCss("@import url('https://evil.com/x.css')")));
-    }
-
-    #[Test]
-    public function it_neutralizes_external_url_in_property()
-    {
-        $this->assertSame(
-            '.cls { background: url(); }',
-            Svg::sanitizeCss('.cls { background: url(https://evil.com/beacon.gif); }')
-        );
-    }
-
-    #[Test]
-    public function it_neutralizes_protocol_relative_url_in_property()
-    {
-        $this->assertSame(
-            '.cls { background: url(); }',
-            Svg::sanitizeCss('.cls { background: url(//evil.com/x); }')
-        );
-    }
-
-    #[Test]
-    public function it_neutralizes_quoted_external_url()
-    {
-        $this->assertSame(
-            '.cls { background: url(); }',
-            Svg::sanitizeCss('.cls { background: url("http://evil.com/x"); }')
-        );
-    }
-
-    #[Test]
-    public function it_preserves_normal_css()
-    {
-        $css = '.cls-1 { fill: #333; stroke: red; }';
-
-        $this->assertSame($css, Svg::sanitizeCss($css));
-    }
-
-    #[Test]
-    public function it_preserves_internal_url_references()
-    {
-        $css = '.cls { fill: url(#myGradient); }';
-
-        $this->assertSame($css, Svg::sanitizeCss($css));
-    }
-
-    #[Test]
-    public function it_preserves_data_uris()
-    {
-        $css = '.cls { background: url(data:image/png;base64,abc123); }';
-
-        $this->assertSame($css, Svg::sanitizeCss($css));
-    }
-
-    #[Test]
-    public function it_handles_mixed_legitimate_and_malicious_css()
-    {
-        $css = ".cls-1 { fill: #333; }\n@import url(\"https://evil.com/track.css\");\n.cls-2 { stroke: url(#grad); background: url(https://evil.com/bg.gif); }";
-        $expected = ".cls-1 { fill: #333; }\n\n.cls-2 { stroke: url(#grad); background: url(); }";
-
-        $this->assertSame($expected, Svg::sanitizeCss($css));
-    }
-
-    #[Test]
-    public function it_strips_font_face_with_external_src()
-    {
-        $css = '@font-face { font-family: "x"; src: url("https://evil.com/font.woff"); }';
-        $expected = '@font-face { font-family: "x"; src: url(); }';
-
-        $this->assertSame($expected, Svg::sanitizeCss($css));
+        return [
+            'strips @import with url()' => [
+                '@import url("https://evil.com/x.css");',
+                '',
+            ],
+            'strips @import with bare string' => [
+                '@import "https://evil.com/x.css";',
+                '',
+            ],
+            'strips @import with protocol-relative url' => [
+                '@import url(//evil.com/x.css);',
+                '',
+            ],
+            'strips @import without semicolon' => [
+                "@import url('https://evil.com/x.css')",
+                '',
+            ],
+            'strips @import using hex escapes' => [
+                '@\\69mport url("https://evil.com/x.css");',
+                '',
+            ],
+            'strips @import using non-hex backslash escapes' => [
+                '@\import url("https://evil.com/x.css");',
+                '',
+            ],
+            'strips @import using mixed hex and non-hex escapes' => [
+                '@\\69\mport url("https://evil.com/x.css");',
+                '',
+            ],
+            'neutralizes external url' => [
+                '.cls { background: url(https://evil.com/beacon.gif); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes protocol-relative url' => [
+                '.cls { background: url(//evil.com/x); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes quoted external url' => [
+                '.cls { background: url("http://evil.com/x"); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes external url using hex escapes' => [
+                '.cls { background: url(\\68\\74\\74\\70\\73://evil.com/beacon.gif); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes external url using non-hex backslash escapes' => [
+                '.cls { background: url(\https://evil.com/x); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes external url using non-breaking space escape' => [
+                '.cls { background: url(\\a0 https://evil.com/x); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes external url using zero-width space escape' => [
+                '.cls { background: url(\\200B https://evil.com/x); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes external url using BOM escape' => [
+                '.cls { background: url(\\FEFF https://evil.com/x); }',
+                '.cls { background: url(); }',
+            ],
+            'neutralizes external url in @font-face src' => [
+                '@font-face { font-family: "x"; src: url("https://evil.com/font.woff"); }',
+                '@font-face { font-family: "x"; src: url(); }',
+            ],
+            'preserves normal css' => [
+                '.cls-1 { fill: #333; stroke: red; }',
+                '.cls-1 { fill: #333; stroke: red; }',
+            ],
+            'preserves internal url references' => [
+                '.cls { fill: url(#myGradient); }',
+                '.cls { fill: url(#myGradient); }',
+            ],
+            'preserves data uris' => [
+                '.cls { background: url(data:image/png;base64,abc123); }',
+                '.cls { background: url(data:image/png;base64,abc123); }',
+            ],
+            'handles mixed legitimate and malicious css' => [
+                ".cls-1 { fill: #333; }\n@import url(\"https://evil.com/track.css\");\n.cls-2 { stroke: url(#grad); background: url(https://evil.com/bg.gif); }",
+                ".cls-1 { fill: #333; }\n\n.cls-2 { stroke: url(#grad); background: url(); }",
+            ],
+        ];
     }
 
     #[Test]

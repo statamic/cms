@@ -29,6 +29,18 @@ class Svg
 
     public static function sanitizeCss(string $css): string
     {
+        // Decode all CSS escape sequences in a single pass to prevent bypass.
+        // Hex escapes: \69mport -> import. Non-hex escapes: \i -> i, \@ -> @.
+        $css = preg_replace_callback(
+            '/\\\\(?:([0-9a-fA-F]{1,6})\s?|(.))/s',
+            fn ($m) => ($m[1] !== '') ? mb_chr(hexdec($m[1]), 'UTF-8') : $m[2],
+            $css
+        );
+
+        // Normalize Unicode whitespace and invisible characters to ASCII spaces
+        // so they can't be used to sneak past the regex patterns below
+        $css = preg_replace('/[\p{Z}\x{200B}\x{FEFF}]+/u', ' ', $css);
+
         // Remove @import rules entirely
         $css = preg_replace('/@import\s+[^;]+;?/i', '', $css);
 
