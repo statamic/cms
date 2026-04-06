@@ -239,11 +239,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $existing = $this->app['config']->get('cache.serializable_classes');
 
-        if ($existing === true) {
+        if (! is_array($existing)) {
             return;
         }
 
-        $classes = [
+        $this->app['config']->set('cache.serializable_classes', array_merge($existing, [
             \Statamic\Auth\File\User::class,
             \Statamic\Assets\Asset::class,
             \Statamic\Assets\AssetContainer::class,
@@ -264,12 +264,7 @@ class AppServiceProvider extends ServiceProvider
             \Carbon\Carbon::class,
             \Illuminate\Support\Carbon::class,
             \Illuminate\Support\Collection::class,
-        ];
-
-        $this->app['config']->set('cache.serializable_classes', array_merge(
-            is_array($existing) ? $existing : [],
-            $classes
-        ));
+        ]));
     }
 
     protected function registerMiddlewareGroup()

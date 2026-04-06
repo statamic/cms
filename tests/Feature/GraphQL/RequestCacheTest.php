@@ -211,6 +211,23 @@ class RequestCacheTest extends TestCase
     }
 
     #[Test]
+    public function it_caches_response_data_as_primitives()
+    {
+        app()->instance('request-tracking', $requests = Collection::make());
+
+        $this->post('/graphql', ['query' => '{one}']);
+
+        $key = 'gql-cache:'.md5('{one}').'_'.md5(json_encode(null));
+        $cached = Cache::get($key);
+
+        $this->assertIsArray($cached);
+        $this->assertArrayHasKey('content', $cached);
+        $this->assertArrayHasKey('status', $cached);
+        $this->assertArrayHasKey('headers', $cached);
+        $this->assertEquals(200, $cached['status']);
+    }
+
+    #[Test]
     public function it_can_disable_caching()
     {
         config(['statamic.graphql.cache' => false]);
