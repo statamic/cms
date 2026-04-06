@@ -19,7 +19,7 @@ class DefaultCache implements ResponseCache
             return null;
         }
 
-        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], true);
+        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], json: true);
     }
 
     public function put(Request $request, $response)

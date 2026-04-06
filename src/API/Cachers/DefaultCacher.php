@@ -21,7 +21,7 @@ class DefaultCacher extends AbstractCacher
             return null;
         }
 
-        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], true);
+        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], json: true);
     }
 
     /**
