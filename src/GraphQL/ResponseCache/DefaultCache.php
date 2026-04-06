@@ -2,8 +2,8 @@
 
 namespace Statamic\GraphQL\ResponseCache;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\GraphQL\ResponseCache;
@@ -19,7 +19,7 @@ class DefaultCache implements ResponseCache
             return null;
         }
 
-        return new Response($cached['content'], $cached['status'], $cached['headers']);
+        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], true);
     }
 
     public function put(Request $request, $response)

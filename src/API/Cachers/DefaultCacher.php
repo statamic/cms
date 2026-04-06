@@ -4,7 +4,6 @@ namespace Statamic\API\Cachers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\Event;
@@ -22,7 +21,7 @@ class DefaultCacher extends AbstractCacher
             return null;
         }
 
-        return new Response($cached['content'], $cached['status'], $cached['headers']);
+        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], true);
     }
 
     /**
