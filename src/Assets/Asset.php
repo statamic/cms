@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
-use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -46,6 +45,7 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Support\Traits\Hookable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -970,9 +970,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
             $this->disk()->put(
                 $this->path(),
-                (new DOMSanitizer(DOMSanitizer::SVG))->sanitize($contents, [
-                    'remove-xml-tags' => ! Str::startsWith($contents, '<?xml'),
-                ])
+                Svg::sanitize($contents)
             );
         }
 

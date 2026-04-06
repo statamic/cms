@@ -3,7 +3,6 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
-use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
@@ -217,11 +216,7 @@ class NavItem
     private function sanitizeSvg(string $svg): string
     {
         try {
-            $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
-
-            return $sanitizer->sanitize($svg, [
-                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
-            ]);
+            return Svg::sanitize($svg);
         } catch (\Throwable $e) {
             return '';
         }
