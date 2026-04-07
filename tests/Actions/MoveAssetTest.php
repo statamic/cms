@@ -88,6 +88,44 @@ class MoveAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_reports_completed_moves_when_a_later_asset_conflicts(): void
+    {
+        $this->createAsset('source/a.svg', 'a');
+        $this->createAsset('source/b.svg', 'b');
+        $this->createAsset('target/b.svg', 'existing');
+
+        $idA = 'test_container::source/a.svg';
+        $idB = 'test_container::source/b.svg';
+        $idAAtTarget = 'test_container::target/a.svg';
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post(cp_route('assets.actions.run'), [
+                'action' => 'move_asset',
+                'context' => ['container' => 'test_container'],
+                'selections' => [$idA, $idB],
+                'values' => ['folder' => 'target'],
+            ])
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+                'conflict' => [
+                    'type' => 'asset_move',
+                    'asset' => [
+                        'id' => $idB,
+                    ],
+                ],
+                'completed_moves' => [
+                    $idA => $idAAtTarget,
+                ],
+            ]);
+
+        Storage::disk('test')->assertMissing('source/a.svg');
+        Storage::disk('test')->assertExists('target/a.svg');
+        Storage::disk('test')->assertExists('source/b.svg');
+    }
+
+    #[Test]
     public function it_blocks_conflicting_move_without_strategy(): void
     {
         $this->createAsset('source/logo.svg', 'new');

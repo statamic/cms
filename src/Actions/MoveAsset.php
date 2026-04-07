@@ -47,6 +47,7 @@ class MoveAsset extends Action
         $strategy = $this->context['conflict'] ?? 'cancel';
         $timestamp = now()->timestamp;
         $ids = [];
+        $completedMoves = [];
 
         foreach ($assets as $index => $asset) {
             $destinationPath = Str::removeLeft(Path::tidy($folder.'/'.$asset->basename()), '/');
@@ -69,7 +70,10 @@ class MoveAsset extends Action
                 if ($strategy === 'overwrite') {
                     $assetForGlideCacheClear = $existingAsset ?? $asset->container()->makeAsset($destinationPath);
                     Glide::clearAsset($assetForGlideCacheClear);
-                    $ids[] = $asset->move($folder)->id();
+                    $oldId = $asset->id();
+                    $newId = $asset->move($folder)->id();
+                    $completedMoves[$oldId] = $newId;
+                    $ids[] = $newId;
 
                     continue;
                 }
@@ -81,7 +85,10 @@ class MoveAsset extends Action
                         $filename .= '-'.$index;
                     }
 
-                    $ids[] = $asset->moveUnique($folder, $filename)->id();
+                    $oldId = $asset->id();
+                    $newId = $asset->moveUnique($folder, $filename)->id();
+                    $completedMoves[$oldId] = $newId;
+                    $ids[] = $newId;
 
                     continue;
                 }
@@ -106,11 +113,15 @@ class MoveAsset extends Action
                             ],
                             'destination' => $folder,
                         ],
+                        'completed_moves' => (object) $completedMoves,
                     ],
                 );
             }
 
-            $ids[] = $asset->move($folder)->id();
+            $oldId = $asset->id();
+            $newId = $asset->move($folder)->id();
+            $completedMoves[$oldId] = $newId;
+            $ids[] = $newId;
         }
 
         return [

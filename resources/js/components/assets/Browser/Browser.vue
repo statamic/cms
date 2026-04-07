@@ -1020,16 +1020,32 @@ export default {
             return false;
         },
 
-        openMoveConflictModal({ action, asset, destinationFolder, selections, message, conflict }) {
+        openMoveConflictModal({ action, asset, destinationFolder, selections, message, conflict, completedMoves }) {
+            const initialRemap =
+                completedMoves && typeof completedMoves === 'object' && !Array.isArray(completedMoves) ? completedMoves : {};
+
             this.moveConflictContext = {
                 action,
                 asset,
                 destinationFolder,
                 pendingSelections: Array.from(new Set((selections || [asset?.id]).filter(Boolean))),
                 conflict,
+                idRemap: { ...initialRemap },
             };
             this.moveConflictMessage = message;
             this.showMoveConflictModal = true;
+        },
+
+        remapMoveConflictAssetId(id, idRemap = {}) {
+            let current = id;
+            const seen = new Set();
+
+            while (current && idRemap[current] && !seen.has(current)) {
+                seen.add(current);
+                current = idRemap[current];
+            }
+
+            return current;
         },
 
         async resolveMoveConflict(strategy) {
@@ -1058,11 +1074,19 @@ export default {
                 const resolution = this.moveConflictPolicy;
 
                 if (conflictAssetId) {
-                    context.pendingSelections = context.pendingSelections.filter((id) => id !== conflictAssetId);
+                    const idRemap = context.idRemap || {};
+
+                    context.pendingSelections = context.pendingSelections.filter(
+                        (id) => this.remapMoveConflictAssetId(id, idRemap) !== conflictAssetId,
+                    );
                 }
 
                 if (nextStrategy && nextStrategy !== 'cancel' && conflictAssetId) {
-                    const resolutionResult = await this.runMoveConflictAction(context, [conflictAssetId], nextStrategy);
+                    const resolutionResult = await this.runMoveConflictAction(
+                        context,
+                        [this.remapMoveConflictAssetId(conflictAssetId, context.idRemap || {})],
+                        nextStrategy,
+                    );
 
                     if (resolutionResult.success === false) {
                         this.moveConflictPolicy = null;
@@ -1099,6 +1123,15 @@ export default {
                     return;
                 }
 
+                if (
+                    response.completed_moves &&
+                    typeof response.completed_moves === 'object' &&
+                    !Array.isArray(response.completed_moves) &&
+                    Object.keys(response.completed_moves).length
+                ) {
+                    context.idRemap = { ...context.idRemap, ...response.completed_moves };
+                }
+
                 context.conflict = response.conflict;
                 this.moveConflictMessage = response.message;
 
@@ -1122,7 +1155,14 @@ export default {
         },
 
         async runMoveConflictAction(context, selections, strategy = null) {
-            const selectedAssetIds = Array.from(new Set((selections || []).filter(Boolean)));
+            const idRemap = context.idRemap || {};
+            const selectedAssetIds = Array.from(
+                new Set(
+                    (selections || [])
+                        .filter(Boolean)
+                        .map((id) => this.remapMoveConflictAssetId(id, idRemap)),
+                ),
+            );
 
             if (selectedAssetIds.length === 0) {
                 return {

@@ -124,6 +124,7 @@ export default {
                                 selections,
                                 message: data.message,
                                 conflict: data.conflict,
+                                completedMoves: data.completed_moves,
                             });
 
                             return;
