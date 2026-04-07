@@ -137,7 +137,28 @@ const selectedOptions = computed(() => {
     }
 
     return selections.map((value) => {
-        return props.options.find((option) => getOptionValue(option) === value) ?? { label: value, value };
+        // Extract the actual value when dealing with objects
+        const valueToFind = typeof value === 'object' && value !== null 
+            ? value[props.optionValue] 
+            : value;
+            
+        const foundOption = props.options.find((option) => 
+            getOptionValue(option) === valueToFind
+        );
+        
+        if (foundOption) {
+            return foundOption;
+        }
+        
+        // If value is already a complete option object with optionLabel and optionValue as keys, use it directly
+        if (typeof value === 'object' && value !== null 
+            && props.optionLabel in value 
+            && props.optionValue in value) {
+            return value;
+        }
+        
+        // Fallback for primitive values
+        return { [props.optionLabel]: valueToFind, [props.optionValue]: valueToFind };
     });
 });
 
