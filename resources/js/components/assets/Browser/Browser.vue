@@ -1057,7 +1057,7 @@ export default {
                 return;
             }
 
-            if (this.moveConflictApplyToAll && strategy !== 'cancel') {
+            if (this.moveConflictApplyToAll) {
                 this.moveConflictPolicy = strategy;
             }
 
