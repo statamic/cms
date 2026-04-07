@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, onMounted } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import useSkeletonDelay from '@/composables/skeleton-delay.js';
@@ -11,6 +11,7 @@ const props = defineProps({
     context: { type: Object, default: () => ({}) },
     item: { required: true },
     isDirty: { type: Boolean, default: false },
+    autoLoad: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['started', 'completed']);
@@ -23,6 +24,10 @@ const actionsLoaded = ref(props.actions !== undefined);
 const loading = ref(false);
 const shouldShowSkeleton = useSkeletonDelay(loading);
 let loadActionsRequest = null;
+
+onMounted(() => {
+    if (props.autoLoad) loadActions();
+});
 
 watch(
     () => props.actions,

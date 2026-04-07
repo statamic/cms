@@ -153,24 +153,36 @@
                     variant="destructive"
                     @click="deleteTreeBranch(branch, removeBranch)"
                 />
-                <template v-if="branchTreeActions(branch).length">
-                    <DropdownSeparator />
-                    <ItemActions
-                        :url="entriesActionUrl"
-                        :actions="branchTreeActions(branch)"
-                        :item="branch.entry"
-                        v-slot="{ actions }"
-                    >
+                <ItemActions
+                    v-if="branch.entry"
+                    :url="entriesActionUrl"
+                    :context="{ view: 'tree' }"
+                    :item="branch.entry"
+                    auto-load
+                    v-slot="{ actions, shouldShowSkeleton }"
+                >
+                    <template v-if="shouldShowSkeleton">
+                        <DropdownSeparator />
+                        <div v-for="index in 3" :key="index" class="contents">
+                            <Skeleton class="m-1 size-5" />
+                            <Skeleton
+                                class="mx-2 my-1.5 h-5"
+                                :class="index === 1 ? 'w-28' : index === 2 ? 'w-36' : 'w-24'"
+                            />
+                        </div>
+                    </template>
+                    <template v-else-if="branchTreeActions(actions).length">
+                        <DropdownSeparator />
                         <DropdownItem
-                            v-for="action in actions"
+                            v-for="action in branchTreeActions(actions)"
                             :key="action.handle"
                             :text="__(action.title)"
                             :icon="action.icon"
                             :variant="action.dangerous ? 'destructive' : undefined"
                             @click="action.run()"
                         />
-                    </ItemActions>
-                </template>
+                    </template>
+                </ItemActions>
             </template>
         </page-tree>
 
@@ -208,7 +220,7 @@ import DeleteLocalizationConfirmation from '@/components/collections/DeleteLocal
 import CollectionCalendar from '@/components/entries/calendar/Calendar.vue';
 import SiteSelector from '@/components/SiteSelector.vue';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@/components/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, Skeleton, ToggleGroup, ToggleItem } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
 import Head from '@/pages/layout/Head.vue';
 import { router } from '@inertiajs/vue3';
@@ -224,6 +236,7 @@ export default {
         Dropdown,
         Header,
         Button,
+        Skeleton,
         ToggleGroup,
         ToggleItem,
         PageTree: defineAsyncComponent(() => import('@/components/structures/PageTree.vue')),
@@ -415,8 +428,8 @@ export default {
             return branch.redirect != null;
         },
 
-        branchTreeActions(branch) {
-            return (branch.actions || []).filter((action) => action.handle !== 'delete');
+        branchTreeActions(actions) {
+            return (actions || []).filter((action) => action.handle !== 'delete');
         },
 
         createEntry(blueprint, parent) {

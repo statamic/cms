@@ -3,7 +3,6 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav;
-use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
 use Statamic\Facades\User;
@@ -94,14 +93,6 @@ class TreeBuilder
             $referenceExists = $page->referenceExists();
             $entry = $referenceExists ? $page->entry() : null;
 
-            $actionContext = ['view' => 'tree'];
-            if ($collection) {
-                $actionContext['collection'] = $collection->handle();
-            }
-            if ($entry) {
-                $actionContext['site'] = $entry->locale();
-            }
-
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
@@ -117,7 +108,6 @@ class TreeBuilder
                 'slug' => $page->slug(),
                 'status' => $referenceExists ? $page->status() : null,
                 'redirect' => $entry ? $entry->get('redirect') : null,
-                'actions' => $entry ? Action::for($entry, $actionContext) : [],
                 'collection' => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),
