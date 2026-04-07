@@ -245,6 +245,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], [
             \Statamic\Auth\File\User::class,
+            \Statamic\Auth\File\Passkey::class,
+            \Statamic\Auth\Eloquent\Passkey::class,
             \Statamic\Assets\Asset::class,
             \Statamic\Assets\AssetContainer::class,
             \Statamic\Entries\Collection::class,
