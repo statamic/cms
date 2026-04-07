@@ -143,6 +143,7 @@
                                 :columns="columns"
                                 :visible-columns="visibleColumns"
                                 :is-searching="isSearching"
+                                :selected-assets="selectedAssets"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -485,7 +486,6 @@ export default {
                 folders: this.folders,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
-                selectedAssets: this.selectedAssets,
                 creatingFolder: this.creatingFolder,
                 creatingFolderError: this.creatingFolderError,
             };

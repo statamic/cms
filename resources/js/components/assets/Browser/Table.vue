@@ -162,7 +162,6 @@ export default {
         columns: Array,
         visibleColumns: Array,
         isSearching: Boolean,
-        selectedAssets: Array,
     },
 
     watch: {
