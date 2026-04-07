@@ -63,9 +63,6 @@ class MoveAsset extends Action
                 $existingDescriptor = $sourceLastModified >= $destinationLastModified
                     ? __('statamic::messages.asset_conflict_an_older')
                     : __('statamic::messages.asset_conflict_a_newer');
-                $existingAge = $sourceLastModified >= $destinationLastModified
-                    ? __('statamic::messages.asset_conflict_older')
-                    : __('statamic::messages.asset_conflict_newer');
 
                 if ($strategy === 'overwrite') {
                     $assetForGlideCacheClear = $existingAsset ?? $asset->container()->makeAsset($destinationPath);
@@ -98,7 +95,6 @@ class MoveAsset extends Action
                         'filename' => $asset->basename(),
                         'existing_descriptor' => $existingDescriptor,
                         'moving_age' => $movingAge,
-                        'existing_age' => $existingAge,
                     ]),
                     [
                         'conflict' => [
