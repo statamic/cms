@@ -180,7 +180,7 @@ class WebAuthnTest extends TestCase
 
         $credentials = ['id' => 'credential-id', 'rawId' => 'raw-id', 'response' => [], 'type' => 'public-key'];
         $challenge = random_bytes(32);
-        session()->put('webauthn.challenge', $challenge);
+        session()->put('webauthn.challenge', base64_encode($challenge));
 
         // Create real objects
         $publicKeyCredential = new PublicKeyCredential(
@@ -219,6 +219,7 @@ class WebAuthnTest extends TestCase
         $this->mockAssertionValidator
             ->shouldReceive('check')
             ->once()
+            ->withArgs(fn ($credential, $response, $options) => $options->challenge === $challenge)
             ->andReturn($updatedCredentialSource);
 
         $result = $this->webauthn->validateAssertion($mockUser, $credentials);
@@ -234,7 +235,6 @@ class WebAuthnTest extends TestCase
         $user->save();
 
         $credentials = ['id' => 'credential-id', 'rawId' => 'raw-id', 'response' => [], 'type' => 'public-key'];
-        session()->put('webauthn.challenge', random_bytes(32));
 
         $publicKeyCredential = new PublicKeyCredential(
             'public-key',
