@@ -13,7 +13,11 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Auth\File\Passkey;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
+use Symfony\Component\Uid\Uuid;
+use Webauthn\PublicKeyCredentialSource;
+use Webauthn\TrustPath\EmptyTrustPath;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -133,14 +137,92 @@ class ResetPasswordTest extends TestCase
         Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
     }
 
+    #[Test]
+    #[DefineEnvironment('disallowPasswordLoginWithPasskey')]
+    #[DataProvider('resetPasswordProvider')]
+    public function it_does_not_log_in_when_user_has_passkeys_and_password_login_is_disallowed(string $type)
+    {
+        $user = $this->userWithPasskey();
+        $token = $this->broker($type)->createToken($user);
+
+        $this
+            ->assertGuest()
+            ->post($this->resetUrl($type), [
+                'token' => $token,
+                'email' => $user->email(),
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+            ])
+            ->assertRedirect($this->loginUrl($type));
+
+        $this->assertGuest();
+        $this->assertTrue(Hash::check('newpassword', $user->fresh()->password()));
+    }
+
+    #[Test]
+    #[DataProvider('resetPasswordProvider')]
+    public function it_logs_in_when_user_has_passkeys_and_password_login_is_allowed(string $type)
+    {
+        $user = $this->userWithPasskey();
+        $token = $this->broker($type)->createToken($user);
+
+        $this
+            ->assertGuest()
+            ->post($this->resetUrl($type), [
+                'token' => $token,
+                'email' => $user->email(),
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+            ])
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertTrue(Hash::check('newpassword', $user->fresh()->password()));
+    }
+
     protected function disableTwoFactor($app)
     {
         $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 
+    protected function disallowPasswordLoginWithPasskey($app)
+    {
+        $app['config']->set('statamic.webauthn.allow_password_login_with_passkey', false);
+    }
+
+    private function loginUrl(string $type): string
+    {
+        return match ($type) {
+            'cp' => cp_route('login'),
+            'web' => route('statamic.site'),
+        };
+    }
+
     private function user()
     {
         return tap(User::make()->makeSuper()->email('david@hasselhoff.com')->password('secret'))->save();
+    }
+
+    private function userWithPasskey()
+    {
+        $user = $this->user();
+
+        $credential = PublicKeyCredentialSource::create(
+            publicKeyCredentialId: 'test-credential-id',
+            type: 'public-key',
+            transports: ['usb'],
+            attestationType: 'none',
+            trustPath: new EmptyTrustPath(),
+            aaguid: Uuid::fromString('00000000-0000-0000-0000-000000000000'),
+            credentialPublicKey: 'test-public-key',
+            userHandle: $user->id(),
+            counter: 0
+        );
+
+        $passkey = (new Passkey)->setUser($user)->setName('Test Key')->setCredential($credential);
+        $passkey->save();
+
+        return $user->fresh();
     }
 
     private function userWithTwoFactorEnabled()

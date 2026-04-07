@@ -147,6 +147,12 @@ trait ResetsPasswords
             return;
         }
 
+        if ($statamicUser
+            && ! config('statamic.webauthn.allow_password_login_with_passkey', true)
+            && $statamicUser->passkeys()->isNotEmpty()) {
+            return;
+        }
+
         $this->guard()->login($user);
     }
 
@@ -180,8 +186,17 @@ trait ResetsPasswords
             return new JsonResponse(['message' => trans($response)], 200);
         }
 
-        return redirect($this->redirectPath())
+        $redirect = $this->guard()->check()
+            ? $this->redirectPath()
+            : $this->loginPath();
+
+        return redirect($redirect)
             ->with('status', trans($response));
+    }
+
+    protected function loginPath(): string
+    {
+        return route('statamic.site');
     }
 
     protected function twoFactorChallengeRedirect(): string
