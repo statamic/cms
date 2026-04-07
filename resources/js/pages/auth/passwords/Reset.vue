@@ -30,9 +30,6 @@ const submit = () => {
             processing.value = true;
             errors.value = {};
         },
-        onSuccess: (e) => {
-            return window.location.href = e.url;
-        },
         onError: () => processing.value = false
     });
 }

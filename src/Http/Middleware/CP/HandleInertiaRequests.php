@@ -75,6 +75,10 @@ class HandleInertiaRequests extends Middleware
             $this->toasts->success($message);
         }
 
+        if ($message = $session->get('status')) {
+            $this->toasts->success($message);
+        }
+
         if ($message = $session->get('error')) {
             $this->toasts->error($message);
         }
