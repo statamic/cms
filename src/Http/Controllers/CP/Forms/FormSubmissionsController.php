@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Inertia\Inertia;
-use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
 use Statamic\Query\OrderBy;
@@ -12,7 +12,7 @@ use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class FormSubmissionsController extends CpController
 {
-    use QueriesFilters;
+    use QueriesFilters, QueriesFormSubmissionSearch;
 
     public function index(FilteredRequest $request, $form)
     {
@@ -49,19 +49,7 @@ class FormSubmissionsController extends CpController
     {
         $query = $form->querySubmissions();
 
-        if ($search = request('search')) {
-            $query->where(function ($query) use ($form, $search) {
-                $query->where('date', 'like', '%'.$search.'%');
-
-                $form->blueprint()->fields()->all()
-                    ->filter(function (Field $field): bool {
-                        return in_array($field->type(), ['text', 'textarea', 'integer']);
-                    })
-                    ->each(function (Field $field) use ($query, $search): void {
-                        $query->orWhere($field->handle(), 'like', '%'.$search.'%');
-                    });
-            });
-        }
+        $this->applySubmissionSearch($query, $form, request('search'));
 
         return $query;
     }

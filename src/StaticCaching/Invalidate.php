@@ -8,6 +8,7 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeDeleted;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
@@ -27,6 +28,7 @@ use Statamic\Facades\Form;
 class Invalidate implements ShouldQueue
 {
     protected $invalidator;
+    protected $cacher;
 
     protected $events = [
         AssetSaved::class => 'refreshAsset',
@@ -42,6 +44,7 @@ class Invalidate implements ShouldQueue
         NavDeleted::class => 'invalidateNav',
         FormSaved::class => 'refreshForm',
         FormDeleted::class => 'invalidateForm',
+        CollectionTreeEntriesMovedOrRemoved::class => 'invalidateMovedOrRemovedEntries',
         CollectionTreeSaved::class => 'invalidateCollectionByTree',
         CollectionTreeDeleted::class => 'invalidateCollectionByTree',
         NavTreeSaved::class => 'refreshNavByTree',
@@ -50,9 +53,10 @@ class Invalidate implements ShouldQueue
         BlueprintDeleted::class => 'invalidateByBlueprint',
     ];
 
-    public function __construct(Invalidator $invalidator)
+    public function __construct(Invalidator $invalidator, Cacher $cacher)
     {
         $this->invalidator = $invalidator;
+        $this->cacher = $cacher;
     }
 
     public function subscribe($dispatcher)
@@ -120,6 +124,13 @@ class Invalidate implements ShouldQueue
     public function refreshForm($event)
     {
         $this->invalidator->refresh($event->form);
+    }
+
+    public function invalidateMovedOrRemovedEntries($event)
+    {
+        if ($urls = array_merge($event->removedUrls, $event->movedUrls)) {
+            $this->cacher->invalidateUrls($urls);
+        }
     }
 
     public function invalidateCollectionByTree($event)

@@ -1,5 +1,26 @@
 # Release Notes
 
+## 6.10.0 (2026-04-02)
+
+### What's new
+- Default values can be computed [#14279](https://github.com/statamic/cms/issues/14279) by @edalzell
+- Ability to add to the filename replacements list [#14316](https://github.com/statamic/cms/issues/14316) by @edalzell
+
+### What's fixed
+- Harden OrderBys [#14421](https://github.com/statamic/cms/issues/14421) by @jasonvarga
+- Serialize nocache regions before storing in cache [#14422](https://github.com/statamic/cms/issues/14422) by @jasonvarga
+- Fix invalid HTML `lang` attribute [#14427](https://github.com/statamic/cms/issues/14427) by @duncanmcclean
+- Add serializable classes to allowlist [#14416](https://github.com/statamic/cms/issues/14416) by @duncanmcclean
+- Filter invalid UTF-8 locales from dictionary [#14426](https://github.com/statamic/cms/issues/14426) by @duncanmcclean
+- Fallback to option key in listings when label is missing [#14429](https://github.com/statamic/cms/issues/14429) by @duncanmcclean
+- Ensure moved/removed entries are statically invalidated [#14386](https://github.com/statamic/cms/issues/14386) by @ryanmitchell
+- Catch axios errors in blueprint builder [#14428](https://github.com/statamic/cms/issues/14428) by @duncanmcclean
+- Improve error handling when requiring starter kits [#14411](https://github.com/statamic/cms/issues/14411) by @duncanmcclean
+- Ensure empty addon settings get default blueprint values [#14384](https://github.com/statamic/cms/issues/14384) by @ryanmitchell
+- Bump lodash-es from 4.17.23 to 4.18.1 [#14425](https://github.com/statamic/cms/issues/14425) by @dependabot
+
+
+
 ## 6.9.0 (2026-04-01)
 
 ### What's new
