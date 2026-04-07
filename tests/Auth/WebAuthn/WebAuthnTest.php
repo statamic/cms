@@ -56,7 +56,7 @@ class WebAuthnTest extends TestCase
 
         $this->assertInstanceOf(PublicKeyCredentialRequestOptions::class, $options);
         $this->assertNotNull(session('webauthn.challenge'));
-        $this->assertEquals(32, strlen(session('webauthn.challenge')));
+        $this->assertEquals(32, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertEquals(PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED, $options->userVerification);
     }
 
@@ -84,11 +84,11 @@ class WebAuthnTest extends TestCase
         // Challenge should be stored in session for later verification
         $storedChallenge = session('webauthn.challenge');
         $this->assertNotNull($storedChallenge);
-        $this->assertEquals(32, strlen($storedChallenge));
+        $this->assertEquals(32, strlen(base64_decode($storedChallenge)));
 
         // The challenge in the options should be the same binary value
         // (base64url encoding happens during serialization, not in the object)
-        $this->assertEquals($storedChallenge, $options->challenge);
+        $this->assertEquals(base64_decode($storedChallenge), $options->challenge);
     }
 
     #[Test]
