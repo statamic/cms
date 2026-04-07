@@ -1095,9 +1095,14 @@ export default {
                     }
 
                     if (nextStrategy === 'overwrite') {
-                        const originalPreview = context.conflict?.existing?.preview;
-                        const originalThumbnail = context.conflict?.existing?.thumbnail;
-                        Statamic.$callbacks.call('bustAndReloadImageCaches', [originalPreview, originalThumbnail]);
+                        const urls = [
+                            context.conflict?.existing?.preview,
+                            context.conflict?.existing?.thumbnail,
+                        ].filter(Boolean);
+
+                        if (urls.length) {
+                            Statamic.$callbacks.call('bustAndReloadImageCaches', urls);
+                        }
                     }
                 }
 
