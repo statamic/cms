@@ -75,6 +75,7 @@ class HandleInertiaRequests extends Middleware
             $this->toasts->success($message);
         }
 
+        // Laravel's built-in auth flows (password reset, etc.) flash to 'status'.
         if ($message = $session->get('status')) {
             $this->toasts->success($message);
         }
