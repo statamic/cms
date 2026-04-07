@@ -239,11 +239,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $existing = $this->app['config']->get('cache.serializable_classes');
 
-        if (! is_array($existing)) {
+        if ($existing === null || $existing === true) {
             return;
         }
 
-        $this->app['config']->set('cache.serializable_classes', array_merge($existing, [
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], [
             \Statamic\Auth\File\User::class,
             \Statamic\Assets\Asset::class,
             \Statamic\Assets\AssetContainer::class,

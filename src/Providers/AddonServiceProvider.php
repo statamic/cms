@@ -721,11 +721,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $existing = $this->app['config']->get('cache.serializable_classes');
 
-        if (! is_array($existing)) {
+        if ($existing === null || $existing === true) {
             return;
         }
 
-        $this->app['config']->set('cache.serializable_classes', array_merge($existing, $classes));
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], $classes));
     }
 
     protected function schedule(Schedule $schedule)
