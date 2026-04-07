@@ -660,8 +660,8 @@ export default {
         },
 
         actionFailed(response = {}) {
-            this.loading = false;
             this.$toast.error(response.message || __('Action failed'));
+            this.$refs.listing.refresh();
         },
 
         assetSaved() {
