@@ -10,17 +10,17 @@ use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\File\Passkey;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
-use Statamic\Auth\File\Passkey;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
-use Symfony\Component\Uid\Uuid;
-use Webauthn\PublicKeyCredentialSource;
-use Webauthn\TrustPath\EmptyTrustPath;
 use Statamic\Facades\User;
+use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Webauthn\PublicKeyCredentialSource;
+use Webauthn\TrustPath\EmptyTrustPath;
 
 class ResetPasswordTest extends TestCase
 {
