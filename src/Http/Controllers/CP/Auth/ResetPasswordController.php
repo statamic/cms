@@ -29,4 +29,9 @@ class ResetPasswordController extends Controller
     {
         return route('statamic.cp.password.reset.action');
     }
+
+    protected function twoFactorChallengeRedirect(): string
+    {
+        return cp_route('two-factor-challenge');
+    }
 }

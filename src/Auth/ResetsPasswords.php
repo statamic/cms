@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRules;
 use Illuminate\Validation\ValidationException;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 
 /**
  * A copy of Illuminate\Auth\ResetsPasswords.
@@ -131,6 +134,19 @@ trait ResetsPasswords
 
         event(new PasswordReset($user));
 
+        $statamicUser = User::fromUser($user);
+
+        if ($statamicUser && TwoFactor::enabled() && $statamicUser->hasEnabledTwoFactorAuthentication()) {
+            request()->session()->put([
+                'login.id' => $statamicUser->getKey(),
+                'login.remember' => false,
+            ]);
+
+            TwoFactorAuthenticationChallenged::dispatch($statamicUser);
+
+            return;
+        }
+
         $this->guard()->login($user);
     }
 
@@ -154,12 +170,23 @@ trait ResetsPasswords
      */
     protected function sendResetResponse(Request $request, $response)
     {
+        if ($request->session()->has('login.id')) {
+            return $request->wantsJson()
+                ? new JsonResponse(['two_factor' => true], 200)
+                : redirect($this->twoFactorChallengeRedirect());
+        }
+
         if ($request->wantsJson()) {
             return new JsonResponse(['message' => trans($response)], 200);
         }
 
         return redirect($this->redirectPath())
             ->with('status', trans($response));
+    }
+
+    protected function twoFactorChallengeRedirect(): string
+    {
+        return route('statamic.two-factor-challenge');
     }
 
     /**
