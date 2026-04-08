@@ -213,4 +213,36 @@ class MoveAssetTest extends TestCase
         $this->assertEquals('existing', Storage::disk('test')->get('target/logo.svg'));
         $this->assertEquals('new', Storage::disk('test')->get('target/logo-1712000000.svg'));
     }
+
+    #[Test]
+    public function it_does_not_add_index_suffix_to_first_conflicting_asset_in_batch_with_non_conflicting_assets_before_it(): void
+    {
+        Carbon::setTestNow(Carbon::createFromTimestamp(1712000000, config('app.timezone')));
+
+        $this->createAsset('source/a.svg', 'a-new');
+        $this->createAsset('source/logo.svg', 'new');
+        $this->createAsset('target/logo.svg', 'existing');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->post(cp_route('assets.actions.run'), [
+                'action' => 'move_asset',
+                'context' => ['container' => 'test_container', 'conflict' => 'timestamp'],
+                'selections' => ['test_container::source/a.svg', 'test_container::source/logo.svg'],
+                'values' => ['folder' => 'target'],
+            ])
+            ->assertOk()
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        Storage::disk('test')->assertMissing('source/a.svg');
+        Storage::disk('test')->assertMissing('source/logo.svg');
+        Storage::disk('test')->assertExists('target/a.svg');
+        Storage::disk('test')->assertExists('target/logo.svg');
+        Storage::disk('test')->assertExists('target/logo-1712000000.svg');
+        $this->assertEquals('a-new', Storage::disk('test')->get('target/a.svg'));
+        $this->assertEquals('existing', Storage::disk('test')->get('target/logo.svg'));
+        $this->assertEquals('new', Storage::disk('test')->get('target/logo-1712000000.svg'));
+    }
 }

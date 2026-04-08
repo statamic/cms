@@ -46,6 +46,7 @@ class MoveAsset extends Action
         $folder = $values['folder'];
         $strategy = $this->context['conflict'] ?? 'cancel';
         $timestamp = now()->timestamp;
+        $timestampCount = 0;
         $ids = [];
         $completedMoves = [];
 
@@ -78,10 +79,11 @@ class MoveAsset extends Action
                 if ($strategy === 'timestamp') {
                     $filename = $asset->filename().'-'.$timestamp;
 
-                    if ($index > 0) {
-                        $filename .= '-'.$index;
+                    if ($timestampCount > 0) {
+                        $filename .= '-'.$timestampCount;
                     }
 
+                    $timestampCount++;
                     $oldId = $asset->id();
                     $newId = $asset->moveUnique($folder, $filename)->id();
                     $completedMoves[$oldId] = $newId;
