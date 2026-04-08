@@ -311,7 +311,7 @@ function onPaste(e) {
 
     const pastedValue = e.clipboardData.getData('text');
 
-    updateModelValue([...props.modelValue, ...pastedValue.split(',').map((v) => v.trim())]);
+    updateModelValue([...(props.modelValue ?? []), ...pastedValue.split(',').map((v) => v.trim())]);
 }
 
 function pushTaggableOption(e) {
