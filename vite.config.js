@@ -35,6 +35,7 @@ export default defineConfig(({ mode, command }) => {
             }),
             vue(),
             svgLoader(),
+            visualizer({ filename: 'bundle-stats.html' }),
         ],
         css: {
             devSourcemap: true,
@@ -45,11 +46,6 @@ export default defineConfig(({ mode, command }) => {
             },
         },
         build: {
-            rollupOptions: {
-                output: {
-                    plugins: [visualizer({ filename: 'bundle-stats.html' })]
-                },
-            },
             minify: isProdBuild
         },
         test: {
