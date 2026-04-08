@@ -1,5 +1,30 @@
 # Release Notes
 
+## 6.11.0 (2026-04-07)
+
+### What's new
+- Add support for public properties to PathDataManager [#11697](https://github.com/statamic/cms/issues/11697) by @marcorieser
+- Add ability to filter submission exports [#14432](https://github.com/statamic/cms/issues/14432) by @jasonvarga
+- Add elevated session guards to AssignGroups and AssignRoles actions [#14450](https://github.com/statamic/cms/issues/14450) by @jasonvarga
+
+### What's fixed
+- Fix Stache index re-entrancy causing null URIs on cold stache [#14181](https://github.com/statamic/cms/issues/14181) by @o1y
+- Fix form submission types [#14430](https://github.com/statamic/cms/issues/14430) by @daun
+- Support decimal values in Range fieldtype [#13096](https://github.com/statamic/cms/issues/13096) by @hastinbe
+- Add `link` tag to allowed Antlers tags [#14438](https://github.com/statamic/cms/issues/14438) by @edalzell
+- Add `@default` support to Antlers content allowlists [#14440](https://github.com/statamic/cms/issues/14440) by @jasonvarga
+- Centralize SVG sanitization and sanitize CSS in style tags [#14442](https://github.com/statamic/cms/issues/14442) by @jasonvarga
+- Fix serializable_classes issues [#14443](https://github.com/statamic/cms/issues/14443) by @jasonvarga
+- Fix addon settings always showing as migratable [#14444](https://github.com/statamic/cms/issues/14444) by @duncanmcclean
+- Fix creating passkeys with JSON session serialization [#14448](https://github.com/statamic/cms/issues/14448) by @duncanmcclean
+- Stop auto-logging in users after password reset [#14454](https://github.com/statamic/cms/issues/14454) by @jasonvarga
+- Fix sync/desync on localizable nested fields [#14335](https://github.com/statamic/cms/issues/14335) by @duncanmcclean
+- French translations [#14431](https://github.com/statamic/cms/issues/14431) by @ebeauchamps
+- Bump defu from 6.1.4 to 6.1.6 [#14434](https://github.com/statamic/cms/issues/14434) by @dependabot
+- Bump vite from 7.1.12 to 7.3.2 [#14441](https://github.com/statamic/cms/issues/14441) by @dependabot
+
+
+
 ## 6.10.0 (2026-04-02)
 
 ### What's new
