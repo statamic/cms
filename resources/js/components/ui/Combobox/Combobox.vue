@@ -255,7 +255,7 @@ function clear() {
     emit('update:modelValue', null);
 }
 
-function select(option) {
+function select() {
 	dropdownOpen.value = !shouldCloseOnSelect.value;
 	if (shouldCloseOnSelect.value) triggerRef.value.$el.focus();
 }
