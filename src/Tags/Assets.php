@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Assets\Asset as AssetModel;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Asset;
@@ -170,6 +171,10 @@ class Assets extends Tags
         }
 
         return $value->filter(function ($value) use ($type) {
+            if ($type === 'audio') {
+                return $value->isAudio();
+            }
+
             if ($type === 'image') {
                 return $value->isImage();
             }
@@ -267,9 +272,10 @@ class Assets extends Tags
         }
 
         $extensions = match ($type) {
-            'image' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'],
+            'audio' => AssetModel::AUDIO_EXTENSIONS,
+            'image' => AssetModel::IMAGE_EXTENSIONS,
             'svg' => ['svg'],
-            'video' => ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'],
+            'video' => AssetModel::VIDEO_EXTENSIONS,
             default => [],
         };
 

@@ -29,8 +29,9 @@ class AssetsTest extends TestCase
         Storage::disk('test')->put('b.jpg', UploadedFile::fake()->image('b.jpg')->getContent());
         Storage::disk('test')->put('c.mp4', UploadedFile::fake()->create('c.mp4')->getContent());
         Storage::disk('test')->put('d.svg', '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
-        Storage::disk('test')->put('nested/private/e.jpg', UploadedFile::fake()->image('e.jpg')->getContent());
-        Storage::disk('test')->put('nested/public/f.jpg', UploadedFile::fake()->image('f.jpg')->getContent());
+        Storage::disk('test')->put('e.mp3', UploadedFile::fake()->create('e.mp3')->getContent());
+        Storage::disk('test')->put('nested/private/f.jpg', UploadedFile::fake()->image('f.jpg')->getContent());
+        Storage::disk('test')->put('nested/public/g.jpg', UploadedFile::fake()->image('g.jpg')->getContent());
 
         tap(AssetContainer::make('test')->disk('test'))->save();
 
@@ -38,8 +39,9 @@ class AssetsTest extends TestCase
         Asset::find('test::b.jpg')->data(['title' => 'Beta'])->save();
         Asset::find('test::c.mp4')->data(['title' => 'Gamma'])->save();
         Asset::find('test::d.svg')->data(['title' => 'Delta'])->save();
-        Asset::find('test::nested/private/e.jpg')->data(['title' => 'Epsilon'])->save();
-        Asset::find('test::nested/public/f.jpg')->data(['title' => 'Zeta'])->save();
+        Asset::find('test::e.mp3')->data(['title' => 'Epsilon'])->save();
+        Asset::find('test::nested/private/f.jpg')->data(['title' => 'Zeta'])->save();
+        Asset::find('test::nested/public/g.jpg')->data(['title' => 'Eta'])->save();
     }
 
     #[Test]
@@ -53,7 +55,7 @@ class AssetsTest extends TestCase
             'filename:starts_with' => 'b',
         ]));
 
-        $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([
+        $this->assertSame(['a', 'b', 'f', 'g'], $this->getFilenames([
             'extension:is' => 'jpg',
             'sort' => 'filename:asc',
         ]));
@@ -77,7 +79,7 @@ class AssetsTest extends TestCase
     {
         app('statamic.scopes')[AssetsTagJpgScope::handle()] = AssetsTagJpgScope::class;
 
-        $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([
+        $this->assertSame(['a', 'b', 'f', 'g'], $this->getFilenames([
             'query_scope' => AssetsTagJpgScope::handle(),
             'sort' => 'filename:asc',
         ]));
@@ -86,7 +88,12 @@ class AssetsTest extends TestCase
     #[Test]
     public function it_filters_assets_by_type()
     {
-        $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([
+        $this->assertSame(['e'], $this->getFilenames([
+            'type' => 'audio',
+            'sort' => 'filename:asc',
+        ]));
+
+        $this->assertSame(['a', 'b', 'f', 'g'], $this->getFilenames([
             'type' => 'image',
             'sort' => 'filename:asc',
         ]));
@@ -177,7 +184,7 @@ class AssetsTest extends TestCase
     #[Test]
     public function it_keeps_legacy_filtering_params_working()
     {
-        $this->assertSame(['f'], $this->getFilenames([
+        $this->assertSame(['g'], $this->getFilenames([
             'folder' => 'nested',
             'recursive' => true,
             'sort' => 'filename:asc',
@@ -185,7 +192,7 @@ class AssetsTest extends TestCase
             'limit' => 1,
         ]));
 
-        $this->assertSame(['a', 'b', 'c', 'd', 'f'], $this->getFilenames([
+        $this->assertSame(['a', 'b', 'c', 'd', 'e', 'g'], $this->getFilenames([
             'not_in' => '/?nested/private',
             'sort' => 'filename:asc',
         ]));
