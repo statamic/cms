@@ -197,13 +197,7 @@ class Assets extends Tags
 
         $regex = '#^('.$not_in.')#';
 
-        return $assets->reject(function ($asset) use ($regex) {
-            $path = method_exists($asset, 'path')
-                ? $asset->path()
-                : (string) $asset;
-
-            return preg_match($regex, $path);
-        });
+        return $assets->reject(fn ($asset) => preg_match($regex, $asset->folder()));
     }
 
     /**
