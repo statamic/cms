@@ -53,6 +53,8 @@ class FormSubmissionStoreTest extends TestCase
         );
 
         $this->assertInstanceOf(Submission::class, $item);
+        $this->assertEquals('Test User', $item->get('name'));
+        $this->assertStringContainsString('test message with bad bytes:', $item->get('message'));
         $this->assertTrue(mb_check_encoding($item->get('message'), 'UTF-8'));
         $this->assertNotNull(json_encode($item->data()->all()));
     }
