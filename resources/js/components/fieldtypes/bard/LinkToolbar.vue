@@ -86,7 +86,7 @@
                 type="text"
                 ref="input"
                 v-model="appends"
-                prepend="Append"
+                :prepend="__('Append')"
                 :placeholder="__('?query=params#anchor')"
             />
 
@@ -365,7 +365,7 @@ export default {
         applyAttrs(attrs) {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
             this.appends = this.getAppendsForUrl(attrs.href);
-            this.url = { [this.linkType]: attrs.href?.replace(this.appends, '' ) };
+            this.url = { [this.linkType]: this.appends ? attrs.href?.replace(this.appends, '') : attrs.href };
             this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
@@ -515,7 +515,7 @@ export default {
                 return null;
             }
 
-            return urlString.replace(urlString.split(/[?#]/)[0], '');
+            return urlString.replace(urlString.split(/[?#]/)[0], '') || null;
         },
 
         parseDataUrl(url) {
@@ -526,7 +526,7 @@ export default {
             const appends = this.getAppendsForUrl(url);
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
-            const matches = url.replace(appends, '').match(regex);
+            const matches = (appends ? url.replace(appends, '') : url).match(regex);
             if (!matches) {
                 return {};
             }
