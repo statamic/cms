@@ -24,7 +24,7 @@ import { SortableList } from '@/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
-	/** When `true`, the dropdown will expand to fit longer option labels. */
+	/** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
 	adaptiveWidth: { type: Boolean, default: false },
 	/** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
 	align: { type: String, default: 'start' },
