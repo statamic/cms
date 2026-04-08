@@ -400,7 +400,7 @@ defineExpose({
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden cursor-pointer"
                                 :class="{
-									'placeholder-gray-900! dark:placeholder-text-gray-300!': selectedOption && !multiple && !dropdownOpen
+									'placeholder-gray-900! dark:placeholder-gray-300!': selectedOption && !multiple && !dropdownOpen
                                 }"
                                 type="search"
                                 autocomplete="off"
