@@ -236,13 +236,7 @@ export default class Passkeys {
      * @private
      */
     _handleError(e, onError) {
-        if (e.response && e.response.data) {
-            this._error = e.response.data.message;
-        } else if (e.message) {
-            this._error = e.message;
-        } else {
-            this._error = 'Something went wrong';
-        }
+        this._error = e.message || 'Something went wrong';
 
         if (onError) {
             onError({ message: this._error, originalError: e });
