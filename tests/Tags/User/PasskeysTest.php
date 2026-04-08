@@ -72,25 +72,6 @@ class PasskeysTest extends TestCase
     }
 
     #[Test]
-    public function it_includes_delete_url()
-    {
-        $passkey = Mockery::mock(Passkey::class);
-        $passkey->shouldReceive('id')->andReturn('passkey-123');
-        $passkey->shouldReceive('name')->andReturn('Test');
-        $passkey->shouldReceive('lastLogin')->andReturn(null);
-
-        $user = Mockery::mock(User::make()->email('test@example.com'))->makePartial();
-        $user->shouldReceive('passkeys')->andReturn(collect(['passkey-123' => $passkey]));
-        $user->save();
-
-        $this->actingAs($user);
-
-        $output = $this->tag('{{ user:passkeys }}{{ delete_url }}{{ /user:passkeys }}');
-
-        $this->assertStringContainsString(route('statamic.passkeys.destroy', ['id' => 'passkey-123']), $output);
-    }
-
-    #[Test]
     public function it_fetches_data_without_content()
     {
         $passkey = Mockery::mock(Passkey::class);

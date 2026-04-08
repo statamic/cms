@@ -336,7 +336,6 @@ class UserTags extends Tags
                 'id' => $passkey->id(),
                 'name' => $passkey->name(),
                 'last_login' => $passkey->lastLogin(),
-                'delete_url' => route('statamic.passkeys.destroy', ['id' => $passkey->id()]),
             ];
         })->values()->all();
 
