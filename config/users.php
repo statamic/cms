@@ -176,10 +176,23 @@ return [
     | Users may be required to reauthorize before performing certain
     | sensitive actions. This is called an elevated session. Here
     | you may configure the duration of the session in minutes.
+    | You may also disable the elevated session entirely.
     |
     */
 
     'elevated_session_duration' => 15,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Elevated Session Disabled
+    |--------------------------------------------------------------------------
+    |
+    | Here you may disable elevated sessions entirely. This can be
+    | useful when using OAuth.
+    |
+    */
+
+    'elevated_session_disabled' => false,
 
     /*
     |--------------------------------------------------------------------------
