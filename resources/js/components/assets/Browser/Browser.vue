@@ -659,11 +659,6 @@ export default {
             this.$refs.listing.refresh();
         },
 
-        actionFailed(response = {}) {
-            this.$toast.error(response.message || __('Action failed'));
-            this.$refs.listing.refresh();
-        },
-
         assetSaved() {
             this.loadAssets();
         },
@@ -1090,7 +1085,7 @@ export default {
 
                     if (resolutionResult.success === false) {
                         this.moveConflictPolicy = null;
-                        this.actionFailed(resolutionResult);
+                        this.actionCompleted(false, resolutionResult);
                         return;
                     }
 
@@ -1124,7 +1119,7 @@ export default {
 
                 if (response.conflict?.type !== 'asset_move') {
                     this.moveConflictPolicy = null;
-                    this.actionFailed(response);
+                    this.actionCompleted(false, response);
                     return;
                 }
 
@@ -1144,7 +1139,7 @@ export default {
 
                 if (!currentConflictAssetId) {
                     this.moveConflictPolicy = null;
-                    this.actionFailed(response);
+                    this.actionCompleted(false, response);
                     return;
                 }
 
