@@ -81,22 +81,6 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
-    public function it_supports_paginating_assets()
-    {
-        $results = $this->runTag([
-            'sort' => 'filename:asc',
-            'paginate' => 2,
-        ]);
-
-        $this->assertIsArray($results);
-        $this->assertArrayHasKey('results', $results);
-        $this->assertArrayHasKey('paginate', $results);
-        $this->assertCount(2, $results['results']);
-        $this->assertSame(['a', 'b'], collect($results['results'])->map->filename()->all());
-        $this->assertSame(6, $results['paginate']['total_items']);
-    }
-
-    #[Test]
     public function it_filters_assets_by_type()
     {
         $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([

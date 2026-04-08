@@ -2,7 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\Log;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Query\Builder;
@@ -15,9 +14,7 @@ use Statamic\Support\Arr;
 
 class Assets extends Tags
 {
-    use Concerns\GetsQueryResults,
-        Concerns\OutputsItems,
-        Concerns\QueriesConditions,
+    use Concerns\QueriesConditions,
         Concerns\QueriesOrderBys,
         Concerns\QueriesScopes;
 
@@ -79,14 +76,13 @@ class Assets extends Tags
             return $this->outputCollection($this->assetsFromCollection($collection));
         }
 
-        $results = $this->assetsFromContainer($id, $path);
-        $results = $this->applyPostQueryFilters($results);
+        $this->assets = $this->assetsFromContainer($id, $path);
 
-        if ($results instanceof \Illuminate\Support\Collection && $results->isEmpty()) {
+        if ($this->assets->isEmpty()) {
             return $this->parseNoResults();
         }
 
-        return $this->output($results);
+        return $this->assets;
     }
 
     protected function assetsFromContainer($id, $path)
@@ -115,7 +111,21 @@ class Assets extends Tags
         $this->queryScopes($query);
         $this->queryOrderBys($query);
 
-        return $this->results($query);
+        if ($this->params->get('not_in')) {
+            $assets = $this->filterNotIn($query->get());
+
+            return $this->limitCollection($assets);
+        }
+
+        if ($limit = $this->params->int('limit')) {
+            $query->limit($limit);
+        }
+
+        if ($offset = $this->params->int('offset')) {
+            $query->offset($offset);
+        }
+
+        return $query->get();
     }
 
     protected function assetsFromCollection($collection)
@@ -211,10 +221,13 @@ class Assets extends Tags
 
     private function outputCollection($assets)
     {
-        $this->assets = $this->applyPostCollectionFilters($assets);
+        $this->assets = $this->filterNotIn($assets);
 
-        $this->sortCollection();
-        $this->limitCollection();
+        if ($sort = $this->params->get('sort')) {
+            $this->assets = $this->assets->multisort($sort);
+        }
+
+        $this->assets = $this->limitCollection($this->assets);
 
         if ($this->assets->isEmpty()) {
             return $this->parseNoResults();
@@ -223,23 +236,13 @@ class Assets extends Tags
         return $this->assets;
     }
 
-    private function sortCollection()
-    {
-        if ($sort = $this->params->get('sort')) {
-            $this->assets = $this->assets->multisort($sort);
-        }
-    }
-
-    /**
-     * Limit and offset the asset collection.
-     */
-    private function limitCollection()
+    private function limitCollection($assets)
     {
         $limit = $this->params->int('limit');
-        $limit = ($limit == 0) ? $this->assets->count() : $limit;
+        $limit = ($limit == 0) ? $assets->count() : $limit;
         $offset = $this->params->int('offset');
 
-        $this->assets = $this->assets->splice($offset, $limit);
+        return $assets->splice($offset, $limit);
     }
 
     protected function queryType($query)
@@ -280,32 +283,6 @@ class Assets extends Tags
         }
 
         $query->where('folder', $folder);
-    }
-
-    protected function applyPostQueryFilters($results)
-    {
-        if ($results instanceof AbstractPaginator) {
-            $results->setCollection($this->applyPostCollectionFilters($results->getCollection())->values());
-
-            return $results;
-        }
-
-        if ($results instanceof Chunks) {
-            return $results->map(function ($chunk) {
-                return $this->applyPostCollectionFilters($chunk)->values();
-            });
-        }
-
-        if ($results instanceof \Illuminate\Support\Collection) {
-            return $this->applyPostCollectionFilters($results);
-        }
-
-        return $results;
-    }
-
-    protected function applyPostCollectionFilters($assets)
-    {
-        return $this->filterNotIn($assets);
     }
 
     private function isAssetsFieldValue($value)
