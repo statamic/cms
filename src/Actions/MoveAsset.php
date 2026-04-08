@@ -4,6 +4,7 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Exceptions\AssetConflictException;
+use Statamic\Facades\Asset as AssetRepository;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Glide;
@@ -68,6 +69,13 @@ class MoveAsset extends Action
                 if ($strategy === 'overwrite') {
                     $assetForGlideCacheClear = $existingAsset ?? $asset->container()->makeAsset($destinationPath);
                     Glide::clearAsset($assetForGlideCacheClear);
+
+                    // Remove the pre-existing destination record before moving the source
+                    // so we never leave behind stale repository entries for this path.
+                    if ($existingAsset) {
+                        AssetRepository::delete($existingAsset);
+                    }
+
                     $oldId = $asset->id();
                     $newId = $asset->move($folder)->id();
                     $completedMoves[$oldId] = $newId;

@@ -189,6 +189,8 @@ class MoveAssetTest extends TestCase
         Storage::disk('test')->assertMissing('source/logo.svg');
         Storage::disk('test')->assertExists('target/logo.svg');
         $this->assertEquals('new', Storage::disk('test')->get('target/logo.svg'));
+        $this->assertCount(1, $this->container->assets('/', true));
+        $this->assertSame(['test_container::target/logo.svg'], $this->container->assets('/', true)->pluck('id')->values()->all());
     }
 
     #[Test]
