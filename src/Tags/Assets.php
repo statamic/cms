@@ -110,6 +110,7 @@ class Assets extends Tags
         $query = $container->queryAssets();
 
         $this->queryFolder($query);
+        $this->queryType($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -241,6 +242,24 @@ class Assets extends Tags
         $this->assets = $this->assets->splice($offset, $limit);
     }
 
+    protected function queryType($query)
+    {
+        $type = $this->params->get('type');
+
+        if (! $type) {
+            return;
+        }
+
+        $extensions = match ($type) {
+            'image' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'],
+            'svg' => ['svg'],
+            'video' => ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'],
+            default => [],
+        };
+
+        $query->whereIn('extension', $extensions);
+    }
+
     protected function queryFolder($query)
     {
         $folder = $this->params->get('folder');
@@ -286,7 +305,7 @@ class Assets extends Tags
 
     protected function applyPostCollectionFilters($assets)
     {
-        return $this->filterNotIn($this->filterByType($assets));
+        return $this->filterNotIn($assets);
     }
 
     private function isAssetsFieldValue($value)
