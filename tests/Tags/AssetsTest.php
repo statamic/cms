@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Tags\Assets;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -105,6 +108,73 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_assets_from_a_collection()
+    {
+        $this->createCollectionWithAssetFields();
+
+        tap(Entry::make()->collection('articles')->data([
+            'hero' => 'a.jpg',
+            'avatar' => 'b.jpg',
+        ]))->save();
+
+        tap(Entry::make()->collection('articles')->data([
+            'hero' => 'c.mp4',
+        ]))->save();
+
+        $this->assertSame(['a', 'b', 'c'], $this->getFilenames([
+            'collection' => 'articles',
+            'sort' => 'filename:asc',
+        ]));
+    }
+
+    #[Test]
+    public function it_gets_unique_assets_from_a_collection()
+    {
+        $this->createCollectionWithAssetFields();
+
+        tap(Entry::make()->collection('articles')->data(['hero' => 'a.jpg']))->save();
+        tap(Entry::make()->collection('articles')->data(['hero' => 'a.jpg']))->save();
+
+        $this->assertSame(['a'], $this->getFilenames([
+            'collection' => 'articles',
+        ]));
+    }
+
+    #[Test]
+    public function it_gets_assets_from_a_collection_filtered_by_type()
+    {
+        $this->createCollectionWithAssetFields();
+
+        tap(Entry::make()->collection('articles')->data([
+            'hero' => 'a.jpg',
+            'avatar' => 'c.mp4',
+        ]))->save();
+
+        $this->assertSame(['a'], $this->getFilenames([
+            'collection' => 'articles',
+            'type' => 'image',
+            'sort' => 'filename:asc',
+        ]));
+    }
+
+    #[Test]
+    public function it_gets_assets_from_a_collection_filtered_by_fields()
+    {
+        $this->createCollectionWithAssetFields();
+
+        tap(Entry::make()->collection('articles')->data([
+            'hero' => 'a.jpg',
+            'avatar' => 'b.jpg',
+        ]))->save();
+
+        $this->assertSame(['a'], $this->getFilenames([
+            'collection' => 'articles',
+            'fields' => 'hero',
+            'sort' => 'filename:asc',
+        ]));
+    }
+
+    #[Test]
     public function it_keeps_legacy_filtering_params_working()
     {
         $this->assertSame(['f'], $this->getFilenames([
@@ -121,11 +191,27 @@ class AssetsTest extends TestCase
         ]));
     }
 
+    private function createCollectionWithAssetFields()
+    {
+        tap(Collection::make('articles'))->save();
+
+        $blueprint = tap(Blueprint::make('article')->setContents([
+            'fields' => [
+                ['handle' => 'hero', 'field' => ['type' => 'assets', 'container' => 'test', 'max_files' => 1]],
+                ['handle' => 'avatar', 'field' => ['type' => 'assets', 'container' => 'test', 'max_files' => 1]],
+            ],
+        ]))->save();
+
+        Blueprint::shouldReceive('in')->with('collections/articles')->andReturn(collect([$blueprint]));
+    }
+
     private function runTag(array $params = [])
     {
         $tag = new Assets;
         $tag->setContext([]);
-        $tag->setParameters(array_merge(['container' => 'test'], $params));
+        $tag->setParameters(isset($params['collection'])
+            ? $params
+            : array_merge(['container' => 'test'], $params));
 
         return $tag->index();
     }
