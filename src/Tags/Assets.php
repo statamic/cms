@@ -2,7 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Illuminate\Support\Facades\Log;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Asset;
@@ -88,7 +87,7 @@ class Assets extends Tags
     protected function assetsFromContainer($id, $path)
     {
         if (! $id && ! $path) {
-            Log::debug('No asset container ID or path was specified.');
+            \Log::debug('No asset container ID or path was specified.');
 
             return collect();
         }
