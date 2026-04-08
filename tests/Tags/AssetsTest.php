@@ -196,6 +196,23 @@ class AssetsTest extends TestCase
             'not_in' => '/?nested/private',
             'sort' => 'filename:asc',
         ]));
+
+        $this->assertSame(['c', 'd'], $this->getFilenames([
+            'not_in' => '/?nested/private',
+            'sort' => 'filename:asc',
+            'offset' => 2,
+            'limit' => 2,
+        ]));
+    }
+
+    #[Test]
+    public function it_returns_no_results_when_query_matches_nothing()
+    {
+        $results = $this->runTag(['title:is' => 'nonexistent']);
+
+        $this->assertIsArray($results);
+        $this->assertTrue($results['no_results']);
+        $this->assertEquals(0, $results['total_results']);
     }
 
     private function createCollectionWithAssetFields()
