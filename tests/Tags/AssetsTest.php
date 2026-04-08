@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
@@ -21,19 +22,21 @@ class AssetsTest extends TestCase
 
         Storage::fake('test', ['url' => '/assets']);
 
-        Storage::disk('test')->put('a.jpg', '');
-        Storage::disk('test')->put('b.jpg', '');
-        Storage::disk('test')->put('c.mp4', '');
-        Storage::disk('test')->put('nested/private/d.jpg', '');
-        Storage::disk('test')->put('nested/public/e.jpg', '');
+        Storage::disk('test')->put('a.jpg', UploadedFile::fake()->image('a.jpg')->getContent());
+        Storage::disk('test')->put('b.jpg', UploadedFile::fake()->image('b.jpg')->getContent());
+        Storage::disk('test')->put('c.mp4', UploadedFile::fake()->create('c.mp4')->getContent());
+        Storage::disk('test')->put('d.svg', '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
+        Storage::disk('test')->put('nested/private/e.jpg', UploadedFile::fake()->image('e.jpg')->getContent());
+        Storage::disk('test')->put('nested/public/f.jpg', UploadedFile::fake()->image('f.jpg')->getContent());
 
         tap(AssetContainer::make('test')->disk('test'))->save();
 
         Asset::find('test::a.jpg')->data(['title' => 'Alpha'])->save();
         Asset::find('test::b.jpg')->data(['title' => 'Beta'])->save();
         Asset::find('test::c.mp4')->data(['title' => 'Gamma'])->save();
-        Asset::find('test::nested/private/d.jpg')->data(['title' => 'Delta'])->save();
-        Asset::find('test::nested/public/e.jpg')->data(['title' => 'Epsilon'])->save();
+        Asset::find('test::d.svg')->data(['title' => 'Delta'])->save();
+        Asset::find('test::nested/private/e.jpg')->data(['title' => 'Epsilon'])->save();
+        Asset::find('test::nested/public/f.jpg')->data(['title' => 'Zeta'])->save();
     }
 
     #[Test]
@@ -47,7 +50,7 @@ class AssetsTest extends TestCase
             'filename:starts_with' => 'b',
         ]));
 
-        $this->assertSame(['a', 'b', 'd', 'e'], $this->getFilenames([
+        $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([
             'extension:is' => 'jpg',
             'sort' => 'filename:asc',
         ]));
@@ -71,7 +74,7 @@ class AssetsTest extends TestCase
     {
         app('statamic.scopes')[AssetsTagJpgScope::handle()] = AssetsTagJpgScope::class;
 
-        $this->assertSame(['a', 'b', 'd', 'e'], $this->getFilenames([
+        $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([
             'query_scope' => AssetsTagJpgScope::handle(),
             'sort' => 'filename:asc',
         ]));
@@ -90,13 +93,37 @@ class AssetsTest extends TestCase
         $this->assertArrayHasKey('paginate', $results);
         $this->assertCount(2, $results['results']);
         $this->assertSame(['a', 'b'], collect($results['results'])->map->filename()->all());
-        $this->assertSame(5, $results['paginate']['total_items']);
+        $this->assertSame(6, $results['paginate']['total_items']);
+    }
+
+    #[Test]
+    public function it_filters_assets_by_type()
+    {
+        $this->assertSame(['a', 'b', 'e', 'f'], $this->getFilenames([
+            'type' => 'image',
+            'sort' => 'filename:asc',
+        ]));
+
+        $this->assertSame(['d'], $this->getFilenames([
+            'type' => 'svg',
+            'sort' => 'filename:asc',
+        ]));
+
+        $this->assertSame(['c'], $this->getFilenames([
+            'type' => 'video',
+            'sort' => 'filename:asc',
+        ]));
+
+        $this->assertSame([], $this->getFilenames([
+            'type' => 'invalid',
+            'sort' => 'filename:asc',
+        ]));
     }
 
     #[Test]
     public function it_keeps_legacy_filtering_params_working()
     {
-        $this->assertSame(['e'], $this->getFilenames([
+        $this->assertSame(['f'], $this->getFilenames([
             'folder' => 'nested',
             'recursive' => true,
             'sort' => 'filename:asc',
@@ -104,12 +131,7 @@ class AssetsTest extends TestCase
             'limit' => 1,
         ]));
 
-        $this->assertSame(['a', 'b', 'd', 'e'], $this->getFilenames([
-            'type' => 'image',
-            'sort' => 'filename:asc',
-        ]));
-
-        $this->assertSame(['a', 'b', 'c', 'e'], $this->getFilenames([
+        $this->assertSame(['a', 'b', 'c', 'd', 'f'], $this->getFilenames([
             'not_in' => '/?nested/private',
             'sort' => 'filename:asc',
         ]));
