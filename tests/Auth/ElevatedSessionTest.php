@@ -301,6 +301,47 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled()
+    {
+        config(['statamic.users.elevated_session_disabled' => true]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_even_if_session_expired()
+    {
+        config(['statamic.users.elevated_session_disabled' => true]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_via_json()
+    {
+        config(['statamic.users.elevated_session_disabled' => true]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->getJson('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
     public function the_session_is_elevated_upon_login()
     {
         $this
