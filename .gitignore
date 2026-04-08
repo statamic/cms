@@ -19,3 +19,5 @@ bundle-stats.html
 .claude/settings.local.json
 polyscope.json
 storybook-static
+
+.context
