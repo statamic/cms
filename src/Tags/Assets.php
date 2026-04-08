@@ -202,7 +202,8 @@ class Assets extends Tags
 
         $regex = '#^('.$not_in.')#';
 
-        return $assets->reject(fn ($asset) => preg_match($regex, $asset->folder()));
+        // Checking against path for backwards compatibility. Technically folder would be more correct.
+        return $assets->reject(fn ($asset) => preg_match($regex, $asset->path()));
     }
 
     /**

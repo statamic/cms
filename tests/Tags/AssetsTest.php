@@ -182,6 +182,24 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
+    public function it_filters_by_folder_non_recursively()
+    {
+        $this->assertSame(['f'], $this->getFilenames([
+            'folder' => 'nested/private',
+            'sort' => 'filename:asc',
+        ]));
+    }
+
+    #[Test]
+    public function it_returns_root_assets_when_folder_is_slash_without_recursive()
+    {
+        $this->assertSame(['a', 'b', 'c', 'd', 'e'], $this->getFilenames([
+            'folder' => '/',
+            'sort' => 'filename:asc',
+        ]));
+    }
+
+    #[Test]
     public function it_keeps_legacy_filtering_params_working()
     {
         $this->assertSame(['g'], $this->getFilenames([
