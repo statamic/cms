@@ -101,7 +101,6 @@ class UserTags extends Tags
     public function loginForm()
     {
         $data = array_merge($this->getFormSession(), [
-            'passkeys_enabled' => config('statamic.webauthn') !== null,
             'passkey_options_url' => route('statamic.passkeys.options'),
             'passkey_verify_url' => route('statamic.passkeys.login'),
         ]);

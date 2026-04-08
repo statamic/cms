@@ -371,7 +371,7 @@ EOT
     #[Test]
     public function it_includes_passkey_data()
     {
-        $output = $this->tag('{{ user:login_form }}{{ passkeys_enabled }}|{{ passkey_options_url }}|{{ passkey_verify_url }}{{ /user:login_form }}');
+        $output = $this->tag('{{ user:login_form }}{{ passkey_options_url }}|{{ passkey_verify_url }}{{ /user:login_form }}');
 
         $this->assertStringContainsString(route('statamic.passkeys.options'), $output);
         $this->assertStringContainsString(route('statamic.passkeys.login'), $output);
