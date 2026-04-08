@@ -17,6 +17,7 @@ import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
+import FormattingLocalesFieldtype from '../components/fieldtypes/FormattingLocalesFieldtype.vue';
 import DateIndexFieldtype from '../components/fieldtypes/DateIndexFieldtype.vue';
 import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
 import DictionaryIndexFieldtype from '../components/fieldtypes/DictionaryIndexFieldtype.vue';
@@ -88,6 +89,7 @@ export default function registerFieldtypes(app) {
     app.component('collection_title_formats-fieldtype', TitleFormats);
     app.component('color-fieldtype', ColorFieldtype);
     app.component('date-fieldtype', DateFieldtype);
+    app.component('formatting_locales-fieldtype', FormattingLocalesFieldtype);
     app.component('date-fieldtype-index', DateIndexFieldtype);
     app.component('dictionary-fieldtype', DictionaryFieldtype);
     app.component('dictionary-fieldtype-index', DictionaryIndexFieldtype);

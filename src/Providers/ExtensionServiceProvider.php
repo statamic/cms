@@ -83,6 +83,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\FieldDisplay::class,
         Fieldtypes\Files::class,
         Fieldtypes\Floatval::class,
+        Fieldtypes\FormattingLocales::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,

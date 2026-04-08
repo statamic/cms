@@ -4,6 +4,7 @@ namespace Tests\Tags\User;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -321,5 +322,45 @@ EOT
         $this->assertFalse(auth()->check());
 
         Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id === 1);
+    }
+
+    #[Test]
+    #[DefineEnvironment('disableTwoFactor')]
+    public function it_skips_two_factor_challenge_when_two_factor_is_disabled()
+    {
+        Event::fake();
+
+        $this->assertFalse(auth()->check());
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->assertGuest()
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertLocation('/');
+
+        $this->assertTrue(auth()->check());
+
+        Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    protected function disableTwoFactor($app)
+    {
+        $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 }

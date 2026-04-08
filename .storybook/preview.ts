@@ -8,6 +8,7 @@ import './theme.css';
 import {translate, translateChoice} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
+import NumberFormatter from '@/components/NumberFormatter';
 import cleanCodeSnippet from './clean-code-snippet';
 import PortalVue from 'portal-vue';
 import FullscreenHeader from '@/components/publish/FullscreenHeader.vue';
@@ -65,6 +66,7 @@ setup(async (app) => {
   app.config.globalProperties.__ = translate;
   app.config.globalProperties.__n = translateChoice;
   app.config.globalProperties.$date = new DateFormatter;
+  app.config.globalProperties.$number = new NumberFormatter;
   app.config.globalProperties.cp_url = (url) => url;
   app.config.globalProperties.$portals = portals;
   app.config.globalProperties.$stacks = stacks;

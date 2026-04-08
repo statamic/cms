@@ -14,6 +14,7 @@ export default defineConfig(({ mode, command }) => {
     const isRunningBuild = command === 'build';
     const isProdBuild = isRunningBuild && mode === 'production';
     const isProdDevBuild = isRunningBuild && mode === 'development';
+    const isTesting = !!process.env.VITEST;
 
     return {
         base: './',
@@ -25,7 +26,7 @@ export default defineConfig(({ mode, command }) => {
         plugins: [
             tsconfigPaths(),
             tailwindcss(),
-            laravel({
+            !isTesting && laravel({
                 valetTls: env.VALET_TLS,
                 input: ['resources/css/app.css', 'resources/js/index.js'],
                 refresh: true,
