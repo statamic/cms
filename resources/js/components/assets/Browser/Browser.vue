@@ -1018,12 +1018,16 @@ export default {
         openMoveConflictModal({ action, asset, destinationFolder, selections, message, conflict, completedMoves }) {
             const initialRemap =
                 completedMoves && typeof completedMoves === 'object' && !Array.isArray(completedMoves) ? completedMoves : {};
+            const completedSelectionIds = new Set(Object.keys(initialRemap).map((id) => String(id)));
+            const pendingSelections = Array.from(new Set((selections || [asset?.id]).filter(Boolean))).filter(
+                (id) => !completedSelectionIds.has(String(id)),
+            );
 
             this.moveConflictContext = {
                 action,
                 asset,
                 destinationFolder,
-                pendingSelections: Array.from(new Set((selections || [asset?.id]).filter(Boolean))),
+                pendingSelections,
                 conflict,
                 idRemap: { ...initialRemap },
             };
