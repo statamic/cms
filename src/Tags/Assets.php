@@ -10,10 +10,8 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Pattern;
-use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class Assets extends Tags
 {
@@ -117,70 +115,6 @@ class Assets extends Tags
         $this->queryOrderBys($query);
 
         return $this->results($query);
-    }
-
-    protected function queryConditions($query)
-    {
-        $this->queryableConditionParams()->each(function ($value, $param) use ($query) {
-            $field = explode(':', $param)[0];
-            $condition = explode(':', $param)[1] ?? false;
-            $value = $this->getQueryConditionValue($value, $field);
-            $fields = $this->queryConditionFields($field);
-
-            if (count($fields) === 1) {
-                $this->queryCondition($query, $fields[0], $condition, $value);
-
-                return;
-            }
-
-            $query->where(function ($query) use ($fields, $condition, $value) {
-                $this->queryCondition($query, Arr::pull($fields, 0), $condition, $value);
-
-                foreach ($fields as $field) {
-                    $query->orWhere(function ($query) use ($field, $condition, $value) {
-                        $this->queryCondition($query, $field, $condition, $value);
-                    });
-                }
-            });
-        });
-    }
-
-    protected function queryConditionFields($field): array
-    {
-        if (Str::contains($field, ['.', '->']) || $this->isNativeAssetConditionField($field)) {
-            return [$field];
-        }
-
-        if (! Site::hasMultiple()) {
-            return [$field, "data->{$field}"];
-        }
-
-        $site = Site::current()->handle();
-
-        return [$field, "data->{$field}", "data->{$site}->{$field}"];
-    }
-
-    protected function isNativeAssetConditionField(string $field): bool
-    {
-        return in_array($field, [
-            'id',
-            'container',
-            'path',
-            'basename',
-            'folder',
-            'filename',
-            'extension',
-            'is_image',
-            'is_video',
-            'is_audio',
-            'size',
-            'last_modified',
-            'height',
-            'width',
-            'mime_type',
-            'duration',
-            'ratio',
-        ]);
     }
 
     protected function assetsFromCollection($collection)

@@ -19,11 +19,6 @@ class AssetsTest extends TestCase
     {
         parent::setUp();
 
-        $this->setSites([
-            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
-            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://localhost/es/'],
-        ]);
-
         Storage::fake('test', ['url' => '/assets']);
 
         Storage::disk('test')->put('a.jpg', '');
@@ -59,10 +54,11 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
-    public function it_filters_assets_by_localized_field_conditions()
+    public function it_filters_assets_by_custom_field_conditions()
     {
         Asset::find('test::b.jpg')->data([
-            'en' => ['alt' => 'Bob Ross'],
+            'title' => 'Beta',
+            'alt' => 'Bob Ross',
         ])->save();
 
         $this->assertSame(['b'], $this->getFilenames([
