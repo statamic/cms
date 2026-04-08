@@ -164,7 +164,6 @@ class UsersTest extends TestCase
     private function getColumns(Users $fieldtype): array
     {
         $method = new \ReflectionMethod($fieldtype, 'getColumns');
-        $method->setAccessible(true);
 
         return $method->invoke($fieldtype);
     }

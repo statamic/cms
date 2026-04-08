@@ -459,6 +459,7 @@ export default {
                     this.saving = false;
                     this.clearErrors();
                     this.$nextTick(() => this.$refs.container.clearDirtyState());
+                    Statamic.$events.$emit('asset.saved', this.asset);
                 })
                 .catch((e) => {
                     this.saving = false;

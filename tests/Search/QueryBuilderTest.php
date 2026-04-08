@@ -659,6 +659,27 @@ class QueryBuilderTest extends TestCase
             'Smeagol\'s Precious',
         ], $query->where('type', 'b')->pluck('title')->all());
     }
+
+    #[Test]
+    public function results_are_found_using_where_status()
+    {
+        $items = collect([
+            ['reference' => 'a', 'status' => 'published'],
+            ['reference' => 'b', 'status' => 'draft'],
+            ['reference' => 'c', 'status' => 'published'],
+            ['reference' => 'd', 'status' => 'scheduled'],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereStatus('published')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(['a', 'c'], $results->map->reference->all());
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereStatus('draft')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals(['b'], $results->map->reference->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder
