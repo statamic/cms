@@ -306,8 +306,8 @@ class UserTags extends Tags
     public function passkeyForm()
     {
         $data = [
-            'create_url' => route('statamic.passkeys.create'),
-            'store_url' => route('statamic.passkeys.store'),
+            'passkey_options_url' => route('statamic.passkeys.create'),
+            'passkey_verify_url' => route('statamic.passkeys.store'),
         ];
 
         if (! $this->canParseContents()) {

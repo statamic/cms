@@ -26,7 +26,7 @@ class PasskeyFormTest extends TestCase
     #[Test]
     public function it_renders_urls()
     {
-        $output = $this->tag('{{ user:passkey_form }}{{ create_url }}|{{ store_url }}{{ /user:passkey_form }}');
+        $output = $this->tag('{{ user:passkey_form }}{{ passkey_options_url }}|{{ passkey_verify_url }}{{ /user:passkey_form }}');
 
         $this->assertStringContainsString(route('statamic.passkeys.create'), $output);
         $this->assertStringContainsString(route('statamic.passkeys.store'), $output);
@@ -38,8 +38,8 @@ class PasskeyFormTest extends TestCase
         $form = Statamic::tag('user:passkey_form')->fetch();
 
         $this->assertIsArray($form);
-        $this->assertEquals(route('statamic.passkeys.create'), $form['create_url']);
-        $this->assertEquals(route('statamic.passkeys.store'), $form['store_url']);
+        $this->assertEquals(route('statamic.passkeys.create'), $form['passkey_options_url']);
+        $this->assertEquals(route('statamic.passkeys.store'), $form['passkey_verify_url']);
     }
 
     #[Test]
