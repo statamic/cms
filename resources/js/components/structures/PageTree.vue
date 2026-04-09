@@ -154,7 +154,7 @@ export default {
             if (!loading) {
                 this.$nextTick(() => {
                     if (this.$refs.tree) {
-                        this.$refs.tree.ariaInstructions = __('Use arrow keys to navigate. Alt plus arrow keys to reorder.');
+                        this.$refs.tree.ariaInstructions = __('messages.tree_aria_instructions');
                     }
                 });
             }

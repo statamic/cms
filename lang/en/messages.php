@@ -256,6 +256,7 @@ return [
     'theme_share_instructions' => 'Publish this theme through your statamic.com account to make it available to others.',
     'try_again_in_seconds' => '{0,1}Try again now.|Try again in :count seconds.',
     'try_again_in_minutes' => 'Try again in a minute.|Try again in :count minutes.',
+    'tree_aria_instructions' => 'Use arrow keys to navigate. Alt plus arrow keys to reorder.',
     'two_factor_account_requirement' => 'Your account requires two-factor authentication. Please enable it before proceeding.',
     'two_factor_challenge_code_instructions' => 'Enter the 6-digit code from your authenticator app to confirm access to your account.',
     'two_factor_enable_introduction' => 'When enabled, you will be prompted for a secure, random token from your phone\'s authenticator app every time you log in.',
