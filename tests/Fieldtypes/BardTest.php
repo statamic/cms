@@ -1397,6 +1397,54 @@ EOT;
     }
 
     #[Test]
+    public function it_preserves_appends_on_localized_entry_links()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('fr');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => false])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr?foo=bar#section']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="/fr/blog/one-fr?foo=bar#section">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_appends_on_entry_links_with_select_across_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('en');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => true])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr?foo=bar#section']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="http://localhost/fr/blog/one-fr?foo=bar#section">The One</a>', $augmented);
+    }
+
+    #[Test]
     public function it_gets_link_data_with_appends()
     {
         tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();

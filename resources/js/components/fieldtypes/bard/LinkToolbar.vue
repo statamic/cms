@@ -84,7 +84,6 @@
             <ui-input
                 v-if="linkType === 'entry'"
                 type="text"
-                ref="input"
                 v-model="appends"
                 :prepend="__('Append')"
                 :placeholder="__('?query=params#anchor')"
@@ -248,6 +247,13 @@ export default {
             return this.sanitizeLink(this.url[this.linkType]);
         },
 
+        normalizedAppends() {
+            const value = this.appends;
+            if (!value) return '';
+            if (value.startsWith('?') || value.startsWith('#')) return value;
+            return value.includes('=') ? `?${value}` : `#${value}`;
+        },
+
         defaultRel() {
             let rel = [];
             if (this.config.link_noopener) rel.push('noopener');
@@ -408,7 +414,7 @@ export default {
             }
 
             this.$emit('updated', {
-                href: this.href + (this.appends ?? ''),
+                href: this.href + this.normalizedAppends,
                 rel: this.rel,
                 target: this.canHaveTarget && this.targetBlank ? '_blank' : null,
                 title: this.title,
