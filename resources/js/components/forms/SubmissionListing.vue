@@ -56,6 +56,6 @@ export default {
         },
     },
 
-    expose: ['parameters'],
+    expose: ['parameters', 'refresh'],
 };
 </script>

@@ -23,7 +23,11 @@ const props = defineProps([
 const deleter = ref(null);
 const generatingFakeSubmission = ref(false);
 const deletingFakeSubmissions = ref(false);
-const submissionListing = ref(null);
+const submissionListing = ref();
+const exportModalOpen = ref(false);
+const exportFormat = ref(null);
+const exportScope = ref('all');
+const listingParameters = ref({});
 
 async function generateFakeSubmission(mode) {
     if (generatingFakeSubmission.value) {
@@ -74,12 +78,6 @@ async function deleteFakeSubmissions() {
         deletingFakeSubmissions.value = false;
     }
 }
-
-const submissionListing = ref(null);
-const exportModalOpen = ref(false);
-const exportFormat = ref(null);
-const exportScope = ref('all');
-const listingParameters = ref({});
 
 const hasFilteredScope = computed(() => {
     const params = listingParameters.value;
