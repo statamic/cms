@@ -67,4 +67,9 @@ class UserPolicy
     {
         return $this->edit($authed, $user);
     }
+
+    public function impersonate($authed, $user)
+    {
+        return true;
+    }
 }
