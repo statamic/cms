@@ -430,7 +430,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $svg = (new Writer(
             new ImageRenderer(
-                new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
+                new RendererStyle(size: 192, fill: Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
                 new SvgImageBackEnd
             )
         ))->writeString($this->twoFactorQrCodeUrl());

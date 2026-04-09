@@ -66,6 +66,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         resolveGqlValue as traitResolveGqlValue;
     }
 
+    const AUDIO_EXTENSIONS = ['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav'];
+    const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+    const VIDEO_EXTENSIONS = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov'];
+
     protected $container;
     protected $path;
     protected $meta;
@@ -471,7 +475,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isAudio()
     {
-        return $this->extensionIsOneOf(['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav']);
+        return $this->extensionIsOneOf(self::AUDIO_EXTENSIONS);
     }
 
     /**
@@ -504,7 +508,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']);
+        return $this->extensionIsOneOf(self::IMAGE_EXTENSIONS);
     }
 
     /**
@@ -524,7 +528,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isVideo()
     {
-        return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+        return $this->extensionIsOneOf(self::VIDEO_EXTENSIONS);
     }
 
     /**

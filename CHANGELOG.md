@@ -1,5 +1,19 @@
 # Release Notes
 
+## 6.12.0 (2026-04-08)
+
+### What's new
+- Add support for filtering conditions in Assets Tag [#13936](https://github.com/statamic/cms/issues/13936) by @jackmcdade
+
+### What's fixed
+- Add padding around 2FA QR code for dark mode scanning [#14460](https://github.com/statamic/cms/issues/14460) by @duncanmcclean
+- Fix form submissions with non-UTF-8 data crashing the CP listing [#14461](https://github.com/statamic/cms/issues/14461) by @duncanmcclean
+- Remove deprecated function calls [#14457](https://github.com/statamic/cms/issues/14457) by @justindantzer
+- Upgrade to Vite 8 [#14459](https://github.com/statamic/cms/issues/14459) by @jasonvarga
+- Nested fields should respect read-only state [#14351](https://github.com/statamic/cms/issues/14351) by @duncanmcclean
+
+
+
 ## 6.11.0 (2026-04-07)
 
 ### What's new
