@@ -38,21 +38,27 @@ class LoginController extends Controller
 
     private function checkPasskeyEnforcement(Request $request)
     {
-        if (! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
-            if ($user = User::findByEmail($request->get($this->username()))) {
-                if ($user->passkeys()->isNotEmpty()) {
-                    $errorRedirect = $request->input('_error_redirect');
-
-                    $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
-                        ? redirect($errorRedirect)
-                        : back();
-
-                    throw new HttpResponseException(
-                        $errorResponse->withInput()->withErrors(__('statamic::messages.password_passkeys_only'))
-                    );
-                }
-            }
+        if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            return;
         }
+
+        if (! $user = User::findByEmail($request->get($this->username()))) {
+            return;
+        }
+
+        if ($user->passkeys()->isEmpty()) {
+            return;
+        }
+
+        $errorRedirect = $request->input('_error_redirect');
+
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
+
+        throw new HttpResponseException(
+            $errorResponse->withInput()->withErrors(__('statamic::messages.password_passkeys_only'))
+        );
     }
 
     protected function twoFactorChallengeRedirect(): string
