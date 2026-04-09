@@ -70,6 +70,6 @@ class UserPolicy
 
     public function impersonate($authed, $user)
     {
-        return true;
+        return $authed->hasPermission('impersonate users');
     }
 }
