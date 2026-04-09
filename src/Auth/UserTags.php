@@ -305,10 +305,10 @@ class UserTags extends Tags
      */
     public function passkeyForm()
     {
-        $data = $this->getFormSession('user.passkey');
-
-        $data['create_url'] = route('statamic.passkeys.create');
-        $data['store_url'] = route('statamic.passkeys.store');
+        $data = [
+            'create_url' => route('statamic.passkeys.create'),
+            'store_url' => route('statamic.passkeys.store'),
+        ];
 
         if (! $this->canParseContents()) {
             return $data;
