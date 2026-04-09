@@ -349,7 +349,6 @@ export default {
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
 				if (! values) return;
-                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
 
                 this.updateAttributes({ values });
             },
