@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\ResponseCache;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -12,7 +13,13 @@ class DefaultCache implements ResponseCache
 {
     public function get(Request $request)
     {
-        return Cache::get($this->getCacheKey($request));
+        $cached = Cache::get($this->getCacheKey($request));
+
+        if (! is_array($cached)) {
+            return null;
+        }
+
+        return new JsonResponse($cached['content'], $cached['status'], $cached['headers'], json: true);
     }
 
     public function put(Request $request, $response)
@@ -21,7 +28,11 @@ class DefaultCache implements ResponseCache
 
         $ttl = Carbon::now()->addMinutes((int) config('statamic.graphql.cache.expiry', 60));
 
-        Cache::put($key, $response, $ttl);
+        Cache::put($key, [
+            'content' => $response->getContent(),
+            'status' => $response->getStatusCode(),
+            'headers' => $response->headers->all(),
+        ], $ttl);
     }
 
     protected function track($request)

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html
-    lang="{{ Statamic::cpLocale() }}"
+    lang="{{ str_replace('_', '-', Statamic::cpLocale()) }}"
     dir="{{ Statamic::cpDirection() }}"
 >
     <head>

@@ -437,7 +437,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $this->assertEquals('passkey', $user->getElevatedSessionMethod());
@@ -456,7 +455,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $this->assertEquals('password_confirmation', $user->getElevatedSessionMethod());
@@ -493,7 +491,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $response = $this
@@ -520,7 +517,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $credentials = [
@@ -556,7 +552,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $this

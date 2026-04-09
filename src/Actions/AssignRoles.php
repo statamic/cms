@@ -24,6 +24,11 @@ class AssignRoles extends Action
         return $authed->can('assign roles');
     }
 
+    public function requiresElevatedSession(): bool
+    {
+        return true;
+    }
+
     public function confirmationText()
     {
         /** @translation */
