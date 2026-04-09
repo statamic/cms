@@ -236,6 +236,132 @@ describe('Passkeys', () => {
         });
     });
 
+    describe('configure', () => {
+        test('it returns the instance', () => {
+            const result = passkeys.configure({ optionsUrl: '/options' });
+            expect(result).toBe(passkeys);
+        });
+
+        test('it uses configured defaults for authenticate', async () => {
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ challenge: 'test' }),
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ redirect: '/dashboard' }),
+                });
+
+            startAuthentication.mockResolvedValueOnce({ id: 'credential-id' });
+
+            const onSuccess = vi.fn();
+
+            passkeys.configure({
+                optionsUrl: '/passkeys/options',
+                verifyUrl: '/passkeys/login',
+                onSuccess,
+            });
+
+            await passkeys.authenticate();
+
+            expect(global.fetch).toHaveBeenCalledTimes(2);
+            expect(onSuccess).toHaveBeenCalledWith({ redirect: '/dashboard' });
+        });
+
+        test('it uses configured defaults for register', async () => {
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ challenge: 'test' }),
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ verified: true }),
+                });
+
+            startRegistration.mockResolvedValueOnce({ id: 'new-credential' });
+
+            const onSuccess = vi.fn();
+
+            passkeys.configure({
+                optionsUrl: '/passkeys/create',
+                verifyUrl: '/passkeys/store',
+                onSuccess,
+            });
+
+            await passkeys.register({ name: 'My Key' });
+
+            expect(onSuccess).toHaveBeenCalledWith({ verified: true });
+
+            const lastCall = global.fetch.mock.calls[1];
+            const body = JSON.parse(lastCall[1].body);
+            expect(body.name).toBe('My Key');
+        });
+
+        test('call-time options override configured defaults', async () => {
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ challenge: 'test' }),
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ redirect: '/' }),
+                });
+
+            startAuthentication.mockResolvedValueOnce({ id: 'credential-id' });
+
+            const defaultSuccess = vi.fn();
+            const overrideSuccess = vi.fn();
+
+            passkeys.configure({
+                optionsUrl: '/passkeys/options',
+                verifyUrl: '/passkeys/login',
+                onSuccess: defaultSuccess,
+            });
+
+            await passkeys.authenticate({ onSuccess: overrideSuccess });
+
+            expect(defaultSuccess).not.toHaveBeenCalled();
+            expect(overrideSuccess).toHaveBeenCalledWith({ redirect: '/' });
+        });
+
+        test('it uses configured defaults for initAutofill', async () => {
+            browserSupportsWebAuthn.mockReturnValue(true);
+            const freshPasskeys = new Passkeys();
+
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ challenge: 'test' }),
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: () => Promise.resolve({ redirect: '/' }),
+                });
+
+            startAuthentication.mockResolvedValueOnce({ id: 'credential-id' });
+
+            const onSuccess = vi.fn();
+
+            freshPasskeys.configure({
+                optionsUrl: '/passkeys/options',
+                verifyUrl: '/passkeys/login',
+                onSuccess,
+            });
+
+            await freshPasskeys.initAutofill();
+
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            expect(startAuthentication).toHaveBeenCalledWith({
+                optionsJSON: { challenge: 'test' },
+                useBrowserAutofill: true,
+            });
+        });
+    });
+
     describe('CSRF token', () => {
         test('it reads CSRF token from meta tag', async () => {
             document.querySelector = vi.fn((selector) => {

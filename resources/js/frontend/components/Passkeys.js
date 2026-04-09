@@ -5,6 +5,12 @@ export default class Passkeys {
         this.supported = browserSupportsWebAuthn();
         this._waiting = false;
         this._error = null;
+        this._defaults = {};
+    }
+
+    configure(defaults) {
+        this._defaults = defaults;
+        return this;
     }
 
     get waiting() {
@@ -26,7 +32,7 @@ export default class Passkeys {
      * @param {boolean} [options.useBrowserAutofill=false] - Use browser autofill UI
      * @param {string} [options.csrfToken] - Override CSRF token
      */
-    async authenticate(options) {
+    async authenticate(options = {}) {
         const {
             optionsUrl,
             verifyUrl,
@@ -34,7 +40,7 @@ export default class Passkeys {
             onError,
             useBrowserAutofill = false,
             csrfToken,
-        } = options;
+        } = { ...this._defaults, ...options };
 
         if (!useBrowserAutofill) {
             this._waiting = true;
@@ -111,7 +117,7 @@ export default class Passkeys {
      * @param {Function} [options.onError] - Callback on error with error object
      * @param {string} [options.csrfToken] - Override CSRF token
      */
-    async register(options) {
+    async register(options = {}) {
         const {
             optionsUrl,
             verifyUrl,
@@ -119,7 +125,7 @@ export default class Passkeys {
             onSuccess,
             onError,
             csrfToken,
-        } = options;
+        } = { ...this._defaults, ...options };
 
         this._waiting = true;
         this._error = null;
@@ -202,7 +208,7 @@ export default class Passkeys {
      * @param {Function} [options.onError] - Callback on error with error object
      * @param {string} [options.csrfToken] - Override CSRF token
      */
-    initAutofill(options) {
+    initAutofill(options = {}) {
         if (!this.supported) {
             return;
         }
