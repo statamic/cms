@@ -44,6 +44,8 @@ class FormSubmissionsStore extends ChildStore
             Log::warning('Could not parse form submission file: '.$path);
         }
 
+        $data = $this->sanitizeData($data);
+
         $form = pathinfo($path, PATHINFO_DIRNAME);
         $form = Str::after($form, $this->parent->directory());
 
@@ -55,5 +57,20 @@ class FormSubmissionsStore extends ChildStore
             ->data($data);
 
         return $submission;
+    }
+
+    private function sanitizeData(array $data): array
+    {
+        return collect($data)->map(function ($value) {
+            if (is_array($value)) {
+                return $this->sanitizeData($value);
+            }
+
+            if (is_string($value) && ! mb_check_encoding($value, 'UTF-8')) {
+                return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            }
+
+            return $value;
+        })->all();
     }
 }

@@ -2,16 +2,22 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Assets\Asset as AssetModel;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Pattern;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 
 class Assets extends Tags
 {
+    use Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes;
+
     /**
      * @var AssetCollection
      */
@@ -40,7 +46,7 @@ class Assets extends Tags
 
             $this->assets = (new AssetCollection([$value]))->flatten();
 
-            return $this->output();
+            return $this->outputCollection($this->assets);
         }
 
         if ($value instanceof Value) {
@@ -66,15 +72,17 @@ class Assets extends Tags
         $path = $this->params->get('path');
         $collection = $this->params->get('collection');
 
-        $this->assets = $collection
-            ? $this->assetsFromCollection($collection)
-            : $this->assetsFromContainer($id, $path);
+        if ($collection) {
+            return $this->outputCollection($this->assetsFromCollection($collection));
+        }
+
+        $this->assets = $this->assetsFromContainer($id, $path);
 
         if ($this->assets->isEmpty()) {
             return $this->parseNoResults();
         }
 
-        return $this->output();
+        return $this->assets;
     }
 
     protected function assetsFromContainer($id, $path)
@@ -95,9 +103,29 @@ class Assets extends Tags
             return collect();
         }
 
-        $assets = $container->assets($this->params->get('folder'), $this->params->get('recursive', false));
+        $query = $container->queryAssets();
 
-        return $this->filterByType($assets);
+        $this->queryFolder($query);
+        $this->queryType($query);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        if ($this->params->get('not_in')) {
+            $assets = $this->filterNotIn($query->get());
+
+            return $this->limitCollection($assets);
+        }
+
+        if ($limit = $this->params->int('limit')) {
+            $query->limit($limit);
+        }
+
+        if ($offset = $this->params->int('offset')) {
+            $query->offset($offset);
+        }
+
+        return $query->get();
     }
 
     protected function assetsFromCollection($collection)
@@ -143,6 +171,10 @@ class Assets extends Tags
         }
 
         return $value->filter(function ($value) use ($type) {
+            if ($type === 'audio') {
+                return $value->isAudio();
+            }
+
             if ($type === 'image') {
                 return $value->isImage();
             }
@@ -161,18 +193,17 @@ class Assets extends Tags
 
     /**
      * Filter out assets from a requested folder.
-     *
-     * @return void
      */
-    private function filterNotIn()
+    private function filterNotIn($assets)
     {
-        if ($not_in = $this->params->get('not_in')) {
-            $regex = '#^('.$not_in.')#';
-
-            $this->assets = $this->assets->reject(function ($path) use ($regex) {
-                return preg_match($regex, $path);
-            });
+        if (! $not_in = $this->params->get('not_in')) {
+            return $assets;
         }
+
+        $regex = '#^('.$not_in.')#';
+
+        // Checking against path for backwards compatibility. Technically folder would be more correct.
+        return $assets->reject(fn ($asset) => preg_match($regex, $asset->path()));
     }
 
     /**
@@ -204,36 +235,74 @@ class Assets extends Tags
             ];
         });
 
-        return $this->output();
+        return $this->outputCollection($this->assets);
     }
 
-    private function output()
+    private function outputCollection($assets)
     {
-        $this->filterNotIn();
+        $this->assets = $this->filterNotIn($assets);
 
-        $this->sort();
-        $this->limit();
+        if ($sort = $this->params->get('sort')) {
+            $this->assets = $this->assets->multisort($sort);
+        }
+
+        $this->assets = $this->limitCollection($this->assets);
+
+        if ($this->assets->isEmpty()) {
+            return $this->parseNoResults();
+        }
 
         return $this->assets;
     }
 
-    private function sort()
-    {
-        if ($sort = $this->params->get('sort')) {
-            $this->assets = $this->assets->multisort($sort);
-        }
-    }
-
-    /**
-     * Limit and offset the asset collection.
-     */
-    private function limit()
+    private function limitCollection($assets)
     {
         $limit = $this->params->int('limit');
-        $limit = ($limit == 0) ? $this->assets->count() : $limit;
+        $limit = ($limit == 0) ? $assets->count() : $limit;
         $offset = $this->params->int('offset');
 
-        $this->assets = $this->assets->splice($offset, $limit);
+        return $assets->splice($offset, $limit);
+    }
+
+    protected function queryType($query)
+    {
+        $type = $this->params->get('type');
+
+        if (! $type) {
+            return;
+        }
+
+        $extensions = match ($type) {
+            'audio' => AssetModel::AUDIO_EXTENSIONS,
+            'image' => AssetModel::IMAGE_EXTENSIONS,
+            'svg' => ['svg'],
+            'video' => AssetModel::VIDEO_EXTENSIONS,
+            default => [],
+        };
+
+        $query->whereIn('extension', $extensions);
+    }
+
+    protected function queryFolder($query)
+    {
+        $folder = $this->params->get('folder');
+        $recursive = $this->params->get('recursive', false);
+
+        if ($folder === '/' && $recursive) {
+            $folder = null;
+        }
+
+        if ($folder === null) {
+            return;
+        }
+
+        if ($recursive) {
+            $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
+
+            return;
+        }
+
+        $query->where('folder', $folder);
     }
 
     private function isAssetsFieldValue($value)

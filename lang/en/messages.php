@@ -136,6 +136,7 @@ return [
     'form_configure_generate_fake_submissions_instructions' => 'Allow generating fake submissions and workflow testing from the submissions screen.',
     'form_configure_store_instructions' => 'Disable to stop storing submissions. Events and email notifications will still be sent.',
     'form_configure_title_instructions' => 'Use a call to action, such as \'Contact Us\'.',
+    'form_export_filtered_description' => 'Exports submissions with current filters and visible columns.',
     'form_create_description' => 'Get started by creating your first form.',
     'form_fake_submissions_deleted' => 'Deleted :count fake submission.|Deleted :count fake submissions.',
     'form_fake_submissions_delete_failed' => 'Fake submissions could not be deleted.',

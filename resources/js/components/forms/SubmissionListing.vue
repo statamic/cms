@@ -44,10 +44,18 @@ export default {
         };
     },
 
+    computed: {
+        parameters() {
+            return this.$refs.listing?.parameters;
+        },
+    },
+
     methods: {
         refresh() {
             this.$refs.listing?.refresh();
         },
     },
+
+    expose: ['parameters'],
 };
 </script>

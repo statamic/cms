@@ -69,7 +69,7 @@ class StorePasskeyTest extends TestCase
         $responseChallenge = $response->json('challenge');
 
         $this->assertNotNull(session('webauthn.challenge'));
-        $this->assertEquals(16, strlen(session('webauthn.challenge')));
+        $this->assertEquals(16, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertIsString($responseChallenge);
     }
 

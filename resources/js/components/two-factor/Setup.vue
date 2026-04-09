@@ -67,7 +67,7 @@ watch(setupModalOpen, (open) => {
                     <ui-description class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</ui-description>
 
                     <div class="flex space-x-6">
-                        <div class="bg-white" v-html="qrCode"></div>
+                        <div class="shrink-0 rounded-md border border-gray-200 dark:border-none overflow-hidden" v-html="qrCode"></div>
                         <div class="space-y-6 w-full">
                             <ui-field :label="__('Setup Key')">
                                 <ui-input copyable readonly :model-value="secretKey" />

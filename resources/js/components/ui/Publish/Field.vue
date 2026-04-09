@@ -182,13 +182,14 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
+const rootFieldPath = computed(() => isNested.value ? fullPath.value.split('.')[0] : fullPath.value);
 
 function sync() {
-    syncField(fullPath.value);
+    syncField(rootFieldPath.value);
 }
 
 function desync() {
-    desyncField(fullPath.value);
+    desyncField(rootFieldPath.value);
 }
 
 const fieldtypeComponentProps = computed(() => ({
