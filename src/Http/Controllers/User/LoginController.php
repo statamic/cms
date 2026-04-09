@@ -19,9 +19,9 @@ class LoginController extends Controller
 
     public function login(UserLoginRequest $request)
     {
-        $this->checkPasskeyEnforcement($request);
-
         $this->handleTooManyLoginAttempts($request);
+
+        $this->checkPasskeyEnforcement($request);
 
         $user = User::fromUser($this->validateCredentials($request));
 
