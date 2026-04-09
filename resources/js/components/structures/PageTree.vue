@@ -31,6 +31,7 @@
                     :each-droppable="eachDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
+                    :aria-label="__('Tree Structure')"
                     @after-drop="afterDrop"
                     @open:node="nodeOpened"
                     @close:node="nodeClosed"
