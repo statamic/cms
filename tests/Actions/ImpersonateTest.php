@@ -98,6 +98,17 @@ class ImpersonateTest extends TestCase
     }
 
     #[Test]
+    public function it_is_not_authorized_without_permission()
+    {
+        $this->setTestRoles(['editor' => ['edit users']]);
+
+        $impersonator = tap(User::make()->email('admin@example.com')->assignRole('editor'))->save();
+        $impersonated = tap(User::make()->email('user@example.com'))->save();
+
+        $this->assertFalse((new Action)->authorize($impersonator, $impersonated));
+    }
+
+    #[Test]
     public function super_users_bypass_the_policy_check()
     {
         $impersonator = tap(User::make()->email('admin@example.com')->makeSuper())->save();
