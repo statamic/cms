@@ -71,7 +71,7 @@ class StoreRoleTest extends TestCase
     #[Test]
     public function it_allows_storing_a_role_without_elevated_session_when_elevated_sessions_are_disabled()
     {
-        config(['statamic.users.elevated_session_disabled' => true]);
+        config(['statamic.users.elevated_sessions_enabled' => false]);
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])

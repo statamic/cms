@@ -303,7 +303,7 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled()
     {
-        config(['statamic.users.elevated_session_disabled' => true]);
+        config(['statamic.users.elevated_sessions_enabled' => false]);
 
         $this->actingAs($this->user);
 
@@ -316,7 +316,7 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_even_if_session_expired()
     {
-        config(['statamic.users.elevated_session_disabled' => true]);
+        config(['statamic.users.elevated_sessions_enabled' => false]);
 
         $this->actingAs($this->user);
 
@@ -330,7 +330,7 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_via_json()
     {
-        config(['statamic.users.elevated_session_disabled' => true]);
+        config(['statamic.users.elevated_sessions_enabled' => false]);
 
         $this->actingAs($this->user);
 

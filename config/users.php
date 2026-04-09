@@ -187,12 +187,12 @@ return [
     | Elevated Session Disabled
     |--------------------------------------------------------------------------
     |
-    | Here you may disable elevated sessions entirely. This can be
-    | useful when using OAuth.
+    | Here you may enable or disable elevated sessions. Disabling
+    | can be useful when using OAuth.
     |
     */
 
-    'elevated_session_disabled' => false,
+    'elevated_sessions_enabled' => true,
 
     /*
     |--------------------------------------------------------------------------
