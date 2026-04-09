@@ -150,6 +150,16 @@ export default {
             this.getPages();
         },
 
+        loading(loading) {
+            if (!loading) {
+                this.$nextTick(() => {
+                    if (this.$refs.tree) {
+                        this.$refs.tree.ariaInstructions = __('Use arrow keys to navigate. Alt plus arrow keys to reorder.');
+                    }
+                });
+            }
+        },
+
         collapsedState: {
             deep: true,
             handler(state) {
