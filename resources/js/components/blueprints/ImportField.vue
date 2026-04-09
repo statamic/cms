@@ -8,7 +8,7 @@
                         <div class="flex flex-1 items-center py-2">
                             <ui-icon class="size-4 me-2 text-ui-accent-text/80" name="fieldsets" />
                             <div class="flex items-center gap-2">
-                                <a class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" :href="fieldsetEditUrl" v-text="fieldsetTitle" v-tooltip="__('Edit fieldset')" />
+                                <a class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" :href="fieldsetEditUrl" v-text="fieldsetTitle" v-tooltip="__('Edit Fieldset')" />
                                 <ui-icon name="link" class="text-gray-400" />
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
                                 <ui-badge

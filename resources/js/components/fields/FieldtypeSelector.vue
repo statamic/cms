@@ -229,7 +229,12 @@ export default {
 
         if (this.$config.get('isFormBlueprint')) url += '&forms=true';
 
-        this.$axios.get(url).then((response) => (loadedFieldtypes.value = response.data));
+        this.$axios.get(url)
+            .then((response) => (loadedFieldtypes.value = response.data))
+            .catch((e) => {
+                this.$toast.error(e.response?.data?.message || __('Something went wrong'));
+                this.close();
+            });
     },
 
     methods: {

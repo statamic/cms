@@ -21,6 +21,7 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\TermsFieldtypeTerms as TermsResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
@@ -336,7 +337,7 @@ class Terms extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = OrderBy::column($request->get('sort'));
 
         if (! $column && ! $request->search) {
             $column = 'title'; // todo: get from taxonomy or config

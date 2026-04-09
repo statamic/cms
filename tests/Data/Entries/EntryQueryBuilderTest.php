@@ -1215,6 +1215,18 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::collection('calendar')->id('calendar-past')->published(true)->date(now()->subDay())->create();
         EntryFactory::collection('calendar')->id('calendar-past-draft')->published(false)->date(now()->subDay())->create();
 
+        Collection::make('news')->dated(true)->futureDateBehavior('unlisted')->pastDateBehavior('public')->save();
+        EntryFactory::collection('news')->id('news-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('news')->id('news-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('news')->id('news-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('news')->id('news-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('alerts')->dated(true)->futureDateBehavior('public')->pastDateBehavior('unlisted')->save();
+        EntryFactory::collection('alerts')->id('alerts-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-past-draft')->published(false)->date(now()->subDay())->create();
+
         // Undated, but with customized date behavior. Nonsensical situation, but it can happen.
         // See https://github.com/statamic/eloquent-driver/issues/288
         Collection::make('undated')->dated(false)->futureDateBehavior('private')->pastDateBehavior('private')->save();
@@ -1235,6 +1247,10 @@ class EntryQueryBuilderTest extends TestCase
                 'event-past-draft',
                 'calendar-future-draft',
                 'calendar-past-draft',
+                'news-future-draft',
+                'news-past-draft',
+                'alerts-future-draft',
+                'alerts-past-draft',
                 'undated-draft',
             ]],
             'published' => ['published', [
@@ -1243,6 +1259,10 @@ class EntryQueryBuilderTest extends TestCase
                 'event-future',
                 'calendar-future',
                 'calendar-past',
+                'news-future',
+                'news-past',
+                'alerts-future',
+                'alerts-past',
                 'undated',
             ]],
             'scheduled' => ['scheduled', [

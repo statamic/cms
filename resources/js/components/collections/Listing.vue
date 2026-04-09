@@ -90,7 +90,7 @@
                                         </div>
                                     </template>
                                     <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                        <div class="text-end font-mono text-xs text-gray-500 ps-6">
+                                        <div class="text-end font-mono text-xs text-gray-500 ps-6 whitespace-nowrap">
                                             <date-time :of="entry.date.date" date-only />
                                         </div>
                                     </template>
@@ -105,7 +105,7 @@
                     </div>
                 </ui-card>
 
-                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 gap-y-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <div class="flex items-center gap-1.5">
                         <ui-badge :text="String(collection.published_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
                         <span>{{ __('Published') }}</span>

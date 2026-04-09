@@ -153,7 +153,7 @@ class InstallEloquentDriver extends Command
     {
         switch ($repository) {
             case 'addon_settings':
-                return config('statamic.system.addon_settings_driver') === 'database';
+                return config('statamic.eloquent-driver.addon_settings.driver') === 'eloquent';
 
             case 'asset_containers':
                 return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';

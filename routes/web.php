@@ -5,6 +5,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Route;
 use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectController;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\TwoFactor;
 use Statamic\Http\Controllers\ActivateAccountController;
 use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
@@ -15,6 +16,8 @@ use Statamic\Http\Controllers\ResetPasswordController;
 use Statamic\Http\Controllers\TwoFactorChallengeController;
 use Statamic\Http\Controllers\TwoFactorSetupController;
 use Statamic\Http\Controllers\User\LoginController;
+use Statamic\Http\Controllers\User\PasskeyController;
+use Statamic\Http\Controllers\User\PasskeyLoginController;
 use Statamic\Http\Controllers\User\PasswordController;
 use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
@@ -50,17 +53,32 @@ Route::name('statamic.')->group(function () {
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
 
-            Route::get('two-factor-setup', TwoFactorSetupController::class)->name('two-factor-setup');
-            Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
-            Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+            Route::group(['prefix' => 'passkeys'], function () {
+                Route::middleware(ThrottleRequests::class.':30,1')->group(function () {
+                    Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.options');
+                    Route::post('auth', [PasskeyLoginController::class, 'login'])->name('passkeys.login');
+                });
 
-            Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
-                Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
-                Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
-                Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
-                Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
-                Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
+                Route::middleware('auth')->group(function () {
+                    Route::get('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+                    Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
+                    Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
+                });
             });
+
+            if (TwoFactor::enabled()) {
+                Route::get('two-factor-setup', TwoFactorSetupController::class)->name('two-factor-setup');
+                Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
+                Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+
+                Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+                    Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+                    Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
+                    Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
+                    Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
+                    Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
+                });
+            }
         });
 
         Route::group(['prefix' => 'auth', 'middleware' => [CPAuthGuard::class]], function () {

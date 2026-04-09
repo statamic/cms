@@ -3,46 +3,15 @@
 namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Statamic\Auth\WebAuthn\Serializer;
-use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\URL;
-use Statamic\Facades\WebAuthn;
+use Statamic\Http\Controllers\User\PasskeyLoginController as Controller;
 use Statamic\Support\Str;
 
-class PasskeyLoginController
+class PasskeyLoginController extends Controller
 {
-    public function options()
+    protected function successRedirectUrl(Request $request): string
     {
-        $options = WebAuthn::prepareAssertion();
-
-        return app(Serializer::class)->normalize($options);
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->only(['id', 'rawId', 'response', 'type']);
-
-        $user = WebAuthn::getUserFromCredentials($credentials);
-
-        WebAuthn::validateAssertion($user, $credentials);
-
-        $this->authenticate($user);
-
-        return ['redirect' => $this->successRedirectUrl()];
-    }
-
-    private function authenticate(UserContract $user): void
-    {
-        Auth::login($user, config('statamic.webauthn.remember_me', true));
-
-        session()->elevate();
-        session()->regenerate();
-    }
-
-    private function successRedirectUrl()
-    {
-        $referer = request('referer');
+        $referer = $request->input('referer');
 
         return Str::contains($referer, '/'.config('statamic.cp.route')) && ! URL::isExternalToApplication($referer)
             ? $referer

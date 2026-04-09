@@ -11,12 +11,14 @@ use Statamic\Facades\Action;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
@@ -79,7 +81,7 @@ class UsersController extends CpController
             'blueprints' => ['user'],
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -277,7 +279,7 @@ class UsersController extends CpController
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
-            'twoFactor' => $isCurrentUser ? [
+            'twoFactor' => $isCurrentUser && TwoFactor::enabled() ? [
                 'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
                 'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
                 'routes' => [

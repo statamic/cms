@@ -51,7 +51,7 @@
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -86,6 +86,7 @@
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
+                    :read-only="isReadOnly"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >

@@ -199,6 +199,8 @@ return [
     'phpinfo_utility_description' => 'Vérifiez vos paramètres de configuration PHP et les modules installés.',
     'plus_count_more' => '+ :count de plus',
     'preference_confirm_dirty_navigation_instructions' => 'Si vous devez recevoir un avertissement lorsque vous essayez de quitter la page et qu’il y a des modifications non enregistrées.',
+    'preference_formatting_locale_instructions' => 'Le paramètre de langue utilisé pour la mise en forme des valeurs de dates et de nombres dans le Panneau de configuration.',
+    'preference_formatting_locale_invalid' => 'Veuillez saisir un code de langue valide.',
     'preference_locale_instructions' => 'La langue d’affichage préférée du Panneau de configuration.',
     'preference_start_page_instructions' => 'La première page affichée après connexion au Panneau de configuration.',
     'preference_strict_accessibility_instructions' => 'Nous avons conçu le Panneau de configuration dans un souci d’accessibilité, en nous efforçant de respecter autant que possible les directives WCAG 2.2. Activez cette option pour appliquer des règles d’accessibilité plus strictes en augmentant le contraste des bordures du formulaire.',

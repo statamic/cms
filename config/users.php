@@ -183,6 +183,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Two-Factor Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Here you may disable two-factor authentication entirely. This can be
+    | useful on local or staging environments, or when using OAuth.
+    |
+    */
+
+    'two_factor_enabled' => env('STATAMIC_TWO_FACTOR_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enforce Two-Factor Authentication
     |--------------------------------------------------------------------------
     |
