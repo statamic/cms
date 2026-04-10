@@ -58,8 +58,7 @@ class ElevatedSessionController extends Controller
             ? __('Password confirmed')
             : __('Code verified');
 
-        $default = $request->input('_redirect') ?? route('statamic.site');
-        $redirect = redirect()->intended($default);
+        $redirect = redirect()->intended(route('statamic.site'));
 
         if ($request->wantsJson()) {
             return response()->json([
