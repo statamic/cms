@@ -94,9 +94,7 @@ class ElevatedSessionFormTest extends TestCase
     #[Test]
     public function it_provides_passkey_method_when_passwords_are_disabled()
     {
-        $this->markTestSkipped('TODO: Passkey support is not yet implemented.');
-
-        config('statamic.webauthn.allow_password_login_with_passkey', false);
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
 
         $user = User::make()->email('foo@bar.com');
 

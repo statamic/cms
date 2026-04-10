@@ -21,12 +21,7 @@ class ElevatedSessionController extends Controller
         $method = $user->getElevatedSessionMethod();
 
         if ($customUrl = config('statamic.users.elevated_session_page')) {
-            return redirect()->setIntendedUrl($request->fullUrl())->to($customUrl);
-        }
-
-        if ($method === 'passkey') {
-            // TODO: Implement frontend passkey support for elevated sessions
-            throw new \Exception('Passkey authentication for elevated sessions is not yet supported on the frontend.');
+            return redirect()->to($customUrl);
         }
 
         if ($method === 'verification_code') {
@@ -36,10 +31,11 @@ class ElevatedSessionController extends Controller
         return Inertia::render('auth/ConfirmPassword', [
             'outside' => true,
             'method' => $method,
-            'allowPasskey' => false,
+            'allowPasskey' => $method !== 'verification_code' && $user->passkeys()->isNotEmpty(),
             'status' => session('status'),
             'submitUrl' => route('statamic.elevated-session.confirm'),
             'resendUrl' => route('statamic.elevated-session.resend-code'),
+            'passkeyOptionsUrl' => route('statamic.elevated-session.passkey-options'),
         ]);
     }
 

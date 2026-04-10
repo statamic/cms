@@ -753,11 +753,6 @@ class UserTags extends Tags
 
         $method = $user->getElevatedSessionMethod();
 
-        if ($method === 'passkey') {
-            // TODO: Implement frontend passkey support for elevated sessions
-            throw new \Exception('Passkey authentication for elevated sessions is not yet supported on the frontend.');
-        }
-
         if ($method === 'verification_code') {
             session()->sendElevatedSessionVerificationCodeIfRequired();
         }
@@ -765,7 +760,10 @@ class UserTags extends Tags
         $data = [
             ...$this->getFormSession('user.elevated_session'),
             'method' => $method,
+            'allow_passkey' => $method !== 'verification_code' && $user->passkeys()->isNotEmpty(),
             'resend_code_url' => route('statamic.elevated-session.resend-code'),
+            'passkey_options_url' => route('statamic.elevated-session.passkey-options'),
+            'submit_url' => route('statamic.elevated-session.confirm'),
         ];
 
         $action = route('statamic.elevated-session.confirm');
