@@ -1116,7 +1116,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (method_exists($this, $method = Str::camel($field)) && $this->methodIsSafeToQuery($method)) {
             return $this->{$method}();
         }
 
@@ -1127,6 +1127,17 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function methodIsSafeToQuery(string $method): bool
+    {
+        return in_array($method, [
+            'id', 'path', 'folder', 'filename', 'basename', 'extension',
+            'blueprint', 'container', 'containerId', 'containerHandle',
+            'size', 'lastModified', 'mimeType',
+            'width', 'height', 'orientation', 'ratio', 'duration',
+            'isImage', 'isVideo', 'isAudio', 'isSvg', 'isMedia', 'isPdf',
+        ]);
     }
 
     public function getCurrentDirtyStateAttributes(): array

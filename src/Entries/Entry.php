@@ -1098,7 +1098,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('entry-uris')->forget($this->id());
         }
 
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (method_exists($this, $method = Str::camel($field)) && $this->methodIsSafeToQuery($method)) {
             return $this->{$method}();
         }
 
@@ -1109,6 +1109,15 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function methodIsSafeToQuery(string $method): bool
+    {
+        return in_array($method, [
+            'id', 'path', 'slug', 'uri', 'status', 'published',
+            'date', 'order', 'collection', 'collectionHandle',
+            'blueprint', 'locale', 'site', 'lastModified',
+        ]);
     }
 
     public function getSearchValue(string $field)

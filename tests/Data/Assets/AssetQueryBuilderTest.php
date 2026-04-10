@@ -715,6 +715,17 @@ class AssetQueryBuilderTest extends TestCase
             'f.jpg',
         ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
     }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $count = $this->container->assets()->count();
+        $this->assertGreaterThan(0, $count);
+
+        $this->container->queryAssets()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, $this->container->assets());
+    }
 }
 
 class CustomScope extends Scope
