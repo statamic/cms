@@ -16,9 +16,12 @@ const props = defineProps({
         <Button :text="__('Save')" variant="primary" />
     </Teleport>
 
-    <button class="left-panel-popover__menu-button min-[1000px]:hidden" id="anchor-left-panel" popovertarget="popover-left-panel">
-        Form Builder
-    </button>
+    <Button
+        class="min-[1000px]:hidden"
+        id="anchor-left-panel"
+        popovertarget="popover-left-panel"
+        :text="__('Form Builder')"
+    />
 
     <LayoutPanel side="left">
         <div style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">

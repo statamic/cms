@@ -290,12 +290,6 @@ main.nav-closed {
         }
     }
 
-    .left-panel-popover__menu-button {
-        background: var(--dropdown-nav-background-color);
-        border-radius: 15px;
-        font-size: 0.85em;
-    }
-
     .left-panel-popover__close-button {
         position: fixed;
         left: 33.33%;
