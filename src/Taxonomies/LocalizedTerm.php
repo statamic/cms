@@ -504,7 +504,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             'absoluteUrl', 'apiUrl', 'blueprint', 'editUrl', 'entriesCount', 'hasOrigin', 'id', 'isRedirect',
             'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'path', 'private', 'published',
             'redirectUrl', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
-            'uri', 'url', 'values',
+            'uri', 'url', 'urlWithoutRedirect', 'values',
         ];
     }
 

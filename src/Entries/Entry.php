@@ -1117,7 +1117,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'apiUrl', 'blueprint', 'collection', 'collectionHandle', 'date', 'editUrl', 'hasDate', 'hasExplicitDate', 'hasOrigin',
             'hasSeconds', 'hasStructure', 'hasTime', 'id', 'isRedirect', 'isRoot', 'lastModified', 'lastModifiedBy',
             'layout', 'locale', 'order', 'path', 'private', 'published', 'redirectUrl', 'reference', 'site', 'sites', 'slug',
-            'status', 'template', 'uri', 'url',
+            'status', 'template', 'uri', 'url', 'urlWithoutRedirect',
         ];
     }
 
