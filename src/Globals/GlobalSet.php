@@ -3,6 +3,7 @@
 namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
@@ -18,9 +19,10 @@ use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class GlobalSet implements Contract
+class GlobalSet implements ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
@@ -242,6 +244,22 @@ class GlobalSet implements Contract
     public function deleteUrl()
     {
         return cp_route('globals.destroy', $this->handle());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'editUrl', 'handle', 'id', 'localizations', 'path', 'sites', 'title',
+        ];
     }
 
     public static function __callStatic($method, $parameters)

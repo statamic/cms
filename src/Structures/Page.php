@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use Statamic\Contracts\Auth\Protect\Protectable;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\BulkAugmentable;
@@ -25,7 +26,7 @@ use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Str;
 
-class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
+class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
 {
     use ContainsSupplementalData, ForwardsCalls, HasAugmentedInstance, ResolvesValues, TracksQueriedColumns;
 
@@ -491,6 +492,24 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function __call($method, $args)
     {
         return $this->forwardCallTo($this->entry(), $method, $args);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return $this->value($field);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'blueprint', 'collection', 'depth', 'editUrl', 'id', 'isRedirect', 'isRoot',
+            'private', 'published', 'reference', 'route', 'site', 'slug', 'status', 'structure',
+            'title', 'uri', 'url', 'urlWithoutRedirect',
+        ];
     }
 
     #[\ReturnTypeWillChange]

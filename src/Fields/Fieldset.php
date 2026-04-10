@@ -18,10 +18,11 @@ use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Fieldset
+class Fieldset implements ContainsQueryableValues
 {
     protected $handle;
     protected $contents = [];
@@ -294,6 +295,23 @@ class Fieldset
         FieldsetReset::dispatch($this);
 
         return true;
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'editUrl', 'fields', 'handle', 'isDeletable', 'isResettable',
+            'namespace', 'path', 'title',
+        ];
     }
 
     public static function __callStatic($method, $parameters)

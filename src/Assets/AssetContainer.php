@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
@@ -27,9 +28,10 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable, ContainsQueryableValues
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -691,6 +693,24 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'accessible', 'allowDownloading', 'allowMoving', 'allowRenaming', 'allowUploads',
+            'blueprint', 'createFolders', 'diskHandle', 'diskPath', 'editUrl', 'handle', 'hasSearchIndex',
+            'id', 'path', 'private', 'searchIndex', 'showUrl', 'sortDirection', 'sortField', 'title', 'url',
+        ];
     }
 
     public function __toString()

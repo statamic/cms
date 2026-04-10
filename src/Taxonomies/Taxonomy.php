@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
@@ -32,7 +33,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
 
-class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQueryableValues, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
@@ -567,5 +568,23 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     public function hasCustomTermTemplate()
     {
         return $this->termTemplate !== null;
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return $this->get($field);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'collection', 'collections', 'defaultPublishState', 'editUrl', 'handle',
+            'hasSearchIndex', 'id', 'layout', 'path', 'revisionsEnabled', 'searchIndex', 'sites',
+            'sortDirection', 'sortField', 'template', 'termTemplate', 'title', 'uri', 'url',
+        ];
     }
 }
