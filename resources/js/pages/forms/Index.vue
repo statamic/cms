@@ -67,7 +67,7 @@ const reloadPage = () => router.reload();
 
             <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="reloadPage">
                 <template #cell-title="{ row: form }">
-                    <Link :href="form.show_url">{{ form.title }}</Link>
+                    <Link :href="form.fields_url">{{ form.title }}</Link>
                 </template>
                 <template #prepended-row-actions="{ row: form }">
                     <DropdownItem v-if="form.can_edit" :text="__('Configure')" :href="form.edit_url" icon="cog" />

@@ -38,6 +38,7 @@ class FormsController extends CpController
                     'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
+                    'fields_url' => cp_route('forms.fields.index', $form->handle()),
                     'blueprint_url' => cp_route('blueprints.forms.edit', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
