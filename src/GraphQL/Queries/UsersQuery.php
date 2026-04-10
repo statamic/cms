@@ -11,6 +11,7 @@ use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\UserType;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
 class UsersQuery extends Query
@@ -65,7 +66,9 @@ class UsersQuery extends Query
                 [$sort, $order] = explode(' ', $sort);
             }
 
-            $query->orderBy($sort, $order);
+            if ($sort = OrderBy::column($sort)) {
+                $query->orderBy($sort, $order);
+            }
         }
     }
 
