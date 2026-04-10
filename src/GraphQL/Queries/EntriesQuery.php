@@ -8,7 +8,6 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
-use Statamic\Query\OrderBy;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\AuthorizeQueryScopes;
 use Statamic\GraphQL\Middleware\AuthorizeSubResources;
@@ -17,6 +16,7 @@ use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Queries\Concerns\ScopesQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
 class EntriesQuery extends Query

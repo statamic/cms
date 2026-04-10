@@ -5,13 +5,13 @@ namespace Statamic\GraphQL\Queries;
 use Facades\Statamic\API\FilterAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
-use Statamic\Query\OrderBy;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\UserType;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
 class UsersQuery extends Query

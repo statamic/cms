@@ -7,13 +7,13 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Asset;
 use Statamic\Facades\GraphQL;
-use Statamic\Query\OrderBy;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
 class AssetsQuery extends Query
