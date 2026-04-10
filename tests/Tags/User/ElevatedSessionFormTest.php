@@ -14,7 +14,6 @@ use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Webauthn\PublicKeyCredentialSource;
 
 #[Group('elevated-session')]
 class ElevatedSessionFormTest extends TestCase
@@ -97,15 +96,12 @@ class ElevatedSessionFormTest extends TestCase
         config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
 
         $user = User::make()->email('foo@bar.com');
-
-        $mockCredential = \Mockery::mock(PublicKeyCredentialSource::class);
-        $mockCredential->publicKeyCredentialId = 'key-a';
-
-        $user->setPasskeys(collect([
-            (new Passkey)->setCredential($mockCredential),
-        ]));
-
         $user->save();
+
+        $passkey = \Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+        $user->setPasskeys(collect([$passkey]));
+
         $this->actingAs($user);
 
         $output = $this->tag('{{ user:elevated_session_form }}<p class="method">{{ method }}</p>{{ /user:elevated_session_form }}');
