@@ -60,11 +60,13 @@ return [
     |
     | Additional middleware applied to the frontend auth routes (login,
     | register, password reset, etc). Useful for rate limiting, e.g.
-    | 'throttle:4,1' to allow 4 attempts per minute.
+    | 'throttle:5,1' to allow 5 attempts per minute.
     |
     */
 
-    'auth_middleware' => [],
+    'auth_middleware' => [
+        \Illuminate\Routing\Middleware\ThrottleRequests::class.':5,1',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -72,11 +74,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | Additional middleware applied to the frontend form submission route.
-    | Useful for rate limiting, e.g. 'throttle:30,1' to allow 30 submissions
+    | Useful for rate limiting, e.g. 'throttle:10,1' to allow 10 submissions
     | per minute.
     |
     */
 
-    'forms_middleware' => [],
+    'forms_middleware' => [
+        \Illuminate\Routing\Middleware\ThrottleRequests::class.':10,1',
+    ],
 
 ];
