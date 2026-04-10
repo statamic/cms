@@ -485,7 +485,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field)) && $this->methodIsSafeToQuery($method)) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -498,13 +498,13 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return $field->fieldtype()->toQueryableValue($value);
     }
 
-    private function methodIsSafeToQuery(string $method): bool
+    private function queryableMethods(): array
     {
-        return in_array($method, [
+        return [
             'id', 'path', 'slug', 'title', 'uri',
             'taxonomy', 'taxonomyHandle', 'blueprint',
             'locale', 'site', 'lastModified', 'entriesCount',
-        ]);
+        ];
     }
 
     public function getCpSearchResultBadge()

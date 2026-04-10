@@ -365,7 +365,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field)) && $this->methodIsSafeToQuery($method)) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -378,12 +378,12 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $field->fieldtype()->toQueryableValue($value);
     }
 
-    private function methodIsSafeToQuery(string $method): bool
+    private function queryableMethods(): array
     {
-        return in_array($method, [
+        return [
             'id', 'path', 'email', 'name', 'blueprint',
             'roles', 'groups', 'isSuper',
             'lastLogin', 'preferredLocale',
-        ]);
+        ];
     }
 }
