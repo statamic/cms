@@ -53,4 +53,30 @@ return [
 
     'middleware' => 'web',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auth Route Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Additional middleware applied to the frontend auth routes (login,
+    | register, password reset, etc). Useful for rate limiting, e.g.
+    | 'throttle:4,1' to allow 4 attempts per minute.
+    |
+    */
+
+    'auth_middleware' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Forms Route Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Additional middleware applied to the frontend form submission route.
+    | Useful for rate limiting, e.g. 'throttle:30,1' to allow 30 submissions
+    | per minute.
+    |
+    */
+
+    'forms_middleware' => [],
+
 ];

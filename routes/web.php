@@ -34,12 +34,12 @@ use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
-        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class])->name('forms.submit');
+        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware(array_merge([HandlePrecognitiveRequests::class], (array) config('statamic.routes.forms_middleware', [])))->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
 
-        Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
+        Route::group(['prefix' => 'auth', 'middleware' => array_merge([AuthGuard::class], (array) config('statamic.routes.auth_middleware', []))], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
             Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
