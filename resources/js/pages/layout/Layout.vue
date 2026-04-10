@@ -74,12 +74,19 @@ const { makeResizable } = useResizable();
 
 const sidebarMinWidth = 175;
 const sidebarMaxWidth = 450;
-const desktopSidebarDefaultWidth = 320;
+const sidebarCompactDefaultWidth = 270;
+const sidebarWideDefaultWidth = 320;
+/** Below this width, sidebars default to `sidebarMinWidth` (175px). */
+const sidebarNarrowBreakpoint = 1250;
+/** At or above `sidebarNarrowBreakpoint` and below this, sidebars default to 280px. */
+const sidebarCompactBreakpoint = 1400;
 
 const getSidebarDefaultWidth = () => {
-    // When the viewport is narrow, start the sidebar at its minimum width.
-    if (typeof window === 'undefined') return desktopSidebarDefaultWidth;
-    return window.innerWidth < 1200 ? sidebarMinWidth : desktopSidebarDefaultWidth;
+    if (typeof window === 'undefined') return sidebarWideDefaultWidth;
+    const w = window.innerWidth;
+    if (w < sidebarNarrowBreakpoint) return sidebarMinWidth;
+    if (w < sidebarCompactBreakpoint) return sidebarCompactDefaultWidth;
+    return sidebarWideDefaultWidth;
 };
 
 makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getSidebarDefaultWidth });
@@ -88,17 +95,22 @@ makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: sidebar
 const applyBreakpointDefaults = () => {
     if (typeof window === 'undefined') return;
 
-    const narrow = window.innerWidth < 1200;
-    const target = narrow ? sidebarMinWidth : desktopSidebarDefaultWidth;
-    const narrowPx = `${sidebarMinWidth}px`;
-    const desktopPx = `${desktopSidebarDefaultWidth}px`;
+    const w = window.innerWidth;
+    let target;
+    if (w < sidebarNarrowBreakpoint) target = sidebarMinWidth;
+    else if (w < sidebarCompactBreakpoint) target = sidebarCompactDefaultWidth;
+    else target = sidebarWideDefaultWidth;
+
+    const minPx = `${sidebarMinWidth}px`;
+    const compactPx = `${sidebarCompactDefaultWidth}px`;
+    const widePx = `${sidebarWideDefaultWidth}px`;
 
     const applyIfUnmodified = (panelEl) => {
         if (!panelEl) return;
         const current = panelEl.style.width;
 
-        // Only apply if it currently equals our prior "default", meaning the user hasn't dragged it.
-        if (!current || current === narrowPx || current === desktopPx) {
+        // Only apply if it currently equals a prior default, meaning the user hasn't dragged it.
+        if (!current || current === minPx || current === compactPx || current === widePx) {
             panelEl.style.width = `${target}px`;
         }
     };
@@ -123,7 +135,6 @@ onUnmounted(() => {
     window.removeEventListener('resize', applyBreakpointDefaults);
 });
 
-// TODO: Make the nav an overlay
 </script>
 
 <template>
