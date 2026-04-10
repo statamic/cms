@@ -17,10 +17,11 @@ const props = defineProps({
     </Teleport>
 
     <Button
-        class="min-[1000px]:hidden"
+        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:-translate-x-9 mb-5"
         id="anchor-left-panel"
         popovertarget="popover-left-panel"
         :text="__('Form Builder')"
+        icon="bar-sidebar-left-panel-open"
     />
 
     <LayoutPanel side="left">
