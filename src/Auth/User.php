@@ -381,8 +381,9 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     private function queryableMethods(): array
     {
         return [
-            'apiUrl', 'avatar', 'blueprint', 'editUrl', 'gravatarUrl', 'hasAvatarField', 'initials',
-            'isSuper', 'isTaxonomizable', 'name', 'preferredLocale', 'preferredTheme', 'reference', 'title',
+            'apiUrl', 'avatar', 'blueprint', 'editUrl', 'email', 'gravatarUrl', 'groups', 'hasAvatarField',
+            'id', 'initials', 'isSuper', 'isTaxonomizable', 'lastLogin', 'name', 'path', 'preferredLocale',
+            'preferredTheme', 'reference', 'roles', 'title',
         ];
     }
 }
