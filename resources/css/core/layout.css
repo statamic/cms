@@ -284,7 +284,7 @@ main.nav-closed {
     #popover-left-panel {
         position-anchor: --anchor-left-panel;
         top: 3.5rem;
-        width: 33.33%;
+        width: max(11rem, 33.33%);
         &:not(:popover-open) {
             pointer-events: none;
         }
@@ -292,7 +292,7 @@ main.nav-closed {
 
     .left-panel-popover__close-button {
         position: fixed;
-        left: 33.33%;
+        left: max(11rem, 33.33%);
         top: 3.5rem;
         width: initial;
         height: initial;
