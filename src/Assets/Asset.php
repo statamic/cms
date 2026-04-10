@@ -1132,11 +1132,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     private function queryableMethods(): array
     {
         return [
-            'id', 'path', 'folder', 'filename', 'basename', 'extension',
-            'blueprint', 'container', 'containerId', 'containerHandle',
-            'size', 'lastModified', 'mimeType',
-            'width', 'height', 'orientation', 'ratio', 'duration',
-            'isImage', 'isVideo', 'isAudio', 'isSvg', 'isMedia', 'isPdf',
+            'absoluteUrl', 'apiUrl', 'basename', 'blueprint', 'containerId', 'containerHandle', 'dimensions',
+            'duration', 'editUrl', 'exists', 'extension', 'filename', 'folder', 'guessedExtension',
+            'hasDimensions', 'hasDuration', 'height', 'id', 'isAudio', 'isImage', 'isMedia', 'isPdf',
+            'isPreviewable', 'isSvg', 'isVideo', 'lastModified', 'mimeType', 'orientation', 'path', 'pdfUrl',
+            'ratio', 'reference', 'size', 'thumbnailUrl', 'title', 'url', 'width',
         ];
     }
 

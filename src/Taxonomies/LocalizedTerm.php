@@ -501,9 +501,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     private function queryableMethods(): array
     {
         return [
-            'id', 'path', 'slug', 'title', 'uri',
-            'taxonomy', 'taxonomyHandle', 'blueprint',
-            'locale', 'site', 'lastModified', 'entriesCount',
+            'absoluteUrl', 'apiUrl', 'blueprint', 'editUrl', 'entriesCount', 'hasOrigin', 'id', 'isRedirect',
+            'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'path', 'private', 'published',
+            'redirectUrl', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
+            'uri', 'url', 'values',
         ];
     }
 
