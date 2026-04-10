@@ -4,19 +4,23 @@ namespace Tests\Tags\User;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Statamic\Facades\WebAuthn;
 use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('2fa')]
+#[Group('passkeys')]
 class LoginFormTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
@@ -362,5 +366,158 @@ EOT
     protected function disableTwoFactor($app)
     {
         $app['config']->set('statamic.users.two_factor_enabled', false);
+    }
+
+    #[Test]
+    public function it_includes_passkey_data()
+    {
+        $output = $this->tag('{{ user:login_form }}{{ passkey_options_url }}|{{ passkey_verify_url }}{{ /user:login_form }}');
+
+        $this->assertStringContainsString(route('statamic.passkeys.options'), $output);
+        $this->assertStringContainsString(route('statamic.passkeys.login'), $output);
+    }
+
+    #[Test]
+    public function it_allows_password_login_when_user_has_no_passkeys()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_blocks_password_login_when_user_has_passkeys_and_enforcement_enabled()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        $passkey = Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+        $user->setPasskeys(collect([$passkey]));
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => false]);
+
+        $this
+            ->from('/login')
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/login');
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_allows_password_login_when_user_has_passkeys_and_enforcement_disabled()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        $passkey = Mockery::mock(Passkey::class);
+        $passkey->shouldReceive('id')->andReturn('passkey-1');
+        $user->setPasskeys(collect([$passkey]));
+
+        config(['statamic.webauthn.allow_password_login_with_passkey' => true]);
+
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'test@example.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_gets_passkey_login_options()
+    {
+        $response = $this->get(route('statamic.passkeys.options'));
+
+        $response->assertOk();
+
+        $data = $response->json();
+
+        $this->assertArrayHasKey('challenge', $data);
+        $this->assertArrayHasKey('userVerification', $data);
+        $this->assertEquals('required', $data['userVerification']);
+    }
+
+    #[Test]
+    public function it_logs_in_with_passkey()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->postJson(route('statamic.passkeys.login'))
+            ->assertOk()
+            ->assertJson(['redirect' => '/']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_redirects_to_provided_url_after_passkey_login()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->postJson(route('statamic.passkeys.login'), ['redirect' => '/dashboard'])
+            ->assertOk()
+            ->assertJson(['redirect' => '/dashboard']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_after_passkey_login()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
+
+        $this
+            ->postJson(route('statamic.passkeys.login'), ['redirect' => 'https://evil.com'])
+            ->assertOk()
+            ->assertJson(['redirect' => '/']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_fails_passkey_login_when_validation_fails()
+    {
+        $user = User::make()->id('test-user')->email('test@example.com')->password('secret');
+        $user->save();
+
+        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
+        WebAuthn::shouldReceive('validateAssertion')->once()->andThrow(new \Exception('Invalid'));
+
+        $this
+            ->postJson(route('statamic.passkeys.login'))
+            ->assertStatus(500);
+
+        $this->assertGuest();
     }
 }

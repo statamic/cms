@@ -211,6 +211,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     <FieldsProvider
                         :fields="config.fields"
                         :as-config="false"
+                        :read-only
                         :field-path-prefix="fieldPathPrefix"
                         :meta-path-prefix="metaPathPrefix"
                     >

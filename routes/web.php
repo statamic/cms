@@ -17,6 +17,8 @@ use Statamic\Http\Controllers\ResetPasswordController;
 use Statamic\Http\Controllers\TwoFactorChallengeController;
 use Statamic\Http\Controllers\TwoFactorSetupController;
 use Statamic\Http\Controllers\User\LoginController;
+use Statamic\Http\Controllers\User\PasskeyController;
+use Statamic\Http\Controllers\User\PasskeyLoginController;
 use Statamic\Http\Controllers\User\PasswordController;
 use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
@@ -56,6 +58,19 @@ Route::name('statamic.')->group(function () {
                 Route::get('confirm-password', [ElevatedSessionController::class, 'showForm'])->name('elevated-session')->middleware([HandleInertiaRequests::class]);
                 Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
                 Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+            });
+
+            Route::group(['prefix' => 'passkeys'], function () {
+                Route::middleware(ThrottleRequests::class.':30,1')->group(function () {
+                    Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.options');
+                    Route::post('auth', [PasskeyLoginController::class, 'login'])->name('passkeys.login');
+                });
+
+                Route::middleware('auth')->group(function () {
+                    Route::get('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+                    Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
+                    Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
+                });
             });
 
             if (TwoFactor::enabled()) {
