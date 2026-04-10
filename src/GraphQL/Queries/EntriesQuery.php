@@ -8,6 +8,7 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\Query\OrderBy;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\AuthorizeQueryScopes;
 use Statamic\GraphQL\Middleware\AuthorizeSubResources;
@@ -96,7 +97,9 @@ class EntriesQuery extends Query
                 [$sort, $order] = explode(' ', $sort);
             }
 
-            $query->orderBy($sort, $order);
+            if ($sort = OrderBy::column($sort)) {
+                $query->orderBy($sort, $order);
+            }
         }
     }
 

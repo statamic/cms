@@ -5,6 +5,7 @@ namespace Statamic\GraphQL\Queries;
 use Facades\Statamic\API\FilterAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
+use Statamic\Query\OrderBy;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
@@ -65,7 +66,9 @@ class UsersQuery extends Query
                 [$sort, $order] = explode(' ', $sort);
             }
 
-            $query->orderBy($sort, $order);
+            if ($sort = OrderBy::column($sort)) {
+                $query->orderBy($sort, $order);
+            }
         }
     }
 
