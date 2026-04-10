@@ -627,8 +627,10 @@ class ElevatedSessionTest extends TestCase
                 ->component('auth/ConfirmPassword')
                 ->where('outside', true)
                 ->has('method')
+                ->has('allowPasskey')
                 ->has('submitUrl')
                 ->has('resendUrl')
+                ->has('passkeyOptionsUrl')
             );
     }
 
