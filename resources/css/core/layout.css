@@ -244,6 +244,10 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / LEFT PANEL
 =================================================== */
+#anchor-left-panel {
+    anchor-name: --anchor-left-panel;
+}
+
 .left-panel-popover {
     .left-panel-popover__menu {
         overscroll-behavior-y: contain;
@@ -277,10 +281,6 @@ main.nav-closed {
         ;
     }
 
-    #anchor-left-panel {
-        anchor-name: --anchor-left-panel;
-    }
-
     #popover-left-panel {
         position-anchor: --anchor-left-panel;
         top: 3.5rem;
@@ -293,6 +293,69 @@ main.nav-closed {
     .left-panel-popover__close-button {
         position: fixed;
         left: max(11rem, 33.33%);
+        top: 3.5rem;
+        width: initial;
+        height: initial;
+        cursor: pointer;
+        padding: 1rem;
+        & svg {
+            font-size: 1rem;
+            inline-size: unset;
+        }
+    }
+}
+
+/* GROUP THREE PANEL STATES / RIGHT PANEL
+=================================================== */
+#anchor-right-panel {
+    anchor-name: --anchor-right-panel;
+}
+
+.right-panel-popover {
+    .right-panel-popover__menu {
+        overscroll-behavior-y: contain;
+        height: calc(100% + 3.5rem);
+
+        display: none;
+
+        &,
+        & .right-panel-popover__close-button {
+            opacity: 0;
+            transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
+        }
+
+        &:popover-open,
+        &:popover-open .right-panel-popover__close-button {
+            display: block;
+            opacity: 1;
+
+            @starting-style {
+                opacity: 0;
+                margin-block-start: 0;
+                margin-inline-end: -50%;
+            }
+        }
+
+        background: var(--theme-color-body-bg);
+        @apply
+            px-2
+            border-l border-gray-200 dark:border-gray-700
+            shadow-2xl
+        ;
+    }
+
+    #popover-right-panel {
+        position-anchor: --anchor-right-panel;
+        top: 3.5rem;
+        width: max(11rem, 33.33%);
+        &:not(:popover-open) {
+            pointer-events: none;
+        }
+    }
+
+    .right-panel-popover__close-button {
+        position: fixed;
+        right: max(11rem, 33.33%);
         top: 3.5rem;
         width: initial;
         height: initial;
