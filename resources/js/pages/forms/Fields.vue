@@ -17,7 +17,7 @@ const props = defineProps({
     </Teleport>
 
     <Button
-        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:-translate-x-9 mb-5"
+        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:-translate-x-9 mb-5 col-start-1 row-start-1"
         popovertarget="popover-left-panel"
         :text="__('Form Builder')"
         icon="bar-sidebar-left-panel-open"
@@ -324,7 +324,7 @@ const props = defineProps({
         </div>
     </LayoutPanel>
 
-    <div class="py-4">
+    <div class="pt-20 min-[1000px]:py-10 col-span-full row-start-1">
         <p>TODO: Form Builder</p>
         <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
         <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
@@ -343,7 +343,7 @@ const props = defineProps({
     </div>
 
     <Button
-        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:translate-x-9 mb-5"
+        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
         icon="bar-sidebar-right-panel-open"

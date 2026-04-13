@@ -162,7 +162,10 @@ onUnmounted(() => {
                 </div>
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto sm:mb-2" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
-                    <div class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18" data-max-width-wrapper>
+                    <div class="
+                        max-[1000px]:grid max-[1000px]:grid-cols-[auto_1fr_auto]
+                        w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18
+                    " data-max-width-wrapper>
                         <slot />
                     </div>
                 </div>

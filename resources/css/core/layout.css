@@ -359,26 +359,6 @@ main.nav-closed {
     }
 }
 
-/* #content-card > div {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-}
-
-#content-card > div > div {
-    border: 3px solid blue!important;
-    grid-column: -1/1;
-    grid-row: 1;
-}
-
-#content-card > div > button:nth-child(1) {
-    grid-column: 1;
-    grid-row: 1;
-}
-#content-card > div > button:nth-child(3) {
-    grid-row: 1;
-    grid-column: 3;
-} */
-
 
 /* ==========================================================================
    DRAGGABLE MIRRORS
