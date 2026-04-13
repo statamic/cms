@@ -967,6 +967,9 @@ class EntryQueryBuilderTest extends TestCase
             '/ test',
             'test /',
             'test / test',
+            'Über dem Meer',
+            'über dem meer',
+            'Ärger',
         ])->each(function ($val, $i) {
             EntryFactory::id($i)
                 ->slug('post-'.$i)
@@ -999,6 +1002,10 @@ class EntryQueryBuilderTest extends TestCase
             '%/' => ['/', 'test /'],
             '/%' => ['/', '/ test'],
             '%/%' => ['/', '/ test', 'test /', 'test / test'],
+            '%über%' => ['Über dem Meer', 'über dem meer'],
+            '%Über%' => ['Über dem Meer', 'über dem meer'],
+            '%ärger%' => ['Ärger'],
+            '%Ärger%' => ['Ärger'],
         ])->mapWithKeys(function ($expected, $like) {
             return [$like => [$like, $expected]];
         });
