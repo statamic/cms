@@ -346,7 +346,7 @@ const props = defineProps({
         class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
-        icon="bar-sidebar-right-panel-open"
+        icon="cog"
     />
 
     <LayoutPanel side="right">
