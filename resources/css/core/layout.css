@@ -244,10 +244,6 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / LEFT PANEL
 =================================================== */
-#anchor-left-panel {
-    anchor-name: --anchor-left-panel;
-}
-
 .left-panel-popover {
     .left-panel-popover__menu {
         overscroll-behavior-y: contain;
@@ -282,7 +278,6 @@ main.nav-closed {
     }
 
     #popover-left-panel {
-        position-anchor: --anchor-left-panel;
         top: 3.5rem;
         width: max(11rem, 33.33%);
         &:not(:popover-open) {
@@ -307,10 +302,6 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / RIGHT PANEL
 =================================================== */
-#anchor-right-panel {
-    anchor-name: --anchor-right-panel;
-}
-
 .right-panel-popover {
     .right-panel-popover__menu {
         overscroll-behavior-y: contain;
@@ -345,7 +336,6 @@ main.nav-closed {
     }
 
     #popover-right-panel {
-        position-anchor: --anchor-right-panel;
         top: 3.5rem;
         width: max(11rem, 33.33%);
         &:not(:popover-open) {

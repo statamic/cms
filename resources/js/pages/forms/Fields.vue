@@ -18,7 +18,6 @@ const props = defineProps({
 
     <Button
         class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:-translate-x-9 mb-5"
-        id="anchor-left-panel"
         popovertarget="popover-left-panel"
         :text="__('Form Builder')"
         icon="bar-sidebar-left-panel-open"
@@ -331,7 +330,6 @@ const props = defineProps({
 
     <Button
         class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:-translate-x-9 mb-5"
-        id="anchor-right-panel"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
         icon="bar-sidebar-right-panel-open"
