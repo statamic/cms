@@ -32,7 +32,6 @@ export default function useResizable() {
                     handle.style.zIndex = 'var(--z-index-draggable)';
                     handle.style[resolvedEdge] = '-2px';
 
-                    panel.style.position = 'relative';
                     panel.appendChild(handle);
 
                     const resetToDefaultWidth = () => {
