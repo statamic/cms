@@ -336,6 +336,7 @@ main.nav-closed {
     }
 
     #popover-right-panel {
+        margin-inline-start: auto;
         top: 3.5rem;
         width: max(11rem, 33.33%);
         &:not(:popover-open) {
@@ -357,6 +358,7 @@ main.nav-closed {
         }
     }
 }
+
 
 /* ==========================================================================
    DRAGGABLE MIRRORS
