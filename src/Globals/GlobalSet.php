@@ -3,8 +3,8 @@
 namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
-use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;

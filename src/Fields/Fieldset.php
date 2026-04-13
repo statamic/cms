@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -18,7 +19,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy;
-use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
