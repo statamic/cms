@@ -156,7 +156,7 @@ onUnmounted(() => {
             >
                 <!-- Panel contents will be injected via <Teleport> -->
                 <div v-show="leftPanelActive" data-left-panel ref="leftPanel" id="left-panel" tabindex="-1" class="
-                    relative overflow-y-scroll overscroll-y-contain overflow-x-clip sticky top-0 min-h-full h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
+                    relative overflow-y-scroll overscroll-y-contain overflow-x-clip sticky top-0 h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
                     max-sm:ps-2 pe-2
                 {{ leftPanelActive ? 'grid' : 'hidden' }}">
                 </div>
@@ -167,7 +167,7 @@ onUnmounted(() => {
                     </div>
                 </div>
                 <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="
-                    relative overflow-y-scroll overscroll-y-contain overflow-x-clip sticky top-0 min-h-full h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
+                    relative overflow-y-scroll overscroll-y-contain overflow-x-clip sticky top-0 h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
                     max-sm:ps-2 ps-2
                 {{ rightPanelActive ? 'grid' : 'hidden' }}">
                     <!-- Panel contents will be injected via <Teleport> -->
