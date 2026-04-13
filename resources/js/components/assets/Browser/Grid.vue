@@ -117,7 +117,7 @@
                                     @click.stop="selectionClicked(index, $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
-                                    <div class="relative flex aspect-square size-full items-center justify-center">
+                                    <div class="relative flex aspect-square size-full items-center justify-center cursor-pointer">
                                         <div class="asset-thumb">
                                             <img
                                                 v-if="asset.thumbnail"
