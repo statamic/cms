@@ -163,7 +163,7 @@ onUnmounted(() => {
                         <slot />
                     </div>
                 </div>
-                <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="max-[1000px]:!w-0 max-[1000px]:!p-0 focus:outline-none relative layout-right-panel grid min-h-full mx-auto">
+                <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="max-[1000px]:!w-0 max-[1000px]:!p-0 focus:outline-none relative layout-right-panel overflow-y-scroll overflow-x-clip grid max-sm:ps-2 ps-2 min-h-full mx-auto">
                     <!-- Panel contents will be injected via <Teleport> -->
                 </div>
             </div>
