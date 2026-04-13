@@ -139,6 +139,7 @@ return [
     'form_export_filtered_description' => 'Exports submissions with current filters and visible columns.',
     'form_create_description' => 'Get started by creating your first form.',
     'form_builder' => 'Form Builder',
+    'form_navigation' => 'Form navigation',
     'form_fake_submissions_deleted' => 'Deleted :count fake submission.|Deleted :count fake submissions.',
     'form_fake_submissions_delete_failed' => 'Fake submissions could not be deleted.',
     'form_fake_submissions_form_not_found' => 'Form could not be found for deleting fake submissions.',

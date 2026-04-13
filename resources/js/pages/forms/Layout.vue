@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import { Button } from '@ui';
 
 const page = usePage();
 const form = computed(() => page.props.form);
@@ -14,23 +15,54 @@ const navItems = [
 ];
 
 const isActive = (href) => page.url === new URL(href, window.location.origin).pathname;
+
+const activeSectionLabel = computed(() => {
+    return navItems.find((item) => isActive(item.href))?.label ?? navItems[0]?.label ?? '';
+});
 </script>
 
 <template>
     <Teleport to="#global-header-slot">
-        <nav class="global-header-nav">
-            <ul>
-                <li v-for="navItem in navItems" :key="navItem.href">
-                    <Link
-                        :href="navItem.href"
-                        :class="{ active: isActive(navItem.href) }"
-                        :aria-current="isActive(navItem.href) ? 'page' : undefined"
-                    >
-                        {{ navItem.label }}
-                    </Link>
-                </li>
-            </ul>
-        </nav>
+        <div class="flex items-center justify-center">
+            <div class="global-header-nav-popover lg:hidden">
+                <Button
+                    id="anchor-global-header-nav"
+                    variant="ghost"
+                    size="sm"
+                    class="text-white! border-0! shadow-none! hover:bg-white/12! [&_svg]:text-white/80"
+                    popovertarget="popover-global-header-nav"
+                    :text="activeSectionLabel"
+                    icon-append="chevron-down"
+                />
+                <nav id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
+                    <ul class="global-header-nav-popover__list">
+                        <li v-for="navItem in navItems" :key="`m-${navItem.href}`">
+                            <Link
+                                :href="navItem.href"
+                                :class="{ active: isActive(navItem.href) }"
+                                :aria-current="isActive(navItem.href) ? 'page' : undefined"
+                            >
+                                {{ navItem.label }}
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <nav class="global-header-nav hidden lg:block" :aria-label="__('form_navigation')">
+                <ul>
+                    <li v-for="navItem in navItems" :key="navItem.href">
+                        <Link
+                            :href="navItem.href"
+                            :class="{ active: isActive(navItem.href) }"
+                            :aria-current="isActive(navItem.href) ? 'page' : undefined"
+                        >
+                            {{ navItem.label }}
+                        </Link>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </Teleport>
 
     <slot />
