@@ -670,6 +670,7 @@ provideListingContext({
 defineExpose({
     refresh,
     setFilter,
+    parameters,
 });
 
 watch(parameters, (newParams, oldParams) => {

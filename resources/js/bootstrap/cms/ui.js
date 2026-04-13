@@ -114,6 +114,7 @@ export {
     TabProvider,
     Tabs,
     TabTrigger,
+    Text,
     Textarea,
     TimePicker,
     ToggleGroup,

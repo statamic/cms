@@ -717,6 +717,17 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::externalStyle($url);
     }
 
+    protected function registerSerializableClasses(array $classes)
+    {
+        $existing = $this->app['config']->get('cache.serializable_classes');
+
+        if ($existing === null || $existing === true) {
+            return;
+        }
+
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], $classes));
+    }
+
     protected function schedule(Schedule $schedule)
     {
         //
