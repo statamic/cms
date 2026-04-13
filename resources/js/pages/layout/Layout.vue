@@ -148,7 +148,7 @@ onUnmounted(() => {
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div
                 id="main-content"
-                class="main-content sm:p-2 h-full flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
+                class="main-content sm:p-2 pb-0! h-full flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
                 :class="{
                     'flex': leftPanelActive || rightPanelActive,
                 }"
@@ -160,7 +160,7 @@ onUnmounted(() => {
                     max-sm:ps-2 pe-2
                 {{ leftPanelActive ? 'grid' : 'hidden' }}">
                 </div>
-                <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
+                <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto sm:mb-2" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                     <div class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18" data-max-width-wrapper>
                         <slot />
