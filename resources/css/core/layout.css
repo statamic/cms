@@ -321,42 +321,42 @@ main.nav-closed {
     }
 }
 
-/* GROUP THREE PANEL STATES / LEFT PANEL
+/* GROUP THREE PANEL STATES / SIDE PANELS
 =================================================== */
-.left-panel-popover {
-    .left-panel-popover__menu {
+.left-panel-popover,
+.right-panel-popover {
+    [class*="popover__menu"] {
         overscroll-behavior-y: contain;
         height: calc(100% + 3.5rem);
 
         display: none;
 
         &,
-        & .left-panel-popover__close-button {
+        & [class*="popover__close-button"] {
             opacity: 0;
             transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
         }
 
         &:popover-open,
-        &:popover-open .left-panel-popover__close-button {
+        &:popover-open [class*="popover__close-button"] {
             display: block;
             opacity: 1;
 
             @starting-style {
                 opacity: 0;
                 margin-block-start: 0;
-                margin-inline-start: -50%;
             }
         }
 
         background: var(--theme-color-body-bg);
         @apply
             px-2
-            border-r border-gray-200 dark:border-gray-700
             shadow-2xl
         ;
     }
 
-    #popover-left-panel {
+    #popover-left-panel,
+    #popover-right-panel {
         top: 3.5rem;
         width: max(11rem, 33.33%);
         &:not(:popover-open) {
@@ -364,9 +364,8 @@ main.nav-closed {
         }
     }
 
-    .left-panel-popover__close-button {
+    [class*="popover__close-button"] {
         position: fixed;
-        left: max(11rem, 33.33%);
         top: 3.5rem;
         width: initial;
         height: initial;
@@ -379,62 +378,49 @@ main.nav-closed {
     }
 }
 
-/* GROUP THREE PANEL STATES / RIGHT PANEL
+/* GROUP THREE PANEL STATES / SIDE PANELS / LEFT PANEL
+=================================================== */
+.left-panel-popover {
+    .left-panel-popover__menu {
+        &:popover-open,
+        &:popover-open .left-panel-popover__close-button {
+            @starting-style {
+                margin-inline-start: -50%;
+            }
+        }
+
+        @apply
+            border-r border-gray-200 dark:border-gray-700
+        ;
+    }
+
+    .left-panel-popover__close-button {
+        left: max(11rem, 33.33%);
+    }
+}
+
+/* GROUP THREE PANEL STATES / SIDE PANELS / RIGHT PANEL
 =================================================== */
 .right-panel-popover {
     .right-panel-popover__menu {
-        overscroll-behavior-y: contain;
-        height: calc(100% + 3.5rem);
-
-        display: none;
-
-        &,
-        & .right-panel-popover__close-button {
-            opacity: 0;
-            transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
-        }
-
         &:popover-open,
         &:popover-open .right-panel-popover__close-button {
-            display: block;
-            opacity: 1;
-
             @starting-style {
-                opacity: 0;
-                margin-block-start: 0;
                 margin-inline-end: -50%;
             }
         }
 
-        background: var(--theme-color-body-bg);
         @apply
-            px-2
             border-l border-gray-200 dark:border-gray-700
-            shadow-2xl
         ;
     }
 
     #popover-right-panel {
         margin-inline-start: auto;
-        top: 3.5rem;
-        width: max(11rem, 33.33%);
-        &:not(:popover-open) {
-            pointer-events: none;
-        }
     }
 
     .right-panel-popover__close-button {
-        position: fixed;
         right: max(11rem, 33.33%);
-        top: 3.5rem;
-        width: initial;
-        height: initial;
-        cursor: pointer;
-        padding: 1rem;
-        & svg {
-            font-size: 1rem;
-            inline-size: unset;
-        }
     }
 }
 
