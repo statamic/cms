@@ -9,6 +9,12 @@ use Statamic\Support\Str;
 
 class ResolveValue
 {
+    private array $denylist = [
+        'delete', 'deleteFile', 'deleteQuietly',
+        'destroy', 'forceDelete', 'save', 'saveQuietly',
+        'truncate', 'update', 'updateQuietly', 'write', 'writeFile',
+    ];
+
     public function __invoke($item, $name)
     {
         if (Str::startsWith($name, 'data->')) {
@@ -52,7 +58,7 @@ class ResolveValue
             return $item->getQueryableValue($name);
         }
 
-        if (method_exists($item, $method = Str::camel($name))) {
+        if (method_exists($item, $method = Str::camel($name)) && ! in_array($method, $this->denylist)) {
             return $item->{$method}();
         }
 
