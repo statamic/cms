@@ -34,7 +34,7 @@ const activeSectionLabel = computed(() => {
                     icon-append="chevron-down"
                 />
                 <nav id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
-                    <ul class="global-header-nav-popover__list">
+                    <ul>
                         <li v-for="navItem in navItems" :key="`m-${navItem.href}`">
                             <Link
                                 :href="navItem.href"

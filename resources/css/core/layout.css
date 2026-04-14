@@ -242,16 +242,17 @@ main.nav-closed {
     }
 
     .global-header-nav-popover__menu {
-        overscroll-behavior-y: contain;
-        display: none;
-        opacity: 0;
-        transition:
-            opacity 200ms,
-            display 200ms allow-discrete,
-            overlay 200ms allow-discrete;
+        position-anchor: --anchor-global-header-nav;
+        top: calc(anchor(bottom) + 6px);
+        left: anchor(left);
+        min-width: max(anchor-size(width), 11rem);
+        max-width: 22rem;
+        @apply p-1 bg-white dark:bg-gray-925 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-xl;
 
+        /* Popover styling - This is not strictly needed but it smooths out the popover opening */
+        opacity: 0;
+        transition: opacity 0.2s;
         &:popover-open {
-            display: block;
             opacity: 1;
 
             @starting-style {
@@ -259,50 +260,22 @@ main.nav-closed {
             }
         }
 
-        background: var(--theme-color-body-bg);
-        @apply p-1 border border-gray-200 shadow-2xl rounded-xl;
-    }
+        ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
 
-    :where(.dark) & .global-header-nav-popover__menu {
-        @apply border-gray-700;
-    }
+            a {
+                text-decoration: none;
 
-    #popover-global-header-nav {
-        position-anchor: --anchor-global-header-nav;
-        top: calc(anchor(bottom) + 6px);
-        left: anchor(left);
-        min-width: max(anchor-size(width), 11rem);
-        max-width: 22rem;
+                @apply flex px-2.5 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
 
-        &:not(:popover-open) {
-            pointer-events: none;
+                &.active,
+                &[aria-current='page'] {
+                    @apply bg-gray-400/15 text-gray-925 dark:bg-gray-800 dark:text-white font-semibold;
+                }
+            }
         }
-    }
-
-    .global-header-nav-popover__list {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .global-header-nav-popover__list a {
-        text-decoration: none;
-
-        @apply flex px-2.5 py-1.5 rounded-lg text-sm text-gray-700 hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
-    }
-
-    :where(.dark) & .global-header-nav-popover__list a {
-        color: var(--color-gray-200);
-    }
-
-    .global-header-nav-popover__list a.active,
-    .global-header-nav-popover__list a[aria-current='page'] {
-        @apply bg-gray-400/15 text-gray-925 dark:text-white font-semibold;
-    }
-
-    :where(.dark) & .global-header-nav-popover__list a.active,
-    :where(.dark) & .global-header-nav-popover__list a[aria-current='page'] {
-        @apply bg-gray-800 text-white;
     }
 }
 
