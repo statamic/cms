@@ -1,5 +1,28 @@
 # Release Notes
 
+## 6.13.0 (2026-04-13)
+
+### What's new
+- Frontend Passkeys [#14453](https://github.com/statamic/cms/issues/14453) by @duncanmcclean
+- Allow control over who can be impersonated in UserPolicy [#14469](https://github.com/statamic/cms/issues/14469) by @ryanmitchell
+
+### What's fixed
+- Fix Bard arrow keys/undo [#14467](https://github.com/statamic/cms/issues/14467) by @jackmcdade
+- Fix visible he-tree accessibility text in tree view [#14465](https://github.com/statamic/cms/issues/14465) by @duncanmcclean
+- Append to Bard Entry links [#11468](https://github.com/statamic/cms/issues/11468) by @edalzell
+- Disable broadcast provider when broadcasting driver is null [#14471](https://github.com/statamic/cms/issues/14471) by @jasonvarga
+- Make the collapsible section icon smaller to fit in with the rest of UI [#14478](https://github.com/statamic/cms/issues/14478) by @jaygeorge
+- Add `.npmrc` file [#14477](https://github.com/statamic/cms/issues/14477) by @duncanmcclean
+- Fix SVG sanitization tests [#14483](https://github.com/statamic/cms/issues/14483) by @duncanmcclean
+- Use `cursor: pointer` when selecting from asset grid [#14487](https://github.com/statamic/cms/issues/14487) by @joshuablum
+- Remove negative assertions from `TestCase` [#14458](https://github.com/statamic/cms/issues/14458) by @duncanmcclean
+- Harden OrderBys [#14474](https://github.com/statamic/cms/issues/14474) by @duncanmcclean
+- Harden query value resolution [#14476](https://github.com/statamic/cms/issues/14476) by @duncanmcclean
+- French translations [#14479](https://github.com/statamic/cms/issues/14479) by @ebeauchamps
+- Bump axios from 1.14.0 to 1.15.0 [#14473](https://github.com/statamic/cms/issues/14473) by @dependabot
+
+
+
 ## 6.12.0 (2026-04-08)
 
 ### What's new
