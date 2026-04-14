@@ -85,14 +85,10 @@ export default {
             }
 
             if (this.sectionBehavior === 'flatten') {
-                return this.fieldsetSectionsCount === 1
-                    ? __('Ignoring Section')
-                    : __('Ignoring Sections');
+                return __n('Ignoring Section|Ignoring Sections', this.fieldsetSectionsCount);
             }
 
-            return this.fieldsetSectionsCount === 1
-                ? __('Has Section')
-                : __('Has Sections');
+            return __n('Has Section|Has Sections', this.fieldsetSectionsCount);
         },
 
         fieldConfig() {
