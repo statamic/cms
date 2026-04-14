@@ -146,6 +146,17 @@ main.nav-closed {
 =================================================== */
 /* When the left panel exists, e.g. Form Builder with fields */
 
+/* If the left panel exists with content */
+.main-content:has([data-left-panel]:not(:empty)) {
+    .content-card {
+        @apply dark:border-s dark:border-content-border dark:rounded-none;
+    }
+}
+/* If the right panel exists with content */
+#main [data-right-panel]:not(:empty) {
+    @apply dark:border-s dark:border-content-border dark:rounded-none;
+}
+
 /* If the left panel exists with content and the nav closes */
 #main:has([data-left-panel]:not(:empty)).nav-closed .main-content {
     border-inline-start: 1px solid transparent;
@@ -155,14 +166,14 @@ main.nav-closed {
         border-inline-start 0s ease-out 0.3s
     ;
 }
-
+/* If the left panel exists with content and the nav opens */
 #main.nav-open:has([data-left-panel]:not(:empty)) {
     /* Add separation between the nav and the left panel, when the nav is open */
     .main-content {
-        @apply border-s border-gray-300 dark:border-gray-700;
+        @apply border-s border-content-border;
         /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
         transition: border-inline-start 0s ease-out 0.1s;
-        @apply shadow-xl dark:shadow-none;
+        @apply shadow-xl dark:rounded-none;
     }
 }
 
