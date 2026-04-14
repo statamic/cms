@@ -103,6 +103,18 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        Request::macro('isLivePreviewOf', function ($item) {
+            $token = $this->statamicToken();
+
+            if (! $token || $token->handler() !== LivePreview::class) {
+                return false;
+            }
+
+            $previewItem = \Facades\Statamic\CP\LivePreview::item($token);
+
+            return $item && $previewItem && method_exists($item, 'reference') && $previewItem->reference() === $item->reference();
+        });
+
         TrimStrings::skipWhen(function (Request $request) {
             $route = config('statamic.cp.route');
 
@@ -181,6 +193,8 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
+        $this->app->singleton(\Statamic\Fields\FieldRepository::class);
+
         $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(config('statamic.system.fieldsets_path'));
@@ -217,6 +231,42 @@ class AppServiceProvider extends ServiceProvider
                 ->finalNewline(config('statamic.templates.style.final_newline', false))
                 ->preferComponentSyntax(config('statamic.templates.antlers.use_components', false));
         });
+
+        $this->registerSerializableClasses();
+    }
+
+    private function registerSerializableClasses()
+    {
+        $existing = $this->app['config']->get('cache.serializable_classes');
+
+        if ($existing === null || $existing === true) {
+            return;
+        }
+
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], [
+            \Statamic\Auth\File\User::class,
+            \Statamic\Auth\File\Passkey::class,
+            \Statamic\Auth\Eloquent\Passkey::class,
+            \Statamic\Assets\Asset::class,
+            \Statamic\Assets\AssetContainer::class,
+            \Statamic\Entries\Collection::class,
+            \Statamic\Entries\Entry::class,
+            \Statamic\Forms\Form::class,
+            \Statamic\Forms\Submission::class,
+            \Statamic\Globals\GlobalSet::class,
+            \Statamic\Globals\Variables::class,
+            \Statamic\Revisions\Revision::class,
+            \Statamic\Structures\Nav::class,
+            \Statamic\Structures\NavTree::class,
+            \Statamic\Structures\CollectionTree::class,
+            \Statamic\Structures\CollectionStructure::class,
+            \Statamic\Taxonomies\Taxonomy::class,
+            \Statamic\Taxonomies\LocalizedTerm::class,
+            \Statamic\Taxonomies\Term::class,
+            \Carbon\Carbon::class,
+            \Illuminate\Support\Carbon::class,
+            \Illuminate\Support\Collection::class,
+        ]));
     }
 
     protected function registerMiddlewareGroup()

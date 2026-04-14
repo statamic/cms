@@ -30,7 +30,7 @@ class DatabaseSession extends Session
             throw new RegionNotFound($key);
         }
 
-        return unserialize($region->region);
+        return unserialize($region->region, ['allowed_classes' => true]);
     }
 
     protected function cacheRegion(Region $region)

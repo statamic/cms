@@ -130,8 +130,6 @@ trait ResetsPasswords
         $user->save();
 
         event(new PasswordReset($user));
-
-        $this->guard()->login($user);
     }
 
     /**

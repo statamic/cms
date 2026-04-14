@@ -119,7 +119,7 @@ class BrowserController extends CpController
         $sortByMethod = $order === 'desc' ? 'sortByDesc' : 'sortBy';
 
         $folders = $folders->$sortByMethod(
-            fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+            fn (AssetFolder $folder) => in_array($sort, ['basename', 'title', 'lastModified', 'size', 'count', 'path']) ? $folder->$sort() : $folder->basename()
         );
 
         $folders = $folders->slice(($page - 1) * $perPage, $perPage);

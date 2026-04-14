@@ -65,9 +65,10 @@ class PasskeyLoginTest extends TestCase
         // Verify the session has been populated
         $this->assertNotNull(session('webauthn.challenge'));
 
-        // The session challenge is the binary form (32 bytes)
+        // The session challenge is base64 encoded (32 bytes -> 44 chars)
         // The response challenge is the base64url encoded form
-        $this->assertEquals(32, strlen(session('webauthn.challenge')));
+        $this->assertEquals(44, strlen(session('webauthn.challenge')));
+        $this->assertEquals(32, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertIsString($responseChallenge);
     }
 

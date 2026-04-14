@@ -43,7 +43,7 @@
                                     :sortable-handle-class="sortableHandleClass"
                                     :collapsed="collapsed.includes(set._id)"
                                     :enabled="set.enabled"
-                                    :read-only
+                                    :read-only="isReadOnly"
                                     :can-add-set="canAddSet"
                                     :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
@@ -147,11 +147,11 @@ export default {
         },
 
         sortableItemClass() {
-            return `${this.name}-sortable-item`;
+            return `${this.fieldId}-sortable-item`;
         },
 
         sortableHandleClass() {
-            return `${this.name}-sortable-handle`;
+            return `${this.fieldId}-sortable-handle`;
         },
 
         replicatorPreview() {

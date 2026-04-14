@@ -100,7 +100,10 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
-        $data = $this->getFormSession();
+        $data = array_merge($this->getFormSession(), [
+            'passkey_options_url' => route('statamic.passkeys.options'),
+            'passkey_verify_url' => route('statamic.passkeys.login'),
+        ]);
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
@@ -294,6 +297,112 @@ class UserTags extends Tags
     }
 
     /**
+     * Output a passkey registration form.
+     *
+     * Maps to {{ user:passkey_form }}
+     *
+     * @return string
+     */
+    public function passkeyForm()
+    {
+        $data = [
+            'passkey_options_url' => route('statamic.passkeys.create'),
+            'passkey_verify_url' => route('statamic.passkeys.store'),
+        ];
+
+        if (! $this->canParseContents()) {
+            return $data;
+        }
+
+        return $this->parse($data);
+    }
+
+    /**
+     * Output the current user's passkeys.
+     *
+     * Maps to {{ user:passkeys }}
+     *
+     * @return string
+     */
+    public function passkeys()
+    {
+        if (! $user = User::current()) {
+            return $this->canParseContents() ? $this->parseNoResults() : [];
+        }
+
+        $passkeys = $user->passkeys()->map(function ($passkey) {
+            return [
+                'id' => $passkey->id(),
+                'name' => $passkey->name(),
+                'last_login' => $passkey->lastLogin(),
+            ];
+        })->values()->all();
+
+        if (! $this->canParseContents()) {
+            return $passkeys;
+        }
+
+        if (empty($passkeys)) {
+            return $this->parseNoResults();
+        }
+
+        return $this->parseLoop($passkeys);
+    }
+
+    /**
+     * Output a delete passkey form.
+     *
+     * Maps to {{ user:delete_passkey_form }}
+     *
+     * @return string
+     */
+    public function deletePasskeyForm()
+    {
+        if (! $user = User::current()) {
+            return '';
+        }
+
+        $id = $this->params->get('id');
+
+        if (! $id || ! $user->passkeys()->get($id)) {
+            return '';
+        }
+
+        $action = route('statamic.passkeys.destroy', ['id' => $id]);
+        $method = 'POST';
+
+        $knownParams = ['id', 'redirect'];
+
+        $params = [];
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if (! $this->canParseContents()) {
+            return [
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => array_merge(
+                    $this->formMetaPrefix($this->formParams($method, $params)),
+                    ['_method' => 'DELETE']
+                ),
+            ];
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= '<input type="hidden" name="_method" value="DELETE" />';
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse([]);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
      * Outputs a logout URL.
      *
      * Maps to {{ user:logout_url }}
@@ -352,7 +461,7 @@ class UserTags extends Tags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if ($resetUrl = $this->params->get('reset_url')) {
+        if ($resetUrl = $this->getPasswordResetUrl($this->params->get('reset_url'))) {
             $params['reset_url'] = $resetUrl;
         }
 
@@ -372,6 +481,19 @@ class UserTags extends Tags
         $html .= $this->formClose();
 
         return $html;
+    }
+
+    private function getPasswordResetUrl(?string $url = null): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        if (! URL::isAbsolute($url) && ! str_starts_with($url, '/')) {
+            $url = '/'.$url;
+        }
+
+        return encrypt($url);
     }
 
     /**
@@ -431,7 +553,7 @@ class UserTags extends Tags
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
         if ($redirect) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="redirect" value="'.e($redirect).'" />';
         }
 
         $html .= $this->parse($data);

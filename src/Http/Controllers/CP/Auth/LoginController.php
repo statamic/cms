@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Concerns\HandlesLogins;
@@ -69,13 +70,13 @@ class LoginController extends CpController
             'password' => 'required|string',
         ]);
 
-        $this->checkPasskeyEnforcement($request);
-
         $this->handleTooManyLoginAttempts($request);
+
+        $this->checkPasskeyEnforcement($request);
 
         $user = User::fromUser($this->validateCredentials($request));
 
-        if ($user->hasEnabledTwoFactorAuthentication()) {
+        if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
@@ -157,14 +158,20 @@ class LoginController extends CpController
 
     private function checkPasskeyEnforcement(Request $request)
     {
-        if (! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
-            if ($user = User::findByEmail($request->get($this->username()))) {
-                if ($user->passkeys()->isNotEmpty()) {
-                    throw ValidationException::withMessages([
-                        $this->username() => [trans('statamic::messages.password_passkeys_only')],
-                    ]);
-                }
-            }
+        if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            return;
         }
+
+        if (! $user = User::findByEmail($request->get($this->username()))) {
+            return;
+        }
+
+        if ($user->passkeys()->isEmpty()) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('statamic::messages.password_passkeys_only')],
+        ]);
     }
 }
