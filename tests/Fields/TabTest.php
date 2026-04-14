@@ -313,4 +313,48 @@ class TabTest extends TestCase
         $this->assertEquals('Main', $publish['sections'][0]['display']);
         $this->assertEquals(['title', 'meta_title', 'summary'], collect($publish['sections'][0]['fields'])->pluck('handle')->all());
     }
+
+    #[Test]
+    public function it_applies_config_overrides_to_fields_inside_imported_fieldset_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text', 'display' => 'Meta Title']],
+                            ['handle' => 'meta_description', 'field' => ['type' => 'textarea', 'display' => 'Meta Description']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'fields' => [
+                        [
+                            'import' => 'seo',
+                            'config' => [
+                                'meta_title' => ['instructions' => 'Keep it under 60 characters.'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $publish = $tab->toPublishArray();
+        $fields = collect($publish['sections'][0]['fields']);
+
+        $metaTitle = $fields->firstWhere('handle', 'meta_title');
+        $this->assertEquals('Keep it under 60 characters.', $metaTitle['instructions']);
+        $this->assertEquals('Meta Title', $metaTitle['display']);
+
+        $metaDescription = $fields->firstWhere('handle', 'meta_description');
+        $this->assertNull($metaDescription['instructions']);
+        $this->assertEquals('Meta Description', $metaDescription['display']);
+    }
 }
