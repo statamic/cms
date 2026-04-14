@@ -4,7 +4,7 @@ namespace Statamic\Forms\Fields;
 
 use Statamic\Support\Arr;
 
-class Email extends FormField
+class Email extends FormFieldtype
 {
     protected static $handle = 'email';
     protected $icon = 'mail-sign-at';
@@ -25,7 +25,7 @@ class Email extends FormField
             'validate' => [...$this->config('validate', []), 'email'],
             'input_type' => 'email',
 //            'placeholder' => $this->config('placeholder'),
-            ...Arr::except($this->config(), ['input_type', 'validate']),
+            ...Arr::except($this->config(), ['type', 'input_type', 'validate']),
         ];
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms\Fields;
 
-class Fallback extends FormField
+class Fallback extends FormFieldtype
 {
     public function toFieldArray(): array
     {

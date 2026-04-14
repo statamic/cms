@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormFieldtype;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
@@ -131,7 +131,7 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Fieldtype::class,
     ];
 
-    protected $formFields = [
+    protected $formFieldtypes = [
         Forms\Fields\Email::class,
         Forms\Fields\Fallback::class,
     ];
@@ -312,10 +312,10 @@ class ExtensionServiceProvider extends ServiceProvider
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
             ],
-            'form-fields' => [
-                'class' => FormField::class,
-                'directory' => 'FormFields',
-                'extensions' => $this->formFields,
+            'form-fieldtypes' => [
+                'class' => FormFieldtype::class,
+                'directory' => 'FormFieldtypes',
+                'extensions' => $this->formFieldtypes,
             ],
             'modifiers' => [
                 'class' => Modifier::class,

@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms\Fields;
 
-use Facades\Statamic\Forms\Fields\FormFieldRepository;
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Support\Collection;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
@@ -31,7 +31,7 @@ class FormFields
     public function fields(): Collection
     {
         return $this->items()->mapWithKeys(fn (array $field): array => [
-            $field['handle'] => FormFieldRepository::find($field['field']['type'])->setConfig(Arr::except($field['field'], 'type')),
+            $field['handle'] => new FormField($field['handle'], $field['field']),
         ]);
     }
 

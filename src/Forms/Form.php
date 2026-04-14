@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms;
 
-use Facades\Statamic\Forms\Fields\FormFieldRepository;
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -86,6 +86,8 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         if (empty($fields) && $blueprint = Blueprint::find("forms.{$this->handle()}")) {
             $fields = $this->fieldsFromLegacyBlueprint($blueprint);
+
+            $this->set('fields', $fields);
         }
 
         return new FormFields($fields);
@@ -98,24 +100,14 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 return [
                     ...$section,
                     'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
-                        $formFieldtype = 'fallback';
-
                         // TODO: Do some real conversions here
                         if ($field['field']['type'] === 'text' && in_array('email', $field['field']['validate'] ?? [])) {
-                            $formFieldtype = 'email';
+                            $field['field']['type'] = 'email';
                             unset($field['field']['input_type']);
                             $field['field']['validate'] = collect($field['field']['validate'] ?? [])->filter(fn ($validate) => $validate !== 'email')->all();
                         }
 
-                        $formFieldtype = FormFieldRepository::find($formFieldtype)->setConfig($field['field']);
-
-                        return [
-                            'handle' => $field['handle'],
-                            'field' => Arr::removeNullValues([
-                                'type' => $formFieldtype->handle(),
-                                ...Arr::except($field['field'], 'type'),
-                            ]),
-                        ];
+                        return ['handle' => $field['handle'], 'field' => $field['field']];
                     })->all(),
                 ];
             })->all();

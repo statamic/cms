@@ -3,27 +3,28 @@
 namespace Statamic\Forms\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FormFieldtypeNotFoundException;
 
-class FormFieldRepository
+class FormFieldtypeRepository
 {
-    private $formFields;
+    private $formFieldtypes;
 
     public function find(string $handle)
     {
-        if (isset($this->formFields[$handle])) {
-            return clone $this->formFields[$handle];
+        if (isset($this->formFieldtypes[$handle])) {
+            return clone $this->formFieldtypes[$handle];
         }
 
         if (! ($formFields = $this->classes())->has($handle)) {
-            throw new \Statamic\Exceptions\FieldtypeNotFoundException($handle); // todo
+            throw new FormFieldtypeNotFoundException($handle);
         }
 
-        return $this->formFields[$handle] = app($formFields->get($handle));
+        return $this->formFieldtypes[$handle] = app($formFields->get($handle));
     }
 
     public function classes(): Collection
     {
-        return app('statamic.form-fields');
+        return app('statamic.form-fieldtypes');
     }
 
     public function handles(): Collection

@@ -2,113 +2,56 @@
 
 namespace Statamic\Forms\Fields;
 
-use Statamic\Extend\HasHandle;
-use Statamic\Extend\RegistersItself;
-use Statamic\Facades\Blink;
-use Statamic\Fields\ConfigFields;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
+use Statamic\Exceptions\FormFieldtypeNotFoundException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
-
 use function Statamic\trans as __;
 
-abstract class FormField
+class FormField
 {
-    use HasHandle, RegistersItself {
-        handle as protected traitHandle;
+    public function __construct(protected string $handle, protected array $config)
+    {
     }
 
-    protected static $title;
-    protected static $binding = 'form-fields';
-
-    protected $config;
-    protected $categories = [];
-    protected $keywords = [];
-    protected $icon;
-
-    public static function title(): string
+    public function handle(): string
     {
-        if (static::$title) {
-            return __(static::$title);
+        return $this->handle;
+    }
+
+    public function config(): array
+    {
+        return $this->config;
+    }
+
+    public function type(): string
+    {
+        return Arr::get($this->config, 'type', 'text');
+    }
+
+    public function fieldtype()
+    {
+        try {
+            return FormFieldtypeRepository::find($this->type())->setField($this);
+        } catch (FormFieldtypeNotFoundException $e) {
+            return (new Fallback)->setField($this);
         }
-
-        $translation = __($key = 'statamic::form-fields.'.static::handle().'.title');
-
-        if ($translation !== $key) {
-            return $translation;
-        }
-
-        return __(Str::title(Str::humanize(static::handle())));
     }
 
-    public static function handle(): string
+    public function display()
     {
-        return Str::removeRight(static::traitHandle(), '_form_field');
+        return Arr::get($this->config, 'display', __(Str::slugToTitle($this->handle)));
     }
 
-    public function categories(): array
+    public function instructions()
     {
-        return $this->categories;
+        return Arr::get($this->config, 'instructions');
     }
 
-    public function keywords(): array
+    public function toFieldArray(): array
     {
-        return $this->keywords;
+        return $this->fieldtype()->toFieldArray();
     }
 
-    public function icon(): string
-    {
-        return $this->icon ?? "form-field-{$this->handle()}";
-    }
-
-    public function setConfig(array $config): self
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    public function config(?string $key = null, $fallback = null)
-    {
-        $config = $this->configFields()->all()
-            ->map->defaultValue()
-            ->merge($this->config);
-
-        return $key
-            ? ($config->get($key) ?? $fallback)
-            : $config->all();
-    }
-
-    public function configFields(): Fields
-    {
-        if ($cached = Blink::get($blink = 'form-config-fields-'.$this->handle())) {
-            return $cached;
-        }
-
-        $fields = collect($this->configFieldItems());
-
-        $fields = $fields
-            ->map(function ($field, $handle) {
-                return compact('handle', 'field');
-            });
-
-        $fields = new ConfigFields($fields);
-
-        Blink::put($blink, $fields);
-
-        return $fields;
-    }
-
-    protected function configFieldItems(): array
-    {
-        return [];
-    }
-
-    public function toField(): Field
-    {
-        // todo: not sure this is the right handle
-        return new Field($this->handle(), $this->toFieldArray());
-    }
-
-    abstract public function toFieldArray(): array;
+    // TODO: commonFieldOptions()
 }
