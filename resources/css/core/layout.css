@@ -334,10 +334,9 @@ main.nav-closed {
         ;
     }
 
-    #popover-left-panel,
-    #popover-right-panel {
+    .left-panel-popover__menu,
+    .right-panel-popover__menu {
         top: 3.5rem;
-        width: max(11rem, 33.33%);
         &:not(:popover-open) {
             pointer-events: none;
         }
@@ -361,6 +360,7 @@ main.nav-closed {
 =================================================== */
 .left-panel-popover {
     .left-panel-popover__menu {
+        width: max(11rem, 33.33%);
         &:popover-open,
         &:popover-open .left-panel-popover__close-button {
             @starting-style {
@@ -382,6 +382,7 @@ main.nav-closed {
 =================================================== */
 .right-panel-popover {
     .right-panel-popover__menu {
+        width: max(18rem, 33.33%);
         &:popover-open,
         &:popover-open .right-panel-popover__close-button {
             @starting-style {
@@ -399,7 +400,7 @@ main.nav-closed {
     }
 
     .right-panel-popover__close-button {
-        right: max(11rem, 33.33%);
+        right: max(18rem, 33.33%);
     }
 }
 
