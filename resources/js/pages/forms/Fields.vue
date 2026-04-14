@@ -82,6 +82,9 @@ const props = defineProps({
                                 <li>
                                     <Button :text="__('Toggle')" :title="__('Toggle')" icon="fieldtype-toggle" />
                                 </li>
+                                <li>
+                                    <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
+                                </li>
                             </ul>
                         </li>
                         <li>
@@ -227,6 +230,9 @@ const props = defineProps({
                         </li>
                         <li>
                             <Button :text="__('Toggle')" :title="__('Toggle')" icon="fieldtype-toggle" />
+                        </li>
+                        <li>
+                            <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
                         </li>
                     </ul>
                 </li>
