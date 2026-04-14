@@ -17,7 +17,7 @@ const props = defineProps({
     </Teleport>
 
     <Button
-        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:-translate-x-9 mb-5 col-start-1 row-start-1"
+        class="min-[1000px]:hidden sticky top-3 sm:top-5 sm:-translate-x-3 md:-translate-x-9 mb-5 col-start-1 row-start-1"
         popovertarget="popover-left-panel"
         :text="__('Form Builder')"
         icon="bar-sidebar-left-panel-open"
@@ -343,7 +343,7 @@ const props = defineProps({
     </div>
 
     <Button
-        class="min-[1000px]:hidden sticky top-3 sm:-translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
+        class="min-[1000px]:hidden sticky top-3 sm:top-5 sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
         icon="cog"
