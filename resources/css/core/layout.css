@@ -259,7 +259,6 @@ main.nav-closed {
             }
         }
 
-        margin: 0;
         background: var(--theme-color-body-bg);
         @apply p-1 border border-gray-200 shadow-2xl rounded-xl;
     }
@@ -282,19 +281,14 @@ main.nav-closed {
 
     .global-header-nav-popover__list {
         list-style: none;
-        margin: 0;
-        padding: 0;
         display: flex;
         flex-direction: column;
     }
 
     .global-header-nav-popover__list a {
-        display: block;
-        border-radius: 0.375rem;
-        @apply px-2.5 py-1.5 text-sm text-gray-700;
         text-decoration: none;
 
-        @apply flex hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
+        @apply flex px-2.5 py-1.5 rounded-lg text-sm text-gray-700 hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
     }
 
     :where(.dark) & .global-header-nav-popover__list a {
