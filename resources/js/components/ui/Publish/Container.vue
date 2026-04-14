@@ -6,7 +6,7 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 
 <script setup>
 import { nanoid as uniqid } from 'nanoid';
-import { watch, ref, computed, toRef, nextTick } from 'vue';
+import { onMounted, onUnmounted, watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
@@ -236,6 +236,30 @@ function removeLocalizedField(path) {
     if (index !== -1) localizedFields.value.splice(index, 1);
 }
 
+const fieldFocus = ref({});
+
+const fieldLocks = computed(() => {
+    const locks = {};
+    for (const { handle, user } of Object.values(fieldFocus.value)) {
+        if (!locks[handle]) {
+            locks[handle] = user;
+        }
+    }
+    return locks;
+});
+
+function focusField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('focusField only supports top-level fields.');
+    fieldFocus.value[user.id] = { handle, user };
+}
+
+function blurField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('blurField only supports top-level fields.');
+    if (fieldFocus.value[user.id]?.handle === handle) {
+        delete fieldFocus.value[user.id];
+    }
+}
+
 function pushComponent(name, { props }) {
     const component = new Component(uniqid(), name, props);
     components.value.push(component);
@@ -278,6 +302,10 @@ const builtInProvides = {
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    fieldFocus,
+    fieldLocks,
+    focusField,
+    blurField,
     isDirty,
     withoutDirtying,
 };
@@ -293,6 +321,25 @@ if (import.meta.env.DEV) {
 const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
+
+onMounted(() => {
+    Statamic.$events.$emit('publish-container-created', {
+        name: props.name,
+        reference: props.reference,
+        site: props.site,
+        values,
+        setFieldValue,
+        setValues,
+        pushComponent,
+        fieldFocus,
+        focusField,
+        blurField,
+    });
+});
+
+onUnmounted(() => {
+    Statamic.$events.$emit('publish-container-destroyed', { name: props.name });
+});
 
 defineExpose({
     name: props.name,

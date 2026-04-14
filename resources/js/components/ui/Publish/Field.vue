@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, useTemplateRef, watch, ref, inject } from 'vue';
+import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import {
@@ -42,6 +42,9 @@ const {
     setFieldMeta,
     hiddenFields,
     setHiddenField,
+    fieldLocks,
+    focusField,
+    blurField,
     container,
     direction,
 } = injectContainerContext();
@@ -113,13 +116,13 @@ watch(
 
 function focused() {
     if (fieldPathPrefix.value) return;
-    Statamic.$events.$emit('field:focused', { containerName: container.name.value, handle });
+    focusField(handle);
 }
 
 function blurred(event) {
     if (fieldPathPrefix.value) return;
     if (event?.currentTarget?.contains(event.relatedTarget)) return;
-    Statamic.$events.$emit('field:blurred', { containerName: container.name.value, handle });
+    blurField(handle);
 }
 
 const values = computed(() => {
@@ -173,30 +176,8 @@ const isReadOnly = computed(() => {
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
-const lockedBy = ref(null);
+const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
 const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
-
-function _onFieldLock({ containerName, handle: lockedHandle, user }) {
-    if (containerName === container.name.value && lockedHandle === handle) {
-        lockedBy.value = user;
-    }
-}
-function _onFieldUnlock({ containerName, handle: unlockedHandle }) {
-    if (containerName === container.name.value && unlockedHandle === handle) {
-        lockedBy.value = null;
-    }
-}
-
-onMounted(() => {
-    Statamic.$events.$on('field:lock', _onFieldLock);
-    Statamic.$events.$on('field:unlock', _onFieldUnlock);
-});
-
-onUnmounted(() => {
-    Statamic.$events.$off('field:lock', _onFieldLock);
-    Statamic.$events.$off('field:unlock', _onFieldUnlock);
-});
-
 
 const isSyncable = computed(() => {
     // Only top-level fields can be synced.
