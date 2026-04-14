@@ -2,7 +2,9 @@
 
 namespace Statamic\Forms;
 
+use Facades\Statamic\Forms\Fields\FormFieldRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -24,6 +26,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Forms\Exporters\Exporter;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -76,6 +79,53 @@ class Form implements Arrayable, Augmentable, FormContract
         return $this->fluentlyGetOrSet('title')->args(func_get_args());
     }
 
+    public function formFields(): Collection
+    {
+//        return $this->formFieldsContents()->map()
+
+        // todo: map from file array to FormField instances
+        // todo: ->blueprint() should map this method and call toFieldArray() on each field
+    }
+
+    public function formFieldsContents(): array
+    {
+        $contents = $this->get('fields', []);
+
+        if (empty($contents) && $blueprint = Blueprint::find("forms.{$this->handle()}")) {
+            $contents = $blueprint->contents();
+
+            $contents['tabs'] = collect($contents['tabs'] ?? [])->map(function (array $tab): array {
+                return collect($tab['sections'] ?? [])->map(function (array $section) {
+                    $fields = collect($section['fields'] ?? [])->map(function (array $field): array {
+                        $formField = 'fallback';
+
+                        // todo: should really check for the validation rule here
+                        if ($field['field']['type'] === 'email') {
+                            $formField = 'email';
+                        }
+
+                        $formField = FormFieldRepository::find($formField);
+
+                        // todo: this should be the format we save stuff in (so not the new fieldtype, that should only affect when we map it to a bluepritn
+                        return [
+                            'handle' => $field['handle'],
+                            'field' => $formField->setConfig($field['field'])->toFieldArray(),
+                        ];
+                    })->all();
+
+                    return [
+                        ...$section,
+                        'fields' => $fields,
+                    ];
+                })->all();
+            })->all();
+        }
+
+        return $contents;
+    }
+
+    // todo: separate formFieldsContents() method that just maps fields to field arrays, but keeps up the tabs/sections
+
     /**
      * Get the blueprint.
      *
@@ -83,8 +133,14 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('forms.'.$this->handle())
-            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
+        // todo: handle tabs/sections
+        $blueprint = Blueprint::make("form_fields_{$this->handle()}")->setContents($this->formFieldsContents());
+
+        // for some reason, the fields aren't showing ihn the blueprint
+        dd($blueprint, $blueprint->fields());
+
+        //        $blueprint = Blueprint::find('forms.'.$this->handle())
+        //            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
 
         FormBlueprintFound::dispatch($blueprint, $this);
 

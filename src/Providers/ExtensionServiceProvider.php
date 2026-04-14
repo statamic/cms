@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Forms\Fields\FormField;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +21,7 @@ use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags;
+use Statamic\Forms;
 use Statamic\UpdateScripts as Updates;
 use Statamic\Widgets;
 use Statamic\Widgets\Widget;
@@ -127,6 +129,11 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $formFields = [
+        Forms\Fields\Email::class,
+        Forms\Fields\Fallback::class,
     ];
 
     protected $modifierAliases = [
@@ -304,6 +311,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-fields' => [
+                'class' => FormField::class,
+                'directory' => 'FormFields',
+                'extensions' => $this->formFields,
             ],
             'modifiers' => [
                 'class' => Modifier::class,

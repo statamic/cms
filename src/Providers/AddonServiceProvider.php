@@ -21,6 +21,7 @@ use Statamic\Facades\Fieldset;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
@@ -69,6 +70,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<Fieldtype>>
      */
     protected $fieldtypes = [];
+
+    /**
+     * @var list<class-string<FormField>>
+     */
+    protected $formFields = [];
 
     /**
      * @var list<class-string<Modifier>>
@@ -203,6 +209,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootActions()
                 ->bootDictionaries()
                 ->bootFieldtypes()
+                ->bootFormFields()
                 ->bootModifiers()
                 ->bootWidgets()
                 ->bootFormJsDrivers()
@@ -355,6 +362,19 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->unique();
 
         foreach ($fieldtypes as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormFields()
+    {
+        $formFields = collect($this->formFields)
+            ->merge($this->autoloadFilesFromFolder('FormFields', FormField::class))
+            ->unique();
+
+        foreach ($formFields as $class) {
             $class::register();
         }
 
