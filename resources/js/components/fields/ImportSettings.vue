@@ -82,7 +82,7 @@ export default {
         },
 
         sectionBehaviorInstructions() {
-            return __('Choose whether imported fieldset sections should be preserved or flattened into this section.');
+            return __('messages.fieldset_import_section_behavior_instructions');
         },
 
         sectionBehaviorOptions() {

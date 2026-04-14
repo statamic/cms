@@ -86,7 +86,7 @@
                     <Field
                         v-if="selectedFieldsetHasSections"
                         :label="__('Section Behavior')"
-                        :instructions="__('Choose whether imported fieldset sections should be preserved or flattened into this section.')"
+                        :instructions="__('messages.fieldset_import_section_behavior_instructions')"
                         class="mt-6"
                     >
                         <RadioGroup v-model="sectionBehavior">
