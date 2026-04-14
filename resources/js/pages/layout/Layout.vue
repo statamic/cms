@@ -159,7 +159,7 @@ onUnmounted(() => {
                     sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
                     max-sm:ps-2 pe-2">
                 </div>
-                <div id="content-card" tabindex="-1" class="focus:outline-none relative grid py-2 min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
+                <div id="content-card" tabindex="-1" class="focus:outline-none relative grid sm:py-2 min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
                     <div class="content-card">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                     <div class="
