@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -23,7 +24,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Fieldset
+class Fieldset implements ContainsQueryableValues
 {
     protected $handle;
     protected $contents = [];
@@ -305,6 +306,23 @@ class Fieldset
         return (new Link($text, Category::Fields))
             ->url($this->editUrl())
             ->icon('fieldsets');
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'editUrl', 'fields', 'handle', 'isDeletable', 'isResettable',
+            'namespace', 'path', 'title',
+        ];
     }
 
     public static function __callStatic($method, $parameters)

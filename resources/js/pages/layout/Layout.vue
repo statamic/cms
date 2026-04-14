@@ -148,22 +148,32 @@ onUnmounted(() => {
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div
                 id="main-content"
-                class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl"
+                class="main-content py-0! sm:p-2 h-full flex-1 flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
                 :class="{
                     'flex': leftPanelActive || rightPanelActive,
                 }"
                 :data-max-width-enabled="isMaxWidthEnabled"
             >
                 <!-- Panel contents will be injected via <Teleport> -->
-                <div v-show="leftPanelActive" data-left-panel ref="leftPanel" id="left-panel" tabindex="-1" class="max-[1000px]:!w-0 max-[1000px]:!p-0 focus:outline-none relative layout-left-panel overflow-y-scroll overflow-x-clip grid max-sm:ps-2 pe-2 min-h-full mx-auto">
+                <div v-show="leftPanelActive" data-left-panel ref="leftPanel" id="left-panel" tabindex="-1" class="
+                    sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
+                    max-sm:ps-2 pe-2">
                 </div>
-                <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
+                <div id="content-card" tabindex="-1" class="focus:outline-none relative grid sm:py-2 min-h-full mx-auto" :class="{ 'flex-1': leftPanelActive || rightPanelActive }">
+                    <div class="content-card">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
-                    <div class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18" data-max-width-wrapper>
-                        <slot />
+                    <div
+                        class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18"
+                        :class="{ 'max-[1000px]:grid max-[1000px]:grid-cols-[auto_1fr_auto]': leftPanelActive || rightPanelActive }"
+                        data-max-width-wrapper
+                    >
+                            <slot />
+                        </div>
                     </div>
                 </div>
-                <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="focus:outline-none relative layout-right-panel grid min-h-full mx-auto">
+                <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="
+                    sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
+                    max-sm:ps-2 ps-2">
                     <!-- Panel contents will be injected via <Teleport> -->
                 </div>
             </div>
