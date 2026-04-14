@@ -6,7 +6,6 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Query\Scopes\Scope;
@@ -846,6 +845,21 @@ class TermQueryBuilderTest extends TestCase
 
         // Assert returns null when there's no results.
         $this->assertNull(Term::query()->where('type', 'c')->average('quantity'));
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alpha'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Bravo'])->save();
+
+        $count = Term::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        Term::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, Term::all());
     }
 }
 

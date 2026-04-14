@@ -1489,6 +1489,19 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->assertFalse(Entry::query()->exists());
     }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $count = Entry::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        Entry::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, Entry::all());
+    }
 }
 
 class CustomScope extends Scope
