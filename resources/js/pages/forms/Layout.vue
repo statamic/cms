@@ -28,8 +28,7 @@ const activeSectionLabel = computed(() => {
                 <Button
                     id="anchor-global-header-nav"
                     variant="ghost"
-                    size="sm"
-                    class="text-white! border-0! shadow-none! hover:bg-white/12! [&_svg]:text-white/80"
+                    class="text-white! border-0! shadow-none! [&_svg]:text-white/80"
                     popovertarget="popover-global-header-nav"
                     :text="activeSectionLabel"
                     icon-append="chevron-down"

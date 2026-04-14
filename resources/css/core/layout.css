@@ -233,7 +233,8 @@ main.nav-closed {
         }
     }
 }
-
+/* GROUP THREE PANEL STATES / GLOBAL HEADER NAV (TOP MENU) / MOBILE POPOVER
+=================================================== */
 /* Mobile popover for .global-header-nav (forms tabs in header slot) */
 .global-header-nav-popover {
     #anchor-global-header-nav {
@@ -259,9 +260,8 @@ main.nav-closed {
         }
 
         margin: 0;
-        padding: 0.375rem 0;
         background: var(--theme-color-body-bg);
-        @apply border border-gray-200 shadow-2xl rounded-xl;
+        @apply p-1 border border-gray-200 shadow-2xl rounded-xl;
     }
 
     :where(.dark) & .global-header-nav-popover__menu {
@@ -273,7 +273,7 @@ main.nav-closed {
         top: calc(anchor(bottom) + 6px);
         left: anchor(left);
         min-width: max(anchor-size(width), 11rem);
-        max-width: min(22rem, calc(100vw - 1rem));
+        max-width: 22rem;
 
         &:not(:popover-open) {
             pointer-events: none;
@@ -286,16 +286,15 @@ main.nav-closed {
         padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.125rem;
     }
 
     .global-header-nav-popover__list a {
         display: block;
-        padding: 0.5rem 0.75rem;
         border-radius: 0.375rem;
-        font-size: 0.8125rem;
-        color: var(--color-gray-900);
+        @apply px-2.5 py-1.5 text-sm text-gray-700;
         text-decoration: none;
+
+        @apply flex hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
     }
 
     :where(.dark) & .global-header-nav-popover__list a {
@@ -304,7 +303,7 @@ main.nav-closed {
 
     .global-header-nav-popover__list a.active,
     .global-header-nav-popover__list a[aria-current='page'] {
-        @apply bg-gray-100 font-semibold;
+        @apply bg-gray-400/15 text-gray-925 dark:text-white font-semibold;
     }
 
     :where(.dark) & .global-header-nav-popover__list a.active,
