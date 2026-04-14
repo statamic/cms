@@ -1137,7 +1137,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1148,6 +1148,17 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'apiUrl', 'basename', 'blueprint', 'containerId', 'containerHandle', 'dimensions',
+            'duration', 'editUrl', 'exists', 'extension', 'filename', 'folder', 'guessedExtension',
+            'hasDimensions', 'hasDuration', 'height', 'id', 'isAudio', 'isImage', 'isMedia', 'isPdf',
+            'isPreviewable', 'isSvg', 'isVideo', 'lastModified', 'mimeType', 'orientation', 'path', 'pdfUrl',
+            'ratio', 'reference', 'size', 'thumbnailUrl', 'title', 'url', 'width',
+        ];
     }
 
     public function getCurrentDirtyStateAttributes(): array

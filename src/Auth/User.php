@@ -476,7 +476,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -487,5 +487,14 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'avatar', 'blueprint', 'editUrl', 'email', 'gravatarUrl', 'groups', 'hasAvatarField',
+            'id', 'initials', 'isSuper', 'isTaxonomizable', 'lastLogin', 'name', 'path', 'preferredLocale',
+            'preferredTheme', 'reference', 'roles', 'title',
+        ];
     }
 }
