@@ -360,7 +360,7 @@ const activeSettingsTab = ref('settings');
                     </button>
                     <div class="px-0.5 @container py-10">
                         <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                            <TabList class="mb-4">
+                            <TabList class="mb-4 inline-flex">
                                 <TabTrigger name="settings" :text="__('Settings')" />
                                 <TabTrigger name="logic" :text="__('Logic')" />
                                 <TabTrigger name="validation" :text="__('Validation')" />
@@ -380,9 +380,9 @@ const activeSettingsTab = ref('settings');
                 </div>
             </div>
             <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="px-0.5 @container py-10 max-[1000px]:hidden">
+            <div class="px-0.5 @container relative py-6 px-4 max-[1000px]:hidden">
                 <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                    <TabList class="mb-4">
+                    <TabList class="inline-flex mb-4">
                         <TabTrigger name="settings" :text="__('Settings')" />
                         <TabTrigger name="logic" :text="__('Logic')" />
                         <TabTrigger name="validation" :text="__('Validation')" />
