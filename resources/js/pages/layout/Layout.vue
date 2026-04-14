@@ -148,7 +148,7 @@ onUnmounted(() => {
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div
                 id="main-content"
-                class="main-content py-0! sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl"
+                class="main-content py-0! sm:p-2 h-full flex-1 flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
                 :class="{
                     'flex': leftPanelActive || rightPanelActive,
                 }"
