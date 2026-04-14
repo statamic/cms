@@ -19,6 +19,11 @@ const isActive = (href) => page.url === new URL(href, window.location.origin).pa
 const activeSectionLabel = computed(() => {
     return navItems.find((item) => isActive(item.href))?.label ?? navItems[0]?.label ?? '';
 });
+
+const closeMobileNavPopover = () => {
+    const popover = document.getElementById('popover-global-header-nav');
+    popover?.hidePopover?.();
+};
 </script>
 
 <template>
@@ -34,12 +39,13 @@ const activeSectionLabel = computed(() => {
                     icon-append="chevron-down"
                 />
                 <nav id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
-                    <ul class="global-header-nav-popover__list">
+                    <ul>
                         <li v-for="navItem in navItems" :key="`m-${navItem.href}`">
                             <Link
                                 :href="navItem.href"
                                 :class="{ active: isActive(navItem.href) }"
                                 :aria-current="isActive(navItem.href) ? 'page' : undefined"
+                                @click="closeMobileNavPopover"
                             >
                                 {{ navItem.label }}
                             </Link>

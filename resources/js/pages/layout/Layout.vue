@@ -74,49 +74,74 @@ const { makeResizable } = useResizable();
 
 const sidebarMinWidth = 175;
 const sidebarMaxWidth = 450;
-const sidebarCompactDefaultWidth = 270;
+/** Left panel default widths */
+const leftSidebarCompactDefaultWidth = 270;
+/** Right panel is wider at narrow / compact viewports (e.g. settings tabs). */
+const rightSidebarNarrowDefaultWidth = 300;
+const rightSidebarCompactDefaultWidth = 300;
 const sidebarWideDefaultWidth = 320;
-/** Below this width, sidebars default to `sidebarMinWidth` (175px). */
+/** Below this width, left defaults to `sidebarMinWidth`; right uses `rightSidebarNarrowDefaultWidth`. */
 const sidebarNarrowBreakpoint = 1250;
-/** At or above `sidebarNarrowBreakpoint` and below this, sidebars default to 280px. */
+/** Between narrow and this breakpoint, left uses `leftSidebarCompactDefaultWidth`; right uses `rightSidebarCompactDefaultWidth`. */
 const sidebarCompactBreakpoint = 1400;
 
-const getSidebarDefaultWidth = () => {
+const getLeftSidebarDefaultWidth = () => {
     if (typeof window === 'undefined') return sidebarWideDefaultWidth;
     const w = window.innerWidth;
     if (w < sidebarNarrowBreakpoint) return sidebarMinWidth;
-    if (w < sidebarCompactBreakpoint) return sidebarCompactDefaultWidth;
+    if (w < sidebarCompactBreakpoint) return leftSidebarCompactDefaultWidth;
     return sidebarWideDefaultWidth;
 };
 
-makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getSidebarDefaultWidth });
-makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getSidebarDefaultWidth });
+const getRightSidebarDefaultWidth = () => {
+    if (typeof window === 'undefined') return sidebarWideDefaultWidth;
+    const w = window.innerWidth;
+    if (w < sidebarNarrowBreakpoint) return rightSidebarNarrowDefaultWidth;
+    if (w < sidebarCompactBreakpoint) return rightSidebarCompactDefaultWidth;
+    return sidebarWideDefaultWidth;
+};
+
+makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getLeftSidebarDefaultWidth });
+makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getRightSidebarDefaultWidth });
 
 const applyBreakpointDefaults = () => {
     if (typeof window === 'undefined') return;
 
     const w = window.innerWidth;
-    let target;
-    if (w < sidebarNarrowBreakpoint) target = sidebarMinWidth;
-    else if (w < sidebarCompactBreakpoint) target = sidebarCompactDefaultWidth;
-    else target = sidebarWideDefaultWidth;
+    let leftTarget;
+    let rightTarget;
+    if (w < sidebarNarrowBreakpoint) {
+        leftTarget = sidebarMinWidth;
+        rightTarget = rightSidebarNarrowDefaultWidth;
+    } else if (w < sidebarCompactBreakpoint) {
+        leftTarget = leftSidebarCompactDefaultWidth;
+        rightTarget = rightSidebarCompactDefaultWidth;
+    } else {
+        leftTarget = sidebarWideDefaultWidth;
+        rightTarget = sidebarWideDefaultWidth;
+    }
 
     const minPx = `${sidebarMinWidth}px`;
-    const compactPx = `${sidebarCompactDefaultWidth}px`;
+    const leftCompactPx = `${leftSidebarCompactDefaultWidth}px`;
+    const rightNarrowPx = `${rightSidebarNarrowDefaultWidth}px`;
+    const rightCompactPx = `${rightSidebarCompactDefaultWidth}px`;
     const widePx = `${sidebarWideDefaultWidth}px`;
 
-    const applyIfUnmodified = (panelEl) => {
+    /** Widths we treat as “still default” so resize can snap to the new breakpoint ladder. */
+    const leftPriorDefaults = new Set([minPx, leftCompactPx, widePx]);
+    const rightPriorDefaults = new Set([minPx, leftCompactPx, widePx, rightNarrowPx, rightCompactPx]);
+
+    const applyIfUnmodified = (panelEl, target, priorDefaults) => {
         if (!panelEl) return;
         const current = panelEl.style.width;
 
-        // Only apply if it currently equals a prior default, meaning the user hasn't dragged it.
-        if (!current || current === minPx || current === compactPx || current === widePx) {
+        if (!current || priorDefaults.has(current)) {
             panelEl.style.width = `${target}px`;
         }
     };
 
-    if (leftPanelActive.value) applyIfUnmodified(leftPanelRef.value);
-    if (rightPanelActive.value) applyIfUnmodified(rightPanelRef.value);
+    if (leftPanelActive.value) applyIfUnmodified(leftPanelRef.value, leftTarget, leftPriorDefaults);
+    if (rightPanelActive.value) applyIfUnmodified(rightPanelRef.value, rightTarget, rightPriorDefaults);
 };
 
 onMounted(() => {

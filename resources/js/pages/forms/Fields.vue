@@ -1,14 +1,17 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button } from '@ui';
+import { Button, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
+import { ref } from 'vue';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
 });
+
+const activeSettingsTab = ref('settings');
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const props = defineProps({
                     </button>
                     <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10">
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Information</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
@@ -54,7 +57,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Text</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Text</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
@@ -65,7 +68,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choice</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Choice</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
@@ -82,10 +85,13 @@ const props = defineProps({
                                 <li>
                                     <Button :text="__('Toggle')" :title="__('Toggle')" icon="fieldtype-toggle" />
                                 </li>
+                                <li>
+                                    <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
+                                </li>
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Rate</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Rate</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
@@ -99,7 +105,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Contact Info</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
@@ -122,7 +128,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Number</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Number</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Number')" :title="__('Number')" icon="number" />
@@ -133,7 +139,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Date and Time</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Date and Time</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
@@ -150,7 +156,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Media</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Media</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
@@ -167,7 +173,7 @@ const props = defineProps({
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Payment</h2>
+                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Payment</h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
@@ -183,7 +189,7 @@ const props = defineProps({
             <!-- This is the desktop nav - the content is repeated from the left panel -->
             <ul class="px-0.5 grid gap-8 @container py-10 max-[1000px]:hidden">
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Information</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Information</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
@@ -200,7 +206,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Text</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Text</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
@@ -211,7 +217,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Choice</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Choice</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
@@ -228,10 +234,13 @@ const props = defineProps({
                         <li>
                             <Button :text="__('Toggle')" :title="__('Toggle')" icon="fieldtype-toggle" />
                         </li>
+                        <li>
+                            <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
+                        </li>
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Rate</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Rate</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
@@ -245,7 +254,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Contact Info</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Contact Info</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
@@ -268,7 +277,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Number</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Number</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Number')" :title="__('Number')" icon="number" />
@@ -279,7 +288,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Date and Time</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Date and Time</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
@@ -296,7 +305,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Media</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Media</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
@@ -313,7 +322,7 @@ const props = defineProps({
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 font-medium">Payment</h2>
+                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Payment</h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
@@ -329,20 +338,6 @@ const props = defineProps({
 
     <div class="pt-20 min-[1000px]:py-10 col-span-full row-start-1">
         <p>TODO: Form Builder</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
-        <p>Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.</p>
     </div>
 
     <Button
@@ -363,14 +358,46 @@ const props = defineProps({
                     <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
-                    <ul class="px-0.5 @container py-10">
-                        content
-                    </ul>
+                    <div class="@container py-6 px-4">
+                        <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
+                            <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
+                                <TabTrigger name="settings" :text="__('Settings')" />
+                                <TabTrigger name="logic" :text="__('Logic')" />
+                                <TabTrigger name="validation" :text="__('Validation')" />
+                            </TabList>
+
+                            <TabContent name="settings">
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Settings') }}</p>
+                            </TabContent>
+                            <TabContent name="logic">
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                            </TabContent>
+                            <TabContent name="validation">
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
+                            </TabContent>
+                        </Tabs>
+                    </div>
                 </div>
             </div>
             <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="px-0.5 @container py-10 max-[1000px]:hidden">
-                content
+            <div class="@container relative py-6 px-4 max-[1000px]:hidden">
+                <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
+                    <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
+                        <TabTrigger name="settings" :text="__('Settings')" />
+                        <TabTrigger name="logic" :text="__('Logic')" />
+                        <TabTrigger name="validation" :text="__('Validation')" />
+                    </TabList>
+
+                    <TabContent name="settings">
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Settings') }}</p>
+                    </TabContent>
+                    <TabContent name="logic">
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                    </TabContent>
+                    <TabContent name="validation">
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
+                    </TabContent>
+                </Tabs>
             </div>
         </div>
     </LayoutPanel>

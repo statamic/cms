@@ -378,6 +378,10 @@
         /* Effectively remove the left border */
         background-position: -1px;
     }
+    .dark &::before {
+        --c1: var(--color-gray-800);
+        opacity: 0.45;
+    }
 }
 
 /* UTILITIES / DECORATION / CHECKERBOARD

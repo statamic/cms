@@ -148,19 +148,32 @@ main.nav-closed {
 
 /* If the left panel exists with content */
 .main-content:has([data-left-panel]:not(:empty)) {
+    .content-card {
+        @apply dark:border-s dark:border-content-border dark:rounded-none;
+    }
+}
+/* If the right panel exists with content */
+#main [data-right-panel]:not(:empty) {
+    @apply dark:border-s dark:border-content-border dark:rounded-none;
+}
+
+/* If the left panel exists with content and the nav closes */
+#main:has([data-left-panel]:not(:empty)).nav-closed .main-content {
     border-inline-start: 1px solid transparent;
     transition:
         /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
-        box-shadow 0s ease-out 1s
+        box-shadow 0s ease-out 0.3s,
+        border-inline-start 0s ease-out 0.3s
     ;
-    @apply shadow-xl;
 }
-
-/* If the left panel exists with content */
-.nav-open:has([data-left-panel]:not(:empty)) {
+/* If the left panel exists with content and the nav opens */
+#main.nav-open:has([data-left-panel]:not(:empty)) {
     /* Add separation between the nav and the left panel, when the nav is open */
     .main-content {
-        border-inline-start: 1px solid var(--color-gray-300);
+        @apply border-s border-content-border;
+        /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
+        transition: border-inline-start 0s ease-out 0.1s;
+        @apply shadow-xl dark:rounded-none;
     }
 }
 
@@ -242,16 +255,17 @@ main.nav-closed {
     }
 
     .global-header-nav-popover__menu {
-        overscroll-behavior-y: contain;
-        display: none;
-        opacity: 0;
-        transition:
-            opacity 200ms,
-            display 200ms allow-discrete,
-            overlay 200ms allow-discrete;
+        position-anchor: --anchor-global-header-nav;
+        top: calc(anchor(bottom) + 6px);
+        left: anchor(left);
+        min-width: max(anchor-size(width), 11rem);
+        max-width: 22rem;
+        @apply p-1 bg-white dark:bg-gray-925 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-xl;
 
+        /* Popover styling - This is not strictly needed but it smooths out the popover opening */
+        opacity: 0;
+        transition: opacity 0.2s;
         &:popover-open {
-            display: block;
             opacity: 1;
 
             @starting-style {
@@ -259,56 +273,22 @@ main.nav-closed {
             }
         }
 
-        margin: 0;
-        background: var(--theme-color-body-bg);
-        @apply p-1 border border-gray-200 shadow-2xl rounded-xl;
-    }
+        ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
 
-    :where(.dark) & .global-header-nav-popover__menu {
-        @apply border-gray-700;
-    }
+            a {
+                text-decoration: none;
 
-    #popover-global-header-nav {
-        position-anchor: --anchor-global-header-nav;
-        top: calc(anchor(bottom) + 6px);
-        left: anchor(left);
-        min-width: max(anchor-size(width), 11rem);
-        max-width: 22rem;
+                @apply flex px-2.5 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
 
-        &:not(:popover-open) {
-            pointer-events: none;
+                &.active,
+                &[aria-current='page'] {
+                    @apply bg-gray-400/15 text-gray-925 dark:bg-gray-800 dark:text-white font-semibold;
+                }
+            }
         }
-    }
-
-    .global-header-nav-popover__list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .global-header-nav-popover__list a {
-        display: block;
-        border-radius: 0.375rem;
-        @apply px-2.5 py-1.5 text-sm text-gray-700;
-        text-decoration: none;
-
-        @apply flex hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
-    }
-
-    :where(.dark) & .global-header-nav-popover__list a {
-        color: var(--color-gray-200);
-    }
-
-    .global-header-nav-popover__list a.active,
-    .global-header-nav-popover__list a[aria-current='page'] {
-        @apply bg-gray-400/15 text-gray-925 dark:text-white font-semibold;
-    }
-
-    :where(.dark) & .global-header-nav-popover__list a.active,
-    :where(.dark) & .global-header-nav-popover__list a[aria-current='page'] {
-        @apply bg-gray-800 text-white;
     }
 }
 
@@ -354,10 +334,9 @@ main.nav-closed {
         ;
     }
 
-    #popover-left-panel,
-    #popover-right-panel {
+    .left-panel-popover__menu,
+    .right-panel-popover__menu {
         top: 3.5rem;
-        width: max(11rem, 33.33%);
         &:not(:popover-open) {
             pointer-events: none;
         }
@@ -381,6 +360,7 @@ main.nav-closed {
 =================================================== */
 .left-panel-popover {
     .left-panel-popover__menu {
+        width: max(11rem, 33.33%);
         &:popover-open,
         &:popover-open .left-panel-popover__close-button {
             @starting-style {
@@ -402,6 +382,7 @@ main.nav-closed {
 =================================================== */
 .right-panel-popover {
     .right-panel-popover__menu {
+        width: max(18rem, 33.33%);
         &:popover-open,
         &:popover-open .right-panel-popover__close-button {
             @starting-style {
@@ -419,7 +400,7 @@ main.nav-closed {
     }
 
     .right-panel-popover__close-button {
-        right: max(11rem, 33.33%);
+        right: max(18rem, 33.33%);
     }
 }
 
