@@ -165,9 +165,9 @@ class Tab
             $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
                 $field = clone $field;
                 $handle = $prefix.$field->handle();
-                $prefix = $prefix.$field->prefix();
+                $fieldPrefix = $prefix.$field->prefix();
 
-                return [$handle => $field->setHandle($handle)->setPrefix($prefix)];
+                return [$handle => $field->setHandle($handle)->setPrefix($fieldPrefix)];
             });
         }
 
