@@ -49,7 +49,7 @@ abstract class FormFieldtype
         return $this;
     }
 
-    public function field(): ?Field
+    public function field(): ?FormField
     {
         return $this->field;
     }

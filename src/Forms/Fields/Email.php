@@ -13,7 +13,11 @@ class Email extends FormFieldtype
     public function configFieldItems(): array
     {
         return [
-//            'placeholder' => ['display' => 'Placeholder'],
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+            ],
         ];
     }
 
@@ -21,10 +25,10 @@ class Email extends FormFieldtype
     {
         return [
             'type' => 'text',
-            'validate' => [...$this->config('validate', []), 'email'],
             'input_type' => 'email',
-//            'placeholder' => $this->config('placeholder'),
-            ...Arr::except($this->config(), ['type', 'input_type', 'validate']),
+            'placeholder' => $this->config('placeholder'),
+            'validate' => [...$this->config('validate', []), 'email'],
+            ...Arr::except($this->config(), ['type', 'input_type', 'placeholder', 'validate']),
         ];
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms\Fields;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Support\Collection;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
@@ -10,10 +9,6 @@ use Statamic\Support\Arr;
 
 class FormFields
 {
-    // todo: separate FormField and FormFieldtype
-    // todo: write tests
-    // todo: cache some things?
-
     public function __construct(protected array $contents)
     {
     }
@@ -52,7 +47,7 @@ class FormFields
 
                             return [
                                 'handle' => $field['handle'],
-                                'field' => $formField->toFieldArray(),
+                                'field' => Arr::removeNullValues($formField->toFieldArray()),
                             ];
                         })
                         ->all(),

@@ -11,8 +11,11 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
+use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Forms\Fields\FormFields;
 use Tests\TestCase;
 
 class FormTest extends TestCase
@@ -267,5 +270,79 @@ class FormTest extends TestCase
 
         $this->assertEquals('A', $form->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function it_gets_and_sets_form_fields()
+    {
+        $fields = [
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'email', 'field' => ['type' => 'email']],
+                    ],
+                ],
+            ],
+        ];
+
+        $form = Form::make('contact_us')->formFields($fields);
+
+        $formFields = $form->formFields();
+
+        $this->assertInstanceOf(FormFields::class, $formFields);
+        $this->assertEquals($fields, $formFields->contents());
+    }
+
+    #[Test]
+    public function it_saves_form_fields_to_yaml()
+    {
+        $fields = [
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['handle' => 'email', 'field' => ['type' => 'email']],
+                    ],
+                ],
+            ],
+        ];
+
+        $form = tap(Form::make('contact_us')
+            ->title('Contact Us')
+            ->formFields($fields))
+            ->save();
+
+        $saved = YAML::parse(File::get($form->path()));
+
+        $this->assertEquals($fields, $saved['fields']);
+    }
+
+    #[Test]
+    public function it_hydrates_form_fields_from_yaml()
+    {
+        $fields = [
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['handle' => 'email', 'field' => ['type' => 'email']],
+                    ],
+                ],
+            ],
+        ];
+
+        Form::make('contact_us')
+            ->title('Contact Us')
+            ->formFields($fields)
+            ->save();
+
+        $form = Form::find('contact_us');
+
+        $formFields = $form->formFields();
+
+        $this->assertInstanceOf(FormFields::class, $formFields);
+        $this->assertCount(2, $formFields->items());
+        $this->assertEquals('email', $formFields->field('email')->handle());
+        $this->assertEquals('name', $formFields->field('name')->handle());
     }
 }

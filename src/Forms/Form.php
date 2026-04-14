@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -87,7 +86,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->fluentlyGetOrSet('fields')
             ->getter(function ($fields) {
                 if (empty($fields) && $blueprint = Blueprint::find("forms.{$this->handle()}")) {
-                    $fields = $this->convertFieldsFromLegacyBlueprint($blueprint);
+                    $fields = $this->convertFieldsFromBlueprint($blueprint);
                 }
 
                 return new FormFields($fields ?? []);
@@ -95,7 +94,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->args(func_get_args());
     }
 
-    private function convertFieldsFromLegacyBlueprint(\Statamic\Fields\Blueprint $blueprint): array
+    private function convertFieldsFromBlueprint(\Statamic\Fields\Blueprint $blueprint): array
     {
         $sections = collect($blueprint->contents()['tabs'] ?? [])->flatMap(function (array $tab): array {
             return collect($tab['sections'] ?? [])->map(function (array $section): array {

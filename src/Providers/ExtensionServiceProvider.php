@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Forms\Fields\FormFieldtype;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
@@ -13,6 +12,8 @@ use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
@@ -21,7 +22,6 @@ use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags;
-use Statamic\Forms;
 use Statamic\UpdateScripts as Updates;
 use Statamic\Widgets;
 use Statamic\Widgets\Widget;

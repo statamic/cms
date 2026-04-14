@@ -6,6 +6,7 @@ use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
 use function Statamic\trans as __;
 
 class FormField
@@ -26,7 +27,7 @@ class FormField
 
     public function type(): string
     {
-        return Arr::get($this->config, 'type', 'text');
+        return Arr::get($this->config, 'type', 'short_answer');
     }
 
     public function fieldtype()
