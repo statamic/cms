@@ -22,7 +22,7 @@ class Email extends FormField
     {
         return [
             'type' => 'text',
-            'validate' => [...$this->config('validate'), 'email'],
+            'validate' => [...$this->config('validate', []), 'email'],
             'input_type' => 'email',
 //            'placeholder' => $this->config('placeholder'),
             ...Arr::except($this->config(), ['input_type', 'validate']),
