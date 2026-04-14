@@ -358,9 +358,9 @@ const activeSettingsTab = ref('settings');
                     <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
-                    <div class="px-0.5 @container py-10">
+                    <div class="@container py-6 px-4">
                         <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                            <TabList class="mb-4 inline-flex">
+                            <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                                 <TabTrigger name="settings" :text="__('Settings')" />
                                 <TabTrigger name="logic" :text="__('Logic')" />
                                 <TabTrigger name="validation" :text="__('Validation')" />
@@ -380,9 +380,9 @@ const activeSettingsTab = ref('settings');
                 </div>
             </div>
             <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="px-0.5 @container relative py-6 px-4 max-[1000px]:hidden">
+            <div class="@container relative py-6 px-4 max-[1000px]:hidden">
                 <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                    <TabList class="inline-flex mb-4">
+                    <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                         <TabTrigger name="settings" :text="__('Settings')" />
                         <TabTrigger name="logic" :text="__('Logic')" />
                         <TabTrigger name="validation" :text="__('Validation')" />
