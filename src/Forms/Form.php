@@ -90,7 +90,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                     $fields = $this->convertFieldsFromLegacyBlueprint($blueprint);
                 }
 
-                return new FormFields($fields);
+                return new FormFields($fields ?? []);
             })
             ->args(func_get_args());
     }
@@ -102,11 +102,18 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 return [
                     ...$section,
                     'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
-                        // TODO: Do some real conversions here
                         if ($field['field']['type'] === 'text' && in_array('email', $field['field']['validate'] ?? [])) {
                             $field['field']['type'] = 'email';
                             unset($field['field']['input_type']);
                             $field['field']['validate'] = collect($field['field']['validate'] ?? [])->filter(fn ($validate) => $validate !== 'email')->all();
+                        }
+
+                        if ($field['field']['type'] === 'text') {
+                            $field['field']['type'] = 'short_answer';
+                        }
+
+                        if ($field['field']['type'] === 'textarea') {
+                            $field['field']['type'] = 'long_answer';
                         }
 
                         return ['handle' => $field['handle'], 'field' => $field['field']];

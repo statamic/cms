@@ -133,7 +133,8 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $formFieldtypes = [
         Forms\Fields\Email::class,
-        Forms\Fields\Fallback::class,
+        Forms\Fields\LongAnswer::class,
+        Forms\Fields\ShortAnswer::class,
     ];
 
     protected $modifierAliases = [
