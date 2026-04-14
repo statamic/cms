@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use League\Flysystem\PathTraversalDetected;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
@@ -13,7 +14,7 @@ use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetFolder implements Arrayable, Contract
+class AssetFolder implements Arrayable, ContainsQueryableValues, Contract
 {
     use FluentlyGetsAndSets;
 
@@ -235,6 +236,22 @@ class AssetFolder implements Arrayable, Contract
             'path' => (string) $this->path(),
             'parent_path' => $this->parent() ? (string) $this->parent()->path() : null,
             'basename' => (string) $this->basename(),
+        ];
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'basename', 'count', 'lastModified', 'path', 'resolvedPath', 'size', 'title',
         ];
     }
 }

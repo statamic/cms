@@ -62,7 +62,7 @@ class LinkMark extends Link
             return $href;
         }
 
-        $ref = Str::after($href, 'statamic://');
+        $ref = str($href)->after('statamic://')->before('?')->before('#')->toString();
 
         if (! $item = Data::find($ref)) {
             return '';
@@ -70,11 +70,13 @@ class LinkMark extends Link
 
         $selectAcrossSites = Augmentor::$currentBardConfig['select_across_sites'] ?? false;
 
+        $extras = Str::after($href, $ref);
+
         if (! $selectAcrossSites && ! $this->isApi() && $item instanceof Entry) {
-            return ($item->in(Site::current()->handle()) ?? $item)->url();
+            return ($item->in(Site::current()->handle()) ?? $item)->url().$extras;
         }
 
-        return $selectAcrossSites ? $item->absoluteUrl() : $item->url();
+        return $selectAcrossSites ? $item->absoluteUrl().$extras : $item->url().$extras;
     }
 
     private function isApi()

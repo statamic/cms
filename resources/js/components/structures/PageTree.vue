@@ -31,6 +31,7 @@
                     :each-droppable="eachDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
+                    :aria-label="__('Tree Structure')"
                     @after-drop="afterDrop"
                     @open:node="nodeOpened"
                     @close:node="nodeClosed"
@@ -147,6 +148,16 @@ export default {
     watch: {
         site(site) {
             this.getPages();
+        },
+
+        loading(loading) {
+            if (!loading) {
+                this.$nextTick(() => {
+                    if (this.$refs.tree) {
+                        this.$refs.tree.ariaInstructions = __('messages.tree_aria_instructions');
+                    }
+                });
+            }
         },
 
         collapsedState: {

@@ -86,6 +86,7 @@
                     :indent="24"
                     :dir="direction"
                     :stat-handler="statHandler"
+                    :aria-label="__('Tree Structure')"
                     keep-placeholder
                     trigger-class="page-move"
                     :each-droppable="eachDroppable"
@@ -289,6 +290,12 @@ export default {
     mounted() {
         this.setInitialNav(this.nav);
         this.addToCommandPalette();
+
+        this.$nextTick(() => {
+            if (this.$refs.tree) {
+                this.$refs.tree.ariaInstructions = __('messages.tree_aria_instructions');
+            }
+        });
     },
 
     computed: {
