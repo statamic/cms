@@ -38,6 +38,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     protected $handle;
     protected $title;
+    protected $fields;
     protected $blueprint;
     protected $honeypot;
     protected $store;
@@ -80,20 +81,21 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->fluentlyGetOrSet('title')->args(func_get_args());
     }
 
-    public function formFields(): FormFields
+    public function formFields($fields = null)
     {
-        $fields = $this->get('fields', []);
+        return $this
+            ->fluentlyGetOrSet('fields')
+            ->getter(function ($fields) {
+                if (empty($fields) && $blueprint = Blueprint::find("forms.{$this->handle()}")) {
+                    $fields = $this->convertFieldsFromLegacyBlueprint($blueprint);
+                }
 
-        if (empty($fields) && $blueprint = Blueprint::find("forms.{$this->handle()}")) {
-            $fields = $this->fieldsFromLegacyBlueprint($blueprint);
-
-            $this->set('fields', $fields);
-        }
-
-        return new FormFields($fields);
+                return new FormFields($fields);
+            })
+            ->args(func_get_args());
     }
 
-    private function fieldsFromLegacyBlueprint(\Statamic\Fields\Blueprint $blueprint): array
+    private function convertFieldsFromLegacyBlueprint(\Statamic\Fields\Blueprint $blueprint): array
     {
         $sections = collect($blueprint->contents()['tabs'] ?? [])->flatMap(function (array $tab): array {
             return collect($tab['sections'] ?? [])->map(function (array $section): array {
@@ -248,6 +250,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         $data = $this->data->merge(collect([
             'title' => $this->title,
+            'fields' => $this->formFields()?->contents(),
             'honeypot' => $this->honeypot,
             'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
                 $email['markdown'] = Arr::get($email, 'markdown') === true ? true : null;
@@ -327,7 +330,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'email',
         ];
 
-        $this->merge(collect($contents)->except($methods));
+        $this->merge(collect($contents)->except([...$methods, 'fields']));
 
         collect($contents)
             ->filter(function ($value, $property) use ($methods) {
@@ -336,6 +339,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->each(function ($value, $property) {
                 $this->{$property}($value);
             });
+
+        if (isset($contents['fields'])) {
+            $this->formFields($contents['fields']);
+        }
 
         return $this;
     }
