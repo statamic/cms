@@ -1,14 +1,17 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button } from '@ui';
+import { Button, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
+import { ref } from 'vue';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
 });
+
+const activeSettingsTab = ref('settings');
 </script>
 
 <template>
@@ -355,14 +358,46 @@ const props = defineProps({
                     <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
-                    <ul class="px-0.5 @container py-10">
-                        content
-                    </ul>
+                    <div class="px-0.5 @container py-10">
+                        <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
+                            <TabList class="mb-4">
+                                <TabTrigger name="settings" :text="__('Settings')" />
+                                <TabTrigger name="logic" :text="__('Logic')" />
+                                <TabTrigger name="validation" :text="__('Validation')" />
+                            </TabList>
+
+                            <TabContent name="settings">
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Settings') }}</p>
+                            </TabContent>
+                            <TabContent name="logic">
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                            </TabContent>
+                            <TabContent name="validation">
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
+                            </TabContent>
+                        </Tabs>
+                    </div>
                 </div>
             </div>
             <!-- This is the desktop nav - the content is repeated from the right panel -->
             <div class="px-0.5 @container py-10 max-[1000px]:hidden">
-                content
+                <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
+                    <TabList class="mb-4">
+                        <TabTrigger name="settings" :text="__('Settings')" />
+                        <TabTrigger name="logic" :text="__('Logic')" />
+                        <TabTrigger name="validation" :text="__('Validation')" />
+                    </TabList>
+
+                    <TabContent name="settings">
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Settings') }}</p>
+                    </TabContent>
+                    <TabContent name="logic">
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                    </TabContent>
+                    <TabContent name="validation">
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
+                    </TabContent>
+                </Tabs>
             </div>
         </div>
     </LayoutPanel>
