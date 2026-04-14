@@ -146,21 +146,23 @@ main.nav-closed {
 =================================================== */
 /* When the left panel exists, e.g. Form Builder with fields */
 
-/* If the left panel exists with content */
-.main-content:has([data-left-panel]:not(:empty)) {
+/* If the left panel exists with content and the nav closes */
+#main:has([data-left-panel]:not(:empty)).nav-closed .main-content {
     border-inline-start: 1px solid transparent;
     transition:
         /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
-        box-shadow 0s ease-out 1s
+        box-shadow 0s ease-out 0.3s,
+        border-inline-start 0s ease-out 0.3s
     ;
-    @apply shadow-xl;
 }
 
-/* If the left panel exists with content */
-.nav-open:has([data-left-panel]:not(:empty)) {
+#main.nav-open:has([data-left-panel]:not(:empty)) {
     /* Add separation between the nav and the left panel, when the nav is open */
     .main-content {
-        border-inline-start: 1px solid var(--color-gray-300);
+        @apply border-s border-gray-300 dark:border-gray-700;
+        /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
+        transition: border-inline-start 0s ease-out 0.1s;
+        @apply shadow-xl dark:shadow-none;
     }
 }
 
