@@ -178,7 +178,8 @@
                             :key="action.handle"
                             :text="__(action.title)"
                             :icon="action.icon"
-                            :variant="action.dangerous ? 'destructive' : undefined"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @select.prevent
                             @click="action.run()"
                         />
                     </template>
