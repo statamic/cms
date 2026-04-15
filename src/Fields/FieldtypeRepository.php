@@ -2,10 +2,18 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
+use Statamic\Fieldtypes\Text;
+use Statamic\Forms\Fields as FormFields;
+
 class FieldtypeRepository
 {
-    protected $selectableInForms = [];
     private $fieldtypes = [];
+
+    private array $formFieldtypeMappings = [
+        'text' => [FormFields\Email::class, FormFields\ShortAnswer::class],
+        'textarea' => [FormFields\LongAnswer::class],
+    ];
 
     public function preloadable()
     {
@@ -39,23 +47,51 @@ class FieldtypeRepository
         });
     }
 
+    /**
+     * @deprecated Use FormFieldtypeRepository::makeSelectable() instead.
+     */
     public function makeSelectableInForms($handle)
     {
-        $this->selectableInForms[$handle] = true;
+        $mappings = $this->formFieldtypeMappings[$handle] ?? [];
+
+        foreach ($mappings as $mapping) {
+            FormFieldtypeRepository::makeSelectable($mapping::handle());
+        }
     }
 
+    /**
+     * @deprecated Use FormFieldtypeRepository::makeUnselectable() instead.
+     */
     public function makeUnselectableInForms($handle)
     {
-        $this->selectableInForms[$handle] = false;
+        $mappings = $this->formFieldtypeMappings[$handle] ?? [];
+
+        foreach ($mappings as $mapping) {
+            FormFieldtypeRepository::makeUnselectable($mapping::handle());
+        }
     }
 
+    /**
+     * @deprecated Use FormFieldtypeRepository::hasBeenMadeSelectable() instead.
+     */
     public function hasBeenMadeSelectableInForms($handle)
     {
-        return $this->selectableInForms[$handle] ?? false;
+        $mappings = $this->formFieldtypeMappings[$handle] ?? [];
+
+        return collect($mappings)->every(function (string $formFieldtype): bool {
+            return FormFieldtypeRepository::hasBeenMadeSelectable($formFieldtype::handle());
+        });
     }
 
+    /**
+     * @deprecated Use FormFieldtypeRepository::selectableIsOverriden() instead.
+     */
     public function selectableInFormIsOverriden($handle)
     {
-        return array_key_exists($handle, $this->selectableInForms);
+        $mappings = $this->formFieldtypeMappings[$handle] ?? [];
+
+        return collect($mappings)->every(function (string $formFieldtype): bool {
+            return FormFieldtypeRepository::selectableIsOverriden($formFieldtype::handle());
+        });
     }
 }

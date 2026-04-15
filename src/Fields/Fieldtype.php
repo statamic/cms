@@ -28,6 +28,7 @@ abstract class Fieldtype implements Arrayable
     protected $validatable = true;
     protected $defaultable = true;
     protected $selectable = true;
+    /** @deprecated */
     protected $selectableInForms = false;
     protected $relationship = false;
     protected $categories = [];
@@ -101,6 +102,9 @@ abstract class Fieldtype implements Arrayable
         return $this->selectable;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::isSelectable() instead.
+     */
     public function selectableInForms(): bool
     {
         if (FieldtypeRepository::selectableInFormIsOverriden($this->handle())) {
@@ -110,11 +114,17 @@ abstract class Fieldtype implements Arrayable
         return $this->selectableInForms;
     }
 
+    /**
+     * @deprecated Use FormFieldtype::makeSelectable() instead.
+     */
     public static function makeSelectableInForms()
     {
         FieldtypeRepository::makeSelectableInForms(self::handle());
     }
 
+    /**
+     * @deprecated Use FormFieldtype::makeUnselectable() instead.
+     */
     public static function makeUnselectableInForms()
     {
         FieldtypeRepository::makeUnselectableInForms(self::handle());
