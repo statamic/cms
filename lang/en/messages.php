@@ -107,6 +107,7 @@ return [
     'fields_visibility_instructions' => 'Control field visibility on publish forms.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',
     'fieldset_import_prefix_instructions' => 'Apply a prefix to each field when they are imported. e.g. hero_',
+    'fieldset_import_section_behavior_instructions' => 'Choose whether imported fieldset sections should be preserved or flattened into this section.',
     'fieldset_intro' => 'Fieldsets are an optional companion to blueprints, acting as reusable partials that can be used within blueprints.',
     'fieldset_link_fields_prefix_instructions' => 'Prefix each field in the linked fieldset with this value. Useful for importing the same fields multiple times.',
     'fieldsets_handle_instructions' => 'Used to reference this fieldset elsewhere. This cannot be easily changed later.',
