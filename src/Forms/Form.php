@@ -38,7 +38,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $handle;
     protected $title;
     protected $fields;
-    protected $blueprint;
     protected $honeypot;
     protected $store;
     protected $email;
