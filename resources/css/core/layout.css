@@ -421,6 +421,7 @@ main.nav-closed {
     .right-panel-popover__close-button {
         right: max(18rem, 33.33%);
         border-start-end-radius: 0;
+        border-start-start-radius: 0;
         border-end-end-radius: 0;
     }
 }
