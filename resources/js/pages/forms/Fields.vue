@@ -1,7 +1,7 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Icon, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import { ref } from 'vue';
 
@@ -16,7 +16,10 @@ const activeSettingsTab = ref('settings');
 
 <template>
     <Teleport to="#form-layout-actions">
-        <Button :text="__('Save')" variant="primary" />
+        <Button variant="primary" :aria-label="__('Save')">
+            <Icon name="save" class="sm:hidden" />
+            <span class="hidden sm:inline">{{ __('Save') }}</span>
+        </Button>
     </Teleport>
 
     <Button

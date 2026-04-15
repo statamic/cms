@@ -1,5 +1,5 @@
 <script setup>
-import { Header, Button } from '@ui';
+import { Header, Button, Icon } from '@ui';
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -65,7 +65,10 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Teleport to="#form-layout-actions">
-        <Button :text="__('Save')" variant="primary" @click="save" :disabled="saving" />
+        <Button variant="primary" @click="save" :disabled="saving" :aria-label="__('Save')">
+            <Icon name="save" class="sm:hidden" />
+            <span class="hidden sm:inline">{{ __('Save') }}</span>
+        </Button>
     </Teleport>
 
     <Header :title="__('Configure Form')" icon="cog">
