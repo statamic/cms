@@ -21,6 +21,10 @@ const favoriteAlbum = ref(null);
 const secondFavoriteAlbum = ref(null);
 const emailNotifications = ref([]);
 const wantsFreeDrinkVoucher = ref(false);
+const settingsLabel = ref(__('Which album was your favorite?'));
+const settingsHelpText = ref('');
+const settingsPlaceholder = ref('');
+const settingsCharacterLimit = ref(null);
 const heardAboutOptions = [
     { label: __('Instagram'), value: 'instagram' },
     { label: __('Friend referral'), value: 'referral' },
@@ -52,7 +56,7 @@ const notificationOptions = [
 
     <Button
         class="
-            min-[1000px]:hidden sticky top-3 mt-3 z-[var(--z-index-above)]
+            min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above)
             sm:-translate-x-3 md:-translate-x-9 col-start-1 row-start-1
         "
         popovertarget="popover-left-panel"
@@ -396,9 +400,16 @@ const notificationOptions = [
                         <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
                     </Field>
 
-                    <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
-                        <Input v-model="fanLength" />
-                    </Field>
+                    <div data-editing-field>
+                        <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                            <Input v-model="fanLength" />
+                        </Field>
+                    </div>
+
+                    <div class="circle" size="170px"></div>
+                    <div class="circle" size="100px"></div>
+
+                    <div class="field-to-panel-connector"></div>
 
                     <Field :label="__('Which album was your favorite?')">
                         <RadioGroup v-model="favoriteAlbum">
@@ -447,7 +458,7 @@ const notificationOptions = [
 
     <Button
         class="
-        min-[1000px]:hidden sticky top-3 mt-3 z-[var(--z-index-above)]
+        min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above)
         sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
@@ -463,7 +474,7 @@ const notificationOptions = [
                     <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
-                    <div class="@container py-6 px-4">
+                    <div class="@container py-6 px-2.5">
                         <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                                 <TabTrigger name="settings" :text="__('Settings')" />
@@ -472,7 +483,28 @@ const notificationOptions = [
                             </TabList>
 
                             <TabContent name="settings">
-                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Settings') }}</p>
+                                <div class="space-y-6 pt-8">
+                                    <div class="flex items-center gap-2.5">
+                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                        <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
+                                    </div>
+
+                                    <Field :label="__('Label')">
+                                        <Input v-model="settingsLabel" />
+                                    </Field>
+
+                                    <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                        <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                                    </Field>
+
+                                    <Field :label="__('Placeholder')">
+                                        <Input v-model="settingsPlaceholder" />
+                                    </Field>
+
+                                    <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                                        <Input v-model="settingsCharacterLimit" type="number" />
+                                    </Field>
+                                </div>
                             </TabContent>
                             <TabContent name="logic">
                                 <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
@@ -485,7 +517,7 @@ const notificationOptions = [
                 </div>
             </div>
             <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="@container relative py-6 px-4 max-[1000px]:hidden">
+            <div class="@container relative py-6 px-2.5 max-[1000px]:hidden">
                 <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                     <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                         <TabTrigger name="settings" :text="__('Settings')" />
@@ -494,7 +526,28 @@ const notificationOptions = [
                     </TabList>
 
                     <TabContent name="settings">
-                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Settings') }}</p>
+                        <div class="space-y-6 pt-8">
+                            <div class="flex items-center gap-2.5">
+                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
+                            </div>
+
+                            <Field :label="__('Label')">
+                                <Input v-model="settingsLabel" />
+                            </Field>
+
+                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                            </Field>
+
+                            <Field :label="__('Placeholder')">
+                                <Input v-model="settingsPlaceholder" />
+                            </Field>
+
+                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                                <Input v-model="settingsCharacterLimit" type="number" />
+                            </Field>
+                        </div>
                     </TabContent>
                     <TabContent name="logic">
                         <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
