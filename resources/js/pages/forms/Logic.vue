@@ -1,7 +1,7 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button } from '@ui';
+import { Button, Icon } from '@ui';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
@@ -12,7 +12,10 @@ const props = defineProps({
 
 <template>
     <Teleport to="#form-layout-actions">
-        <Button :text="__('Save')" variant="primary" />
+        <Button variant="primary" :aria-label="__('Save')">
+            <Icon name="save" class="sm:hidden" />
+            <span class="hidden sm:inline">{{ __('Save') }}</span>
+        </Button>
     </Teleport>
 
     <div class="py-4">

@@ -10,16 +10,25 @@
             size="sm"
             variant="ghost"
             icon="globe-arrow"
-            class="[&_[data-ui-combobox-trigger]]:text-white/85"
-        />
+            class="**:data-ui-combobox-trigger:text-white/85"
+        >
+            <template #selected-option="{ option }">
+                <div class="size-4 shrink-0">
+                    <Icon name="globe-arrow" class="text-white/85 dark:text-white dark:opacity-50" />
+                </div>
+                <span class="hidden truncate sm:block">
+                    {{ option.name }}
+                </span>
+            </template>
+        </Select>
     </div>
 </template>
 
 <script>
-import { Select } from '@/components/ui';
+import { Icon, Select } from '@/components/ui';
 
 export default {
-    components: { Select },
+    components: { Icon, Select },
 
     computed: {
         sites() {

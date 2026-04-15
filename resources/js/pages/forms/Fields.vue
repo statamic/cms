@@ -1,9 +1,9 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
@@ -11,17 +11,48 @@ const props = defineProps({
     form: Object,
 });
 
+const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const activeSettingsTab = ref('settings');
+const age = ref(null);
+const fanLength = ref('');
+const heardAboutValue = ref(null);
+const favoriteThing = ref('');
+const favoriteAlbum = ref(null);
+const secondFavoriteAlbum = ref(null);
+const emailNotifications = ref([]);
+const wantsFreeDrinkVoucher = ref(false);
+const heardAboutOptions = [
+    { label: __('Instagram'), value: 'instagram' },
+    { label: __('Friend referral'), value: 'referral' },
+    { label: __('Google search'), value: 'google' },
+];
+const albumOptions = [
+    { label: __('Days of Thunder'), value: 'days_of_thunder' },
+    { label: __('Endless Summer'), value: 'endless_summer' },
+    { label: __('Nocturnal'), value: 'nocturnal' },
+    { label: __('Kids'), value: 'kids' },
+    { label: __('Monsters'), value: 'monsters' },
+    { label: __('Heroes'), value: 'heroes' },
+    { label: __('Red, White, and Bruised: The Midnight Live'), value: 'red_white_and_bruised' },
+];
+const notificationOptions = [
+    { label: __('New Singles and Albums'), value: 'singles_and_albums' },
+    { label: __('Merchandise'), value: 'merchandise' },
+    { label: __('Friends of The Midnight'), value: 'friends_of_the_midnight' },
+];
 </script>
 
 <template>
     <Teleport to="#form-layout-actions">
-        <Button :text="__('Save')" variant="primary" />
+        <Button variant="primary" :aria-label="__('Save')">
+            <Icon name="save" class="sm:hidden" />
+            <span class="hidden sm:inline">{{ __('Save') }}</span>
+        </Button>
     </Teleport>
 
     <Button
         class="
-            min-[1000px]:hidden sticky top-3 mt-3
+            min-[1000px]:hidden sticky top-3 mt-3 z-[var(--z-index-above)]
             sm:-translate-x-3 md:-translate-x-9 col-start-1 row-start-1
         "
         popovertarget="popover-left-panel"
@@ -336,13 +367,87 @@ const activeSettingsTab = ref('settings');
         </div>
     </LayoutPanel>
 
-    <div class="pt-20 min-[1000px]:py-10 col-span-full row-start-1">
-        <p>TODO: Form Builder</p>
+    <div class="col-span-full row-start-1 max-[1000px]:pt-14">
+        <Header class="mx-auto max-w-5xl">
+            <template #title>
+                <StatusIndicator status="published" />
+                {{ formTitle }}
+            </template>
+        </Header>
+
+        <Panel class="mx-auto max-w-5xl">
+            <PanelHeader>
+                <Heading :text="__('Section')" />
+            </PanelHeader>
+
+            <Card>
+                <div class="space-y-7">
+                    <Field :label="__('How did you hear about us?')" required>
+                        <Select
+                            v-model="heardAboutValue"
+                            :options="heardAboutOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Choose one')"
+                        />
+                    </Field>
+
+                    <Field :label="__('What do you like most about our band?')" required>
+                        <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                    </Field>
+
+                    <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                        <Input v-model="fanLength" />
+                    </Field>
+
+                    <Field :label="__('Which album was your favorite?')">
+                        <RadioGroup v-model="favoriteAlbum">
+                            <Radio
+                                v-for="album in albumOptions"
+                                :key="album.value"
+                                :value="album.value"
+                                :label="album.label"
+                            />
+                        </RadioGroup>
+                    </Field>
+
+                    <Field :label="__('Which album was your second favorite?')">
+                        <RadioGroup v-model="secondFavoriteAlbum">
+                            <Radio
+                                v-for="album in albumOptions"
+                                :key="`second-${album.value}`"
+                                :value="album.value"
+                                :label="album.label"
+                            />
+                        </RadioGroup>
+                    </Field>
+
+                    <Field :label="__('Sign up for email notifications from The Midnight')">
+                        <CheckboxGroup v-model="emailNotifications">
+                            <Checkbox
+                                v-for="notification in notificationOptions"
+                                :key="notification.value"
+                                :value="notification.value"
+                                :label="notification.label"
+                            />
+                        </CheckboxGroup>
+                    </Field>
+
+                    <Field :label="__('How old are you?')">
+                        <Input v-model="age" type="number" />
+                    </Field>
+
+                    <Field :label="__('I want a free drink voucher')">
+                        <Switch v-model="wantsFreeDrinkVoucher" />
+                    </Field>
+                </div>
+            </Card>
+        </Panel>
     </div>
 
     <Button
         class="
-        min-[1000px]:hidden sticky top-3 mt-3
+        min-[1000px]:hidden sticky top-3 mt-3 z-[var(--z-index-above)]
         sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
