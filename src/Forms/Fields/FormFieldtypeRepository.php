@@ -7,6 +7,7 @@ use Statamic\Exceptions\FormFieldtypeNotFoundException;
 
 class FormFieldtypeRepository
 {
+    protected $selectable = [];
     private $formFieldtypes;
 
     public function find(string $handle)
@@ -32,5 +33,25 @@ class FormFieldtypeRepository
         return $this->classes()->map(function ($class) {
             return $class::handle();
         });
+    }
+
+    public function makeSelectable(string $handle): void
+    {
+        $this->selectable[$handle] = true;
+    }
+
+    public function makeUnselectable(string $handle): void
+    {
+        $this->selectable[$handle] = false;
+    }
+
+    public function hasBeenMadeSelectable(string $handle): bool
+    {
+        return $this->selectable[$handle] ?? false;
+    }
+
+    public function selectableIsOverriden(string $handle): bool
+    {
+        return array_key_exists($handle, $this->selectable);
     }
 }

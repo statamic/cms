@@ -9,6 +9,7 @@ use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Support\Str;
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 
 use function Statamic\trans as __;
 
@@ -22,6 +23,7 @@ abstract class FormFieldtype
     protected static $binding = 'form-fields';
 
     protected $field;
+    protected $selectable = true;
     protected $categories = [];
     protected $keywords = [];
     protected $configFields = [];
@@ -116,9 +118,27 @@ abstract class FormFieldtype
 
     public function toField(): Field
     {
-        // todo: not sure this is the right handle
         return new Field($this->handle(), $this->toFieldArray());
     }
 
     abstract public function toFieldArray(): array;
+
+    public function isSelectable(): bool
+    {
+        if (FormFieldtypeRepository::selectableIsOverriden($this->handle())) {
+            return FormFieldtypeRepository::hasBeenMadeSelectable($this->handle());
+        }
+
+        return $this->selectable;
+    }
+
+    public static function makeSelectable(): void
+    {
+        FormFieldtypeRepository::makeSelectable(static::handle());
+    }
+
+    public static function makeUnselectable(): void
+    {
+        FormFieldtypeRepository::makeUnselectable(static::handle());
+    }
 }
