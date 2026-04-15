@@ -53,6 +53,4 @@ class FormField
     {
         return $this->fieldtype()->toFieldArray();
     }
-
-    // TODO: commonFieldOptions()
 }
