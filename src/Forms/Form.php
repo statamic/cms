@@ -211,11 +211,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function fields()
     {
-        if (! $blueprint = $this->blueprint()) {
-            throw BlueprintUndefinedException::create($this);
-        }
-
-        return $blueprint->fields()->all();
+        return $this->blueprint()->fields()->all();
     }
 
     /**
