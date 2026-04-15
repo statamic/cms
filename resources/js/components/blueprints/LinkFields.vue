@@ -83,6 +83,18 @@
                         <Input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
                     </Field>
 
+                    <Field
+                        v-if="selectedFieldsetHasSections"
+                        :label="__('Section Behavior')"
+                        :instructions="__('messages.fieldset_import_section_behavior_instructions')"
+                        class="mt-6"
+                    >
+                        <RadioGroup v-model="sectionBehavior">
+                            <Radio :label="__('Preserve')" :description="__('Keep imported sections as-is.')" value="preserve" />
+                            <Radio :label="__('Flatten')" :description="__('Merge all fields into this section.')" value="flatten" />
+                        </RadioGroup>
+                    </Field>
+
                     <Button
                         class="w-full mt-6"
                         variant="primary"
@@ -98,11 +110,11 @@
 
 <script>
 import { nanoid as uniqid } from 'nanoid';
-import { Combobox, Button, Input, Heading, Field, Stack, StackClose } from '@/components/ui';
+import { Combobox, Button, Input, Heading, Field, Stack, StackClose, RadioGroup, Radio } from '@/components/ui';
 import { usePage } from '@inertiajs/vue3';
 
 export default {
-    components: { Heading, Combobox, Button, Input, Field, Stack, StackClose },
+    components: { Heading, Combobox, Button, Input, Field, Stack, StackClose, RadioGroup, Radio },
 
     props: {
         excludeFieldset: String,
@@ -134,6 +146,7 @@ export default {
             reference: null,
             fieldset: null,
             importPrefix: null,
+            sectionBehavior: 'preserve',
             fieldSuggestions,
             fieldsetSuggestions: fieldsets.map((fieldset) => ({
                 value: fieldset.handle,
@@ -141,6 +154,22 @@ export default {
             })),
             fieldsets,
         };
+    },
+
+    computed: {
+        selectedFieldsetHasSections() {
+            if (!this.fieldset) return false;
+
+            return this.fieldsets.find((f) => f.handle === this.fieldset)?.has_sections === true;
+        },
+    },
+
+    watch: {
+        fieldset() {
+            if (!this.selectedFieldsetHasSections) {
+                this.sectionBehavior = 'preserve';
+            }
+        },
     },
 
     mounted() {
@@ -171,12 +200,18 @@ export default {
         },
 
         linkFieldset() {
-            this.linkAndClose({
+            const field = {
                 _id: uniqid(),
                 type: 'import',
                 fieldset: this.fieldset,
                 prefix: this.importPrefix,
-            });
+            };
+
+            if (this.selectedFieldsetHasSections) {
+                field.section_behavior = this.sectionBehavior;
+            }
+
+            this.linkAndClose(field);
         },
 
         linkAndClose(field) {
@@ -185,6 +220,7 @@ export default {
             this.reference = null;
             this.fieldset = null;
             this.importPrefix = null;
+            this.sectionBehavior = 'preserve';
         },
 
         addToCommandPalette() {
