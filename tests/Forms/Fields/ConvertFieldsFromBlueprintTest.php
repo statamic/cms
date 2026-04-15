@@ -4,8 +4,10 @@ namespace Tests\Forms\Fields;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Fields\Fieldset;
 use Tests\TestCase;
 
 class ConvertFieldsFromBlueprintTest extends TestCase
@@ -79,6 +81,52 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
             ],
         ];
+    }
+
+    #[Test]
+    public function it_preserves_fieldsets()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'imported_field', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('test')
+            ->andReturn($fieldset);
+
+        $this->makeBlueprint([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'normal_field', 'field' => ['type' => 'text']],
+                                ['import' => 'test'],
+                                ['import' => 'test', 'prefix' => 'prefixed_'],
+                                ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $form = Form::make('contact_us');
+
+        $this->assertEquals([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'normal_field', 'field' => ['type' => 'short_answer']],
+                        ['import' => 'test'],
+                        ['import' => 'test', 'prefix' => 'prefixed_'],
+                        ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
+                    ],
+                ],
+            ],
+        ], $form->formFields()->contents());
     }
 
     #[Test]

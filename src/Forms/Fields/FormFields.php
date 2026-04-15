@@ -2,9 +2,14 @@
 
 namespace Statamic\Forms\Fields;
 
+use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Support\Arr;
 
 class FormFields
@@ -25,9 +30,17 @@ class FormFields
 
     public function fields(): Collection
     {
-        return $this->items()->mapWithKeys(fn (array $field): array => [
-            $field['handle'] => new FormField($field['handle'], $field['field']),
-        ]);
+        return $this->items()->flatMap(function (array $config): array {
+            if (isset($config['import'])) {
+                return $this->getImportedFields($config);
+            }
+
+            if (is_string($config['field'])) {
+                return [$config['handle'] => $this->getReferencedField($config)];
+            }
+
+            return [$config['handle'] => new FormField($config['handle'], $config['field'])];
+        })->filter();
     }
 
     public function field(string $handle): ?FormField
@@ -42,11 +55,15 @@ class FormFields
                 return [
                     ...$section,
                     'fields' => collect($section['fields'] ?? [])
-                        ->map(function (array $field): array {
-                            $formField = $this->field($field['handle']);
+                        ->map(function (array $config): array {
+                            if (isset($config['import']) || is_string($config['field'])) {
+                                return $config;
+                            }
+
+                            $formField = $this->field($config['handle']);
 
                             return [
-                                'handle' => $field['handle'],
+                                'handle' => $config['handle'],
                                 'field' => Arr::removeNullValues($formField->toFieldArray()),
                             ];
                         })
@@ -62,5 +79,63 @@ class FormFields
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Borrowed from \Statamic\Fields\Fields.
+     */
+    private function getReferencedField(array $config): FormField
+    {
+        if (! $field = FieldRepository::find($config['field'])) {
+            throw new \Exception("Field {$config['field']} not found.");
+        }
+
+        if ($overrides = Arr::get($config, 'config')) {
+            $field->setConfig(array_merge($field->config(), $overrides));
+        }
+
+        return new FormField($field->handle(), $field->config());
+    }
+
+    /**
+     * Borrowed from \Statamic\Fields\Fields.
+     */
+    private function getImportedFields(array $config): array
+    {
+        $recursion = tap(app(FieldsetRecursionStack::class))->push($config['import']);
+
+        $blink = 'form-fields-imported-fields-'.md5(json_encode($config));
+
+        $imported = Blink::once($blink, function () use ($config) {
+            if (! $fieldset = FieldsetRepository::find($config['import'])) {
+                throw new FieldsetNotFoundException($config['import']);
+            }
+
+            $fields = $fieldset->fields()->all();
+
+            if ($overrides = $config['config'] ?? null) {
+                $fields = $fields->map(function ($field, $handle) use ($overrides) {
+                    return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
+                });
+            }
+
+            if ($prefix = Arr::get($config, 'prefix')) {
+                $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+                    $field = clone $field;
+                    $handle = $prefix.$field->handle();
+                    $prefix = $prefix.$field->prefix();
+
+                    return [$handle => $field->setHandle($handle)->setPrefix($prefix)];
+                });
+            }
+
+            return $fields;
+        })->map(function ($field) {
+            return new FormField($field->handle(), $field->config());
+        })->all();
+
+        $recursion->pop();
+
+        return $imported;
     }
 }

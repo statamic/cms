@@ -124,7 +124,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::set($field, 'field.type', 'long_answer');
                         }
 
-                        return ['handle' => $field['handle'], 'field' => $field['field']];
+                        return $field;
                     })->all(),
                 ];
             })->all();

@@ -3,6 +3,8 @@
 namespace Tests\Forms\Fields;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
+use Statamic\Fields\Fieldset;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFields;
 use Tests\TestCase;
@@ -19,6 +21,7 @@ class FormFieldsTest extends TestCase
                     'fields' => [
                         ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
                         ['handle' => 'email', 'field' => ['type' => 'email']],
+                        ['import' => 'test'],
                     ],
                 ],
             ],
@@ -58,6 +61,38 @@ class FormFieldsTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_items_from_fieldsets()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'imported_field', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('test')
+            ->andReturn($fieldset);
+
+        $formFields = new FormFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['import' => 'test'],
+                        ['import' => 'test', 'prefix' => 'prefixed_'],
+                        ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            ['import' => 'test'],
+            ['import' => 'test', 'prefix' => 'prefixed_'],
+            ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
+        ], $formFields->items()->all());
+    }
+
+    #[Test]
     public function it_returns_fields()
     {
         $formFields = new FormFields([
@@ -84,6 +119,38 @@ class FormFieldsTest extends TestCase
         $this->assertEquals('email', $fields->get('email')->type());
         $this->assertEquals('short_answer', $fields->get('name')->type());
         $this->assertEquals('long_answer', $fields->get('message')->type());
+    }
+
+    #[Test]
+    public function it_returns_fields_from_fieldsets()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'imported_field', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('test')
+            ->andReturn($fieldset);
+
+        $formFields = new FormFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['import' => 'test'],
+                        ['import' => 'test', 'prefix' => 'prefixed_'],
+                        ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = $formFields->fields();
+
+        $this->assertEveryItemIsInstanceOf(FormField::class, $fields->all());
+        $this->assertEquals(['imported_field', 'prefixed_imported_field', 'renamed_imported_field'], $fields->keys()->all());
+        $this->assertEveryItem($fields->map->type()->values()->all(), fn (string $type) => $type === 'text');
     }
 
     #[Test]
@@ -173,6 +240,50 @@ class FormFieldsTest extends TestCase
                             'display' => 'Additional Info',
                             'fields' => [
                                 ['handle' => 'shopping_list', 'field' => ['type' => 'list', 'display' => 'Shopping List']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], $blueprint->contents());
+    }
+
+    #[Test]
+    public function it_converts_to_a_blueprint_with_fieldsets()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'imported_field', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('test')
+            ->andReturn($fieldset);
+
+        $formFields = new FormFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['import' => 'test'],
+                        ['import' => 'test', 'prefix' => 'prefixed_'],
+                        ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint = $formFields->toBlueprint();
+
+        $this->assertEquals([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['import' => 'test'],
+                                ['import' => 'test', 'prefix' => 'prefixed_'],
+                                ['handle' => 'renamed_imported_field', 'field' => 'test.imported_field', 'config' => ['display' => 'Renamed Imported Field']],
                             ],
                         ],
                     ],
