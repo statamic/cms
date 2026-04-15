@@ -47,6 +47,7 @@ const notificationOptions = [
 </script>
 
 <template>
+
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')">
             <Icon name="save" class="sm:hidden" />
@@ -371,7 +372,9 @@ const notificationOptions = [
         </div>
     </LayoutPanel>
 
+
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
+
         <Header class="mx-auto max-w-5xl">
             <template #title>
                 <StatusIndicator status="published" />
@@ -408,8 +411,6 @@ const notificationOptions = [
 
                     <div class="circle" size="170px"></div>
                     <div class="circle" size="100px"></div>
-
-                    <div class="field-to-panel-connector"></div>
 
                     <Field :label="__('Which album was your favorite?')">
                         <RadioGroup v-model="favoriteAlbum">
@@ -483,7 +484,7 @@ const notificationOptions = [
                             </TabList>
 
                             <TabContent name="settings">
-                                <div class="space-y-6 pt-8">
+                                <div data-field-settings class="space-y-6 pt-8">
                                     <div class="flex items-center gap-2.5">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                         <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
@@ -516,6 +517,7 @@ const notificationOptions = [
                     </div>
                 </div>
             </div>
+
             <!-- This is the desktop nav - the content is repeated from the right panel -->
             <div class="@container relative py-6 px-2.5 max-[1000px]:hidden">
                 <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
@@ -526,8 +528,8 @@ const notificationOptions = [
                     </TabList>
 
                     <TabContent name="settings">
-                        <div class="space-y-6 pt-8">
-                            <div class="flex items-center gap-2.5">
+                        <div data-field-settings class="space-y-6 pt-8">
+                            <div style="anchor-name: --field-settings;" class="flex items-center gap-2.5">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                 <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
                             </div>

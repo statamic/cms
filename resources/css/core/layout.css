@@ -444,3 +444,34 @@ main.nav-closed {
 body > .draggable-mirror {
     z-index: var(--z-index-draggable);
 }
+
+
+[data-editing-field] {
+    border: 3px solid blue!important;
+    anchor-name: --editing-field;
+}
+
+.field-to-panel-connector {
+  position: absolute;
+  border: 3px solid blue!important;
+    right: anchor(--field-settings left);
+    top: anchor(--field-settings top);
+    width: 2rem;
+    bottom: anchor(--editing-field center);
+
+
+    /* position: fixed;
+    border: 3px solid blue!important;
+    height: 10rem;
+    bottom: anchor(--editing-field center); */
+}
+
+/* [data-field-settings] {
+    border: 3px solid blue!important;
+    anchor-name: --field-settings;
+} */
+
+#right-panel {
+    /* border: 3px solid blue!important; */
+    /* anchor-name: --field-settings; */
+}

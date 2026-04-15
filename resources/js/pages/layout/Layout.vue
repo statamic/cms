@@ -173,7 +173,7 @@ onUnmounted(() => {
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div
                 id="main-content"
-                class="main-content py-0! sm:p-2 h-full flex-1 flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
+                class="main-content relative py-0! sm:p-2 h-full flex-1 flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl"
                 :class="{
                     'flex': leftPanelActive || rightPanelActive,
                 }"
@@ -196,8 +196,9 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
+                <div class="field-to-panel-connector"></div>
                 <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="
-                    sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
+                    sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
                     max-sm:ps-2 ps-2">
                     <!-- Panel contents will be injected via <Teleport> -->
                 </div>
