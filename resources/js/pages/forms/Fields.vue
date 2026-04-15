@@ -399,9 +399,11 @@ const notificationOptions = [
                         />
                     </Field>
 
+                    <div data-editing-field>
                     <Field :label="__('What do you like most about our band?')" required>
                         <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
                     </Field>
+                    </div>
 
                     <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
                         <Input v-model="fanLength" />
@@ -418,7 +420,6 @@ const notificationOptions = [
                         </RadioGroup>
                     </Field>
 
-                    <div data-editing-field>
                     <Field :label="__('Which album was your second favorite?')">
                         <RadioGroup v-model="secondFavoriteAlbum">
                             <Radio
@@ -429,7 +430,6 @@ const notificationOptions = [
                             />
                         </RadioGroup>
                     </Field>
-                    </div>
 
                     <Field :label="__('Sign up for email notifications from The Midnight')">
                         <CheckboxGroup v-model="emailNotifications">
@@ -481,7 +481,7 @@ const notificationOptions = [
                             </TabList>
 
                             <TabContent name="settings">
-                                <div data-field-settings class="space-y-6 pt-8">
+                                <div class="space-y-6 pt-8">
                                     <div class="flex items-center gap-2.5">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                         <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
@@ -525,14 +525,50 @@ const notificationOptions = [
                     </TabList>
 
                     <TabContent name="settings">
-                        <div data-field-settings class="space-y-6 pt-8">
-                            <div style="anchor-name: --field-settings;" class="flex items-center gap-2.5">
+                        <div class="space-y-6 pt-8">
+                            <div data-field-settings class="flex items-center gap-2.5">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                 <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
                             </div>
 
                             <Field :label="__('Label')">
                                 <Input v-model="settingsLabel" />
+                            </Field>
+
+                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                            </Field>
+
+                            <Field :label="__('Placeholder')">
+                                <Input v-model="settingsPlaceholder" />
+                            </Field>
+
+                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                                <Input v-model="settingsCharacterLimit" type="number" />
+                            </Field>
+
+                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                            </Field>
+
+                            <Field :label="__('Placeholder')">
+                                <Input v-model="settingsPlaceholder" />
+                            </Field>
+
+                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                                <Input v-model="settingsCharacterLimit" type="number" />
+                            </Field>
+
+                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                            </Field>
+
+                            <Field :label="__('Placeholder')">
+                                <Input v-model="settingsPlaceholder" />
+                            </Field>
+
+                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                                <Input v-model="settingsCharacterLimit" type="number" />
                             </Field>
 
                             <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
