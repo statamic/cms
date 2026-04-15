@@ -20,6 +20,50 @@ class FormFieldtypeRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_form_fieldtype()
+    {
+        FooFormFieldtype::register();
+
+        $found = $this->repo->find('test');
+        $this->assertInstanceOf(FooFormFieldtype::class, $found);
+
+        // Find it again and assert that it's a different instance each time.
+        $second = $this->repo->find('test');
+        $this->assertInstanceOf(FooFormFieldtype::class, $second);
+        $this->assertNotSame($found, $second);
+    }
+
+    #[Test]
+    public function it_caches_and_clones_existing_instances()
+    {
+        FooFormFieldtype::register();
+
+        $found = $this->repo->find('test');
+        $this->assertInstanceOf(FooFormFieldtype::class, $found);
+
+        // Re-register another fieldtype that uses the same handle.
+        // In reality this wouldn't happen, but we do it for this test to ensure the caching works.
+        BarFormFieldtype::register();
+
+        // Assert that it was registered. If you were to manually resolve it
+        // out of the container you'd get the overridden fieldtype.
+        $this->assertEquals(BarFormFieldtype::class, app('statamic.form-fieldtypes')->get('test'));
+
+        // Find it again through the repo to assert that it's a different instance each time.
+        $second = $this->repo->find('test');
+        $this->assertInstanceOf(FooFormFieldtype::class, $second);
+        $this->assertNotSame($found, $second);
+    }
+
+    #[Test]
+    public function it_throw_exception_when_finding_invalid_form_fieldtype()
+    {
+        $this->expectException(FormFieldtypeNotFoundException::class);
+        $this->expectExceptionMessage('Form Fieldtype [test] not found');
+        $this->repo->find('test');
+    }
+
+    #[Test]
     public function it_makes_fields_selectable_in_forms()
     {
         $this->assertFalse($this->repo->hasBeenMadeSelectable('test-selectable'));
@@ -38,5 +82,25 @@ class FormFieldtypeRepositoryTest extends TestCase
         $this->repo->makeUnselectable('test-unselectable');
         $this->assertFalse($this->repo->hasBeenMadeSelectable('test-unselectable'));
         $this->assertTrue($this->repo->selectableIsOverriden('test-unselectable'));
+    }
+}
+
+class FooFormFieldtype extends FormFieldtype
+{
+    public static $handle = 'test';
+
+    public function toFieldArray(): array
+    {
+        // TODO: Implement toFieldArray() method.
+    }
+}
+
+class BarFormFieldtype extends FormFieldtype
+{
+    public static $handle = 'test';
+
+    public function toFieldArray(): array
+    {
+        // TODO: Implement toFieldArray() method.
     }
 }
