@@ -1,9 +1,9 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Card, Checkbox, CheckboxGroup, Field, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
@@ -11,6 +11,7 @@ const props = defineProps({
     form: Object,
 });
 
+const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const activeSettingsTab = ref('settings');
 const age = ref(null);
 const fanLength = ref('');
@@ -366,8 +367,15 @@ const notificationOptions = [
         </div>
     </LayoutPanel>
 
-    <div class="pt-20 col-span-full row-start-1">
-        <Panel class="mx-auto w-full max-w-5xl">
+    <div class="col-span-full row-start-1">
+        <Header class="mx-auto max-w-5xl">
+            <template #title>
+                <StatusIndicator status="published" />
+                {{ formTitle }}
+            </template>
+        </Header>
+
+        <Panel class="mx-auto max-w-5xl">
             <PanelHeader>
                 <Heading :text="__('Section')" />
             </PanelHeader>
