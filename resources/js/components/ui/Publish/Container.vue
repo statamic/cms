@@ -210,6 +210,10 @@ function setFieldValue(path, value) {
     data_set(values.value, path, value);
 }
 
+function setMeta(newMeta) {
+    meta.value = newMeta;
+}
+
 function setFieldMeta(path, value) {
     data_set(meta.value, path, value);
 }
@@ -297,6 +301,7 @@ const builtInProvides = {
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
+    setMeta,
     setFieldMeta,
     setFieldPreviewValue,
     setRevealerField,
@@ -330,6 +335,9 @@ onMounted(() => {
         values,
         setFieldValue,
         setValues,
+        meta,
+        setMeta,
+        setFieldMeta,
         pushComponent,
         fieldFocus,
         focusField,
@@ -353,6 +361,7 @@ defineExpose({
     pushComponent,
     visibleValues,
     setValues,
+    setMeta,
     setExtraValues,
 });
 
