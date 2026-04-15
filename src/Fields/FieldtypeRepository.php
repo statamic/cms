@@ -3,7 +3,6 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
-use Statamic\Fieldtypes\Text;
 use Statamic\Forms\Fields as FormFields;
 
 class FieldtypeRepository

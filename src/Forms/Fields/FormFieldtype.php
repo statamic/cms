@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Fields;
 
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -9,7 +10,6 @@ use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Support\Str;
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 
 use function Statamic\trans as __;
 
