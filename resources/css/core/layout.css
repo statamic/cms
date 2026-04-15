@@ -358,6 +358,13 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / SIDE PANELS / LEFT PANEL
 =================================================== */
+/* Hide the left panel button when the right panel is open to prevent unwanted/unnecessary click targets on the screen */
+#main:has(.right-panel-popover__menu:popover-open) {
+    button[popovertarget="popover-left-panel"] {
+        display: none;
+    }
+}
+
 .left-panel-popover {
     .left-panel-popover__menu {
         width: max(11rem, 33.33%);
@@ -380,6 +387,13 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / SIDE PANELS / RIGHT PANEL
 =================================================== */
+/* Hide the right panel button when the left panel is open to prevent unwanted/unnecessary click targets on the screen */
+#main:has(.left-panel-popover__menu:popover-open) {
+    button[popovertarget="popover-right-panel"] {
+        display: none;
+    }
+}
+
 .right-panel-popover {
     .right-panel-popover__menu {
         width: max(18rem, 33.33%);

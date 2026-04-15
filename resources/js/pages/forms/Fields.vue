@@ -52,7 +52,7 @@ const notificationOptions = [
 
     <Button
         class="
-            min-[1000px]:hidden sticky top-3 mt-3
+            min-[1000px]:hidden sticky top-3 mt-3 z-[var(--z-index-above)]
             sm:-translate-x-3 md:-translate-x-9 col-start-1 row-start-1
         "
         popovertarget="popover-left-panel"
@@ -367,7 +367,7 @@ const notificationOptions = [
         </div>
     </LayoutPanel>
 
-    <div class="col-span-full row-start-1">
+    <div class="col-span-full row-start-1 max-[1000px]:pt-14">
         <Header class="mx-auto max-w-5xl">
             <template #title>
                 <StatusIndicator status="published" />
@@ -447,7 +447,7 @@ const notificationOptions = [
 
     <Button
         class="
-        min-[1000px]:hidden sticky top-3 mt-3
+        min-[1000px]:hidden sticky top-3 mt-3 z-[var(--z-index-above)]
         sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
