@@ -462,7 +462,7 @@ body > .draggable-mirror {
   position: absolute;
   border: 3px solid blue!important;
     right: anchor(--field-settings left);
-    top: anchor(--field-settings top);
+    top: anchor(--field-settings center);
     width: 2rem;
     bottom: calc(anchor(--editing-field center) + -1rem);
 }
