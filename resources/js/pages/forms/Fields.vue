@@ -403,14 +403,9 @@ const notificationOptions = [
                         <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
                     </Field>
 
-                    <div data-editing-field>
-                        <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
-                            <Input v-model="fanLength" />
-                        </Field>
-                    </div>
-
-                    <div class="circle" size="170px"></div>
-                    <div class="circle" size="100px"></div>
+                    <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                        <Input v-model="fanLength" />
+                    </Field>
 
                     <Field :label="__('Which album was your favorite?')">
                         <RadioGroup v-model="favoriteAlbum">
@@ -423,6 +418,7 @@ const notificationOptions = [
                         </RadioGroup>
                     </Field>
 
+                    <div data-editing-field>
                     <Field :label="__('Which album was your second favorite?')">
                         <RadioGroup v-model="secondFavoriteAlbum">
                             <Radio
@@ -433,6 +429,7 @@ const notificationOptions = [
                             />
                         </RadioGroup>
                     </Field>
+                    </div>
 
                     <Field :label="__('Sign up for email notifications from The Midnight')">
                         <CheckboxGroup v-model="emailNotifications">

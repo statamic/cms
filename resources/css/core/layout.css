@@ -446,6 +446,13 @@ body > .draggable-mirror {
 }
 
 
+
+
+
+
+
+
+
 [data-editing-field] {
     border: 3px solid blue!important;
     anchor-name: --editing-field;
@@ -457,21 +464,13 @@ body > .draggable-mirror {
     right: anchor(--field-settings left);
     top: anchor(--field-settings top);
     width: 2rem;
-    bottom: anchor(--editing-field center);
-
-
-    /* position: fixed;
-    border: 3px solid blue!important;
-    height: 10rem;
-    bottom: anchor(--editing-field center); */
+    bottom: calc(anchor(--editing-field center) + -1rem);
 }
 
-/* [data-field-settings] {
+[data-field-settings] {
     border: 3px solid blue!important;
     anchor-name: --field-settings;
-} */
-
-#right-panel {
-    /* border: 3px solid blue!important; */
-    /* anchor-name: --field-settings; */
 }
+
+
+
