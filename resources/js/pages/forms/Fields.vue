@@ -1,7 +1,7 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Icon, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Card, Field, Heading, Icon, Panel, PanelHeader, Select, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import { ref } from 'vue';
 
@@ -12,6 +12,13 @@ const props = defineProps({
 });
 
 const activeSettingsTab = ref('settings');
+const heardAboutValue = ref(null);
+const favoriteThing = ref('');
+const heardAboutOptions = [
+    { label: __('Instagram'), value: 'instagram' },
+    { label: __('Friend referral'), value: 'referral' },
+    { label: __('Google search'), value: 'google' },
+];
 </script>
 
 <template>
@@ -340,7 +347,29 @@ const activeSettingsTab = ref('settings');
     </LayoutPanel>
 
     <div class="pt-20 min-[1000px]:py-10 col-span-full row-start-1">
-        <p>TODO: Form Builder</p>
+        <Panel class="mx-auto w-full max-w-5xl">
+            <PanelHeader>
+                <Heading :text="__('Section')" />
+            </PanelHeader>
+
+            <Card>
+                <div class="space-y-7">
+                    <Field :label="__('How did you hear about us?')" required>
+                        <Select
+                            v-model="heardAboutValue"
+                            :options="heardAboutOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Choose one')"
+                        />
+                    </Field>
+
+                    <Field :label="__('What do you like most about our band?')" required>
+                        <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                    </Field>
+                </div>
+            </Card>
+        </Panel>
     </div>
 
     <Button
