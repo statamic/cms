@@ -101,18 +101,29 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 return [
                     ...$section,
                     'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
-                        if ($field['field']['type'] === 'text' && in_array('email', $field['field']['validate'] ?? [])) {
-                            $field['field']['type'] = 'email';
-                            unset($field['field']['input_type']);
-                            $field['field']['validate'] = collect($field['field']['validate'] ?? [])->filter(fn ($validate) => $validate !== 'email')->all();
+                        if (
+                            Arr::get($field, 'field.type') === 'text'
+                            && in_array('email', Arr::get($field, 'field.validate') ?? [])
+                        ) {
+                            Arr::set($field, 'field.type', 'email');
+                            Arr::pull($field, 'field.input_type');
+
+                            $remainingValidationRules = collect(Arr::get($field, 'field.validate'))
+                                ->reject(fn (string $validate): bool => $validate === 'email');
+
+                            if ($remainingValidationRules->isEmpty()) {
+                                unset($field['field']['validate']);
+                            } else {
+                                $field['field']['validate'] = $remainingValidationRules->all();
+                            }
                         }
 
-                        if ($field['field']['type'] === 'text') {
-                            $field['field']['type'] = 'short_answer';
+                        if (Arr::get($field, 'field.type') === 'text') {
+                            Arr::set($field, 'field.type', 'short_answer');
                         }
 
-                        if ($field['field']['type'] === 'textarea') {
-                            $field['field']['type'] = 'long_answer';
+                        if (Arr::get($field, 'field.type') === 'textarea') {
+                            Arr::set($field, 'field.type', 'long_answer');
                         }
 
                         return ['handle' => $field['handle'], 'field' => $field['field']];
