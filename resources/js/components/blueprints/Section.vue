@@ -18,6 +18,8 @@
                 :editing-field="editingField"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
+                :exclude-fieldset="excludeFieldset"
+                :with-command-palette="withCommandPalette"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-deleted="deleteField"
@@ -146,6 +148,8 @@ export default {
 	    showCollapsibleField: { type: Boolean, default: false },
         showHideField: { type: Boolean, default: false },
         editText: { type: String },
+        excludeFieldset: { type: String, default: null },
+        withCommandPalette: { type: Boolean, default: false },
     },
 
     data() {
