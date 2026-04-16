@@ -124,6 +124,7 @@ class EmailTest extends TestCase
         $socialBlueprint = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         $companyBlueprint = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($socialBlueprint);
         BlueprintRepository::shouldReceive('find')->with('globals.company')->andReturn($companyBlueprint);
 
@@ -200,6 +201,7 @@ class EmailTest extends TestCase
             'email' => ['type' => 'text'],
         ]);
 
+        BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('globals.company_information')->andReturn($companyInformationBlueprint);
 
         $form = tap(Form::make('test')->formFields([
