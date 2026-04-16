@@ -30,7 +30,17 @@ class DatabaseSession extends Session
             throw new RegionNotFound($key);
         }
 
-        return unserialize(base64_decode($region->region), ['allowed_classes' => true]);
+        // Fall back to treating the value as a raw serialized string for rows
+        // written before base64 encoding was introduced. Strict base64_decode
+        // returns false on legacy rows because serialized PHP output contains
+        // characters outside the base64 alphabet.
+        $decoded = base64_decode($region->region, true);
+
+        if ($decoded === false) {
+            $decoded = $region->region;
+        }
+
+        return unserialize($decoded, ['allowed_classes' => true]);
     }
 
     protected function cacheRegion(Region $region)
