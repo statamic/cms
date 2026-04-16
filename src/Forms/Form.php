@@ -99,14 +99,14 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 return [
                     ...$section,
                     'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
-                        if (
-                            Arr::get($field, 'field.type') === 'text'
-                            && in_array('email', Arr::get($field, 'field.validate') ?? [])
-                        ) {
+                        $validate = Arr::get($field, 'field.validate');
+                        $validateRules = is_string($validate) ? explode('|', $validate) : ($validate ?? []);
+
+                        if (Arr::get($field, 'field.type') === 'text' && in_array('email', $validateRules)) {
                             Arr::set($field, 'field.type', 'email');
                             Arr::pull($field, 'field.input_type');
 
-                            $remainingValidationRules = collect(Arr::get($field, 'field.validate'))
+                            $remainingValidationRules = collect($validateRules)
                                 ->reject(fn (string $validate): bool => $validate === 'email');
 
                             if ($remainingValidationRules->isEmpty()) {
