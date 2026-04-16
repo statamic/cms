@@ -28,7 +28,6 @@ class Assets extends Fieldtype
     use UpdatesReferences;
     protected $categories = ['media', 'relationship'];
     protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
-    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {

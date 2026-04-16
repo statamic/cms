@@ -9,7 +9,6 @@ class Radio extends Fieldtype
     use HasSelectOptions;
 
     protected $categories = ['controls'];
-    protected $selectableInForms = true;
     protected $indexComponent = 'tags';
 
     protected function configFieldItems(): array

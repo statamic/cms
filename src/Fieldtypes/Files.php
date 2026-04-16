@@ -15,7 +15,6 @@ use Statamic\Support\Str;
 class Files extends Fieldtype
 {
     protected $selectable = false;
-    protected $selectableInForms = true;
     protected $categories = ['media'];
 
     protected function configFieldItems(): array
