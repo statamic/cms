@@ -3,7 +3,6 @@
 namespace Tests\Tags\Form;
 
 use Illuminate\Support\Facades\Blade;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
 use Statamic\Support\Arr;

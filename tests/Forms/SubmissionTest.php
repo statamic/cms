@@ -12,7 +12,6 @@ use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;

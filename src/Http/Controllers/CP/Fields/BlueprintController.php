@@ -6,11 +6,9 @@ use Inertia\Inertia;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Taxonomy;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class BlueprintController extends CpController
