@@ -18,7 +18,8 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
-use Statamic\Facades\Blueprint;
+use Statamic\Facades;
+use Statamic\Fields\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
@@ -83,7 +84,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this
             ->fluentlyGetOrSet('fields')
             ->getter(function ($fields) {
-                if (empty($fields) && $blueprint = Blueprint::find("forms.{$this->handle()}")) {
+                if (empty($fields) && $blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
                     $fields = $this->convertFieldsFromBlueprint($blueprint);
                 }
 
@@ -92,7 +93,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->args(func_get_args());
     }
 
-    private function convertFieldsFromBlueprint(\Statamic\Fields\Blueprint $blueprint): array
+    private function convertFieldsFromBlueprint(Blueprint $blueprint): array
     {
         $sections = collect($blueprint->contents()['tabs'] ?? [])->flatMap(function (array $tab): array {
             return collect($tab['sections'] ?? [])->map(function (array $section): array {
