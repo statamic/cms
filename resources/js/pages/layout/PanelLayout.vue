@@ -2,83 +2,61 @@
 import { provide, ref, onMounted, onUnmounted, useTemplateRef } from 'vue';
 import useResizable from '@/composables/use-resizable.js';
 
-const leftPanelRef = useTemplateRef('leftPanel');
-const rightPanelRef = useTemplateRef('rightPanel');
+const minWidth = 175;
+const maxWidth = 450;
+const breakpoints = { narrow: 1250, compact: 1400 };
 
-const leftPanelActive = ref(false);
-const rightPanelActive = ref(false);
+const left = {
+    ref: useTemplateRef('leftPanel'),
+    active: ref(false),
+    edge: 'right',
+    defaults: [minWidth, 270, 320],
+};
 
-provide('leftPanelActive', leftPanelActive);
-provide('rightPanelActive', rightPanelActive);
+const right = {
+    ref: useTemplateRef('rightPanel'),
+    active: ref(false),
+    edge: 'left',
+    defaults: [300, 300, 320],
+};
+
+provide('leftPanelActive', left.active);
+provide('rightPanelActive', right.active);
+
+function getDefaultWidth(panel) {
+    const w = window.innerWidth;
+    if (w < breakpoints.narrow) return panel.defaults[0];
+    if (w < breakpoints.compact) return panel.defaults[1];
+    return panel.defaults[2];
+}
 
 const { makeResizable } = useResizable();
 
-const sidebarMinWidth = 175;
-const sidebarMaxWidth = 450;
-const leftSidebarCompactDefaultWidth = 270;
-const rightSidebarNarrowDefaultWidth = 300;
-const rightSidebarCompactDefaultWidth = 300;
-const sidebarWideDefaultWidth = 320;
-const sidebarNarrowBreakpoint = 1250;
-const sidebarCompactBreakpoint = 1400;
+[left, right].forEach((panel) => {
+    makeResizable(panel.ref, panel.active, {
+        edge: panel.edge,
+        minWidth,
+        maxWidth,
+        defaultWidth: () => getDefaultWidth(panel),
+    });
 
-const getLeftSidebarDefaultWidth = () => {
-    if (typeof window === 'undefined') return sidebarWideDefaultWidth;
-    const w = window.innerWidth;
-    if (w < sidebarNarrowBreakpoint) return sidebarMinWidth;
-    if (w < sidebarCompactBreakpoint) return leftSidebarCompactDefaultWidth;
-    return sidebarWideDefaultWidth;
-};
+    // Pre-compute the set of pixel strings we treat as "unmodified by the user"
+    panel.priorDefaults = new Set(panel.defaults.map((d) => `${d}px`));
+});
 
-const getRightSidebarDefaultWidth = () => {
-    if (typeof window === 'undefined') return sidebarWideDefaultWidth;
-    const w = window.innerWidth;
-    if (w < sidebarNarrowBreakpoint) return rightSidebarNarrowDefaultWidth;
-    if (w < sidebarCompactBreakpoint) return rightSidebarCompactDefaultWidth;
-    return sidebarWideDefaultWidth;
-};
+function applyBreakpointDefaults() {
+    [left, right].forEach((panel) => {
+        if (!panel.active.value) return;
 
-makeResizable(leftPanelRef, leftPanelActive, { edge: 'right', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getLeftSidebarDefaultWidth });
-makeResizable(rightPanelRef, rightPanelActive, { edge: 'left', minWidth: sidebarMinWidth, maxWidth: sidebarMaxWidth, defaultWidth: getRightSidebarDefaultWidth });
+        const el = panel.ref.value;
+        if (!el) return;
 
-const applyBreakpointDefaults = () => {
-    if (typeof window === 'undefined') return;
-
-    const w = window.innerWidth;
-    let leftTarget;
-    let rightTarget;
-    if (w < sidebarNarrowBreakpoint) {
-        leftTarget = sidebarMinWidth;
-        rightTarget = rightSidebarNarrowDefaultWidth;
-    } else if (w < sidebarCompactBreakpoint) {
-        leftTarget = leftSidebarCompactDefaultWidth;
-        rightTarget = rightSidebarCompactDefaultWidth;
-    } else {
-        leftTarget = sidebarWideDefaultWidth;
-        rightTarget = sidebarWideDefaultWidth;
-    }
-
-    const minPx = `${sidebarMinWidth}px`;
-    const leftCompactPx = `${leftSidebarCompactDefaultWidth}px`;
-    const rightNarrowPx = `${rightSidebarNarrowDefaultWidth}px`;
-    const rightCompactPx = `${rightSidebarCompactDefaultWidth}px`;
-    const widePx = `${sidebarWideDefaultWidth}px`;
-
-    const leftPriorDefaults = new Set([minPx, leftCompactPx, widePx]);
-    const rightPriorDefaults = new Set([minPx, leftCompactPx, widePx, rightNarrowPx, rightCompactPx]);
-
-    const applyIfUnmodified = (panelEl, target, priorDefaults) => {
-        if (!panelEl) return;
-        const current = panelEl.style.width;
-
-        if (!current || priorDefaults.has(current)) {
-            panelEl.style.width = `${target}px`;
+        const current = el.style.width;
+        if (!current || panel.priorDefaults.has(current)) {
+            el.style.width = `${getDefaultWidth(panel)}px`;
         }
-    };
-
-    if (leftPanelActive.value) applyIfUnmodified(leftPanelRef.value, leftTarget, leftPriorDefaults);
-    if (rightPanelActive.value) applyIfUnmodified(rightPanelRef.value, rightTarget, rightPriorDefaults);
-};
+    });
+}
 
 onMounted(() => {
     applyBreakpointDefaults();
@@ -93,8 +71,8 @@ onUnmounted(() => {
 <template>
     <Teleport defer to="#main-content">
         <div
-            v-show="leftPanelActive"
-            :data-left-panel="leftPanelActive ? '' : undefined"
+            v-show="left.active"
+            :data-left-panel="left.active ? '' : undefined"
             ref="leftPanel"
             id="left-panel"
             tabindex="-1"
@@ -104,14 +82,14 @@ onUnmounted(() => {
     </Teleport>
 
     <Teleport defer to="#main-content">
-        <div v-show="leftPanelActive || rightPanelActive" class="field-to-panel-connector-initial" style="order: 1"></div>
-        <div v-show="leftPanelActive || rightPanelActive" class="field-to-panel-connector-scroll-past" style="order: 1"></div>
+        <div v-show="left.active || right.active" class="field-to-panel-connector-initial" style="order: 1"></div>
+        <div v-show="left.active || right.active" class="field-to-panel-connector-scroll-past" style="order: 1"></div>
     </Teleport>
 
     <Teleport defer to="#main-content">
         <div
-            v-show="rightPanelActive"
-            :data-right-panel="rightPanelActive ? '' : undefined"
+            v-show="right.active"
+            :data-right-panel="right.active ? '' : undefined"
             ref="rightPanel"
             id="right-panel"
             tabindex="-1"
