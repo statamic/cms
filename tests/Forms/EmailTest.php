@@ -121,20 +121,22 @@ class EmailTest extends TestCase
     #[Test]
     public function it_adds_data_to_the_view()
     {
-        $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
-        $company = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
-        $formBlueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        $socialBlueprint = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
+        $companyBlueprint = Blueprint::makeFromFields(['company_name' => ['type' => 'text']])->setHandle('company')->setNamespace('globals');
 
-        BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
-        BlueprintRepository::shouldReceive('find')->with('globals.company')->andReturn($company);
-        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
+        BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($socialBlueprint);
+        BlueprintRepository::shouldReceive('find')->with('globals.company')->andReturn($companyBlueprint);
 
         $social = tap(GlobalSet::make('social'))->save();
         $social->inDefaultSite()->data(['twitter' => '@statamic'])->save();
         $company = tap(GlobalSet::make('company'))->save();
         $company->inDefaultSite()->data(['company_name' => 'Statamic'])->save();
 
-        $form = tap(Form::make('test'))->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'foo', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
         $submission = $form->makeSubmission()->data(['foo' => 'bar']);
 
         $email = $this->makeEmailWithSubmission($submission);
@@ -193,20 +195,19 @@ class EmailTest extends TestCase
             'email' => 'info@example.com',
         ])->save();
 
-        $formBlueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text'],
-            'email' => ['type' => 'text'],
-        ]);
-
         $companyInformationBlueprint = Blueprint::makeFromFields([
             'name' => ['type' => 'text'],
             'email' => ['type' => 'text'],
         ]);
 
-        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
         BlueprintRepository::shouldReceive('find')->with('globals.company_information')->andReturn($companyInformationBlueprint);
 
-        $form = tap(Form::make('test'))->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+            ],
+        ]))->save();
 
         $submission = $form->makeSubmission()->data([
             'name' => 'Foo Bar',

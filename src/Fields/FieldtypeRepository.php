@@ -77,6 +77,10 @@ class FieldtypeRepository
     {
         $mappings = $this->formFieldtypeMappings[$handle] ?? [];
 
+        if (empty($mappings)) {
+            return false;
+        }
+
         return collect($mappings)->every(function (string $formFieldtype): bool {
             return FormFieldtypeRepository::hasBeenMadeSelectable($formFieldtype::handle());
         });
@@ -88,6 +92,10 @@ class FieldtypeRepository
     public function selectableInFormIsOverriden($handle)
     {
         $mappings = $this->formFieldtypeMappings[$handle] ?? [];
+
+        if (empty($mappings)) {
+            return false;
+        }
 
         return collect($mappings)->every(function (string $formFieldtype): bool {
             return FormFieldtypeRepository::selectableIsOverriden($formFieldtype::handle());
