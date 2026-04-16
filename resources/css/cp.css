@@ -17,6 +17,7 @@
 @import './components/index-fields.css';
 @import './components/notifications.css';
 @import './components/page-tree.css';
+@import './components/field-connectors.css';
 @import './components/pagination.css';
 @import './components/popover.css';
 @import './components/preview.css';

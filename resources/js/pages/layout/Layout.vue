@@ -196,7 +196,8 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="field-to-panel-connector"></div>
+                <div class="field-to-panel-connector-initial"></div>
+                <div class="field-to-panel-connector-scroll-past"></div>
                 <div v-show="rightPanelActive" ref="rightPanel" data-right-panel id="right-panel" tabindex="-1" class="
                     sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none
                     max-sm:ps-2 ps-2">
