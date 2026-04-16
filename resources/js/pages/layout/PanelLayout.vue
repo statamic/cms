@@ -82,8 +82,8 @@ onUnmounted(() => {
     </Teleport>
 
     <Teleport defer to="#main-content">
-        <div v-show="left.active || right.active" class="field-to-panel-connector-initial" style="order: 1"></div>
-        <div v-show="left.active || right.active" class="field-to-panel-connector-scroll-past" style="order: 1"></div>
+        <div v-show="left.active || right.active" class="field-to-panel-connector-initial"></div>
+        <div v-show="left.active || right.active" class="field-to-panel-connector-scroll-past"></div>
     </Teleport>
 
     <Teleport defer to="#main-content">
