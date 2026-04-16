@@ -90,6 +90,23 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
                 return new FormFields($fields ?? []);
             })
+            ->setter(function ($fields) {
+                if (isset($fields['tabs'])) {
+                    $fields = [
+                        'sections' => collect($fields['tabs'])->flatMap(fn ($tab) => $tab['sections'])->all(),
+                    ];
+                }
+
+                if (isset($fields['fields'])) {
+                    $fields = [
+                        'sections' => [
+                            ['fields' => $fields['fields']],
+                        ],
+                    ];
+                }
+
+                return $fields;
+            })
             ->args(func_get_args());
     }
 
@@ -146,14 +163,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         FormBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
-    }
-
-    public function blueprintCommandPaletteLink()
-    {
-        return $this->blueprint()?->commandPaletteLink(
-            type: 'Forms',
-            url: $this->editBlueprintUrl(),
-        );
     }
 
     /**
@@ -282,6 +291,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        if ($blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
+            $blueprint->delete();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -460,9 +473,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return cp_route('forms.destroy', $this->handle());
     }
 
+    /** @deprecated */
     public function editBlueprintUrl()
     {
-        return cp_route('blueprints.forms.edit', $this->handle());
+        return cp_route('forms.fields.index', $this->handle());
     }
 
     public function hasFiles()

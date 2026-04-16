@@ -124,12 +124,6 @@ function exportSubmissions() {
                 <DropdownMenu>
                     <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
                     <DropdownItem
-                        v-if="form.canConfigureFields"
-                        :text="__('Edit Blueprint')"
-                        icon="blueprint-edit"
-                        :href="form.blueprintUrl"
-                    />
-                    <DropdownItem
                         v-if="form.canDelete"
                         :text="__('Delete Form')"
                         icon="trash"
@@ -144,13 +138,6 @@ function exportSubmissions() {
                 :text="__('Configure Form')"
                 icon="cog"
                 :url="form.editUrl"
-            />
-
-            <CommandPaletteItem
-                category="Actions"
-                :text="__('Edit Blueprint')"
-                icon="blueprint-edit"
-                :url="form.blueprintUrl"
             />
 
             <CommandPaletteItem

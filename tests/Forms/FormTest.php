@@ -11,10 +11,10 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\YAML;
-use Statamic\Fields\Blueprint;
 use Statamic\Forms\Fields\FormFields;
 use Tests\TestCase;
 
@@ -31,8 +31,6 @@ class FormTest extends TestCase
     public function it_saves_a_form()
     {
         Event::fake();
-
-        $blueprint = (new Blueprint)->setHandle('post')->save();
 
         $form = Form::make('contact_us')
             ->title('Contact Us')
@@ -74,8 +72,6 @@ class FormTest extends TestCase
     {
         Event::fake();
 
-        $blueprint = (new Blueprint)->setHandle('post')->save();
-
         $form = Form::make('contact_us')
             ->title('Contact Us')
             ->honeypot('winnie');
@@ -92,11 +88,29 @@ class FormTest extends TestCase
     }
 
     #[Test]
+    public function it_deletes_blueprint_after_saving()
+    {
+        Blueprint::make()->setHandle('contact_us')->setNamespace('forms')->save();
+
+        $this->assertNotNull(Blueprint::find('forms.contact_us'));
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie')
+            ->data([
+                'foo' => 'bar',
+                'roo' => 'rar',
+            ]);
+
+        $form->save();
+
+        $this->assertNull(Blueprint::find('forms.contact_us'));
+    }
+
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
-
-        $blueprint = (new Blueprint)->setHandle('post')->save();
 
         $form = Form::make('contact_us')
             ->title('Contact Us')
@@ -118,8 +132,6 @@ class FormTest extends TestCase
             return false;
         });
 
-        $blueprint = (new Blueprint)->setHandle('post')->save();
-
         $form = Form::make('contact_us')
             ->title('Contact Us')
             ->honeypot('winnie')
@@ -136,8 +148,6 @@ class FormTest extends TestCase
         Event::listen(FormSaving::class, function () {
             return false;
         });
-
-        $blueprint = (new Blueprint)->setHandle('post')->save();
 
         $form = Form::make('contact_us')
             ->title('Contact Us')

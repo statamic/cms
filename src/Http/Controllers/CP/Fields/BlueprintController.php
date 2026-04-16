@@ -32,7 +32,6 @@ class BlueprintController extends CpController
             'navs' => $this->navs(),
             'assetContainers' => $this->assets(),
             'globals' => $this->globals(),
-            'forms' => $this->forms(),
             'userBlueprint' => [
                 'edit_url' => cp_route('blueprints.users.edit'),
             ],
@@ -98,16 +97,5 @@ class BlueprintController extends CpController
             'handle' => $set->handle(),
             'edit_url' => cp_route('blueprints.globals.edit', $set->handle()),
         ])->values()->all();
-    }
-
-    public function forms(): array
-    {
-        return User::current()->can('configure form fields')
-            ? Form::all()->map(fn ($form) => [
-                'title' => $form->title(),
-                'handle' => $form->handle(),
-                'edit_url' => cp_route('blueprints.forms.edit', $form->handle()),
-            ])->values()->all()
-            : [];
     }
 }

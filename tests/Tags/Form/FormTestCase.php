@@ -78,20 +78,20 @@ abstract class FormTestCase extends TestCase
         return Blade::render($string, $context);
     }
 
-    protected function createForm($blueprintContents = null, $handle = null)
+    protected function createForm($fieldContents = null, $handle = null)
     {
-        $defaultBlueprintContents = [
-            'fields' => $this->defaultFields,
+        $defaultFieldsContents = [
+            'sections' => [
+                ['fields' => $this->defaultFields],
+            ],
         ];
-
-        $blueprint = Blueprint::make()->setContents($blueprintContents ?? $defaultBlueprintContents);
 
         $handle = $handle ?? 'contact';
 
-        Blueprint::shouldReceive('find')->with("forms.{$handle}")->andReturn($blueprint);
-        Blueprint::makePartial();
-
-        $form = Form::make()->handle($handle)->honeypot('winnie');
+        $form = Form::make()
+            ->handle($handle)
+            ->honeypot('winnie')
+            ->formFields($fieldContents ?? $defaultFieldsContents);
 
         Form::shouldReceive('find')->with($handle)->andReturn($form);
         Form::makePartial();

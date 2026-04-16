@@ -225,11 +225,7 @@ export default {
     created() {
         if (this.fieldtypesLoaded) return;
 
-        let url = cp_url('fields/fieldtypes?selectable=true');
-
-        if (this.$config.get('isFormBlueprint')) url += '&forms=true';
-
-        this.$axios.get(url)
+        this.$axios.get(cp_url('fields/fieldtypes?selectable=true'))
             .then((response) => (loadedFieldtypes.value = response.data))
             .catch((e) => {
                 this.$toast.error(e.response?.data?.message || __('Something went wrong'));
