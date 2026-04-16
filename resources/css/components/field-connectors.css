@@ -55,18 +55,23 @@
 
     /* GROUP FIELD CONNECTORS / INITIAL CONNECTOR
     =================================================== */
-    .field-to-panel-connector-initial {
+    .field-to-panel-connector-initial,
+    .field-to-panel-connector-scroll-past {
         position: absolute;
         top: anchor(--field-settings center);
         right: anchor(--field-settings left);
         bottom: anchor(--editing-field center);
         width: 2.75rem;
+        &::before {
+            content: '';
+            position: fixed;
+        }
+    }
+    .field-to-panel-connector-initial {
         border-inline-start: 1px dashed var(--color-blue-400);
         &::before {
             --width: 1.5rem;
-            content: '';
             background: white;
-            position: fixed;
             top: calc(var(--global-header-height) + 1rem);
             height: 6rem;
             width: var(--width);
@@ -82,16 +87,8 @@
     =================================================== */
     /* This connector points downwards and is visible once you scroll _past_ the field */
     .field-to-panel-connector-scroll-past {
-        position: absolute;
-        /* border: 3px solid blue!important; */
-        top: anchor(--field-settings center);
-        right: anchor(--field-settings left);
-        bottom: anchor(--editing-field center);
-        width: 2.75rem;
         &::before {
-            content: '';
             border-inline-start: 1px dashed var(--color-blue-400);
-            position: fixed;
             transform: translateY(-8rem);
             height: 8rem;
             animation: clip-upwards auto linear both;
