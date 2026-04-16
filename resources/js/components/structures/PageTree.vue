@@ -31,6 +31,7 @@
                     :each-droppable="eachDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
+                    :i18n="treeDraggableI18n"
                     :aria-label="__('Tree Structure')"
                     @after-drop="afterDrop"
                     @open:node="nodeOpened"
@@ -143,21 +144,17 @@ export default {
         direction() {
             return this.$config.get('direction', 'ltr');
         },
+
+        treeDraggableI18n() {
+            return {
+                instructions: __('messages.tree_aria_instructions'),
+            };
+        },
     },
 
     watch: {
         site(site) {
             this.getPages();
-        },
-
-        loading(loading) {
-            if (!loading) {
-                this.$nextTick(() => {
-                    if (this.$refs.tree) {
-                        this.$refs.tree.ariaInstructions = __('messages.tree_aria_instructions');
-                    }
-                });
-            }
         },
 
         collapsedState: {
