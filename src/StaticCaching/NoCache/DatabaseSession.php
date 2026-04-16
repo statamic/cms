@@ -30,7 +30,7 @@ class DatabaseSession extends Session
             throw new RegionNotFound($key);
         }
 
-        return unserialize($region->region, ['allowed_classes' => true]);
+        return unserialize(base64_decode($region->region), ['allowed_classes' => true]);
     }
 
     protected function cacheRegion(Region $region)
@@ -39,7 +39,7 @@ class DatabaseSession extends Session
             'key' => $region->key(),
         ], [
             'url' => md5($this->url),
-            'region' => serialize($region),
+            'region' => base64_encode(serialize($region)),
         ]);
     }
 }
