@@ -1,11 +1,12 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
+import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import { computed, ref } from 'vue';
 
-defineOptions({ layout: [Layout, FormsLayout] });
+defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
