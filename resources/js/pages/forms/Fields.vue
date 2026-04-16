@@ -548,7 +548,7 @@ const notificationOptions = [
                                 <Input v-model="settingsCharacterLimit" type="number" />
                             </Field>
 
-                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <!-- <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
                                 <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
                             </Field>
 
@@ -582,7 +582,7 @@ const notificationOptions = [
 
                             <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
                                 <Input v-model="settingsCharacterLimit" type="number" />
-                            </Field>
+                            </Field> -->
                         </div>
                     </TabContent>
                     <TabContent name="logic">
