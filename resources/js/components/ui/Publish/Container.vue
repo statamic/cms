@@ -12,7 +12,7 @@ import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
 
-const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
 const props = defineProps({
     name: {
@@ -176,6 +176,12 @@ watch(
 watch(
     localizedFields,
     (values) => emit('update:modifiedFields', values),
+    { deep: true },
+);
+
+watch(
+    meta,
+    (meta) => emit('update:meta', meta),
     { deep: true },
 );
 
