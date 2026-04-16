@@ -32,8 +32,8 @@ class DatabaseSession extends Session
 
         // Fall back to treating the value as a raw serialized string for rows
         // written before base64 encoding was introduced. Strict base64_decode
-        // returns false on legacy rows because serialized PHP output contains
-        // characters outside the base64 alphabet.
+        // reliably detects legacy rows because any serialized PHP value always
+        // contains ":" or ";", neither of which are in the base64 alphabet.
         $decoded = base64_decode($region->region, true);
 
         if ($decoded === false) {
