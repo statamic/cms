@@ -404,7 +404,12 @@ const notificationOptions = [
 
                     <div id="editing-field" data-editing-field class="relative scroll-mt-20">
                         <div class="!absolute z-(--z-index-above) -top-0.5 end-0 flex items-center">
-                            <WidthSelector v-model="editingFieldWidth" size="base" variant="filled" class="me-2" />
+                            <WidthSelector
+                                v-model="editingFieldWidth"
+                                size="base"
+                                variant="filled"
+                                class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! dark:text-blue-300! dark:[&_.pointer-events-none]:text-blue-300! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
+                            />
                             <Button
                                 size="sm"
                                 inset
