@@ -125,7 +125,8 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::pull($field, 'field.input_type');
 
                             $remainingValidationRules = collect($validateRules)
-                                ->reject(fn (string $validate): bool => $validate === 'email');
+                                ->reject(fn (string $validate): bool => $validate === 'email')
+                                ->values();
 
                             if ($remainingValidationRules->isEmpty()) {
                                 unset($field['field']['validate']);
