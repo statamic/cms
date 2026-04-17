@@ -90,7 +90,7 @@
         }
         100% {
             top: var(--global-header-height);
-            height: 7.5rem;
+            height: 8.85rem;
         }
     }
     @keyframes clip-upwards {
@@ -143,7 +143,7 @@
             /* Move the mask up to continue hiding the line now that we've moved past the padding of the container */
             animation: move-mask-upwards auto linear both;
             animation-timeline: --cp-main-scroll;
-            animation-range: 0rem 2rem;
+            animation-range: 0rem 0.5rem;
 
         }
 
