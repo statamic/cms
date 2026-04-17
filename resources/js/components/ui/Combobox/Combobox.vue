@@ -155,6 +155,7 @@ const getOptionLabel = (option) => {
 };
 
 const getOptionValue = (option) => option?.[props.optionValue];
+const matchOptionByValue = (option, value) => getOptionValue(option) === value;
 const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
 const isDisabled = (option) => !isSelected(option) && props.multiple && limitReached.value;
 
@@ -375,7 +376,7 @@ defineExpose({
 	            :multiple
 	            :open="dropdownOpen"
 	            :model-value="modelValue"
-                :by="(option, value) => getOptionValue(option) === value"
+                :by="matchOptionByValue"
                 :disabled="disabled || readOnly"
                 :reset-search-term-on-blur="false"
                 :reset-search-term-on-select="false"
