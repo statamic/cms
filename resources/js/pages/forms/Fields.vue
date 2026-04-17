@@ -400,7 +400,7 @@ const notificationOptions = [
                         />
                     </Field>
 
-                    <div data-editing-field>
+                    <div id="editing-field" data-editing-field>
                     <Field :label="__('What do you like most about our band?')" required>
                         <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
                     </Field>
@@ -485,7 +485,9 @@ const notificationOptions = [
                                 <div class="space-y-6 pt-8">
                                     <div class="flex items-center gap-2.5">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                        <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
+                                        <a href="#editing-field" class="text-xl font-medium antialiased">
+                                            {{ __('Multi Choice') }}
+                                        </a>
                                     </div>
 
                                     <Field :label="__('Label')">
@@ -529,7 +531,9 @@ const notificationOptions = [
                         <div class="space-y-6 pt-8">
                             <div data-field-settings class="flex items-center gap-2.5">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
+                                <a href="#editing-field" class="text-xl font-medium antialiased">
+                                    {{ __('Multi Choice') }}
+                                </a>
                             </div>
 
                             <Field :label="__('Label')">
