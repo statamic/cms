@@ -6,6 +6,7 @@ use Statamic\Support\Arr;
 
 class Email extends FormFieldtype
 {
+    protected static $fieldtype = 'text';
     protected $icon = 'mail-sign-at';
     protected $categories = ['Contact Info'];
 

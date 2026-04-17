@@ -6,6 +6,8 @@ use Statamic\Support\Arr;
 
 class LongAnswer extends FormFieldtype
 {
+    protected static $fieldtype = 'textarea';
+
     public function configFieldItems(): array
     {
         return [

@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -21,6 +22,7 @@ abstract class FormFieldtype implements Arrayable
 
     protected static $title;
     protected static $binding = 'form-fields';
+    protected static $fieldtype;
 
     protected $field;
     protected $selectable = true;
@@ -59,6 +61,11 @@ abstract class FormFieldtype implements Arrayable
     public static function handle(): string
     {
         return Str::removeRight(static::traitHandle(), '_form_field');
+    }
+
+    public static function fieldtype(): ?string
+    {
+        return static::$fieldtype;
     }
 
     public function categories(): array
