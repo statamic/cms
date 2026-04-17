@@ -484,6 +484,7 @@ defineExpose({
                                     <div class="py-1 px-2 w-full overflow-x-hidden">
                                         <ComboboxItem
 	                                        as="button"
+	                                        :key="`${getOptionValue(option)}-${isDisabled(option)}`"
                                             :value="getOptionValue(option)"
                                             :text-value="getOptionLabel(option)"
                                             :disabled="isDisabled(option)"

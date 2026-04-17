@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {expect, fn, userEvent, within} from 'storybook/test';
+import {expect, fn, userEvent, waitFor, within} from 'storybook/test';
 import {Combobox} from '@ui';
 import {ref} from 'vue';
 import {icons} from "@/stories/icons";
@@ -664,15 +664,12 @@ export const TestMaxSelectionsLimit: Story = {
         // Deselect one option by clicking it
         const selectedOption = document.querySelector('[data-ui-combobox-item="the_midnight"]');
         await userEvent.click(selectedOption!);
-        await new Promise((r) => setTimeout(r, 100));
 
-        // Reopen dropdown to check state
-        await userEvent.click(trigger);
-        await new Promise((r) => setTimeout(r, 100));
-
-        const nowEnabledOption = document.querySelector('[data-ui-combobox-item="sunglasses_kid"]');
-        expect(nowEnabledOption).toBeTruthy();
-        expect(nowEnabledOption!.hasAttribute('data-disabled')).toBe(false);
+        await waitFor(() => {
+            const nowEnabledOption = document.querySelector('[data-ui-combobox-item="sunglasses_kid"]');
+            expect(nowEnabledOption).toBeTruthy();
+            expect(nowEnabledOption!.hasAttribute('data-disabled')).toBe(false);
+        });
     },
 };
 
