@@ -258,7 +258,7 @@ function clear() {
 
 function select() {
 	dropdownOpen.value = !shouldCloseOnSelect.value;
-	if (shouldCloseOnSelect.value) triggerRef.value.$el.focus();
+	if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
 }
 
 function deselect(option) {
