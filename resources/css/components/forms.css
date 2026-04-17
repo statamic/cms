@@ -20,3 +20,36 @@
     }
 }
 
+/* GROUP LOGIC TEXT
+=================================================== */
+
+/* GROUP LOGIC TEXT / VERTICAL
+=================================================== */
+.logic-text {
+    --logic-line: var(--color-gray-300);
+
+    ol {
+        li {
+            /* display: block; */
+            gap: 1rem;
+        }
+    }
+}
+
+:where(.dark) .logic-text {
+    --logic-line: var(--color-gray-600);
+}
+
+.logic-text__badge {
+    @apply
+        py-2 px-3.5
+        bg-content-bg
+        text-sm
+    ;
+    display: inline-block;
+    text-align: center;
+    color: var(--color-gray-800);
+    border-radius: 100vw;
+    box-shadow: var(--shadow-ui-sm);
+}
+

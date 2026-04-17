@@ -27,18 +27,18 @@ const logicDestinationOptions = [
 </script>
 
 <template>
-    <div data-logic-tree class="logic-flow">
+    <div data-logic-text class="logic-text">
         <h3 class="sr-only">{{ __('Conditional logic') }}</h3>
 
-        <ol class="logic-flow__root">
+        <ol>
             <li>
-                <div class="logic-flow__badge" aria-hidden="true">
+                <div class="logic-text__badge" aria-hidden="true">
                     {{ __('If') }}
                 </div>
                 <ol>
                     <li>
                         <div
-                            class="logic-flow__pill flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900"
+                            class="logic-text__pill flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900"
                         >
                             <span
                                 class="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400"
@@ -80,7 +80,7 @@ const logicDestinationOptions = [
             </li>
 
             <li>
-                <div class="logic-flow__badge" aria-hidden="true">
+                <div class="logic-text__badge" aria-hidden="true">
                     {{ __('Then go to …') }}
                 </div>
                 <ol>
