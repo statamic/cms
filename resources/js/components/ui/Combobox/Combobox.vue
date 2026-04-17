@@ -166,7 +166,8 @@ const selectedOptions = computed(() => {
     }
 
     return selections.map((value) => {
-        return props.options.find((option) => getOptionValue(option) === value) ?? { label: value, value };
+        return props.options.find((option) => getOptionValue(option) === value)
+            ?? { [props.optionLabel]: value, [props.optionValue]: value };
     });
 });
 
