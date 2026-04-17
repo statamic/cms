@@ -1,5 +1,11 @@
 /* BARD
 =================================================== */
+
+.bard-bulk-op [data-type] header,
+.bard-bulk-op [data-type] header * {
+    transition: none !important;
+}
+
 @layer ui {
     /* .grid-cell, [data-ui-input-group] are exceptions for Bard fieldtypes inside a Grid fieldtype, since these cause double borders */
     .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {

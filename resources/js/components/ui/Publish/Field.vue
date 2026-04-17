@@ -9,6 +9,7 @@ import {
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
+import { KEYS } from '@/components/field-conditions/Constants.js';
 
 const props = defineProps({
     config: {
@@ -137,7 +138,15 @@ const extraValues = computed(() => {
     return fieldPathPrefix.value ? data_get(containerExtraValues.value, fieldPathPrefix.value) : containerExtraValues.value;
 });
 
-const shouldShowField = computed(() => {
+const conditionHandles = computed(() => {
+    const conditionKey = KEYS.find((k) => props.config[k]);
+    if (!conditionKey) return null;
+    const conditions = props.config[conditionKey];
+    if (typeof conditions === 'string') return null;
+    return Object.keys(conditions);
+});
+
+function evaluateShowField() {
     return new ShowField(
         values.value,
         extraValues.value,
@@ -147,7 +156,45 @@ const shouldShowField = computed(() => {
         setHiddenField,
         { container },
     ).showField(props.config, fullPath.value);
+}
+
+const hasConditions = computed(() => {
+    if (props.config.visibility === 'hidden') return false;
+    return KEYS.some((k) => props.config[k]);
 });
+
+const shouldShowField = ref(props.config.visibility !== 'hidden');
+
+const isCustomCondition = computed(() => {
+    const conditionKey = KEYS.find((k) => props.config[k]);
+    return conditionKey ? typeof props.config[conditionKey] === 'string' : false;
+});
+
+if (hasConditions.value) {
+    shouldShowField.value = evaluateShowField();
+
+    watch(
+        () => {
+            if (isCustomCondition.value) return values.value;
+            const handles = conditionHandles.value;
+            if (!handles) return null;
+            const src = values.value ?? {};
+            const rootSrc = containerValues.value ?? {};
+            return handles.map((handle) => {
+                if (handle.startsWith('$root.') || handle.startsWith('root.')) {
+                    return data_get(rootSrc, handle.replace(/^\$?root\./, ''));
+                }
+                return data_get(src, handle);
+            });
+        },
+        () => { shouldShowField.value = evaluateShowField(); },
+        { deep: isCustomCondition.value },
+    );
+
+    watch(hiddenFields, () => {
+        shouldShowField.value = evaluateShowField();
+    });
+}
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 

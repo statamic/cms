@@ -9,8 +9,7 @@ import { nanoid as uniqid } from 'nanoid';
 import { onMounted, onUnmounted, watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
-import Values from '@/components/publish/Values.js';
-import { data_get } from '@/bootstrap/globals.js';
+import { clone, data_get } from '@/bootstrap/globals.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
@@ -106,11 +105,34 @@ const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
 const direction = computed(() => Statamic.$config.get('sites').find(s => s.handle === props.site)?.direction ?? document.documentElement.dir ?? 'ltr');
 
+// File-scoped helper: walk the dotted path and delete the leaf if present.
+function forgetAtPath(obj, path) {
+    const parts = path.split('.');
+    while (parts.length > 1) {
+        const key = parts.shift();
+        if (!obj || typeof obj !== 'object' || !(key in obj)) return;
+        obj = obj[key];
+    }
+    if (obj && typeof obj === 'object') delete obj[parts[0]];
+}
+
 const visibleValues = computed(() => {
-    const omittable = Object.keys(hiddenFields.value).filter(
-        (field) => hiddenFields.value[field].omitValue,
-    );
-    return new Values(values.value).except(omittable);
+    const hf = hiddenFields.value;
+    let omittable = null;
+    for (const key in hf) {
+        if (hf[key].omitValue) {
+            if (omittable === null) omittable = [];
+            omittable.push(key);
+        }
+    }
+
+    // Hot path: nothing hidden -> return the reactive tree directly.
+    if (omittable === null) return values.value;
+
+    // Only clone when we actually need to omit something.
+    const out = clone(values.value);
+    for (const key of omittable) forgetAtPath(out, key);
+    return out;
 });
 
 const revealerValues = computed(() => {
@@ -160,16 +182,19 @@ watch(
 
 watch(
     values,
-    (values) => {
+    (v) => {
         dirty();
-        emit('update:modelValue', values);
+        emit('update:modelValue', v);
+        emit('update:visibleValues', visibleValues.value);
     },
     { deep: true },
 );
 
 watch(
-    visibleValues,
-    (values) => emit('update:visibleValues', values),
+    hiddenFields,
+    () => {
+        emit('update:visibleValues', visibleValues.value);
+    },
     { deep: true },
 );
 

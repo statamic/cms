@@ -1,5 +1,6 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch, onBeforeUnmount } from 'vue';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
 import {
     Icon,
     Switch,
@@ -14,14 +15,15 @@ import {
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
-import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@/components/field-actions/FieldAction.js';
 import toFieldActions from '@/components/field-actions/toFieldActions.js';
 import { reveal } from '@api';
+import usePreviewText from '@/composables/use-preview-text';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
 const replicatorSets = inject('replicatorSets');
+const mountScheduler = inject('mountScheduler', createMountScheduler());
 
 const props = defineProps({
     config: Object,
@@ -75,34 +77,19 @@ const fieldActionPayload = computed(() => ({
     isReadOnly: props.readOnly,
 }));
 
+const fieldActionsRef = ref(null);
 const fieldActions = computed(() => {
-    return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
+    if (fieldActionsRef.value) return fieldActionsRef.value;
+    fieldActionsRef.value = toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
+    return fieldActionsRef.value;
 });
 
-const previewText = computed(() => {
-    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
-        .filter(([handle, value]) => {
-            if (!handle.endsWith('_')) return false;
-            handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
-            const config = props.config.fields.find((f) => f.handle === handle);
-            if (!config) return false;
-            return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
-        })
-        .map(([handle, value]) => value)
-        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
-        .map((value) => {
-            if (value instanceof PreviewHtml) return value.html;
-
-            if (typeof value === 'string') return escapeHtml(value);
-
-            if (Array.isArray(value) && typeof value[0] === 'string') {
-                return escapeHtml(value.join(', '));
-            }
-
-            return escapeHtml(JSON.stringify(value));
-        })
-        .filter((html) => html && html.trim() !== '')
-        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
+const { previewText } = usePreviewText({
+    config: computed(() => props.config),
+    values: computed(() => props.values),
+    previews,
+    fieldPathPrefix,
+    showFieldPreviews: computed(() => props.showFieldPreviews),
 });
 
 function toggleEnabledState() {
@@ -119,6 +106,32 @@ function destroy() {
     deletingSet.value = false;
     emit('removed');
 }
+
+const hasBeenExpanded = ref(!props.collapsed);
+const fieldsReady = ref(!props.collapsed);
+let isUnmounted = false;
+
+onBeforeUnmount(() => {
+    isUnmounted = true;
+});
+
+watch(
+    () => props.collapsed,
+    (collapsed) => {
+        if (!collapsed && !hasBeenExpanded.value) {
+            // First time expanding - defer field mounting via scheduler
+            hasBeenExpanded.value = true;
+            mountScheduler.schedule(() => {
+                if (!isUnmounted) {
+                    fieldsReady.value = true;
+                }
+            });
+        } else if (!collapsed) {
+            // Already expanded before - just show
+            fieldsReady.value = true;
+        }
+    },
+);
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
@@ -179,13 +192,15 @@ reveal.use(rootEl, () => emit('expanded'));
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
-                            <DropdownItem
-                                v-if="fieldActions.length"
-                                v-for="action in fieldActions"
-                                :text="action.title"
-                                :variant="action.dangerous ? 'destructive' : 'default'"
-                                @click="action.run(action)"
-                            />
+                            <template v-if="fieldActions.length">
+                                <DropdownItem
+                                    v-for="action in fieldActions"
+                                    :key="action.title"
+                                    :text="action.title"
+                                    :variant="action.dangerous ? 'destructive' : 'default'"
+                                    @click="action.run(action)"
+                                />
+                            </template>
                             <DropdownSeparator v-if="fieldActions.length" />
                             <DropdownItem
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
@@ -203,20 +218,23 @@ reveal.use(rootEl, () => emit('expanded'));
             </header>
 
             <div
-                v-show="!collapsed && hasFields"
+                v-if="hasBeenExpanded && hasFields"
+                v-show="!collapsed"
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
-                    <FieldsProvider
-                        :fields="config.fields"
-                        :as-config="false"
-                        :read-only
-                        :field-path-prefix="fieldPathPrefix"
-                        :meta-path-prefix="metaPathPrefix"
-                    >
-                        <Fields class="p-4" />
-                    </FieldsProvider>
+                    <template v-if="fieldsReady">
+                        <FieldsProvider
+                            :fields="config.fields"
+                            :as-config="false"
+                            :read-only="readOnly"
+                            :field-path-prefix="fieldPathPrefix"
+                            :meta-path-prefix="metaPathPrefix"
+                        >
+                            <Fields class="p-4" />
+                        </FieldsProvider>
+                    </template>
                 </div>
             </div>
         </div>

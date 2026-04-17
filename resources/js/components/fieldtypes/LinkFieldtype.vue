@@ -40,6 +40,8 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { Input, Select } from '@/components/ui';
+import debounce from '@/util/debounce.js';
+import { markRaw } from 'vue';
 
 export default {
     components: { Input, Text, Select },
@@ -58,6 +60,13 @@ export default {
             selectedAssets: this.meta.initialSelectedAssets,
             metaChanging: false,
         };
+    },
+
+    created() {
+        this.syncUrlDebounced = markRaw(debounce((url) => {
+            this.update(url);
+            this.updateMeta({ ...this.meta, initialUrl: url });
+        }, 150));
     },
 
     computed: {
@@ -116,13 +125,17 @@ export default {
 
         urlValue(url) {
             if (this.metaChanging) return;
-
-            this.update(url);
-            this.updateMeta({ ...this.meta, initialUrl: url });
+            this.syncUrlDebounced(url);
         },
 
         meta(meta, oldMeta) {
-            if (JSON.stringify(meta) === JSON.stringify(oldMeta)) return;
+            if (meta === oldMeta) return;
+            if (
+                meta.initialUrl === oldMeta.initialUrl &&
+                meta.initialOption === oldMeta.initialOption &&
+                this.shallowArrayEqual(meta.initialSelectedEntries, oldMeta.initialSelectedEntries) &&
+                this.shallowArrayEqual(meta.initialSelectedAssets, oldMeta.initialSelectedAssets)
+            ) return;
 
             this.metaChanging = true;
             this.urlValue = meta.initialUrl;
@@ -134,6 +147,10 @@ export default {
     },
 
     methods: {
+        shallowArrayEqual(a, b) {
+            return a === b || (Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => x === b[i]));
+        },
+
         initialOptions() {
             return [
                 this.config.required ? null : { label: __('None'), value: null },

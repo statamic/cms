@@ -1,3 +1,8 @@
 /* ==========================================================================
    REPLICATOR FIELDTYPE
    ========================================================================== */
+
+.replicator-bulk-op [data-replicator-set] header,
+.replicator-bulk-op [data-replicator-set] header * {
+    transition: none !important;
+}

@@ -54,14 +54,16 @@
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
                         <DropdownMenu>
-                            <DropdownItem
-                                v-if="fieldActions.length"
-                                v-for="action in fieldActions"
-                                :text="action.title"
-                                :variant="action.dangerous ? 'destructive' : 'default'"
-                                @click="action.run(action)"
-                            />
-                            <DropdownSeparator v-if="fieldActions.length" />
+                            <template v-if="fieldActions.length">
+                                <DropdownItem
+                                    v-for="action in fieldActions"
+                                    :key="action.title"
+                                    :text="action.title"
+                                    :variant="action.dangerous ? 'destructive' : 'default'"
+                                    @click="action.run(action)"
+                                />
+                                <DropdownSeparator />
+                            </template>
                             <DropdownItem
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
                                 @click="toggleCollapsedState"
@@ -78,20 +80,22 @@
             </header>
 
             <div
-                v-if="index !== undefined && hasFields"
+                v-if="index !== undefined && hasFields && hasBeenExpanded"
                 v-show="!collapsed"
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
-                <FieldsProvider
-                    :fields="fields"
-                    :as-config="false"
-                    :read-only="isReadOnly"
-                    :field-path-prefix="fieldPathPrefix"
-                    :meta-path-prefix="metaPathPrefix"
-                >
-                    <Fields class="p-4" />
-                </FieldsProvider>
+                <template v-if="fieldsReady">
+                    <FieldsProvider
+                        :fields="fields"
+                        :as-config="false"
+                        :read-only="isReadOnly"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
+                </template>
             </div>
         </div>
     </node-view-wrapper>
@@ -117,6 +121,7 @@ import {
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
 import { reveal } from '@api';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
 
 export default {
     props: nodeViewProps,
@@ -138,9 +143,34 @@ export default {
 
     mixins: [ManagesPreviewText, HasFieldActions],
 
+    data() {
+        return {
+            hasBeenExpanded: false,
+            fieldsReady: false,
+        };
+    },
+
+    watch: {
+        collapsed(collapsed) {
+            if (!collapsed && !this.hasBeenExpanded) {
+                // First time expanding - defer field mounting via scheduler
+                this.hasBeenExpanded = true;
+                this.mountScheduler.schedule(() => {
+                    if (!this._unmounted) {
+                        this.fieldsReady = true;
+                    }
+                });
+            } else if (!collapsed) {
+                // Already expanded before - just show
+                this.fieldsReady = true;
+            }
+        },
+    },
+
     inject: {
         bard: {},
         bardSets: {},
+        mountScheduler: { default: createMountScheduler() },
         publishContainer: { from: containerContextKey },
     },
 
@@ -346,16 +376,39 @@ export default {
     },
 
     mounted() {
-        watch(
-            () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
-            (values) => {
-				if (! values) return;
-                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
+        if (! this.collapsed) {
+            this.hasBeenExpanded = true;
+            this.fieldsReady = true;
+        }
 
-                this.updateAttributes({ values });
-            },
-            { deep: true }
-        );
+        const startSyncWatcher = () => {
+            this._syncWatcherStop = watch(
+                () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
+                (values) => {
+                    if (!values) return;
+
+                    // Fast path: same reactive reference -> nothing to sync.
+                    if (values === this.node.attrs.values) return;
+
+                    // Structural equality check; preserves correctness for reference swaps with identical content.
+                    if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
+
+                    this.updateAttributes({ values });
+                },
+                { deep: true, immediate: true }
+            );
+        };
+
+        if (this.fieldsReady) {
+            startSyncWatcher();
+        } else {
+            this._syncWatcherFieldsReadyStop = this.$watch('fieldsReady', (ready) => {
+                if (ready) {
+                    startSyncWatcher();
+                    this._syncWatcherFieldsReadyStop?.();
+                }
+            });
+        }
 
         reveal.mount(this.$refs.container, this.expand);
 
@@ -363,10 +416,16 @@ export default {
         // draggable ancestor. ProseMirror sets draggable=true on the node-view-wrapper
         // because the Set node spec has draggable:true. We must keep it false.
         this.$el.setAttribute('draggable', false);
+        this._draggablePending = false;
         this._draggableObserver = new MutationObserver(() => {
-            if (this.$el.getAttribute('draggable') !== 'false') {
-                this.$el.setAttribute('draggable', false);
-            }
+            if (this._draggablePending) return;
+            this._draggablePending = true;
+            requestAnimationFrame(() => {
+                this._draggablePending = false;
+                if (!this._unmounted && this.$el.getAttribute('draggable') !== 'false') {
+                    this.$el.setAttribute('draggable', false);
+                }
+            });
         });
         this._draggableObserver.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
     },
@@ -376,7 +435,10 @@ export default {
     },
 
     beforeUnmount() {
+        this._unmounted = true;
         this._draggableObserver?.disconnect();
+        this._syncWatcherStop?.();
+        this._syncWatcherFieldsReadyStop?.();
     },
 };
 </script>

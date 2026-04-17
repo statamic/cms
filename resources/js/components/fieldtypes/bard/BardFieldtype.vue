@@ -7,7 +7,7 @@
             <div :class="fullScreenMode && wrapperClasses">
                 <div
                     class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm"
-                    :class="{ 'bard-fullscreen': fullScreenMode }"
+                    :class="{ 'bard-fullscreen': fullScreenMode, 'bard-bulk-op': suppressTransitions }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
                     @dragend="ignorePageHeader(false)"
@@ -177,6 +177,8 @@ import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
+import extractBardText from "@/util/extractBardText";
+import { createMountScheduler } from "@/util/createMountScheduler.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -213,10 +215,12 @@ export default {
             escBinding: null,
             showAddSetButton: false,
             hasBeenFocused: false,
+            suppressTransitions: false,
             provide: {
                 bard: this.makeBardProvide(),
                 bardSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
+                mountScheduler: createMountScheduler(),
             },
             errorsById: {},
             debounceNextUpdate: true,
@@ -294,25 +298,7 @@ export default {
 
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
-            const stack = [...this.value];
-            let text = '';
-            while (stack.length) {
-                const node = stack.shift();
-                if (node.type === 'text') {
-                    text += ` ${node.text || ''}`;
-                } else if (node.type === 'set') {
-                    const handle = node.attrs.values.type;
-                    const set = this.setConfigs.find((set) => set.handle === handle);
-                    text += ` [${__(set ? set.display : handle)}]`;
-                }
-                if (text.length > 150) {
-                    break;
-                }
-                if (node.content) {
-                    stack.unshift(...node.content);
-                }
-            }
-            return text;
+            return extractBardText(this.value, 150, this.setConfigs);
         },
 
         inputIsInline() {
@@ -391,6 +377,7 @@ export default {
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
+        this._lastDocSize = this.editor.state.doc.content.size;
 
 		this.$nextTick(() => this.mounted = true);
 
@@ -643,11 +630,19 @@ export default {
         },
 
         collapseAll() {
+            this.suppressTransitions = true;
             this.collapsed = Object.keys(this.meta.existing);
+            this.$nextTick(() => requestAnimationFrame(() => {
+                this.suppressTransitions = false;
+            }));
         },
 
         expandAll() {
+            this.suppressTransitions = true;
             this.collapsed = [];
+            this.$nextTick(() => requestAnimationFrame(() => {
+                this.suppressTransitions = false;
+            }));
         },
 
         toggleCollapseSets() {
@@ -868,24 +863,19 @@ export default {
                         }
                     }, 1);
                 },
-                onUpdate: () => {
-                    const oldJson = this.json;
-                    const newJson = clone(this.editor.getJSON().content);
+                onUpdate: ({ transaction }) => {
+                    // Filter out non-doc transactions (selection, metadata, etc.).
+                    if (!transaction.docChanged) return;
 
-                    const countNodes = (nodes) => {
-                        if (!nodes || !Array.isArray(nodes)) return 0;
-                        let count = nodes.length;
-                        nodes.forEach(node => {
-                            if (node.content) {
-                                count += countNodes(node.content);
-                            }
-                        });
-                        return count;
-                    };
+                    const newDocSize = this.editor.state.doc.content.size;
+                    const oldDocSize = this._lastDocSize ?? newDocSize;
 
-                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+                    // Structural size change -> sync immediately, skip the usual debounce window.
+                    if (oldDocSize !== newDocSize) this.debounceNextUpdate = false;
+                    this._lastDocSize = newDocSize;
 
-                    this.json = newJson;
+                    // getJSON() already returns a fresh plain object — no clone() needed.
+                    this.json = this.editor.getJSON().content;
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {

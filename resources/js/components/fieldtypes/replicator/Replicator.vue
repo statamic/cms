@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-800': fullScreenMode, 'replicator-bulk-op': suppressTransitions }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -34,7 +34,7 @@
                                     v-for="(set, index) in value"
                                     :key="set._id"
                                     :id="set._id"
-                                    :index
+                                    :index="index"
                                     :field-path="setFieldPathPrefix"
                                     :meta-path="setMetaPathPrefix"
                                     :values="set"
@@ -94,7 +94,8 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import { data_get } from "@/bootstrap/globals.js";
+import { data_get } from '@/bootstrap/globals.js';
+import { createMountScheduler } from '@/util/createMountScheduler.js';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -111,9 +112,11 @@ export default {
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
             escBinding: null,
+            suppressTransitions: false,
             provide: {
                 replicatorSets: this.config.sets,
                 showReplicatorFieldPreviews: this.config.previews,
+                mountScheduler: createMountScheduler(),
             },
             errorsById: {},
             setsCache: {},
@@ -325,11 +328,19 @@ export default {
         },
 
         collapseAll() {
+            this.suppressTransitions = true;
             this.collapsed = this.value.map((v) => v._id);
+            this.$nextTick(() => requestAnimationFrame(() => {
+                this.suppressTransitions = false;
+            }));
         },
 
         expandAll() {
+            this.suppressTransitions = true;
             this.collapsed = [];
+            this.$nextTick(() => requestAnimationFrame(() => {
+                this.suppressTransitions = false;
+            }));
         },
 
         toggleFullscreen() {
