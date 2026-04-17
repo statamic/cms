@@ -40,7 +40,6 @@ const shouldFocus = computed(() => {
     if (props.config.focus === false || props.config.focus === true) {
         return props.config.focus;
     }
-
     const isRootField = !props.fieldPathPrefix;
     const isImplicitAutofocusField = name.value === 'title' || name.value === 'alt';
 
@@ -48,7 +47,7 @@ const shouldFocus = computed(() => {
 });
 
 function inputUpdated(value) {
-    return props.config.debounce === false ? update(value) : updateDebounced(value);
+    return !props.config.debounce ? update(value) : updateDebounced(value);
 }
 
 defineExpose(expose);
