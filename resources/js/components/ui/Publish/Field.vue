@@ -42,6 +42,9 @@ const {
     setFieldMeta,
     hiddenFields,
     setHiddenField,
+    fieldLocks,
+    focusField,
+    blurField,
     container,
     direction,
 } = injectContainerContext();
@@ -112,11 +115,14 @@ watch(
 );
 
 function focused() {
-    // todo
+    if (fieldPathPrefix.value) return;
+    focusField(handle);
 }
 
-function blurred() {
-    // todo
+function blurred(event) {
+    if (fieldPathPrefix.value) return;
+    if (event?.currentTarget?.contains(event.relatedTarget)) return;
+    blurField(handle);
 }
 
 const values = computed(() => {
@@ -170,7 +176,8 @@ const isReadOnly = computed(() => {
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
-const isLocked = computed(() => false); // todo
+const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
+const isLocked = computed(() => lockedBy.value !== null && lockedBy.value.id !== Statamic.user.id);
 
 const isSyncable = computed(() => {
     // Only top-level fields can be synced.
@@ -244,6 +251,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
+                    <ui-avatar v-if="isLocked" :user="lockedBy" class="rounded-full w-4 h-4 text-2xs" v-tooltip="lockedBy.name" />
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                 </Label>
@@ -254,7 +262,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction" v-if="fieldtypeComponentExists">
+            <div :dir="direction" v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
