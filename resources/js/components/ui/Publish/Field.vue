@@ -3,8 +3,8 @@ import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import {
+    Avatar,
     Field,
-    Icon,
     Label,
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
@@ -244,7 +244,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <template #label v-if="shouldShowLabel">
                 <Label :for="fieldId" :required="isRequired" class="relative">
                     <Transition name="lock-avatar-pop" mode="out-in">
-                        <ui-avatar
+                        <Avatar
                             v-if="isLocked"
                             :key="`lock-avatar-${handle}-${lockedBy?.id}`"
                             :user="lockedBy"
