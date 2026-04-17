@@ -947,12 +947,12 @@ export const TestDisabledStatePreventsInteraction: Story = {
         await new Promise((r) => setTimeout(r, 100));
         await expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy();
 
-        // Clear button should not work (it exists but click shouldn't trigger update)
+        // Clear button should be rendered as disabled and clicks shouldn't trigger updates
         const clearButton = canvasElement.querySelector('[data-ui-combobox-clear-button]');
-        if (clearButton) {
-            await userEvent.click(clearButton);
-            await new Promise((r) => setTimeout(r, 100));
-        }
+        await expect(clearButton).toBeTruthy();
+        expect((clearButton as HTMLButtonElement).disabled).toBe(true);
+        await userEvent.click(clearButton!);
+        await new Promise((r) => setTimeout(r, 100));
 
         // Model value should not have changed
         await expect(args['onUpdate:modelValue']).not.toHaveBeenCalled();
