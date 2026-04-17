@@ -171,6 +171,14 @@ class AuthServiceProvider extends ServiceProvider
                 : $broker;
         });
 
+        RateLimiter::for('statamic.auth', function (Request $request) {
+            return Limit::perMinute(4)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.forms', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });

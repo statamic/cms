@@ -34,7 +34,7 @@ use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
-        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class])->name('forms.submit');
+        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
@@ -42,16 +42,16 @@ Route::name('statamic.')->group(function () {
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
-            Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
+            Route::group(['middleware' => [HandlePrecognitiveRequests::class, 'throttle:statamic.auth']], function () {
                 Route::post('login', [LoginController::class, 'login'])->name('login');
                 Route::post('register', RegisterController::class)->name('register');
                 Route::post('profile', ProfileController::class)->name('profile');
                 Route::post('password', PasswordController::class)->name('password');
             });
 
-            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.auth')->name('password.email');
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-            Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+            Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.auth')->name('password.reset.action');
 
             Route::group(['prefix' => 'passkeys'], function () {
                 Route::middleware(ThrottleRequests::class.':30,1')->group(function () {
