@@ -130,6 +130,7 @@
     .field-to-panel-connector-initial {
         border-inline-start: 1px dashed var(--color-blue-400);
         @apply dark:border-blue-500;
+        top: calc(anchor(--field-settings top) + 2.15rem);
         bottom: calc(anchor(--editing-field top) + 8px);
         &::before {
             --width: 1.5rem;
@@ -143,6 +144,24 @@
             animation: move-mask-upwards auto linear both;
             animation-timeline: --cp-main-scroll;
             animation-range: 0rem 2rem;
+
+        }
+
+        &::after {
+            --offset: 1.5rem;
+            content: '';
+            position: fixed;
+            z-index: var(--z-index-above);
+            translate: 0 -1.15rem;
+            width: var(--offset);
+            border-block-start: 1px dashed var(--color-blue-400);
+            border-inline-start: 1px dashed var(--color-blue-400);
+            border-start-start-radius: 25px;
+            height: 1rem;
+            animation: flip auto linear both;
+            animation-timeline: --editing-field-scroll;
+            --crossing: -80%;
+            animation-range: exit-crossing var(--crossing) exit-crossing var(--crossing);
         }
     }
     /* GROUP FIELD CONNECTORS / PAST CONNECTOR
