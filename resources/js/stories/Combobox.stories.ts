@@ -989,3 +989,27 @@ export const TestDisabledStateMultiplePreventsInteraction: Story = {
         await expect(args['onUpdate:modelValue']).not.toHaveBeenCalled();
     },
 };
+
+export const TestShouldOpenDropdownDoesNotBlockClose: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string[]>([]);
+            return { value, options: defaultOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" multiple taggable :should-open-dropdown="(open) => open && options.length > 0" placeholder="Add tags..." />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('combobox');
+
+        await userEvent.click(trigger);
+        await expect(document.querySelector('[data-ui-combobox-content]')).toBeTruthy();
+
+        await userEvent.keyboard('{Escape}');
+        await new Promise((r) => setTimeout(r, 100));
+
+        await expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy();
+    },
+};

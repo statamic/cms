@@ -279,7 +279,7 @@ function updateModelValue(value) {
 }
 
 function updateDropdownOpen(open) {
-	if (! props.shouldOpenDropdown(open)) return;
+	if (open && ! props.shouldOpenDropdown(open)) return;
     if (props.disabled || props.readOnly) return;
 
     dropdownOpen.value = open;
