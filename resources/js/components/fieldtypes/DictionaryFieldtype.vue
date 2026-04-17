@@ -44,7 +44,7 @@
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
                                 :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
-                                @click="deselect(option.value)"
+                                @click="deselect(getOptionValue(option))"
                             >
                                 <span>&times;</span>
                             </button>

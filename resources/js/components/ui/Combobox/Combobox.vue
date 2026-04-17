@@ -558,7 +558,7 @@ defineExpose({
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
-                                @click="deselect(option.value)"
+                                @click="deselect(getOptionValue(option))"
                             >
                                 &times;
                             </button>
