@@ -29,10 +29,21 @@
     --logic-line: var(--color-gray-300);
 
     ol {
+        display: grid;
+        @apply gap-2.5;
         li {
-            /* display: block; */
-            gap: 1rem;
+            /* Prevent full-width comboboxes */
+            > .w-full {
+                display: inline-flex;
+                width: unset;
+                min-width: unset;
+            }
         }
+    }
+
+    [data-ui-combobox-trigger] {
+        display: inline-flex;
+        width: unset;
     }
 }
 
@@ -42,14 +53,30 @@
 
 .logic-text__badge {
     @apply
-        py-2 px-3.5
+        py-2 px-3.5 mb-2.5
         bg-content-bg
+        rounded-full
         text-sm
     ;
     display: inline-block;
     text-align: center;
     color: var(--color-gray-800);
-    border-radius: 100vw;
     box-shadow: var(--shadow-ui-sm);
 }
 
+.logic-text__pill {
+    display: flex;
+    align-items: center;
+    @apply gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900;
+}
+
+.logic-text__pill-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @apply size-6 bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full;
+}
+
+.logic-text__pill-text {
+    @apply text-sm font-medium text-gray-900 dark:text-gray-100;
+}

@@ -38,14 +38,14 @@ const logicDestinationOptions = [
                 <ol>
                     <li>
                         <div
-                            class="logic-text__pill flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900"
+                            class="logic-text__pill"
                         >
                             <span
-                                class="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400"
+                                class="logic-text__pill-icon"
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <span class="logic-text__pill-text">
                                 {{ __('Which album was your favorite?') }}
                             </span>
                         </div>
@@ -53,9 +53,7 @@ const logicDestinationOptions = [
                     <li>
                         <Combobox
                             v-model="logicOperator"
-                            class="max-w-44"
                             size="sm"
-                            variant="default"
                             :options="logicOperatorOptions"
                             option-label="label"
                             option-value="value"
@@ -66,9 +64,7 @@ const logicDestinationOptions = [
                     <li>
                         <Combobox
                             v-model="logicValue"
-                            class="max-w-xs"
                             size="sm"
-                            variant="default"
                             :options="logicValueOptions"
                             option-label="label"
                             option-value="value"
