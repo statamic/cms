@@ -406,7 +406,7 @@ defineExpose({
                                 type="search"
                                 autocomplete="off"
                                 v-model="searchQuery"
-                                @blur.prevent="onBlur"
+                                @blur="onBlur"
                                 @paste.prevent="onPaste"
                                 @keydown.enter="pushTaggableOption"
                             />
