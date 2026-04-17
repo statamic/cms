@@ -10,6 +10,7 @@ class Toggle extends Fieldtype
 {
     protected $categories = ['controls'];
     protected $keywords = ['checkbox', 'bool', 'boolean'];
+    protected $selectableInForms = true;
     protected $defaultValue = false;
 
     protected function configFieldItems(): array

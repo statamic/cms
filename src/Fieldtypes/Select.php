@@ -10,6 +10,7 @@ class Select extends Fieldtype
 
     protected $categories = ['controls'];
     protected $keywords = ['select', 'option', 'choice', 'dropdown', 'list'];
+    protected $selectableInForms = true;
     protected $indexComponent = 'tags';
 
     protected function configFieldItems(): array

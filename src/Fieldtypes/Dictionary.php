@@ -14,6 +14,7 @@ use Statamic\Support\Arr;
 class Dictionary extends Fieldtype
 {
     protected $categories = ['controls', 'relationship'];
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {

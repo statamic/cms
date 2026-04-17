@@ -7,5 +7,6 @@ use Statamic\Fields\Fieldtype;
 class Spacer extends Fieldtype
 {
     protected $categories = ['special'];
+    protected $selectableInForms = true;
     protected $icon = 'fieldtype-width';
 }

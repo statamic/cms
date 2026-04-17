@@ -11,6 +11,7 @@ class Checkboxes extends Fieldtype
     }
 
     protected $categories = ['controls'];
+    protected $selectableInForms = true;
     protected $indexComponent = 'tags';
 
     protected function configFieldItems(): array
