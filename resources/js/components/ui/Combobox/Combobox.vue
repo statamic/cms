@@ -24,49 +24,49 @@ import { SortableList } from '@/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
-    /** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
-    adaptiveWidth: { type: Boolean, default: false },
-    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
-    align: { type: String, default: 'start' },
-    /** When `true`, the selected value will be clearable. */
-    clearable: { type: Boolean, default: false },
-    /** When `true`, the options dropdown will close after selecting an option. */
-    closeOnSelect: { type: Boolean, default: undefined },
-    disabled: { type: Boolean, default: false },
-    /** When `true`, the focus outline will be more discrete. */
-    discreteFocusOutline: { type: Boolean, default: false },
-    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
-    icon: { type: String, default: null },
-    /** ID attribute for the input element */
-    id: { type: String },
-    /** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
-    ignoreFilter: { type: Boolean, default: false },
-    /** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
-    labelHtml: { type: Boolean, default: false },
-    /** The maximum number of selectable options. */
-    maxSelections: { type: Number, default: null },
-    /** The controlled value of the combobox. */
-    modelValue: { type: [Object, String, Number], default: null },
-    /** When `true`, multiple options are allowed. */
-    multiple: { type: Boolean, default: false },
-    /** Key of the option's label in the option's object. */
-    optionLabel: { type: String, default: 'label' },
-    /** Array of option objects */
-    options: { type: Array, default: () => [] },
-    /** Key of the option's value in the option's object. */
-    optionValue: { type: String, default: 'value' },
-    placeholder: { type: String, default: () => __('Select...') },
-    readOnly: { type: Boolean, default: false },
-    /** When `true`, the options will be searchable. */
-    searchable: { type: Boolean, default: true },
-    /** Determines if the dropdown should open */
-    shouldOpenDropdown: { type: Function, default: () => true },
-    /** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
-    size: { type: String, default: 'base' },
-    /** When `true`, additional options can be added by typing in the search input and pressing enter. */
-    taggable: { type: Boolean, default: false },
-    /** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
-    variant: { type: String, default: 'default' },
+	/** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
+	adaptiveWidth: { type: Boolean, default: false },
+	/** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
+	align: { type: String, default: 'start' },
+	/** When `true`, the selected value will be clearable. */
+	clearable: { type: Boolean, default: false },
+	/** When `true`, the options dropdown will close after selecting an option. */
+	closeOnSelect: { type: Boolean, default: undefined },
+	disabled: { type: Boolean, default: false },
+	/** When `true`, the focus outline will be more discrete. */
+	discreteFocusOutline: { type: Boolean, default: false },
+	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+	icon: { type: String, default: null },
+	/** ID attribute for the input element */
+	id: { type: String },
+	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
+	ignoreFilter: { type: Boolean, default: false },
+	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
+	labelHtml: { type: Boolean, default: false },
+	/** The maximum number of selectable options. */
+	maxSelections: { type: Number, default: null },
+	/** The controlled value of the combobox. */
+	modelValue: { type: [Object, String, Number], default: null },
+	/** When `true`, multiple options are allowed. */
+	multiple: { type: Boolean, default: false },
+	/** Key of the option's label in the option's object. */
+	optionLabel: { type: String, default: 'label' },
+	/** Array of option objects */
+	options: { type: Array, default: () => [] },
+	/** Key of the option's value in the option's object. */
+	optionValue: { type: String, default: 'value' },
+	placeholder: { type: String, default: () => __('Select...') },
+	readOnly: { type: Boolean, default: false },
+	/** When `true`, the options will be searchable. */
+	searchable: { type: Boolean, default: true },
+	/** Determines if the dropdown should open */
+	shouldOpenDropdown: { type: Function, default: () => true },
+	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+	size: { type: String, default: 'base' },
+	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
+	taggable: { type: Boolean, default: false },
+	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+	variant: { type: String, default: 'default' },
 });
 
 defineOptions({
