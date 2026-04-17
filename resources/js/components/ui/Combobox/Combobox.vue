@@ -292,6 +292,7 @@ function updateDropdownOpen(open) {
 
 function openDropdown(e) {
 	if (dropdownOpen.value) return;
+	if (e.target.tagName === 'INPUT') return;
 	if (typeof e.preventDefault === 'function') e.preventDefault();
 
 	updateDropdownOpen(true);
