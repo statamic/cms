@@ -311,6 +311,8 @@ function onBlur(e) {
 function onPaste(e) {
 	if (!props.taggable) return;
 
+	e.preventDefault();
+
     const pastedValue = e.clipboardData.getData('text');
 
     updateModelValue([...(props.modelValue ?? []), ...pastedValue.split(',').map((v) => v.trim())]);
@@ -393,7 +395,7 @@ defineExpose({
                                 autocomplete="off"
                                 v-model="searchQuery"
                                 @blur="onBlur"
-                                @paste.prevent="onPaste"
+                                @paste="onPaste"
                                 @keydown.enter="pushTaggableOption"
                             />
 
