@@ -12,7 +12,7 @@ class FormConnectController extends CpController
 {
     public function __invoke($form)
     {
-        // TOOD: Remove from this controller when wiring up the form builder.
+        // TODO: Remove from this controller when wiring up the form builder.
         $formFieldtypes = app('statamic.form-fieldtypes')
             ->unique()
             ->map(fn ($class) => app($class))
