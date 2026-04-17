@@ -14,7 +14,8 @@ const navItems = [
     { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
 ];
 
-const isActive = (href) => page.url === new URL(href, window.location.origin).pathname;
+const currentPath = computed(() => new URL(page.url, window.location.origin).pathname);
+const isActive = (href) => currentPath.value === new URL(href, window.location.origin).pathname;
 
 const activeSectionLabel = computed(() => {
     return navItems.find((item) => isActive(item.href))?.label ?? navItems[0]?.label ?? '';
