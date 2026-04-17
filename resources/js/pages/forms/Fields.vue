@@ -2,6 +2,7 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
+import LogicFlowMock from './LogicFlowMock.vue';
 import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
@@ -537,7 +538,16 @@ const notificationOptions = [
                                 </div>
                             </TabContent>
                             <TabContent name="logic">
-                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                                <div class="space-y-6 pt-8">
+                                    <div class="flex items-center gap-2.5">
+                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                        <a href="#editing-field" class="text-xl font-medium antialiased">
+                                            {{ __('Multi Choice') }}
+                                        </a>
+                                    </div>
+
+                                    <LogicFlowMock />
+                                </div>
                             </TabContent>
                             <TabContent name="validation">
                                 <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
@@ -619,7 +629,16 @@ const notificationOptions = [
                         </div>
                     </TabContent>
                     <TabContent name="logic">
-                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                        <div class="space-y-6 pt-8">
+                            <div data-field-settings class="flex items-center gap-2.5">
+                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                <a href="#editing-field" class="text-xl font-medium antialiased">
+                                    {{ __('Multi Choice') }}
+                                </a>
+                            </div>
+
+                            <LogicFlowMock />
+                        </div>
                     </TabContent>
                     <TabContent name="validation">
                         <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
