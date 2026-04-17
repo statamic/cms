@@ -11,6 +11,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -341,6 +342,39 @@ class StoreEntryTest extends TestCase
             ->assertOk();
 
         $this->assertFalse($response->json('values.published'), 'Initial published value should be false when user lacks publish permission, even if collection defaults to published');
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_for_structured_entries_with_depth_conditional_routes()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('child-id')->slug('child')->collection('test')->create();
+
+        $tree = $collection->structure()->in('en');
+        $tree->tree([
+            ['entry' => 'root-id', 'children' => [
+                ['entry' => 'child-id'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Duplicate Child',
+                'slug' => 'child',
+                '_parent' => 'root-id',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
     }
 
     private function seedUserAndCollection()
