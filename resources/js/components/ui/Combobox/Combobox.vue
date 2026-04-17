@@ -503,7 +503,7 @@ defineExpose({
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
 	                                        :title="getOptionLabel(option)"
-                                            @select="select(option)"
+                                            @select="select"
                                         >
                                             <slot name="option" v-bind="option">
                                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
