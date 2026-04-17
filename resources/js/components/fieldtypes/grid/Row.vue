@@ -5,6 +5,7 @@
         <FieldsProvider
             :fields="fields"
             :as-config="false"
+            :read-only
             :field-path-prefix="`${fieldPathPrefix}.${index}`"
             :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
         >
@@ -73,6 +74,9 @@ export default {
         hasError: {
             type: Boolean,
             default: false,
+        },
+        readOnly: {
+            type: Boolean,
         },
     },
 

@@ -953,7 +953,6 @@ class AssetTest extends TestCase
 
         $reflection = new ReflectionClass($asset);
         $property = $reflection->getProperty('withEvents');
-        $property->setAccessible(true);
         $withEvents = $property->getValue($asset);
         $this->assertTrue($withEvents);
     }

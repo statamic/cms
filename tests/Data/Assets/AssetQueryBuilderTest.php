@@ -783,6 +783,17 @@ class AssetQueryBuilderTest extends TestCase
         // Assert returns null when there's no results.
         $this->assertNull($this->container->queryAssets()->where('type', 'c')->average('quantity'));
     }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $count = $this->container->assets()->count();
+        $this->assertGreaterThan(0, $count);
+
+        $this->container->queryAssets()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, $this->container->assets());
+    }
 }
 
 class CustomScope extends Scope

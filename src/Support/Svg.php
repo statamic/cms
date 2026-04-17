@@ -20,11 +20,11 @@ class Svg
     {
         $sanitizer = $sanitizer ?? new DOMSanitizer(DOMSanitizer::SVG);
 
-        $svg = $sanitizer->sanitize($svg, [
+        $svg = static::sanitizeStyleTags($svg);
+
+        return $sanitizer->sanitize($svg, [
             'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
         ]);
-
-        return static::sanitizeStyleTags($svg);
     }
 
     public static function sanitizeCss(string $css): string
