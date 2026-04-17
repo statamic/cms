@@ -303,7 +303,7 @@ function openDropdown(e) {
 function onBlur(e) {
 	if (!props.taggable) return;
 
-	let isInsideDropdown = e.relatedTarget?.dataset.hasOwnProperty('rekaCollectionItem');
+	let isInsideDropdown = 'rekaCollectionItem' in (e.relatedTarget?.dataset ?? {});
 	if (isInsideDropdown) return;
 
 	pushTaggableOption(e);
