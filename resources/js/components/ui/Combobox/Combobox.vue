@@ -333,25 +333,10 @@ function pushTaggableOption(e) {
 	updateModelValue([...props.modelValue ?? [], e.target.value]);
 }
 
-async function scrollToSelectedOption() {
+function scrollToSelectedOption() {
 	if (props.multiple || !props.modelValue) return;
 
-	await rootRef.value?.highlightSelected?.();
-
-	const index = filteredOptions.value.findIndex(
-		(option) => getOptionValue(option) === props.modelValue
-	);
-
-	if (index >= 0 && viewportRef.value) {
-		const estimatedItemHeight = 40;
-		const viewportHeight = viewportRef.value.clientHeight;
-		const itemPosition = index * estimatedItemHeight;
-		const centeredPosition = itemPosition - (viewportHeight / 2) + (estimatedItemHeight / 2);
-
-		requestAnimationFrame(() => {
-			viewportRef.value.scrollTop = Math.max(0, centeredPosition);
-		});
-	}
+	rootRef.value?.highlightSelected?.();
 }
 
 function focus() {
