@@ -28,7 +28,9 @@ abstract class Fieldtype implements Arrayable
     protected $validatable = true;
     protected $defaultable = true;
     protected $selectable = true;
-    /** @deprecated */
+    /**
+     * @deprecated Register a FormFieldtype instead.
+     */
     protected $selectableInForms = false;
     protected $relationship = false;
     protected $categories = [];

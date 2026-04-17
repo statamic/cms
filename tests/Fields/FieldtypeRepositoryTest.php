@@ -2,7 +2,6 @@
 
 namespace Tests\Fields;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\FieldtypeNotFoundException;
 use Statamic\Fields\Fieldtype;
@@ -65,34 +64,24 @@ class FieldtypeRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function it_makes_the_relevant_form_fieldtypes_selectable()
+    public function it_makes_fields_selectable_in_forms()
     {
-        FormFieldtypeRepository::makeUnselectable('long_answer');
-        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('textarea'));
+        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test-selectable'));
 
-        $this->repo->makeSelectableInForms('textarea');
-
-        // Makes the Long Answer form fieldtype selectable because it's based on the Text fieldtype.
-        $this->assertTrue(FormFieldtypeRepository::hasBeenMadeSelectable('long_answer'));
-        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('textarea'));
-
-        // Doesn't make the Email / Short Answer form fieldtypes selectable because they're not based on the Text fieldtype.
-        $this->assertFalse(FormFieldtypeRepository::selectableIsOverriden('email'));
-        $this->assertFalse(FormFieldtypeRepository::selectableIsOverriden('short_answer'));
+        $this->repo->makeSelectableInForms('test-selectable');
+        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test-selectable'));
+        $this->assertTrue($this->repo->selectableInFormIsOverriden('test-selectable'));
     }
 
     #[Test]
-    public function it_makes_the_relevant_form_fieldtypes_unselectable()
+    public function it_makes_fields_unselectable_in_forms()
     {
-        $this->repo->makeUnselectableInForms('text');
+        $this->repo->makeSelectableInForms('test-unselectable');
+        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test-unselectable'));
 
-        // Makes the Email / Short Answer form fieldtypes unselectable because they're based on the Text fieldtype.
-        $this->assertTrue(FormFieldtypeRepository::selectableIsOverriden('email'));
-        $this->assertTrue(FormFieldtypeRepository::selectableIsOverriden('short_answer'));
-        $this->assertTrue($this->repo->selectableInFormIsOverriden('text'));
-
-        // Doesn't make the Long Answer form fieldtype unselectable because it's not based on the Text fieldtype.
-        $this->assertFalse(FormFieldtypeRepository::selectableIsOverriden('long_answer'));
+        $this->repo->makeUnselectableInForms('test-unselectable');
+        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test-unselectable'));
+        $this->assertTrue($this->repo->selectableInFormIsOverriden('test-unselectable'));
     }
 }
 

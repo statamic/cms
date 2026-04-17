@@ -553,30 +553,37 @@ class FieldtypeTest extends TestCase
     #[Test]
     public function it_can_make_a_fieldtype_selectable_in_forms()
     {
-        $fieldtype = FieldtypeRepository::find('textarea');
+        $fieldtype = new class extends Fieldtype
+        {
+            public static $handle = 'test-selectable';
+            protected $selectableInForms = false;
+        };
 
         $this->assertFalse($fieldtype->selectableInForms());
 
         $fieldtype::makeSelectableInForms();
 
         $this->assertTrue($fieldtype->selectableInForms());
-        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('textarea'));
-        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('textarea'));
+        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test-selectable'));
+        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-selectable'));
     }
 
     #[Test]
     public function it_can_make_a_fieldtype_unselectable_in_forms()
     {
-        $fieldtype = FieldtypeRepository::find('text');
+        $fieldtype = new class extends Fieldtype
+        {
+            public static $handle = 'test-unselectable';
+            protected $selectableInForms = true;
+        };
 
-        $fieldtype::makeSelectableInForms();
         $this->assertTrue($fieldtype->selectableInForms());
 
         $fieldtype::makeUnselectableInForms();
 
         $this->assertFalse($fieldtype->selectableInForms());
-        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('text'));
-        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('text'));
+        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test-unselectable'));
+        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-unselectable'));
     }
 }
 
