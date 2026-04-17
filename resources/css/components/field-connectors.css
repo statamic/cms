@@ -20,6 +20,9 @@
         background: var(--color-blue-50);
         border-radius: 10px;
     }
+    :where(.dark) &::before {
+        @apply bg-blue-950 border-blue-500;
+    }
     &::after {
         --offset: 2rem;
         content: '';
@@ -37,13 +40,18 @@
         --crossing: -30%;
         animation-range: exit-crossing var(--crossing) exit-crossing var(--crossing);
     }
+    :where(.dark) &::after {
+        @apply border-blue-500;
+    }
 }
 
 /* GROUP FIELD CONNECTORS
 =================================================== */
 /* Notes...
 
-    Links fields to the right setting panel
+    - Links fields to the right settings panel
+    - Usually we would just use anchor positioning to do this, but the right panel uses sticky positioning. Achor positioning doesn't support sticky positioning, so while the initial anchor is correct, it doesn't update as we scroll.
+        - So we're using scroll-driven animations to mask two different lines to achieve the desired effect
 
 */
 @supports (animation-timeline: auto) and (anchor-name: --my-anchor) {
@@ -112,9 +120,10 @@
     }
     .field-to-panel-connector-initial {
         border-inline-start: 1px dashed var(--color-blue-400);
+        @apply dark:border-blue-500;
         &::before {
             --width: 1.5rem;
-            background: white;
+            @apply bg-content-bg;
             top: calc(var(--global-header-height) + 1rem);
             height: 6rem;
             width: var(--width);
@@ -137,6 +146,9 @@
             animation: clip-upwards auto linear both;
             animation-timeline: --editing-field-scroll;
             animation-range: exit-crossing -43% exit-crossing 50%;
+        }
+        :where(.dark) &::before {
+            @apply border-blue-500;
         }
     }
 }
