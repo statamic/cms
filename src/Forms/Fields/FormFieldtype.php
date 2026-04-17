@@ -13,7 +13,7 @@ use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
-abstract class FormFieldtype
+abstract class FormFieldtype implements Arrayable
 {
     use HasHandle, RegistersItself {
         handle as protected traitHandle;
@@ -140,5 +140,17 @@ abstract class FormFieldtype
     public static function makeUnselectable(): void
     {
         FormFieldtypeRepository::makeUnselectable(static::handle());
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'handle' => $this->handle(),
+            'title' => static::title(),
+            'categories' => $this->categories(),
+            'keywords' => $this->keywords(),
+            'icon' => $this->icon(),
+            'config' => $this->configFields()->toPublishArray(),
+        ];
     }
 }
