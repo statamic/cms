@@ -202,7 +202,7 @@ const limitIndicatorColor = computed(() => {
 });
 
 const canClearSelection = computed(() => props.clearable && props.modelValue);
-const shouldCloseOnSelect = computed(() => props.closeOnSelect || !props.multiple);
+const shouldCloseOnSelect = computed(() => props.closeOnSelect ?? !props.multiple);
 const shouldShowOptionsChevron = computed(() => props.options.length > 0 || props.ignoreFilter);
 const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelections && props.maxSelections !== Infinity);
 
