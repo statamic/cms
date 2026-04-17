@@ -138,7 +138,6 @@ const searchQuery = ref('');
 const dropdownOpen = ref(false);
 const rootRef = useTemplateRef('root');
 const triggerRef = useTemplateRef('trigger');
-const viewportRef = useTemplateRef('viewport');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
@@ -459,7 +458,7 @@ defineExpose({
                                 event.preventDefault();
                             }"
                         >
-                            <div ref="viewport" class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
+                            <div class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
                                 <!-- Hidden width measurer for wide dropdown mode -->
                                 <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
                                     <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
