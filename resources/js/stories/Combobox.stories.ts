@@ -395,7 +395,7 @@ const optionSlotsCode = `
     <template #selected-option="{ option }">
         <img :src="option.image" class="size-5 rounded-full" />
         <span v-text="option.label" />
-	</template>
+    </template>
     <template #option="{ label, image }">
         <img :src="image" class="size-5 rounded-full" />
         <span v-text="label" />
@@ -427,10 +427,10 @@ export const _OptionSlots: Story = {
                 placeholder="Select author..."
                 :options="options"
             >
-	            <template #selected-option="{ option }">
-		            <img :src="option.image" class="size-5 rounded-full" />
-		            <span v-text="option.label" />
-	            </template>
+                <template #selected-option="{ option }">
+                    <img :src="option.image" class="size-5 rounded-full" />
+                    <span v-text="option.label" />
+                </template>
                 <template #option="{ label, image }">
                     <img :src="image" class="size-5 rounded-full" />
                     <span v-text="label" />

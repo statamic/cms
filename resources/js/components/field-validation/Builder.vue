@@ -237,7 +237,7 @@ export default {
                 this.rules.push(rule);
             }
 
-	        this.$nextTick(() => this.$refs.rulesSelect.focus());
+            this.$nextTick(() => this.$refs.rulesSelect.focus());
         },
 
         add(rule) {

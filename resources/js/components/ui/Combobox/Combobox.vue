@@ -24,49 +24,49 @@ import { SortableList } from '@/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
-	/** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
-	adaptiveWidth: { type: Boolean, default: false },
-	/** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
-	align: { type: String, default: 'start' },
-	/** When `true`, the selected value will be clearable. */
-	clearable: { type: Boolean, default: false },
-	/** When `true`, the options dropdown will close after selecting an option. */
-	closeOnSelect: { type: Boolean, default: undefined },
-	disabled: { type: Boolean, default: false },
-	/** When `true`, the focus outline will be more discrete. */
-	discreteFocusOutline: { type: Boolean, default: false },
-	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
-	icon: { type: String, default: null },
-	/** ID attribute for the input element */
-	id: { type: String },
-	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
-	ignoreFilter: { type: Boolean, default: false },
-	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
-	labelHtml: { type: Boolean, default: false },
-	/** The maximum number of selectable options. */
-	maxSelections: { type: Number, default: null },
-	/** The controlled value of the combobox. */
-	modelValue: { type: [Object, String, Number], default: null },
-	/** When `true`, multiple options are allowed. */
-	multiple: { type: Boolean, default: false },
-	/** Key of the option's label in the option's object. */
-	optionLabel: { type: String, default: 'label' },
-	/** Array of option objects */
-	options: { type: Array, default: () => [] },
-	/** Key of the option's value in the option's object. */
-	optionValue: { type: String, default: 'value' },
-	placeholder: { type: String, default: () => __('Select...') },
-	readOnly: { type: Boolean, default: false },
-	/** When `true`, the options will be searchable. */
-	searchable: { type: Boolean, default: true },
-	/** Determines if the dropdown should open */
-	shouldOpenDropdown: { type: Function, default: () => true },
-	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
-	size: { type: String, default: 'base' },
-	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
-	taggable: { type: Boolean, default: false },
-	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
-	variant: { type: String, default: 'default' },
+    /** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
+    adaptiveWidth: { type: Boolean, default: false },
+    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
+    align: { type: String, default: 'start' },
+    /** When `true`, the selected value will be clearable. */
+    clearable: { type: Boolean, default: false },
+    /** When `true`, the options dropdown will close after selecting an option. */
+    closeOnSelect: { type: Boolean, default: undefined },
+    disabled: { type: Boolean, default: false },
+    /** When `true`, the focus outline will be more discrete. */
+    discreteFocusOutline: { type: Boolean, default: false },
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon: { type: String, default: null },
+    /** ID attribute for the input element */
+    id: { type: String },
+    /** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
+    ignoreFilter: { type: Boolean, default: false },
+    /** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
+    labelHtml: { type: Boolean, default: false },
+    /** The maximum number of selectable options. */
+    maxSelections: { type: Number, default: null },
+    /** The controlled value of the combobox. */
+    modelValue: { type: [Object, String, Number], default: null },
+    /** When `true`, multiple options are allowed. */
+    multiple: { type: Boolean, default: false },
+    /** Key of the option's label in the option's object. */
+    optionLabel: { type: String, default: 'label' },
+    /** Array of option objects */
+    options: { type: Array, default: () => [] },
+    /** Key of the option's value in the option's object. */
+    optionValue: { type: String, default: 'value' },
+    placeholder: { type: String, default: () => __('Select...') },
+    readOnly: { type: Boolean, default: false },
+    /** When `true`, the options will be searchable. */
+    searchable: { type: Boolean, default: true },
+    /** Determines if the dropdown should open */
+    shouldOpenDropdown: { type: Function, default: () => true },
+    /** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+    size: { type: String, default: 'base' },
+    /** When `true`, additional options can be added by typing in the search input and pressing enter. */
+    taggable: { type: Boolean, default: false },
+    /** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+    variant: { type: String, default: 'default' },
 });
 
 defineOptions({
@@ -207,22 +207,22 @@ const shouldShowOptionsChevron = computed(() => props.options.length > 0 || prop
 const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelections && props.maxSelections !== Infinity);
 
 const shouldShowInput = computed(() => {
-	if (!props.searchable) return false;
-	if (props.taggable) return true;
+    if (!props.searchable) return false;
+    if (props.taggable) return true;
 
-	return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
+    return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
 });
 
 const placeholder = computed(() => {
-	if (props.multiple && selectedOptions.value.length > 0) {
-		return __n(':count item selected|:count items selected', selectedOptions.value.length);
-	}
+    if (props.multiple && selectedOptions.value.length > 0) {
+        return __n(':count item selected|:count items selected', selectedOptions.value.length);
+    }
 
-	if (selectedOption.value) {
-		return getOptionLabel(selectedOption.value);
-	}
+    if (selectedOption.value) {
+        return getOptionLabel(selectedOption.value);
+    }
 
-	return props.placeholder;
+    return props.placeholder;
 });
 
 const filteredOptions = computed(() => {
@@ -257,8 +257,8 @@ function clear() {
 }
 
 function select() {
-	dropdownOpen.value = !shouldCloseOnSelect.value;
-	if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
+    dropdownOpen.value = !shouldCloseOnSelect.value;
+    if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
 }
 
 function deselect(option) {
@@ -266,52 +266,52 @@ function deselect(option) {
 }
 
 function updateModelValue(value) {
-	let originalValue = props.modelValue || [];
+    let originalValue = props.modelValue || [];
 
-	searchQuery.value = '';
-	emit('update:modelValue', value);
+    searchQuery.value = '';
+    emit('update:modelValue', value);
 
-	if (!Array.isArray(value)) value = [value];
-	if (!Array.isArray(originalValue)) originalValue = [originalValue];
+    if (!Array.isArray(value)) value = [value];
+    if (!Array.isArray(originalValue)) originalValue = [originalValue];
 
-	value
-		.filter((option) => !originalValue?.includes(option))
-		.forEach((option) => emit('selected', option));
+    value
+        .filter((option) => !originalValue?.includes(option))
+        .forEach((option) => emit('selected', option));
 }
 
 function updateDropdownOpen(open) {
-	if (open && ! props.shouldOpenDropdown(open)) return;
+    if (open && ! props.shouldOpenDropdown(open)) return;
     if (props.disabled || props.readOnly) return;
 
     dropdownOpen.value = open;
 
     if (open) {
-	    nextTick(() => searchInputRef?.value?.$el?.focus());
+        nextTick(() => searchInputRef?.value?.$el?.focus());
         requestAnimationFrame(() => requestAnimationFrame(() => scrollToSelectedOption()));
     }
 }
 
 function openDropdown(e) {
-	if (dropdownOpen.value) return;
-	if (e.key === ' ' && e.target.tagName === 'INPUT') return;
-	if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (dropdownOpen.value) return;
+    if (e.key === ' ' && e.target.tagName === 'INPUT') return;
+    if (typeof e.preventDefault === 'function') e.preventDefault();
 
-	updateDropdownOpen(true);
+    updateDropdownOpen(true);
 }
 
 function onBlur(e) {
-	if (!props.taggable) return;
+    if (!props.taggable) return;
 
-	let isInsideDropdown = 'rekaCollectionItem' in (e.relatedTarget?.dataset ?? {});
-	if (isInsideDropdown) return;
+    let isInsideDropdown = 'rekaCollectionItem' in (e.relatedTarget?.dataset ?? {});
+    if (isInsideDropdown) return;
 
-	pushTaggableOption(e);
+    pushTaggableOption(e);
 }
 
 function onPaste(e) {
-	if (!props.taggable) return;
+    if (!props.taggable) return;
 
-	e.preventDefault();
+    e.preventDefault();
 
     const pastedValue = e.clipboardData.getData('text');
 
@@ -319,37 +319,37 @@ function onPaste(e) {
 }
 
 function pushTaggableOption(e) {
-	if (!props.taggable) return;
-	if (e.target.value === '') return;
+    if (!props.taggable) return;
+    if (e.target.value === '') return;
 
-	e.preventDefault();
+    e.preventDefault();
 
-	if (props.modelValue?.includes(e.target.value)) {
-		searchQuery.value = '';
-		return;
-	}
+    if (props.modelValue?.includes(e.target.value)) {
+        searchQuery.value = '';
+        return;
+    }
 
-	emit('added', e.target.value);
+    emit('added', e.target.value);
 
-	updateModelValue([...props.modelValue ?? [], e.target.value]);
+    updateModelValue([...props.modelValue ?? [], e.target.value]);
 }
 
 function scrollToSelectedOption() {
-	if (props.multiple || !props.modelValue) return;
+    if (props.multiple || !props.modelValue) return;
 
-	rootRef.value?.highlightSelected?.();
+    rootRef.value?.highlightSelected?.();
 }
 
 function focus() {
-	shouldShowInput.value
-		? nextTick(() => searchInputRef.value?.$el.focus())
-		: nextTick(() => triggerRef.value?.$el.focus());
+    shouldShowInput.value
+        ? nextTick(() => searchInputRef.value?.$el.focus())
+        : nextTick(() => triggerRef.value?.$el.focus());
 }
 
 defineExpose({
     searchQuery,
     filteredOptions,
-	focus,
+    focus,
 });
 </script>
 
@@ -358,18 +358,18 @@ defineExpose({
         <div class="flex w-full min-w-0">
             <ComboboxRoot
                 ref="root"
-	            class="cursor-pointer flex-1 min-w-0"
-	            :multiple
-	            :open="dropdownOpen"
-	            :model-value="modelValue"
+                class="cursor-pointer flex-1 min-w-0"
+                :multiple
+                :open="dropdownOpen"
+                :model-value="modelValue"
                 :by="matchOptionByValue"
                 :disabled="disabled || readOnly"
                 :reset-search-term-on-blur="false"
                 :reset-search-term-on-select="false"
                 data-ui-combobox
                 ignore-filter
-	            @update:open="updateDropdownOpen"
-	            @update:model-value="updateModelValue"
+                @update:open="updateDropdownOpen"
+                @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor class="block w-full" data-ui-combobox-anchor>
                     <ComboboxTrigger
@@ -389,7 +389,7 @@ defineExpose({
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden cursor-pointer"
                                 :class="{
-									'placeholder-gray-900! dark:placeholder-gray-300!': selectedOption && !multiple && !dropdownOpen
+                                    'placeholder-gray-900! dark:placeholder-gray-300!': selectedOption && !multiple && !dropdownOpen
                                 }"
                                 type="search"
                                 autocomplete="off"
@@ -400,9 +400,9 @@ defineExpose({
                             />
 
                             <div
-	                            v-else
-	                            class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none select-none"
-	                            data-ui-combobox-selected-option
+                                v-else
+                                class="w-full text-start bg-transparent flex items-center gap-2 cursor-pointer focus:outline-none select-none"
+                                data-ui-combobox-selected-option
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
                                     <div v-if="icon" class="size-4">
@@ -417,22 +417,22 @@ defineExpose({
 
                         <div v-if="canClearSelection || shouldShowOptionsChevron" class="flex gap-1.5 items-center ms-1.5 -me-1">
                             <Button
-	                            v-if="canClearSelection"
-	                            icon="x"
-	                            variant="ghost"
-	                            size="xs"
-	                            round
-	                            :disabled="disabled || readOnly"
-	                            :aria-label="__('Clear selection')"
-	                            data-ui-combobox-clear-button
-	                            @click="clear"
+                                v-if="canClearSelection"
+                                icon="x"
+                                variant="ghost"
+                                size="xs"
+                                round
+                                :disabled="disabled || readOnly"
+                                :aria-label="__('Clear selection')"
+                                data-ui-combobox-clear-button
+                                @click="clear"
                             />
                             <Icon
-	                            v-if="shouldShowOptionsChevron"
-	                            name="chevron-down"
-	                            class="text-gray-400 dark:text-white/40 size-4"
-	                            aria-hidden="true"
-	                            data-ui-combobox-chevron
+                                v-if="shouldShowOptionsChevron"
+                                name="chevron-down"
+                                class="text-gray-400 dark:text-white/40 size-4"
+                                aria-hidden="true"
+                                data-ui-combobox-chevron
                             />
                         </div>
                     </ComboboxTrigger>
@@ -440,8 +440,8 @@ defineExpose({
 
                 <ComboboxPortal>
                     <ComboboxContent
-	                    :align
-	                    :side-offset="5"
+                        :align
+                        :side-offset="5"
                         position="popper"
                         :class="[
                             'shadow-ui-sm z-(--z-index-above) rounded-lg border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-800',
@@ -483,14 +483,14 @@ defineExpose({
                                 >
                                     <div class="py-1 px-2 w-full overflow-x-hidden">
                                         <ComboboxItem
-	                                        as="button"
-	                                        :key="`${getOptionValue(option)}-${isDisabled(option)}`"
+                                            as="button"
+                                            :key="`${getOptionValue(option)}-${isDisabled(option)}`"
                                             :value="getOptionValue(option)"
                                             :text-value="getOptionLabel(option)"
                                             :disabled="isDisabled(option)"
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
-	                                        :title="getOptionLabel(option)"
+                                            :title="getOptionLabel(option)"
                                             @select="select"
                                         >
                                             <slot name="option" v-bind="option">
@@ -508,12 +508,12 @@ defineExpose({
             </ComboboxRoot>
 
             <div
-	            v-if="shouldShowLimitIndicator"
-	            class="ms-2 mt-3 text-xs"
-	            :class="limitIndicatorColor"
-	            :aria-label="__(':count of :max selections', { count: selectedOptions.length, max: maxSelections })"
-	            aria-live="polite"
-	            data-ui-combobox-limit-indicator
+                v-if="shouldShowLimitIndicator"
+                class="ms-2 mt-3 text-xs"
+                :class="limitIndicatorColor"
+                :aria-label="__(':count of :max selections', { count: selectedOptions.length, max: maxSelections })"
+                aria-live="polite"
+                data-ui-combobox-limit-indicator
             >
                 <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
             </div>

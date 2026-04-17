@@ -145,12 +145,12 @@ export const _Clearable: Story = {
             return { value, options };
         },
         template: `
-		    <Select
-			    v-model="value"
-			    clearable
-			    placeholder="Select a band..."
-			    :options="options"
-		    />
+            <Select
+                v-model="value"
+                clearable
+                placeholder="Select a band..."
+                :options="options"
+            />
         `,
     }),
 };
@@ -173,16 +173,16 @@ export const _Icon: Story = {
             return { value };
         },
         template: `
-	        <Select
+            <Select
                 v-model="value"
-		        icon="money-bag-dollar"
+                icon="money-bag-dollar"
                 placeholder="Select a currency..."
-		        :options="[
+                :options="[
                     { label: 'U.S. Dollar', value: 'usd' },
                     { label: 'Euro', value: 'euro' },
                     { label: 'Gold Doubloon', value: 'gold_doublon' }
                 ]"
-	        />
+            />
         `,
     }),
 };
@@ -199,7 +199,7 @@ const optionSlotsCode = `
     <template #selected-option="{ option }">
         <img :src="option.image" class="size-5 rounded-full" />
         <span v-text="option.label" />
-	</template>
+    </template>
     <template #option="{ label, image }">
         <img :src="image" class="size-5 rounded-full" />
         <span v-text="label" />
@@ -231,10 +231,10 @@ export const _OptionSlots: Story = {
                 placeholder="Select author..."
                 :options="options"
             >
-	            <template #selected-option="{ option }">
-		            <img :src="option.image" class="size-5 rounded-full" />
-		            <span v-text="option.label" />
-	            </template>
+                <template #selected-option="{ option }">
+                    <img :src="option.image" class="size-5 rounded-full" />
+                    <span v-text="option.label" />
+                </template>
                 <template #option="{ label, image }">
                     <img :src="image" class="size-5 rounded-full" />
                     <span v-text="label" />

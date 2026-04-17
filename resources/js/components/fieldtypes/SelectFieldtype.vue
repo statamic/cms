@@ -1,6 +1,6 @@
 <template>
     <Combobox
-	    :id="id"
+        :id="id"
         :clearable="config.clearable"
         :disabled="config.disabled"
         :label-html="config.label_html"
@@ -12,7 +12,7 @@
         :read-only="isReadOnly"
         :searchable="config.searchable || config.taggable"
         :taggable="config.taggable"
-	    :close-on-select="(config.taggable && !options.length) || !config.multiple"
+        :close-on-select="(config.taggable && !options.length) || !config.multiple"
         @update:modelValue="comboboxUpdated"
     />
 </template>
