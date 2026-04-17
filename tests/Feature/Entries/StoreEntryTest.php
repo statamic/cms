@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -11,7 +12,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
