@@ -82,8 +82,8 @@ onUnmounted(() => {
     </Teleport>
 
     <Teleport defer to="#main-content">
-        <div v-show="left.active || right.active" class="field-to-panel-connector-initial" style="order: 1"></div>
-        <div v-show="left.active || right.active" class="field-to-panel-connector-scroll-past" style="order: 1"></div>
+        <div v-show="left.active || right.active" class="field-to-panel-connector-initial"></div>
+        <div v-show="left.active || right.active" class="field-to-panel-connector-scroll-past"></div>
     </Teleport>
 
     <Teleport defer to="#main-content">
@@ -94,7 +94,7 @@ onUnmounted(() => {
             id="right-panel"
             tabindex="-1"
             style="order: 2"
-            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
+            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 sm:-mr-2 grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
         ></div>
     </Teleport>
 

@@ -517,7 +517,7 @@ const notificationOptions = [
             </div>
 
             <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="@container relative py-6 px-2.5 max-[1000px]:hidden">
+            <div class="@container relative py-6 px-2.5 pe-4.5 max-[1000px]:hidden">
                 <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                     <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                         <TabTrigger name="settings" :text="__('Settings')" />
@@ -548,7 +548,7 @@ const notificationOptions = [
                                 <Input v-model="settingsCharacterLimit" type="number" />
                             </Field>
 
-                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <!-- <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
                                 <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
                             </Field>
 
@@ -582,7 +582,7 @@ const notificationOptions = [
 
                             <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
                                 <Input v-model="settingsCharacterLimit" type="number" />
-                            </Field>
+                            </Field> -->
                         </div>
                     </TabContent>
                     <TabContent name="logic">
