@@ -19,6 +19,7 @@ use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
@@ -91,6 +92,8 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                 return new FormFields($fields ?? []);
             })
             ->setter(function ($fields) {
+                Blink::forget('form-blueprint-'.$this->handle());
+
                 if (isset($fields['tabs'])) {
                     $fields = [
                         'sections' => collect($fields['tabs'])->flatMap(fn ($tab) => $tab['sections'])->all(),
@@ -159,7 +162,13 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function blueprint()
     {
+        if (Blink::has($blink = 'form-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
         $blueprint = $this->formFields()->toBlueprint();
+
+        Blink::put($blink, $blueprint);
 
         FormBlueprintFound::dispatch($blueprint, $this);
 
