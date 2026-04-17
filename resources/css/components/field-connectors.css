@@ -3,7 +3,7 @@
 @keyframes flip {
     to {
         /* TranslateY to compensate for the height of the pseudo element */
-        transform: scaleY(-1) translateY(0.6rem);
+        transform: scaleY(-1) translateY(-1rem);
     }
 }
 [data-editing-field] {
@@ -28,16 +28,16 @@
         content: '';
         position: absolute;
         z-index: var(--z-index-above);
-        top: 50%;
-        width: var(--offset);
+        top: -0.35rem;
+        width: calc(var(--offset) - 2px);
         inset-inline-end: calc(0% - 1rem - 1px - var(--offset));
         border-block-end: 1px dashed var(--color-blue-400);
         border-inline-end: 1px dashed var(--color-blue-400);
         border-end-end-radius: 25px;
-        height: 0.75rem;
+        height: 1rem;
         animation: flip auto linear both;
         animation-timeline: --editing-field-scroll;
-        --crossing: -30%;
+        --crossing: -80%;
         animation-range: exit-crossing var(--crossing) exit-crossing var(--crossing);
     }
     :where(.dark) &::after {
@@ -85,7 +85,7 @@
         0% {
             opacity: 0;
         }
-        0.5rem {
+        1% {
             opacity: 1;
         }
         100% {
@@ -116,9 +116,9 @@
     .field-to-panel-connector-initial,
     .field-to-panel-connector-scroll-past {
         position: absolute;
-        top: anchor(--field-settings center);
+        top: anchor(--field-settings top);
         right: anchor(--field-settings left);
-        bottom: anchor(--editing-field center);
+        bottom: anchor(--editing-field top);
         width: 2.75rem;
         &::before {
             content: '';
@@ -130,9 +130,11 @@
     .field-to-panel-connector-initial {
         border-inline-start: 1px dashed var(--color-blue-400);
         @apply dark:border-blue-500;
+        bottom: calc(anchor(--editing-field top) + 8px);
         &::before {
             --width: 1.5rem;
             @apply bg-content-bg;
+            background: white;
             top: calc(var(--global-header-height) + 1rem);
             height: 6rem;
             width: var(--width);
@@ -153,7 +155,7 @@
             height: 8.6rem;
             animation: clip-upwards auto linear both;
             animation-timeline: --editing-field-scroll;
-            animation-range: exit-crossing -43% exit-crossing 50%;
+            animation-range: exit-crossing -65% exit-crossing 25%;
         }
         :where(.dark) &::before {
             @apply border-blue-500;
