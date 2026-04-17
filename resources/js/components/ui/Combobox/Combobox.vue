@@ -476,7 +476,6 @@ defineExpose({
 
                                 <ComboboxVirtualizer
                                     v-if="filteredOptions.length"
-                                    :key="JSON.stringify(modelValue)"
                                     :estimate-size="40"
                                     :options="filteredOptions"
                                     :text-content="(opt) => getOptionLabel(opt)"
