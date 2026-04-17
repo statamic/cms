@@ -21,20 +21,20 @@
         border-radius: 10px;
     }
     &::after {
-        --offset: 3.025rem;
+        --offset: 2rem;
         content: '';
         position: absolute;
         z-index: var(--z-index-above);
         top: 50%;
         width: var(--offset);
-        inset-inline-end: calc(0% - var(--offset));
+        inset-inline-end: calc(0% - 1rem - 1px - var(--offset));
         border-block-end: 1px dashed var(--color-blue-400);
         border-inline-end: 1px dashed var(--color-blue-400);
         border-end-end-radius: 25px;
         height: 0.75rem;
         animation: flip auto linear both;
         animation-timeline: --editing-field-scroll;
-        --crossing: -35%;
+        --crossing: -30%;
         animation-range: exit-crossing var(--crossing) exit-crossing var(--crossing);
     }
 }
@@ -83,6 +83,9 @@
             opacity: 0;
             /* Hide */
             clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+        }
+        14% {
+            opacity: 0;
         }
         15%, 100% {
             opacity: 1;
