@@ -491,7 +491,7 @@ class EntriesController extends CpController
             ->merge([
                 'parent_uri' => $parent ? $parent->uri() : null,
                 'slug' => $entry->slug(),
-                // 'depth' => '', // todo
+                'depth' => $parent ? $parent->depth() + 1 : 1,
                 'is_root' => false,
             ])
             ->build($entry->route());
