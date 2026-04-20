@@ -20,14 +20,6 @@
     }
 }
 
-@keyframes field-direction-fade-in {
-    50% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
 
 /* GROUP FIELD DIRECTION
 =================================================== */
@@ -43,6 +35,15 @@
     @apply p-1 w-7! h-5! ms-1 text-blue-500 bg-blue-50 border-1 border-dotted border-blue-400 rounded-full;
 }
 
+@keyframes field-direction-fade-in {
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 [data-field-direction-up] {
     opacity: 0;
     animation: field-direction-fade-in linear both;
@@ -50,6 +51,17 @@
     animation-range: exit 0%, exit 100%;
 }
 
+@keyframes field-direction-fade-out {
+    50%, 100% {
+        opacity: 0;
+    }
+}
+
+[data-field-direction-down] {
+    animation: field-direction-fade-out linear both;
+    animation-timeline: --editing-field-scroll;
+    animation-range: entry 50%, entry 100%;
+}
 
 
 /* GROUP LOGIC TEXT
