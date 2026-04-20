@@ -17,12 +17,12 @@ class ElevatedSessionController extends Controller
 {
     public function showForm(Request $request)
     {
-        $user = User::current();
-        $method = $user->getElevatedSessionMethod();
-
         if ($customUrl = config('statamic.users.elevated_session_page')) {
             return redirect()->to($customUrl);
         }
+
+        $user = User::current();
+        $method = $user->getElevatedSessionMethod();
 
         if ($method === 'verification_code') {
             session()->sendElevatedSessionVerificationCodeIfRequired();
