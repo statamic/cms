@@ -32,7 +32,7 @@
 
 [data-field-direction-down],
 [data-field-direction-up] {
-    @apply p-1 w-7! h-5! ms-1 text-blue-500 bg-blue-50 border-1 border-dotted border-blue-400 rounded-full;
+    @apply p-1 size-5! ms-1 text-blue-500 bg-blue-50 border-1 border-dotted border-blue-400 rounded-full;
 }
 
 @keyframes field-direction-fade-in {
