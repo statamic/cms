@@ -77,14 +77,21 @@
     --column-indent: 1.5rem;
     overflow-x: clip;
 
-    > ol > li {
-        display: grid;
-        grid-template-columns: var(--column-indent) 1fr;
-        .logic-text__badge-wrapper {
-            grid-column: 1 / -1;
-        }
-        > * {
-            grid-column: 2;
+    /* Outer structure */
+    > ol {
+        @apply gap-4!;
+        > li {
+            display: grid;
+            grid-template-columns: var(--column-indent) 1fr;
+            .logic-text__badge-wrapper {
+                grid-column: 1 / -1;
+            }
+            > * {
+                grid-column: 2;
+            }
+            &:not(:first-child) .logic-text__badge {
+                @apply mb-4;
+            }
         }
     }
 
