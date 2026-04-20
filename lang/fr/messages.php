@@ -108,6 +108,7 @@ return [
     'fields_visibility_instructions' => 'Contrôle la visibilité de ce champ dans les formulaires.',
     'fieldset_import_fieldset_instructions' => 'Le jeu de champs à importer.',
     'fieldset_import_prefix_instructions' => 'Le préfixe à appliquer à chaque champ lors de leur importation. Ex. hero_',
+    'fieldset_import_section_behavior_instructions' => 'Choisissez si les sections de jeux de champs importées doivent être conservées ou aplaties dans cette section.',
     'fieldset_intro' => 'Les jeux de champs sont des compagnons optionnels des Blueprints qui vous permettent de créer des partiels réutilisables dans tous vos Blueprints.',
     'fieldset_link_fields_prefix_instructions' => 'Tous les champs du jeu de champs lié seront préfixés avec ceci. Utile quand vous voulez importer les mêmes champs plusieurs fois.',
     'fieldsets_handle_instructions' => 'Utilisé pour référencer ce jeu de champs sur le frontal. Ceci ne sera pas facile à modifier par la suite.',

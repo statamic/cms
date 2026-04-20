@@ -1,0 +1,82 @@
+/* GROUP FIELD BACKGROUND
+=================================================== */
+[data-editing-field] {
+    position: relative;
+    scroll-margin-top: 3rem;
+    > * {
+        /* Pull everything inside above */
+        position: relative;
+    }
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -0.5rem calc(-1rem - 2px) -1rem;
+        border: 1px dashed var(--color-blue-400);
+        background: var(--color-blue-50);
+        border-radius: 10px;
+    }
+    :where(.dark) &::before {
+        @apply bg-blue-950 border-blue-500;
+    }
+}
+
+/* GROUP LOGIC TEXT
+=================================================== */
+
+/* GROUP LOGIC TEXT / VERTICAL
+=================================================== */
+.logic-text {
+    --logic-line: var(--color-gray-300);
+
+    ol {
+        display: grid;
+        @apply gap-2.5;
+        li {
+            /* Prevent full-width comboboxes */
+            > .w-full {
+                display: inline-flex;
+                width: unset;
+                min-width: unset;
+            }
+        }
+    }
+
+    [data-ui-combobox-trigger] {
+        display: inline-flex;
+        width: unset;
+    }
+}
+
+:where(.dark) .logic-text {
+    --logic-line: var(--color-gray-600);
+}
+
+.logic-text__badge {
+    @apply
+        py-2 px-3.5 mb-2.5
+        bg-content-bg
+        rounded-full
+        text-sm
+    ;
+    display: inline-block;
+    text-align: center;
+    color: var(--color-gray-800);
+    box-shadow: var(--shadow-ui-sm);
+}
+
+.logic-text__pill {
+    display: flex;
+    align-items: center;
+    @apply gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900;
+}
+
+.logic-text__pill-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @apply size-6 bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full;
+}
+
+.logic-text__pill-text {
+    @apply text-sm font-medium text-gray-900 dark:text-gray-100;
+}

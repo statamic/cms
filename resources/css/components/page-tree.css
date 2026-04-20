@@ -93,7 +93,3 @@
         @apply pt-1 rounded-t-2xl;
     }
 }
-
-.he-tree-sr-only {
-    @apply sr-only;
-}

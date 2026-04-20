@@ -2,8 +2,10 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
+import LogicFlowMock from './LogicFlowMock.vue';
 import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
+import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
@@ -22,6 +24,7 @@ const favoriteAlbum = ref(null);
 const secondFavoriteAlbum = ref(null);
 const emailNotifications = ref([]);
 const wantsFreeDrinkVoucher = ref(false);
+const editingFieldWidth = ref(100);
 const settingsLabel = ref(__('Which album was your favorite?'));
 const settingsHelpText = ref('');
 const settingsPlaceholder = ref('');
@@ -400,10 +403,37 @@ const notificationOptions = [
                         />
                     </Field>
 
-                    <div data-editing-field>
-                    <Field :label="__('What do you like most about our band?')" required>
-                        <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
-                    </Field>
+                    <div id="editing-field" data-editing-field class="relative scroll-mt-20">
+                        <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
+                            <WidthSelector
+                                v-model="editingFieldWidth"
+                                size="base"
+                                variant="filled"
+                                class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
+                            />
+                            <Button
+                                size="sm"
+                                inset
+                                icon="duplicate"
+                                variant="subtle"
+                                :aria-label="__('Duplicate field')"
+                                :title="__('Duplicate field')"
+                                class="[&_svg]:opacity-45"
+                            />
+                            <Button
+                                size="sm"
+                                inset
+                                icon="trash"
+                                variant="subtle"
+                                :aria-label="__('Remove field')"
+                                :title="__('Remove field')"
+                                class="[&_svg]:opacity-45"
+                            />
+                        </div>
+
+                        <Field :label="__('What do you like most about our band?')" required>
+                            <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                        </Field>
                     </div>
 
                     <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
@@ -485,7 +515,9 @@ const notificationOptions = [
                                 <div class="space-y-6 pt-8">
                                     <div class="flex items-center gap-2.5">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                        <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
+                                        <a href="#editing-field" class="text-xl font-medium antialiased">
+                                            {{ __('Multi Choice') }}
+                                        </a>
                                     </div>
 
                                     <Field :label="__('Label')">
@@ -506,7 +538,16 @@ const notificationOptions = [
                                 </div>
                             </TabContent>
                             <TabContent name="logic">
-                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                                <div class="space-y-6 pt-8">
+                                    <div class="flex items-center gap-2.5">
+                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                        <a href="#editing-field" class="text-xl font-medium antialiased">
+                                            {{ __('Multi Choice') }}
+                                        </a>
+                                    </div>
+
+                                    <LogicFlowMock />
+                                </div>
                             </TabContent>
                             <TabContent name="validation">
                                 <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
@@ -529,7 +570,9 @@ const notificationOptions = [
                         <div class="space-y-6 pt-8">
                             <div data-field-settings class="flex items-center gap-2.5">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                <h3 class="text-xl font-medium antialiased">{{ __('Multi Choice') }}</h3>
+                                <a href="#editing-field" class="text-xl font-medium antialiased">
+                                    {{ __('Multi Choice') }}
+                                </a>
                             </div>
 
                             <Field :label="__('Label')">
@@ -586,7 +629,16 @@ const notificationOptions = [
                         </div>
                     </TabContent>
                     <TabContent name="logic">
-                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Logic') }}</p>
+                        <div class="space-y-6 pt-8">
+                            <div data-field-settings class="flex items-center gap-2.5">
+                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                <a href="#editing-field" class="text-xl font-medium antialiased">
+                                    {{ __('Multi Choice') }}
+                                </a>
+                            </div>
+
+                            <LogicFlowMock />
+                        </div>
                     </TabContent>
                     <TabContent name="validation">
                         <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
