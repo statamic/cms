@@ -74,36 +74,23 @@
     :where(.dark) & {
         --logic-line: var(--color-gray-600);
     }
-    --column-indent: 1.5rem;
-    overflow-x: clip;
 
     /* Outer structure */
     > ol {
-        @apply gap-4!;
-        > li {
+        /* Inner structure */
+        ol {
             display: grid;
-            grid-template-columns: var(--column-indent) 1fr;
-            .logic-text__badge-wrapper {
-                grid-column: 1 / -1;
-            }
-            > * {
-                grid-column: 2;
-            }
-            &:not(:first-child) .logic-text__badge {
-                @apply mb-4;
-            }
-        }
-    }
-
-    ol {
-        display: grid;
-        @apply gap-2.5;
-        li {
-            /* Prevent full-width comboboxes */
-            > .w-full {
-                display: inline-flex;
-                width: unset;
-                min-width: unset;
+            grid-template-columns: 100%;
+            @apply gap-2.5 mb-2.5;
+            margin-inline-start: 1.5rem;
+            margin-block-end: calc(var(--spacing) * 4);
+            li {
+                /* Prevent full-width comboboxes */
+                > .w-full {
+                    display: inline-flex;
+                    width: unset;
+                    min-width: unset;
+                }
             }
         }
     }
@@ -130,7 +117,6 @@
 .logic-text__pill {
     display: flex;
     align-items: center;
-    max-width: calc(100% - var(--column-indent) * 2 - 1rem);
     @apply gap-2 rounded-full bg-white px-3 py-2 shadow-ui-sm;
 }
 

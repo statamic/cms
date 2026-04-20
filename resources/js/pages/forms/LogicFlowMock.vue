@@ -78,7 +78,7 @@ const logicDestinationOptions = [
             </li>
 
             <li>
-                <div class="logic-text__badge-wrapper">
+                <div class="logic-text__badge-wrapper mb-1.75">
                     <div class="logic-text__badge" aria-hidden="true">
                         {{ __('Then go to …') }}
                     </div>
