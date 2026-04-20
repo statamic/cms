@@ -681,6 +681,19 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function frontend_can_confirm_elevated_session_via_inertia()
+    {
+        redirect()->setIntendedUrl('/target-url');
+
+        $this
+            ->actingAs($this->user)
+            ->post('/!/auth/elevated-session', ['password' => 'secret'], ['X-Inertia' => 'true'])
+            ->assertStatus(409)
+            ->assertHeader('X-Inertia-Location', 'http://localhost/target-url')
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
     public function frontend_cannot_confirm_elevated_session_with_incorrect_password()
     {
         $this
