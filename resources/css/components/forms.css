@@ -136,9 +136,9 @@
 
 .logic-text__pill-icon {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    @apply size-6 bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full;
 }
 
 .logic-text__pill-text {

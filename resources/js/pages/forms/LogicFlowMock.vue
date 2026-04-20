@@ -43,12 +43,12 @@ const logicDestinationOptions = [
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon"
+                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full"
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
                             <span class="logic-text__pill-text">
-                                {{ __('Which album was your favorite testing?') }}
+                                {{ __('Which album was your favorite testing hea ae haeh ahea ?') }}
                             </span>
                         </div>
                     </li>
@@ -83,7 +83,7 @@ const logicDestinationOptions = [
                         {{ __('Then go to …') }}
                     </div>
                 </div>
-                <ol>
+                <ol class="col-span-full">
                     <li>
                         <Combobox
                             v-model="logicDestination"
@@ -96,13 +96,25 @@ const logicDestinationOptions = [
                             :placeholder="__('Destination')"
                             searchable
                         >
-                            <template #option="option">
-                                <div class="flex items-center gap-2">
+                            <template #option="{ icon, label }">
+                                <div class="flex items-center gap-2 bg-orange-50">
                                     <Icon
-                                        v-if="option.icon"
-                                        :name="option.icon"
-                                        class="size-4 shrink-0 text-orange-500 dark:text-orange-400"
+                                        v-if="icon"
+                                        :name="icon"
+                                        class="size-4 shrink-0 rounded-full text-orange-500 dark:text-orange-400"
                                     />
+                                    <span>{{ label }}</span>
+                                </div>
+                            </template>
+                            <template #selected-option="{ option }">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full">
+                                        <Icon
+                                            v-if="option.icon"
+                                            :name="option.icon"
+                                            class="size-4 shrink-0 rounded-full text-orange-600 dark:text-orange-400"
+                                        />
+                                    </div>
                                     <span>{{ option.label }}</span>
                                 </div>
                             </template>
