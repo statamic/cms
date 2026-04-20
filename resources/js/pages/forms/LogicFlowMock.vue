@@ -32,8 +32,10 @@ const logicDestinationOptions = [
 
         <ol>
             <li>
-                <div class="logic-text__badge" aria-hidden="true">
-                    {{ __('If') }}
+                <div class="logic-text__badge-wrapper">
+                    <div class="logic-text__badge" aria-hidden="true">
+                        {{ __('If') }}
+                    </div>
                 </div>
                 <ol>
                     <li>
@@ -46,7 +48,7 @@ const logicDestinationOptions = [
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
                             <span class="logic-text__pill-text">
-                                {{ __('Which album was your favorite?') }}
+                                {{ __('Which album was your favorite testing?') }}
                             </span>
                         </div>
                     </li>
@@ -76,8 +78,10 @@ const logicDestinationOptions = [
             </li>
 
             <li>
-                <div class="logic-text__badge" aria-hidden="true">
-                    {{ __('Then go to …') }}
+                <div class="logic-text__badge-wrapper">
+                    <div class="logic-text__badge" aria-hidden="true">
+                        {{ __('Then go to …') }}
+                    </div>
                 </div>
                 <ol>
                     <li>

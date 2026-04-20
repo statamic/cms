@@ -71,6 +71,22 @@
 =================================================== */
 .logic-text {
     --logic-line: var(--color-gray-300);
+    :where(.dark) & {
+        --logic-line: var(--color-gray-600);
+    }
+    --column-indent: 1.5rem;
+    overflow-x: clip;
+
+    > ol > li {
+        display: grid;
+        grid-template-columns: var(--column-indent) 1fr;
+        .logic-text__badge-wrapper {
+            grid-column: 1 / -1;
+        }
+        > * {
+            grid-column: 2;
+        }
+    }
 
     ol {
         display: grid;
@@ -91,10 +107,6 @@
     }
 }
 
-:where(.dark) .logic-text {
-    --logic-line: var(--color-gray-600);
-}
-
 .logic-text__badge {
     @apply
         py-2 px-3.5 mb-2.5
@@ -111,7 +123,8 @@
 .logic-text__pill {
     display: flex;
     align-items: center;
-    @apply gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900;
+    max-width: calc(100% - var(--column-indent) * 2 - 1rem);
+    @apply gap-2 rounded-full bg-white px-3 py-2 shadow-ui-sm;
 }
 
 .logic-text__pill-icon {
@@ -123,4 +136,7 @@
 
 .logic-text__pill-text {
     @apply text-sm font-medium text-gray-900 dark:text-gray-100;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
