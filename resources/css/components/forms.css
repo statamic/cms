@@ -109,6 +109,7 @@
         text-sm
     ;
     display: inline-block;
+    user-select: none;
     text-align: center;
     color: var(--color-gray-800);
     box-shadow: var(--shadow-ui-sm);

@@ -32,10 +32,8 @@ const logicDestinationOptions = [
 
         <ol>
             <li>
-                <div class="logic-text__badge-wrapper">
-                    <div class="logic-text__badge" aria-hidden="true">
-                        {{ __('If') }}
-                    </div>
+                <div class="logic-text__badge" aria-hidden="true">
+                    {{ __('If') }}
                 </div>
                 <ol>
                     <li>
@@ -78,10 +76,8 @@ const logicDestinationOptions = [
             </li>
 
             <li>
-                <div class="logic-text__badge-wrapper mb-1.75">
-                    <div class="logic-text__badge" aria-hidden="true">
-                        {{ __('Then go to …') }}
-                    </div>
+                <div class="logic-text__badge mb-4!" aria-hidden="true">
+                    {{ __('Then go to …') }}
                 </div>
                 <ol class="col-span-full">
                     <li>
