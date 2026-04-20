@@ -52,7 +52,7 @@
 }
 
 @keyframes field-direction-fade-out {
-    50%, 100% {
+    to {
         opacity: 0;
     }
 }
