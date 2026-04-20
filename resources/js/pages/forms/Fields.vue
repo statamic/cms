@@ -403,7 +403,7 @@ const notificationOptions = [
                         />
                     </Field>
 
-                    <div id="editing-field" data-editing-field class="relative scroll-mt-20">
+                    <div id="editing-field" data-editing-field>
                         <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                             <WidthSelector
                                 v-model="editingFieldWidth"
