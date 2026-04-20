@@ -422,7 +422,7 @@ class ElevatedSessionTest extends TestCase
             ->actingAs($this->user)
             ->from('/original')
             ->get(cp_route('elevated-session.resend-code'))
-            ->assertSessionHasErrors(['method' => 'Resend code is only available for verification code method'])
+            ->assertSessionHasErrors(['method' => 'Resend code is only available for verification code method.'])
             ->assertSessionMissing('statamic_elevated_session_verification_code');
 
         Notification::assertNothingSent();

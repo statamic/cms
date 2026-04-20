@@ -84,7 +84,7 @@ class ElevatedSessionController extends Controller
     {
         if (User::current()->getElevatedSessionMethod() !== 'verification_code') {
             throw ValidationException::withMessages([
-                'method' => 'Resend code is only available for verification code method',
+                'method' => __('statamic::validation.elevated_session_resend_code_unavailable'),
             ]);
         }
 
