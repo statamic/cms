@@ -87,7 +87,6 @@ const logicDestinationOptions = [
                     <li>
                         <Combobox
                             v-model="logicDestination"
-                            class="max-w-md"
                             size="sm"
                             variant="default"
                             :options="logicDestinationOptions"
@@ -97,17 +96,17 @@ const logicDestinationOptions = [
                             searchable
                         >
                             <template #option="{ icon, label }">
-                                <div class="flex items-center gap-2 bg-orange-50">
+                                <div class="flex gap-2 text-left">
                                     <Icon
                                         v-if="icon"
                                         :name="icon"
-                                        class="size-4 shrink-0 rounded-full text-orange-500 dark:text-orange-400"
+                                        class="size-4 shrink-0 text-orange-500 dark:text-orange-400"
                                     />
                                     <span>{{ label }}</span>
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 -ms-0.75">
                                     <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full">
                                         <Icon
                                             v-if="option.icon"
