@@ -413,6 +413,29 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function frontend_resending_code_is_rate_limited()
+    {
+        Notification::fake();
+        $user = User::make()->email('foo@bar.com')->makeSuper();
+
+        $request = function () use ($user) {
+            return $this
+                ->actingAs($user)
+                ->from('/original')
+                ->get(route('statamic.elevated-session.resend-code'));
+        };
+
+        $request()->assertRedirect('/original')->assertSessionHas('status');
+        $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
+        $this->travel(30)->seconds();
+        $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
+        $this->travel(1)->minute();
+        $request()->assertRedirect('/original')->assertSessionHas('status');
+
+        Notification::assertCount(2);
+    }
+
+    #[Test]
     public function the_verification_code_will_not_be_sent_if_the_user_has_a_password()
     {
         Notification::fake();
