@@ -574,7 +574,7 @@ const notificationOptions = [
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                 <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                     {{ __('Multi Choice') }}
-                                    <Icon name="arrow-up" class="ms-1 size-5! text-blue-500 bg-blue-100 p-1.25 rounded-full" aria-hidden="true" />
+                                    <Icon name="arrow-up" data-field-direction class="ms-1 size-5! text-blue-500 bg-blue-100 p-1.25 rounded-full" aria-hidden="true" />
                                 </a>
                             </div>
 

@@ -20,6 +20,33 @@
     }
 }
 
+@keyframes field-direction-fade-in {
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* GROUP FIELD DIRECTION
+=================================================== */
+#main-content {
+    timeline-scope: --editing-field-scroll;
+}
+[data-editing-field] {
+    view-timeline-name: --editing-field-scroll;
+}
+
+[data-field-direction] {
+    opacity: 0;
+    animation: field-direction-fade-in linear both;
+    animation-timeline: --editing-field-scroll;
+    animation-range: exit 0%, exit 100%;
+}
+
+
+
 /* GROUP LOGIC TEXT
 =================================================== */
 
