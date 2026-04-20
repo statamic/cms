@@ -148,7 +148,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
-    Route::group(['prefix' => 'passkeys'], function () {
+    Route::group(['prefix' => 'passkeys', 'middleware' => 'throttle:statamic.cp.passkeys'], function () {
         Route::post('/', [PasskeyLoginController::class, 'login'])->name('passkeys.auth');
         Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.auth.options');
     });

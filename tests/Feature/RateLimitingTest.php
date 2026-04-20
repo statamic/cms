@@ -128,4 +128,72 @@ class RateLimitingTest extends TestCase
         $this->post('/!/forms/contact')->assertNotRateLimited();
         $this->post('/!/forms/contact')->assertRateLimited();
     }
+
+    #[Test]
+    public function passkey_endpoint_is_rate_limited()
+    {
+        collect(range(1, 30))->each(fn () => $this->post('/!/auth/passkeys/auth')->assertNotRateLimited());
+        $this->post('/!/auth/passkeys/auth')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_passkey_endpoint_is_rate_limited()
+    {
+        collect(range(1, 30))->each(fn () => $this->post('/cp/auth/passkeys')->assertNotRateLimited());
+        $this->post('/cp/auth/passkeys')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_and_frontend_passkeys_have_independent_buckets()
+    {
+        RateLimiter::for('statamic.passkeys', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $this->post('/!/auth/passkeys/auth')->assertNotRateLimited();
+        $this->post('/!/auth/passkeys/auth')->assertNotRateLimited();
+        $this->post('/!/auth/passkeys/auth')->assertRateLimited();
+
+        $this->post('/cp/auth/passkeys')->assertNotRateLimited();
+    }
+
+    #[Test]
+    public function passkeys_bucket_is_independent_from_auth_bucket()
+    {
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/login')->assertNotRateLimited());
+        $this->post('/!/auth/login')->assertRateLimited();
+
+        $this->post('/!/auth/passkeys/auth')->assertNotRateLimited();
+    }
+
+    #[Test]
+    public function passkeys_rate_limiter_can_be_overridden()
+    {
+        RateLimiter::for('statamic.passkeys', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $this->post('/!/auth/passkeys/auth')->assertNotRateLimited();
+        $this->post('/!/auth/passkeys/auth')->assertNotRateLimited();
+        $this->post('/!/auth/passkeys/auth')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_passkeys_rate_limiter_inherits_overrides_to_statamic_passkeys()
+    {
+        RateLimiter::for('statamic.passkeys', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $this->post('/cp/auth/passkeys')->assertNotRateLimited();
+        $this->post('/cp/auth/passkeys')->assertNotRateLimited();
+        $this->post('/cp/auth/passkeys')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_passkeys_rate_limiter_can_be_overridden_independently()
+    {
+        RateLimiter::for('statamic.cp.passkeys', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $this->post('/cp/auth/passkeys')->assertNotRateLimited();
+        $this->post('/cp/auth/passkeys')->assertNotRateLimited();
+        $this->post('/cp/auth/passkeys')->assertRateLimited();
+
+        // Frontend passkey still uses the default 30/min
+        collect(range(1, 30))->each(fn () => $this->post('/!/auth/passkeys/auth')->assertNotRateLimited());
+    }
 }

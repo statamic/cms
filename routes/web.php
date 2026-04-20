@@ -54,7 +54,7 @@ Route::name('statamic.')->group(function () {
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.auth')->name('password.reset.action');
 
             Route::group(['prefix' => 'passkeys'], function () {
-                Route::middleware(ThrottleRequests::class.':30,1')->group(function () {
+                Route::middleware('throttle:statamic.passkeys')->group(function () {
                     Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.options');
                     Route::post('auth', [PasskeyLoginController::class, 'login'])->name('passkeys.login');
                 });
