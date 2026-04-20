@@ -515,8 +515,9 @@ const notificationOptions = [
                                 <div class="space-y-6 pt-8">
                                     <div class="flex items-center gap-2.5">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                        <a href="#editing-field" class="text-xl font-medium antialiased">
+                                        <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                             {{ __('Multi Choice') }}
+                                            <Icon name="arrow-up" class="size-4 shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                         </a>
                                     </div>
 
@@ -541,8 +542,9 @@ const notificationOptions = [
                                 <div class="space-y-6 pt-8">
                                     <div class="flex items-center gap-2.5">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                        <a href="#editing-field" class="text-xl font-medium antialiased">
+                                        <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                             {{ __('Multi Choice') }}
+                                            <Icon name="arrow-up" class="size-4 shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                         </a>
                                     </div>
 
@@ -570,8 +572,9 @@ const notificationOptions = [
                         <div class="space-y-6 pt-8">
                             <div data-field-settings class="flex items-center gap-2.5">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                <a href="#editing-field" class="text-xl font-medium antialiased">
+                                <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                     {{ __('Multi Choice') }}
+                                    <Icon name="arrow-up" class="ms-1 size-5! text-blue-500 bg-blue-100 p-1.25 rounded-full" aria-hidden="true" />
                                 </a>
                             </div>
 
@@ -632,8 +635,9 @@ const notificationOptions = [
                         <div class="space-y-6 pt-8">
                             <div data-field-settings class="flex items-center gap-2.5">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                <a href="#editing-field" class="text-xl font-medium antialiased">
+                                <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                     {{ __('Multi Choice') }}
+                                    <Icon name="arrow-up" class="size-4 shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                 </a>
                             </div>
 

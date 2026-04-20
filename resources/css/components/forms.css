@@ -2,7 +2,7 @@
 =================================================== */
 [data-editing-field] {
     position: relative;
-    scroll-margin-top: 3rem;
+    scroll-margin-top: 7rem;
     > * {
         /* Pull everything inside above */
         position: relative;
