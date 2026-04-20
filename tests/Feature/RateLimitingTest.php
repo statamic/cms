@@ -55,6 +55,36 @@ class RateLimitingTest extends TestCase
     }
 
     #[Test]
+    public function cp_login_endpoint_is_rate_limited()
+    {
+        collect(range(1, 4))->each(fn () => $this->post('/cp/auth/login')->assertNotRateLimited());
+        $this->post('/cp/auth/login')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_password_email_endpoint_is_rate_limited()
+    {
+        collect(range(1, 4))->each(fn () => $this->post('/cp/auth/password/email')->assertNotRateLimited());
+        $this->post('/cp/auth/password/email')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_password_reset_endpoint_is_rate_limited()
+    {
+        collect(range(1, 4))->each(fn () => $this->post('/cp/auth/password/reset')->assertNotRateLimited());
+        $this->post('/cp/auth/password/reset')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_and_frontend_auth_have_independent_buckets()
+    {
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/login')->assertNotRateLimited());
+        $this->post('/!/auth/login')->assertRateLimited();
+
+        $this->post('/cp/auth/login')->assertNotRateLimited();
+    }
+
+    #[Test]
     public function auth_rate_limiter_can_be_overridden()
     {
         // Simulate a developer overriding the default 4/min limit to 2/min
@@ -63,6 +93,29 @@ class RateLimitingTest extends TestCase
         $this->post('/!/auth/login')->assertNotRateLimited();
         $this->post('/!/auth/login')->assertNotRateLimited();
         $this->post('/!/auth/login')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_auth_rate_limiter_inherits_overrides_to_statamic_auth()
+    {
+        RateLimiter::for('statamic.auth', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $this->post('/cp/auth/login')->assertNotRateLimited();
+        $this->post('/cp/auth/login')->assertNotRateLimited();
+        $this->post('/cp/auth/login')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_auth_rate_limiter_can_be_overridden_independently()
+    {
+        RateLimiter::for('statamic.cp.auth', fn ($request) => Limit::perMinute(2)->by($request->ip()));
+
+        $this->post('/cp/auth/login')->assertNotRateLimited();
+        $this->post('/cp/auth/login')->assertNotRateLimited();
+        $this->post('/cp/auth/login')->assertRateLimited();
+
+        // Frontend auth still uses the default 4/min
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/login')->assertNotRateLimited());
     }
 
     #[Test]

@@ -175,6 +175,10 @@ class AuthServiceProvider extends ServiceProvider
             return Limit::perMinute(4)->by($request->ip());
         });
 
+        RateLimiter::for('statamic.cp.auth', function (Request $request) {
+            return RateLimiter::limiter('statamic.auth')($request);
+        });
+
         RateLimiter::for('statamic.forms', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip());
         });
