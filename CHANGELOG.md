@@ -1,5 +1,23 @@
 # Release Notes
 
+## 6.14.0 (2026-04-16)
+
+### What's new
+- Fieldset sections [#14297](https://github.com/statamic/cms/issues/14297) by @jackmcdade
+- Collaboration support [#13974](https://github.com/statamic/cms/issues/13974) by @joshuablum
+
+### What's fixed
+- Use he-tree i18n prop for tree aria instructions [#14499](https://github.com/statamic/cms/issues/14499) by @jasonvarga
+- Rename `Add Block` back to `Add Set` in replicators [#14503](https://github.com/statamic/cms/issues/14503) by @joshuablum
+- Resolve Cascade content closure before checking content [#14502](https://github.com/statamic/cms/issues/14502) by @marcorieser
+- Fix nocache database driver failing on MySQL with invalid UTF-8 [#14505](https://github.com/statamic/cms/issues/14505) by @jasonvarga
+- Fix bard undos [#14506](https://github.com/statamic/cms/issues/14506) by @jackmcdade
+- Fix collection listing search case insensitivity [#14486](https://github.com/statamic/cms/issues/14486) by @joshuablum
+- Bump follow-redirects from 1.15.11 to 1.16.0 [#14498](https://github.com/statamic/cms/issues/14498) by @dependabot
+- Bump dompurify from 3.3.3 to 3.4.0 [#14500](https://github.com/statamic/cms/issues/14500) by @dependabot
+
+
+
 ## 6.13.0 (2026-04-13)
 
 ### What's new

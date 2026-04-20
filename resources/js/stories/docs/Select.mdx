@@ -4,31 +4,39 @@ import * as SelectStories from '../Select.stories';
 <Meta of={SelectStories} />
 
 # Select
-Displays a list of options for the user to pick from - triggered by an input style button.
+Displays a list of options for the user to pick from - triggered by an input style button. Built on top of the [Combobox](/?path=/docs/forms-combobox--docs) component.
+
 <Canvas of={SelectStories._DocsIntro} sourceState={'shown'} />
 
-## Data Format
-Pass data into the select with the `options` prop as an array of objects. The objects must contain a `value` and a `label`, but can contain any other day you would like as well.
+You should provide an array of option objects via the `options` prop. The objects must contain `value` and `label` keys by default, but you can customize the keys using the `optionValue` and `optionLabel` props.
 
 ## Sizes
-Use the `size` prop to control the input's height and type scale. The scales match the button sizes to make sure everything lines up nicely.
+Use the `size` prop to control the input's height and type scale. Available sizes: `xs`, `sm`, `base`, `lg`, `xl`.
 <Canvas of={SelectStories._Sizes} sourceState={'shown'} />
 
 ## Variants
-Use the `variant` prop to change the appearance of the select.
+Use the `variant` prop to change the appearance of the combobox. Available variants: `default`, `filled`, `ghost`, `subtle`.
 <Canvas of={SelectStories._Variants} sourceState={'shown'} />
 
 ## Clearable
-Add a clear button to your select by setting the `clearable` prop.
+Add a clear button to your combobox by setting the `clearable` prop.
 <Canvas of={SelectStories._Clearable} sourceState={'shown'} />
 
 ## Icon
 Adds an icon to your select box.
 <Canvas of={SelectStories._Icon} sourceState={'shown'} />
 
-## Custom List Items
-You can customize the markup and display of the list items inside of an `#options` slot, with full access to whatever data is passed into the select.
-<Canvas of={SelectStories._CustomListItems} sourceState={'shown'} />
+## Customize Options
+You may customize how options are rendered using the `selected-option` and `option` slots.
+
+- The `selected-option` slot is used to display the currently selected option in the "trigger"
+- The `option` slot is used to display individual options in the dropdown
+
+<Canvas of={SelectStories._OptionSlots} sourceState={'shown'} />
+
+## Adaptive Width
+By default, the dropdown matches the trigger width. Set `adaptiveWidth` to `true` to allow the dropdown to expand to fit longer option labels.
+<Canvas of={SelectStories._AdaptiveWidth} sourceState={'shown'} />
 
 ## Arguments
 <ArgTypes of={SelectStories} />
