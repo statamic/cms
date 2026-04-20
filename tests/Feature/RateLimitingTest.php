@@ -6,10 +6,13 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RateLimitingTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     protected function setUp(): void
     {
         parent::setUp();
