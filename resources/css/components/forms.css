@@ -134,3 +134,23 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+/* GROUP LOGIC TEXT / VERTICAL / ANCHORS
+=================================================== */
+.if-connector {
+    --border-width: 1px;
+    position: absolute;
+    z-index: var(--z-index-below);
+    border: 1px solid blue!important;
+    top: anchor(--if center);
+    left: calc(anchor(--if center) - 1px);
+    bottom: calc(anchor(--if-tree top) - 1.25rem)
+}
+
+#anchor-if {
+    anchor-name: --if;
+}
+
+#anchor-if-tree {
+    anchor-name: --if-tree;
+}

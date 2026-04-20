@@ -32,10 +32,11 @@ const logicDestinationOptions = [
 
         <ol>
             <li>
-                <div class="logic-text__badge" aria-hidden="true">
+                <div class="if-connector"></div>
+                <div id="anchor-if" class="logic-text__badge" aria-hidden="true">
                     {{ __('If') }}
                 </div>
-                <ol>
+                <ol id="anchor-if-tree">
                     <li>
                         <div
                             class="logic-text__pill"
