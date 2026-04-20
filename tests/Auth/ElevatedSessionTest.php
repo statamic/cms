@@ -176,6 +176,23 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function starting_elevated_session_clears_stored_verification_code()
+    {
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
+
+        session()->put('statamic_elevated_session_verification_code', [
+            'code' => 'abc',
+            'generated_at' => now()->timestamp,
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->post('/cp/elevated-session', ['verification_code' => 'abc'])
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp)
+            ->assertSessionMissing('statamic_elevated_session_verification_code');
+    }
+
+    #[Test]
     public function it_cannot_start_elevated_session_with_incorrect_password()
     {
         $this

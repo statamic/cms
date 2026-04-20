@@ -359,6 +359,7 @@ class AppServiceProvider extends ServiceProvider
 
         Session::macro('elevate', function () {
             $this->put('statamic_elevated_session', now()->timestamp);
+            $this->forget('statamic_elevated_session_verification_code');
         });
 
         Session::macro('sendElevatedSessionVerificationCodeIfRequired', function () {
