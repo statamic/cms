@@ -403,36 +403,6 @@ const notificationOptions = [
                         />
                     </Field>
 
-                    <Field :label="__('What do you like most about our band?')" required>
-                        <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
-                    </Field>
-
-                    <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
-                        <Input v-model="fanLength" />
-                    </Field>
-
-                    <Field :label="__('Which album was your favorite?')">
-                        <RadioGroup v-model="favoriteAlbum">
-                            <Radio
-                                v-for="album in albumOptions"
-                                :key="album.value"
-                                :value="album.value"
-                                :label="album.label"
-                            />
-                        </RadioGroup>
-                    </Field>
-
-                    <Field :label="__('Which album was your second favorite?')">
-                        <RadioGroup v-model="secondFavoriteAlbum">
-                            <Radio
-                                v-for="album in albumOptions"
-                                :key="`second-${album.value}`"
-                                :value="album.value"
-                                :label="album.label"
-                            />
-                        </RadioGroup>
-                    </Field>
-
                     <div id="editing-field" data-editing-field>
                         <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                             <WidthSelector
@@ -460,17 +430,47 @@ const notificationOptions = [
                                 class="[&_svg]:opacity-45"
                             />
                         </div>
-                        <Field :label="__('Sign up for email notifications from The Midnight')">
-                            <CheckboxGroup v-model="emailNotifications">
-                                <Checkbox
-                                    v-for="notification in notificationOptions"
-                                    :key="notification.value"
-                                    :value="notification.value"
-                                    :label="notification.label"
-                                />
-                            </CheckboxGroup>
+                        <Field :label="__('What do you like most about our band?')" required>
+                            <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
                         </Field>
                     </div>
+
+                    <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                        <Input v-model="fanLength" />
+                    </Field>
+
+                    <Field :label="__('Which album was your favorite?')">
+                        <RadioGroup v-model="favoriteAlbum">
+                            <Radio
+                                v-for="album in albumOptions"
+                                :key="album.value"
+                                :value="album.value"
+                                :label="album.label"
+                            />
+                        </RadioGroup>
+                    </Field>
+
+                    <Field :label="__('Which album was your second favorite?')">
+                        <RadioGroup v-model="secondFavoriteAlbum">
+                            <Radio
+                                v-for="album in albumOptions"
+                                :key="`second-${album.value}`"
+                                :value="album.value"
+                                :label="album.label"
+                            />
+                        </RadioGroup>
+                    </Field>
+
+                    <Field :label="__('Sign up for email notifications from The Midnight')">
+                        <CheckboxGroup v-model="emailNotifications">
+                            <Checkbox
+                                v-for="notification in notificationOptions"
+                                :key="notification.value"
+                                :value="notification.value"
+                                :label="notification.label"
+                            />
+                        </CheckboxGroup>
+                    </Field>
 
                     <Field :label="__('How old are you?')">
                         <Input v-model="age" type="number" />
