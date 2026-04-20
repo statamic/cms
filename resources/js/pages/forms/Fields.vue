@@ -573,8 +573,10 @@ const notificationOptions = [
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                 <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                     {{ __('Multi Choice') }}
-                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
-                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                    <div class="grid *:[grid-area:1/1]">
+                                        <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                        <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                    </div>
                                 </a>
                             </div>
 
