@@ -33,7 +33,7 @@
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="sortable-item cursor-grab"
+                        class="sortable-item cursor-grab active:cursor-grabbing"
                     >
                         <Badge size="lg" color="white">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
@@ -43,18 +43,14 @@
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                                :aria-label="__('Deselect option')"
-                                @click="deselect(option.value)"
+                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
+                                @click="deselect(getOptionValue(option))"
                             >
                                 <span>&times;</span>
                             </button>
-                            <button
-                                v-else
-                                type="button"
-                                class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                            >
+                            <span v-else class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700">
                                 <span>&times;</span>
-                            </button>
+                            </span>
                         </Badge>
                     </div>
                 </div>

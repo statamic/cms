@@ -11,6 +11,7 @@
                                 <a class="cursor-pointer overflow-hidden text-ellipsis text-sm text-ui-accent-text hover:text-ui-accent-text/80" :href="fieldsetEditUrl" v-text="fieldsetTitle" v-tooltip="__('Edit Fieldset')" />
                                 <ui-icon name="link" class="text-gray-400" />
                                 <span class="text-gray-500 font-mono text-2xs" v-text="__('Fieldset')" />
+                                <ui-badge v-if="sectionBadgeText" size="sm" color="gray" :text="sectionBadgeText" />
                                 <ui-badge
                                     v-if="field.prefix"
                                     size="sm"
@@ -62,8 +63,32 @@ export default {
             return title ? __(title) : this.field.fieldset;
         },
 
+        fieldsetHasSections() {
+            return this.$page?.props?.fieldsets?.[this.field.fieldset]?.has_sections === true;
+        },
+
+        fieldsetSectionsCount() {
+            return this.$page?.props?.fieldsets?.[this.field.fieldset]?.sections_count ?? 0;
+        },
+
         fieldsetEditUrl() {
             return cp_url(`fields/fieldsets/${this.field.fieldset}/edit`);
+        },
+
+        sectionBehavior() {
+            return this.field.section_behavior ?? 'preserve';
+        },
+
+        sectionBadgeText() {
+            if (!this.fieldsetHasSections) {
+                return null;
+            }
+
+            if (this.sectionBehavior === 'flatten') {
+                return __n('Ignoring Section|Ignoring Sections', this.fieldsetSectionsCount);
+            }
+
+            return __n('Has Section|Has Sections', this.fieldsetSectionsCount);
         },
 
         fieldConfig() {

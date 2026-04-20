@@ -24,6 +24,7 @@ import Card from '../Card/Card.vue';
 import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
+import Text from '../Text.vue';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -94,6 +95,16 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event);
     },
 }));
+
+const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
+
+const timeZoneLabel = computed(() => {
+    const tz = timeZoneName.value;
+    if (!tz) return null;
+
+    const parts = new Intl.DateTimeFormat(undefined, { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
+    return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
+});
 
 const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
@@ -187,6 +198,12 @@ const getInputLabel = (part) => {
                                 </div>
                             </template>
                         </div>
+                        <Text
+                            class="text-gray-600 dark:text-gray-400 me-1"
+                            size="xs"
+                            v-tooltip="timeZoneName"
+                            :text="timeZoneLabel"
+                        />
                         <Button
                             v-if="clearable && !readOnly"
                             @click="emit('update:modelValue', null)"

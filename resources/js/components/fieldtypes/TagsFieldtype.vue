@@ -8,6 +8,7 @@
         :placeholder="__(config.placeholder)"
         :read-only="isReadOnly"
         :taggable="true"
+        :should-open-dropdown="(open) => open && options.length > 0"
         @update:modelValue="update"
     />
 </template>

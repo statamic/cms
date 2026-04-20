@@ -5,7 +5,7 @@ import {router} from '@inertiajs/vue3';
 import {action} from 'storybook/actions';
 import './storybook.css';
 import './theme.css';
-import {translate} from '@/translations/translator';
+import {translate, translateChoice} from '@/translations/translator';
 import registerUiComponents from '@/bootstrap/ui';
 import DateFormatter from '@/components/DateFormatter';
 import NumberFormatter from '@/components/NumberFormatter';
@@ -25,6 +25,7 @@ router.on('before', (event) => {
 
 setup(async (app) => {
   window.__ = translate;
+  window.__n = translateChoice;
 
   window.Statamic = {
       $config: {
@@ -63,6 +64,7 @@ setup(async (app) => {
   };
 
   app.config.globalProperties.__ = translate;
+  app.config.globalProperties.__n = translateChoice;
   app.config.globalProperties.$date = new DateFormatter;
   app.config.globalProperties.$number = new NumberFormatter;
   app.config.globalProperties.cp_url = (url) => url;

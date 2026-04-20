@@ -416,6 +416,7 @@ export default {
                 folder: this.folder,
                 folderActionUrl: this.folderActionUrl,
                 folders: this.folders,
+                maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
                 creatingFolder: this.creatingFolder,
