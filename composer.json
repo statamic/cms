@@ -33,6 +33,7 @@
         "statamic/stringy": "^3.1.2",
         "stillat/blade-parser": "^2.1",
         "symfony/http-foundation": "^7.3.7 || ^8.0",
+        "symfony/intl": "^7.0",
         "symfony/lock": "^7.0.3 || ^8.0",
         "symfony/var-exporter": "^7.0.3 || ^8.0",
         "symfony/yaml": "^7.0.3 || ^8.0",

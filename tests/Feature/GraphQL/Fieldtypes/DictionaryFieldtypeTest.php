@@ -61,7 +61,7 @@ class DictionaryFieldtypeTest extends FieldtypeTestCase
             'timezone' => ['name' => 'America/New_York', 'offset' => '-04:00'],
             'timezones' => [['name' => 'Australia/Sydney', 'offset' => '+10:00'], ['name' => 'America/New_York', 'offset' => '-04:00']],
             'currency' => ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$'],
-            'currencies' => [['name' => 'British Pound Sterling', 'code' => 'GBP', 'symbol' => '£'], ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$']],
+            'currencies' => [['name' => 'British Pound', 'code' => 'GBP', 'symbol' => '£'], ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$']],
         ]);
     }
 

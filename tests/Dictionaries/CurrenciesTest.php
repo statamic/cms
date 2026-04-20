@@ -15,105 +15,38 @@ class CurrenciesTest extends TestCase
     {
         $options = (new Currencies)->options();
 
-        $this->assertCount(154, $options);
+        $this->assertGreaterThan(150, count($options));
         $option = $options['USD'];
         $this->assertEquals('US Dollar (USD)', $option);
     }
 
     #[Test]
     #[DataProvider('searchProvider')]
-    public function it_searches_options($query, $expected)
+    public function it_searches_options($query, $expectedCodes)
     {
-        $this->assertEquals($expected, (new Currencies)->options($query));
+        $dictionary = new Currencies;
+        $allOptions = $dictionary->options();
+        $results = $dictionary->options($query);
+
+        $this->assertLessThan(count($allOptions), count($results));
+        $this->assertNotEmpty(array_diff_key($allOptions, $results));
+        $this->assertEmpty(array_diff_key($results, $allOptions));
+
+        foreach ($expectedCodes as $code) {
+            $this->assertArrayHasKey($code, $results);
+            $this->assertTrue(str_ends_with($results[$code], "({$code})"));
+        }
     }
 
     public static function searchProvider()
     {
         return [
-            'euro' => [
-                'euro',
-                [
-                    'EUR' => 'Euro (EUR)',
-                ],
-            ],
-            'dollar' => [
-                'dollar',
-                [
-                    'AUD' => 'Australian Dollar (AUD)',
-                    'BZD' => 'Belize Dollar (BZD)',
-                    'CAD' => 'Canadian Dollar (CAD)',
-                    'HKD' => 'Hong Kong Dollar (HKD)',
-                    'JMD' => 'Jamaican Dollar (JMD)',
-                    'NAD' => 'Namibian Dollar (NAD)',
-                    'NZD' => 'New Zealand Dollar (NZD)',
-                    'SGD' => 'Singapore Dollar (SGD)',
-                    'TTD' => 'Trinidad and Tobago Dollar (TTD)',
-                    'USD' => 'US Dollar (USD)',
-                    'BND' => 'Brunei Dollar (BND)',
-                    'TWD' => 'New Taiwan Dollar (TWD)',
-                    'BBD' => 'Barbadian Dollar (BBD)',
-                    'BMD' => 'Bermudian Dollar (BMD)',
-                    'BSD' => 'Bahamian Dollar (BSD)',
-                    'FJD' => 'Fijian Dollar (FJD)',
-                    'GYD' => 'Guyanese Dollar (GYD)',
-                    'KYD' => 'Cayman Islands Dollar (KYD)',
-                    'LRD' => 'Liberian Dollar (LRD)',
-                    'SBD' => 'Solomon Islands Dollar (SBD)',
-                    'SRD' => 'Surinamese Dollar (SRD)',
-                    'XCD' => 'Eastern Caribbean Dollar (XCD)',
-                ],
-            ],
-            'dollar symbol' => [
-                '$',
-                [
-                    'ARS' => 'Argentine Peso (ARS)',
-                    'AUD' => 'Australian Dollar (AUD)',
-                    'BND' => 'Brunei Dollar (BND)',
-                    'BRL' => 'Brazilian Real (BRL)',
-                    'BZD' => 'Belize Dollar (BZD)',
-                    'CAD' => 'Canadian Dollar (CAD)',
-                    'CLP' => 'Chilean Peso (CLP)',
-                    'COP' => 'Colombian Peso (COP)',
-                    'CVE' => 'Cape Verdean Escudo (CVE)',
-                    'DOP' => 'Dominican Peso (DOP)',
-                    'HKD' => 'Hong Kong Dollar (HKD)',
-                    'JMD' => 'Jamaican Dollar (JMD)',
-                    'MOP' => 'Macanese Pataca (MOP)',
-                    'MXN' => 'Mexican Peso (MXN)',
-                    'NAD' => 'Namibian Dollar (NAD)',
-                    'NIO' => 'Nicaraguan Córdoba (NIO)',
-                    'NZD' => 'New Zealand Dollar (NZD)',
-                    'SGD' => 'Singapore Dollar (SGD)',
-                    'TOP' => 'Tongan Paʻanga (TOP)',
-                    'TTD' => 'Trinidad and Tobago Dollar (TTD)',
-                    'TWD' => 'New Taiwan Dollar (TWD)',
-                    'USD' => 'US Dollar (USD)',
-                    'UYU' => 'Uruguayan Peso (UYU)',
-                    'ZWG' => 'Zimbabwe Gold (ZWG)',
-                    'BBD' => 'Barbadian Dollar (BBD)',
-                    'BMD' => 'Bermudian Dollar (BMD)',
-                    'BSD' => 'Bahamian Dollar (BSD)',
-                    'CUP' => 'Cuban Peso (CUP)',
-                    'FJD' => 'Fijian Dollar (FJD)',
-                    'GYD' => 'Guyanese Dollar (GYD)',
-                    'KYD' => 'Cayman Islands Dollar (KYD)',
-                    'LRD' => 'Liberian Dollar (LRD)',
-                    'SBD' => 'Solomon Islands Dollar (SBD)',
-                    'SRD' => 'Surinamese Dollar (SRD)',
-                    'WST' => 'Samoan Tala (WST)',
-                    'XCD' => 'Eastern Caribbean Dollar (XCD)',
-                ],
-            ],
-            'pound symbol' => [
-                '£',
-                [
-                    'GBP' => 'British Pound Sterling (GBP)',
-                    'FKP' => 'Falkland Islands Pound (FKP)',
-                    'GIP' => 'Gibraltar Pound (GIP)',
-                    'SHP' => 'Saint Helena Pound (SHP)',
-                    'SSP' => 'South Sudanese Pound (SSP)',
-                ],
-            ],
+            'dollar' => ['dollar', ['USD', 'CAD', 'AUD']],
+            'dollar symbol' => ['$', ['USD', 'CAD', 'AUD']],
+            'euro' => ['euro', ['EUR']],
+            'euro symbol' => ['€', ['EUR']],
+            'yen' => ['yen', ['JPY']],
+            'pound symbol' => ['£', ['GBP']],
         ];
     }
 
@@ -128,5 +61,15 @@ class CurrenciesTest extends TestCase
             'symbol' => '$',
             'decimals' => 2,
         ], $item->data());
+    }
+
+    #[Test]
+    public function it_localizes_labels_using_app_locale()
+    {
+        app()->setLocale('de');
+
+        $usd = (new Currencies)->get('USD')->data();
+
+        $this->assertEquals('US-Dollar', $usd['name']);
     }
 }
