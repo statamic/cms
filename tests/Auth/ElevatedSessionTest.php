@@ -691,6 +691,16 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function frontend_inertia_request_puts_errors_in_default_bag()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/!/auth/elevated-session', ['password' => 'wrong'], ['X-Inertia' => 'true'])
+            ->assertSessionHasErrors(['password'])
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
     public function frontend_verification_code_will_be_sent_for_passwordless_user_when_loading_the_form()
     {
         Notification::fake();

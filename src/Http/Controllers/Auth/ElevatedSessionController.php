@@ -132,7 +132,7 @@ class ElevatedSessionController extends Controller
 
     protected function throwValidationException(Request $request, array $errors): never
     {
-        if ($request->wantsJson()) {
+        if ($request->wantsJson() || $request->inertia()) {
             throw ValidationException::withMessages($errors);
         }
 
