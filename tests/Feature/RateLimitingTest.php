@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -141,6 +142,42 @@ class RateLimitingTest extends TestCase
     {
         collect(range(1, 30))->each(fn () => $this->post('/cp/auth/passkeys')->assertNotRateLimited());
         $this->post('/cp/auth/passkeys')->assertRateLimited();
+    }
+
+    #[Test]
+    public function elevated_session_confirm_endpoint_is_rate_limited()
+    {
+        $this->actingAs(tap(User::make()->email('foo@bar.com'))->save());
+
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/elevated-session')->assertNotRateLimited());
+        $this->post('/!/auth/elevated-session')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_elevated_session_confirm_endpoint_is_rate_limited()
+    {
+        $this->actingAs(tap(User::make()->email('foo@bar.com')->makeSuper())->save());
+
+        collect(range(1, 4))->each(fn () => $this->post('/cp/elevated-session')->assertNotRateLimited());
+        $this->post('/cp/elevated-session')->assertRateLimited();
+    }
+
+    #[Test]
+    public function elevated_session_passkey_options_endpoint_is_rate_limited()
+    {
+        $this->actingAs(tap(User::make()->email('foo@bar.com'))->save());
+
+        collect(range(1, 30))->each(fn () => $this->get('/!/auth/elevated-session/passkey-options')->assertNotRateLimited());
+        $this->get('/!/auth/elevated-session/passkey-options')->assertRateLimited();
+    }
+
+    #[Test]
+    public function cp_elevated_session_passkey_options_endpoint_is_rate_limited()
+    {
+        $this->actingAs(tap(User::make()->email('foo@bar.com')->makeSuper())->save());
+
+        collect(range(1, 30))->each(fn () => $this->get('/cp/elevated-session/passkey-options')->assertNotRateLimited());
+        $this->get('/cp/elevated-session/passkey-options')->assertRateLimited();
     }
 
     #[Test]
