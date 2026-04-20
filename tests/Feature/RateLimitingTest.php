@@ -16,44 +16,39 @@ class RateLimitingTest extends TestCase
         Cache::flush();
     }
 
-    private function assertNotRateLimited($response): void
-    {
-        $this->assertNotEquals(429, $response->getStatusCode(), 'Request was unexpectedly rate limited.');
-    }
-
     #[Test]
     public function login_endpoint_is_rate_limited()
     {
-        collect(range(1, 4))->each(fn () => $this->assertNotRateLimited($this->post('/!/auth/login')));
-        $this->post('/!/auth/login')->assertStatus(429);
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/login')->assertNotRateLimited());
+        $this->post('/!/auth/login')->assertRateLimited();
     }
 
     #[Test]
     public function register_endpoint_is_rate_limited()
     {
-        collect(range(1, 4))->each(fn () => $this->assertNotRateLimited($this->post('/!/auth/register')));
-        $this->post('/!/auth/register')->assertStatus(429);
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/register')->assertNotRateLimited());
+        $this->post('/!/auth/register')->assertRateLimited();
     }
 
     #[Test]
     public function password_email_endpoint_is_rate_limited()
     {
-        collect(range(1, 4))->each(fn () => $this->assertNotRateLimited($this->post('/!/auth/password/email')));
-        $this->post('/!/auth/password/email')->assertStatus(429);
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/password/email')->assertNotRateLimited());
+        $this->post('/!/auth/password/email')->assertRateLimited();
     }
 
     #[Test]
     public function password_reset_endpoint_is_rate_limited()
     {
-        collect(range(1, 4))->each(fn () => $this->assertNotRateLimited($this->post('/!/auth/password/reset')));
-        $this->post('/!/auth/password/reset')->assertStatus(429);
+        collect(range(1, 4))->each(fn () => $this->post('/!/auth/password/reset')->assertNotRateLimited());
+        $this->post('/!/auth/password/reset')->assertRateLimited();
     }
 
     #[Test]
     public function forms_endpoint_is_rate_limited()
     {
-        collect(range(1, 10))->each(fn () => $this->assertNotRateLimited($this->post('/!/forms/contact')));
-        $this->post('/!/forms/contact')->assertStatus(429);
+        collect(range(1, 10))->each(fn () => $this->post('/!/forms/contact')->assertNotRateLimited());
+        $this->post('/!/forms/contact')->assertRateLimited();
     }
 
     #[Test]
@@ -62,9 +57,9 @@ class RateLimitingTest extends TestCase
         // Simulate a developer overriding the default 4/min limit to 2/min
         RateLimiter::for('statamic.auth', fn ($request) => Limit::perMinute(2)->by($request->ip()));
 
-        $this->assertNotRateLimited($this->post('/!/auth/login'));
-        $this->assertNotRateLimited($this->post('/!/auth/login'));
-        $this->post('/!/auth/login')->assertStatus(429);
+        $this->post('/!/auth/login')->assertNotRateLimited();
+        $this->post('/!/auth/login')->assertNotRateLimited();
+        $this->post('/!/auth/login')->assertRateLimited();
     }
 
     #[Test]
@@ -73,8 +68,8 @@ class RateLimitingTest extends TestCase
         // Simulate a developer overriding the default 10/min limit to 2/min
         RateLimiter::for('statamic.forms', fn ($request) => Limit::perMinute(2)->by($request->ip()));
 
-        $this->assertNotRateLimited($this->post('/!/forms/contact'));
-        $this->assertNotRateLimited($this->post('/!/forms/contact'));
-        $this->post('/!/forms/contact')->assertStatus(429);
+        $this->post('/!/forms/contact')->assertNotRateLimited();
+        $this->post('/!/forms/contact')->assertNotRateLimited();
+        $this->post('/!/forms/contact')->assertRateLimited();
     }
 }
