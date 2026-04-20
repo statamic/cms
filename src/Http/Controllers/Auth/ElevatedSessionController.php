@@ -17,7 +17,7 @@ class ElevatedSessionController extends Controller
 {
     public function showForm(Request $request)
     {
-        if ($customUrl = config('statamic.users.elevated_session_page')) {
+        if ($customUrl = config('statamic.users.elevated_session_url')) {
             return redirect()->to($customUrl);
         }
 
