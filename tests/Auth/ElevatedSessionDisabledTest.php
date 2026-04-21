@@ -27,7 +27,7 @@ class ElevatedSessionDisabledTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('statamic.users.elevated_session_enabled', false);
+        $app['config']->set('statamic.users.elevated_sessions_enabled', false);
     }
 
     #[Test]

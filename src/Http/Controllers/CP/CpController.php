@@ -72,7 +72,7 @@ class CpController extends Controller
 
     public function requireElevatedSession(): void
     {
-        if (config('statamic.users.elevated_session_enabled') && ! request()->hasElevatedSession()) {
+        if (config('statamic.users.elevated_sessions_enabled') && ! request()->hasElevatedSession()) {
             throw new ElevatedSessionAuthorizationException;
         }
     }

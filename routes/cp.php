@@ -443,7 +443,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
-    if (config('statamic.users.elevated_session_enabled')) {
+    if (config('statamic.users.elevated_sessions_enabled')) {
         Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
         Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
         Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
