@@ -105,9 +105,9 @@
     }
 }
 
-.logic-text__badge {
+.logic-text-badge {
     @apply
-        py-2 px-3.5 mb-2.5
+        py-2 px-3.5
         bg-content-bg
         rounded-full
         text-sm
@@ -178,8 +178,9 @@
         }
     }
 }
-.logic-text__badge {
+.logic-text__condition {
     position: relative;
+    @apply mb-2.5;
     &::after {
         content: '';
         position: absolute;
