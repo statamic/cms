@@ -33,6 +33,7 @@ const logicJoinOptions = [
 
 const logicContainsOperator = ref('contains');
 const logicContainsAnswer = ref('5');
+const logicContainsAnswerPlaceholder = __('Answer');
 </script>
 
 <template>
@@ -239,9 +240,11 @@ const logicContainsAnswer = ref('5');
                         <Input
                             v-model="logicContainsAnswer"
                             size="sm"
-                            :input-attrs="{ size: Math.max(logicContainsAnswer.length, 1) }"
-                            input-class="w-auto min-w-[2ch]"
-                            :placeholder="__('Answer')"
+                            :input-attrs="{
+                                size: Math.max(logicContainsAnswer.length, logicContainsAnswerPlaceholder.length),
+                                style: `min-width: ${logicContainsAnswerPlaceholder.length}ch;`,
+                            }"
+                            :placeholder="logicContainsAnswerPlaceholder"
                         />
                     </li>
                 </ol>
