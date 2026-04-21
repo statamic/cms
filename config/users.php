@@ -180,7 +180,7 @@ return [
     |
     */
 
-    'elevated_sessions_enabled' => true,
+    'elevated_session_enabled' => true,
 
     'elevated_session_duration' => 15,
 
