@@ -432,7 +432,7 @@ const notificationOptions = [
                         </div>
                         <Field :label="__('What do you like most about our band?')" required>
                             <!-- TODO: Add logic tree icon for fields with logic -->
-                            <Icon name="logic-tree" class="absolute z-(--z-index-above) -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                            <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
                             <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
                         </Field>
                     </div>
