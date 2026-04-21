@@ -58,10 +58,10 @@ class TwoFactorChallengeController extends Controller
         return cp_route('two-factor-challenge');
     }
 
-    protected function redirectPath()
+    protected function redirectPath(Request $request)
     {
         $cp = cp_route('index');
-        $referer = request('referer');
+        $referer = $request->input('referer');
         $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
 
         return $referredFromCp ? $referer : $cp;

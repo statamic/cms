@@ -95,7 +95,7 @@ class TwoFactorChallengeController extends Controller
         return route('statamic.two-factor-challenge');
     }
 
-    protected function redirectPath()
+    protected function redirectPath(Request $request)
     {
         if ($redirect = $request->input('_redirect')) {
             if (! URL::isExternalToApplication($redirect)) {
