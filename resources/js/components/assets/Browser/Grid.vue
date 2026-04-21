@@ -117,7 +117,7 @@
                                     @click.stop="selectionClicked(index, $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
-                                    <div class="relative flex aspect-square size-full items-center justify-center">
+                                    <div class="relative flex aspect-square size-full items-center justify-center" :class="{ 'cursor-pointer': maxFiles === 1 }">
                                         <div class="asset-thumb">
                                             <img
                                                 v-if="asset.thumbnail"
@@ -228,6 +228,7 @@ export default {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
+        maxFiles: { type: Number },
         showCheckerboard: { type: Boolean, default: false },
         checkerboardMode: { type: String, default: 'transparent' },
     },

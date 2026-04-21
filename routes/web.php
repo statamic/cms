@@ -7,6 +7,7 @@ use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectContr
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Http\Controllers\ActivateAccountController;
+use Statamic\Http\Controllers\Auth\ElevatedSessionController;
 use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
 use Statamic\Http\Controllers\FrontendController;
@@ -16,6 +17,8 @@ use Statamic\Http\Controllers\ResetPasswordController;
 use Statamic\Http\Controllers\TwoFactorChallengeController;
 use Statamic\Http\Controllers\TwoFactorSetupController;
 use Statamic\Http\Controllers\User\LoginController;
+use Statamic\Http\Controllers\User\PasskeyController;
+use Statamic\Http\Controllers\User\PasskeyLoginController;
 use Statamic\Http\Controllers\User\PasswordController;
 use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
@@ -32,7 +35,7 @@ use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
-        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class])->name('forms.submit');
+        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
@@ -40,16 +43,36 @@ Route::name('statamic.')->group(function () {
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
-            Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
+            Route::group(['middleware' => [HandlePrecognitiveRequests::class, 'throttle:statamic.auth']], function () {
                 Route::post('login', [LoginController::class, 'login'])->name('login');
                 Route::post('register', RegisterController::class)->name('register');
                 Route::post('profile', ProfileController::class)->name('profile');
                 Route::post('password', PasswordController::class)->name('password');
             });
 
-            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.auth')->name('password.email');
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-            Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+            Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.auth')->name('password.reset.action');
+
+            Route::middleware('auth')->group(function () {
+                Route::get('confirm-password', [ElevatedSessionController::class, 'showForm'])->name('elevated-session')->middleware([HandleInertiaRequests::class]);
+                Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.auth');
+                Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.passkeys');
+                Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+            });
+
+            Route::group(['prefix' => 'passkeys'], function () {
+                Route::middleware('throttle:statamic.passkeys')->group(function () {
+                    Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.options');
+                    Route::post('auth', [PasskeyLoginController::class, 'login'])->name('passkeys.login');
+                });
+
+                Route::middleware('auth')->group(function () {
+                    Route::get('create', [PasskeyController::class, 'create'])->name('passkeys.create');
+                    Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
+                    Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
+                });
+            });
 
             if (TwoFactor::enabled()) {
                 Route::get('two-factor-setup', TwoFactorSetupController::class)->name('two-factor-setup');

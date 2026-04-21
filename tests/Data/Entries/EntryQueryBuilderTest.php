@@ -967,6 +967,9 @@ class EntryQueryBuilderTest extends TestCase
             '/ test',
             'test /',
             'test / test',
+            'Über dem Meer',
+            'über dem meer',
+            'Ärger',
         ])->each(function ($val, $i) {
             EntryFactory::id($i)
                 ->slug('post-'.$i)
@@ -999,6 +1002,10 @@ class EntryQueryBuilderTest extends TestCase
             '%/' => ['/', 'test /'],
             '/%' => ['/', '/ test'],
             '%/%' => ['/', '/ test', 'test /', 'test / test'],
+            '%über%' => ['Über dem Meer', 'über dem meer'],
+            '%Über%' => ['Über dem Meer', 'über dem meer'],
+            '%ärger%' => ['Ärger'],
+            '%Ärger%' => ['Ärger'],
         ])->mapWithKeys(function ($expected, $like) {
             return [$like => [$like, $expected]];
         });
@@ -1488,6 +1495,19 @@ class EntryQueryBuilderTest extends TestCase
     public function exists_returns_false_when_no_results_are_found()
     {
         $this->assertFalse(Entry::query()->exists());
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $count = Entry::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        Entry::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, Entry::all());
     }
 }
 

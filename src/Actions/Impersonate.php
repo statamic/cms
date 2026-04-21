@@ -24,7 +24,11 @@ class Impersonate extends Action
             return false;
         }
 
-        return $item instanceof UserContract && $item->id() != User::current()->id();
+        if (! ($item instanceof UserContract && $item->id() != User::current()->id())) {
+            return false;
+        }
+
+        return User::current()->can('impersonate', $item);
     }
 
     public function visibleToBulk($items)
@@ -34,7 +38,7 @@ class Impersonate extends Action
 
     public function authorize($authed, $user)
     {
-        return $authed->can('impersonate users');
+        return $authed->can('impersonate', $user);
     }
 
     public function run($users, $values)

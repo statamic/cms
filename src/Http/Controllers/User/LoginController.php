@@ -21,6 +21,8 @@ class LoginController extends Controller
     {
         $this->handleTooManyLoginAttempts($request);
 
+        $this->checkPasskeyEnforcement($request);
+
         $user = User::fromUser($this->validateCredentials($request));
 
         if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
@@ -32,6 +34,31 @@ class LoginController extends Controller
         $redirect = $request->input('_redirect', '/');
 
         return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect)->withSuccess(__('Login successful.'));
+    }
+
+    private function checkPasskeyEnforcement(Request $request)
+    {
+        if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            return;
+        }
+
+        if (! $user = User::findByEmail($request->get($this->username()))) {
+            return;
+        }
+
+        if ($user->passkeys()->isEmpty()) {
+            return;
+        }
+
+        $errorRedirect = $request->input('_error_redirect');
+
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
+
+        throw new HttpResponseException(
+            $errorResponse->withInput()->withErrors(__('statamic::messages.password_passkeys_only'))
+        );
     }
 
     protected function twoFactorChallengeRedirect(): string

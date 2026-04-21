@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Requests\CP\Auth;
+namespace Statamic\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -122,12 +122,12 @@ use Statamic\Statamic;
 Route::group(['prefix' => 'auth'], function () {
     if (config('statamic.cp.auth.enabled', true)) {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-        Route::post('login', [LoginController::class, 'login']);
+        Route::post('login', [LoginController::class, 'login'])->middleware('throttle:statamic.cp.auth');
 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.cp.auth')->name('password.email');
         Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.cp.auth')->name('password.reset.action');
 
         if (TwoFactor::enabled()) {
             Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
@@ -148,7 +148,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
-    Route::group(['prefix' => 'passkeys'], function () {
+    Route::group(['prefix' => 'passkeys', 'middleware' => 'throttle:statamic.cp.passkeys'], function () {
         Route::post('/', [PasskeyLoginController::class, 'login'])->name('passkeys.auth');
         Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.auth.options');
     });
@@ -445,8 +445,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
     Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
-    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options');
-    Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
+    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
+    Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
     Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
 
     Route::get('playground', PlaygroundController::class)->name('playground');
