@@ -70,7 +70,7 @@
 /* GROUP LOGIC TEXT / VERTICAL
 =================================================== */
 .logic-text {
-    --logic-line: var(--color-gray-300);
+    --inner-indent: 1.75rem;
     :where(.dark) & {
         --logic-line: var(--color-gray-600);
     }
@@ -82,7 +82,7 @@
             display: grid;
             grid-template-columns: 100%;
             @apply gap-2.5 mb-2.5;
-            margin-inline-start: 1.5rem;
+            margin-inline-start: var(--inner-indent);
             margin-block-end: calc(var(--spacing) * 4);
             li {
                 /* Prevent full-width comboboxes */
@@ -118,7 +118,7 @@
 .logic-text__pill {
     display: flex;
     align-items: center;
-    @apply gap-2 rounded-full bg-white px-3 py-2 shadow-ui-sm;
+    @apply gap-1 rounded-full bg-white px-3 py-2 shadow-ui-sm;
 }
 
 .logic-text__pill-icon {
@@ -135,16 +135,60 @@
     text-overflow: ellipsis;
 }
 
-/* GROUP LOGIC TEXT / VERTICAL / ANCHORS
+/* GROUP LOGIC TEXT / VERTICAL / LOGIC CONNECTORS
 =================================================== */
+.logic-text {
+    --logic-line: 1px dashed var(--color-gray-400);
+    --outer-indent-connector: 1.7rem;
+    /* Inner structure */
+    ol ol {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            z-index: var(--z-index-below);
+            inset-inline-start: 1.5rem;
+            border-inline-start: var(--logic-line);
+            height: 100%;
+        }
+    }
+    /* Exit "If" */
+    > ol > li {
+        &:not(:last-child) {
+            li:last-child {
+                position: relative;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    z-index: var(--z-index-below);
+                    top: 50%;
+                    left: calc(0% - var(--inner-indent) / 2);
+                    width: calc(var(--spacing) * 4);
+                    height: 3.5rem;
+                    border: var(--logic-line);
+                    border-inline-end: 0;
+                    border-block-end: 0;
+                    border-start-start-radius: 100vw;
+                }
+            }
+        }
+    }
+}
+/* GROUP LOGIC TEXT / VERTICAL / LOGIC CONNECTORS / ANCHORS
+=================================================== */
+/* Only use anchor positioning when it makes sense. Sometimes it's simpler to just use absolute positioning. */
 .if-connector {
-    --border-width: 1px;
     position: absolute;
+    @apply w-4;
     z-index: var(--z-index-below);
-    border: 1px solid blue!important;
-    top: anchor(--if center);
-    left: calc(anchor(--if center) - 1px);
-    bottom: calc(anchor(--if-tree top) - 1.25rem)
+    border: var(--logic-line);
+    border-block-start: 0;
+    border-inline-end: 0;
+    /* Escape the box shadow */
+    top: calc(anchor(--if bottom) + 2px);
+    left: var(--outer-indent-connector);
+    bottom: calc(anchor(--if-tree top) - 1.5rem);
+    border-end-start-radius: 100vw;
 }
 
 #anchor-if {
@@ -154,3 +198,5 @@
 #anchor-if-tree {
     anchor-name: --if-tree;
 }
+
+
