@@ -84,6 +84,10 @@
             @apply gap-2.5 mb-2.5;
             margin-inline-start: var(--inner-indent);
             margin-block-end: calc(var(--spacing) * 4);
+            /* Last "Then go to ..." */
+            :is(li:last-child) & {
+                margin-inline-start: 0;
+            }
             li {
                 /* Prevent full-width comboboxes */
                 > .w-full {
