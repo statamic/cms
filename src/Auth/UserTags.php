@@ -127,7 +127,7 @@ class UserTags extends Tags
         }
 
         if ($twoFactorSetupUrl = $this->params->get('two_factor_setup_url')) {
-            $params['two_factor_setup_url'] = $twoFactorSetupUrl;
+            $params['two_factor_setup_url'] = encrypt($twoFactorSetupUrl);
         }
 
         if (! $this->canParseContents()) {

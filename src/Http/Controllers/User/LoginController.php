@@ -29,10 +29,8 @@ class LoginController extends Controller
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        if ($setupUrl = $request->input('_two_factor_setup_url')) {
-            if (! URL::isExternalToApplication($setupUrl)) {
-                $request->session()->put('login.two_factor_setup_url', $setupUrl);
-            }
+        if ($setupUrl = $this->decryptSetupUrl($request->input('_two_factor_setup_url'))) {
+            $request->session()->put('login.two_factor_setup_url', $setupUrl);
         }
 
         if ($redirect = $request->input('_redirect')) {

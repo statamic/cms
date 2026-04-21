@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\Concerns;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -71,10 +72,8 @@ trait HandlesLogins
             }
         }
 
-        if ($setupUrl = $request->input('_two_factor_setup_url')) {
-            if (! URL::isExternalToApplication($setupUrl)) {
-                $session['login.two_factor_setup_url'] = $setupUrl;
-            }
+        if ($setupUrl = $this->decryptSetupUrl($request->input('_two_factor_setup_url'))) {
+            $session['login.two_factor_setup_url'] = $setupUrl;
         }
 
         if ($redirect = $request->input('_redirect')) {
@@ -106,5 +105,20 @@ trait HandlesLogins
         $request->session()->elevate();
 
         $request->session()->regenerate();
+    }
+
+    private function decryptSetupUrl(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        try {
+            $url = decrypt($value);
+        } catch (DecryptException $e) {
+            return null;
+        }
+
+        return URL::isExternalToApplication($url) ? null : $url;
     }
 }

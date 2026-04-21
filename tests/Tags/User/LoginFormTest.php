@@ -367,7 +367,11 @@ EOT
         $output = $this->tag('{{ user:login_form two_factor_challenge_url="/auth/verify" two_factor_setup_url="/auth/setup-2fa" }}{{ /user:login_form }}');
 
         $this->assertStringContainsString('<input type="hidden" name="_two_factor_challenge_url" value="/auth/verify" />', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_two_factor_setup_url" value="/auth/setup-2fa" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_two_factor_setup_url"', $output);
+        $this->assertStringNotContainsString('value="/auth/setup-2fa"', $output);
+
+        preg_match('/name="_two_factor_setup_url" value="([^"]+)"/', $output, $matches);
+        $this->assertEquals('/auth/setup-2fa', decrypt($matches[1]));
     }
 
     #[Test]
@@ -418,9 +422,35 @@ EOT
                 'token' => 'test-token',
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
-                '_two_factor_setup_url' => '/custom-2fa-setup',
+                '_two_factor_setup_url' => encrypt('/custom-2fa-setup'),
             ])
             ->assertSessionHas('login.two_factor_setup_url', '/custom-2fa-setup');
+    }
+
+    #[Test]
+    public function it_does_not_store_unencrypted_setup_url_in_session()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_two_factor_setup_url' => '/custom-2fa-setup',
+            ])
+            ->assertSessionMissing('login.two_factor_setup_url');
     }
 
     #[Test]
