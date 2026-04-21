@@ -180,21 +180,11 @@ return [
     |
     */
 
+    'elevated_sessions_enabled' => true,
+
     'elevated_session_duration' => 15,
 
     'elevated_session_url' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Elevated Session Disabled
-    |--------------------------------------------------------------------------
-    |
-    | Here you may enable or disable elevated sessions. Disabling
-    | can be useful when using OAuth.
-    |
-    */
-
-    'elevated_sessions_enabled' => true,
 
     /*
     |--------------------------------------------------------------------------
