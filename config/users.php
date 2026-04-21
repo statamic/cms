@@ -180,7 +180,7 @@ return [
     |
     */
 
-    'elevated_sessions_enabled' => true,
+    'elevated_sessions_enabled' => env('STATAMIC_ELEVATED_SESSIONS_ENABLED', true),
 
     'elevated_session_duration' => 15,
 
