@@ -1,5 +1,5 @@
 <script setup>
-import { Combobox, Icon } from '@ui';
+import { Combobox, Icon, Input } from '@ui';
 import { ref } from 'vue';
 
 const logicOperator = ref('equals');
@@ -30,6 +30,9 @@ const logicJoinOptions = [
     { label: __('And'), value: 'and' },
     { label: __('Or'), value: 'or' },
 ];
+
+const logicContainsOperator = ref('contains');
+const logicContainsAnswer = ref('5');
 </script>
 
 <template>
@@ -223,7 +226,7 @@ const logicJoinOptions = [
                     </li>
                     <li>
                         <Combobox
-                            v-model="logicOperator"
+                            v-model="logicContainsOperator"
                             size="sm"
                             :options="logicOperatorOptions"
                             option-label="label"
@@ -233,14 +236,10 @@ const logicJoinOptions = [
                         />
                     </li>
                     <li>
-                        <Combobox
-                            v-model="logicValue"
+                        <Input
+                            v-model="logicContainsAnswer"
                             size="sm"
-                            :options="logicValueOptions"
-                            option-label="label"
-                            option-value="value"
-                            :placeholder="__('Value')"
-                            searchable
+                            :placeholder="__('Answer')"
                         />
                     </li>
                 </ol>
