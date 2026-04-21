@@ -94,6 +94,7 @@
                     display: inline-flex;
                     width: unset;
                     min-width: unset;
+                    max-width: 100%;
                 }
             }
         }
@@ -102,6 +103,7 @@
     [data-ui-combobox-trigger] {
         display: inline-flex;
         width: unset;
+        max-width: 100%;
     }
 }
 

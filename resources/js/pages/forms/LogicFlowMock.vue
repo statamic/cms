@@ -202,17 +202,17 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             searchable
                         >
                             <template #option="{ icon, label }">
-                                <div class="flex gap-2 text-left">
+                                <div class="flex min-w-0 gap-2 text-left">
                                     <Icon
                                         v-if="icon"
                                         :name="icon"
                                         class="size-4 shrink-0 text-purple-500 dark:text-purple-400"
                                     />
-                                    <span>{{ label }}</span>
+                                    <span class="block truncate">{{ label }}</span>
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
-                                <div class="flex items-center gap-2 -ms-0.75">
+                                <div class="flex min-w-0 items-center gap-2 -ms-0.75">
                                     <div class="flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 rounded-full">
                                         <Icon
                                             v-if="option.icon"
@@ -220,7 +220,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
                                             class="size-4 shrink-0 rounded-full text-purple-600 dark:text-purple-400"
                                         />
                                     </div>
-                                    <span>{{ option.label }}</span>
+                                    <span class="block truncate">{{ option.label }}</span>
                                 </div>
                             </template>
                         </Combobox>
@@ -267,17 +267,17 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             searchable
                         >
                             <template #option="{ icon, label }">
-                                <div class="flex gap-2 text-left">
+                                <div class="flex min-w-0 gap-2 text-left">
                                     <Icon
                                         v-if="icon"
                                         :name="icon"
                                         class="size-4 shrink-0 text-orange-500 dark:text-orange-400"
                                     />
-                                    <span>{{ label }}</span>
+                                    <span class="block truncate">{{ label }}</span>
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
-                                <div class="flex items-center gap-2 -ms-0.75">
+                                <div class="flex min-w-0 items-center gap-2 -ms-0.75">
                                     <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full">
                                         <Icon
                                             v-if="option.icon"
@@ -285,7 +285,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
                                             class="size-4 shrink-0 rounded-full text-orange-600 dark:text-orange-400"
                                         />
                                     </div>
-                                    <span>{{ option.label }}</span>
+                                    <span class="block truncate">{{ option.label }}</span>
                                 </div>
                             </template>
                         </Combobox>
