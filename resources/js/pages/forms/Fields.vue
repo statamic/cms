@@ -403,46 +403,48 @@ const notificationOptions = [
                         />
                     </Field>
 
-                    <div id="fieldset-start">
-                        <div id="editing-field" data-editing-field>
-                            <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
-                                <WidthSelector
-                                    v-model="editingFieldWidth"
-                                    size="base"
-                                    variant="filled"
-                                    class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
-                                />
-                                <Button
-                                    size="sm"
-                                    inset
-                                    icon="duplicate"
-                                    variant="subtle"
-                                    :aria-label="__('Duplicate field')"
-                                    :title="__('Duplicate field')"
-                                    class="[&_svg]:opacity-45"
-                                />
-                                <Button
-                                    size="sm"
-                                    inset
-                                    icon="trash"
-                                    variant="subtle"
-                                    :aria-label="__('Remove field')"
-                                    :title="__('Remove field')"
-                                    class="[&_svg]:opacity-45"
-                                />
+                    <div data-fieldset-group class="space-y-7">
+                        <div id="fieldset-start">
+                            <div id="editing-field" data-editing-field>
+                                <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
+                                    <WidthSelector
+                                        v-model="editingFieldWidth"
+                                        size="base"
+                                        variant="filled"
+                                        class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        inset
+                                        icon="duplicate"
+                                        variant="subtle"
+                                        :aria-label="__('Duplicate field')"
+                                        :title="__('Duplicate field')"
+                                        class="[&_svg]:opacity-45"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        inset
+                                        icon="trash"
+                                        variant="subtle"
+                                        :aria-label="__('Remove field')"
+                                        :title="__('Remove field')"
+                                        class="[&_svg]:opacity-45"
+                                    />
+                                </div>
+                                <Field :label="__('What do you like most about our band?')" required>
+                                    <!-- TODO: Add logic tree icon for fields with logic -->
+                                    <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                    <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                                </Field>
                             </div>
-                            <Field :label="__('What do you like most about our band?')" required>
-                                <!-- TODO: Add logic tree icon for fields with logic -->
-                                <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                                <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                        </div>
+
+                        <div id="fieldset-end">
+                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                                <Input v-model="fanLength" />
                             </Field>
                         </div>
-                    </div>
-
-                    <div id="fieldset-end">
-                        <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
-                            <Input v-model="fanLength" />
-                        </Field>
                     </div>
 
                     <Field :label="__('Which album was your favorite?')">
@@ -456,34 +458,36 @@ const notificationOptions = [
                         </RadioGroup>
                     </Field>
 
-                    <div id="fieldset-start">
-                        <Field :label="__('Which album was your second favorite?')">
-                            <RadioGroup v-model="secondFavoriteAlbum">
-                                <Radio
-                                    v-for="album in albumOptions"
-                                    :key="`second-${album.value}`"
-                                    :value="album.value"
-                                    :label="album.label"
+                    <div data-fieldset-group class="space-y-7">
+                        <div id="fieldset-start">
+                            <Field :label="__('Which album was your second favorite?')">
+                                <RadioGroup v-model="secondFavoriteAlbum">
+                                    <Radio
+                                        v-for="album in albumOptions"
+                                        :key="`second-${album.value}`"
+                                        :value="album.value"
+                                        :label="album.label"
+                                    />
+                                </RadioGroup>
+                            </Field>
+                        </div>
+
+                        <Field :label="__('Sign up for email notifications from The Midnight')">
+                            <CheckboxGroup v-model="emailNotifications">
+                                <Checkbox
+                                    v-for="notification in notificationOptions"
+                                    :key="notification.value"
+                                    :value="notification.value"
+                                    :label="notification.label"
                                 />
-                            </RadioGroup>
+                            </CheckboxGroup>
                         </Field>
-                    </div>
 
-                    <Field :label="__('Sign up for email notifications from The Midnight')">
-                        <CheckboxGroup v-model="emailNotifications">
-                            <Checkbox
-                                v-for="notification in notificationOptions"
-                                :key="notification.value"
-                                :value="notification.value"
-                                :label="notification.label"
-                            />
-                        </CheckboxGroup>
-                    </Field>
-
-                    <div id="fieldset-end">
-                        <Field :label="__('How old are you?')">
-                            <Input v-model="age" type="number" />
-                        </Field>
+                        <div id="fieldset-end">
+                            <Field :label="__('How old are you?')">
+                                <Input v-model="age" type="number" />
+                            </Field>
+                        </div>
                     </div>
 
                     <Field :label="__('I want a free drink voucher')">

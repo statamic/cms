@@ -23,6 +23,10 @@
 
 /* GROUP MAIN COLUMN / FIELDSETS
 =================================================== */
+[data-fieldset-group] {
+    anchor-scope: --fieldset-start, --fieldset-end;
+}
+
 #fieldset-start {
     anchor-name: --fieldset-start;
 
