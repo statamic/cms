@@ -739,6 +739,53 @@ class UserTags extends Tags
     }
 
     /**
+     * Output an elevated session form.
+     *
+     * Maps to {{ user:elevated_session_form }}
+     *
+     * @return string
+     */
+    public function elevatedSessionForm()
+    {
+        if (! ($user = User::current())) {
+            return;
+        }
+
+        $method = $user->getElevatedSessionMethod();
+
+        if ($method === 'verification_code') {
+            session()->sendElevatedSessionVerificationCodeIfRequired();
+        }
+
+        $data = [
+            ...$this->getFormSession('user.elevated_session'),
+            'method' => $method,
+            'allow_passkey' => $method !== 'verification_code' && $user->passkeys()->isNotEmpty(),
+            'resend_code_url' => route('statamic.elevated-session.resend-code'),
+            'passkey_options_url' => route('statamic.elevated-session.passkey-options'),
+            'submit_url' => route('statamic.elevated-session.confirm'),
+        ];
+
+        $action = route('statamic.elevated-session.confirm');
+        $method = 'POST';
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method),
+                'params' => $this->formMetaPrefix($this->formParams($method)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function eventUrl($url, $relative = false)

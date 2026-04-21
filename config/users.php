@@ -181,6 +181,8 @@ return [
 
     'elevated_session_duration' => 15,
 
+    'elevated_session_url' => null,
+
     /*
     |--------------------------------------------------------------------------
     | Two-Factor Authentication

@@ -82,6 +82,7 @@
             :site="site"
             v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            remember-tab
         />
 
         <confirmation-modal

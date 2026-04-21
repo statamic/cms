@@ -29,6 +29,7 @@ class HandleInertiaRequests extends Middleware
                 'version' => Statamic::version(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
+                'isCpRoute' => Statamic::isCpRoute(),
             ],
             '_toasts' => $this->toasts($request),
         ]);
