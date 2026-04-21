@@ -238,7 +238,10 @@ const logicContainsAnswer = ref('5');
                     <li>
                         <Input
                             v-model="logicContainsAnswer"
+                            class="inline-flex w-auto"
                             size="sm"
+                            :input-attrs="{ size: Math.max(logicContainsAnswer.length, 1) }"
+                            input-class="w-auto min-w-[2ch]"
                             :placeholder="__('Answer')"
                         />
                     </li>
