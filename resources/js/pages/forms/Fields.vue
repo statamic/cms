@@ -442,6 +442,7 @@ const notificationOptions = [
 
                         <div id="fieldset-end">
                             <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                                <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                 <Input v-model="fanLength" />
                             </Field>
                         </div>

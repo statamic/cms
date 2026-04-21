@@ -1,3 +1,8 @@
+[data-ui-input-group] {
+    /* Lock in logic icons */
+    position: relative;
+}
+
 /* GROUP MAIN COLUMN / FIELD BACKGROUND
 =================================================== */
 [data-editing-field] {
@@ -25,6 +30,9 @@
 =================================================== */
 [data-fieldset-group] {
     anchor-scope: --fieldset-start, --fieldset-end;
+    [data-ui-label] {
+        color: var(--color-indigo-800);
+    }
 }
 
 #fieldset-start {
