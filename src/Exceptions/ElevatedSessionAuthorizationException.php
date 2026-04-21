@@ -3,6 +3,7 @@
 namespace Statamic\Exceptions;
 
 use Illuminate\Http\Request;
+use Statamic\Statamic;
 
 class ElevatedSessionAuthorizationException extends \Exception
 {
@@ -13,8 +14,14 @@ class ElevatedSessionAuthorizationException extends \Exception
 
     public function render(Request $request)
     {
-        return $request->wantsJson()
-            ? response()->json(['message' => $this->getMessage()], 403)
-            : redirect()->setIntendedUrl($request->fullUrl())->to(cp_route('confirm-password'));
+        if ($request->wantsJson()) {
+            return response()->json(['message' => $this->getMessage()], 403);
+        }
+
+        $redirectUrl = Statamic::isCpRoute()
+            ? cp_route('confirm-password')
+            : route('statamic.elevated-session');
+
+        return redirect()->setIntendedUrl($request->fullUrl())->to($redirectUrl);
     }
 }

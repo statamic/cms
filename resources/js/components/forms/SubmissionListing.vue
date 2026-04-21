@@ -1,5 +1,6 @@
 <template>
     <Listing
+        ref="listing"
         :url="requestUrl"
         :columns="columns"
         :action-url="actionUrl"
@@ -42,5 +43,13 @@ export default {
             requestUrl: cp_url(`forms/${this.form}/submissions`),
         };
     },
+
+    computed: {
+        parameters() {
+            return this.$refs.listing?.parameters;
+        },
+    },
+
+    expose: ['parameters'],
 };
 </script>

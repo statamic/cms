@@ -66,7 +66,7 @@ function toggleSection(section) {
                 <Button
                     @click="toggleSection(section)"
                     v-if="section.collapsible"
-                    class="static! [&_svg]:size-4.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
                     :icon="section.collapsed ? 'expand' : 'collapse'"
                     size="sm"
                     variant="ghost"

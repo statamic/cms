@@ -18,6 +18,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -40,7 +41,7 @@ class EntriesController extends CpController
             'blueprints' => $collection->entryBlueprints()->map->handle(),
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -485,12 +486,16 @@ class EntriesController extends CpController
 
         $parent = $parent ? $tree->find($parent) : null;
 
+        if ($parent && $parent->isRoot()) {
+            $parent = null;
+        }
+
         return app(\Statamic\Contracts\Routing\UrlBuilder::class)
             ->content($entry)
             ->merge([
                 'parent_uri' => $parent ? $parent->uri() : null,
                 'slug' => $entry->slug(),
-                // 'depth' => '', // todo
+                'depth' => $parent ? $parent->depth() + 1 : 1,
                 'is_root' => false,
             ])
             ->build($entry->route());

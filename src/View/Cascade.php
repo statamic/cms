@@ -154,12 +154,12 @@ class Cascade
 
     protected function hydrateContent()
     {
-        if (! $this->content) {
-            return $this;
-        }
-
         if ($this->content instanceof \Closure) {
             $this->content = call_user_func($this->content);
+        }
+
+        if (! $this->content) {
+            return $this;
         }
 
         $variables = $this->content instanceof Augmentable

@@ -169,6 +169,7 @@ return [
     'date_fieldtype_time_required' => 'Time is required.',
     'duplicate_field_handle' => 'A field with a handle of :handle already exists.',
     'duplicate_uri' => 'Duplicate URI :value',
+    'elevated_session_resend_code_unavailable' => 'Resend code is only available for verification code method.',
     'elevated_session_verification_code' => 'The verification code is incorrect.',
     'email_available' => 'A user with this email already exists.',
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',

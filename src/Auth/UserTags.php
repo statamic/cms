@@ -102,7 +102,10 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
-        $data = $this->getFormSession();
+        $data = array_merge($this->getFormSession(), [
+            'passkey_options_url' => route('statamic.passkeys.options'),
+            'passkey_verify_url' => route('statamic.passkeys.login'),
+        ]);
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect', 'two_factor_challenge_url', 'two_factor_setup_url'];
 
@@ -301,6 +304,112 @@ class UserTags extends Tags
     public function registrationForm()
     {
         return $this->registerForm();
+    }
+
+    /**
+     * Output a passkey registration form.
+     *
+     * Maps to {{ user:passkey_form }}
+     *
+     * @return string
+     */
+    public function passkeyForm()
+    {
+        $data = [
+            'passkey_options_url' => route('statamic.passkeys.create'),
+            'passkey_verify_url' => route('statamic.passkeys.store'),
+        ];
+
+        if (! $this->canParseContents()) {
+            return $data;
+        }
+
+        return $this->parse($data);
+    }
+
+    /**
+     * Output the current user's passkeys.
+     *
+     * Maps to {{ user:passkeys }}
+     *
+     * @return string
+     */
+    public function passkeys()
+    {
+        if (! $user = User::current()) {
+            return $this->canParseContents() ? $this->parseNoResults() : [];
+        }
+
+        $passkeys = $user->passkeys()->map(function ($passkey) {
+            return [
+                'id' => $passkey->id(),
+                'name' => $passkey->name(),
+                'last_login' => $passkey->lastLogin(),
+            ];
+        })->values()->all();
+
+        if (! $this->canParseContents()) {
+            return $passkeys;
+        }
+
+        if (empty($passkeys)) {
+            return $this->parseNoResults();
+        }
+
+        return $this->parseLoop($passkeys);
+    }
+
+    /**
+     * Output a delete passkey form.
+     *
+     * Maps to {{ user:delete_passkey_form }}
+     *
+     * @return string
+     */
+    public function deletePasskeyForm()
+    {
+        if (! $user = User::current()) {
+            return '';
+        }
+
+        $id = $this->params->get('id');
+
+        if (! $id || ! $user->passkeys()->get($id)) {
+            return '';
+        }
+
+        $action = route('statamic.passkeys.destroy', ['id' => $id]);
+        $method = 'POST';
+
+        $knownParams = ['id', 'redirect'];
+
+        $params = [];
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if (! $this->canParseContents()) {
+            return [
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => array_merge(
+                    $this->formMetaPrefix($this->formParams($method, $params)),
+                    ['_method' => 'DELETE']
+                ),
+            ];
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= '<input type="hidden" name="_method" value="DELETE" />';
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse([]);
+
+        $html .= $this->formClose();
+
+        return $html;
     }
 
     /**
@@ -637,6 +746,53 @@ class UserTags extends Tags
         }
 
         return $in ? null : $this->parse();
+    }
+
+    /**
+     * Output an elevated session form.
+     *
+     * Maps to {{ user:elevated_session_form }}
+     *
+     * @return string
+     */
+    public function elevatedSessionForm()
+    {
+        if (! ($user = User::current())) {
+            return;
+        }
+
+        $method = $user->getElevatedSessionMethod();
+
+        if ($method === 'verification_code') {
+            session()->sendElevatedSessionVerificationCodeIfRequired();
+        }
+
+        $data = [
+            ...$this->getFormSession('user.elevated_session'),
+            'method' => $method,
+            'allow_passkey' => $method !== 'verification_code' && $user->passkeys()->isNotEmpty(),
+            'resend_code_url' => route('statamic.elevated-session.resend-code'),
+            'passkey_options_url' => route('statamic.elevated-session.passkey-options'),
+            'submit_url' => route('statamic.elevated-session.confirm'),
+        ];
+
+        $action = route('statamic.elevated-session.confirm');
+        $method = 'POST';
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method),
+                'params' => $this->formMetaPrefix($this->formParams($method)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
     }
 
     /**

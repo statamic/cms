@@ -805,7 +805,7 @@ abstract class Builder implements Contract
 
         $pattern = Pattern::sqlLikeToRegex($like);
 
-        return preg_match('/'.$pattern.'/im', (string) $item);
+        return preg_match('/'.$pattern.'/imu', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)
@@ -815,7 +815,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", (string) $item);
+        return preg_match("/{$pattern}/imu", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)

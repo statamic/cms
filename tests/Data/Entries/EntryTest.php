@@ -1430,7 +1430,6 @@ class EntryTest extends TestCase
         $cached = Cache::get('stache::items::entries::blog::1');
         $reflection = new ReflectionClass($cached);
         $property = $reflection->getProperty('withEvents');
-        $property->setAccessible(true);
         $withEvents = $property->getValue($cached);
         $this->assertTrue($withEvents);
     }

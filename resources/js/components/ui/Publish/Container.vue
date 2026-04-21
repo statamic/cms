@@ -6,13 +6,13 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 
 <script setup>
 import { nanoid as uniqid } from 'nanoid';
-import { watch, ref, computed, toRef, nextTick } from 'vue';
+import { onMounted, onUnmounted, watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
 
-const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
 const props = defineProps({
     name: {
@@ -179,6 +179,12 @@ watch(
     { deep: true },
 );
 
+watch(
+    meta,
+    (meta) => emit('update:meta', meta),
+    { deep: true },
+);
+
 const avoidTrackingDirtyState = ref(false);
 const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
 const isDirty = computed(() => Statamic.$dirty.has(props.name));
@@ -210,6 +216,10 @@ function setFieldValue(path, value) {
     data_set(values.value, path, value);
 }
 
+function setMeta(newMeta) {
+    meta.value = newMeta;
+}
+
 function setFieldMeta(path, value) {
     data_set(meta.value, path, value);
 }
@@ -234,6 +244,30 @@ function addLocalizedField(path) {
 function removeLocalizedField(path) {
     const index = localizedFields.value.indexOf(path);
     if (index !== -1) localizedFields.value.splice(index, 1);
+}
+
+const fieldFocus = ref({});
+
+const fieldLocks = computed(() => {
+    const locks = {};
+    for (const { handle, user } of Object.values(fieldFocus.value)) {
+        if (!locks[handle]) {
+            locks[handle] = user;
+        }
+    }
+    return locks;
+});
+
+function focusField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('focusField only supports top-level fields.');
+    fieldFocus.value[user.id] = { handle, user };
+}
+
+function blurField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('blurField only supports top-level fields.');
+    if (fieldFocus.value[user.id]?.handle === handle) {
+        delete fieldFocus.value[user.id];
+    }
 }
 
 function pushComponent(name, { props }) {
@@ -273,11 +307,16 @@ const builtInProvides = {
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
+    setMeta,
     setFieldMeta,
     setFieldPreviewValue,
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    fieldFocus,
+    fieldLocks,
+    focusField,
+    blurField,
     isDirty,
     withoutDirtying,
 };
@@ -294,6 +333,28 @@ const provided = { ...additionalProvides, ...builtInProvides };
 
 provideContainerContext({ ...provided, container: provided });
 
+onMounted(() => {
+    Statamic.$events.$emit('publish-container-created', {
+        name: props.name,
+        reference: props.reference,
+        site: props.site,
+        values,
+        setFieldValue,
+        setValues,
+        meta,
+        setMeta,
+        setFieldMeta,
+        pushComponent,
+        fieldFocus,
+        focusField,
+        blurField,
+    });
+});
+
+onUnmounted(() => {
+    Statamic.$events.$emit('publish-container-destroyed', { name: props.name });
+});
+
 defineExpose({
     name: props.name,
     values,
@@ -306,6 +367,7 @@ defineExpose({
     pushComponent,
     visibleValues,
     setValues,
+    setMeta,
     setExtraValues,
 });
 
