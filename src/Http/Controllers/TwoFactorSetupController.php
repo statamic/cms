@@ -19,14 +19,15 @@ class TwoFactorSetupController extends Controller
     public function __invoke(Request $request)
     {
         $user = User::fromUser($request->user());
+        $redirect = $this->redirectPath();
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
-            return redirect($this->redirectPath());
+            return redirect($redirect);
         }
 
         return Inertia::render('auth/two-factor/Setup', [
             'routes' => $this->routes($user),
-            'redirect' => $this->redirectPath(),
+            'redirect' => $redirect,
         ]);
     }
 
@@ -38,7 +39,7 @@ class TwoFactorSetupController extends Controller
             }
         }
 
-        if ($redirect = session('login.redirect')) {
+        if ($redirect = session()->pull('login.redirect')) {
             if (! URL::isExternalToApplication($redirect)) {
                 return $redirect;
             }
