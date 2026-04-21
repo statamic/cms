@@ -78,6 +78,7 @@ onBeforeUnmount(() => {
             :value="modelValue"
             :disabled="disabled"
             :readonly="readOnly"
+            :required="required"
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />

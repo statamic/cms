@@ -3,7 +3,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import LogicFlowMock from './LogicFlowMock.vue';
-import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
@@ -432,16 +432,39 @@ const notificationOptions = [
                                         class="[&_svg]:opacity-45"
                                     />
                                 </div>
-                                <Field :label="__('What do you like most about our band?')" required>
+                                <Field :label="__('What do you like most about our band?')">
+                                    <template #label>
+                                        <Label for="favorite-thing-field">
+                                            <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                                {{ __('What do you like most about our band?') }}
+                                                <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                                <span class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 lowercase">
+                                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                                    {{ __('Fieldset') }}
+                                                </span>
+                                            </span>
+                                        </Label>
+                                    </template>
                                     <!-- TODO: Add logic tree icon for fields with logic -->
                                     <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                                    <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                                    <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
                                 </Field>
                             </div>
                         </div>
 
                         <div id="fieldset-end">
                             <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                                <template #label>
+                                    <Label for="">
+                                        <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                            {{ __('How long have you been a fan?') }}
+                                            <span class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 lowercase">
+                                                <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                                {{ __('Fieldset') }}
+                                            </span>
+                                        </span>
+                                    </Label>
+                                </template>
                                 <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                 <Input v-model="fanLength" />
                             </Field>
