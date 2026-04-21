@@ -393,8 +393,9 @@ const notificationOptions = [
 
             <Card>
                 <div class="space-y-7">
-                    <Field :label="__('How did you hear about us?')" required>
+                    <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
                         <Select
+                            id="heard-about-field"
                             v-model="heardAboutValue"
                             :options="heardAboutOptions"
                             option-label="label"
@@ -455,7 +456,7 @@ const notificationOptions = [
                         <div id="fieldset-end">
                             <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
                                 <template #label>
-                                    <Label for="">
+                                    <Label for="fan-length-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                             {{ __('How long have you been a fan?') }}
                                             <span class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 lowercase">
@@ -466,7 +467,7 @@ const notificationOptions = [
                                     </Label>
                                 </template>
                                 <Icon name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                                <Input v-model="fanLength" />
+                                <Input id="fan-length-field" v-model="fanLength" />
                             </Field>
                         </div>
                     </div>
@@ -508,8 +509,8 @@ const notificationOptions = [
                         </Field>
 
                         <div id="fieldset-end">
-                            <Field :label="__('How old are you?')">
-                                <Input v-model="age" type="number" />
+                            <Field id="age-field" :label="__('How old are you?')">
+                                <Input id="age-field" v-model="age" type="number" />
                             </Field>
                         </div>
                     </div>
