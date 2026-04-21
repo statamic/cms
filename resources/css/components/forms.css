@@ -1,4 +1,4 @@
-/* GROUP FIELD BACKGROUND
+/* GROUP MAIN COLUMN / FIELD BACKGROUND
 =================================================== */
 [data-editing-field] {
     position: relative;
@@ -21,7 +21,30 @@
 }
 
 
-/* GROUP FIELD DIRECTION
+/* GROUP MAIN COLUMN / FIELDSETS
+=================================================== */
+#fieldset-start {
+    anchor-name: --fieldset-start;
+
+    /* The connector */
+    &::before {
+        content: '';
+        position: absolute;
+        width: 3rem;
+        top: calc(anchor(--fieldset-start top) + 0.5rem);
+        left: calc(anchor(--fieldset-start left) - 2rem);
+        bottom: anchor(--fieldset-end bottom);
+        border-radius: 10px;
+        border: 1px dashed var(--color-indigo-500);
+        clip-path: polygon(0 0, 30% 0, 30% 100%, 0 100%);
+    }
+}
+#fieldset-end {
+    anchor-name: --fieldset-end;
+}
+
+
+/* GROUP SIDEBAR / FIELD DIRECTION
 =================================================== */
 #main-content {
     timeline-scope: --editing-field-scroll;
@@ -64,10 +87,7 @@
 }
 
 
-/* GROUP LOGIC TEXT
-=================================================== */
-
-/* GROUP LOGIC TEXT / VERTICAL
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / LAYOUT
 =================================================== */
 .logic-text {
     --inner-indent: 1.75rem;
@@ -143,7 +163,7 @@
     text-overflow: ellipsis;
 }
 
-/* GROUP LOGIC TEXT / VERTICAL / LOGIC CONNECTORS
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / CONNECTORS
 =================================================== */
 .logic-text {
     --logic-line: 1px dashed var(--color-gray-400);
