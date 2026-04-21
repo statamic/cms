@@ -439,7 +439,7 @@ const notificationOptions = [
                                             <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                                 {{ __('What do you like most about our band?') }}
                                                 <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                                <span class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 lowercase">
+                                                <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
                                                     <Icon name="link" class="size-3.5" aria-hidden="true" />
                                                     {{ __('Fieldset') }}
                                                 </span>
@@ -459,7 +459,7 @@ const notificationOptions = [
                                     <Label for="fan-length-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                             {{ __('How long have you been a fan?') }}
-                                            <span class="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 lowercase">
+                                            <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
                                                 <Icon name="link" class="size-3.5" aria-hidden="true" />
                                                 {{ __('Fieldset') }}
                                             </span>
@@ -486,6 +486,17 @@ const notificationOptions = [
                     <div data-fieldset-group class="space-y-7">
                         <div id="fieldset-start">
                             <Field :label="__('Which album was your second favorite?')">
+                                <template #label>
+                                    <Label>
+                                        <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                            {{ __('Which album was your second favorite?') }}
+                                            <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
+                                                <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                                {{ __('Fieldset') }}
+                                            </span>
+                                        </span>
+                                    </Label>
+                                </template>
                                 <RadioGroup v-model="secondFavoriteAlbum">
                                     <Radio
                                         v-for="album in albumOptions"
@@ -498,6 +509,17 @@ const notificationOptions = [
                         </div>
 
                         <Field :label="__('Sign up for email notifications from The Midnight')">
+                            <template #label>
+                                <Label>
+                                    <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                        {{ __('Sign up for email notifications from The Midnight') }}
+                                        <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
+                                            <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                            {{ __('Fieldset') }}
+                                        </span>
+                                    </span>
+                                </Label>
+                            </template>
                             <CheckboxGroup v-model="emailNotifications">
                                 <Checkbox
                                     v-for="notification in notificationOptions"
@@ -510,6 +532,17 @@ const notificationOptions = [
 
                         <div id="fieldset-end">
                             <Field id="age-field" :label="__('How old are you?')">
+                                <template #label>
+                                    <Label for="age-field">
+                                        <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                            {{ __('How old are you?') }}
+                                            <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
+                                                <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                                {{ __('Fieldset') }}
+                                            </span>
+                                        </span>
+                                    </Label>
+                                </template>
                                 <Input id="age-field" v-model="age" type="number" />
                             </Field>
                         </div>
