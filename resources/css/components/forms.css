@@ -111,20 +111,22 @@
     @apply
         py-2 px-3.5
         bg-content-bg
+        text-gray-800
+        dark:text-gray-300
         rounded-full
         text-sm
+        shadow-ui-sm
+        dark:border-1 dark:border-gray-600
     ;
     display: inline-block;
     user-select: none;
     text-align: center;
-    color: var(--color-gray-800);
-    box-shadow: var(--shadow-ui-sm);
 }
 
 .logic-text__pill {
     display: flex;
     align-items: center;
-    @apply gap-1 rounded-full bg-white px-3 py-2 shadow-ui-sm;
+    @apply gap-1 rounded-full bg-content-bg px-3 py-2 shadow-ui-sm dark:border-1 dark:border-gray-600;
 }
 
 .logic-text__pill-icon {
