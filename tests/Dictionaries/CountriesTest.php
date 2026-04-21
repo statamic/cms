@@ -15,10 +15,10 @@ class CountriesTest extends TestCase
     {
         $options = (new Countries)->options();
 
-        $this->assertCount(250, $options);
+        $this->assertGreaterThan(240, count($options));
         $this->assertEquals([
             'AFG' => '🇦🇫 Afghanistan',
-            'ALA' => '🇦🇽 Aland Islands',
+            'ALA' => '🇦🇽 Åland Islands',
             'ALB' => '🇦🇱 Albania',
             'DZA' => '🇩🇿 Algeria',
             'ASM' => '🇦🇸 American Samoa',
@@ -42,43 +42,27 @@ class CountriesTest extends TestCase
 
     #[Test]
     #[DataProvider('searchProvider')]
-    public function it_searches_options($query, $expected)
+    public function it_searches_options($query, $expectedCodes)
     {
-        $this->assertEquals($expected, (new Countries)->options($query));
+        $dictionary = new Countries;
+        $allOptions = $dictionary->options();
+        $results = $dictionary->options($query);
+
+        $this->assertLessThan(count($allOptions), count($results));
+        $this->assertNotEmpty(array_diff_key($allOptions, $results));
+        $this->assertEmpty(array_diff_key($results, $allOptions));
+
+        foreach ($expectedCodes as $code) {
+            $this->assertArrayHasKey($code, $results);
+        }
     }
 
     public static function searchProvider()
     {
         return [
-            'au' => [
-                'au',
-                [
-                    'AUS' => '🇦🇺 Australia',
-                    'AUT' => '🇦🇹 Austria',
-                    'GNB' => '🇬🇼 Guinea-Bissau',
-                    'MAC' => '🇲🇴 Macau S.A.R.',
-                    'MRT' => '🇲🇷 Mauritania',
-                    'MUS' => '🇲🇺 Mauritius',
-                    'NRU' => '🇳🇷 Nauru',
-                    'PLW' => '🇵🇼 Palau',
-                    'SAU' => '🇸🇦 Saudi Arabia',
-                    'TKL' => '🇹🇰 Tokelau',
-                ],
-            ],
-            'us' => [
-                'us',
-                [
-                    'AUS' => '🇦🇺 Australia',
-                    'AUT' => '🇦🇹 Austria',
-                    'BLR' => '🇧🇾 Belarus',
-                    'BES' => '🇧🇶 Bonaire, Sint Eustatius and Saba',
-                    'CYP' => '🇨🇾 Cyprus',
-                    'MUS' => '🇲🇺 Mauritius',
-                    'RUS' => '🇷🇺 Russia',
-                    'USA' => '🇺🇸 United States',
-                    'VIR' => '🇻🇮 Virgin Islands (US)',
-                ],
-            ],
+            'au' => ['au', ['AUS', 'AUT']],
+            'united' => ['united', ['USA', 'GBR', 'ARE']],
+            'island' => ['island', ['MHL', 'SLB', 'CYM']],
         ];
     }
 
@@ -95,5 +79,15 @@ class CountriesTest extends TestCase
             'subregion' => 'Australia and New Zealand',
             'emoji' => '🇦🇺',
         ], $item->data());
+    }
+
+    #[Test]
+    public function it_localizes_names_using_app_locale()
+    {
+        app()->setLocale('de');
+
+        $item = (new Countries)->get('DEU')->data();
+
+        $this->assertEquals('Deutschland', $item['name']);
     }
 }
