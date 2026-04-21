@@ -59,7 +59,7 @@ class TwoFactorAuthenticationController extends CpController
 
         $disable($user);
 
-        if (! $request->has('_redirect') && ! $request->has('_setup_url')) {
+        if (! $request->has('_redirect')) {
             if ($user->isTwoFactorAuthenticationRequired()) {
                 return ['redirect' => $this->setupUrlRedirect()];
             }
@@ -68,33 +68,11 @@ class TwoFactorAuthenticationController extends CpController
         }
 
         if ($user->isTwoFactorAuthenticationRequired()) {
-            $this->storeSetupUrlInSession($request);
-
-            return redirect($this->getSetupUrl($request))
+            return redirect($this->setupUrlRedirect())
                 ->with('success', __('Two-factor authentication disabled.'));
         }
 
         return $this->formSuccessRedirect($request, __('Two-factor authentication disabled.'));
-    }
-
-    private function getSetupUrl(Request $request): string
-    {
-        $setupUrl = $request->input('_setup_url');
-
-        if ($setupUrl && ! URL::isExternalToApplication($setupUrl)) {
-            return $setupUrl;
-        }
-
-        return $this->setupUrlRedirect();
-    }
-
-    private function storeSetupUrlInSession(Request $request): void
-    {
-        $setupUrl = $request->input('_setup_url');
-
-        if ($setupUrl && ! URL::isExternalToApplication($setupUrl)) {
-            $request->session()->put('login.two_factor_setup_url', $setupUrl);
-        }
     }
 
     private function handleFormValidationError(Request $request, ValidationException $e)
@@ -132,6 +110,6 @@ class TwoFactorAuthenticationController extends CpController
 
     protected function setupUrlRedirect()
     {
-        return route('statamic.two-factor-setup');
+        return config('statamic.users.two_factor_setup_url') ?? route('statamic.two-factor-setup');
     }
 }

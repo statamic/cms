@@ -124,20 +124,35 @@ class TwoFactorChallengeFormTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_back_with_errors_on_invalid_code()
+    public function it_redirects_to_configured_challenge_url_on_invalid_code()
     {
+        config(['statamic.users.two_factor_challenge_url' => '/two-factor-challenge']);
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this
-            ->session([
-                'login.id' => $user->id(),
-                'login.two_factor_challenge_url' => '/two-factor-challenge',
-            ])
+            ->session(['login.id' => $user->id()])
             ->post(route('statamic.two-factor-challenge'), [
                 'code' => '123456',
                 '_redirect' => '/dashboard',
             ])
             ->assertRedirect('/two-factor-challenge')
+            ->assertSessionHasErrors('code');
+
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_redirects_to_default_challenge_route_on_invalid_code_without_config()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session(['login.id' => $user->id()])
+            ->post(route('statamic.two-factor-challenge'), [
+                'code' => '123456',
+            ])
+            ->assertRedirect(route('statamic.two-factor-challenge'))
             ->assertSessionHasErrors('code');
 
         $this->assertGuest();

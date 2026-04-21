@@ -37,18 +37,6 @@ class DisableTwoFactorFormTest extends TestCase
     }
 
     #[Test]
-    public function it_renders_with_setup_url()
-    {
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this->actingAs($user);
-
-        $output = $this->tag('{{ user:disable_two_factor_form setup_url="/auth/setup-2fa" }}{{ /user:disable_two_factor_form }}');
-
-        $this->assertStringContainsString('<input type="hidden" name="_setup_url" value="/auth/setup-2fa" />', $output);
-    }
-
-    #[Test]
     public function it_does_not_render_for_user_without_2fa()
     {
         $user = $this->user();
@@ -110,6 +98,42 @@ class DisableTwoFactorFormTest extends TestCase
                 '_redirect' => '/account',
             ])
             ->assertRedirect(route('statamic.elevated-session'));
+    }
+
+    #[Test]
+    public function it_redirects_to_configured_setup_url_when_2fa_is_enforced()
+    {
+        config([
+            'statamic.users.two_factor_enforced_roles' => ['*'],
+            'statamic.users.two_factor_setup_url' => '/auth/setup-2fa',
+        ]);
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
+            ->delete(route('statamic.users.two-factor.disable'), [
+                '_redirect' => '/account',
+            ])
+            ->assertRedirect('/auth/setup-2fa')
+            ->assertSessionHas('success');
+    }
+
+    #[Test]
+    public function it_falls_back_to_default_setup_route_when_no_config_and_2fa_is_enforced()
+    {
+        config(['statamic.users.two_factor_enforced_roles' => ['*']]);
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
+            ->delete(route('statamic.users.two-factor.disable'), [
+                '_redirect' => '/account',
+            ])
+            ->assertRedirect(route('statamic.two-factor-setup'));
     }
 
     #[Test]

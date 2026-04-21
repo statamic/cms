@@ -5,7 +5,6 @@ namespace Statamic\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Statamic\Facades\TwoFactor;
-use Statamic\Facades\URL;
 use Statamic\Facades\User;
 
 class RedirectIfTwoFactorSetupIncomplete
@@ -27,28 +26,20 @@ class RedirectIfTwoFactorSetupIncomplete
 
     protected function isSetupUrl(Request $request): bool
     {
-        $currentPath = '/'.ltrim($request->path(), '/');
-
-        // Check if we're on the custom setup URL from session.
-        if ($request->hasSession() && ($customUrl = $request->session()->get('login.two_factor_setup_url'))) {
-            if (! URL::isExternalToApplication($customUrl)) {
-                $customPath = '/'.ltrim(parse_url($customUrl, PHP_URL_PATH), '/');
-
-                if ($currentPath === $customPath) {
-                    return true;
-                }
-            }
+        if (! $customUrl = config('statamic.users.two_factor_setup_url')) {
+            return false;
         }
 
-        return false;
+        $currentPath = '/'.ltrim($request->path(), '/');
+        $customPath = '/'.ltrim(parse_url($customUrl, PHP_URL_PATH) ?? '', '/');
+
+        return $currentPath === $customPath;
     }
 
     protected function redirectUrl(Request $request): string
     {
-        if ($request->hasSession() && ($url = $request->session()->get('login.two_factor_setup_url'))) {
-            if (! URL::isExternalToApplication($url)) {
-                return $url;
-            }
+        if ($url = config('statamic.users.two_factor_setup_url')) {
+            return $url;
         }
 
         return route($this->redirectRoute(), [

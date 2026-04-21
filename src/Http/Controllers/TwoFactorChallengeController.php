@@ -52,8 +52,6 @@ class TwoFactorChallengeController extends Controller
 
         Auth::guard()->login($user, $request->remember());
 
-        $this->clearTwoFactorSession($request);
-
         $request->session()->elevate();
 
         $request->session()->regenerate();
@@ -75,19 +73,7 @@ class TwoFactorChallengeController extends Controller
             }
         }
 
-        if ($challengeUrl = $request->session()->get('login.two_factor_challenge_url')) {
-            return $request->sendFailedTwoFactorChallengeResponse($challengeUrl);
-        }
-
         return $request->sendFailedTwoFactorChallengeResponse($this->failedRedirectPath());
-    }
-
-    protected function clearTwoFactorSession(Request $request): void
-    {
-        $request->session()->forget([
-            'login.two_factor_challenge_url',
-            'login.two_factor_setup_url',
-        ]);
     }
 
     protected function formAction()
@@ -114,6 +100,6 @@ class TwoFactorChallengeController extends Controller
 
     protected function failedRedirectPath()
     {
-        return route('statamic.two-factor-challenge');
+        return config('statamic.users.two_factor_challenge_url') ?? route('statamic.two-factor-challenge');
     }
 }

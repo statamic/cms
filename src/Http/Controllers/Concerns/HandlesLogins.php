@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\Concerns;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -66,16 +65,6 @@ trait HandlesLogins
             'login.remember' => $request->boolean('remember'),
         ];
 
-        if ($challengeUrl = $request->input('_two_factor_challenge_url')) {
-            if (! URL::isExternalToApplication($challengeUrl)) {
-                $session['login.two_factor_challenge_url'] = $challengeUrl;
-            }
-        }
-
-        if ($setupUrl = $this->decryptSetupUrl($request->input('_two_factor_setup_url'))) {
-            $session['login.two_factor_setup_url'] = $setupUrl;
-        }
-
         if ($redirect = $request->input('_redirect')) {
             if (! URL::isExternalToApplication($redirect)) {
                 $session['login.redirect'] = $redirect;
@@ -86,14 +75,9 @@ trait HandlesLogins
 
         TwoFactorAuthenticationChallenged::dispatch($user);
 
-        $challengeRedirect = ($challengeUrl = $request->input('_two_factor_challenge_url'))
-            && ! URL::isExternalToApplication($challengeUrl)
-            ? $challengeUrl
-            : $this->twoFactorChallengeRedirect();
-
         return $request->wantsJson()
             ? response()->json(['two_factor' => true])
-            : redirect($challengeRedirect);
+            : redirect($this->twoFactorChallengeRedirect());
     }
 
     abstract protected function twoFactorChallengeRedirect(): string;
@@ -105,20 +89,5 @@ trait HandlesLogins
         $request->session()->elevate();
 
         $request->session()->regenerate();
-    }
-
-    private function decryptSetupUrl(?string $value): ?string
-    {
-        if (! $value) {
-            return null;
-        }
-
-        try {
-            $url = decrypt($value);
-        } catch (DecryptException $e) {
-            return null;
-        }
-
-        return URL::isExternalToApplication($url) ? null : $url;
     }
 }

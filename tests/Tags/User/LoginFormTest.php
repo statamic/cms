@@ -329,9 +329,11 @@ EOT
     }
 
     #[Test]
-    public function it_redirects_to_custom_two_factor_challenge_url()
+    public function it_redirects_to_configured_two_factor_challenge_url()
     {
         Event::fake();
+
+        config(['statamic.users.two_factor_challenge_url' => '/custom-2fa-challenge']);
 
         User::make()
             ->id(1)
@@ -352,26 +354,11 @@ EOT
                 'token' => 'test-token',
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
-                '_two_factor_challenge_url' => '/custom-2fa-challenge',
             ])
             ->assertRedirect('/custom-2fa-challenge')
-            ->assertSessionHas('login.id', 1)
-            ->assertSessionHas('login.two_factor_challenge_url', '/custom-2fa-challenge');
+            ->assertSessionHas('login.id', 1);
 
         Event::assertDispatched(TwoFactorAuthenticationChallenged::class);
-    }
-
-    #[Test]
-    public function it_renders_form_with_two_factor_params()
-    {
-        $output = $this->tag('{{ user:login_form two_factor_challenge_url="/auth/verify" two_factor_setup_url="/auth/setup-2fa" }}{{ /user:login_form }}');
-
-        $this->assertStringContainsString('<input type="hidden" name="_two_factor_challenge_url" value="/auth/verify" />', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_two_factor_setup_url"', $output);
-        $this->assertStringNotContainsString('value="/auth/setup-2fa"', $output);
-
-        preg_match('/name="_two_factor_setup_url" value="([^"]+)"/', $output, $matches);
-        $this->assertEquals('/auth/setup-2fa', decrypt($matches[1]));
     }
 
     #[Test]
@@ -396,61 +383,8 @@ EOT
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
                 '_redirect' => '/dashboard',
-                '_two_factor_challenge_url' => '/custom-2fa',
             ])
             ->assertSessionHas('login.redirect', '/dashboard');
-    }
-
-    #[Test]
-    public function it_stores_setup_url_in_session_for_two_factor_challenge()
-    {
-        User::make()
-            ->id(1)
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->data([
-                'two_factor_confirmed_at' => now()->timestamp,
-                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
-                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
-                    return RecoveryCode::generate();
-                })->all())),
-            ])
-            ->save();
-
-        $this
-            ->post('/!/auth/login', [
-                'token' => 'test-token',
-                'email' => 'san@holo.com',
-                'password' => 'chewy',
-                '_two_factor_setup_url' => encrypt('/custom-2fa-setup'),
-            ])
-            ->assertSessionHas('login.two_factor_setup_url', '/custom-2fa-setup');
-    }
-
-    #[Test]
-    public function it_does_not_store_unencrypted_setup_url_in_session()
-    {
-        User::make()
-            ->id(1)
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->data([
-                'two_factor_confirmed_at' => now()->timestamp,
-                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
-                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
-                    return RecoveryCode::generate();
-                })->all())),
-            ])
-            ->save();
-
-        $this
-            ->post('/!/auth/login', [
-                'token' => 'test-token',
-                'email' => 'san@holo.com',
-                'password' => 'chewy',
-                '_two_factor_setup_url' => '/custom-2fa-setup',
-            ])
-            ->assertSessionMissing('login.two_factor_setup_url');
     }
 
     #[Test]

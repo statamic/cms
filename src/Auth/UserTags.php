@@ -107,7 +107,7 @@ class UserTags extends Tags
             'passkey_verify_url' => route('statamic.passkeys.login'),
         ]);
 
-        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect', 'two_factor_challenge_url', 'two_factor_setup_url'];
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
         $action = route('statamic.login');
         $method = 'POST';
@@ -120,14 +120,6 @@ class UserTags extends Tags
 
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
-        }
-
-        if ($twoFactorChallengeUrl = $this->params->get('two_factor_challenge_url')) {
-            $params['two_factor_challenge_url'] = $twoFactorChallengeUrl;
-        }
-
-        if ($twoFactorSetupUrl = $this->params->get('two_factor_setup_url')) {
-            $params['two_factor_setup_url'] = encrypt($twoFactorSetupUrl);
         }
 
         if (! $this->canParseContents()) {
@@ -1034,17 +1026,13 @@ class UserTags extends Tags
 
         $data = $this->getFormSession();
 
-        $knownParams = ['redirect', 'allow_request_redirect', 'setup_url'];
+        $knownParams = ['redirect', 'allow_request_redirect'];
 
         $method = 'DELETE';
         $action = route('statamic.users.two-factor.disable');
 
         if ($redirect = $this->getRedirectUrl()) {
             $params['redirect'] = $this->parseRedirect($redirect);
-        }
-
-        if ($setupUrl = $this->params->get('setup_url')) {
-            $params['setup_url'] = $setupUrl;
         }
 
         if (! $this->canParseContents()) {

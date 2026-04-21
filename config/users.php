@@ -213,6 +213,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Two-Factor Authentication URLs
+    |--------------------------------------------------------------------------
+    |
+    | When users log in to the frontend and need to verify a two-factor code
+    | or set up two-factor authentication, they will be redirected to these
+    | URLs. Leave null to use the built-in pages. Control panel flows are
+    | unaffected and always use their own pages.
+    |
+    */
+
+    'two_factor_challenge_url' => null,
+
+    'two_factor_setup_url' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Sorting
     |--------------------------------------------------------------------------
     |
