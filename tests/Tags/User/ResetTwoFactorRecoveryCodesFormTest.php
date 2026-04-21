@@ -77,6 +77,7 @@ class ResetTwoFactorRecoveryCodesFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
             ->post(route('statamic.users.two-factor.recovery-codes.generate'), [
                 '_redirect' => '/recovery-codes',
             ])
@@ -89,12 +90,26 @@ class ResetTwoFactorRecoveryCodesFormTest extends TestCase
     }
 
     #[Test]
+    public function it_requires_elevated_session_to_regenerate()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->post(route('statamic.users.two-factor.recovery-codes.generate'), [
+                '_redirect' => '/recovery-codes',
+            ])
+            ->assertRedirect(route('statamic.elevated-session'));
+    }
+
+    #[Test]
     public function it_redirects_back_without_redirect_param()
     {
         $user = $this->userWithTwoFactorEnabled();
 
         $this
             ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
             ->from('/account/security')
             ->post(route('statamic.users.two-factor.recovery-codes.generate'), [
                 '_redirect' => '/account/security',

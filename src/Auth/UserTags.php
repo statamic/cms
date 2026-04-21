@@ -869,7 +869,8 @@ class UserTags extends Tags
 
         if (
             ! TwoFactor::enabled()
-            || ! $user->hasEnabledTwoFactorAuthentication()
+            || ! $user
+            || $user->hasEnabledTwoFactorAuthentication()
         ) {
             return;
         }
@@ -931,7 +932,7 @@ class UserTags extends Tags
 
         if (
             ! TwoFactor::enabled()
-            || ! $user->hasEnabledTwoFactorAuthentication()
+            || ! $user?->hasEnabledTwoFactorAuthentication()
         ) {
             return $this->parser ? null : [];
         }

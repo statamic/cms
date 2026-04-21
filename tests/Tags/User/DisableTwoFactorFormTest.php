@@ -89,6 +89,7 @@ class DisableTwoFactorFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
             ->delete(route('statamic.users.two-factor.disable'), [
                 '_redirect' => '/account',
             ])
@@ -99,13 +100,29 @@ class DisableTwoFactorFormTest extends TestCase
     }
 
     #[Test]
+    public function it_requires_elevated_session_to_disable()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->delete(route('statamic.users.two-factor.disable'), [
+                '_redirect' => '/account',
+            ])
+            ->assertRedirect(route('statamic.elevated-session'));
+    }
+
+    #[Test]
     public function it_uses_login_redirect_from_session_when_no_redirect_param()
     {
         $user = $this->userWithTwoFactorEnabled();
 
         $this
             ->actingAs($user)
-            ->session(['login.redirect' => '/dashboard'])
+            ->session([
+                'statamic_elevated_session' => now()->timestamp,
+                'login.redirect' => '/dashboard',
+            ])
             ->delete(route('statamic.users.two-factor.disable'), [
                 '_redirect' => '/account',
             ])
