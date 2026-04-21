@@ -221,8 +221,28 @@ const logicJoinOptions = [
                             </template>
                         </Combobox>
                     </li>
-                    
-                    
+                    <li>
+                        <Combobox
+                            v-model="logicOperator"
+                            size="sm"
+                            :options="logicOperatorOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Operator')"
+                            :searchable="false"
+                        />
+                    </li>
+                    <li>
+                        <Combobox
+                            v-model="logicValue"
+                            size="sm"
+                            :options="logicValueOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Value')"
+                            searchable
+                        />
+                    </li>
                 </ol>
             </li>
 
