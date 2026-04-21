@@ -664,6 +664,22 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_epoch_when_last_modified_meta_is_null()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [],
+        ]));
+
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        $lastModified = $asset->lastModified();
+        $this->assertInstanceOf(Carbon::class, $lastModified);
+        $this->assertEquals(0, $lastModified->timestamp);
+    }
+
+    #[Test]
     public function it_generates_and_clears_meta_caches()
     {
         Storage::fake('test');
