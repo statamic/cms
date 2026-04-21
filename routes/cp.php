@@ -443,11 +443,13 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
-    Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
-    Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
-    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
-    Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
-    Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+    if (config('statamic.users.elevated_sessions_enabled')) {
+        Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
+        Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+        Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
+        Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
+        Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+    }
 
     Route::get('playground', PlaygroundController::class)->name('playground');
 

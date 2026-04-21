@@ -322,6 +322,47 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_even_if_session_expired()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_via_json()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->getJson('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
     public function the_session_is_elevated_upon_login()
     {
         $this
@@ -647,7 +688,7 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function frontend_elevated_session_redirects_to_custom_url_when_configured()
     {
-        config(['statamic.users.elevated_session_url' => '/custom-elevated-session']);
+        config(['statamic.users.elevated_sessions_url' => '/custom-elevated-session']);
 
         $this
             ->actingAs($this->user)
@@ -658,7 +699,7 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function frontend_elevated_session_shows_inertia_page_when_no_custom_url()
     {
-        config(['statamic.users.elevated_session_url' => null]);
+        config(['statamic.users.elevated_sessions_url' => null]);
 
         $this
             ->actingAs($this->user)
@@ -735,7 +776,7 @@ class ElevatedSessionTest extends TestCase
     {
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
-        config(['statamic.users.elevated_session_url' => null]);
+        config(['statamic.users.elevated_sessions_url' => null]);
 
         $this
             ->actingAs($user = tap(User::make()->email('foo@bar.com')->makeSuper())->save())
