@@ -137,7 +137,7 @@ class DisableTwoFactorFormTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_login_redirect_from_session_when_no_redirect_param()
+    public function it_prefers_redirect_param_over_login_redirect_in_session()
     {
         $user = $this->userWithTwoFactorEnabled();
 
@@ -151,6 +151,37 @@ class DisableTwoFactorFormTest extends TestCase
                 '_redirect' => '/account',
             ])
             ->assertRedirect('/account');
+
+        $this->assertNull($user->fresh()->two_factor_confirmed_at);
+    }
+
+    #[Test]
+    public function it_redirects_back_without_redirect_param()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
+            ->from('/account')
+            ->delete(route('statamic.users.two-factor.disable'))
+            ->assertRedirect('/account')
+            ->assertSessionHas('success');
+
+        $this->assertNull($user->fresh()->two_factor_confirmed_at);
+    }
+
+    #[Test]
+    public function it_returns_json_for_xhr_requests()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
+            ->deleteJson(route('statamic.users.two-factor.disable'))
+            ->assertOk()
+            ->assertJson(['redirect' => null]);
 
         $this->assertNull($user->fresh()->two_factor_confirmed_at);
     }

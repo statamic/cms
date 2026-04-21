@@ -143,7 +143,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post($url(), [
+            ->postJson($url(), [
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertOk();

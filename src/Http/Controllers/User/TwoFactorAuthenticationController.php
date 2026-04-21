@@ -39,14 +39,14 @@ class TwoFactorAuthenticationController extends CpController
         try {
             $confirm($user, $request->input('code'));
         } catch (ValidationException $e) {
-            if (! $request->has('_redirect')) {
+            if ($request->expectsJson()) {
                 throw $e;
             }
 
             return $this->handleFormValidationError($request, $e);
         }
 
-        if (! $request->has('_redirect')) {
+        if ($request->expectsJson()) {
             return [];
         }
 
@@ -59,7 +59,7 @@ class TwoFactorAuthenticationController extends CpController
 
         $disable($user);
 
-        if (! $request->has('_redirect')) {
+        if ($request->expectsJson()) {
             if ($user->isTwoFactorAuthenticationRequired()) {
                 return ['redirect' => $this->setupUrlRedirect()];
             }
@@ -100,7 +100,7 @@ class TwoFactorAuthenticationController extends CpController
             }
         }
 
-        return redirect(route('statamic.site'))->with('success', $message);
+        return back()->with('success', $message);
     }
 
     protected function confirmUrl()

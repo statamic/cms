@@ -119,15 +119,34 @@ class TwoFactorSetupFormTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_home_without_redirect_param()
+    public function it_redirects_back_without_redirect_param()
     {
         $user = $this->userWithTwoFactorPending();
 
         $this
             ->actingAs($user)
+            ->from('/setup-2fa')
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
-            ]);
+            ])
+            ->assertRedirect('/setup-2fa')
+            ->assertSessionHas('success');
+
+        $this->assertNotNull($user->fresh()->two_factor_confirmed_at);
+    }
+
+    #[Test]
+    public function it_returns_json_for_xhr_requests()
+    {
+        $user = $this->userWithTwoFactorPending();
+
+        $this
+            ->actingAs($user)
+            ->postJson(route('statamic.users.two-factor.confirm'), [
+                'code' => $this->getOneTimeCode($user),
+            ])
+            ->assertOk()
+            ->assertJson([]);
 
         $this->assertNotNull($user->fresh()->two_factor_confirmed_at);
     }

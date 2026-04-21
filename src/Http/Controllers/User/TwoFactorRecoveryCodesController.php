@@ -22,7 +22,7 @@ class TwoFactorRecoveryCodesController extends CpController
 
         $generateRecoveryCodes($user);
 
-        if (! $request->has('_redirect')) {
+        if ($request->expectsJson()) {
             return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
         }
 

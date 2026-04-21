@@ -111,11 +111,22 @@ class ResetTwoFactorRecoveryCodesFormTest extends TestCase
             ->actingAs($user)
             ->session(['statamic_elevated_session' => now()->timestamp])
             ->from('/account/security')
-            ->post(route('statamic.users.two-factor.recovery-codes.generate'), [
-                '_redirect' => '/account/security',
-            ])
+            ->post(route('statamic.users.two-factor.recovery-codes.generate'))
             ->assertRedirect('/account/security')
             ->assertSessionHas('success');
+    }
+
+    #[Test]
+    public function it_returns_json_for_xhr_requests()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->session(['statamic_elevated_session' => now()->timestamp])
+            ->postJson(route('statamic.users.two-factor.recovery-codes.generate'))
+            ->assertOk()
+            ->assertJsonStructure(['recovery_codes']);
     }
 
     private function user()
