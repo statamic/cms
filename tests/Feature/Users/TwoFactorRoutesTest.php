@@ -27,6 +27,8 @@ class TwoFactorRoutesTest extends TestCase
             Route::get('/custom-setup', function () {
                 return 'setup page';
             })->middleware('statamic.web');
+
+            Route::get('/login', fn () => 'login page')->name('login');
         });
     }
 
@@ -122,6 +124,23 @@ class TwoFactorRoutesTest extends TestCase
             ->get('/custom-setup')
             ->assertOk()
             ->assertSee('setup page');
+    }
+
+    #[Test]
+    public function frontend_two_factor_action_routes_require_authentication()
+    {
+        $routes = [
+            ['get', route('statamic.users.two-factor.enable')],
+            ['post', route('statamic.users.two-factor.confirm')],
+            ['delete', route('statamic.users.two-factor.disable')],
+            ['get', route('statamic.users.two-factor.recovery-codes.show')],
+            ['post', route('statamic.users.two-factor.recovery-codes.generate')],
+            ['get', route('statamic.users.two-factor.recovery-codes.download')],
+        ];
+
+        foreach ($routes as [$method, $url]) {
+            $this->{$method}($url)->assertRedirect('/login');
+        }
     }
 
     #[Test]
