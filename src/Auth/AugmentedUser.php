@@ -42,6 +42,7 @@ class AugmentedUser extends AbstractAugmented
             'avatar',
             'api_url',
             'preferred_locale',
+            'has_enabled_two_factor_authentication',
         ];
     }
 
