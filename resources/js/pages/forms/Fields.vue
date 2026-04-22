@@ -471,7 +471,7 @@ const notificationOptions = [
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                     <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
                                     {{ __('How did you hear about us?') }}
-                                    <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                    <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
                                 </span>
                             </Label>
                         </template>
@@ -526,7 +526,7 @@ const notificationOptions = [
                                             <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                                 <Icon name="text-long" data-collapsed-field-icon class="size-3.5 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
                                                 {{ __('What do you like most about our band?') }}
-                                                <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                                <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
                                             </span>
                                         </Label>
                                     </template>

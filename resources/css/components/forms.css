@@ -92,7 +92,7 @@
     [data-editing-field] {
         /* Tweak things optically, since the field is no longer here */
         > *:first-child {
-            top: -0.25rem;
+            top: -0.085rem;
         }
         &::before {
             inset-block: -0.75rem;
