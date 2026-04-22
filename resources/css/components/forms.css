@@ -70,6 +70,32 @@
 }
 
 
+/* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS
+=================================================== */
+/* Collapsed state */
+[data-fields-collapsed="true"] {
+    [data-ui-input-group] {
+        [data-ui-description],
+        > :not(:first-child) {
+            display: none;
+        }
+
+        * {
+            margin-bottom: 0;
+        }
+    }
+    [data-editing-field] {
+        /* Tweak things optically, since the field is no longer here */
+        > *:first-child {
+            top: -0.25rem;
+        }
+        &::before {
+            inset-block: -0.75rem;
+        }
+    }
+}
+
+
 /* GROUP SIDEBAR / FIELD DIRECTION
 =================================================== */
 #main-content {

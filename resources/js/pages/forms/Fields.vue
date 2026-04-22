@@ -3,7 +3,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import LogicFlowMock from './LogicFlowMock.vue';
-import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
@@ -29,6 +29,7 @@ const settingsLabel = ref(__('Which album was your favorite?'));
 const settingsHelpText = ref('');
 const settingsPlaceholder = ref('');
 const settingsCharacterLimit = ref(null);
+const fieldView = ref('expanded');
 const heardAboutOptions = [
     { label: __('Instagram'), value: 'instagram' },
     { label: __('Friend referral'), value: 'referral' },
@@ -384,6 +385,22 @@ const notificationOptions = [
                 <StatusIndicator status="published" />
                 {{ formTitle }}
             </template>
+            <template #actions>
+                <ToggleGroup v-model="fieldView" size="xs">
+                    <ToggleItem
+                        value="expanded"
+                        icon="expand"
+                        :aria-label="__('Expanded view')"
+                        v-tooltip="__('Expanded view')"
+                    />
+                    <ToggleItem
+                        value="collapsed"
+                        icon="collapse"
+                        :aria-label="__('Collapsed view')"
+                        v-tooltip="__('Collapsed view')"
+                    />
+                </ToggleGroup>
+            </template>
         </Header>
 
         <Panel class="mx-auto max-w-5xl">
@@ -392,7 +409,7 @@ const notificationOptions = [
             </PanelHeader>
 
             <Card>
-                <div class="space-y-7">
+                <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
                     <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
                         <Select
                             id="heard-about-field"
@@ -413,7 +430,6 @@ const notificationOptions = [
                                 <span class="sr-only">{{ __('Fieldset') }}</span>
                             </span>
                             <div id="editing-field" data-editing-field>
-                                
                                 <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                                     <WidthSelector
                                         v-model="editingFieldWidth"
@@ -728,3 +744,4 @@ const notificationOptions = [
         </div>
     </LayoutPanel>
 </template>
+
