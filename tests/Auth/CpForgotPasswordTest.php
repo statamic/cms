@@ -5,7 +5,6 @@ namespace Tests\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -13,24 +12,6 @@ use Tests\TestCase;
 class CpForgotPasswordTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        PasswordReset::resetFormUrl(null);
-        PasswordReset::resetFormRoute(null);
-        PasswordReset::redirectAfterReset(null);
-    }
-
-    public function tearDown(): void
-    {
-        PasswordReset::resetFormUrl(null);
-        PasswordReset::resetFormRoute(null);
-        PasswordReset::redirectAfterReset(null);
-
-        parent::tearDown();
-    }
 
     #[Test]
     public function it_returns_generic_success_for_non_existent_user_to_prevent_enumeration()
