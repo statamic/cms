@@ -82,7 +82,10 @@ const notificationOptions = [
                     </button>
                     <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10">
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Information</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Information
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
@@ -99,7 +102,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Text</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Text
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
@@ -110,7 +116,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Choice</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-orange-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Choice
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
@@ -133,7 +142,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Rate</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-amber-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Rate
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
@@ -147,7 +159,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Contact Info</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-blue-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Contact Info
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
@@ -170,7 +185,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Number</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-teal-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Number
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Number')" :title="__('Number')" icon="number" />
@@ -181,7 +199,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Date and Time</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-fuchsia-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Date and Time
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
@@ -198,7 +219,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Media</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-cyan-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Media
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
@@ -215,7 +239,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Payment</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-green-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Payment
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
@@ -231,7 +258,10 @@ const notificationOptions = [
             <!-- This is the desktop nav - the content is repeated from the left panel -->
             <ul class="px-0.5 grid gap-8 @container py-10 max-[1000px]:hidden">
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Information</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Information
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
@@ -248,7 +278,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Text</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Text
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
@@ -259,7 +292,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Choice</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-orange-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Choice
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
@@ -282,7 +318,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Rate</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-amber-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Rate
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
@@ -296,7 +335,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Contact Info</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-blue-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Contact Info
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
@@ -319,7 +361,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Number</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-teal-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Number
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Number')" :title="__('Number')" icon="number" />
@@ -330,7 +375,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Date and Time</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-fuchsia-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Date and Time
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
@@ -347,7 +395,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Media</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-cyan-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Media
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
@@ -364,7 +415,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Payment</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-green-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Payment
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
