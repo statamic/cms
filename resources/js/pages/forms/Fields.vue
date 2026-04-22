@@ -30,6 +30,7 @@ const settingsHelpText = ref('');
 const settingsPlaceholder = ref('');
 const settingsCharacterLimit = ref(null);
 const fieldView = ref('expanded');
+const panelCollapsed = ref(false);
 const totalFieldCount = computed(() => 8);
 const heardAboutOptions = [
     { label: __('Instagram'), value: 'instagram' },
@@ -459,13 +460,26 @@ const notificationOptions = [
         </Header>
 
         <Panel class="mx-auto max-w-5xl">
-            <PanelHeader>
+            <PanelHeader class="relative flex items-center justify-between">
                 <Heading :text="__('Section')" />
+                <Button
+                    @click="panelCollapsed = !panelCollapsed"
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="panelCollapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                />
             </PanelHeader>
 
-            <Card>
-                <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-                    <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! invisible! overflow-clip': panelCollapsed }"
+            >
+                <Card>
+                    <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                        <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
                         <template #label>
                             <Label for="heard-about-field">
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -634,7 +648,7 @@ const notificationOptions = [
                         </div>
                     </div>
 
-                    <Field :label="__('I want a free drink voucher')">
+                        <Field :label="__('I want a free drink voucher')">
                         <template #label>
                             <Label>
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -644,9 +658,10 @@ const notificationOptions = [
                             </Label>
                         </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
-                    </Field>
-                </div>
-            </Card>
+                        </Field>
+                    </div>
+                </Card>
+            </div>
         </Panel>
 
         <p class="mx-auto max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300">
