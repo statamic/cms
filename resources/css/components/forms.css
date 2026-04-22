@@ -190,14 +190,14 @@
 
 .logic-text-badge {
     @apply
-        py-2 px-3.5
+        py-1.5 px-3.5
         bg-content-bg
-        text-gray-800
-        dark:text-gray-300
+        text-gray-800 dark:text-gray-300
         rounded-full
         text-sm
         shadow-ui-sm
-        dark:border-1 dark:border-gray-600
+        border-1
+        border-gray-300 dark:border-gray-600
     ;
     display: inline-block;
     user-select: none;
@@ -207,7 +207,17 @@
 .logic-text__pill {
     display: flex;
     align-items: center;
-    @apply gap-1 rounded-full bg-content-bg px-3 py-2 shadow-ui-sm dark:border-1 dark:border-gray-600;
+    @apply
+        gap-1
+        rounded-full
+        bg-content-bg
+        px-3 py-1
+        shadow-ui-sm
+        text-gray-900 dark:text-gray-100
+        border-1
+        border-gray-300
+        dark:border-1 dark:border-gray-600
+    ;
 }
 
 .logic-text__pill-icon {
@@ -218,7 +228,10 @@
 }
 
 .logic-text__pill-text {
-    @apply text-sm font-medium text-gray-900 dark:text-gray-100;
+    @apply
+        text-sm
+        text-gray-900 dark:text-gray-100
+    ;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
