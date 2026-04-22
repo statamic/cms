@@ -683,7 +683,7 @@ const notificationOptions = [
     />
 
     <LayoutPanel side="right">
-        <div class="[&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
+        <div>
 
 
             <div class="right-panel-popover min-[1000px]:hidden">
