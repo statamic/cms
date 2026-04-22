@@ -72,6 +72,11 @@
 
 /* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS
 =================================================== */
+/* Field Icons (hide by default) */
+[data-collapsed-field-icon] {
+    display: none;
+}
+
 /* Collapsed state */
 [data-fields-collapsed="true"] {
     [data-ui-input-group] {
@@ -92,6 +97,10 @@
         &::before {
             inset-block: -0.75rem;
         }
+    }
+    /* Field Icons */
+    [data-collapsed-field-icon] {
+        display: inline-flex;
     }
 }
 

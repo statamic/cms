@@ -412,6 +412,15 @@ const notificationOptions = [
             <Card>
                 <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
                     <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
+                        <template #label>
+                            <Label for="heard-about-field">
+                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    {{ __('How did you hear about us?') }}
+                                    <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                </span>
+                            </Label>
+                        </template>
                         <Select
                             id="heard-about-field"
                             v-model="heardAboutValue"
@@ -460,7 +469,8 @@ const notificationOptions = [
                                 <Field :label="__('What do you like most about our band?')">
                                     <template #label>
                                         <Label for="favorite-thing-field">
-                                            <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                <Icon name="text-long" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                                                 {{ __('What do you like most about our band?') }}
                                                 <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
                                             </span>
@@ -477,7 +487,8 @@ const notificationOptions = [
                             <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
                                 <template #label>
                                     <Label for="fan-length-field">
-                                        <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="text-short" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                                             {{ __('How long have you been a fan?') }}
                                         </span>
                                     </Label>
@@ -489,6 +500,14 @@ const notificationOptions = [
                     </div>
 
                     <Field :label="__('Which album was your favorite?')">
+                        <template #label>
+                            <Label>
+                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    {{ __('Which album was your favorite?') }}
+                                </span>
+                            </Label>
+                        </template>
                         <RadioGroup v-model="favoriteAlbum">
                             <Radio
                                 v-for="album in albumOptions"
@@ -510,7 +529,8 @@ const notificationOptions = [
                             <Field :label="__('Which album was your second favorite?')">
                                 <template #label>
                                     <Label>
-                                        <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                                             {{ __('Which album was your second favorite?') }}
                                         </span>
                                     </Label>
@@ -529,7 +549,8 @@ const notificationOptions = [
                         <Field :label="__('Sign up for email notifications from The Midnight')">
                             <template #label>
                                 <Label>
-                                    <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="fieldtype-checkboxes" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                                         {{ __('Sign up for email notifications from The Midnight') }}
                                     </span>
                                 </Label>
@@ -548,7 +569,8 @@ const notificationOptions = [
                             <Field id="age-field" :label="__('How old are you?')">
                                 <template #label>
                                     <Label for="age-field">
-                                        <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                                             {{ __('How old are you?') }}
                                         </span>
                                     </Label>
@@ -559,6 +581,14 @@ const notificationOptions = [
                     </div>
 
                     <Field :label="__('I want a free drink voucher')">
+                        <template #label>
+                            <Label>
+                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <Icon name="fieldtype-toggle" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    {{ __('I want a free drink voucher') }}
+                                </span>
+                            </Label>
+                        </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
                     </Field>
                 </div>
@@ -749,4 +779,3 @@ const notificationOptions = [
         </div>
     </LayoutPanel>
 </template>
-
