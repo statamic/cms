@@ -407,8 +407,10 @@ const notificationOptions = [
                     <div data-fieldset-group class="space-y-7">
                         <div id="fieldset-start">
                             <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
-                                <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                {{ __('Fieldset') }}
+                                <span class="inline-flex" v-tooltip="__('Fieldset')">
+                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                </span>
+                                <span class="sr-only">{{ __('Fieldset') }}</span>
                             </span>
                             <div id="editing-field" data-editing-field>
                                 
@@ -483,8 +485,10 @@ const notificationOptions = [
                     <div data-fieldset-group class="space-y-7">
                         <div id="fieldset-start">
                             <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
-                                <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                {{ __('Fieldset') }}
+                                <span class="inline-flex" v-tooltip="__('Fieldset')">
+                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                </span>
+                                <span class="sr-only">{{ __('Fieldset') }}</span>
                             </span>
                             <Field :label="__('Which album was your second favorite?')">
                                 <template #label>

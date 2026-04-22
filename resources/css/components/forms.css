@@ -36,11 +36,10 @@
 }
 
 [data-fieldset-label] {
+    @apply bg-content-bg;
     position: absolute;
-    top: calc(anchor(--fieldset-start top) + 2.5rem);
+    top: calc(anchor(--fieldset-start top) + 2rem);
     left: calc(anchor(--fieldset-start left) - 2.5rem);
-    writing-mode: vertical-lr;
-    background: white;
     width: 0.75rem;
     svg {
         rotate: 90deg;
