@@ -51,6 +51,7 @@ const optionRows = ref(albumOptions.map((option) => ({ cells: [option.label] }))
 const optionRowsConfig = {
     max_columns: 1,
     max_rows: 20,
+    show_header: false,
 };
 const notificationOptions = [
     { label: __('New Singles and Albums'), value: 'singles_and_albums' },

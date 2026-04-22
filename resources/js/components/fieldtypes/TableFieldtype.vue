@@ -14,7 +14,7 @@
 
             <section :class="{ 'mt-14 p-4 dark:bg-gray-800': fullScreenMode }">
                 <table class="table-contained" v-if="rowCount">
-                    <thead>
+                    <thead v-if="showHeader">
                         <tr>
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                             <th v-for="(column, index) in columnCount" :key="index">
@@ -159,6 +159,10 @@ export default {
 
         canDeleteColumns() {
             return !this.isReadOnly && this.columnCount > 1;
+        },
+
+        showHeader() {
+            return this.config.show_header !== false;
         },
 
         replicatorPreview() {
