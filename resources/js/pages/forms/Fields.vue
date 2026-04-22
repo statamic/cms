@@ -511,48 +511,20 @@ const notificationOptions = [
                                 </span>
                                 <span class="sr-only">{{ __('Fieldset') }}</span>
                             </span>
-                            <div id="editing-field" data-editing-field>
-                                <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
-                                    <WidthSelector
-                                        v-model="editingFieldWidth"
-                                        size="base"
-                                        variant="filled"
-                                        class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
-                                    />
-                                    <Button
-                                        size="sm"
-                                        inset
-                                        icon="duplicate"
-                                        variant="subtle"
-                                        :aria-label="__('Duplicate field')"
-                                        :title="__('Duplicate field')"
-                                        class="[&_svg]:opacity-45"
-                                    />
-                                    <Button
-                                        size="sm"
-                                        inset
-                                        icon="trash"
-                                        variant="subtle"
-                                        :aria-label="__('Remove field')"
-                                        :title="__('Remove field')"
-                                        class="[&_svg]:opacity-45"
-                                    />
-                                </div>
-                                <Field :label="__('What do you like most about our band?')">
-                                    <template #label>
-                                        <Label for="favorite-thing-field">
-                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
-                                                {{ __('What do you like most about our band?') }}
-                                                <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                            </span>
-                                        </Label>
-                                    </template>
-                                    <!-- TODO: Add logic tree icon for fields with logic -->
-                                    <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                                    <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
-                                </Field>
-                            </div>
+                            <Field :label="__('What do you like most about our band?')">
+                                <template #label>
+                                    <Label for="favorite-thing-field">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                            {{ __('What do you like most about our band?') }}
+                                            <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                        </span>
+                                    </Label>
+                                </template>
+                                <!-- TODO: Add logic tree icon for fields with logic -->
+                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
+                            </Field>
                         </div>
 
                         <div id="fieldset-end">
@@ -571,24 +543,52 @@ const notificationOptions = [
                         </div>
                     </div>
 
-                    <Field :label="__('Which album was your favorite?')">
-                        <template #label>
-                            <Label>
-                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
-                                    {{ __('Which album was your favorite?') }}
-                                </span>
-                            </Label>
-                        </template>
-                        <RadioGroup v-model="favoriteAlbum">
-                            <Radio
-                                v-for="album in albumOptions"
-                                :key="album.value"
-                                :value="album.value"
-                                :label="album.label"
+                    <div id="editing-field" data-editing-field>
+                        <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
+                            <WidthSelector
+                                v-model="editingFieldWidth"
+                                size="base"
+                                variant="filled"
+                                class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
                             />
-                        </RadioGroup>
-                    </Field>
+                            <Button
+                                size="sm"
+                                inset
+                                icon="duplicate"
+                                variant="subtle"
+                                :aria-label="__('Duplicate field')"
+                                :title="__('Duplicate field')"
+                                class="[&_svg]:opacity-45"
+                            />
+                            <Button
+                                size="sm"
+                                inset
+                                icon="trash"
+                                variant="subtle"
+                                :aria-label="__('Remove field')"
+                                :title="__('Remove field')"
+                                class="[&_svg]:opacity-45"
+                            />
+                        </div>
+                        <Field :label="__('Which album was your favorite?')">
+                            <template #label>
+                                <Label>
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                        {{ __('Which album was your favorite?') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <RadioGroup v-model="favoriteAlbum">
+                                <Radio
+                                    v-for="album in albumOptions"
+                                    :key="album.value"
+                                    :value="album.value"
+                                    :label="album.label"
+                                />
+                            </RadioGroup>
+                        </Field>
+                    </div>
 
                     <div data-fieldset-group class="space-y-7">
                         <div id="fieldset-start">
