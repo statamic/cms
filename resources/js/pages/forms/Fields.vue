@@ -62,6 +62,8 @@ const optionRowsConfig = {
     max_columns: 1,
     max_rows: 20,
     show_header: false,
+    show_add_column: false,
+    add_row_text: __('Add Option'),
     show_hide_toggle: true,
 };
 const notificationOptions = [

@@ -74,9 +74,9 @@
                 </table>
 
                 <div class="flex gap-2">
-                    <ui-button @click="addRow" :disabled="atRowMax" v-if="canAddRows" :text="__('Add Row')" size="sm" />
+                    <ui-button @click="addRow" :disabled="atRowMax" v-if="canAddRows" :text="addRowButtonText" size="sm" />
 
-                    <ui-button @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns" :text="__('Add Column')" size="sm" />
+                    <ui-button @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns && showAddColumnControl" :text="__('Add Column')" size="sm" />
                 </div>
             </section>
 
@@ -181,8 +181,16 @@ export default {
             return !this.isReadOnly && this.rowCount > 0;
         },
 
+        showAddColumnControl() {
+            return this.config.show_add_column !== false;
+        },
+
         canDeleteColumns() {
             return !this.isReadOnly && this.columnCount > 1;
+        },
+
+        addRowButtonText() {
+            return this.config.add_row_text ? __(this.config.add_row_text) : __('Add Row');
         },
 
         showHeader() {
