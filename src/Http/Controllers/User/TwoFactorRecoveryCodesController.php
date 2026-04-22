@@ -26,7 +26,7 @@ class TwoFactorRecoveryCodesController extends CpController
             return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
         }
 
-        return $this->formSuccessRedirect($request, __('Recovery codes regenerated.'));
+        return $this->formSuccessRedirect($request, __('Recovery codes regenerated.'), 'user.two_factor_reset_recovery_codes');
     }
 
     public function download(Request $request)
@@ -43,7 +43,7 @@ class TwoFactorRecoveryCodesController extends CpController
         ]);
     }
 
-    private function formSuccessRedirect(Request $request, string $message)
+    private function formSuccessRedirect(Request $request, string $message, string $formName)
     {
         $redirect = $request->input('_redirect');
 
@@ -51,6 +51,6 @@ class TwoFactorRecoveryCodesController extends CpController
             ? $redirect
             : back()->getTargetUrl();
 
-        return redirect($url)->with('success', $message);
+        return redirect($url)->with("{$formName}.success", $message);
     }
 }

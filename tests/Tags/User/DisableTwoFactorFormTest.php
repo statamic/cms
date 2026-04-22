@@ -82,7 +82,7 @@ class DisableTwoFactorFormTest extends TestCase
                 '_redirect' => '/account',
             ])
             ->assertRedirect('/account')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_disable.success');
 
         $this->assertNull($user->fresh()->two_factor_confirmed_at);
     }
@@ -117,7 +117,7 @@ class DisableTwoFactorFormTest extends TestCase
                 '_redirect' => '/account',
             ])
             ->assertRedirect('/auth/setup-2fa')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_disable.success');
     }
 
     #[Test]
@@ -166,7 +166,7 @@ class DisableTwoFactorFormTest extends TestCase
             ->from('/account')
             ->delete(route('statamic.users.two-factor.disable'))
             ->assertRedirect('/account')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_disable.success');
 
         $this->assertNull($user->fresh()->two_factor_confirmed_at);
     }

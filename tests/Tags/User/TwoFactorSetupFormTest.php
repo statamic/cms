@@ -126,7 +126,7 @@ class TwoFactorSetupFormTest extends TestCase
                 '_redirect' => '/dashboard',
             ])
             ->assertRedirect('/dashboard')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_setup.success');
 
         $this->assertNotNull($user->fresh()->two_factor_confirmed_at);
     }
@@ -143,7 +143,7 @@ class TwoFactorSetupFormTest extends TestCase
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertRedirect('/setup-2fa')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_setup.success');
 
         $this->assertNotNull($user->fresh()->two_factor_confirmed_at);
     }
@@ -177,7 +177,7 @@ class TwoFactorSetupFormTest extends TestCase
                 '_redirect' => '/dashboard',
             ])
             ->assertRedirect('/setup-2fa')
-            ->assertSessionHasErrors('code');
+            ->assertSessionHasErrors('code', null, 'user.two_factor_setup');
 
         $this->assertNull($user->fresh()->two_factor_confirmed_at);
     }
@@ -195,7 +195,7 @@ class TwoFactorSetupFormTest extends TestCase
                 '_error_redirect' => '/setup-error',
             ])
             ->assertRedirect('/setup-error')
-            ->assertSessionHasErrors('code');
+            ->assertSessionHasErrors('code', null, 'user.two_factor_setup');
 
         $this->assertNull($user->fresh()->two_factor_confirmed_at);
     }

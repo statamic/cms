@@ -869,7 +869,7 @@ class UserTags extends Tags
 
         $params = [];
 
-        $data = $this->getFormSession();
+        $data = $this->getFormSession('user.two_factor_enable');
 
         $knownParams = ['redirect', 'allow_request_redirect'];
 
@@ -920,7 +920,7 @@ class UserTags extends Tags
 
         $params = [];
 
-        $data = $this->getFormSession();
+        $data = $this->getFormSession('user.two_factor_setup');
 
         $data['qr_code'] = $user->twoFactorQrCodeSvg();
         $data['qr_code_url'] = 'data:image/svg+xml;base64,'.base64_encode($user->twoFactorQrCodeSvg());
@@ -1021,7 +1021,7 @@ class UserTags extends Tags
 
         $params = [];
 
-        $data = $this->getFormSession();
+        $data = $this->getFormSession('user.two_factor_reset_recovery_codes');
 
         $knownParams = ['redirect', 'allow_request_redirect'];
 
@@ -1070,7 +1070,7 @@ class UserTags extends Tags
 
         $params = [];
 
-        $data = $this->getFormSession();
+        $data = $this->getFormSession('user.two_factor_disable');
 
         $knownParams = ['redirect', 'allow_request_redirect'];
 

@@ -164,7 +164,7 @@ class EnableTwoFactorTest extends TestCase
             ->post($url(), [
                 'code' => '123456',
             ])
-            ->assertSessionHasErrors('code');
+            ->assertSessionHasErrors('code', null, 'user.two_factor_setup');
 
         $this->assertNull($user->two_factor_confirmed_at);
     }

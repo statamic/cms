@@ -82,7 +82,7 @@ class ResetTwoFactorRecoveryCodesFormTest extends TestCase
                 '_redirect' => '/recovery-codes',
             ])
             ->assertRedirect('/recovery-codes')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_reset_recovery_codes.success');
 
         $newCodes = $user->fresh()->twoFactorRecoveryCodes();
         $this->assertNotEquals($originalCodes, $newCodes);
@@ -113,7 +113,7 @@ class ResetTwoFactorRecoveryCodesFormTest extends TestCase
             ->from('/account/security')
             ->post(route('statamic.users.two-factor.recovery-codes.generate'))
             ->assertRedirect('/account/security')
-            ->assertSessionHas('success');
+            ->assertSessionHas('user.two_factor_reset_recovery_codes.success');
     }
 
     #[Test]

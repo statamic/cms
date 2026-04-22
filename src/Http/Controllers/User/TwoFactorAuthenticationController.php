@@ -51,14 +51,14 @@ class TwoFactorAuthenticationController extends CpController
                 throw $e;
             }
 
-            return $this->handleFormValidationError($request, $e);
+            return $this->handleFormValidationError($request, $e, 'user.two_factor_setup');
         }
 
         if ($request->expectsJson()) {
             return [];
         }
 
-        return $this->formSuccessRedirect($request, __('Two-factor authentication enabled.'));
+        return $this->formSuccessRedirect($request, __('Two-factor authentication enabled.'), 'user.two_factor_setup');
     }
 
     public function disable(Request $request, DisableTwoFactorAuthentication $disable)
@@ -77,13 +77,13 @@ class TwoFactorAuthenticationController extends CpController
 
         if ($user->isTwoFactorAuthenticationRequired()) {
             return redirect($this->setupUrlRedirect())
-                ->with('success', __('Two-factor authentication disabled.'));
+                ->with('user.two_factor_disable.success', __('Two-factor authentication disabled.'));
         }
 
-        return $this->formSuccessRedirect($request, __('Two-factor authentication disabled.'));
+        return $this->formSuccessRedirect($request, __('Two-factor authentication disabled.'), 'user.two_factor_disable');
     }
 
-    private function handleFormValidationError(Request $request, ValidationException $e)
+    private function handleFormValidationError(Request $request, ValidationException $e, string $formName)
     {
         $errorRedirect = $request->input('_error_redirect');
 
@@ -91,24 +91,26 @@ class TwoFactorAuthenticationController extends CpController
             ? redirect($errorRedirect)
             : back();
 
-        return $redirect->withInput()->withErrors($e->errors());
+        return $redirect->withInput()->withErrors($e->errors(), $formName);
     }
 
-    private function formSuccessRedirect(Request $request, string $message)
+    private function formSuccessRedirect(Request $request, string $message, string $formName)
     {
+        $successKey = "{$formName}.success";
+
         if ($redirect = $request->input('_redirect')) {
             if (! URL::isExternalToApplication($redirect)) {
-                return redirect($redirect)->with('success', $message);
+                return redirect($redirect)->with($successKey, $message);
             }
         }
 
         if ($loginRedirect = $request->session()->pull('login.redirect')) {
             if (! URL::isExternalToApplication($loginRedirect)) {
-                return redirect($loginRedirect)->with('success', $message);
+                return redirect($loginRedirect)->with($successKey, $message);
             }
         }
 
-        return back()->with('success', $message);
+        return back()->with($successKey, $message);
     }
 
     protected function confirmUrl()
