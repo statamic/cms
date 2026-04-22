@@ -69,6 +69,16 @@
     anchor-name: --fieldset-end;
 }
 
+/* Hide anchors and absolutely positioned logic icons unless the panel is open. When the panel collapses, elements like anchors are slow to hide because of the way they're rendered. */
+[data-panel-collapsed="true"] {
+    [data-fieldset-label],
+    [data-logic-attached],
+    #fieldset-start::before {
+        opacity: 0;
+        transition: opacity 0.05s ease-in;
+    }
+}
+
 
 /* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS
 =================================================== */
