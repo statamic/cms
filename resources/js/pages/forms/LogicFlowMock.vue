@@ -241,8 +241,12 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             v-model="logicContainsAnswer"
                             size="sm"
                             :input-attrs="{
-                                size: Math.max(logicContainsAnswer.length, logicContainsAnswerPlaceholder.length),
-                                style: `min-width: ${logicContainsAnswerPlaceholder.length}ch;`,
+                                size: logicContainsAnswer.length === 0
+                                    ? logicContainsAnswerPlaceholder.length
+                                    : logicContainsAnswer.length,
+                                style: logicContainsAnswer.length === 0
+                                    ? `min-width: ${logicContainsAnswerPlaceholder.length}ch;`
+                                    : undefined,
                             }"
                             :placeholder="logicContainsAnswerPlaceholder"
                         />
