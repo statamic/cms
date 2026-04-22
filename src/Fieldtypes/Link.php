@@ -70,6 +70,10 @@ class Link extends Fieldtype
             return null;
         }
 
+        if ($data === '@child' && ! $this->field->parent() instanceof Entry) {
+            return null;
+        }
+
         if (! $item = ResolveRedirect::item($data, $this->field->parent())) {
             return null;
         }

@@ -233,6 +233,16 @@ class LinkTest extends TestCase
     }
 
     #[Test]
+    public function it_pre_processes_first_child_for_index_when_parent_is_not_an_entry()
+    {
+        $field = new Field('test', ['type' => 'link']);
+        $field->setParent(Mockery::mock());
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertNull($fieldtype->preProcessIndex('@child'));
+    }
+
+    #[Test]
     public function it_pre_processes_first_child_for_index_when_no_children()
     {
         $pages = Mockery::mock();
