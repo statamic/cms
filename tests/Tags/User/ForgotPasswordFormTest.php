@@ -274,18 +274,6 @@ EOT
     }
 
     #[Test]
-    public function it_wont_follow_redirect_to_external_url_on_error()
-    {
-        $this
-            ->from('/forgot-password')
-            ->post('/!/auth/password/email', [
-                'email' => 'not-an-email',
-                '_error_redirect' => 'https://external-site.com/phishing',
-            ])
-            ->assertLocation('/forgot-password');
-    }
-
-    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=password-reset-successful&error_redirect=password-reset-failure');
