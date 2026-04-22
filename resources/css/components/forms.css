@@ -35,6 +35,18 @@
     }
 }
 
+[data-fieldset-label] {
+    position: absolute;
+    top: calc(anchor(--fieldset-start top) + 2.5rem);
+    left: calc(anchor(--fieldset-start left) - 2.5rem);
+    writing-mode: vertical-lr;
+    background: white;
+    width: 0.75rem;
+    svg {
+        rotate: 90deg;
+    }
+}
+
 #fieldset-start {
     anchor-name: --fieldset-start;
 
