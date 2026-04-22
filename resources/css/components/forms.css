@@ -21,7 +21,7 @@
         border-radius: 10px;
     }
     :where(.dark) &::before {
-        @apply bg-blue-950 border-blue-500;
+        @apply bg-blue-950/75 border-blue-500/75;
     }
 }
 
@@ -31,13 +31,14 @@
 [data-fieldset-group] {
     anchor-scope: --fieldset-start, --fieldset-end;
     [data-ui-label] {
-        color: var(--color-indigo-800);
+        @apply text-indigo-800 dark:text-indigo-300;
     }
 }
 
 [data-fieldset-label] {
-    @apply bg-content-bg;
+    @apply bg-content-bg text-indigo-800 dark:text-indigo-400/85;
     position: absolute;
+    display: inline-flex;
     top: calc(anchor(--fieldset-start top) + 2rem);
     left: calc(anchor(--fieldset-start left) - 2.5rem);
     width: 0.75rem;
@@ -51,6 +52,7 @@
 
     /* The connector */
     &::before {
+        @apply border border-dashed border-indigo-500;
         content: '';
         position: absolute;
         width: 3rem;
@@ -58,10 +60,14 @@
         left: calc(anchor(--fieldset-start left) - 2rem);
         bottom: anchor(--fieldset-end bottom);
         border-radius: 10px;
-        border: 1px dashed var(--color-indigo-500);
         clip-path: polygon(0 0, 30% 0, 30% 100%, 0 100%);
     }
 }
+
+:where(.dark) #fieldset-start::before {
+    @apply border-indigo-400/50;
+}
+
 #fieldset-end {
     anchor-name: --fieldset-end;
 }
