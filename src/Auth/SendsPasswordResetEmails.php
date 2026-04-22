@@ -44,7 +44,15 @@ trait SendsPasswordResetEmails
             $this->credentials($request)
         );
 
-        return $response == Password::RESET_LINK_SENT
+        // Treat "no such user" and "throttled" the same as a successful send so the
+        // response does not reveal whether the email belongs to a registered account.
+        // The broker only throttles real users, so a throttled response would itself
+        // be an enumeration oracle.
+        if (in_array($response, [Password::INVALID_USER, Password::RESET_THROTTLED], true)) {
+            $response = Password::RESET_LINK_SENT;
+        }
+
+        return $response === Password::RESET_LINK_SENT
             ? $this->sendResetLinkResponse($request, $response)
             : $this->sendResetLinkFailedResponse($request, $response);
     }
