@@ -7,10 +7,10 @@ const props = defineProps(IndexFieldtype.props);
 
 <template>
     <a :key="value.url" :href="value.url" target="_blank" class="flex items-center space-x-2 text-ellipsis">
-        <Icon v-if="value.type === 'asset'" name="assets" class="size-3" />
-        <Icon v-else-if="value.type === 'entry'" name="collections" class="size-3" />
-        <Icon v-else-if="value.type === 'child'" name="page" class="size-3" />
-        <Icon v-else name="external-link" class="size-3" />
+        <Icon v-if="value.type === 'asset'" name="assets" class="size-3 flex-shrink-0" />
+        <Icon v-else-if="value.type === 'entry'" name="collections" class="size-3 flex-shrink-0" />
+        <Icon v-else-if="value.type === 'child'" name="page" class="size-3 flex-shrink-0" />
+        <Icon v-else name="external-link" class="size-3 flex-shrink-0" />
         <span v-text="value.url ?? value" />
     </a>
 </template>
