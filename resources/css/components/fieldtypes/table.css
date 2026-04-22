@@ -3,7 +3,7 @@ Table Fieldtype
 ========================================================================== */
 
 .table-contained {
-    @apply relative mb-4 w-full rounded-lg border shadow-ui-sm outline-hidden dark:border-gray-700 with-contrast:border-gray-500 text-start;
+    @apply relative mb-4 w-full rounded-lg bg-content-bg border shadow-ui-sm outline-hidden dark:border-gray-700 with-contrast:border-gray-500 text-start;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
