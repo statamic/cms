@@ -91,6 +91,22 @@ class TwoFactorChallengeFormTest extends TestCase
     }
 
     #[Test]
+    public function it_clears_login_session_keys_after_successful_challenge()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session(['login.id' => $user->id(), 'login.remember' => true])
+            ->post(route('statamic.two-factor-challenge'), [
+                'code' => $this->getOneTimeCode($user),
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionMissing('login.id')
+            ->assertSessionMissing('login.remember');
+    }
+
+    #[Test]
     public function it_completes_challenge_with_recovery_code_and_redirects()
     {
         $user = $this->userWithTwoFactorEnabled();

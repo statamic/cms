@@ -52,6 +52,8 @@ class TwoFactorChallengeController extends Controller
 
         Auth::guard()->login($user, $request->remember());
 
+        $request->session()->forget(['login.id', 'login.remember']);
+
         $request->session()->elevate();
 
         $request->session()->regenerate();
