@@ -3,6 +3,7 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import LogicFlowMock from './LogicFlowMock.vue';
+import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
 import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
@@ -46,6 +47,11 @@ const albumOptions = [
     { label: __('Heroes'), value: 'heroes' },
     { label: __('Red, White, and Bruised: The Midnight Live'), value: 'red_white_and_bruised' },
 ];
+const optionRows = ref(albumOptions.map((option) => ({ cells: [option.label] })));
+const optionRowsConfig = {
+    max_columns: 1,
+    max_rows: 20,
+};
 const notificationOptions = [
     { label: __('New Singles and Albums'), value: 'singles_and_albums' },
     { label: __('Merchandise'), value: 'merchandise' },
@@ -642,7 +648,7 @@ const notificationOptions = [
                                 <template #label>
                                     <Label for="age-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-teal-50 text-teal-500 dark:bg-teal-950 dark:text-teal-400" aria-hidden="true" />
+                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-teal-50 text-teal-600 dark:bg-teal-950 dark:text-teal-400" aria-hidden="true" />
                                             {{ __('How old are you?') }}
                                         </span>
                                     </Label>
@@ -727,6 +733,15 @@ const notificationOptions = [
                                     <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
                                         <Input v-model="settingsCharacterLimit" type="number" />
                                     </Field>
+
+                                    <Field :label="__('Options')">
+                                        <TableFieldtype
+                                            id="field-options-mobile"
+                                            handle="options"
+                                            v-model:value="optionRows"
+                                            :config="optionRowsConfig"
+                                        />
+                                    </Field>
                                 </div>
                             </TabContent>
                             <TabContent name="logic">
@@ -789,6 +804,15 @@ const notificationOptions = [
 
                             <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
                                 <Input v-model="settingsCharacterLimit" type="number" />
+                            </Field>
+
+                            <Field :label="__('Options')">
+                                <TableFieldtype
+                                    id="field-options-desktop"
+                                    handle="options"
+                                    v-model:value="optionRows"
+                                    :config="optionRowsConfig"
+                                />
                             </Field>
 
                             <!-- <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
