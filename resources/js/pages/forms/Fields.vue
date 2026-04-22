@@ -30,6 +30,7 @@ const settingsHelpText = ref('');
 const settingsPlaceholder = ref('');
 const settingsCharacterLimit = ref(null);
 const fieldView = ref('expanded');
+const totalFieldCount = computed(() => 8);
 const heardAboutOptions = [
     { label: __('Instagram'), value: 'instagram' },
     { label: __('Friend referral'), value: 'referral' },
@@ -563,6 +564,10 @@ const notificationOptions = [
                 </div>
             </Card>
         </Panel>
+
+        <p class="mx-auto max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300">
+            <strong>{{ totalFieldCount }}</strong> {{ __n('field on this form|fields on this form', totalFieldCount) }}
+        </p>
     </div>
 
     <Button
