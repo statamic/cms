@@ -64,6 +64,49 @@ class Link extends Fieldtype
         );
     }
 
+    public function preProcessIndex($data)
+    {
+        if (! $data) {
+            return null;
+        }
+
+        if ($data === '@child') {
+            $parent = $this->field->parent()->page();
+
+            $children = $parent->isRoot()
+                ? $parent->structure()->in($parent->locale())->pages()->all()->slice(1, 1)
+                : $parent->pages()->all();
+
+            if ($children->isEmpty()) {
+                return null;
+            }
+
+            return ['type' => 'child', 'url' => $children->first()->url()];
+        }
+
+        if (Str::startsWith($data, 'entry::')) {
+            $entry = Facades\Entry::find(Str::after($data, 'entry::'));
+
+            if (! $entry) {
+                return $data;
+            }
+
+            return ['type' => 'entry', 'url' => $entry->url()];
+        }
+
+        if (Str::startsWith($data, 'asset::')) {
+            $asset = Facades\Asset::find(Str::after($data, 'asset::'));
+
+            if (! $asset) {
+                return $data;
+            }
+
+            return ['type' => 'asset', 'url' => $asset->url()];
+        }
+
+        return $data;
+    }
+
     public function preload()
     {
         $value = $this->field->value();
