@@ -52,7 +52,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full"
+                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full"
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
@@ -114,7 +114,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             </template>
                             <template #selected-option="{ option }">
                                 <div class="flex items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full">
+                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full">
                                         <Icon
                                             v-if="option.icon"
                                             :name="option.icon"
@@ -142,7 +142,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full"
+                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full"
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
@@ -278,7 +278,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             </template>
                             <template #selected-option="{ option }">
                                 <div class="flex min-w-0 items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full">
+                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full">
                                         <Icon
                                             v-if="option.icon"
                                             :name="option.icon"
