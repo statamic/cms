@@ -388,6 +388,47 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_stash_login_redirect_when_two_factor_is_not_enforced()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionMissing('login.redirect');
+    }
+
+    #[Test]
+    public function it_stashes_login_redirect_when_two_factor_setup_is_required()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertSessionHas('login.redirect', '/dashboard');
+    }
+
+    #[Test]
     #[DefineEnvironment('disableTwoFactor')]
     public function it_skips_two_factor_challenge_when_two_factor_is_disabled()
     {

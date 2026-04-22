@@ -23,6 +23,10 @@ class TwoFactorRoutesTest extends TestCase
             Route::get('/test-frontend-route', function () {
                 return 'ok';
             })->middleware('statamic.web');
+
+            Route::get('/custom-setup', function () {
+                return 'setup page';
+            })->middleware('statamic.web');
         });
     }
 
@@ -85,6 +89,39 @@ class TwoFactorRoutesTest extends TestCase
             ->actingAs($user)
             ->get('/test-frontend-route')
             ->assertRedirect(route('statamic.two-factor-setup', ['referer' => url('/test-frontend-route')]));
+    }
+
+    #[Test]
+    public function frontend_two_factor_setup_middleware_redirects_to_configured_url()
+    {
+        config([
+            'statamic.users.two_factor_enforced_roles' => ['*'],
+            'statamic.users.two_factor_setup_url' => '/custom-setup',
+        ]);
+
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get('/test-frontend-route')
+            ->assertRedirect('/custom-setup');
+    }
+
+    #[Test]
+    public function frontend_two_factor_setup_middleware_allows_configured_url_through()
+    {
+        config([
+            'statamic.users.two_factor_enforced_roles' => ['*'],
+            'statamic.users.two_factor_setup_url' => '/custom-setup',
+        ]);
+
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get('/custom-setup')
+            ->assertOk()
+            ->assertSee('setup page');
     }
 
     #[Test]
