@@ -21,15 +21,23 @@ class TwoFactorAuthenticationController extends CpController
             abort(403);
         }
 
-        if (! session()->get('errors')?->has('code')) {
+        if (empty($user->two_factor_secret)) {
             $enable($user);
         }
 
-        return [
-            'qr' => $user->twoFactorQrCodeSvg(),
-            'secret_key' => $user->twoFactorSecretKey(),
-            'confirm_url' => $this->confirmUrl(),
-        ];
+        if ($request->expectsJson()) {
+            return [
+                'qr' => $user->twoFactorQrCodeSvg(),
+                'secret_key' => $user->twoFactorSecretKey(),
+                'confirm_url' => $this->confirmUrl(),
+            ];
+        }
+
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            return redirect($redirect);
+        }
+
+        return back();
     }
 
     public function confirm(Request $request, ConfirmTwoFactorAuthentication $confirm)

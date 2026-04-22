@@ -3,7 +3,6 @@
 namespace Statamic\Auth;
 
 use Illuminate\Support\Collection;
-use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
@@ -849,6 +848,57 @@ class UserTags extends Tags
     }
 
     /**
+     * Output a two-factor enable form.
+     *
+     * Maps to {{ user:two_factor_enable_form }}
+     *
+     * @return string|array
+     */
+    public function twoFactorEnableForm()
+    {
+        $user = User::current();
+
+        if (
+            ! TwoFactor::enabled()
+            || ! $user
+            || $user->hasEnabledTwoFactorAuthentication()
+            || $user->two_factor_secret
+        ) {
+            return;
+        }
+
+        $params = [];
+
+        $data = $this->getFormSession();
+
+        $knownParams = ['redirect', 'allow_request_redirect'];
+
+        $method = 'POST';
+        $action = route('statamic.users.two-factor.enable');
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if (! $this->canParseContents()) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
      * Output a two-factor setup form.
      *
      * Maps to {{ user:two_factor_setup_form }}
@@ -863,6 +913,7 @@ class UserTags extends Tags
             ! TwoFactor::enabled()
             || ! $user
             || $user->hasEnabledTwoFactorAuthentication()
+            || empty($user->two_factor_secret)
         ) {
             return;
         }
@@ -870,11 +921,6 @@ class UserTags extends Tags
         $params = [];
 
         $data = $this->getFormSession();
-
-        if (empty($user->two_factor_secret)) {
-            app(EnableTwoFactorAuthentication::class)($user);
-            $user = User::current();
-        }
 
         $data['qr_code'] = $user->twoFactorQrCodeSvg();
         $data['qr_code_url'] = 'data:image/svg+xml;base64,'.base64_encode($user->twoFactorQrCodeSvg());

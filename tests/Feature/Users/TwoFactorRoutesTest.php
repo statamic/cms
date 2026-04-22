@@ -130,7 +130,7 @@ class TwoFactorRoutesTest extends TestCase
     public function frontend_two_factor_action_routes_require_authentication()
     {
         $routes = [
-            ['get', route('statamic.users.two-factor.enable')],
+            ['post', route('statamic.users.two-factor.enable')],
             ['post', route('statamic.users.two-factor.confirm')],
             ['delete', route('statamic.users.two-factor.disable')],
             ['get', route('statamic.users.two-factor.recovery-codes.show')],

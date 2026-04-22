@@ -25,9 +25,9 @@ class TwoFactorSetupFormTest extends TestCase
     }
 
     #[Test]
-    public function it_renders_for_authenticated_user_without_2fa()
+    public function it_renders_for_user_with_pending_setup()
     {
-        $user = $this->user();
+        $user = $this->userWithTwoFactorPending();
 
         $this->actingAs($user);
 
@@ -39,9 +39,22 @@ class TwoFactorSetupFormTest extends TestCase
     }
 
     #[Test]
-    public function it_provides_qr_code_url()
+    public function it_does_not_render_without_pending_setup()
     {
         $user = $this->user();
+
+        $this->actingAs($user);
+
+        $output = $this->tag('{{ user:two_factor_setup_form }}<p>inside</p>{{ /user:two_factor_setup_form }}');
+
+        $this->assertStringNotContainsString('<form', $output);
+        $this->assertStringNotContainsString('<p>inside</p>', $output);
+    }
+
+    #[Test]
+    public function it_provides_qr_code_url()
+    {
+        $user = $this->userWithTwoFactorPending();
 
         $this->actingAs($user);
 
@@ -75,7 +88,7 @@ class TwoFactorSetupFormTest extends TestCase
     #[Test]
     public function it_fetches_form_data()
     {
-        $user = $this->user();
+        $user = $this->userWithTwoFactorPending();
 
         $this->actingAs($user);
 
@@ -91,7 +104,7 @@ class TwoFactorSetupFormTest extends TestCase
     #[Test]
     public function it_renders_with_redirect_params()
     {
-        $user = $this->user();
+        $user = $this->userWithTwoFactorPending();
 
         $this->actingAs($user);
 

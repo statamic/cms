@@ -83,7 +83,7 @@ Route::name('statamic.')->group(function () {
                 Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
                 Route::middleware('auth')->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
-                    Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+                    Route::post('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
                     Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
 
                     Route::middleware(RequireElevatedSession::class)->group(function () {

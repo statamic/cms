@@ -350,7 +350,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     if (TwoFactor::enabled()) {
         Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->middleware(RequireElevatedSession::class)->group(function () {
-            Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+            Route::post('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
             Route::delete('two-factor', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
             Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
             Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
