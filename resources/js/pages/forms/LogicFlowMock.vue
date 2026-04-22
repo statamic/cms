@@ -87,7 +87,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
             </li>
 
             <li>
-                <div class="logic-text-badge logic-text__condition mb-4!" aria-hidden="true">
+                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
                     {{ __('Then go to …') }}
                 </div>
                 <ol>
@@ -251,7 +251,7 @@ const logicContainsAnswerPlaceholder = __('Answer');
             </li>
 
             <li>
-                <div class="logic-text-badge logic-text__condition mb-4!" aria-hidden="true">
+                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
                     {{ __('Then go to …') }}
                 </div>
                 <ol>

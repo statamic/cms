@@ -162,9 +162,8 @@
         ol {
             display: grid;
             grid-template-columns: 100%;
-            @apply gap-2.5 mb-2.5;
+            @apply gap-2.5 mb-2;
             margin-inline-start: var(--inner-indent);
-            margin-block-end: calc(var(--spacing) * 4);
             /* Last "Then go to ..." */
             :is(li:last-child) & {
                 margin-inline-start: 0;
@@ -190,7 +189,7 @@
 
 .logic-text-badge {
     @apply
-        py-1.5 px-3.5
+        py-1.5 px-3
         bg-content-bg
         text-gray-800 dark:text-gray-300
         rounded-full
@@ -278,7 +277,7 @@
 }
 .logic-text__condition {
     position: relative;
-    @apply mb-2.5;
+    @apply mb-4;
     &::after {
         content: '';
         position: absolute;
