@@ -102,6 +102,17 @@ class LinkTest extends TestCase
     }
 
     #[Test]
+    public function it_pre_processes_numeric_value_for_index()
+    {
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'url', 'url' => 404],
+            $fieldtype->preProcessIndex('404')
+        );
+    }
+
+    #[Test]
     public function it_pre_processes_entry_reference_for_index()
     {
         $entry = Mockery::mock(\Statamic\Contracts\Entries\Entry::class);

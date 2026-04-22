@@ -83,7 +83,7 @@ class Link extends Fieldtype
 
         return [
             'type' => $type,
-            'url' => is_string($item) ? $item : $item->url(),
+            'url' => is_object($item) ? $item->url() : $item,
         ];
     }
 
