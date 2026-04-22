@@ -406,7 +406,12 @@ const notificationOptions = [
 
                     <div data-fieldset-group class="space-y-7">
                         <div id="fieldset-start">
+                            <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
+                                <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                {{ __('Fieldset') }}
+                            </span>
                             <div id="editing-field" data-editing-field>
+                                
                                 <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                                     <WidthSelector
                                         v-model="editingFieldWidth"
@@ -439,10 +444,6 @@ const notificationOptions = [
                                             <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                                 {{ __('What do you like most about our band?') }}
                                                 <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                                <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
-                                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                                    {{ __('Fieldset') }}
-                                                </span>
                                             </span>
                                         </Label>
                                     </template>
@@ -459,10 +460,6 @@ const notificationOptions = [
                                     <Label for="fan-length-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                             {{ __('How long have you been a fan?') }}
-                                            <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
-                                                <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                                {{ __('Fieldset') }}
-                                            </span>
                                         </span>
                                     </Label>
                                 </template>
@@ -485,15 +482,15 @@ const notificationOptions = [
 
                     <div data-fieldset-group class="space-y-7">
                         <div id="fieldset-start">
+                            <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
+                                <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                {{ __('Fieldset') }}
+                            </span>
                             <Field :label="__('Which album was your second favorite?')">
                                 <template #label>
                                     <Label>
                                         <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                             {{ __('Which album was your second favorite?') }}
-                                            <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
-                                                <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                                {{ __('Fieldset') }}
-                                            </span>
                                         </span>
                                     </Label>
                                 </template>
@@ -513,10 +510,6 @@ const notificationOptions = [
                                 <Label>
                                     <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                         {{ __('Sign up for email notifications from The Midnight') }}
-                                        <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
-                                            <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                            {{ __('Fieldset') }}
-                                        </span>
                                     </span>
                                 </Label>
                             </template>
@@ -536,10 +529,6 @@ const notificationOptions = [
                                     <Label for="age-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
                                             {{ __('How old are you?') }}
-                                            <span class="inline-flex ms-1.5 gap-2 rounded-md font-mono text-2xs text-gray-500">
-                                                <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                                {{ __('Fieldset') }}
-                                            </span>
                                         </span>
                                     </Label>
                                 </template>
