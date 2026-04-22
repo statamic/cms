@@ -47,11 +47,22 @@ const albumOptions = [
     { label: __('Heroes'), value: 'heroes' },
     { label: __('Red, White, and Bruised: The Midnight Live'), value: 'red_white_and_bruised' },
 ];
-const optionRows = ref(albumOptions.map((option) => ({ cells: [option.label] })));
+const optionRows = ref(albumOptions.map((option) => ({
+    option_value: option.value,
+    cells: [option.label],
+    hidden: false,
+})));
+const visibleAlbumOptions = computed(() => optionRows.value
+    .filter((option) => !option.hidden)
+    .map((option, index) => ({
+        label: option.cells?.[0] || '',
+        value: option.option_value || `option_${index + 1}`,
+    })));
 const optionRowsConfig = {
     max_columns: 1,
     max_rows: 20,
     show_header: false,
+    show_hide_toggle: true,
 };
 const notificationOptions = [
     { label: __('New Singles and Albums'), value: 'singles_and_albums' },
@@ -588,7 +599,7 @@ const notificationOptions = [
                             </template>
                             <RadioGroup v-model="favoriteAlbum">
                                 <Radio
-                                    v-for="album in albumOptions"
+                                v-for="album in visibleAlbumOptions"
                                     :key="album.value"
                                     :value="album.value"
                                     :label="album.label"
@@ -616,7 +627,7 @@ const notificationOptions = [
                                 </template>
                                 <RadioGroup v-model="secondFavoriteAlbum">
                                     <Radio
-                                        v-for="album in albumOptions"
+                                        v-for="album in visibleAlbumOptions"
                                         :key="`second-${album.value}`"
                                         :value="album.value"
                                         :label="album.label"
