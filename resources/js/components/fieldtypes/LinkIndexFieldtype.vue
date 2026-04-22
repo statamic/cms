@@ -11,6 +11,6 @@ const props = defineProps(IndexFieldtype.props);
         <Icon v-else-if="value.type === 'entry'" name="collections" class="size-3 flex-shrink-0" />
         <Icon v-else-if="value.type === 'child'" name="page" class="size-3 flex-shrink-0" />
         <Icon v-else name="external-link" class="size-3 flex-shrink-0" />
-        <span v-text="value.url ?? value" />
+        <span v-text="value.url" />
     </a>
 </template>

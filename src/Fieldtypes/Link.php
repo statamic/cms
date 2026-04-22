@@ -70,41 +70,21 @@ class Link extends Fieldtype
             return null;
         }
 
-        if ($data === '@child') {
-            $parent = $this->field->parent()->page();
-
-            $children = $parent->isRoot()
-                ? $parent->structure()->in($parent->locale())->pages()->all()->slice(1, 1)
-                : $parent->pages()->all();
-
-            if ($children->isEmpty()) {
-                return null;
-            }
-
-            return ['type' => 'child', 'url' => $children->first()->url()];
+        if (! $item = ResolveRedirect::item($data, $this->field->parent())) {
+            return null;
         }
 
-        if (Str::startsWith($data, 'entry::')) {
-            $entry = Facades\Entry::find(Str::after($data, 'entry::'));
+        $type = match (true) {
+            $data === '@child' => 'child',
+            Str::startsWith($data, 'asset::') => 'asset',
+            Str::startsWith($data, 'entry::') => 'entry',
+            default => 'url',
+        };
 
-            if (! $entry) {
-                return $data;
-            }
-
-            return ['type' => 'entry', 'url' => $entry->url()];
-        }
-
-        if (Str::startsWith($data, 'asset::')) {
-            $asset = Facades\Asset::find(Str::after($data, 'asset::'));
-
-            if (! $asset) {
-                return $data;
-            }
-
-            return ['type' => 'asset', 'url' => $asset->url()];
-        }
-
-        return $data;
+        return [
+            'type' => $type,
+            'url' => is_string($item) ? $item : $item->url(),
+        ];
     }
 
     public function preload()

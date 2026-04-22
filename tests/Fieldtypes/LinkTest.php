@@ -95,7 +95,10 @@ class LinkTest extends TestCase
     {
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
-        $this->assertEquals('https://example.com', $fieldtype->preProcessIndex('https://example.com'));
+        $this->assertEquals(
+            ['type' => 'url', 'url' => 'https://example.com'],
+            $fieldtype->preProcessIndex('https://example.com')
+        );
     }
 
     #[Test]
@@ -131,13 +134,23 @@ class LinkTest extends TestCase
     }
 
     #[Test]
+    public function it_pre_processes_missing_entry_reference_for_index()
+    {
+        Facades\Entry::shouldReceive('find')->with('missing-id')->once()->andReturnNull();
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertNull($fieldtype->preProcessIndex('entry::missing-id'));
+    }
+
+    #[Test]
     public function it_pre_processes_missing_asset_reference_for_index()
     {
         Facades\Asset::shouldReceive('find')->with('main::missing.jpg')->once()->andReturnNull();
 
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
 
-        $this->assertEquals('asset::main::missing.jpg', $fieldtype->preProcessIndex('asset::main::missing.jpg'));
+        $this->assertNull($fieldtype->preProcessIndex('asset::main::missing.jpg'));
     }
 
     #[Test]
