@@ -145,6 +145,19 @@ class LinkTest extends TestCase
     }
 
     #[Test]
+    public function it_pre_processes_entry_with_null_url_for_index()
+    {
+        $entry = Mockery::mock(\Statamic\Contracts\Entries\Entry::class);
+        $entry->shouldReceive('url')->once()->andReturnNull();
+
+        Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertNull($fieldtype->preProcessIndex('entry::entry-id'));
+    }
+
+    #[Test]
     public function it_pre_processes_missing_entry_reference_for_index()
     {
         Facades\Entry::shouldReceive('find')->with('missing-id')->once()->andReturnNull();

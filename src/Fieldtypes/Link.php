@@ -74,6 +74,10 @@ class Link extends Fieldtype
             return null;
         }
 
+        if (! ($url = is_object($item) ? $item->url() : $item)) {
+            return null;
+        }
+
         $type = match (true) {
             $data === '@child' => 'child',
             Str::startsWith($data, 'asset::') => 'asset',
@@ -81,10 +85,7 @@ class Link extends Fieldtype
             default => 'url',
         };
 
-        return [
-            'type' => $type,
-            'url' => is_object($item) ? $item->url() : $item,
-        ];
+        return ['type' => $type, 'url' => $url];
     }
 
     public function preload()
