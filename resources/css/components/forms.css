@@ -168,6 +168,8 @@
 
     /* Outer structure */
     > ol {
+        /* Optically align */
+        margin-inline-start: -0.1rem;
         /* Inner structure */
         ol {
             display: grid;
