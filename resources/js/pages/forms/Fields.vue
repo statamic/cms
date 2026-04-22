@@ -469,7 +469,7 @@ const notificationOptions = [
                         <template #label>
                             <Label for="heard-about-field">
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 rounded-sm bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-300" aria-hidden="true" />
                                     {{ __('How did you hear about us?') }}
                                     <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
                                 </span>
@@ -524,7 +524,7 @@ const notificationOptions = [
                                     <template #label>
                                         <Label for="favorite-thing-field">
                                             <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                <Icon name="text-long" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                                <Icon name="text-long" data-collapsed-field-icon class="size-3.5 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950/40 dark:text-purple-300" aria-hidden="true" />
                                                 {{ __('What do you like most about our band?') }}
                                                 <span class="relative -top-px ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
                                             </span>
@@ -542,7 +542,7 @@ const notificationOptions = [
                                 <template #label>
                                     <Label for="fan-length-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="text-short" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                            <Icon name="text-short" data-collapsed-field-icon class="size-3.5 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950/40 dark:text-purple-300" aria-hidden="true" />
                                             {{ __('How long have you been a fan?') }}
                                         </span>
                                     </Label>
@@ -557,7 +557,7 @@ const notificationOptions = [
                         <template #label>
                             <Label>
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 rounded-sm bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-300" aria-hidden="true" />
                                     {{ __('Which album was your favorite?') }}
                                 </span>
                             </Label>
@@ -584,7 +584,7 @@ const notificationOptions = [
                                 <template #label>
                                     <Label>
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                            <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 rounded-sm bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-300" aria-hidden="true" />
                                             {{ __('Which album was your second favorite?') }}
                                         </span>
                                     </Label>
@@ -604,7 +604,7 @@ const notificationOptions = [
                             <template #label>
                                 <Label>
                                     <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="fieldtype-checkboxes" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                        <Icon name="fieldtype-checkboxes" data-collapsed-field-icon class="size-3.5 rounded-sm bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-300" aria-hidden="true" />
                                         {{ __('Sign up for email notifications from The Midnight') }}
                                     </span>
                                 </Label>
@@ -624,7 +624,7 @@ const notificationOptions = [
                                 <template #label>
                                     <Label for="age-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 rounded-sm bg-teal-50 text-teal-500 dark:bg-teal-950/40 dark:text-teal-300" aria-hidden="true" />
                                             {{ __('How old are you?') }}
                                         </span>
                                     </Label>
@@ -638,7 +638,7 @@ const notificationOptions = [
                         <template #label>
                             <Label>
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <Icon name="fieldtype-toggle" data-collapsed-field-icon class="size-3.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    <Icon name="fieldtype-toggle" data-collapsed-field-icon class="size-3.5 rounded-sm bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-300" aria-hidden="true" />
                                     {{ __('I want a free drink voucher') }}
                                 </span>
                             </Label>
