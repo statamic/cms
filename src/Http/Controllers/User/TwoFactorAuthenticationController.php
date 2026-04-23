@@ -37,6 +37,10 @@ class TwoFactorAuthenticationController extends CpController
             return redirect($redirect);
         }
 
+        if ($setupUrl = config('statamic.users.two_factor_setup_url')) {
+            return redirect($setupUrl);
+        }
+
         return back();
     }
 

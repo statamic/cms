@@ -149,6 +149,38 @@ class TwoFactorEnableFormTest extends TestCase
     }
 
     #[Test]
+    public function it_falls_back_to_configured_setup_url_without_redirect_param()
+    {
+        config(['statamic.users.two_factor_setup_url' => '/setup-2fa']);
+
+        $user = $this->user();
+
+        $this
+            ->actingAs($user)
+            ->withActiveElevatedSession()
+            ->from('/profile')
+            ->post(route('statamic.users.two-factor.enable'))
+            ->assertRedirect('/setup-2fa');
+    }
+
+    #[Test]
+    public function it_prefers_redirect_param_over_configured_setup_url()
+    {
+        config(['statamic.users.two_factor_setup_url' => '/setup-2fa']);
+
+        $user = $this->user();
+
+        $this
+            ->actingAs($user)
+            ->withActiveElevatedSession()
+            ->from('/profile')
+            ->post(route('statamic.users.two-factor.enable'), [
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard');
+    }
+
+    #[Test]
     public function it_is_idempotent_when_secret_already_exists()
     {
         Event::fake();
