@@ -135,7 +135,7 @@ provide(publishContextKey, {
                 <Heading :text="__('Form Logic')" />
             </PanelHeader>
             <Card>
-                <div class="relative" data-logic-list>
+                <div class="relative space-y-6 mb-0" data-logic-list>
                     <LogicRule
                         v-for="(block, index) in logicBlocks"
                         :id="block._id"
@@ -154,22 +154,7 @@ provide(publishContextKey, {
                         :show-field-previews="true"
                         @collapsed="collapseSet(block._id)"
                         @expanded="expandSet(block._id)"
-                    >
-                        <template #picker>
-                            <LogicAddRuleButton
-                                variant="between"
-                                :groups="groupConfigs"
-                                :sets="setConfigs"
-                                :index
-                                :enabled="true"
-                                :is-first="index === 0"
-                                :show-connector="true"
-                                :loading-set="loadingSet"
-                                :search-placeholder="__('Search Fields')"
-                                @added="addSet"
-                            />
-                        </template>
-                    </LogicRule>
+                    />
                 </div>
                 <LogicAddRuleButton
                     :groups="groupConfigs"
@@ -186,3 +171,18 @@ provide(publishContextKey, {
         </Panel>
     </div>
 </template>
+
+<style scoped>
+[data-logic-list]::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    bottom: 0;
+    inset-inline-start: 0.875rem;
+    border-inline-start: 1px dashed var(--color-gray-400);
+}
+
+.dark [data-logic-list]::before {
+    border-inline-start-color: var(--color-gray-600);
+}
+</style>
