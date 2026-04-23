@@ -4,6 +4,7 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\User;
 
@@ -18,6 +19,10 @@ class RedirectIfTwoFactorSetupIncomplete
             && ! $user->hasEnabledTwoFactorAuthentication()
             && ! $this->isSetupUrl($request)
         ) {
+            if (empty($user->two_factor_secret)) {
+                app(EnableTwoFactorAuthentication::class)($user);
+            }
+
             return redirect($this->redirectUrl($request));
         }
 

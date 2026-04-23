@@ -110,6 +110,40 @@ class TwoFactorRoutesTest extends TestCase
     }
 
     #[Test]
+    public function frontend_two_factor_setup_middleware_generates_secret_when_none_exists()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com'))->save();
+
+        $this->assertNull($user->two_factor_secret);
+
+        $this
+            ->actingAs($user)
+            ->get('/test-frontend-route')
+            ->assertRedirect(route('statamic.two-factor-setup', ['referer' => url('/test-frontend-route')]));
+
+        $this->assertNotNull($user->fresh()->two_factor_secret);
+    }
+
+    #[Test]
+    public function frontend_two_factor_setup_middleware_does_not_regenerate_existing_secret()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com')->data([
+            'two_factor_secret' => $existing = encrypt(app(\Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+        ]))->save();
+
+        $this
+            ->actingAs($user)
+            ->get('/test-frontend-route')
+            ->assertRedirect(route('statamic.two-factor-setup', ['referer' => url('/test-frontend-route')]));
+
+        $this->assertEquals($existing, $user->fresh()->two_factor_secret);
+    }
+
+    #[Test]
     public function frontend_two_factor_setup_middleware_redirects_to_configured_url()
     {
         config([
