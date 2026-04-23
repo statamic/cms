@@ -783,7 +783,7 @@ const notificationOptions = [
             </div>
 
             <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="@container relative py-6 px-2.5 pe-4.5 max-[1000px]:hidden">
+            <div class="@container relative pt-6 pb-12 px-2.5 pe-4.5 max-[1000px]:hidden">
                 <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                     <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                         <TabTrigger name="settings" :text="__('Settings')" />
