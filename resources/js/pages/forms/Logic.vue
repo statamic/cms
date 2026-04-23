@@ -194,6 +194,7 @@ provide(publishContextKey, {
                                     :is-first="index === 0"
                                     :show-connector="true"
                                     :loading-set="loadingSet"
+                                    :search-placeholder="__('Search Fields')"
                                     @added="addSet"
                                 />
                             </template>
@@ -205,9 +206,10 @@ provide(publishContextKey, {
                     :sets="setConfigs"
                     :show-connector="logicBlocks.length > 0"
                     :index="logicBlocks.length"
-                    :label="__('Add rule')"
+                    :label="__('Add Rule')"
                     :is-first="logicBlocks.length === 0"
                     :loading-set="loadingSet"
+                    :search-placeholder="__('Search Fields')"
                     @added="addSet"
                 />
             </Card>

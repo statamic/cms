@@ -22,7 +22,7 @@
         <template #default>
             <div class="flex items-center p-1.5 gap-1.5">
                 <ui-input
-                    :placeholder="__('Search Sets')"
+                    :placeholder="searchPlaceholderText"
                     class="[&_svg]:size-5"
                     input-attrs="data-set-picker-search-input"
                     icon-prepend="magnifying-glass"
@@ -101,7 +101,7 @@
             <!-- Popover content with toggle group -->
             <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5 gap-1.5">
                 <ui-input
-                    :placeholder="__('Search Sets')"
+                    :placeholder="searchPlaceholderText"
                     class="[&_svg]:size-5"
                     input-attrs="data-set-picker-search-input"
                     icon-prepend="magnifying-glass"
@@ -211,6 +211,7 @@ export default {
         enabled: { type: Boolean, default: true },
         align: { type: String, default: 'start' },
         loadingSet: { type: String, default: null },
+        searchPlaceholder: { type: String, default: null },
     },
 
     data() {
@@ -292,6 +293,10 @@ export default {
 
         noSearchResults() {
             return this.search && this.visibleSets.length === 0;
+        },
+
+        searchPlaceholderText() {
+            return this.searchPlaceholder ? __(this.searchPlaceholder) : __('Search Sets');
         },
 
         iconSet() {
