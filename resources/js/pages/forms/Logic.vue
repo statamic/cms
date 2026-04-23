@@ -59,6 +59,25 @@ const setConfigByHandle = computed(() => {
     }, {});
 });
 
+const areAllRulesCollapsed = computed(() => {
+    if (logicBlocks.value.length === 0) return false;
+    return logicBlocks.value.every((block) => collapsed.value.includes(block._id));
+});
+
+const allRulesView = computed({
+    get() {
+        return areAllRulesCollapsed.value ? 'collapsed' : 'expanded';
+    },
+    set(value) {
+        if (value === 'collapsed') {
+            collapsed.value = logicBlocks.value.map((block) => block._id);
+            return;
+        }
+
+        collapsed.value = [];
+    },
+});
+
 const remainingSetConfigs = computed(() => {
     const usedHandles = new Set(logicBlocks.value.map((block) => block.type));
     return setConfigs.filter((config) => !usedHandles.has(config.handle));
@@ -155,7 +174,13 @@ provide(publishContextKey, {
 
         <Panel>
             <PanelHeader>
-                <Heading :text="__('Form Logic')" />
+                <div class="flex items-center justify-between gap-3">
+                    <Heading :text="__('Form Logic')" />
+                    <ToggleGroup v-model="allRulesView" size="xs">
+                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" />
+                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" />
+                    </ToggleGroup>
+                </div>
             </PanelHeader>
             <Card>
                 <div class="relative space-y-6 mb-0" data-logic-list>

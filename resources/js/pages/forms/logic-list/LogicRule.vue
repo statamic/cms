@@ -106,7 +106,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         <Icon
                             v-if="config.icon"
                             :name="config.icon"
-                            class="size-3.5 me-1 rounded-sm"
+                            class="size-3.5 me-1 rounded-sm opacity-100!"
                             :class="config.iconClass"
                             aria-hidden="true"
                         />
