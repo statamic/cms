@@ -2,7 +2,7 @@
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
-import AddSetButton from '@/components/fieldtypes/replicator/AddSetButton.vue';
+import LogicAddSetButton from './logic-list/LogicAddSetButton.vue';
 import ReplicatorSet from '@/components/fieldtypes/replicator/Set.vue';
 import { SortableList } from '@/components/sortable/Sortable';
 import { computed, provide, ref, watchEffect } from 'vue';
@@ -185,7 +185,7 @@ provide(publishContextKey, {
                             @removed="removeSet(block._id, index)"
                         >
                             <template #picker>
-                                <AddSetButton
+                                <LogicAddSetButton
                                     variant="between"
                                     :groups="groupConfigs"
                                     :sets="setConfigs"
@@ -201,7 +201,7 @@ provide(publishContextKey, {
                         </ReplicatorSet>
                     </div>
                 </SortableList>
-                <AddSetButton
+                <LogicAddSetButton
                     :groups="groupConfigs"
                     :sets="setConfigs"
                     :show-connector="logicBlocks.length > 0"
