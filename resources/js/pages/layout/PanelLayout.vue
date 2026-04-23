@@ -89,7 +89,7 @@ onUnmounted(() => {
             id="right-panel"
             tabindex="-1"
             style="order: 2"
-            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 sm:-mr-2 grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
+            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
         ></div>
     </Teleport>
 
