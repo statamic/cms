@@ -217,6 +217,7 @@
 
 .logic-text__pill {
     display: flex;
+    max-width: fit-content;
     align-items: center;
     @apply
         gap-1

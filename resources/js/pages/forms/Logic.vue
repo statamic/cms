@@ -29,7 +29,7 @@ const logicBlocks = ref([
     { _id: 'age', type: 'age', enabled: true, summary: __('If age is greater than 21, then go to free drink voucher.') },
 ]);
 
-const collapsed = ref(['second_favorite_album', 'age']);
+const collapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});
 const meta = ref({});
 
@@ -98,14 +98,17 @@ function addSet(handle, index = logicBlocks.value.length) {
     loadingSet.value = handle;
     const config = setConfigByHandle.value[handle];
 
-    logicBlocks.value.splice(index, 0, {
+    const newRule = {
         _id: uniqid(),
         type: handle,
         enabled: true,
         summary: config?.display
             ? __('If :rule has matching conditions, continue to the configured destination.', { rule: config.display })
             : __('No conditions yet.'),
-    });
+    };
+
+    logicBlocks.value.splice(index, 0, newRule);
+    collapsed.value.push(newRule._id);
 
     loadingSet.value = null;
 }
