@@ -151,7 +151,7 @@ class Str
 
     public static function durationForHumans($s)
     {
-        $s = (int) $s;
+        $s = (int) round($s);
         $hours = floor($s / 3600);
         $mins = floor(($s % 3600) / 60);
         $secs = $s % 60;
