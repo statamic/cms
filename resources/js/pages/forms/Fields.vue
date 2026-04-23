@@ -548,13 +548,12 @@ const notificationOptions = [
                         </div>
 
                         <div id="fieldset-end">
-                            <Field class="opacity-60" :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
                                 <template #label>
                                     <Label for="fan-length-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
                                             {{ __('How long have you been a fan?') }}
-                                            <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                                         </span>
                                     </Label>
                                 </template>
@@ -668,12 +667,13 @@ const notificationOptions = [
                         </Field>
 
                         <div id="fieldset-end">
-                            <Field id="age-field" :label="__('How old are you?')">
+                            <Field id="age-field" class="opacity-60" :label="__('How old are you?')">
                                 <template #label>
                                     <Label for="age-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-teal-50 text-teal-600 dark:bg-teal-950 dark:text-teal-400" aria-hidden="true" />
                                             {{ __('How old are you?') }}
+                                            <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                                         </span>
                                     </Label>
                                 </template>
