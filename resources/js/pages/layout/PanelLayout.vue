@@ -95,20 +95,3 @@ onUnmounted(() => {
 
     <slot />
 </template>
-
-<style>
-#main-content:has([data-left-panel], [data-right-panel]) {
-    display: flex;
-}
-
-#main-content:has([data-left-panel], [data-right-panel]) > #content-card {
-    flex: 1;
-}
-
-@media (max-width: 1000px) {
-    #main-content:has([data-left-panel], [data-right-panel]) [data-max-width-wrapper] {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-    }
-}
-</style>
