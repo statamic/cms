@@ -81,6 +81,22 @@ class TwoFactorRoutesTest extends TestCase
     }
 
     #[Test]
+    public function cp_two_factor_setup_middleware_ignores_frontend_setup_url_config()
+    {
+        config([
+            'statamic.users.two_factor_enforced_roles' => ['*'],
+            'statamic.users.two_factor_setup_url' => '/custom-setup',
+        ]);
+
+        $user = tap(User::make()->makeSuper()->email('admin@domain.com'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('dashboard'))
+            ->assertRedirect(cp_route('two-factor-setup', ['referer' => cp_route('dashboard')]));
+    }
+
+    #[Test]
     public function frontend_two_factor_setup_middleware_redirects_when_two_factor_is_enforced()
     {
         config()->set('statamic.users.two_factor_enforced_roles', ['*']);
