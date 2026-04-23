@@ -3,6 +3,7 @@
 namespace Statamic\Exceptions;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 class ElevatedSessionAuthorizationException extends \Exception
@@ -22,6 +23,21 @@ class ElevatedSessionAuthorizationException extends \Exception
             ? cp_route('confirm-password')
             : route('statamic.elevated-session');
 
-        return redirect()->setIntendedUrl($request->fullUrl())->to($redirectUrl);
+        $intendedUrl = $request->isMethod('GET')
+            ? $request->fullUrl()
+            : $this->refererForIntendedUrl($request);
+
+        return redirect()->setIntendedUrl($intendedUrl)->to($redirectUrl);
+    }
+
+    private function refererForIntendedUrl(Request $request)
+    {
+        $referer = $request->headers->get('referer');
+
+        if ($referer && ! URL::isExternalToApplication($referer)) {
+            return $referer;
+        }
+
+        return $request->fullUrl();
     }
 }

@@ -45,7 +45,15 @@ class ElevatedSessionTest extends TestCase
                 return 'ok';
             })->middleware(Middleware\RequireElevatedSession::class);
 
+            Route::post('/requires-elevated-session', function () {
+                return 'ok';
+            })->middleware(Middleware\RequireElevatedSession::class);
+
             Route::get('/cp/requires-elevated-session', function () {
+                return 'ok';
+            })->middleware(Middleware\CP\RequireElevatedSession::class);
+
+            Route::post('/cp/requires-elevated-session', function () {
                 return 'ok';
             })->middleware(Middleware\CP\RequireElevatedSession::class);
         });
@@ -307,6 +315,54 @@ class ElevatedSessionTest extends TestCase
             ->withElevatedSession(now()->subMinutes(16))
             ->get('/cp/requires-elevated-session')
             ->assertRedirect('/cp/auth/confirm-password');
+    }
+
+    #[Test]
+    public function middleware_uses_referer_as_intended_url_for_post_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->post('/cp/requires-elevated-session', [], ['referer' => 'http://localhost/cp/some-form'])
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/some-form');
+    }
+
+    #[Test]
+    public function middleware_falls_back_to_full_url_when_referer_is_external_for_post_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->post('/cp/requires-elevated-session', [], ['referer' => 'https://evil.example.com/form'])
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/requires-elevated-session');
+    }
+
+    #[Test]
+    public function middleware_falls_back_to_full_url_when_referer_is_missing_for_post_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->post('/cp/requires-elevated-session')
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/requires-elevated-session');
+    }
+
+    #[Test]
+    public function middleware_uses_full_url_as_intended_url_for_get_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/cp/requires-elevated-session', ['referer' => 'http://localhost/cp/some-form'])
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/requires-elevated-session');
     }
 
     #[Test]
