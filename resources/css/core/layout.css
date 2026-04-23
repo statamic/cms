@@ -352,7 +352,9 @@ main.nav-closed {
         background: hsl(0deg 0% 100% / 50%);
         backdrop-filter: blur(10px);
         & svg {
-            font-size: 1rem;
+            width: calc(var(--spacing) * 3.5);
+            height: calc(var(--spacing) * 3.5);
+            aspect-ratio: 1;
             inline-size: unset;
         }
     }
