@@ -101,7 +101,7 @@ const notificationOptions = [
                     <button class="left-panel-popover__close-button" title="Close" popovertarget="popover-left-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
-                    <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10">
+                    <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10 pb-40">
                         <li>
                             <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
                                 <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
@@ -708,7 +708,7 @@ const notificationOptions = [
                 <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
                     <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                 </button>
-                <div class="@container py-6 px-2.5">
+                <div class="@container pt-6 pb-40 px-2.5">
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                         <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
