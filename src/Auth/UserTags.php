@@ -797,6 +797,16 @@ class UserTags extends Tags
     }
 
     /**
+     * Output a boolean of whether two-factor auth is enabled for the user.
+     *
+     * Maps to {{ user:two_factor_enabled }}
+     */
+    public function twoFactorEnabled(): bool
+    {
+        return (bool) User::current()?->hasEnabledTwoFactorAuthentication();
+    }
+
+    /**
      * Output a two-factor challenge form for login verification.
      *
      * Maps to {{ user:two_factor_challenge_form }}
