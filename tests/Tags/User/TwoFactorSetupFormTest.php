@@ -121,6 +121,7 @@ class TwoFactorSetupFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
                 '_redirect' => '/dashboard',
@@ -132,12 +133,28 @@ class TwoFactorSetupFormTest extends TestCase
     }
 
     #[Test]
+    public function it_requires_elevated_session_to_confirm()
+    {
+        $user = $this->userWithTwoFactorPending();
+
+        $this
+            ->actingAs($user)
+            ->post(route('statamic.users.two-factor.confirm'), [
+                'code' => $this->getOneTimeCode($user),
+            ])
+            ->assertRedirect(route('statamic.elevated-session'));
+
+        $this->assertNull($user->fresh()->two_factor_confirmed_at);
+    }
+
+    #[Test]
     public function it_redirects_back_without_redirect_param()
     {
         $user = $this->userWithTwoFactorPending();
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/setup-2fa')
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
@@ -155,6 +172,7 @@ class TwoFactorSetupFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->postJson(route('statamic.users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
             ])
@@ -171,6 +189,7 @@ class TwoFactorSetupFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/setup-2fa')
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => '123456',
@@ -189,6 +208,7 @@ class TwoFactorSetupFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => '123456',
                 '_redirect' => '/dashboard',
@@ -207,7 +227,10 @@ class TwoFactorSetupFormTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->session(['login.redirect' => '/account'])
+            ->session([
+                'statamic_elevated_session' => now()->timestamp,
+                'login.redirect' => '/account',
+            ])
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
                 '_redirect' => '',
@@ -215,6 +238,11 @@ class TwoFactorSetupFormTest extends TestCase
             ->assertRedirect('/account');
 
         $this->assertNotNull($user->fresh()->two_factor_confirmed_at);
+    }
+
+    private function withActiveElevatedSession()
+    {
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
     }
 
     private function user()

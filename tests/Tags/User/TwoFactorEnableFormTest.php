@@ -95,6 +95,7 @@ class TwoFactorEnableFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/profile')
             ->post(route('statamic.users.two-factor.enable'))
             ->assertRedirect('/profile');
@@ -105,12 +106,26 @@ class TwoFactorEnableFormTest extends TestCase
     }
 
     #[Test]
+    public function it_requires_elevated_session_to_enable()
+    {
+        $user = $this->user();
+
+        $this
+            ->actingAs($user)
+            ->post(route('statamic.users.two-factor.enable'))
+            ->assertRedirect(route('statamic.elevated-session'));
+
+        $this->assertNull($user->fresh()->two_factor_secret);
+    }
+
+    #[Test]
     public function it_redirects_to_redirect_param()
     {
         $user = $this->user();
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/profile')
             ->post(route('statamic.users.two-factor.enable'), [
                 '_redirect' => '/dashboard',
@@ -125,6 +140,7 @@ class TwoFactorEnableFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/profile')
             ->post(route('statamic.users.two-factor.enable'), [
                 '_redirect' => 'https://evil.example.com',
@@ -141,6 +157,7 @@ class TwoFactorEnableFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/profile')
             ->post(route('statamic.users.two-factor.enable'))
             ->assertRedirect('/profile');
@@ -150,6 +167,7 @@ class TwoFactorEnableFormTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->from('/profile')
             ->post(route('statamic.users.two-factor.enable'))
             ->assertRedirect('/profile');
@@ -157,6 +175,11 @@ class TwoFactorEnableFormTest extends TestCase
         $this->assertEquals($firstSecret, $user->fresh()->two_factor_secret);
 
         Event::assertDispatchedTimes(TwoFactorAuthenticationEnabled::class, 1);
+    }
+
+    private function withActiveElevatedSession()
+    {
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
     }
 
     private function user()

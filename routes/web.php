@@ -82,16 +82,13 @@ Route::name('statamic.')->group(function () {
                 Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
                 Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
-                Route::middleware('auth')->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+                Route::middleware(['auth', RequireElevatedSession::class])->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
                     Route::post('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
                     Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
-
-                    Route::middleware(RequireElevatedSession::class)->group(function () {
-                        Route::delete('two-factor/disable', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
-                        Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
-                        Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
-                        Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
-                    });
+                    Route::delete('two-factor/disable', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
+                    Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
+                    Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
+                    Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
                 });
             }
         });
