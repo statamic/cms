@@ -693,6 +693,14 @@ const notificationOptions = [
                         </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
                         </Field>
+
+                        <Button
+                            variant="primary"
+                            @click.prevent
+                            class="hover:cursor-not-allowed"
+                            style="--theme-color-primary: var(--theme-color-gray-950)"
+                            :text="__('Submit')"
+                        />
                     </div>
                 </Card>
             </div>
