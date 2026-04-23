@@ -4,11 +4,10 @@ import {
     Badge,
     Icon,
     Subheading,
-    PublishFields as Fields,
-    PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
 import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
+import LogicFlowMock from '../LogicFlowMock.vue';
 import { reveal } from '@api';
 
 const emit = defineEmits(['collapsed', 'expanded']);
@@ -33,9 +32,7 @@ const props = defineProps({
 
 const { previews } = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
-const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
-const hasFields = computed(() => Array.isArray(props.config.fields) ? props.config.fields.length > 0 : Object.keys(props.config.fields || {}).length > 0);
 
 const ruleGroup = computed(() => {
     if (replicatorSets.length < 1) return null;
@@ -98,7 +95,7 @@ reveal.use(rootEl, () => emit('expanded'));
         >
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
-                :class="{ 'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields }"
+                :class="{ 'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed }"
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
@@ -130,20 +127,14 @@ reveal.use(rootEl, () => emit('expanded'));
             </header>
 
             <div
-                v-show="!collapsed && hasFields"
+                v-show="!collapsed"
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
-                    <FieldsProvider
-                        :fields="config.fields"
-                        :as-config="false"
-                        :read-only="readOnly"
-                        :field-path-prefix="fieldPathPrefix"
-                        :meta-path-prefix="metaPathPrefix"
-                    >
-                        <Fields class="p-4" />
-                    </FieldsProvider>
+                    <div class="p-4">
+                        <LogicFlowMock />
+                    </div>
                 </div>
             </div>
         </div>
