@@ -20,9 +20,16 @@ const logicValueOptions = [
 
 const logicDestination = ref('second_favorite');
 const logicDestinationOptions = [
-    { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio' },
-    { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short' },
-    { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes' },
+    { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
+    { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
+    { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
+];
+const logicConditionField = ref('long_answer');
+const logicConditionFieldOptions = [
+    { label: __('What do you like most about our band?'), value: 'long_answer', icon: 'text-long', category: 'text' },
+    { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
+    { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
+    { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
 ];
 
 const logicJoin = ref('and');
@@ -34,6 +41,21 @@ const logicJoinOptions = [
 const logicContainsOperator = ref('contains');
 const logicContainsAnswer = ref('5');
 const logicContainsAnswerPlaceholder = __('Answer');
+
+const optionIconClasses = (option) => {
+    if (option?.category === 'text') return 'size-4 shrink-0 text-purple-500 dark:text-purple-400';
+    return 'size-4 shrink-0 text-orange-500 dark:text-orange-400';
+};
+
+const optionChipClasses = (option) => {
+    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 rounded-full';
+    return 'flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full';
+};
+
+const optionChipIconClasses = (option) => {
+    if (option?.category === 'text') return 'size-4 shrink-0 rounded-full text-purple-600 dark:text-purple-400';
+    return 'size-4 shrink-0 rounded-full text-orange-600 dark:text-orange-400';
+};
 </script>
 
 <template>
@@ -192,32 +214,32 @@ const logicContainsAnswerPlaceholder = __('Answer');
                 <ol>
                     <li>
                         <Combobox
-                            v-model="logicDestination"
+                            v-model="logicConditionField"
                             size="sm"
                             variant="default"
-                            :options="logicDestinationOptions"
+                            :options="logicConditionFieldOptions"
                             option-label="label"
                             option-value="value"
                             :placeholder="__('Destination')"
                             searchable
                         >
-                            <template #option="{ icon, label }">
-                                <div class="flex min-w-0 gap-2 text-left">
+                            <template #option="{ icon, label, category }">
+                                <div class="flex min-w-0 gap-2 items-center text-left">
                                     <Icon
                                         v-if="icon"
                                         :name="icon"
-                                        class="size-4 shrink-0 text-purple-500 dark:text-purple-400"
+                                        :class="optionIconClasses({ category })"
                                     />
                                     <span class="block truncate">{{ label }}</span>
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
                                 <div class="flex min-w-0 items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 rounded-full">
+                                    <div :class="optionChipClasses(option)">
                                         <Icon
                                             v-if="option.icon"
                                             :name="option.icon"
-                                            class="size-4 shrink-0 rounded-full text-purple-600 dark:text-purple-400"
+                                            :class="optionChipIconClasses(option)"
                                         />
                                     </div>
                                     <span class="block truncate">{{ option.label }}</span>
@@ -270,23 +292,23 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             :placeholder="__('Destination')"
                             searchable
                         >
-                            <template #option="{ icon, label }">
-                                <div class="flex min-w-0 gap-2 text-left">
+                            <template #option="{ icon, label, category }">
+                                <div class="flex min-w-0 gap-2 items-center text-left">
                                     <Icon
                                         v-if="icon"
                                         :name="icon"
-                                        class="size-4 shrink-0 text-orange-500 dark:text-orange-400"
+                                        :class="optionIconClasses({ category })"
                                     />
                                     <span class="block truncate">{{ label }}</span>
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
                                 <div class="flex min-w-0 items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full">
+                                    <div :class="optionChipClasses(option)">
                                         <Icon
                                             v-if="option.icon"
                                             :name="option.icon"
-                                            class="size-4 shrink-0 rounded-full text-orange-600 dark:text-orange-400"
+                                            :class="optionChipIconClasses(option)"
                                         />
                                     </div>
                                     <span class="block truncate">{{ option.label }}</span>
