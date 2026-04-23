@@ -35,10 +35,13 @@ const meta = ref({});
 
 const setConfigs = [
     { handle: 'heard_about_us', display: __('How did you hear about us?'), fields: [] },
+    { handle: 'like_most', display: __('What do you like most about our band?'), fields: [] },
     { handle: 'fan_length', display: __('How long have you been a fan?'), fields: [] },
     { handle: 'favorite_album', display: __('Which album was your favorite?'), fields: [] },
     { handle: 'second_favorite_album', display: __('Which album was your second favorite?'), fields: [] },
+    { handle: 'email_notifications_signup', display: __('Sign up for email notifications from The Midnight'), fields: [] },
     { handle: 'age', display: __('How old are you?'), fields: [] },
+    { handle: 'free_drink_voucher', display: __('I want a free drink voucher'), fields: [] },
 ];
 
 const groupConfigs = [
@@ -54,6 +57,21 @@ const setConfigByHandle = computed(() => {
         carry[config.handle] = config;
         return carry;
     }, {});
+});
+
+const remainingSetConfigs = computed(() => {
+    const usedHandles = new Set(logicBlocks.value.map((block) => block.type));
+    return setConfigs.filter((config) => !usedHandles.has(config.handle));
+});
+
+const remainingGroupConfigs = computed(() => {
+    return [
+        {
+            handle: 'logic',
+            display: __('Logic Rules'),
+            sets: remainingSetConfigs.value,
+        },
+    ];
 });
 
 watchEffect(() => {
@@ -75,6 +93,8 @@ function setFieldMeta(path, value) {
 }
 
 function addSet(handle, index = logicBlocks.value.length) {
+    if (logicBlocks.value.some((block) => block.type === handle)) return;
+
     loadingSet.value = handle;
     const config = setConfigByHandle.value[handle];
 
@@ -157,8 +177,8 @@ provide(publishContextKey, {
                     />
                 </div>
                 <LogicAddRuleButton
-                    :groups="groupConfigs"
-                    :sets="setConfigs"
+                    :groups="remainingGroupConfigs"
+                    :sets="remainingSetConfigs"
                     :show-connector="logicBlocks.length > 0"
                     :index="logicBlocks.length"
                     :label="__('Add Rule')"

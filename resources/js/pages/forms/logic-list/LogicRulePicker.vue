@@ -29,13 +29,8 @@
                     size="sm"
                     type="text"
                     v-model="search"
-                    :variant="mode === 'list' ? 'ghost' : 'default'"
+                    variant="ghost"
                 />
-
-                <ui-toggle-group v-model="mode" size="sm">
-                    <ui-toggle-item icon="layout-list" value="list" :aria-label="__('List view')" />
-                    <ui-toggle-item icon="layout-grid" value="grid" :aria-label="__('Grid view')" />
-                </ui-toggle-group>
             </div>
 
             <ui-tabs default-tab="all" v-model="selectedTab" class="w-full" v-if="mode === 'grid'">
@@ -107,11 +102,6 @@
                     v-model="search"
                     variant="ghost"
                 />
-
-                <ui-toggle-group v-model="mode" size="sm">
-                    <ui-toggle-item icon="layout-list" value="list" aria-label="List view" />
-                    <ui-toggle-item icon="layout-grid" value="grid" aria-label="Grid view" />
-                </ui-toggle-group>
             </div>
 
             <div v-if="showGroupBreadcrumb" class="flex items-center p-1.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600">
@@ -210,7 +200,7 @@ export default {
             selectionIndex: 0,
             keybindings: [],
             isOpen: false,
-            mode: this.getStoredMode(),
+            mode: 'list',
             selectedTab: 'all',
         };
     },
@@ -291,9 +281,6 @@ export default {
         selectedTab() {
             this.selectionIndex = 0;
         },
-        mode() {
-            this.saveMode();
-        },
         loadingSet(loading, wasLoading) {
             if (wasLoading && !loading) {
                 this.isOpen = false;
@@ -328,12 +315,12 @@ export default {
         },
         keypressUp(e) {
             e.preventDefault();
-            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            const items = this.items;
             this.selectionIndex = this.selectionIndex === 0 ? items.length - 1 : this.selectionIndex - 1;
         },
         keypressDown(e) {
             e.preventDefault();
-            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            const items = this.items;
             this.selectionIndex = this.selectionIndex === items.length - 1 ? 0 : this.selectionIndex + 1;
         },
         keypressRight(e) {
@@ -347,7 +334,7 @@ export default {
         },
         keypressEnter(e) {
             e.preventDefault();
-            const items = this.mode === 'grid' ? this.currentTabItems : this.items;
+            const items = this.items;
             const item = items[this.selectionIndex];
             if (item && item.type === 'group') this.selectGroup(item.handle);
             else if (item) this.addRule(item.handle);
@@ -361,18 +348,6 @@ export default {
                 e.stopPropagation();
                 e.preventDefault();
             }
-        },
-        getStoredMode() {
-            try {
-                return localStorage.getItem('statamic.replicator.setPicker.mode') || 'list';
-            } catch {
-                return 'list';
-            }
-        },
-        saveMode() {
-            try {
-                localStorage.setItem('statamic.replicator.setPicker.mode', this.mode);
-            } catch {}
         },
         isSetLoading(handle) {
             return this.loadingSet === handle;
