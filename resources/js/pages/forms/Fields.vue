@@ -772,6 +772,7 @@ const notificationOptions = [
                                     </div>
 
                                     <LogicFlowMock />
+                                    <Button size="sm" variant="subtle" class="w-auto!" :text="__('+ Add Condition')" />
                                 </div>
                             </TabContent>
                             <TabContent name="validation">
@@ -880,6 +881,7 @@ const notificationOptions = [
                             </div>
 
                             <LogicFlowMock />
+                            <Button size="sm" variant="subtle" class="w-auto!" :text="__('+ Add Condition')" />
                         </div>
                     </TabContent>
                     <TabContent name="validation">
