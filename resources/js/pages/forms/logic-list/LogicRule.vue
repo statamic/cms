@@ -106,6 +106,13 @@ reveal.use(rootEl, () => emit('expanded'));
                             {{ __(ruleGroup.display) }}
                             <Icon name="chevron-right" class="relative top-px size-3" />
                         </span>
+                        <Icon
+                            v-if="config.icon"
+                            :name="config.icon"
+                            class="size-3.5 me-1 rounded-sm"
+                            :class="config.iconClass"
+                            aria-hidden="true"
+                        />
                         {{ __(config.display) || config.handle }}
                     </Badge>
                     <Icon
