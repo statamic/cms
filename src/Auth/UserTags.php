@@ -872,7 +872,6 @@ class UserTags extends Tags
             ! TwoFactor::enabled()
             || ! $user
             || $user->hasEnabledTwoFactorAuthentication()
-            || $user->two_factor_secret
         ) {
             return;
         }

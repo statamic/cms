@@ -38,7 +38,7 @@ class TwoFactorEnableFormTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_render_for_user_with_pending_setup()
+    public function it_renders_for_user_with_pending_setup()
     {
         $user = $this->userWithTwoFactorPending();
 
@@ -46,8 +46,8 @@ class TwoFactorEnableFormTest extends TestCase
 
         $output = $this->tag('{{ user:two_factor_enable_form }}<p>inside</p>{{ /user:two_factor_enable_form }}');
 
-        $this->assertStringNotContainsString('<form', $output);
-        $this->assertStringNotContainsString('<p>inside</p>', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/two-factor/enable">', $output);
+        $this->assertStringContainsString('<p>inside</p>', $output);
     }
 
     #[Test]
