@@ -126,10 +126,8 @@ const visibleValues = computed(() => {
         }
     }
 
-    // Hot path: nothing hidden -> return the reactive tree directly.
     if (omittable === null) return values.value;
 
-    // Only clone when we actually need to omit something.
     const out = clone(values.value);
     for (const key of omittable) forgetAtPath(out, key);
     return out;

@@ -130,12 +130,7 @@ export default {
 
         meta(meta, oldMeta) {
             if (meta === oldMeta) return;
-            if (
-                meta.initialUrl === oldMeta.initialUrl &&
-                meta.initialOption === oldMeta.initialOption &&
-                this.shallowArrayEqual(meta.initialSelectedEntries, oldMeta.initialSelectedEntries) &&
-                this.shallowArrayEqual(meta.initialSelectedAssets, oldMeta.initialSelectedAssets)
-            ) return;
+            if (JSON.stringify(meta) === JSON.stringify(oldMeta)) return;
 
             this.metaChanging = true;
             this.urlValue = meta.initialUrl;
@@ -147,10 +142,6 @@ export default {
     },
 
     methods: {
-        shallowArrayEqual(a, b) {
-            return a === b || (Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => x === b[i]));
-        },
-
         initialOptions() {
             return [
                 this.config.required ? null : { label: __('None'), value: null },

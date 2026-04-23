@@ -40,6 +40,7 @@ const shouldFocus = computed(() => {
     if (props.config.focus === false || props.config.focus === true) {
         return props.config.focus;
     }
+
     const isRootField = !props.fieldPathPrefix;
     const isImplicitAutofocusField = name.value === 'title' || name.value === 'alt';
 

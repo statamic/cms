@@ -16,7 +16,6 @@ export default {
 
     methods: {
         formatPreviewValue(value, fieldConfig) {
-            // Delegate to shared utility (non-escaping variant for backward compatibility)
             return formatPreviewValueUtil(value, fieldConfig, { escape: false });
         },
     },

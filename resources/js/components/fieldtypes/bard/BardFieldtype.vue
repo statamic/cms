@@ -864,17 +864,14 @@ export default {
                     }, 1);
                 },
                 onUpdate: ({ transaction }) => {
-                    // Filter out non-doc transactions (selection, metadata, etc.).
                     if (!transaction.docChanged) return;
 
                     const newDocSize = this.editor.state.doc.content.size;
                     const oldDocSize = this._lastDocSize ?? newDocSize;
 
-                    // Structural size change -> sync immediately, skip the usual debounce window.
                     if (oldDocSize !== newDocSize) this.debounceNextUpdate = false;
                     this._lastDocSize = newDocSize;
 
-                    // getJSON() already returns a fresh plain object — no clone() needed.
                     this.json = this.editor.getJSON().content;
                     this.html = this.editor.getHTML();
                 },

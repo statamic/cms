@@ -101,7 +101,7 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Toggle: ✓ Field Label / ✗ Field Label
     if (type === 'toggle') {
-        const display = fieldConfig.display || '';
+        const display = fieldConfig.display || 'Toggle';
         const prefix = value ? '✓' : '✗';
         const result = display ? `${prefix} ${display}` : prefix;
         return escape ? escapeHtml(result) : result;
@@ -130,7 +130,7 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Replicator: Display: N set(s)
     if (type === 'replicator') {
-        const display = fieldConfig.display || 'Sets';
+        const display = fieldConfig.display || 'Replicator';
         const count = Array.isArray(value) ? value.length : 0;
         const result = `${display}: ${count} ${count === 1 ? 'Set' : 'Sets'}`;
         return escape ? escapeHtml(result) : result;
@@ -138,7 +138,7 @@ export default function formatPreviewValue(value, fieldConfig, options = {}) {
 
     // Grid: Display: N row(s)
     if (type === 'grid') {
-        const display = fieldConfig.display || 'Rows';
+        const display = fieldConfig.display || 'Grid';
         const count = Array.isArray(value) ? value.length : 0;
         const result = `${display}: ${count} ${count === 1 ? 'Row' : 'Rows'}`;
         return escape ? escapeHtml(result) : result;

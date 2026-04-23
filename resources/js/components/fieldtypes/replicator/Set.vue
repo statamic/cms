@@ -119,7 +119,6 @@ watch(
     () => props.collapsed,
     (collapsed) => {
         if (!collapsed && !hasBeenExpanded.value) {
-            // First time expanding - defer field mounting via scheduler
             hasBeenExpanded.value = true;
             mountScheduler.schedule(() => {
                 if (!isUnmounted) {
@@ -127,7 +126,6 @@ watch(
                 }
             });
         } else if (!collapsed) {
-            // Already expanded before - just show
             fieldsReady.value = true;
         }
     },
@@ -192,15 +190,13 @@ reveal.use(rootEl, () => emit('expanded'));
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
-                            <template v-if="fieldActions.length">
-                                <DropdownItem
-                                    v-for="action in fieldActions"
-                                    :key="action.title"
-                                    :text="action.title"
-                                    :variant="action.dangerous ? 'destructive' : 'default'"
-                                    @click="action.run(action)"
-                                />
-                            </template>
+                            <DropdownItem
+                                v-if="fieldActions.length"
+                                v-for="action in fieldActions"
+                                :text="action.title"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run(action)"
+                            />
                             <DropdownSeparator v-if="fieldActions.length" />
                             <DropdownItem
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"

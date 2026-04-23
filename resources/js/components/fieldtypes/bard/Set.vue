@@ -153,7 +153,6 @@ export default {
     watch: {
         collapsed(collapsed) {
             if (!collapsed && !this.hasBeenExpanded) {
-                // First time expanding - defer field mounting via scheduler
                 this.hasBeenExpanded = true;
                 this.mountScheduler.schedule(() => {
                     if (!this._unmounted) {
@@ -161,7 +160,6 @@ export default {
                     }
                 });
             } else if (!collapsed) {
-                // Already expanded before - just show
                 this.fieldsReady = true;
             }
         },
@@ -386,11 +384,7 @@ export default {
                 () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
                 (values) => {
                     if (!values) return;
-
-                    // Fast path: same reactive reference -> nothing to sync.
                     if (values === this.node.attrs.values) return;
-
-                    // Structural equality check; preserves correctness for reference swaps with identical content.
                     if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
 
                     this.updateAttributes({ values });

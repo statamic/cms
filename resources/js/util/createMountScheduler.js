@@ -27,8 +27,6 @@ export function createMountScheduler({ budgetMs = DEFAULT_BUDGET_MS } = {}) {
                 deadline = await waitForIdle();
 
                 const frameStart = performance.now();
-                // Trust timeRemaining() only when rIC granted real idle.
-                // On didTimeout (browser forced us in after 50ms), fall back to the explicit budget.
                 const shouldYield = () => {
                     if (deadline && typeof deadline.timeRemaining === 'function' && !deadline.didTimeout) {
                         return deadline.timeRemaining() < 1;
