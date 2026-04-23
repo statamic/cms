@@ -97,7 +97,7 @@ class AuthRedirectTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_non_logged_in_statamic_users()
+    public function it_redirects_to_login_when_authenticated_user_is_not_a_statamic_user()
     {
         $nonStatamicUser = EloquentUser::make();
 
