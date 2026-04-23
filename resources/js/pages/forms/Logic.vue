@@ -1,8 +1,8 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator } from '@ui';
-import { computed } from 'vue';
+import { Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { computed, ref } from 'vue';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
@@ -11,6 +11,7 @@ const props = defineProps({
 });
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
+const logicView = ref('list');
 </script>
 
 <template>
@@ -26,6 +27,12 @@ const formTitle = computed(() => props.form?.title || __('Untitled Form'));
             <template #title>
                 <StatusIndicator status="published" />
                 {{ formTitle }}
+            </template>
+            <template #actions>
+                <ToggleGroup v-model="logicView" size="xs">
+                    <ToggleItem value="list" icon="layout-list" :label="__('List')" />
+                    <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
+                </ToggleGroup>
             </template>
         </Header>
 
