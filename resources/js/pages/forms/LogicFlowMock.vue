@@ -234,7 +234,7 @@ const optionChipIconClasses = (option) => {
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
-                                <div class="flex min-w-0 items-center gap-2 -ms-0.75">
+                                <div class="flex min-w-0 items-center gap-1 -ms-0.75">
                                     <div :class="optionChipClasses(option)">
                                         <Icon
                                             v-if="option.icon"
@@ -303,7 +303,7 @@ const optionChipIconClasses = (option) => {
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
-                                <div class="flex min-w-0 items-center gap-2 -ms-0.75">
+                                <div class="flex min-w-0 items-center gap-1 -ms-0.75">
                                     <div :class="optionChipClasses(option)">
                                         <Icon
                                             v-if="option.icon"
