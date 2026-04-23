@@ -4,7 +4,6 @@ import FormsLayout from './Layout.vue';
 import { Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
 import LogicAddSetButton from './logic-list/LogicAddSetButton.vue';
 import ReplicatorSet from '@/components/fieldtypes/replicator/Set.vue';
-import { SortableList } from '@/components/sortable/Sortable';
 import { computed, provide, ref, watchEffect } from 'vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
@@ -153,54 +152,45 @@ provide(publishContextKey, {
                 <Heading :text="__('Form Logic')" />
             </PanelHeader>
             <Card>
-                <SortableList
-                    v-model="logicBlocks"
-                    :item-class="sortableItemClass"
-                    :handle-class="sortableHandleClass"
-                    :vertical="true"
-                    append-to="body"
-                    constrain-dimensions
-                >
-                    <div class="relative">
-                        <ReplicatorSet
-                            v-for="(block, index) in logicBlocks"
-                            :id="block._id"
-                            :key="block._id"
-                            :index
-                            :field-path="fieldPath"
-                            :meta-path="metaPath"
-                            :values="block"
-                            :config="setConfigByHandle[block.type]"
-                            :sortable-item-class="sortableItemClass"
-                            :sortable-handle-class="sortableHandleClass"
-                            :collapsed="collapsed.includes(block._id)"
-                            :enabled="block.enabled"
-                            :read-only="false"
-                            :can-add-set="true"
-                            :has-error="false"
-                            :show-field-previews="true"
-                            @collapsed="collapseSet(block._id)"
-                            @expanded="expandSet(block._id)"
-                            @duplicated="duplicateSet(block._id)"
-                            @removed="removeSet(block._id, index)"
-                        >
-                            <template #picker>
-                                <LogicAddSetButton
-                                    variant="between"
-                                    :groups="groupConfigs"
-                                    :sets="setConfigs"
-                                    :index
-                                    :enabled="true"
-                                    :is-first="index === 0"
-                                    :show-connector="true"
-                                    :loading-set="loadingSet"
-                                    :search-placeholder="__('Search Fields')"
-                                    @added="addSet"
-                                />
-                            </template>
-                        </ReplicatorSet>
-                    </div>
-                </SortableList>
+                <div class="relative" data-logic-list>
+                    <ReplicatorSet
+                        v-for="(block, index) in logicBlocks"
+                        :id="block._id"
+                        :key="block._id"
+                        :index
+                        :field-path="fieldPath"
+                        :meta-path="metaPath"
+                        :values="block"
+                        :config="setConfigByHandle[block.type]"
+                        :sortable-item-class="sortableItemClass"
+                        :sortable-handle-class="sortableHandleClass"
+                        :collapsed="collapsed.includes(block._id)"
+                        :enabled="block.enabled"
+                        :read-only="false"
+                        :can-add-set="true"
+                        :has-error="false"
+                        :show-field-previews="true"
+                        @collapsed="collapseSet(block._id)"
+                        @expanded="expandSet(block._id)"
+                        @duplicated="duplicateSet(block._id)"
+                        @removed="removeSet(block._id, index)"
+                    >
+                        <template #picker>
+                            <LogicAddSetButton
+                                variant="between"
+                                :groups="groupConfigs"
+                                :sets="setConfigs"
+                                :index
+                                :enabled="true"
+                                :is-first="index === 0"
+                                :show-connector="true"
+                                :loading-set="loadingSet"
+                                :search-placeholder="__('Search Fields')"
+                                @added="addSet"
+                            />
+                        </template>
+                    </ReplicatorSet>
+                </div>
                 <LogicAddSetButton
                     :groups="groupConfigs"
                     :sets="setConfigs"
@@ -216,3 +206,9 @@ provide(publishContextKey, {
         </Panel>
     </div>
 </template>
+
+<style scoped>
+[data-logic-list] :deep(.logic-rule-handle) {
+    display: none;
+}
+</style>
