@@ -583,6 +583,15 @@ const notificationOptions = [
                             <Button
                                 size="sm"
                                 inset
+                                icon="eye"
+                                variant="subtle"
+                                :aria-label="__('Hide field')"
+                                :title="__('Hide field')"
+                                class="[&_svg]:opacity-45"
+                            />
+                            <Button
+                                size="sm"
+                                inset
                                 icon="trash"
                                 variant="subtle"
                                 :aria-label="__('Remove field')"
