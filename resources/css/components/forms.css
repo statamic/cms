@@ -246,6 +246,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    user-select: none;
 }
 
 /* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / CONNECTORS
@@ -289,7 +290,11 @@
 }
 .logic-text__condition {
     position: relative;
-    @apply mb-4;
+    @apply mb-2;
+    .logic-text > ol > li:is(:first-child, :last-child) & {
+        /* Increase for entry and exit points */
+        @apply mb-4;
+    }
     &::after {
         content: '';
         position: absolute;
@@ -304,6 +309,3 @@
         height: calc(100% - 4px);
     }
 }
-
-
-
