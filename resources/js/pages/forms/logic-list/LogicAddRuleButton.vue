@@ -1,12 +1,12 @@
 <template>
     <div class="inline-block" v-if="variant === 'button'">
-        <logic-set-picker
+        <logic-rule-picker
             :enabled="enabled"
             :sets="groups"
             align="start"
             :loading-set="loadingSet"
             :search-placeholder="searchPlaceholder"
-            @added="addSet"
+            @added="addRule"
         >
             <template #trigger>
                 <div class="inline-flex relative pt-2" :class="{ 'pt-6': showConnector }">
@@ -14,16 +14,16 @@
                     <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative" />
                 </div>
             </template>
-        </logic-set-picker>
+        </logic-rule-picker>
     </div>
-    <logic-set-picker
+    <logic-rule-picker
         v-else
         :enabled="enabled"
         :sets="groups"
         align="center"
         :loading-set="loadingSet"
         :search-placeholder="searchPlaceholder"
-        @added="addSet"
+        @added="addRule"
     >
         <template #trigger>
             <div
@@ -51,11 +51,11 @@
                 <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity delay-10 duration-250" />
             </div>
         </template>
-    </logic-set-picker>
+    </logic-rule-picker>
 </template>
 
 <script setup>
-import LogicSetPicker from './LogicSetPicker.vue';
+import LogicRulePicker from './LogicRulePicker.vue';
 import { Button } from '@/components/ui';
 import { computed } from 'vue';
 
@@ -74,9 +74,9 @@ const props = defineProps({
     searchPlaceholder: { type: String, default: null },
 });
 
-const label = computed(() => props.label ? __(props.label) : __('Add Set'));
+const label = computed(() => props.label ? __(props.label) : __('Add Rule'));
 
-function addSet(handle) {
+function addRule(handle) {
     emit('added', handle, props.index);
 }
 </script>

@@ -1,0 +1,144 @@
+<script setup>
+import { computed, inject, ref } from 'vue';
+import {
+    Badge,
+    Icon,
+    Subheading,
+    PublishFields as Fields,
+    PublishFieldsProvider as FieldsProvider,
+    injectPublishContext as injectContainerContext,
+} from '@/components/ui';
+import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
+import { reveal } from '@api';
+
+const emit = defineEmits(['collapsed', 'expanded']);
+
+const replicatorSets = inject('replicatorSets');
+
+const props = defineProps({
+    config: Object,
+    id: String,
+    fieldPath: String,
+    metaPath: String,
+    index: Number,
+    collapsed: Boolean,
+    values: Object,
+    sortableItemClass: String,
+    readOnly: Boolean,
+    enabled: Boolean,
+    hasError: Boolean,
+    canAddRule: Boolean,
+    showFieldPreviews: Boolean,
+});
+
+const { previews } = injectContainerContext();
+const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
+const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
+const isInvalid = computed(() => Object.keys(props.config).length === 0);
+const hasFields = computed(() => Array.isArray(props.config.fields) ? props.config.fields.length > 0 : Object.keys(props.config.fields || {}).length > 0);
+
+const ruleGroup = computed(() => {
+    if (replicatorSets.length < 1) return null;
+
+    return (
+        replicatorSets.find((group) => {
+            return group.sets.filter((set) => set.handle === props.config.handle).length > 0;
+        }) ?? {}
+    );
+});
+
+const isRuleGroupVisible = computed(() => replicatorSets.length > 1 && ruleGroup.value.display);
+
+const previewText = computed(() => {
+    return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
+        .filter(([handle]) => {
+            if (!handle.endsWith('_')) return false;
+            handle = handle.substr(0, handle.length - 1);
+            const config = props.config.fields.find((f) => f.handle === handle);
+            if (!config) return false;
+            return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
+        })
+        .map(([, value]) => value)
+        .filter((value) => !['null', '[]', '{}', '', undefined].includes(JSON.stringify(value)))
+        .map((value) => {
+            if (value instanceof PreviewHtml) return value.html;
+            if (typeof value === 'string') return escapeHtml(value);
+
+            if (Array.isArray(value) && typeof value[0] === 'string') {
+                return escapeHtml(value.join(', '));
+            }
+
+            return escapeHtml(JSON.stringify(value));
+        })
+        .filter((html) => html && html.trim() !== '')
+        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
+});
+
+function toggleCollapsedState() {
+    props.collapsed ? emit('expanded') : emit('collapsed');
+}
+
+const rootEl = ref();
+reveal.use(rootEl, () => emit('expanded'));
+</script>
+
+<template>
+    <div ref="rootEl" :class="sortableItemClass">
+        <slot name="picker" />
+        <div
+            layout
+            data-replicator-set
+            class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
+            :class="{ 'border-red-500': hasError }"
+            :data-collapsed="collapsed ?? undefined"
+            :data-error="hasError ?? undefined"
+            :data-invalid="isInvalid ?? undefined"
+            :data-readonly="readOnly ?? undefined"
+            :data-type="config.handle"
+        >
+            <header
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :class="{ 'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields }"
+            >
+                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                    <Badge size="lg" pill color="white" class="px-3">
+                        <span v-if="isRuleGroupVisible" class="flex items-center gap-2">
+                            {{ __(ruleGroup.display) }}
+                            <Icon name="chevron-right" class="relative top-px size-3" />
+                        </span>
+                        {{ __(config.display) || config.handle }}
+                    </Badge>
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="__(config.instructions)"
+                    />
+                    <Subheading
+                        v-show="collapsed"
+                        v-html="previewText"
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+                </button>
+            </header>
+
+            <div
+                v-show="!collapsed && hasFields"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
+            >
+                <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
+                    <FieldsProvider
+                        :fields="config.fields"
+                        :as-config="false"
+                        :read-only="readOnly"
+                        :field-path-prefix="fieldPathPrefix"
+                        :meta-path-prefix="metaPathPrefix"
+                    >
+                        <Fields class="p-4" />
+                    </FieldsProvider>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

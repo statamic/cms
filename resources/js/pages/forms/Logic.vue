@@ -2,8 +2,8 @@
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
-import LogicAddSetButton from './logic-list/LogicAddSetButton.vue';
-import ReplicatorSet from '@/components/fieldtypes/replicator/Set.vue';
+import LogicAddRuleButton from './logic-list/LogicAddRuleButton.vue';
+import LogicRule from './logic-list/LogicRule.vue';
 import { computed, provide, ref, watchEffect } from 'vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
@@ -19,7 +19,6 @@ const logicView = ref('list');
 const fieldPath = 'logic_rules';
 const metaPath = 'logic_rules';
 const sortableItemClass = 'logic-rule-block';
-const sortableHandleClass = 'logic-rule-handle';
 const loadingSet = ref(null);
 
 const logicBlocks = ref([
@@ -101,22 +100,6 @@ function expandSet(id) {
     collapsed.value = collapsed.value.filter(setId => setId !== id);
 }
 
-function duplicateSet(id) {
-    const index = logicBlocks.value.findIndex(block => block._id === id);
-    if (index === -1) return;
-
-    const original = logicBlocks.value[index];
-    logicBlocks.value.splice(index + 1, 0, {
-        ...JSON.parse(JSON.stringify(original)),
-        _id: uniqid(),
-    });
-}
-
-function removeSet(id, index) {
-    collapsed.value = collapsed.value.filter(setId => setId !== id);
-    logicBlocks.value.splice(index, 1);
-}
-
 provide('replicatorSets', groupConfigs);
 provide(publishContextKey, {
     setFieldValue,
@@ -153,7 +136,7 @@ provide(publishContextKey, {
             </PanelHeader>
             <Card>
                 <div class="relative" data-logic-list>
-                    <ReplicatorSet
+                    <LogicRule
                         v-for="(block, index) in logicBlocks"
                         :id="block._id"
                         :key="block._id"
@@ -163,20 +146,17 @@ provide(publishContextKey, {
                         :values="block"
                         :config="setConfigByHandle[block.type]"
                         :sortable-item-class="sortableItemClass"
-                        :sortable-handle-class="sortableHandleClass"
                         :collapsed="collapsed.includes(block._id)"
                         :enabled="block.enabled"
                         :read-only="false"
-                        :can-add-set="true"
+                        :can-add-rule="true"
                         :has-error="false"
                         :show-field-previews="true"
                         @collapsed="collapseSet(block._id)"
                         @expanded="expandSet(block._id)"
-                        @duplicated="duplicateSet(block._id)"
-                        @removed="removeSet(block._id, index)"
                     >
                         <template #picker>
-                            <LogicAddSetButton
+                            <LogicAddRuleButton
                                 variant="between"
                                 :groups="groupConfigs"
                                 :sets="setConfigs"
@@ -189,9 +169,9 @@ provide(publishContextKey, {
                                 @added="addSet"
                             />
                         </template>
-                    </ReplicatorSet>
+                    </LogicRule>
                 </div>
-                <LogicAddSetButton
+                <LogicAddRuleButton
                     :groups="groupConfigs"
                     :sets="setConfigs"
                     :show-connector="logicBlocks.length > 0"
@@ -206,9 +186,3 @@ provide(publishContextKey, {
         </Panel>
     </div>
 </template>
-
-<style scoped>
-[data-logic-list] :deep(.logic-rule-handle) {
-    display: none;
-}
-</style>

@@ -5,10 +5,9 @@
         </Primitive>
     </template>
 
-    <!-- Modal for Grid Mode -->
     <ui-modal
         :blur="false"
-        :title="__('Add Set')"
+        :title="__('Add Rule')"
         v-model:open="isOpen"
         v-else-if="shouldUseModal"
         class="xl:max-w-3xl 2xl:max-w-page"
@@ -39,7 +38,6 @@
                 </ui-toggle-group>
             </div>
 
-            <!-- Tabs for Grid Mode -->
             <ui-tabs default-tab="all" v-model="selectedTab" class="w-full" v-if="mode === 'grid'">
                 <ui-tab-list class="px-2">
                     <ui-tab-trigger :text="group.display" :name="group.handle" v-for="group in groupedItems" :key="group.handle" />
@@ -57,7 +55,7 @@
                             @mouseover="selectionIndex = i"
                             :title="__(item.instructions)"
                         >
-                            <div @click="!isLoading && addSet(item.handle)" class="p-2.5">
+                            <div @click="!isLoading && addRule(item.handle)" class="p-2.5">
                                 <div class="h-40 w-full flex items-center justify-center">
                                     <ui-icon v-if="isSetLoading(item.handle)" name="loading" class="size-8 text-gray-600 dark:text-gray-300" />
                                     <img v-else-if="item.image" :src="item.image" class="rounded-lg h-40 object-contain bg-gray-50 dark:bg-gray-850" />
@@ -72,7 +70,7 @@
                             </div>
                         </div>
                         <div v-if="group.items.length === 0" class="p-3 text-center text-xs text-gray-600">
-                            {{ search ? __('No results') : __('No sets available') }}
+                            {{ search ? __('No results') : __('No rules available') }}
                         </div>
                     </div>
                 </ui-tab-content>
@@ -80,7 +78,6 @@
         </template>
     </ui-modal>
 
-    <!-- Use Popover for list mode when content fits -->
     <ui-popover
         v-else
         :align="align"
@@ -98,7 +95,6 @@
         </template>
 
         <template #default>
-            <!-- Popover content with toggle group -->
             <div class="flex items-center border-b border-gray-200 dark:border-gray-600 p-1.5 gap-1.5">
                 <ui-input
                     :placeholder="searchPlaceholderText"
@@ -118,7 +114,6 @@
                 </ui-toggle-group>
             </div>
 
-            <!-- Breadcrumbs for List Mode -->
             <div v-if="showGroupBreadcrumb" class="flex items-center p-1.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600">
                 <ui-button @click="unselectGroup" size="xs" variant="ghost">
                     {{ __('Groups') }}
@@ -129,7 +124,6 @@
                 </span>
             </div>
 
-            <!-- List Mode -->
             <div class="max-h-[21rem] overflow-auto p-1.5 st-custom-scrollbar">
                 <div
                     v-for="(item, i) in items"
@@ -153,7 +147,7 @@
                     </div>
                     <div
                         v-if="item.type === 'set'"
-                        @click="!isLoading && addSet(item.handle)"
+                        @click="!isLoading && addRule(item.handle)"
                         class="group flex items-center rounded-lg p-2.5 gap-2 sm:gap-3"
                         :class="{ 'opacity-50 pointer-events-none': isLoading }"
                     >
@@ -201,11 +195,7 @@ import fuzzysort from 'fuzzysort';
 
 export default {
     emits: ['added', 'clicked-away'],
-
-    components: {
-        Primitive,
-    },
-
+    components: { Primitive },
     props: {
         sets: Array,
         enabled: { type: Boolean, default: true },
@@ -213,7 +203,6 @@ export default {
         loadingSet: { type: String, default: null },
         searchPlaceholder: { type: String, default: null },
     },
-
     data() {
         return {
             selectedGroupHandle: null,
@@ -225,146 +214,76 @@ export default {
             selectedTab: 'all',
         };
     },
-
     computed: {
-        showSearch() {
-            return !this.hasMultipleGroups || !this.selectedGroup;
-        },
-
         showGroupBreadcrumb() {
             return this.hasMultipleGroups && this.selectedGroup;
         },
-
         showGroups() {
             return this.hasMultipleGroups && !this.selectedGroup && !this.search;
         },
-
         hasMultipleSets() {
-            return (
-                this.sets.reduce((count, group) => {
-                    return count + group.sets.length;
-                }, 0) > 1
-            );
+            return this.sets.reduce((count, group) => count + group.sets.length, 0) > 1;
         },
-
         hasMultipleGroups() {
             return this.sets.length > 1;
         },
-
         selectedGroup() {
             return this.sets.find((group) => group.handle === this.selectedGroupHandle);
         },
-
         selectedGroupDisplayText() {
             return this.selectedGroup ? __(this.selectedGroup.display || this.selectedGroup.handle) : null;
         },
-
         visibleSets() {
             if (!this.selectedGroup && !this.search) return [];
-
             let sets = this.selectedGroup
                 ? this.selectedGroup.sets
-                : this.sets.reduce((sets, group) => {
-                      return sets.concat(group.sets);
-                  }, []);
-
-            if (this.search) {
-                sets = this.filterSetsBySearch(sets);
-            }
-
+                : this.sets.reduce((carry, group) => carry.concat(group.sets), []);
+            if (this.search) sets = this.filterSetsBySearch(sets);
             return sets.filter((set) => !set.hide);
         },
-
         items() {
-            let items = [];
-
-            if (this.showGroups) {
-                this.sets.forEach((group) => {
-                    items.push({ ...group, type: 'group' });
-                });
-            }
-
-            this.visibleSets.forEach((set) => {
-                items.push({ ...set, type: 'set' });
-            });
-
+            const items = [];
+            if (this.showGroups) this.sets.forEach((group) => items.push({ ...group, type: 'group' }));
+            this.visibleSets.forEach((set) => items.push({ ...set, type: 'set' }));
             return items;
         },
-
         noSearchResults() {
             return this.search && this.visibleSets.length === 0;
         },
-
         searchPlaceholderText() {
-            return this.searchPlaceholder ? __(this.searchPlaceholder) : __('Search Sets');
+            return this.searchPlaceholder ? __(this.searchPlaceholder) : __('Search Rules');
         },
-
         iconSet() {
             return this.$config.get('replicatorSetIcons') || undefined;
         },
-
-        // For Grid Mode - groups items into tabs
         groupedItems() {
-            const groups = {};
-
-            // Add all sets to 'all' group
-            groups.all = {
-                display: __('All'),
-                handle: 'all',
-                items: []
-            };
-
-            // Group sets by their parent group
+            const groups = { all: { display: __('All'), handle: 'all', items: [] } };
             this.sets.forEach(group => {
                 let filteredSets = group.sets.filter(set => !set.hide);
-
-                // Apply search filter if there's a search term
-                if (this.search) {
-                    filteredSets = this.filterSetsBySearch(filteredSets);
-                }
-
-                groups[group.handle] = {
-                    display: group.display || group.handle,
-                    handle: group.handle,
-                    items: filteredSets
-                };
-
-                // Add filtered sets to 'all' group
+                if (this.search) filteredSets = this.filterSetsBySearch(filteredSets);
+                groups[group.handle] = { display: group.display || group.handle, handle: group.handle, items: filteredSets };
                 groups.all.items = groups.all.items.concat(filteredSets);
             });
-
             return groups;
         },
-
-        // Get items for the currently selected tab
         currentTabItems() {
             if (this.mode !== 'grid') return [];
-
             const group = this.groupedItems[this.selectedTab];
             return group ? group.items : [];
         },
-
-        // Determine whether to use Modal or Popover
         shouldUseModal() {
-            // Modal for grid mode, Popover for list mode
             return this.mode === 'grid';
         },
-
         isLoading() {
             return !!this.loadingSet;
         },
     },
-
     watch: {
         isOpen(isOpen) {
             if (isOpen) {
-                if (this.sets.length === 1) {
-                    this.selectedGroupHandle = this.sets[0].handle;
-                }
+                if (this.sets.length === 1) this.selectedGroupHandle = this.sets[0].handle;
                 this.bindKeys();
-            } else {
-                this.unbindKeys();
-            }
+            } else this.unbindKeys();
         },
         search() {
             this.selectionIndex = 0;
@@ -376,7 +295,6 @@ export default {
             this.saveMode();
         },
         loadingSet(loading, wasLoading) {
-            // Close the picker when loading completes
             if (wasLoading && !loading) {
                 this.isOpen = false;
                 this.unselectGroup();
@@ -384,21 +302,17 @@ export default {
             }
         },
     },
-
     methods: {
-        addSet(handle) {
+        addRule(handle) {
             this.$emit('added', handle);
         },
-
         selectGroup(handle) {
             this.selectedGroupHandle = handle;
             this.selectionIndex = 0;
         },
-
         unselectGroup() {
             this.selectedGroupHandle = null;
         },
-
         bindKeys() {
             this.keybindings = [
                 this.$keys.bindGlobal('up', (e) => this.keypressUp(e)),
@@ -408,83 +322,61 @@ export default {
                 this.$keys.bindGlobal('left', (e) => this.keypressLeft(e)),
             ];
         },
-
         unbindKeys() {
             this.keybindings.forEach((binding) => binding.destroy());
             this.keybindings = [];
         },
-
         keypressUp(e) {
             e.preventDefault();
             const items = this.mode === 'grid' ? this.currentTabItems : this.items;
             this.selectionIndex = this.selectionIndex === 0 ? items.length - 1 : this.selectionIndex - 1;
         },
-
         keypressDown(e) {
             e.preventDefault();
             const items = this.mode === 'grid' ? this.currentTabItems : this.items;
             this.selectionIndex = this.selectionIndex === items.length - 1 ? 0 : this.selectionIndex + 1;
         },
-
         keypressRight(e) {
             e.preventDefault();
-            if (this.selectedGroup || this.search) return; // Pressing right to select a set feels awkward.
+            if (this.selectedGroup || this.search) return;
             this.keypressEnter(e);
         },
-
         keypressLeft(e) {
             e.preventDefault();
             this.unselectGroup();
         },
-
         keypressEnter(e) {
             e.preventDefault();
             const items = this.mode === 'grid' ? this.currentTabItems : this.items;
             const item = items[this.selectionIndex];
-            if (item && item.type === 'group') {
-                this.selectGroup(item.handle);
-            } else if (item) {
-                this.addSet(item.handle);
-            }
+            if (item && item.type === 'group') this.selectGroup(item.handle);
+            else if (item) this.addRule(item.handle);
         },
-
         singleButtonClicked() {
             if (!this.enabled) return;
-
-            this.addSet(this.sets[0].sets[0].handle);
+            this.addRule(this.sets[0].sets[0].handle);
         },
-
-        open() {
-            this.isOpen = true;
-        },
-
         onTriggerClick(e) {
             if (!this.enabled) {
                 e.stopPropagation();
                 e.preventDefault();
             }
         },
-
         getStoredMode() {
             try {
                 return localStorage.getItem('statamic.replicator.setPicker.mode') || 'list';
-            } catch (e) {
+            } catch {
                 return 'list';
             }
         },
-
         saveMode() {
             try {
                 localStorage.setItem('statamic.replicator.setPicker.mode', this.mode);
-            } catch (e) {
-                // Ignore localStorage errors
-            }
+            } catch {}
         },
-
         isSetLoading(handle) {
             return this.loadingSet === handle;
         },
-
         filterSetsBySearch(sets) {
             return fuzzysort
                 .go(this.search, sets, {
@@ -498,9 +390,8 @@ export default {
                     },
                 })
                 .map((result) => result.obj);
-        }
+        },
     },
-
     beforeUnmount() {
         this.unbindKeys();
     },
