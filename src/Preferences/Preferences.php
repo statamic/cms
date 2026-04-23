@@ -45,7 +45,7 @@ class Preferences
     {
         $this->resetState();
 
-        if (auth()->check()) {
+        if (User::current()) {
             $this
                 ->mergeDottedUserPreferences()
                 ->mergeDottedRolePreferences();
