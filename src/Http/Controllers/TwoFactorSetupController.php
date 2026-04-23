@@ -39,7 +39,7 @@ class TwoFactorSetupController extends Controller
             }
         }
 
-        if ($redirect = session()->pull('login.redirect')) {
+        if ($redirect = session()->get('login.redirect')) {
             if (! URL::isExternalToApplication($redirect)) {
                 return $redirect;
             }
