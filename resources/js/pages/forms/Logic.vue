@@ -31,7 +31,11 @@ const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 
         <Panel>
             <PanelHeader>
-                <Heading :text="__('Section')" />
+                <Heading>
+                    <span>{{ __('Connect') }}</span>
+                    <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                    <span>{{ __('Email Notifications') }}</span>
+                </Heading>
             </PanelHeader>
             <Card class="min-h-32"></Card>
         </Panel>
