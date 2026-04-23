@@ -84,8 +84,8 @@ reveal.use(rootEl, () => emit('expanded'));
         <slot name="picker" />
         <div
             layout
-            data-replicator-set
-            class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
+            data-replicator-rule
+            class="@container relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
             :class="{ 'border-red-500': hasError }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
