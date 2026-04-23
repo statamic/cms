@@ -60,6 +60,8 @@ trait HandlesLogins
 
     protected function twoFactorChallengeResponse(Request $request, User $user)
     {
+        $request->session()->forget('login.redirect');
+
         $session = [
             'login.id' => $user->getKey(),
             'login.remember' => $request->boolean('remember'),

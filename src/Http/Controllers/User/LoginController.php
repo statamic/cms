@@ -33,8 +33,12 @@ class LoginController extends Controller
         $redirect = $redirect && ! URL::isExternalToApplication($redirect) ? $redirect : null;
 
         // If 2FA setup is required, stash the redirect so the setup flow can use it after completion.
-        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication() && $redirect) {
-            $request->session()->put('login.redirect', $redirect);
+        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication()) {
+            $request->session()->forget('login.redirect');
+
+            if ($redirect) {
+                $request->session()->put('login.redirect', $redirect);
+            }
         }
 
         $this->authenticate($request, $user);
