@@ -56,8 +56,8 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text">
-                                {{ __('Which album was your favorite testing hea ae haeh ahea ?') }}
+                            <span class="logic-text__pill-text" :title="__('Which album was your favorite? Test for a long string and truncation')">
+                                {{ __('Which album was your favorite? Test for a long string and truncation') }}
                             </span>
                         </div>
                     </li>
@@ -146,8 +146,8 @@ const logicContainsAnswerPlaceholder = __('Answer');
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text">
-                                {{ __('Which album was your favorite testing hea ae haeh ahea ?') }}
+                            <span class="logic-text__pill-text" :title="__('Which album was your favorite? Test for a long string and truncation')">
+                                {{ __('Which album was your favorite? Test for a long string and truncation') }}
                             </span>
                         </div>
                     </li>
