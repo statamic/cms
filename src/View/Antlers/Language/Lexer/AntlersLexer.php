@@ -1084,6 +1084,8 @@ class AntlersLexer
                     continue;
                 }
 
+                // Must come before the ?? and ? checks below so ??? isn't
+                // misread as ?? followed by ?.
                 if ($this->cur == DocumentParser::Punctuation_Question
                     && $this->next == DocumentParser::Punctuation_Question
                     && ($this->currentIndex + 2) < $this->inputLen

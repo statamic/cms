@@ -115,6 +115,28 @@ EOT;
         ]));
     }
 
+    public function test_chaining_is_left_associative_with_mixed_operators()
+    {
+        // Grouping is (a ??? b) ?? c. The strict inner group preserves 0,
+        // but the outer loose ?? then treats 0 as null-like and falls through to c.
+        $template = <<<'EOT'
+{{ a ??? b ?? c }}
+EOT;
+
+        $this->assertSame('C', $this->renderString($template, [
+            'a' => 0,
+            'b' => 'B',
+            'c' => 'C',
+        ]));
+
+        // When the strict inner group returns a truthy value, the outer ?? keeps it.
+        $this->assertSame('B', $this->renderString($template, [
+            'a' => null,
+            'b' => 'B',
+            'c' => 'C',
+        ]));
+    }
+
     public function test_modifiers_can_be_called_on_strict_group()
     {
         $template = <<<'EOT'
