@@ -2,18 +2,20 @@
 
 namespace Statamic\Hooks\CP;
 
+use Statamic\Assets\AssetContainer;
+use Statamic\Assets\QueryBuilder;
 use Statamic\Support\Traits\Hookable;
 
 class AssetsIndexQuery
 {
     use Hookable;
 
-    public function __construct(private $query, private $container)
+    public function __construct(private QueryBuilder $query, private AssetContainer $container)
     {
         //
     }
 
-    public function query()
+    public function query(): QueryBuilder
     {
         $payload = $this->runHooksWith('query', [
             'query' => $this->query,
