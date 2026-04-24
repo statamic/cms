@@ -86,7 +86,7 @@ class BrowserController extends CpController
         $totalFolders = $folders->count();
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
-        $totalAssets = $folder->queryAssets()->count();
+        $totalAssets = (new AssetsIndexQuery($folder->queryAssets(), $container))->query()->count();
         $totalItems = $totalAssets + $totalFolders;
 
         if ($sort = OrderBy::column($request->sort)) {
