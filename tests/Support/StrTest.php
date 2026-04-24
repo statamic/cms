@@ -162,6 +162,7 @@ class StrTest extends TestCase
         $this->assertEquals('1:01:01', Str::durationForHumans(3661));
         $this->assertEquals('2:10:00', Str::durationForHumans(7800));
         $this->assertEquals('10:05:30', Str::durationForHumans(36330));
+        $this->assertEquals('0:37', Str::durationForHumans(36.92));
     }
 
     #[Test]

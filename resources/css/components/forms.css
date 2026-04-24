@@ -1,8 +1,13 @@
-/* GROUP FIELD BACKGROUND
+[data-ui-input-group] {
+    /* Lock in logic icons */
+    position: relative;
+}
+
+/* GROUP MAIN COLUMN / FIELD BACKGROUND
 =================================================== */
 [data-editing-field] {
     position: relative;
-    scroll-margin-top: 3rem;
+    scroll-margin-top: 7rem;
     > * {
         /* Pull everything inside above */
         position: relative;
@@ -16,27 +21,173 @@
         border-radius: 10px;
     }
     :where(.dark) &::before {
-        @apply bg-blue-950 border-blue-500;
+        @apply bg-blue-950/75 border-blue-500/75;
     }
 }
 
-/* GROUP LOGIC TEXT
-=================================================== */
 
-/* GROUP LOGIC TEXT / VERTICAL
+/* GROUP MAIN COLUMN / FIELDSETS
+=================================================== */
+[data-fieldset-group] {
+    anchor-scope: --fieldset-start, --fieldset-end;
+}
+
+[data-fieldset-label] {
+    @apply bg-content-bg text-indigo-800 dark:text-indigo-400/85;
+    position: absolute;
+    display: inline-flex;
+    top: calc(anchor(--fieldset-start top) + 2rem);
+    left: calc(anchor(--fieldset-start left) - 2.5rem);
+    width: 0.75rem;
+    svg {
+        rotate: 90deg;
+    }
+}
+
+#fieldset-start {
+    anchor-name: --fieldset-start;
+
+    /* The connector */
+    &::before {
+        @apply border border-dashed border-indigo-500;
+        content: '';
+        position: absolute;
+        width: 3rem;
+        top: calc(anchor(--fieldset-start top) + 0.5rem);
+        left: calc(anchor(--fieldset-start left) - 2rem);
+        bottom: anchor(--fieldset-end bottom);
+        border-radius: 10px;
+        clip-path: polygon(0 0, 30% 0, 30% 100%, 0 100%);
+    }
+}
+
+:where(.dark) #fieldset-start::before {
+    @apply border-indigo-400/50;
+}
+
+#fieldset-end {
+    anchor-name: --fieldset-end;
+}
+
+/* Hide anchors and absolutely positioned logic icons unless the panel is open. When the panel collapses, elements like anchors are slow to hide because of the way they're rendered. */
+[data-panel-collapsed="true"] {
+    [data-fieldset-label],
+    [data-logic-attached],
+    #fieldset-start::before {
+        opacity: 0;
+        transition: opacity 0.05s ease-in;
+    }
+}
+
+
+/* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS
+=================================================== */
+/* Field Icons (hide by default) */
+[data-collapsed-field-icon] {
+    display: none;
+}
+
+/* Collapsed state */
+[data-fields-collapsed="true"] {
+    [data-ui-input-group] {
+        [data-ui-description],
+        > :not(:first-child) {
+            display: none;
+        }
+
+        * {
+            margin-bottom: 0;
+        }
+    }
+    [data-editing-field] {
+        /* Tweak things optically, since the field is no longer here */
+        > *:first-child {
+            top: -0.085rem;
+        }
+        &::before {
+            inset-block: -0.75rem;
+        }
+    }
+    /* Field Icons */
+    [data-collapsed-field-icon] {
+        display: inline-flex;
+    }
+}
+
+
+/* GROUP SIDEBAR / FIELD DIRECTION
+=================================================== */
+#main-content {
+    timeline-scope: --editing-field-scroll;
+}
+[data-editing-field] {
+    view-timeline-name: --editing-field-scroll;
+}
+
+[data-field-direction-down],
+[data-field-direction-up] {
+    @apply p-1 size-5! ms-1 text-blue-500 bg-blue-50 border-1 border-dotted border-blue-400 rounded-full;
+}
+
+@keyframes field-direction-fade-in {
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+[data-field-direction-up] {
+    opacity: 0;
+    animation: field-direction-fade-in linear both;
+    animation-timeline: --editing-field-scroll;
+    animation-range: exit 0%, exit 100%;
+}
+
+@keyframes field-direction-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+[data-field-direction-down] {
+    animation: field-direction-fade-out linear both;
+    animation-timeline: --editing-field-scroll;
+    animation-range: entry 50%, entry 100%;
+}
+
+
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / LAYOUT
 =================================================== */
 .logic-text {
-    --logic-line: var(--color-gray-300);
+    --inner-indent: 1.75rem;
+    :where(.dark) & {
+        --logic-line: var(--color-gray-600);
+    }
 
-    ol {
-        display: grid;
-        @apply gap-2.5;
-        li {
-            /* Prevent full-width comboboxes */
-            > .w-full {
-                display: inline-flex;
-                width: unset;
-                min-width: unset;
+    /* Outer structure */
+    > ol {
+        /* Optically align */
+        margin-inline-start: -0.1rem;
+        /* Inner structure */
+        ol {
+            display: grid;
+            grid-template-columns: 100%;
+            @apply gap-2.5 mb-2;
+            margin-inline-start: var(--inner-indent);
+            /* Last "Then go to ..." */
+            :is(li:last-child) & {
+                margin-inline-start: 0;
+            }
+            li {
+                /* Prevent full-width comboboxes */
+                > .w-full {
+                    display: inline-flex;
+                    width: unset;
+                    min-width: unset;
+                    max-width: 100%;
+                }
             }
         }
     }
@@ -44,39 +195,150 @@
     [data-ui-combobox-trigger] {
         display: inline-flex;
         width: unset;
+        max-width: 100%;
     }
 }
 
-:where(.dark) .logic-text {
-    --logic-line: var(--color-gray-600);
-}
-
-.logic-text__badge {
+.logic-text-badge {
     @apply
-        py-2 px-3.5 mb-2.5
+        py-1.5 px-3
         bg-content-bg
+        text-gray-800 dark:text-gray-300
         rounded-full
         text-sm
+        shadow-ui-sm
+        border-1
+        border-gray-300 dark:border-gray-600
     ;
     display: inline-block;
+    user-select: none;
     text-align: center;
-    color: var(--color-gray-800);
-    box-shadow: var(--shadow-ui-sm);
 }
 
 .logic-text__pill {
     display: flex;
+    max-width: fit-content;
     align-items: center;
-    @apply gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-900;
+    @apply
+        gap-1
+        rounded-full
+        bg-content-bg
+        px-3 py-1
+        shadow-ui-sm
+        text-gray-900 dark:text-gray-100
+        border-1
+        border-gray-300
+        dark:border-1 dark:border-gray-600
+    ;
 }
 
 .logic-text__pill-icon {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    @apply size-6 bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 rounded-full;
 }
 
 .logic-text__pill-text {
-    @apply text-sm font-medium text-gray-900 dark:text-gray-100;
+    @apply
+        text-sm
+        text-gray-900 dark:text-gray-100
+    ;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / CONNECTORS
+=================================================== */
+.logic-text {
+    --logic-line: 1px dashed var(--color-gray-400);
+    --outer-indent-connector: 1rem;
+    /* Inner structure */
+    ol ol {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            z-index: var(--z-index-below);
+            inset-inline-start: 1.5rem;
+            border-inline-start: var(--logic-line);
+            height: 100%;
+        }
+    }
+    /* Exit "If" */
+    > ol > li {
+        &:not(:last-child) {
+            li:last-child {
+                position: relative;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    z-index: var(--z-index-below);
+                    top: 50%;
+                    left: calc(0% - var(--inner-indent) / 2);
+                    width: calc(var(--spacing) * 4);
+                    height: 3.5rem;
+                    border: var(--logic-line);
+                    border-inline-end: 0;
+                    border-block-end: 0;
+                    border-start-start-radius: 100vw;
+                }
+            }
+        }
+    }
+}
+.logic-text__condition {
+    position: relative;
+    @apply mb-2;
+    .logic-text > ol > li:is(:first-child, :last-child) & {
+        /* Increase for entry and exit points */
+        @apply mb-4;
+    }
+    &::after {
+        content: '';
+        position: absolute;
+        left: var(--outer-indent-connector);
+        border: var(--logic-line);
+        border-inline-end: 0;
+        border-block-start: 0;
+        border-end-start-radius: 100vw;
+        top: 100%;
+        width: calc(var(--spacing) * 4);
+        /* Don't overlap/clash with subsequent connectors */
+        height: calc(100% - 4px);
+    }
+}
+
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / HORIZONTAL ORIENTATION
+=================================================== */
+@container (width >= 500px) {
+    .logic-text {
+        /* Outer structure */
+        > ol {
+            > li {
+                &:not(:last-child) {
+                    li:last-child {
+                        /* Pull logic connectors back to the left */
+                        position: unset;
+                    }
+                }
+                &:not(:last-child, :first-child) {
+                    li {
+                        /* Increase spacing between middle modes to stop connectors colliding */
+                        margin-block: 0.5rem;
+                    }
+                }
+            }
+            /* Inner structure */
+            ol {
+                display: flex;
+                &::before {
+                    /* Hide connectors for now-horizontal logic */
+                    content: unset;
+                }
+            }
+        }
+    }
 }

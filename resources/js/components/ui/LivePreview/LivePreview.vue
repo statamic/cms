@@ -271,6 +271,18 @@ function setEditorWidth(width) {
     localStorage.setItem(widthLocalStorageKey, width);
 }
 
+function onResizeEnd() {
+    editorResizing.value = false;
+
+    // Chromium doesn't recalculate iframe scroll state after the parent
+    // container is resized. Toggling a transform forces a reflow. #14540
+    const iframe = iframeContentContainer.value?.querySelector('iframe');
+    if (iframe) {
+        iframe.style.transform = 'translateZ(0)';
+        requestAnimationFrame(() => iframe.style.transform = '');
+    }
+}
+
 function close() {
     if (poppedOut.value) closePopout();
 
@@ -343,7 +355,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
                             v-show="!poppedOut"
                             @resized="setEditorWidth"
                             @resize-start="editorResizing = true"
-                            @resize-end="editorResizing = false"
+                            @resize-end="onResizeEnd"
                             @collapsed="collapseEditor"
                         />
                     </div>

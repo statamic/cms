@@ -82,11 +82,6 @@ onUnmounted(() => {
     </Teleport>
 
     <Teleport defer to="#main-content">
-        <div v-show="left.active || right.active" class="field-to-panel-connector-initial"></div>
-        <div v-show="left.active || right.active" class="field-to-panel-connector-scroll-past"></div>
-    </Teleport>
-
-    <Teleport defer to="#main-content">
         <div
             v-show="right.active"
             :data-right-panel="right.active ? '' : undefined"
@@ -94,26 +89,9 @@ onUnmounted(() => {
             id="right-panel"
             tabindex="-1"
             style="order: 2"
-            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 sm:-mr-2 grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
+            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full max-[1000px]:!w-0 max-[1000px]:!p-0 grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
         ></div>
     </Teleport>
 
     <slot />
 </template>
-
-<style>
-#main-content:has([data-left-panel], [data-right-panel]) {
-    display: flex;
-}
-
-#main-content:has([data-left-panel], [data-right-panel]) > #content-card {
-    flex: 1;
-}
-
-@media (max-width: 1000px) {
-    #main-content:has([data-left-panel], [data-right-panel]) [data-max-width-wrapper] {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-    }
-}
-</style>

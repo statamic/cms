@@ -998,7 +998,7 @@ class NavBuilder
         $updated = collect($this->items)
             ->filter(fn ($item) => collect($this->itemsWithChildrenClosures)->contains($item->id()))
             ->filter(fn ($item) => $item->isActive() || $this->withHidden)
-            ->mapWithKeys(fn ($item) => [$item->id() => $item->children()?->map->url()->all() ?? []])
+            ->mapWithKeys(fn ($item) => [$item->id() => $item->resolveChildren()->children()?->map->url()->all() ?? []])
             ->filter(fn ($urls, $id) => $this->urlsUnresolvedChildren->get($id) != $urls)
             ->each(fn ($urls, $id) => $this->trackChangedChildren($id, $urls))
             ->isNotEmpty();

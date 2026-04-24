@@ -25,7 +25,7 @@ onMounted(() => getSetupCode());
 function getSetupCode() {
     loading.value = true;
 
-    axios.get(props.enableUrl).then((response) => {
+    axios.post(props.enableUrl).then((response) => {
         qrCode.value = response.data.qr;
         secretKey.value = response.data.secret_key;
         confirmUrl.value = response.data.confirm_url;

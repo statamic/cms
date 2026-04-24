@@ -329,6 +329,151 @@ EOT
     }
 
     #[Test]
+    public function it_redirects_to_configured_two_factor_challenge_url()
+    {
+        Event::fake();
+
+        config(['statamic.users.two_factor_challenge_url' => '/custom-2fa-challenge']);
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->assertGuest()
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertRedirect('/custom-2fa-challenge')
+            ->assertSessionHas('login.id', 1);
+
+        Event::assertDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    #[Test]
+    public function it_stores_redirect_in_session_for_two_factor_challenge()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertSessionHas('login.redirect', '/dashboard');
+    }
+
+    #[Test]
+    public function it_does_not_stash_login_redirect_when_two_factor_is_not_enforced()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionMissing('login.redirect');
+    }
+
+    #[Test]
+    public function it_stashes_login_redirect_when_two_factor_setup_is_required()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertSessionHas('login.redirect', '/dashboard');
+    }
+
+    #[Test]
+    public function it_clears_stale_login_redirect_on_two_factor_challenge()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, fn () => RecoveryCode::generate())->all())),
+            ])
+            ->save();
+
+        $this
+            ->withSession(['login.redirect' => '/stale'])
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertSessionMissing('login.redirect');
+    }
+
+    #[Test]
+    public function it_clears_stale_login_redirect_when_two_factor_setup_is_required()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->withSession(['login.redirect' => '/stale'])
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertSessionMissing('login.redirect');
+    }
+
+    #[Test]
     #[DefineEnvironment('disableTwoFactor')]
     public function it_skips_two_factor_challenge_when_two_factor_is_disabled()
     {

@@ -35,6 +35,7 @@ import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
+import LinkIndexFieldtype from '../components/fieldtypes/LinkIndexFieldtype.vue';
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
 import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
@@ -107,6 +108,7 @@ export default function registerFieldtypes(app) {
     app.component('icon-fieldtype', IconFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
+    app.component('link-fieldtype-index', LinkIndexFieldtype);
     app.component('list-fieldtype', ListFieldtype);
     app.component('list-fieldtype-index', ListIndexFieldtype);
     app.component(

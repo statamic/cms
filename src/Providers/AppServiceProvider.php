@@ -8,15 +8,19 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
+use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Jobs\HandleEntrySchedule;
+use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Sites\Sites;
 use Statamic\Stache\Query\RevisionQueryBuilder;
 use Statamic\Statamic;
@@ -122,6 +126,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->addAboutCommandInfo();
+
+        $this->registerElevatedSessionMacros();
 
         $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
     }
@@ -329,5 +335,50 @@ class AppServiceProvider extends ServiceProvider
             : $sites->take(3)->map->name()->join(', ').', and '.($sites->count() - 3).' more';
 
         return $sites->count().' ('.$summary.')';
+    }
+
+    private function registerElevatedSessionMacros()
+    {
+        Request::macro('hasElevatedSession', function () {
+            return $this->getElevatedSessionExpiry() > now()->timestamp;
+        });
+
+        Request::macro('getElevatedSessionExpiry', function () {
+            if (! $lastElevated = session()->get('statamic_elevated_session')) {
+                return null;
+            }
+
+            return Carbon::createFromTimestamp($lastElevated)
+                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
+                ->timestamp;
+        });
+
+        Request::macro('getElevatedSessionVerificationCode', function () {
+            return session()->get('statamic_elevated_session_verification_code')['code'] ?? null;
+        });
+
+        Session::macro('elevate', function () {
+            $this->put('statamic_elevated_session', now()->timestamp);
+            $this->forget('statamic_elevated_session_verification_code');
+        });
+
+        Session::macro('sendElevatedSessionVerificationCodeIfRequired', function () {
+            if ($timestamp = session()->get('statamic_elevated_session_verification_code')['generated_at'] ?? null) {
+                if ($timestamp > now()->subMinutes(5)->timestamp) {
+                    return;
+                }
+            }
+
+            $this->sendElevatedSessionVerificationCode();
+        });
+
+        Session::macro('sendElevatedSessionVerificationCode', function () {
+            session()->put(
+                key: 'statamic_elevated_session_verification_code',
+                value: ['code' => $verificationCode = Str::random(20), 'generated_at' => now()->timestamp],
+            );
+
+            User::current()->notify(new ElevatedSessionVerificationCode($verificationCode));
+        });
     }
 }

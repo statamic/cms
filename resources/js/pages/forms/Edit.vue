@@ -5,10 +5,9 @@ import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
 import { PublishContainer as Container, PublishTabs as Tabs } from '@/components/ui';
 import Layout from '@/pages/layout/Layout.vue';
-import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 
-defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
+defineOptions({ layout: [Layout, FormsLayout] });
 
 const props = defineProps({
     blueprint: {

@@ -46,6 +46,23 @@ class TwoFactorSetupTest extends TestCase
     }
 
     #[Test]
+    public function redirect_url_is_preserved_across_refreshes_of_the_frontend_setup_page()
+    {
+        $user = $this->user();
+
+        $this
+            ->actingAs($user)
+            ->withSession(['login.redirect' => '/dashboard'])
+            ->get(route('statamic.two-factor-setup'))
+            ->assertInertia(fn ($page) => $page->where('redirect', '/dashboard'));
+
+        $this
+            ->actingAs($user)
+            ->get(route('statamic.two-factor-setup'))
+            ->assertInertia(fn ($page) => $page->where('redirect', '/dashboard'));
+    }
+
+    #[Test]
     public function it_does_not_redirect_to_external_url_on_frontend_route()
     {
         $this

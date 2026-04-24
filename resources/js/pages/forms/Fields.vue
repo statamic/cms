@@ -3,7 +3,8 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import LogicFlowMock from './LogicFlowMock.vue';
-import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
+import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
@@ -29,6 +30,9 @@ const settingsLabel = ref(__('Which album was your favorite?'));
 const settingsHelpText = ref('');
 const settingsPlaceholder = ref('');
 const settingsCharacterLimit = ref(null);
+const fieldView = ref('expanded');
+const panelCollapsed = ref(false);
+const totalFieldCount = computed(() => 8);
 const heardAboutOptions = [
     { label: __('Instagram'), value: 'instagram' },
     { label: __('Friend referral'), value: 'referral' },
@@ -43,6 +47,25 @@ const albumOptions = [
     { label: __('Heroes'), value: 'heroes' },
     { label: __('Red, White, and Bruised: The Midnight Live'), value: 'red_white_and_bruised' },
 ];
+const optionRows = ref(albumOptions.map((option) => ({
+    option_value: option.value,
+    cells: [option.label],
+    hidden: false,
+})));
+const visibleAlbumOptions = computed(() => optionRows.value
+    .filter((option) => !option.hidden)
+    .map((option, index) => ({
+        label: option.cells?.[0] || '',
+        value: option.option_value || `option_${index + 1}`,
+    })));
+const optionRowsConfig = {
+    max_columns: 1,
+    max_rows: 20,
+    show_header: false,
+    show_add_column: false,
+    add_row_text: __('Add Option'),
+    show_hide_toggle: true,
+};
 const notificationOptions = [
     { label: __('New Singles and Albums'), value: 'singles_and_albums' },
     { label: __('Merchandise'), value: 'merchandise' },
@@ -78,9 +101,12 @@ const notificationOptions = [
                     <button class="left-panel-popover__close-button" title="Close" popovertarget="popover-left-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
-                    <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10">
+                    <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10 pb-40">
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Information</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Information
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
@@ -97,7 +123,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Text</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Text
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
@@ -108,7 +137,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Choice</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-orange-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Choice
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
@@ -131,7 +163,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Rate</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-amber-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Rate
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
@@ -145,7 +180,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Contact Info</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-blue-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Contact Info
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
@@ -168,7 +206,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Number</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-teal-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Number
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Number')" :title="__('Number')" icon="number" />
@@ -179,7 +220,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Date and Time</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-fuchsia-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Date and Time
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
@@ -196,7 +240,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Media</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-cyan-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Media
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
@@ -213,7 +260,10 @@ const notificationOptions = [
                             </ul>
                         </li>
                         <li>
-                            <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Payment</h2>
+                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span class="h-2 shrink-0 rounded-full bg-green-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                                Payment
+                            </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                                 <li>
                                     <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
@@ -229,7 +279,10 @@ const notificationOptions = [
             <!-- This is the desktop nav - the content is repeated from the left panel -->
             <ul class="px-0.5 grid gap-8 @container py-10 max-[1000px]:hidden">
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Information</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Information
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
@@ -246,7 +299,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Text</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Text
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
@@ -257,7 +313,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Choice</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-orange-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Choice
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
@@ -280,7 +339,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Rate</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-amber-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Rate
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
@@ -294,7 +356,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Contact Info</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-blue-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Contact Info
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
@@ -317,7 +382,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Number</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-teal-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Number
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Number')" :title="__('Number')" icon="number" />
@@ -328,7 +396,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Date and Time</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-fuchsia-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Date and Time
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
@@ -345,7 +416,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Media</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-cyan-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Media
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
@@ -362,7 +436,10 @@ const notificationOptions = [
                     </ul>
                 </li>
                 <li>
-                    <h2 class="px-1.5 pb-1.5 text-sm text-gray-950 dark:text-gray-200 font-medium">Payment</h2>
+                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span class="h-2 shrink-0 rounded-full bg-green-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
+                        Payment
+                    </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li>
                             <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
@@ -384,17 +461,60 @@ const notificationOptions = [
                 <StatusIndicator status="published" />
                 {{ formTitle }}
             </template>
+            <template #actions>
+                <ToggleGroup v-model="fieldView" size="xs">
+                    <ToggleItem
+                        value="expanded"
+                        icon="expand"
+                        :aria-label="__('Expanded view')"
+                        v-tooltip="__('Expanded view')"
+                    />
+                    <ToggleItem
+                        value="collapsed"
+                        icon="collapse"
+                        :aria-label="__('Collapsed view')"
+                        v-tooltip="__('Collapsed view')"
+                    />
+                </ToggleGroup>
+            </template>
         </Header>
 
-        <Panel class="mx-auto max-w-5xl">
-            <PanelHeader>
+        <Panel
+            class="mx-auto max-w-5xl"
+            :class="{ 'pb-0': panelCollapsed }"
+            :data-panel-collapsed="panelCollapsed ? 'true' : 'false'"
+        >
+            <PanelHeader class="relative flex items-center justify-between">
                 <Heading :text="__('Section')" />
+                <Button
+                    @click="panelCollapsed = !panelCollapsed"
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="panelCollapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                />
             </PanelHeader>
 
-            <Card>
-                <div class="space-y-7">
-                    <Field :label="__('How did you hear about us?')" required>
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! invisible! overflow-clip': panelCollapsed }"
+            >
+                <Card>
+                    <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                        <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
+                        <template #label>
+                            <Label for="heard-about-field">
+                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                    {{ __('How did you hear about us?') }}
+                                    <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                </span>
+                            </Label>
+                        </template>
                         <Select
+                            id="heard-about-field"
                             v-model="heardAboutValue"
                             :options="heardAboutOptions"
                             option-label="label"
@@ -403,7 +523,47 @@ const notificationOptions = [
                         />
                     </Field>
 
-                    <div id="editing-field" data-editing-field class="relative scroll-mt-20">
+                    <div data-fieldset-group class="space-y-7">
+                        <div id="fieldset-start">
+                            <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
+                                <span class="inline-flex" v-tooltip="__('Fieldset')">
+                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                </span>
+                                <span class="sr-only">{{ __('Fieldset') }}</span>
+                            </span>
+                            <Field :label="__('What do you like most about our band?')">
+                                <template #label>
+                                    <Label for="favorite-thing-field">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                            {{ __('What do you like most about our band?') }}
+                                            <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                        </span>
+                                    </Label>
+                                </template>
+                                <!-- TODO: Add logic tree icon for fields with logic -->
+                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
+                            </Field>
+                        </div>
+
+                        <div id="fieldset-end">
+                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                                <template #label>
+                                    <Label for="fan-length-field">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                            {{ __('How long have you been a fan?') }}
+                                        </span>
+                                    </Label>
+                                </template>
+                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                <Input id="fan-length-field" v-model="fanLength" />
+                            </Field>
+                        </div>
+                    </div>
+
+                    <div id="editing-field" data-editing-field>
                         <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                             <WidthSelector
                                 v-model="editingFieldWidth"
@@ -423,6 +583,15 @@ const notificationOptions = [
                             <Button
                                 size="sm"
                                 inset
+                                icon="eye"
+                                variant="subtle"
+                                :aria-label="__('Hide field')"
+                                :title="__('Hide field')"
+                                class="[&_svg]:opacity-45"
+                            />
+                            <Button
+                                size="sm"
+                                inset
                                 icon="trash"
                                 variant="subtle"
                                 :aria-label="__('Remove field')"
@@ -430,59 +599,116 @@ const notificationOptions = [
                                 class="[&_svg]:opacity-45"
                             />
                         </div>
-
-                        <Field :label="__('What do you like most about our band?')" required>
-                            <Textarea v-model="favoriteThing" :rows="4" resize="vertical" />
+                        <Field :label="__('Which album was your favorite?')">
+                            <template #label>
+                                <Label>
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                        {{ __('Which album was your favorite?') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <RadioGroup v-model="favoriteAlbum">
+                                <Radio
+                                v-for="album in visibleAlbumOptions"
+                                    :key="album.value"
+                                    :value="album.value"
+                                    :label="album.label"
+                                />
+                            </RadioGroup>
                         </Field>
                     </div>
 
-                    <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
-                        <Input v-model="fanLength" />
-                    </Field>
+                    <div data-fieldset-group class="space-y-7">
+                        <div id="fieldset-start">
+                            <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
+                                <span class="inline-flex" v-tooltip="__('Fieldset')">
+                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                </span>
+                                <span class="sr-only">{{ __('Fieldset') }}</span>
+                            </span>
+                            <Field :label="__('Which album was your second favorite?')">
+                                <template #label>
+                                    <Label>
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                            {{ __('Which album was your second favorite?') }}
+                                        </span>
+                                    </Label>
+                                </template>
+                                <RadioGroup v-model="secondFavoriteAlbum">
+                                    <Radio
+                                        v-for="album in visibleAlbumOptions"
+                                        :key="`second-${album.value}`"
+                                        :value="album.value"
+                                        :label="album.label"
+                                    />
+                                </RadioGroup>
+                            </Field>
+                        </div>
 
-                    <Field :label="__('Which album was your favorite?')">
-                        <RadioGroup v-model="favoriteAlbum">
-                            <Radio
-                                v-for="album in albumOptions"
-                                :key="album.value"
-                                :value="album.value"
-                                :label="album.label"
-                            />
-                        </RadioGroup>
-                    </Field>
+                        <Field :label="__('Sign up for email notifications from The Midnight')">
+                            <template #label>
+                                <Label>
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="fieldtype-checkboxes" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                        {{ __('Sign up for email notifications from The Midnight') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <CheckboxGroup v-model="emailNotifications">
+                                <Checkbox
+                                    v-for="notification in notificationOptions"
+                                    :key="notification.value"
+                                    :value="notification.value"
+                                    :label="notification.label"
+                                />
+                            </CheckboxGroup>
+                        </Field>
 
-                    <Field :label="__('Which album was your second favorite?')">
-                        <RadioGroup v-model="secondFavoriteAlbum">
-                            <Radio
-                                v-for="album in albumOptions"
-                                :key="`second-${album.value}`"
-                                :value="album.value"
-                                :label="album.label"
-                            />
-                        </RadioGroup>
-                    </Field>
+                        <div id="fieldset-end">
+                            <Field id="age-field" class="opacity-60" :label="__('How old are you?')">
+                                <template #label>
+                                    <Label for="age-field">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-teal-50 text-teal-600 dark:bg-teal-950 dark:text-teal-400" aria-hidden="true" />
+                                            {{ __('How old are you?') }}
+                                            <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
+                                        </span>
+                                    </Label>
+                                </template>
+                                <Input id="age-field" v-model="age" type="number" />
+                            </Field>
+                        </div>
+                    </div>
 
-                    <Field :label="__('Sign up for email notifications from The Midnight')">
-                        <CheckboxGroup v-model="emailNotifications">
-                            <Checkbox
-                                v-for="notification in notificationOptions"
-                                :key="notification.value"
-                                :value="notification.value"
-                                :label="notification.label"
-                            />
-                        </CheckboxGroup>
-                    </Field>
-
-                    <Field :label="__('How old are you?')">
-                        <Input v-model="age" type="number" />
-                    </Field>
-
-                    <Field :label="__('I want a free drink voucher')">
+                        <Field :label="__('I want a free drink voucher')">
+                        <template #label>
+                            <Label>
+                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <Icon name="fieldtype-toggle" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                    {{ __('I want a free drink voucher') }}
+                                </span>
+                            </Label>
+                        </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
-                    </Field>
-                </div>
-            </Card>
+                        </Field>
+
+                        <Button
+                            variant="primary"
+                            @click.prevent
+                            class="hover:cursor-not-allowed"
+                            style="--theme-color-primary: var(--theme-color-gray-950)"
+                            :text="__('Submit')"
+                        />
+                    </div>
+                </Card>
+            </div>
         </Panel>
+
+        <p class="mx-auto max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300">
+            <strong>{{ totalFieldCount }}</strong> {{ __n('field on this form|fields on this form', totalFieldCount) }}
+        </p>
     </div>
 
     <Button
@@ -495,156 +721,188 @@ const notificationOptions = [
     />
 
     <LayoutPanel side="right">
-        <div class="[&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
+        <div class="right-panel-popover min-[1000px]:hidden">
+            <div id="popover-right-panel" class="right-panel-popover__menu" popover>
+                <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
+                    <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
+                </button>
+                <div class="@container pt-6 pb-40 px-2.5">
+                    <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
+                        <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
+                            <TabTrigger name="settings" :text="__('Settings')" />
+                            <TabTrigger name="logic" :text="__('Logic')" />
+                            <TabTrigger name="validation" :text="__('Validation')" />
+                        </TabList>
 
-
-            <div class="right-panel-popover min-[1000px]:hidden">
-                <div id="popover-right-panel" class="right-panel-popover__menu" popover>
-                    <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">
-                        <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
-                    </button>
-                    <div class="@container py-6 px-2.5">
-                        <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                            <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
-                                <TabTrigger name="settings" :text="__('Settings')" />
-                                <TabTrigger name="logic" :text="__('Logic')" />
-                                <TabTrigger name="validation" :text="__('Validation')" />
-                            </TabList>
-
-                            <TabContent name="settings">
-                                <div class="space-y-6 pt-8">
-                                    <div class="flex items-center gap-2.5">
-                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                        <a href="#editing-field" class="text-xl font-medium antialiased">
-                                            {{ __('Multi Choice') }}
-                                        </a>
-                                    </div>
-
-                                    <Field :label="__('Label')">
-                                        <Input v-model="settingsLabel" />
-                                    </Field>
-
-                                    <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
-                                        <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
-                                    </Field>
-
-                                    <Field :label="__('Placeholder')">
-                                        <Input v-model="settingsPlaceholder" />
-                                    </Field>
-
-                                    <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
-                                        <Input v-model="settingsCharacterLimit" type="number" />
-                                    </Field>
+                        <TabContent name="settings">
+                            <div class="space-y-6 pt-8">
+                                <div class="flex items-center gap-2.5">
+                                    <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                        {{ __('Multi Choice') }}
+                                        <div class="grid *:[grid-area:1/1]">
+                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                        </div>
+                                    </a>
                                 </div>
-                            </TabContent>
-                            <TabContent name="logic">
-                                <div class="space-y-6 pt-8">
-                                    <div class="flex items-center gap-2.5">
-                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                        <a href="#editing-field" class="text-xl font-medium antialiased">
-                                            {{ __('Multi Choice') }}
-                                        </a>
-                                    </div>
 
-                                    <LogicFlowMock />
+                                <Field :label="__('Label')">
+                                    <Input v-model="settingsLabel" />
+                                </Field>
+
+                                <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                    <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                                </Field>
+
+                                <Field :label="__('Placeholder')">
+                                    <Input v-model="settingsPlaceholder" />
+                                </Field>
+
+                                <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                                    <Input v-model="settingsCharacterLimit" type="number" />
+                                </Field>
+
+                                <Field :label="__('Options')">
+                                    <TableFieldtype
+                                        id="field-options-mobile"
+                                        handle="options"
+                                        v-model:value="optionRows"
+                                        :config="optionRowsConfig"
+                                    />
+                                </Field>
+                            </div>
+                        </TabContent>
+                        <TabContent name="logic">
+                            <div class="space-y-6 pt-8">
+                                <div class="flex items-center gap-2.5">
+                                    <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                        {{ __('Multi Choice') }}
+                                        <div class="grid *:[grid-area:1/1]">
+                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                        </div>
+                                    </a>
                                 </div>
-                            </TabContent>
-                            <TabContent name="validation">
-                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
-                            </TabContent>
-                        </Tabs>
-                    </div>
+
+                                <LogicFlowMock />
+                                <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
+                            </div>
+                        </TabContent>
+                        <TabContent name="validation">
+                            <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
+                        </TabContent>
+                    </Tabs>
                 </div>
             </div>
+        </div>
 
-            <!-- This is the desktop nav - the content is repeated from the right panel -->
-            <div class="@container relative py-6 px-2.5 pe-4.5 max-[1000px]:hidden">
-                <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                    <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
-                        <TabTrigger name="settings" :text="__('Settings')" />
-                        <TabTrigger name="logic" :text="__('Logic')" />
-                        <TabTrigger name="validation" :text="__('Validation')" />
-                    </TabList>
+        <!-- This is the desktop nav - the content is repeated from the right panel -->
+        <div class="@container relative pt-6 pb-12 px-2.5 pe-4.5 max-[1000px]:hidden">
+            <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
+                <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
+                    <TabTrigger name="settings" :text="__('Settings')" />
+                    <TabTrigger name="logic" :text="__('Logic')" />
+                    <TabTrigger name="validation" :text="__('Validation')" />
+                </TabList>
 
-                    <TabContent name="settings">
-                        <div class="space-y-6 pt-8">
-                            <div data-field-settings class="flex items-center gap-2.5">
-                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                <a href="#editing-field" class="text-xl font-medium antialiased">
-                                    {{ __('Multi Choice') }}
-                                </a>
-                            </div>
-
-                            <Field :label="__('Label')">
-                                <Input v-model="settingsLabel" />
-                            </Field>
-
-                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
-                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
-                            </Field>
-
-                            <Field :label="__('Placeholder')">
-                                <Input v-model="settingsPlaceholder" />
-                            </Field>
-
-                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
-                                <Input v-model="settingsCharacterLimit" type="number" />
-                            </Field>
-
-                            <!-- <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
-                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
-                            </Field>
-
-                            <Field :label="__('Placeholder')">
-                                <Input v-model="settingsPlaceholder" />
-                            </Field>
-
-                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
-                                <Input v-model="settingsCharacterLimit" type="number" />
-                            </Field>
-
-                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
-                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
-                            </Field>
-
-                            <Field :label="__('Placeholder')">
-                                <Input v-model="settingsPlaceholder" />
-                            </Field>
-
-                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
-                                <Input v-model="settingsCharacterLimit" type="number" />
-                            </Field>
-
-                            <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
-                                <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
-                            </Field>
-
-                            <Field :label="__('Placeholder')">
-                                <Input v-model="settingsPlaceholder" />
-                            </Field>
-
-                            <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
-                                <Input v-model="settingsCharacterLimit" type="number" />
-                            </Field> -->
+                <TabContent name="settings">
+                    <div class="space-y-6 pt-8">
+                        <div data-field-settings class="flex items-center gap-2.5">
+                            <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                {{ __('Multi Choice') }}
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
                         </div>
-                    </TabContent>
-                    <TabContent name="logic">
-                        <div class="space-y-6 pt-8">
-                            <div data-field-settings class="flex items-center gap-2.5">
-                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                                <a href="#editing-field" class="text-xl font-medium antialiased">
-                                    {{ __('Multi Choice') }}
-                                </a>
-                            </div>
 
-                            <LogicFlowMock />
+                        <Field :label="__('Label')">
+                            <Input v-model="settingsLabel" />
+                        </Field>
+
+                        <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                        </Field>
+
+                        <Field :label="__('Placeholder')">
+                            <Input v-model="settingsPlaceholder" />
+                        </Field>
+
+                        <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                            <Input v-model="settingsCharacterLimit" type="number" />
+                        </Field>
+
+                        <Field :label="__('Options')">
+                            <TableFieldtype
+                                id="field-options-desktop"
+                                handle="options"
+                                v-model:value="optionRows"
+                                :config="optionRowsConfig"
+                            />
+                        </Field>
+
+                        <!-- <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                        </Field>
+
+                        <Field :label="__('Placeholder')">
+                            <Input v-model="settingsPlaceholder" />
+                        </Field>
+
+                        <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                            <Input v-model="settingsCharacterLimit" type="number" />
+                        </Field>
+
+                        <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                        </Field>
+
+                        <Field :label="__('Placeholder')">
+                            <Input v-model="settingsPlaceholder" />
+                        </Field>
+
+                        <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                            <Input v-model="settingsCharacterLimit" type="number" />
+                        </Field>
+
+                        <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                        </Field>
+
+                        <Field :label="__('Placeholder')">
+                            <Input v-model="settingsPlaceholder" />
+                        </Field>
+
+                        <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
+                            <Input v-model="settingsCharacterLimit" type="number" />
+                        </Field> -->
+                    </div>
+                </TabContent>
+                <TabContent name="logic">
+                    <div class="space-y-6 pt-8">
+                        <div data-field-settings class="flex items-center gap-2.5">
+                            <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                {{ __('Multi Choice') }}
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
                         </div>
-                    </TabContent>
-                    <TabContent name="validation">
-                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
-                    </TabContent>
-                </Tabs>
-            </div>
+
+                        <LogicFlowMock />
+                        <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
+                    </div>
+                </TabContent>
+                <TabContent name="validation">
+                    <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
+                </TabContent>
+            </Tabs>
         </div>
     </LayoutPanel>
 </template>
