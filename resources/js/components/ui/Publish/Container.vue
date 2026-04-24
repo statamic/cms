@@ -273,11 +273,9 @@ function blurField(handle, user = Statamic.user) {
 function pushComponent(name, { props }) {
     const component = new Component(uniqid(), name, props);
     components.value.push(component);
-    const originalDestroy = component.destroy.bind(component);
     component.destroy = () => {
         const index = components.value.indexOf(component);
         if (index !== -1) components.value.splice(index, 1);
-        originalDestroy();
     };
     return component;
 }
