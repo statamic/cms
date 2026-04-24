@@ -10,6 +10,7 @@ use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\AssetsIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAsset;
@@ -104,7 +105,7 @@ class BrowserController extends CpController
         $folders = $folders->slice(($page - 1) * $perPage, $perPage);
 
         if ($page >= $lastFolderPage) {
-            $query = $folder->queryAssets();
+            $query = (new AssetsIndexQuery($folder->queryAssets(), $container))->query();
             $query->orderBy($sort, $order);
             $this->applyQueryScopes($query, $request->all());
 
