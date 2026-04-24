@@ -1084,6 +1084,24 @@ class AntlersLexer
                     continue;
                 }
 
+                if ($this->cur == DocumentParser::Punctuation_Question
+                    && $this->next == DocumentParser::Punctuation_Question
+                    && ($this->currentIndex + 2) < $this->inputLen
+                    && $this->chars[$this->currentIndex + 2] == DocumentParser::Punctuation_Question) {
+                    // ???
+                    $strictNullCoalesceOperator = new NullCoalesceOperator();
+                    $strictNullCoalesceOperator->content = '???';
+                    $strictNullCoalesceOperator->strict = true;
+                    $strictNullCoalesceOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                    $strictNullCoalesceOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 3);
+
+                    $this->runtimeNodes[] = $strictNullCoalesceOperator;
+                    $this->lastNode = $strictNullCoalesceOperator;
+                    $this->currentIndex += 2;
+
+                    continue;
+                }
+
                 if ($this->cur == DocumentParser::Punctuation_Question && $this->next == DocumentParser::Punctuation_Question) {
                     // ??
                     $nullCoalesceOperator = new NullCoalesceOperator();
