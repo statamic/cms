@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\User;
 use Statamic\Statamic;
+use Tests\Auth\Eloquent\User as EloquentUser;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -93,5 +94,16 @@ class AuthRedirectTest extends TestCase
             ->get('/cp')
             ->assertRedirect(cp_route('unauthorized'))
             ->assertSessionHas(['error' => 'Unauthorized.']);
+    }
+
+    #[Test]
+    public function it_redirects_to_login_when_authenticated_user_is_not_a_statamic_user()
+    {
+        $nonStatamicUser = EloquentUser::make();
+
+        $this
+            ->actingAs($nonStatamicUser)
+            ->get('/cp')
+            ->assertRedirect(cp_route('login'));
     }
 }

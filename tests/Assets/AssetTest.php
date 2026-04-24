@@ -664,6 +664,22 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_throw_when_getting_last_modified_and_file_doesnt_exist()
+    {
+        // This is really a workaround for an underlying bug.
+        // It's odd for an asset to not have a corresponding file.
+        // Once resolved, this test could be removed, although it doesn't hurt by being here.
+
+        Storage::fake('test');
+        // Intentionally do no not create the actual file.
+
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        $lastModified = $asset->lastModified();
+        $this->assertInstanceOf(Carbon::class, $lastModified);
+    }
+
+    #[Test]
     public function it_generates_and_clears_meta_caches()
     {
         Storage::fake('test');

@@ -29,11 +29,21 @@ class LoginController extends Controller
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
+        $redirect = $request->input('_redirect');
+        $redirect = $redirect && ! URL::isExternalToApplication($redirect) ? $redirect : null;
+
+        // If 2FA setup is required, stash the redirect so the setup flow can use it after completion.
+        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication()) {
+            $request->session()->forget('login.redirect');
+
+            if ($redirect) {
+                $request->session()->put('login.redirect', $redirect);
+            }
+        }
+
         $this->authenticate($request, $user);
 
-        $redirect = $request->input('_redirect', '/');
-
-        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect)->withSuccess(__('Login successful.'));
+        return redirect($redirect ?? route('statamic.site'))->withSuccess(__('Login successful.'));
     }
 
     private function checkPasskeyEnforcement(Request $request)
@@ -63,7 +73,7 @@ class LoginController extends Controller
 
     protected function twoFactorChallengeRedirect(): string
     {
-        return route('statamic.two-factor-challenge');
+        return config('statamic.users.two_factor_challenge_url') ?? route('statamic.two-factor-challenge');
     }
 
     /**
@@ -103,9 +113,13 @@ class LoginController extends Controller
     {
         Auth::logout();
 
-        $redirect = request()->get('redirect', '/');
+        $redirect = request()->get('redirect');
 
-        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
+        $url = $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
+
+        return redirect($url);
     }
 
     protected function username()

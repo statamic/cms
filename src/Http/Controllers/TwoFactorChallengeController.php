@@ -18,7 +18,7 @@ class TwoFactorChallengeController extends Controller
     public function __construct(Request $request)
     {
         $this->middleware('throttle:two-factor');
-        $this->middleware(HandleInertiaRequests::class);
+        $this->middleware(HandleInertiaRequests::class)->except('store');
         $this->middleware(RedirectIfAuthenticated::class);
     }
 
@@ -45,20 +45,37 @@ class TwoFactorChallengeController extends Controller
         } elseif (! $request->hasValidCode()) {
             TwoFactorAuthenticationFailed::dispatch($user);
 
-            return $request->sendFailedTwoFactorChallengeResponse();
+            return $this->sendFailedResponse($request);
         }
 
         ValidTwoFactorAuthenticationCodeProvided::dispatch($user);
 
         Auth::guard()->login($user, $request->remember());
 
+        $request->session()->forget(['login.id', 'login.remember']);
+
         $request->session()->elevate();
 
         $request->session()->regenerate();
 
-        return $request->expectsJson()
-            ? response('Authenticated')
-            : redirect()->intended($this->redirectPath());
+        if ($request->inertia() || $request->expectsJson()) {
+            return $request->inertia()
+                ? Inertia::location($this->redirectPath($request))
+                : response('Authenticated');
+        }
+
+        return redirect()->intended($this->redirectPath($request));
+    }
+
+    protected function sendFailedResponse(TwoFactorChallengeRequest $request)
+    {
+        if ($errorRedirect = $request->input('_error_redirect')) {
+            if (! URL::isExternalToApplication($errorRedirect)) {
+                return $request->sendFailedTwoFactorChallengeResponse($errorRedirect);
+            }
+        }
+
+        return $request->sendFailedTwoFactorChallengeResponse($this->failedRedirectPath());
     }
 
     protected function formAction()
@@ -66,12 +83,25 @@ class TwoFactorChallengeController extends Controller
         return route('statamic.two-factor-challenge');
     }
 
-    protected function redirectPath()
+    protected function redirectPath(Request $request)
     {
-        $redirect = request('redirect');
+        if ($redirect = $request->input('_redirect')) {
+            if (! URL::isExternalToApplication($redirect)) {
+                return $redirect;
+            }
+        }
 
-        return $redirect && ! URL::isExternalToApplication($redirect)
-            ? $redirect
-            : route('statamic.site');
+        if ($redirect = $request->session()->pull('login.redirect')) {
+            if (! URL::isExternalToApplication($redirect)) {
+                return $redirect;
+            }
+        }
+
+        return route('statamic.site');
+    }
+
+    protected function failedRedirectPath()
+    {
+        return config('statamic.users.two_factor_challenge_url') ?? route('statamic.two-factor-challenge');
     }
 }

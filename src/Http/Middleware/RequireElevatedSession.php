@@ -9,7 +9,7 @@ class RequireElevatedSession
 {
     public function handle($request, Closure $next)
     {
-        if (! $request->hasElevatedSession()) {
+        if (config('statamic.users.elevated_sessions_enabled') && ! $request->hasElevatedSession()) {
             throw new ElevatedSessionAuthorizationException;
         }
 

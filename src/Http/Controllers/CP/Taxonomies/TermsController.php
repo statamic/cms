@@ -131,7 +131,7 @@ class TermsController extends CpController
                     'url' => $localized->editUrl(),
                     'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
-            })->all(),
+            })->values()->all(),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
