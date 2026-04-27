@@ -93,7 +93,7 @@ class Date extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.date.config.timezone'),
                         'type' => 'dictionary',
                         'dictionary' => 'timezones',
-                        'placeholder' => 'Auto',
+                        'placeholder' => $this->timezonePlaceholder(),
                         'clearable' => true,
                         'width' => 50,
                         'max_items' => 1,
@@ -246,6 +246,7 @@ class Date extends Fieldtype
         $common = [
             'mode' => $this->config('mode', 'single'),
             'time_enabled' => $this->config('time_enabled'),
+            'timezone' => $this->resolvedTimezone(),
         ];
 
         if ($this->config('mode') === 'range') {
@@ -375,6 +376,13 @@ class Date extends Fieldtype
     public function preload()
     {
         return ['timezone' => $this->resolvedTimezone()];
+    }
+
+    private function timezonePlaceholder(): string
+    {
+        $default = config('statamic.cp.default_timezone', 'auto');
+
+        return $default !== 'auto' ? $default : __('Auto');
     }
 
     private function resolvedTimezone(): string

@@ -370,37 +370,37 @@ class DateTest extends TestCase
                 'UTC',
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'date with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'date in a different timezone' => [
                 'America/New_York', // -0400
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29T04:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T04:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'date with time' => [
                 'UTC',
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true],
+                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true, 'timezone' => 'auto'],
             ],
             'date with time and custom format' => [
                 'UTC',
                 ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
                 '2012--08--29 13:43',
-                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true],
+                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true, 'timezone' => 'auto'],
             ],
             'date with time in a different timezone' => [
                 'America/New_York', // -0400
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29T17:43:00.000Z', 'mode' => 'single', 'time_enabled' => true],
+                ['date' => '2012-08-29T17:43:00.000Z', 'mode' => 'single', 'time_enabled' => true, 'timezone' => 'auto'],
             ],
             'null range' => [
                 'UTC',
@@ -412,19 +412,19 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'range with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
-                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'range in a different timezone' => [
                 'America/New_York', // -4000
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-27T04:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
+                ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-27T04:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
@@ -432,32 +432,32 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 '2012-08-29',
-                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'range where single date has been provided with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'date where range has been provided' => [
                 // e.g. If it was once a range field. Use the start date.
                 'UTC',
                 [],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'date where range has been provided with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
-                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto'],
             ],
             'range where time has been enabled' => [
                 'UTC',
                 ['mode' => 'range', 'time_enabled' => true],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => true],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => true, 'timezone' => 'auto'],
             ],
         ];
     }
