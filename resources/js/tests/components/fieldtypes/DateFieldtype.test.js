@@ -94,11 +94,12 @@ test('configured timezone overrides browser timezone', () => {
     expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
 });
 
-test('displayTimezone falls back to browser local when no timezone is configured', () => {
+test('displayTimezone falls back to browser local when timezone is auto', () => {
     process.env.TZ = 'America/New_York';
 
     const dateField = makeDateField({
         value: '2025-12-25T02:23:00Z',
+        meta: { timezone: 'auto' },
     });
 
     expect(dateField.vm.displayTimezone).toBe('America/New_York');

@@ -68,7 +68,9 @@ export default {
         },
 
         displayTimezone() {
-            return this.meta?.timezone || getLocalTimeZone();
+            const tz = this.meta?.timezone;
+
+            return tz && tz !== 'auto' ? tz : getLocalTimeZone();
         },
 
         datePickerValue() {

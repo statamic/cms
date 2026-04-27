@@ -682,9 +682,9 @@ class DateTest extends TestCase
     }
 
     #[Test]
-    public function it_preloads_null_timezone_by_default()
+    public function it_preloads_auto_timezone_by_default()
     {
-        $this->assertNull($this->fieldtype()->preload()['timezone']);
+        $this->assertEquals('auto', $this->fieldtype()->preload()['timezone']);
     }
 
     #[Test]
@@ -716,11 +716,11 @@ class DateTest extends TestCase
     }
 
     #[Test]
-    public function it_preloads_null_when_cp_default_timezone_is_auto()
+    public function it_preloads_auto_when_cp_default_timezone_is_auto()
     {
         config()->set('statamic.cp.default_timezone', 'auto');
 
-        $this->assertNull($this->fieldtype()->preload()['timezone']);
+        $this->assertEquals('auto', $this->fieldtype()->preload()['timezone']);
     }
 
     #[Test]
