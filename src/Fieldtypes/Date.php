@@ -387,7 +387,9 @@ class Date extends Fieldtype
 
     private function resolvedTimezone(): string
     {
-        return $this->config('timezone', config('statamic.cp.default_timezone', 'auto'));
+        $timezone = $this->config('timezone', config('statamic.cp.default_timezone', 'auto'));
+
+        return is_array($timezone) ? ($timezone[0] ?? 'auto') : $timezone;
     }
 
     public function timeEnabled()
