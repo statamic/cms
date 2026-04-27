@@ -168,8 +168,8 @@ const optionChipIconClasses = (option) => {
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text" :title="__('Which album was your favorite? Test for a long string and truncation')">
-                                {{ __('Which album was your favorite? Test for a long string and truncation') }}
+                            <span class="logic-text__pill-text" :title="__('Which album was your favorite? Test for a long string and truncation Test for a long string and truncation')">
+                                {{ __('Which album was your favorite? Test for a long string and truncation Test for a long string and truncation') }}
                             </span>
                         </div>
                     </li>

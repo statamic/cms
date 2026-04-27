@@ -270,14 +270,14 @@
     /* Exit "If" */
     > ol > li {
         &:not(:last-child) {
-            li:last-child {
+            + li {
                 position: relative;
                 &::before {
                     content: '';
                     position: absolute;
                     z-index: var(--z-index-below);
-                    top: 50%;
-                    left: calc(0% - var(--inner-indent) / 2);
+                    top: -1.5rem;
+                    left: calc(0% + var(--inner-indent) / 2);
                     width: calc(var(--spacing) * 4);
                     height: 3.5rem;
                     border: var(--logic-line);
@@ -334,6 +334,7 @@
             /* Inner structure */
             ol {
                 display: flex;
+                flex-wrap: wrap;
                 &::before {
                     /* Hide connectors for now-horizontal logic */
                     content: unset;
