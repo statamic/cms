@@ -96,6 +96,7 @@ class Date extends Fieldtype
                         'placeholder' => 'auto',
                         'clearable' => true,
                         'width' => 50,
+                        'max_items' => 1,
                     ],
                 ],
             ],
