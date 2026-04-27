@@ -25,7 +25,7 @@ const formTitle = computed(() => props.form?.title || __('Untitled Form'));
         <Panel>
             <PanelHeader>
                 <Heading>
-                    <span>{{ __('Connect') }}</span>
+                    <span class="inline-flex items-center gap-2"><Icon name="connection" class="size-4! opacity-60! text-gray-925 dark:text-white" aria-hidden="true" />{{ __('Connect') }}</span>
                     <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                     <span>{{ __('Email Notifications') }}</span>
                 </Heading>
