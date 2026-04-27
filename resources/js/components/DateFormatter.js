@@ -3,23 +3,6 @@ import { getLocale, getDefaultLocale, setDefaultLocale } from './FormattingLocal
 export default class DateFormatter {
     #date;
     #options;
-    #presets = {
-        datetime: {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-        },
-        date: {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-        },
-        time: {
-            timeStyle: 'short',
-        },
-    };
 
     constructor(date, options) {
         this.#date = this.#normalizeDate(date);
@@ -151,9 +134,9 @@ export default class DateFormatter {
         if (!options) options = 'datetime';
 
         if (typeof options === 'string') {
-            if (!this.#presets[options]) throw new Error(`Invalid date format: ${options}`);
+            if (!DateFormatter.presets[options]) throw new Error(`Invalid date format: ${options}`);
 
-            return this.#presets[options];
+            return DateFormatter.presets[options];
         }
 
         return options;
