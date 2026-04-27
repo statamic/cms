@@ -1,6 +1,7 @@
 <template>
     <Uploader
         ref="uploader"
+        class="*:h-full"
         :container="container.id"
         :path="currentPath"
         :enabled="container.can_upload"
