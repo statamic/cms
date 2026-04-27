@@ -174,7 +174,7 @@
         ol {
             display: grid;
             grid-template-columns: 100%;
-            @apply gap-2.5 gap-y-2 mb-2.5;
+            @apply gap-2 mb-2.5;
             margin-inline-start: var(--inner-indent);
             /* Last "Then go to ..." */
             :is(li:last-child) & {
@@ -254,7 +254,7 @@
 =================================================== */
 .logic-text {
     --logic-line: 1px dashed var(--color-gray-400);
-    --outer-indent-connector: 1rem;
+    --outer-indent-connector: calc(1rem - 2px);
     /* Inner structure */
     ol ol {
         position: relative;
@@ -291,7 +291,7 @@
 }
 .logic-text__condition {
     position: relative;
-    @apply mb-2;
+    @apply mb-2.5;
     .logic-text > ol > li:is(:first-child, :last-child) & {
         /* Increase for entry and exit points */
         @apply mb-4;
@@ -307,7 +307,7 @@
         top: 100%;
         width: calc(var(--spacing) * 4);
         /* Don't overlap/clash with subsequent connectors */
-        height: 75%;
+        height: 70%;
     }
     &.logic-text-badge::after {
         /* Increase height of the connectors for the entry/exit badges because there's an increased distance for these. */
