@@ -1,6 +1,6 @@
 <?php
 
-namespace Forms\Fields;
+namespace Tests\Forms\Fields;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Fields\FormField;
