@@ -30,7 +30,7 @@ export default {
                 ...events,
             },
             [
-                h('div', { class: { 'pointer-events-none': this.dragging } }, [
+                h('div', { class: ['h-full', { 'pointer-events-none': this.dragging }] }, [
                     fileField,
                     ...this.$slots.default({ dragging: this.enabled ? this.dragging : false }),
                 ]),
