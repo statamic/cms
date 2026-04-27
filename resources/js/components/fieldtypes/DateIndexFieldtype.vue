@@ -42,7 +42,11 @@ const tooltip = computed(() => {
         return null;
     }
 
-    const formatter = new DateFormatter().options({ dateStyle: 'long', timeStyle: 'long', ...timezoneOption.value });
+    const tooltipOptions = props.value.time_enabled
+        ? { dateStyle: 'long', timeStyle: 'long' }
+        : { dateStyle: 'long' };
+
+    const formatter = new DateFormatter().options({ ...tooltipOptions, ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
         return formatter.date(new Date(props.value.start)) + ' – ' + formatter.date(new Date(props.value.end));
