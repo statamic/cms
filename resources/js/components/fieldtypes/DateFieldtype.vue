@@ -92,16 +92,24 @@ export default {
             return this.hasTime ? (this.hasSeconds ? 'second' : 'minute') : 'day';
         },
 
+        replicatorPreviewOptions() {
+            const preset = this.hasTime ? 'datetime' : 'date';
+            const tz = this.displayTimezone;
+
+            return { ...DateFormatter.presets[preset], timeZone: tz };
+        },
+
         replicatorPreview() {
             if (!this.showFieldPreviews) return;
             if (!this.value) return;
 
+            const formatter = new DateFormatter().options(this.replicatorPreviewOptions);
+
             if (this.isRange) {
-                const formatter = new DateFormatter().options(this.hasTime ? 'datetime' : 'date');
                 return formatter.date(this.value.start) + ' – ' + formatter.date(this.value.end);
             }
 
-            return DateFormatter.format(this.value, this.hasTime && this.value ? 'datetime' : 'date');
+            return formatter.date(this.value).toString();
         },
     },
 
