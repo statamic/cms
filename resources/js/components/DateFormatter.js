@@ -96,6 +96,14 @@ export default class DateFormatter {
         return new DateFormatter(this.#date, this.#options.fallback || 'datetime').toString();
     }
 
+    static get presets() {
+        return {
+            datetime: { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' },
+            date: { year: 'numeric', month: 'numeric', day: 'numeric' },
+            time: { timeStyle: 'short' },
+        };
+    }
+
     static format(date, options) {
         return new DateFormatter(date, options).toString();
     }

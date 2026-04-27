@@ -11,11 +11,6 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose } = Fieldtype.use(emit, props);
 
-const datePresets = {
-    datetime: { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' },
-    date: { year: 'numeric', month: 'numeric', day: 'numeric' },
-};
-
 const timezoneOption = computed(() => {
     const tz = props.value?.timezone;
 
@@ -28,7 +23,7 @@ const formatted = computed(() => {
     }
 
     const preset = props.value.time_enabled ? 'datetime' : 'date';
-    const formatter = new DateFormatter().options({ ...datePresets[preset], ...timezoneOption.value });
+    const formatter = new DateFormatter().options({ ...DateFormatter.presets[preset], ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
         return formatter.date(new Date(props.value.start)) + ' – ' + formatter.date(new Date(props.value.end));
