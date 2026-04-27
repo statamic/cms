@@ -23,7 +23,7 @@
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { DatePicker, DateRangePicker, Button } from '@/components/ui';
-import { getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
+import { getLocalTimeZone, parseAbsolute, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -67,6 +67,14 @@ export default {
             return this.config.inline;
         },
 
+        displayTimezone() {
+            const cpDefault = this.$config.get('cpDateTimezone');
+
+            return this.meta?.timezone
+                || (cpDefault && cpDefault !== 'auto' ? cpDefault : null)
+                || getLocalTimeZone();
+        },
+
         datePickerValue() {
             if (!this.value || this.value === 'now') {
                 return null;
@@ -74,12 +82,12 @@ export default {
 
             if (this.isRange) {
                 return {
-                    start: parseAbsoluteToLocal(this.value.start),
-                    end: parseAbsoluteToLocal(this.value.end),
+                    start: parseAbsolute(this.value.start, this.displayTimezone),
+                    end: parseAbsolute(this.value.end, this.displayTimezone),
                 };
             }
 
-            return parseAbsoluteToLocal(this.value);
+            return parseAbsolute(this.value, this.displayTimezone);
         },
 
         datePickerGranularity() {
@@ -131,7 +139,7 @@ export default {
             // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
             // information. In that case, we need to convert it to a ZonedDateTime object.
             if (!this.isRange && !value.offset && !value.timeZone) {
-                value = toZoned(value, getLocalTimeZone());
+                value = toZoned(value, this.displayTimezone);
             }
 
             // The date picker will give us CalendarDateTimes in the local time zone.

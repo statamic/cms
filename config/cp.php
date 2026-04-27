@@ -117,6 +117,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Date Timezone
+    |--------------------------------------------------------------------------
+    |
+    | The default timezone used when displaying and entering dates in the
+    | Control Panel. When set to "auto", the browser's local timezone
+    | will be used. Set to an IANA timezone (e.g. "America/New_York")
+    | to pin all date fields to a specific timezone by default.
+    |
+    */
+
+    'date_timezone' => env('STATAMIC_CP_DATE_TIMEZONE', 'auto'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Thumbnails
     |--------------------------------------------------------------------------
     |

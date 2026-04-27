@@ -81,6 +81,7 @@ class JavascriptComposer
             'commandPalettePreloadedItems' => CommandPalette::getPreloadedItems(),
             'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
+            'cpDateTimezone' => config('statamic.cp.date_timezone', 'auto'),
             'defaultTheme' => $this->defaultTheme(),
         ];
     }

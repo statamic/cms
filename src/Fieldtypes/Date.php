@@ -88,6 +88,15 @@ class Date extends Fieldtype
                         'default' => false,
                         'width' => 50,
                     ],
+                    'timezone' => [
+                        'display' => __('Timezone'),
+                        'instructions' => __('statamic::fieldtypes.date.config.timezone'),
+                        'type' => 'dictionary',
+                        'dictionary' => 'timezones',
+                        'placeholder' => 'auto',
+                        'clearable' => true,
+                        'width' => 50,
+                    ],
                 ],
             ],
             [
@@ -360,6 +369,11 @@ class Date extends Fieldtype
         } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value, config('app.timezone'));
         }
+    }
+
+    public function preload()
+    {
+        return ['timezone' => $this->config('timezone')];
     }
 
     public function timeEnabled()

@@ -16,7 +16,7 @@ window.Statamic = {
     },
 };
 
-const makeDateField = (props = {}) => {
+const makeDateField = (props = {}, configOverrides = {}) => {
     return mount(DateFieldtype, {
         shallow: true,
         props: {
@@ -38,6 +38,9 @@ const makeDateField = (props = {}) => {
                     get: (key) => {
                         if (key === 'locale') {
                             return 'en';
+                        }
+                        if (key === 'cpDateTimezone') {
+                            return configOverrides.cpDateTimezone ?? 'auto';
                         }
                     },
                 },
@@ -81,4 +84,69 @@ test('datePickerValue returns null when value is "now"', () => {
     const dateField = makeDateField({ value: 'now' });
 
     expect(dateField.vm.datePickerValue).toBe(null);
+});
+
+test('per-field timezone overrides browser timezone', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField({
+        value: '2025-12-25T02:23:00Z',
+        meta: { timezone: 'Europe/London' },
+    });
+
+    expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
+});
+
+test('cp default timezone is used when no per-field timezone is set', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField(
+        { value: '2025-12-25T02:23:00Z' },
+        { cpDateTimezone: 'Europe/London' },
+    );
+
+    expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
+});
+
+test('per-field timezone takes precedence over cp default timezone', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField(
+        {
+            value: '2025-12-25T02:23:00Z',
+            meta: { timezone: 'Australia/Sydney' },
+        },
+        { cpDateTimezone: 'Europe/London' },
+    );
+
+    expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T13:23:00+11:00[Australia/Sydney]');
+});
+
+test('displayTimezone falls back to browser local when cp default is auto', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField(
+        { value: '2025-12-25T02:23:00Z' },
+        { cpDateTimezone: 'auto' },
+    );
+
+    expect(dateField.vm.displayTimezone).toBe('America/New_York');
+});
+
+test('range dates use configured timezone', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField({
+        value: { start: '2025-12-25T02:23:00Z', end: '2025-12-26T02:23:00Z' },
+        meta: { timezone: 'Europe/London' },
+        config: {
+            mode: 'range',
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    const value = dateField.vm.datePickerValue;
+    expect(value.start.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
+    expect(value.end.toString()).toBe('2025-12-26T02:23:00+00:00[Europe/London]');
 });

@@ -681,6 +681,30 @@ class DateTest extends TestCase
         ];
     }
 
+    #[Test]
+    public function it_preloads_timezone_config()
+    {
+        $this->assertNull($this->fieldtype()->preload()['timezone']);
+
+        $this->assertEquals(
+            'America/New_York',
+            $this->fieldtype(['timezone' => 'America/New_York'])->preload()['timezone']
+        );
+    }
+
+    #[Test]
+    public function it_includes_timezone_in_config_field_items()
+    {
+        $fieldtype = $this->fieldtype();
+        $configFields = (new \ReflectionMethod($fieldtype, 'configFieldItems'))->invoke($fieldtype);
+
+        $dateTimeSection = collect($configFields)->firstWhere('display', __('Date & Time'));
+
+        $this->assertArrayHasKey('timezone', $dateTimeSection['fields']);
+        $this->assertEquals('dictionary', $dateTimeSection['fields']['timezone']['type']);
+        $this->assertEquals('timezones', $dateTimeSection['fields']['timezone']['dictionary']);
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_replace([
