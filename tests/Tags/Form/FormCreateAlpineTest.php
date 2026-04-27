@@ -3,6 +3,7 @@
 namespace Tests\Tags\Form;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Form;
 use Statamic\Statamic;
 
 class FormCreateAlpineTest extends FormTestCase
@@ -930,6 +931,22 @@ EOT
         ];
 
         $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-name-field" type="text" name="name" value="" x-model="form.name" @change="form.validate(\'name\')">'], $config, [], ['js' => 'alpine_precognition']);
+    }
+
+    #[Test]
+    public function it_wont_submit_form_when_precognition_validate_only_header_is_spoofed()
+    {
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->withHeaders([
+                'Precognition-Validate-Only' => 'foo',
+            ])
+            ->post('/!/forms/contact', [])
+            ->assertSessionHasErrors(['email'], null, 'form.contact')
+            ->assertLocation('/');
+
+        $this->assertEmpty(Form::find('contact')->submissions());
     }
 
     private function jsonEncode($data)
