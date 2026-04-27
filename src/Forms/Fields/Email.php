@@ -27,7 +27,7 @@ class Email extends FormFieldtype
             'type' => 'text',
             'input_type' => 'email',
             'placeholder' => $this->config('placeholder'),
-            'validate' => [...((array) $this->config('validate', [])), 'email'],
+            'validate' => array_values(array_unique([...((array) $this->config('validate', [])), 'email'])),
             ...Arr::except($this->config(), ['type', 'input_type', 'placeholder', 'validate']),
         ];
     }

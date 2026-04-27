@@ -39,6 +39,22 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_duplicate_the_email_validation_rule()
+    {
+        $fieldtype = (new Email)->setField(new FormField('email', [
+            'type' => 'email',
+            'validate' => ['required', 'email'],
+        ]));
+
+        $this->assertEquals([
+            'type' => 'text',
+            'input_type' => 'email',
+            'placeholder' => null,
+            'validate' => ['required', 'email'],
+        ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
     public function it_passes_through_extra_config()
     {
         $fieldtype = (new Email)->setField(new FormField('email', [
