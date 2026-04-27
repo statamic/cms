@@ -186,12 +186,12 @@ class Validator
     {
         $request = request();
 
-        if (! $request->headers->has('Precognition-Validate-Only')) {
+        if (! $request->headers->has('Precognition')) {
             return $rules;
         }
 
         return Collection::make($rules)
-            ->only(explode(',', $request->header('Precognition-Validate-Only')))
+            ->only(explode(',', $request->header('Precognition')))
             ->all();
     }
 }
