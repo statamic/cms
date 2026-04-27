@@ -64,18 +64,8 @@ const areAllRulesCollapsed = computed(() => {
     return logicBlocks.value.every((block) => collapsed.value.includes(block._id));
 });
 
-const allRulesView = computed({
-    get() {
-        return areAllRulesCollapsed.value ? 'collapsed' : 'expanded';
-    },
-    set(value) {
-        if (value === 'collapsed') {
-            collapsed.value = logicBlocks.value.map((block) => block._id);
-            return;
-        }
-
-        collapsed.value = [];
-    },
+const allRulesView = computed(() => {
+    return areAllRulesCollapsed.value ? 'collapsed' : 'expanded';
 });
 
 const remainingSetConfigs = computed(() => {
@@ -142,6 +132,14 @@ function expandSet(id) {
     collapsed.value = collapsed.value.filter(setId => setId !== id);
 }
 
+function expandAllRules() {
+    collapsed.value = [];
+}
+
+function collapseAllRules() {
+    collapsed.value = logicBlocks.value.map((block) => block._id);
+}
+
 provide('replicatorSets', groupConfigs);
 provide(publishContextKey, {
     setFieldValue,
@@ -176,9 +174,9 @@ provide(publishContextKey, {
             <PanelHeader>
                 <div class="flex items-center justify-between gap-3">
                     <Heading :text="__('Form Logic')" />
-                    <ToggleGroup v-model="allRulesView" size="xs">
-                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" />
-                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" />
+                    <ToggleGroup :model-value="allRulesView" size="xs">
+                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules" />
+                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules" />
                     </ToggleGroup>
                 </div>
             </PanelHeader>
