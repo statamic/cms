@@ -68,11 +68,7 @@ export default {
         },
 
         displayTimezone() {
-            const cpDefault = this.$config.get('cpDateTimezone');
-
-            return this.meta?.timezone
-                || (cpDefault && cpDefault !== 'auto' ? cpDefault : null)
-                || getLocalTimeZone();
+            return this.meta?.timezone || getLocalTimeZone();
         },
 
         datePickerValue() {

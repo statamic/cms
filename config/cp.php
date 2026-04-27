@@ -127,7 +127,7 @@ return [
     |
     */
 
-    'date_timezone' => env('STATAMIC_CP_DATE_TIMEZONE', 'auto'),
+    'default_timezone' => env('STATAMIC_CP_DEFAULT_TIMEZONE', 'auto'),
 
     /*
     |--------------------------------------------------------------------------

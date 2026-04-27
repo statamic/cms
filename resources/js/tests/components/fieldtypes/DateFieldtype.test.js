@@ -16,7 +16,7 @@ window.Statamic = {
     },
 };
 
-const makeDateField = (props = {}, configOverrides = {}) => {
+const makeDateField = (props = {}) => {
     return mount(DateFieldtype, {
         shallow: true,
         props: {
@@ -38,9 +38,6 @@ const makeDateField = (props = {}, configOverrides = {}) => {
                     get: (key) => {
                         if (key === 'locale') {
                             return 'en';
-                        }
-                        if (key === 'cpDateTimezone') {
-                            return configOverrides.cpDateTimezone ?? 'auto';
                         }
                     },
                 },
@@ -86,7 +83,7 @@ test('datePickerValue returns null when value is "now"', () => {
     expect(dateField.vm.datePickerValue).toBe(null);
 });
 
-test('per-field timezone overrides browser timezone', () => {
+test('configured timezone overrides browser timezone', () => {
     process.env.TZ = 'America/New_York';
 
     const dateField = makeDateField({
@@ -97,38 +94,12 @@ test('per-field timezone overrides browser timezone', () => {
     expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
 });
 
-test('cp default timezone is used when no per-field timezone is set', () => {
+test('displayTimezone falls back to browser local when no timezone is configured', () => {
     process.env.TZ = 'America/New_York';
 
-    const dateField = makeDateField(
-        { value: '2025-12-25T02:23:00Z' },
-        { cpDateTimezone: 'Europe/London' },
-    );
-
-    expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
-});
-
-test('per-field timezone takes precedence over cp default timezone', () => {
-    process.env.TZ = 'America/New_York';
-
-    const dateField = makeDateField(
-        {
-            value: '2025-12-25T02:23:00Z',
-            meta: { timezone: 'Australia/Sydney' },
-        },
-        { cpDateTimezone: 'Europe/London' },
-    );
-
-    expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T13:23:00+11:00[Australia/Sydney]');
-});
-
-test('displayTimezone falls back to browser local when cp default is auto', () => {
-    process.env.TZ = 'America/New_York';
-
-    const dateField = makeDateField(
-        { value: '2025-12-25T02:23:00Z' },
-        { cpDateTimezone: 'auto' },
-    );
+    const dateField = makeDateField({
+        value: '2025-12-25T02:23:00Z',
+    });
 
     expect(dateField.vm.displayTimezone).toBe('America/New_York');
 });

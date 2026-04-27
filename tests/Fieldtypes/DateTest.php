@@ -682,14 +682,45 @@ class DateTest extends TestCase
     }
 
     #[Test]
-    public function it_preloads_timezone_config()
+    public function it_preloads_null_timezone_by_default()
     {
         $this->assertNull($this->fieldtype()->preload()['timezone']);
+    }
+
+    #[Test]
+    public function it_preloads_per_field_timezone()
+    {
+        $this->assertEquals(
+            'America/New_York',
+            $this->fieldtype(['timezone' => 'America/New_York'])->preload()['timezone']
+        );
+    }
+
+    #[Test]
+    public function it_preloads_cp_default_timezone_when_no_per_field_timezone()
+    {
+        config()->set('statamic.cp.default_timezone', 'Europe/London');
+
+        $this->assertEquals('Europe/London', $this->fieldtype()->preload()['timezone']);
+    }
+
+    #[Test]
+    public function per_field_timezone_takes_precedence_over_cp_default()
+    {
+        config()->set('statamic.cp.default_timezone', 'Europe/London');
 
         $this->assertEquals(
             'America/New_York',
             $this->fieldtype(['timezone' => 'America/New_York'])->preload()['timezone']
         );
+    }
+
+    #[Test]
+    public function it_preloads_null_when_cp_default_timezone_is_auto()
+    {
+        config()->set('statamic.cp.default_timezone', 'auto');
+
+        $this->assertNull($this->fieldtype()->preload()['timezone']);
     }
 
     #[Test]
