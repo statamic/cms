@@ -26,7 +26,7 @@ const logicDestinationOptions = [
 ];
 const logicConditionField = ref('long_answer');
 const logicConditionFieldOptions = [
-    { label: __('What do you like most about our band? Lorem ipsum ius kasd cibo utroque an, eum eu populo percipitur, his in equidem posidonium concludaturque. No eam deserunt salutatus, fastidii conceptam consectetuer no vim, sea paulo takimata ei. Tation sadipscing nec ei, cum graeci ancillae et. Modus dicit altera nec ad, nostro civibus epicurei et pro. Errem numquam interesset mel at, cu unum illum vim, ius quot splendide disputando in.'), value: 'long_answer', icon: 'text-long', category: 'text' },
+    { label: __('What do you like most about our band? '), value: 'long_answer', icon: 'text-long', category: 'text' },
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
@@ -78,8 +78,8 @@ const optionChipIconClasses = (option) => {
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text" :title="__('Which album was your favorite? Test for a long string and truncation')">
-                                {{ __('Which album was your favorite? Test for a long string and truncation') }}
+                            <span class="logic-text__pill-text" :title="__('Which album was your favorite?')">
+                                {{ __('Which album was your favorite?') }}
                             </span>
                         </div>
                     </li>
@@ -168,8 +168,8 @@ const optionChipIconClasses = (option) => {
                             >
                                 <Icon name="fieldtype-radio" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text" :title="__('Which album was your favorite? Test for a long string and truncation Test for a long string and truncation')">
-                                {{ __('Which album was your favorite? Test for a long string and truncation Test for a long string and truncation') }}
+                            <span class="logic-text__pill-text" :title="__('Which album was your favorite?')">
+                                {{ __('Which album was your favorite?') }}
                             </span>
                         </div>
                     </li>
