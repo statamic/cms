@@ -199,6 +199,7 @@ const getInputLabel = (part) => {
                             </template>
                         </div>
                         <Text
+                            v-if="timeZoneLabel"
                             class="text-gray-600 dark:text-gray-400 me-1"
                             size="xs"
                             v-tooltip="timeZoneName"

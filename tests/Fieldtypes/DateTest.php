@@ -214,6 +214,36 @@ class DateTest extends TestCase
                 ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
                 ['start' => '2012-08-28 20:00', 'end' => '2013-09-27 19:59'],
             ],
+            'date-only format' => [
+                'UTC',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only format in a different timezone' => [
+                'America/New_York',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d'],
+                '2012-08-29',
+                '2012--08--29',
+            ],
+            'date-only format range' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+            'date-only format range in a different timezone' => [
+                'America/New_York',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
         ];
     }
 
@@ -294,6 +324,30 @@ class DateTest extends TestCase
                 '2012-08-29 13:43',
                 '2012-08-29T17:43:00.000Z',
             ],
+            'date-only format' => [
+                'UTC',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only format in a different timezone' => [
+                'America/New_York',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only format in a positive offset timezone' => [
+                'Australia/Sydney',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only custom format' => [
+                'America/New_York',
+                ['format' => 'Y--m--d'],
+                '2012--08--29',
+                '2012-08-29',
+            ],
             'null range' => [
                 'UTC',
                 ['mode' => 'range'],
@@ -318,6 +372,18 @@ class DateTest extends TestCase
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
                 ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-28T03:59:00.000Z'],
             ],
+            'date-only format range' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+            'date-only format range in a different timezone' => [
+                'America/New_York',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
             'range where single date has been provided' => [
                 'UTC',
                 // e.g. If it was once a non-range field.
@@ -326,11 +392,11 @@ class DateTest extends TestCase
                 '2012-08-29',
                 ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T23:59:59.999Z'],
             ],
-            'range where single date has been provided with custom format' => [
+            'range where single date has been provided with date-only custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d'],
                 '2012--08--29',
-                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T23:59:59.999Z'],
+                ['start' => '2012-08-29', 'end' => '2012-08-29'],
             ],
             'date where range has been provided' => [
                 'UTC',
@@ -458,6 +524,30 @@ class DateTest extends TestCase
                 ['mode' => 'range', 'time_enabled' => true],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
                 ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => true],
+            ],
+            'date-only format' => [
+                'UTC',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                ['date' => '2012-08-29', 'mode' => 'single', 'time_enabled' => false],
+            ],
+            'date-only format in a different timezone' => [
+                'America/New_York',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                ['date' => '2012-08-29', 'mode' => 'single', 'time_enabled' => false],
+            ],
+            'date-only format range' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27', 'mode' => 'range', 'time_enabled' => false],
+            ],
+            'date-only format range in a different timezone' => [
+                'America/New_York',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27', 'mode' => 'range', 'time_enabled' => false],
             ],
         ];
     }
@@ -601,6 +691,16 @@ class DateTest extends TestCase
             'invalid date format' => [
                 [],
                 '2024-01-29',
+                ['Not a valid date.'],
+            ],
+            'valid date-only format' => [
+                ['format' => 'Y-m-d'],
+                '2024-01-29',
+                [],
+            ],
+            'invalid date-only format' => [
+                ['format' => 'Y-m-d'],
+                'marchtember oneteenth',
                 ['Not a valid date.'],
             ],
             'ridiculous invalid date format' => [
