@@ -174,7 +174,7 @@
         ol {
             display: grid;
             grid-template-columns: 100%;
-            @apply gap-2.5 mb-2;
+            @apply gap-2.5 gap-y-2 mb-2.5;
             margin-inline-start: var(--inner-indent);
             /* Last "Then go to ..." */
             :is(li:last-child) & {
@@ -327,7 +327,7 @@
                 &:not(:last-child, :first-child) {
                     li {
                         /* Increase spacing between middle modes to stop connectors colliding */
-                        margin-block: 0.25rem;
+                        margin-block: 0.15rem;
                     }
                 }
             }
