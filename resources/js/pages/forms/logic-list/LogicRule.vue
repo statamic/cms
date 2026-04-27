@@ -2,6 +2,7 @@
 import { computed, inject, ref } from 'vue';
 import {
     Badge,
+    Button,
     Icon,
     Subheading,
     injectPublishContext as injectContainerContext,
@@ -134,6 +135,12 @@ reveal.use(rootEl, () => emit('expanded'));
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <div class="p-4">
                         <LogicFlowMock />
+                        <Button
+                            size="sm"
+                            variant="subtle"
+                            class="-ms-2 mt-2 bg-transparent!"
+                            :text="__('+ Add Condition')"
+                        />
                     </div>
                 </div>
             </div>
