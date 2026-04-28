@@ -36,7 +36,7 @@ const formTitle = computed(() => props.form?.title || __('Untitled Form'));
     </div>
 
     <div class="py-4">
-        <!-- TOOD: Remove from this component when wiring up the form builder. -->
+        <!-- TODO: Remove from this component when wiring up the form builder. -->
         <ul>
             <li v-for="fieldtype in fieldtypes" :key="fieldtype.handle">
                 {{ fieldtype.title }}
