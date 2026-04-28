@@ -82,7 +82,7 @@ const integrations = [
                     <span>{{ __('Email Notifications') }}</span>
                 </Heading>
             </PanelHeader>
-            <Card :class="{ 'py-0!': mode === 'table' }">
+            <Card :class="{ 'p-0!': mode === 'table' }">
                 <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                     <div
                         v-for="integration in integrations"
@@ -117,9 +117,9 @@ const integrations = [
                 <div v-else>
                     <Table class="w-full">
                         <TableColumns>
-                            <TableColumn>{{ __('Integration') }}</TableColumn>
-                            <TableColumn>{{ __('Description') }}</TableColumn>
-                            <TableColumn class="text-right">{{ __('Vendor') }}</TableColumn>
+                            <TableColumn class="first:pl-4 last:pr-4">{{ __('Integration') }}</TableColumn>
+                            <TableColumn class="first:pl-4 last:pr-4">{{ __('Description') }}</TableColumn>
+                            <TableColumn class="text-right first:pl-4 last:pr-4">{{ __('Vendor') }}</TableColumn>
                         </TableColumns>
                         <TableRows>
                             <TableRow
@@ -127,7 +127,7 @@ const integrations = [
                                 :key="`list-${integration.name}`"
                                 class="hover:bg-gray-50 dark:hover:bg-gray-950/35"
                             >
-                                <TableCell>
+                                <TableCell class="first:pl-4 last:pr-4">
                                     <a href="#" class="flex min-w-0 items-center gap-2">
                                         <span class="h-7 w-7 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
                                             <span v-html="integration.logo" />
@@ -138,10 +138,10 @@ const integrations = [
                                         <span class="truncate text-sm text-gray-800 dark:text-gray-200">{{ __(integration.name) }}</span>
                                     </a>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell class="first:pl-4 last:pr-4">
                                     <span class="text-sm text-gray-700 dark:text-gray-300">{{ __(integration.description) }}</span>
                                 </TableCell>
-                                <TableCell class="text-right">
+                                <TableCell class="text-right first:pl-4 last:pr-4">
                                     <span class="inline-flex shrink-0 items-center text-sm text-gray-800 dark:text-gray-200">
                                         <span class="h-4 w-4 overflow-hidden me-1 [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
                                             <span v-html="integration.vendorLogo" />
