@@ -139,10 +139,10 @@ function sortIcon(column) {
                         <span class="inline-flex items-center gap-1.5">
                             <span
                                 v-if="selectedIntegration"
-                                class="h-4 w-4 overflow-hidden [&_svg]:h-full [&_svg]:w-full"
+                                class="h-4 w-4 overflow-hidden [&_svg]:h-full [&_svg]:w-full shape-squircle rounded-full"
                                 aria-hidden="true"
                             >
-                                <span v-html="selectedIntegration.developerLogo" />
+                                <span v-html="selectedIntegration.logo" />
                             </span>
                             <span>{{ __(selectedIntegrationName) }}</span>
                         </span>
