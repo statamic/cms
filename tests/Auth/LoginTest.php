@@ -135,6 +135,14 @@ class LoginTest extends TestCase
     }
 
     #[Test]
+    public function it_stores_the_intended_url_when_redirected_to_login()
+    {
+        $this
+            ->get(cp_route('collections.index'))
+            ->assertSessionHas('url.intended', 'http://localhost/cp/collections');
+    }
+
+    #[Test]
     public function it_can_logout()
     {
         $this
