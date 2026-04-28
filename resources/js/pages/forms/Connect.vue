@@ -43,7 +43,7 @@ const integrations = [
         logo: zapierLogo,
         vendorLogo: statamicVendorLogo,
         vendorName: 'Statamic',
-        count: null,
+        count: 4,
     },
     {
         name: 'IFTTT Workflows',
@@ -115,15 +115,18 @@ const integrations = [
                         v-for="integration in integrations"
                         :key="`list-${integration.name}`"
                         href="#"
-                        class="flex items-center justify-between gap-3 rounded-lg border border-gray-300 bg-gray-50/30 p-3 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
+                        class="flex items-center gap-3 rounded-lg border border-gray-300 bg-gray-50/30 p-3 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
                     >
                         <div class="flex items-center gap-2">
                             <span class="h-7 w-7 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
                                 <span v-html="integration.logo" />
                             </span>
+                            <Badge v-if="integration.count" size="sm" color="white" pill>
+                                {{ integration.count }}
+                            </Badge>
                             <span class="inline-flex items-center text-sm text-gray-800 dark:text-gray-200">
                                 {{ __(':integration by', { integration: __(integration.name) }) }}
-                                <span class="inline-flex items-center ms-2">
+                                <span class="inline-flex items-center ms-1.5">
                                     <span class="h-4 w-4 overflow-hidden me-1 [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
                                         <span v-html="integration.vendorLogo" />
                                     </span>
@@ -131,9 +134,6 @@ const integrations = [
                                 </span>
                             </span>
                         </div>
-                        <Badge v-if="integration.count" size="sm" color="white" pill>
-                            {{ integration.count }}
-                        </Badge>
                     </a>
                 </div>
             </Card>
