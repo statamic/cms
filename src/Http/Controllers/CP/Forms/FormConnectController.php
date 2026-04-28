@@ -12,6 +12,8 @@ class FormConnectController extends CpController
 {
     public function __invoke($form)
     {
+        $this->authorize('edit', $form);
+
         // TODO: Remove from this controller when wiring up the form builder.
         $formFieldtypes = app('statamic.form-fieldtypes')
             ->unique()
