@@ -3,6 +3,9 @@ import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
 import { Badge, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator } from '@ui';
 import { computed } from 'vue';
+import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
+import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
+import iftttLogoRaw from '../../../svg/forms/connect/ifttt.svg?raw';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
@@ -11,37 +14,35 @@ const props = defineProps({
 });
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
+const emailNotificationsLogo = emailNotificationsLogoRaw
+    .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
+    .replace(/<!DOCTYPE[\s\S]*?>\s*/i, '');
+const zapierLogo = zapierLogoRaw
+    .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
+    .replace(/<!DOCTYPE[\s\S]*?>\s*/i, '');
+const iftttLogo = iftttLogoRaw
+    .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
+    .replace(/<!DOCTYPE[\s\S]*?>\s*/i, '');
+const statamicVendorLogo = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 139.56 111.63"><path fill="#ff269e" d="M112.46 110.48c9.62-.6 13.78-5.17 14.72-15.49.73-8.04 1-12.06 1.36-20.11.43-9.6 5.28-15.13 9.96-17.7 1.41-.8 1.4-2.65 0-3.54-4.88-2.94-9.61-9.19-9.98-17.45-.36-7.9-.63-11.85-1.35-19.75-1.02-11.13-4.55-14.67-14.18-15.28a793 793 0 0 0-86.42 0c-9.62.61-13.16 4.15-14.18 15.28-.72 7.9-.99 11.85-1.35 19.75-.38 8.26-5.1 14.51-9.98 17.45a2.01 2.01 0 0 0 0 3.54c4.69 2.49 9.53 8.01 9.96 17.7.36 8.04.63 12.06 1.36 20.11.94 10.32 5.1 14.89 14.72 15.49 28.52 1.53 56.85 1.53 85.36 0M69.55 92.63c-8.77.49-19.7-3.8-25.95-9.95-1.23-1.13-1.73-2.53-1.76-3.92-.03-1.11.23-2.31 1.04-3.23.87-1.14 1.31-1.71 2.18-2.85 1.1-1.38 2.3-2.02 3.7-2.01 1.58.01 3.08.67 4.68 1.71 5.06 3.3 10.63 5.2 17.31 5.2 5.1 0 9.78-2.89 9.23-6.57-2.18-14.6-38.37-6.19-37.83-30.63.29-12.86 13.14-21.88 25.75-21.57 9.77.25 17.47 3.09 23.08 6.71 1.4.95 2.37 2.83 2.41 4.69.02 1.12-.23 2.13-.86 3.06-.65 1-.97 1.49-1.63 2.49-1.18 1.66-2.57 2.49-4.34 2.48-1.21 0-2.52-.48-3.92-1.14-4.2-2.17-8.56-3.31-13.85-3.31-5.47 0-9.15 3.52-8.76 6.1 2.18 14.47 37.35 5.97 37.84 30.07.3 14.88-15.58 22.52-28.34 22.68Z"/></svg>';
 
 const integrations = [
     {
         name: 'Email Notifications',
-        logo: '✉',
-        logoClass: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300',
+        logo: emailNotificationsLogo,
+        vendorLogo: statamicVendorLogo,
         count: 3,
     },
     {
         name: 'Zapier Workflows',
-        logo: 'Z',
-        logoClass: 'bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
+        logo: zapierLogo,
+        vendorLogo: statamicVendorLogo,
         count: null,
     },
     {
         name: 'IFTTT Workflows',
-        logo: 'I',
-        logoClass: 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
+        logo: iftttLogo,
+        vendorLogo: statamicVendorLogo,
         count: 1,
-    },
-    {
-        name: 'Flower Analytics',
-        logo: '✿',
-        logoClass: 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300',
-        count: null,
-    },
-    {
-        name: 'Kiwi CRM',
-        logo: 'K',
-        logoClass: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300',
-        count: 5,
     },
 ];
 </script>
@@ -72,22 +73,16 @@ const integrations = [
                     >
                         <a
                             href="#"
-                            class="block mb-2 aspect-square rounded-lg border border-gray-300 bg-gray-50/30 p-4 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
+                            class="block mb-2 aspect-square rounded-lg border border-gray-300 bg-gray-50/30 p-8 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
                         >
-                            <span
-                                class="inline-flex h-14 w-14 items-center justify-center rounded-xl text-2xl font-bold"
-                                :class="integration.logoClass"
-                            >
-                                {{ integration.logo }}
-                            </span>
+                            <div
+                                class="overflow-hidden rounded-full shape-squircle"
+                                v-html="integration.logo"
+                            />
                         </a>
-                        <div class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200">
-                            <span
-                                class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded text-2xs font-bold"
-                                :class="integration.logoClass"
-                                aria-hidden="true"
-                            >
-                                {{ integration.logo }}
+                        <div class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200">  
+                            <span class="h-5 w-5 shrink-0 overflow-hidden [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                                <span v-html="integration.vendorLogo" />
                             </span>
                             <span class="truncate">{{ __(integration.name) }}</span>
                             <Badge
