@@ -21,7 +21,6 @@ abstract class FormFieldtype implements Arrayable
     }
 
     protected static $title;
-    protected static $binding = 'form-fields';
     protected static $fieldtype;
 
     protected $field;
