@@ -209,7 +209,7 @@ function sortIcon(column) {
                             </TableColumn>
                             <TableColumn class="text-right first:pl-4 last:pr-4">
                                 <Button
-                                    :text="__('Vendor')"
+                                    :text="__('Developer')"
                                     :icon-append="sortIcon('vendorName')"
                                     size="sm"
                                     variant="ghost"
