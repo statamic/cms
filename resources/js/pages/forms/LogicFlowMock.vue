@@ -27,10 +27,10 @@ const props = defineProps({
 
 const logicOperator = ref(props.mockPreset.logicOperator || 'equals');
 const logicOperatorOptions = [
-    { label: '=', value: 'equals' },
-    { label: '!=', value: 'not_equals' },
-    { label: __('contains'), value: 'contains' },
-    { label: __('is empty'), value: 'is_empty' },
+    { label: __('Equals'), value: 'equals' },
+    { label: __('Does not equal'), value: 'not_equals' },
+    { label: __('Contains'), value: 'contains' },
+    { label: __('Is empty'), value: 'is_empty' },
 ];
 
 const logicValue = ref(props.mockPreset.logicValue || 'referral');
