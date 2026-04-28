@@ -74,13 +74,13 @@ const optionIconClasses = (option) => {
 };
 
 const optionChipClasses = (option) => {
-    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 rounded-full';
-    return 'flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full';
+    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 rounded-sm';
+    return 'flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-sm';
 };
 
 const optionChipIconClasses = (option) => {
-    if (option?.category === 'text') return 'size-4 shrink-0 rounded-full text-purple-600 dark:text-purple-400';
-    return 'size-4 shrink-0 rounded-full text-orange-600 dark:text-orange-400';
+    if (option?.category === 'text') return 'size-4 shrink-0 rounded-sm text-purple-600 dark:text-purple-400';
+    return 'size-4 shrink-0 rounded-sm text-orange-600 dark:text-orange-400';
 };
 </script>
 
