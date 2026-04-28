@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { markRaw } from 'vue';
 import AssetBrowser from './Browser/Browser.vue'
 import Uploader from './Uploader.vue'
 import {
@@ -155,7 +156,7 @@ export default {
     },
 
     mounted() {
-        this.uploaderInstance = this.$refs.uploader;
+        this.uploaderInstance = markRaw(this.$refs.uploader);
     },
 
     computed: {
