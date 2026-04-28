@@ -951,9 +951,7 @@ EOT
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
-            ->withHeaders([
-                'Precognition-Validate-Only' => 'foo',
-            ])
+            ->withHeaders(['Precognition-Validate-Only' => 'foo'])
             ->post('/!/forms/contact', [])
             ->assertSessionHasErrors(['email'], null, 'form.contact')
             ->assertLocation('/');
