@@ -15,9 +15,19 @@ const props = defineProps({
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const mode = ref('grid');
+const selectedIntegrationName = ref(null);
 
 function modeChanged(value) {
     mode.value = value;
+}
+
+function selectIntegration(integration) {
+    selectedIntegrationName.value = integration.name;
+}
+
+function clearSelectedIntegration() {
+    selectedIntegrationName.value = null;
+    mode.value = 'grid';
 }
 const emailNotificationsLogo = emailNotificationsLogoRaw
     .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
@@ -109,13 +119,24 @@ function sortIcon(column) {
         <Panel>
             <PanelHeader>
                 <Heading>
-                    <span class="inline-flex items-center gap-2"><Icon name="connection" class="size-4! opacity-60! text-gray-925 dark:text-white" aria-hidden="true" />{{ __('Connect') }}</span>
-                    <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                    <span>{{ __('Email Notifications') }}</span>
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-2 text-inherit my-0!"
+                        :class="selectedIntegrationName ? 'cursor-pointer hover:opacity-80' : 'cursor-default'"
+                        :disabled="!selectedIntegrationName"
+                        @click="clearSelectedIntegration"
+                    >
+                        <Icon name="connection" class="size-4! opacity-60! text-gray-925 dark:text-white" aria-hidden="true" />
+                        {{ __('Connect') }}
+                    </button>
+                    <template v-if="selectedIntegrationName">
+                        <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                        <span>{{ __(selectedIntegrationName) }}</span>
+                    </template>
                 </Heading>
             </PanelHeader>
             <Card :class="{ 'p-0!': mode === 'table' }">
-                <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                <div v-if="mode === 'grid'" class="pt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     <div
                         v-for="integration in integrations"
                         :key="integration.name"
@@ -124,6 +145,7 @@ function sortIcon(column) {
                         <a
                             href="#"
                             class="relative block mb-2 aspect-square rounded-lg border border-gray-300 bg-gray-50/30 p-8 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
+                            @click.prevent="selectIntegration(integration)"
                         >
                             <Badge
                                 v-if="integration.count"
@@ -188,7 +210,7 @@ function sortIcon(column) {
                                 class="hover:bg-gray-50 dark:hover:bg-gray-950/35"
                             >
                                 <TableCell class="first:pl-4 last:pr-4">
-                                    <a href="#" class="flex min-w-0 items-center gap-2">
+                                    <a href="#" class="flex min-w-0 items-center gap-2" @click.prevent="selectIntegration(integration)">
                                         <span class="h-7 w-7 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
                                             <span v-html="integration.logo" />
                                         </span>
