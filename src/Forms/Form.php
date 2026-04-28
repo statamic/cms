@@ -123,12 +123,14 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                         $validate = Arr::get($field, 'field.validate');
                         $validateRules = is_string($validate) ? explode('|', $validate) : ($validate ?? []);
 
-                        if (Arr::get($field, 'field.type') === 'text' && in_array('email', $validateRules)) {
+                        $isEmailRule = fn ($rule) => is_string($rule) && ($rule === 'email' || str_starts_with($rule, 'email:'));
+
+                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isEmailRule)) {
                             Arr::set($field, 'field.type', 'email');
                             Arr::pull($field, 'field.input_type');
 
                             $remainingValidationRules = collect($validateRules)
-                                ->reject(fn (string $validate): bool => $validate === 'email')
+                                ->reject($isEmailRule)
                                 ->values();
 
                             if ($remainingValidationRules->isEmpty()) {

@@ -68,6 +68,14 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => ['required', 'email']],
                 ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
             ],
+            'email, with parameterized email rule' => [
+                ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => ['required', 'email:rfc,strict']],
+                ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
+            ],
+            'email, pipe-string parameterized email rule' => [
+                ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => 'required|email:rfc'],
+                ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
+            ],
             'short_answer' => [
                 ['type' => 'text', 'display' => 'Name'],
                 ['type' => 'short_answer', 'display' => 'Name'],
