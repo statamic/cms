@@ -934,6 +934,18 @@ EOT
     }
 
     #[Test]
+    public function it_validates_precognitive_requests()
+    {
+        $this
+            ->withPrecognition()
+            ->withHeaders(['Precognition-Validate-Only' => 'email'])
+            ->postJson('/!/forms/contact', ['email' => ''])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['email'])
+            ->assertJsonMissingValidationErrors(['message']);
+    }
+
+    #[Test]
     public function it_wont_submit_form_when_precognition_validate_only_header_is_spoofed()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
