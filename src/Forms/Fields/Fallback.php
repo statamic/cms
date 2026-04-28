@@ -20,6 +20,11 @@ class Fallback extends FormFieldtype
         return $this->config();
     }
 
+    public function title(): string
+    {
+        return $this->wrappedFieldtype?->title() ?? parent::title();
+    }
+
     public function toArray(): array
     {
         if (! $this->wrappedFieldtype) {

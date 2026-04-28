@@ -31,7 +31,7 @@ abstract class FormFieldtype implements Arrayable
     protected $configFields = [];
     protected $icon;
 
-    public static function title(): string
+    public function title(): string
     {
         if (static::$title) {
             return __(static::$title);
@@ -153,7 +153,7 @@ abstract class FormFieldtype implements Arrayable
     {
         return [
             'handle' => $this->handle(),
-            'title' => static::title(),
+            'title' => $this->title(),
             'categories' => $this->categories(),
             'keywords' => $this->keywords(),
             'icon' => $this->icon(),

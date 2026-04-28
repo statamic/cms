@@ -34,7 +34,7 @@ class FormConnectController extends CpController
 
         return Inertia::render('forms/Connect', [
             'form' => $form,
-            'fieldtypes' => $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->handle()->values(),
+            'fieldtypes' => $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values(),
         ]);
     }
 }
