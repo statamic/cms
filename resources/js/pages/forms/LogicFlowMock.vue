@@ -2,6 +2,21 @@
 import { Combobox, Icon, Input } from '@ui';
 import { ref } from 'vue';
 
+const props = defineProps({
+    initialConditionLabel: {
+        type: String,
+        default: null,
+    },
+    initialConditionIcon: {
+        type: String,
+        default: 'fieldtype-radio',
+    },
+    initialConditionIconClass: {
+        type: String,
+        default: 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400',
+    },
+});
+
 const logicOperator = ref('equals');
 const logicOperatorOptions = [
     { label: __('Equals'), value: 'equals' },
@@ -74,12 +89,13 @@ const optionChipIconClasses = (option) => {
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full"
+                                class="logic-text__pill-icon size-6 rounded-full"
+                                :class="props.initialConditionIconClass"
                             >
-                                <Icon name="fieldtype-radio" class="size-3.5" />
+                                <Icon :name="props.initialConditionIcon" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text" :title="__('Which album was your favorite?')">
-                                {{ __('Which album was your favorite?') }}
+                            <span class="logic-text__pill-text" :title="props.initialConditionLabel || __('Which album was your favorite?')">
+                                {{ props.initialConditionLabel || __('Which album was your favorite?') }}
                             </span>
                         </div>
                     </li>
@@ -164,12 +180,13 @@ const optionChipIconClasses = (option) => {
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full"
+                                class="logic-text__pill-icon size-6 rounded-full"
+                                :class="props.initialConditionIconClass"
                             >
-                                <Icon name="fieldtype-radio" class="size-3.5" />
+                                <Icon :name="props.initialConditionIcon" class="size-3.5" />
                             </span>
-                            <span class="logic-text__pill-text" :title="__('Which album was your favorite?')">
-                                {{ __('Which album was your favorite?') }}
+                            <span class="logic-text__pill-text" :title="props.initialConditionLabel || __('Which album was your favorite?')">
+                                {{ props.initialConditionLabel || __('Which album was your favorite?') }}
                             </span>
                         </div>
                     </li>

@@ -151,7 +151,11 @@ reveal.use(rootEl, () => emit('expanded'));
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <div class="p-4">
-                        <LogicFlowMock />
+                        <LogicFlowMock
+                            :initial-condition-label="__(config.display) || config.handle"
+                            :initial-condition-icon="config.icon || 'fieldtype-radio'"
+                            :initial-condition-icon-class="config.iconClass || 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400'"
+                        />
                         <Button
                             size="sm"
                             variant="subtle"
