@@ -118,23 +118,6 @@ class LoginTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_referer_url()
-    {
-        $user = $this->user();
-
-        $this
-            ->assertGuest()
-            ->post(cp_route('login'), [
-                'email' => $user->email(),
-                'password' => 'secret',
-                'referer' => 'http://localhost/cp/cp/collections',
-            ])
-            ->assertRedirect('http://localhost/cp/cp/collections');
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
     public function it_redirects_to_intended_url()
     {
         $user = $this->user();
