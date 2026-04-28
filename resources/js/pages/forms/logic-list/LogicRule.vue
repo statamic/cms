@@ -3,6 +3,9 @@ import { computed, inject, ref } from 'vue';
 import {
     Badge,
     Button,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
     Icon,
     Subheading,
     injectPublishContext as injectContainerContext,
@@ -11,7 +14,7 @@ import PreviewHtml from '@/components/fieldtypes/replicator/PreviewHtml.js';
 import LogicFlowMock from '../LogicFlowMock.vue';
 import { reveal } from '@api';
 
-const emit = defineEmits(['collapsed', 'expanded']);
+const emit = defineEmits(['collapsed', 'expanded', 'removed']);
 
 const replicatorSets = inject('replicatorSets');
 
@@ -125,6 +128,19 @@ reveal.use(rootEl, () => emit('expanded'));
                         class="overflow-hidden text-ellipsis whitespace-nowrap"
                     />
                 </button>
+                <Dropdown>
+                    <template #trigger>
+                        <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open row actions')" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem
+                            :text="__('Delete row')"
+                            icon="trash"
+                            variant="destructive"
+                            @click="emit('removed')"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </header>
 
             <div

@@ -132,6 +132,11 @@ function expandSet(id) {
     collapsed.value = collapsed.value.filter(setId => setId !== id);
 }
 
+function removeSet(id) {
+    logicBlocks.value = logicBlocks.value.filter((block) => block._id !== id);
+    collapsed.value = collapsed.value.filter((setId) => setId !== id);
+}
+
 function expandAllRules() {
     collapsed.value = [];
 }
@@ -200,6 +205,7 @@ provide(publishContextKey, {
                         :show-field-previews="true"
                         @collapsed="collapseSet(block._id)"
                         @expanded="expandSet(block._id)"
+                        @removed="removeSet(block._id)"
                     />
                 </div>
                 <LogicAddRuleButton
