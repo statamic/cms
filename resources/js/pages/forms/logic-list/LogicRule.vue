@@ -75,6 +75,66 @@ const previewText = computed(() => {
         .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
 });
 
+const collapsedPreviewText = computed(() => {
+    if (previewText.value && previewText.value.trim() !== '') return previewText.value;
+    if (props.values?.summary) return escapeHtml(props.values.summary);
+    return '';
+});
+
+const showSecondaryCondition = computed(() => {
+    const summary = props.values?.summary?.toLowerCase() || '';
+    return summary.includes(', and ') || summary.includes(' and ');
+});
+
+const mockPresetByHandle = {
+    heard_about_us: {
+        logicOperator: 'equals',
+        logicValue: 'referral',
+        logicDestination: 'fan_length',
+        logicJoin: 'and',
+        logicContainsOperator: 'contains',
+        logicContainsAnswer: 'referral',
+    },
+    fan_length: {
+        logicOperator: 'contains',
+        logicValue: 'referral',
+        logicDestination: 'email_notifications',
+        logicJoin: 'and',
+        logicContainsOperator: 'contains',
+        logicContainsAnswer: 'years',
+    },
+    favorite_album: {
+        logicOperator: 'equals',
+        logicValue: 'days_of_thunder',
+        logicDestination: 'second_favorite',
+        logicConditionField: 'heard_about_us',
+        logicJoin: 'and',
+        logicContainsOperator: 'contains',
+        logicContainsAnswer: 'referral',
+    },
+    second_favorite_album: {
+        logicOperator: 'equals',
+        logicValue: 'endless_summer',
+        logicDestination: 'email_notifications',
+        logicJoin: 'and',
+        logicContainsOperator: 'contains',
+        logicContainsAnswer: 'summer',
+    },
+    age: {
+        logicOperator: 'equals',
+        logicValue: '21',
+        logicDestination: 'free_drink_voucher',
+        logicConditionField: 'age',
+        logicJoin: 'and',
+        logicContainsOperator: 'contains',
+        logicContainsAnswer: '21',
+    },
+};
+
+const mockPreset = computed(() => {
+    return mockPresetByHandle[props.config?.handle] || {};
+});
+
 function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
@@ -125,7 +185,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     />
                     <Subheading
                         v-show="collapsed"
-                        v-html="previewText"
+                        v-html="collapsedPreviewText"
                         class="overflow-hidden text-ellipsis whitespace-nowrap"
                     />
                 </button>
@@ -155,6 +215,8 @@ reveal.use(rootEl, () => emit('expanded'));
                             :initial-condition-label="__(config.display) || config.handle"
                             :initial-condition-icon="config.icon || 'fieldtype-radio'"
                             :initial-condition-icon-class="config.iconClass || 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400'"
+                            :show-secondary-condition="showSecondaryCondition"
+                            :mock-preset="mockPreset"
                         />
                         <Button
                             size="sm"

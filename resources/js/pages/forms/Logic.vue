@@ -22,11 +22,11 @@ const sortableItemClass = 'logic-rule-block';
 const loadingSet = ref(null);
 
 const logicBlocks = ref([
-    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('If answer is "Friend", then continue to fan duration question.') },
-    { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('If answer contains "ages", then go to email notifications.') },
-    { _id: 'favorite_album', type: 'favorite_album', enabled: true, summary: __('If favorite album equals Days of Thunder, then go to second favorite album.') },
-    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('No conditions yet.') },
-    { _id: 'age', type: 'age', enabled: true, summary: __('If age is greater than 21, then go to free drink voucher.') },
+    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('equals Friend referral, then go to How long have you been a fan?') },
+    { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('contains years, then go to Sign up for email notifications from The Midnight') },
+    { _id: 'favorite_album', type: 'favorite_album', enabled: true, summary: __('equals Days of Thunder, and answer contains referral, then go to Which album was your second favorite?') },
+    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('No conditions configured yet.') },
+    { _id: 'age', type: 'age', enabled: true, summary: __('is greater than 21, then go to I want a free drink voucher') },
 ]);
 
 const collapsed = ref(logicBlocks.value.map((block) => block._id));

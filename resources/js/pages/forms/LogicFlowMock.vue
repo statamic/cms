@@ -15,31 +15,42 @@ const props = defineProps({
         type: String,
         default: 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400',
     },
+    showSecondaryCondition: {
+        type: Boolean,
+        default: true,
+    },
+    mockPreset: {
+        type: Object,
+        default: () => ({}),
+    },
 });
 
-const logicOperator = ref('equals');
+const logicOperator = ref(props.mockPreset.logicOperator || 'equals');
 const logicOperatorOptions = [
-    { label: __('Equals'), value: 'equals' },
-    { label: __('Does not equal'), value: 'not_equals' },
-    { label: __('Contains'), value: 'contains' },
-    { label: __('Is empty'), value: 'is_empty' },
+    { label: '=', value: 'equals' },
+    { label: '!=', value: 'not_equals' },
+    { label: __('contains'), value: 'contains' },
+    { label: __('is empty'), value: 'is_empty' },
 ];
 
-const logicValue = ref('days_of_thunder');
+const logicValue = ref(props.mockPreset.logicValue || 'referral');
 const logicValueOptions = [
+    { label: __('Friend referral'), value: 'referral' },
+    { label: __('Google search'), value: 'google' },
+    { label: __('21'), value: '21' },
     { label: __('Days of Thunder'), value: 'days_of_thunder' },
     { label: __('Endless Summer'), value: 'endless_summer' },
     { label: __('Nocturnal'), value: 'nocturnal' },
     { label: __('Kids'), value: 'kids' },
 ];
 
-const logicDestination = ref('second_favorite');
+const logicDestination = ref(props.mockPreset.logicDestination || 'fan_length');
 const logicDestinationOptions = [
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
 ];
-const logicConditionField = ref('long_answer');
+const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
 const logicConditionFieldOptions = [
     { label: __('What do you like most about our band? '), value: 'long_answer', icon: 'text-long', category: 'text' },
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
@@ -47,14 +58,14 @@ const logicConditionFieldOptions = [
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
 ];
 
-const logicJoin = ref('and');
+const logicJoin = ref(props.mockPreset.logicJoin || 'and');
 const logicJoinOptions = [
     { label: __('And'), value: 'and' },
     { label: __('Or'), value: 'or' },
 ];
 
-const logicContainsOperator = ref('contains');
-const logicContainsAnswer = ref('5');
+const logicContainsOperator = ref(props.mockPreset.logicContainsOperator || 'contains');
+const logicContainsAnswer = ref(props.mockPreset.logicContainsAnswer || 'referral');
 const logicContainsAnswerPlaceholder = __('Answer');
 
 const optionIconClasses = (option) => {
@@ -215,7 +226,7 @@ const optionChipIconClasses = (option) => {
                 </ol>
             </li>
 
-            <li>
+            <li v-if="props.showSecondaryCondition">
                 <div class="logic-text__condition" aria-hidden="true">
                     <Combobox
                         v-model="logicJoin"
