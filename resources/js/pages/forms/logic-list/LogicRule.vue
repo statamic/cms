@@ -113,7 +113,7 @@ const collapsedPreviewText = computed(() => {
         const before = summary.slice(0, markerIndex + marker.length);
         const destination = summary.slice(markerIndex + marker.length).trimStart();
 
-        return `${formatOperators(before)} '${escapeHtml(destination)}'`;
+        return `${formatOperators(before)} ‘${escapeHtml(destination)}’`;
     }
     return '';
 });
