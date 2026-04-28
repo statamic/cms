@@ -94,10 +94,15 @@ function sortIcon(column) {
                 {{ formTitle }}
             </template>
             <template #actions>
-                <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
-                    <ToggleItem value="grid" icon="layout-grid" />
-                    <ToggleItem value="table" icon="layout-list" />
-                </ToggleGroup>
+                <div class="flex items-center gap-2">
+                    <Button variant="primary" href="#" icon-append="external-link">
+                        {{ __('Browse the Marketplace') }}
+                    </Button>
+                    <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
+                        <ToggleItem value="grid" icon="layout-grid" />
+                        <ToggleItem value="table" icon="layout-list" />
+                    </ToggleGroup>
+                </div>
             </template>
         </Header>
 
