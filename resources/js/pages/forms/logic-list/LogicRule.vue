@@ -94,7 +94,7 @@ const collapsedPreviewText = computed(() => {
             __('contains'),
         ];
 
-        const operatorChipClass = 'inline-flex items-center rounded-md bg-gray-200/70 px-1.5 py-0.25 text-[12px] font-medium text-gray-800 dark:bg-gray-850 dark:text-gray-200';
+        const operatorChipClass = 'inline-flex items-center rounded-md bg-gray-200/50 px-1.5 py-0.25 text-xs font-medium text-gray-800 dark:bg-gray-850 dark:text-gray-200';
         const formatOperators = (text) => {
             let formatted = escapeHtml(text);
 
