@@ -1,7 +1,7 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Badge, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { Badge, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem } from '@ui';
 import { computed, ref } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
@@ -36,6 +36,7 @@ const integrations = [
         logo: emailNotificationsLogo,
         vendorLogo: statamicVendorLogo,
         vendorName: 'Statamic',
+        description: 'Send branded confirmation emails and admin alerts instantly.',
         count: 3,
     },
     {
@@ -43,6 +44,7 @@ const integrations = [
         logo: zapierLogo,
         vendorLogo: statamicVendorLogo,
         vendorName: 'Statamic',
+        description: 'Trigger automations when submissions match your form rules.',
         count: 4,
     },
     {
@@ -50,9 +52,11 @@ const integrations = [
         logo: iftttLogo,
         vendorLogo: statamicVendorLogo,
         vendorName: 'Statamic',
+        description: 'Connect lightweight applets for notifications and logging.',
         count: 1,
     },
 ];
+
 </script>
 
 <template>
@@ -78,7 +82,7 @@ const integrations = [
                     <span>{{ __('Email Notifications') }}</span>
                 </Heading>
             </PanelHeader>
-            <Card>
+            <Card :class="{ 'py-0!': mode === 'table' }">
                 <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                     <div
                         v-for="integration in integrations"
@@ -110,31 +114,44 @@ const integrations = [
                         </div>
                     </div>
                 </div>
-                <div v-else class="space-y-2">
-                    <a
-                        v-for="integration in integrations"
-                        :key="`list-${integration.name}`"
-                        href="#"
-                        class="flex items-center justify-between gap-3 rounded-lg border border-gray-300 bg-gray-50/30 p-3 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
-                    >
-                        <div class="flex min-w-0 items-center gap-2">
-                            <span class="h-7 w-7 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
-                                <span v-html="integration.logo" />
-                            </span>
-                            <Badge v-if="integration.count" size="sm" color="white" pill>
-                                {{ integration.count }}
-                            </Badge>
-                            <span class="truncate text-sm text-gray-800 dark:text-gray-200">{{ __(integration.name) }}</span>
-                        </div>
-                        <div class="inline-flex shrink-0 items-center text-sm text-gray-800 dark:text-gray-200">
-                            <span class="inline-flex items-center">
-                                <span class="h-4 w-4 overflow-hidden me-1 [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
-                                    <span v-html="integration.vendorLogo" />
-                                </span>
-                                {{ __(integration.vendorName) }}
-                            </span>
-                        </div>
-                    </a>
+                <div v-else>
+                    <Table class="w-full">
+                        <TableColumns>
+                            <TableColumn>{{ __('Integration') }}</TableColumn>
+                            <TableColumn>{{ __('Description') }}</TableColumn>
+                            <TableColumn class="text-right">{{ __('Vendor') }}</TableColumn>
+                        </TableColumns>
+                        <TableRows>
+                            <TableRow
+                                v-for="integration in integrations"
+                                :key="`list-${integration.name}`"
+                                class="hover:bg-gray-50 dark:hover:bg-gray-950/35"
+                            >
+                                <TableCell>
+                                    <a href="#" class="flex min-w-0 items-center gap-2">
+                                        <span class="h-7 w-7 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                                            <span v-html="integration.logo" />
+                                        </span>
+                                        <Badge v-if="integration.count" size="sm" color="white" pill>
+                                            {{ integration.count }}
+                                        </Badge>
+                                        <span class="truncate text-sm text-gray-800 dark:text-gray-200">{{ __(integration.name) }}</span>
+                                    </a>
+                                </TableCell>
+                                <TableCell>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ __(integration.description) }}</span>
+                                </TableCell>
+                                <TableCell class="text-right">
+                                    <span class="inline-flex shrink-0 items-center text-sm text-gray-800 dark:text-gray-200">
+                                        <span class="h-4 w-4 overflow-hidden me-1 [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                                            <span v-html="integration.vendorLogo" />
+                                        </span>
+                                        {{ __(integration.vendorName) }}
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        </TableRows>
+                    </Table>
                 </div>
             </Card>
         </Panel>
