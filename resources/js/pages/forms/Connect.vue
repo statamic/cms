@@ -94,7 +94,7 @@ function sortIcon(column) {
                 {{ formTitle }}
             </template>
             <template #actions>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <Button variant="primary" href="#" icon-append="external-link">
                         {{ __('Browse the Marketplace') }}
                     </Button>
