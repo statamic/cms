@@ -176,11 +176,8 @@ function sortIcon(column) {
                                 v-html="integration.logo"
                             />
                         </a>
-                        <div class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200">  
-                            <span class="h-5 w-5 shrink-0 overflow-hidden [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
-                                <span v-html="integration.vendorLogo" />
-                            </span>
-                            <span class="truncate">{{ __(integration.name) }}</span>
+                        <div class="flex items-center justify-center text-gray-800 dark:text-gray-200">
+                            <span class="truncate text-xs">{{ __(integration.name) }}</span>
                         </div>
                     </div>
                 </div>
