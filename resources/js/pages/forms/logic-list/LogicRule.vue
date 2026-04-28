@@ -77,7 +77,44 @@ const previewText = computed(() => {
 
 const collapsedPreviewText = computed(() => {
     if (previewText.value && previewText.value.trim() !== '') return previewText.value;
-    if (props.values?.summary) return escapeHtml(props.values.summary);
+    if (props.values?.summary) {
+        const summary = props.values.summary;
+        const noConditionsText = __('No conditions configured yet.');
+
+        if (summary.trim() === noConditionsText) return '';
+
+        const marker = __('then go to');
+        const markerIndex = summary.toLowerCase().indexOf(marker.toLowerCase());
+
+        const operatorLabels = [
+            __('does not equal'),
+            __('is greater than'),
+            __('is less than'),
+            __('equals'),
+            __('contains'),
+        ];
+
+        const operatorChipClass = 'inline-flex items-center rounded-md bg-gray-200/70 px-1.5 py-0.25 text-[11px] font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-200';
+        const formatOperators = (text) => {
+            let formatted = escapeHtml(text);
+
+            operatorLabels.forEach((label) => {
+                const escapedLabel = escapeHtml(label);
+                formatted = formatted
+                    .split(escapedLabel)
+                    .join(`<span class="${operatorChipClass}">${escapedLabel}</span>`);
+            });
+
+            return formatted;
+        };
+
+        if (markerIndex === -1) return formatOperators(summary);
+
+        const before = summary.slice(0, markerIndex + marker.length);
+        const destination = summary.slice(markerIndex + marker.length).trimStart();
+
+        return `${formatOperators(before)} ${escapeHtml(destination)}`;
+    }
     return '';
 });
 
@@ -186,7 +223,7 @@ reveal.use(rootEl, () => emit('expanded'));
                     <Subheading
                         v-show="collapsed"
                         v-html="collapsedPreviewText"
-                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                        class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!"
                     />
                 </button>
                 <Dropdown>
