@@ -162,21 +162,15 @@ function sortIcon(column) {
                             class="relative block mb-2 aspect-square rounded-lg border border-gray-300 bg-gray-50/30 p-8 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
                             @click.prevent="selectIntegration(integration)"
                         >
-                            <Badge
-                                v-if="integration.count"
-                                size="sm"
-                                color="white"
-                                pill
-                                class="absolute top-1 right-1"
-                            >
-                                {{ integration.count }}
-                            </Badge>
                             <div
                                 class="overflow-hidden rounded-full shape-squircle"
                                 v-html="integration.logo"
                             />
                         </a>
-                        <div class="flex items-center justify-center text-gray-800 dark:text-gray-200">
+                        <div class="flex items-center justify-center gap-1.5 text-gray-800 dark:text-gray-200">
+                            <Badge v-if="integration.count" size="sm" color="white" pill>
+                                {{ integration.count }}
+                            </Badge>
                             <span class="truncate text-xs">{{ __(integration.name) }}</span>
                         </div>
                     </div>
