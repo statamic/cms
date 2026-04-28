@@ -136,7 +136,7 @@ function sortIcon(column) {
                 </Heading>
             </PanelHeader>
             <Card :class="{ 'p-0!': mode === 'table' }">
-                <div v-if="mode === 'grid'" class="pt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     <div
                         v-for="integration in integrations"
                         :key="integration.name"
