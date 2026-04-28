@@ -79,6 +79,11 @@ const sortedIntegrations = computed(() => {
     return sortDirection.value === 'desc' ? sorted.reverse() : sorted;
 });
 
+const selectedIntegration = computed(() => {
+    if (!selectedIntegrationName.value) return null;
+    return integrations.value.find((integration) => integration.name === selectedIntegrationName.value) ?? null;
+});
+
 function setSort(column) {
     if (sortColumn.value === column) {
         sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
@@ -131,7 +136,16 @@ function sortIcon(column) {
                     </button>
                     <template v-if="selectedIntegrationName">
                         <Icon name="chevron-right" class="size-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                        <span>{{ __(selectedIntegrationName) }}</span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span
+                                v-if="selectedIntegration"
+                                class="h-4 w-4 overflow-hidden [&_svg]:h-full [&_svg]:w-full"
+                                aria-hidden="true"
+                            >
+                                <span v-html="selectedIntegration.vendorLogo" />
+                            </span>
+                            <span>{{ __(selectedIntegrationName) }}</span>
+                        </span>
                     </template>
                 </Heading>
             </PanelHeader>
