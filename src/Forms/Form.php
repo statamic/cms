@@ -283,7 +283,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         $data = $this->data->merge(collect([
             'title' => $this->title,
-            'fields' => $this->formFields()?->contents(),
+            'fields' => $this->formFields()->contents(),
             'honeypot' => $this->honeypot,
             'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
                 $email['markdown'] = Arr::get($email, 'markdown') === true ? true : null;
