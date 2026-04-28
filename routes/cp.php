@@ -305,7 +305,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::patch('asset-containers/{asset_container}', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.update');
 
             Route::get('forms/{form}/edit', FormBlueprintController::class)->name('forms.edit');
-            Route::patch('forms/{form}', FormBlueprintController::class)->name('forms.update');
 
             Route::get('globals/{global_set}/edit', [GlobalsBlueprintController::class, 'edit'])->name('globals.edit');
             Route::patch('globals/{global_set}', [GlobalsBlueprintController::class, 'update'])->name('globals.update');
