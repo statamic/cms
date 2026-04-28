@@ -1,8 +1,8 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Badge, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator } from '@ui';
-import { computed } from 'vue';
+import { Badge, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { computed, ref } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
 import iftttLogoRaw from '../../../svg/forms/connect/ifttt.svg?raw';
@@ -14,6 +14,11 @@ const props = defineProps({
 });
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
+const mode = ref('grid');
+
+function modeChanged(value) {
+    mode.value = value;
+}
 const emailNotificationsLogo = emailNotificationsLogoRaw
     .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
     .replace(/<!DOCTYPE[\s\S]*?>\s*/i, '');
@@ -54,6 +59,12 @@ const integrations = [
                 <StatusIndicator status="published" />
                 {{ formTitle }}
             </template>
+            <template #actions>
+                <ToggleGroup :model-value="mode" @update:model-value="modeChanged">
+                    <ToggleItem value="grid" icon="layout-grid" />
+                    <ToggleItem value="table" icon="layout-list" />
+                </ToggleGroup>
+            </template>
         </Header>
 
         <Panel>
@@ -65,7 +76,7 @@ const integrations = [
                 </Heading>
             </PanelHeader>
             <Card>
-                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                     <div
                         v-for="integration in integrations"
                         :key="integration.name"
@@ -95,6 +106,27 @@ const integrations = [
                             </Badge>
                         </div>
                     </div>
+                </div>
+                <div v-else class="space-y-2">
+                    <a
+                        v-for="integration in integrations"
+                        :key="`list-${integration.name}`"
+                        href="#"
+                        class="flex items-center justify-between gap-3 rounded-lg border border-gray-300 bg-gray-50/30 p-3 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
+                    >
+                        <div class="flex min-w-0 items-center gap-2">
+                            <span class="h-7 w-7 shrink-0 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                                <span v-html="integration.logo" />
+                            </span>
+                            <span class="h-4 w-4 shrink-0 overflow-hidden [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                                <span v-html="integration.vendorLogo" />
+                            </span>
+                            <span class="truncate text-sm text-gray-800 dark:text-gray-200">{{ __(integration.name) }}</span>
+                        </div>
+                        <Badge v-if="integration.count" size="sm" color="white" pill>
+                            {{ integration.count }}
+                        </Badge>
+                    </a>
                 </div>
             </Card>
         </Panel>

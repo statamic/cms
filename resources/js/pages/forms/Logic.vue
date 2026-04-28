@@ -163,7 +163,7 @@ provide(publishContextKey, {
                 {{ formTitle }}
             </template>
             <template #actions>
-                <ToggleGroup v-model="logicView" size="xs">
+                <ToggleGroup v-model="logicView" size="sm">
                     <ToggleItem value="list" icon="layout-list" :label="__('List')" />
                     <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
                 </ToggleGroup>
