@@ -1,7 +1,7 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Badge, Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem } from '@ui';
+import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem } from '@ui';
 import { computed, ref } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
@@ -210,5 +210,6 @@ function sortIcon(column) {
                 </div>
             </Card>
         </Panel>
+        <DocsCallout :topic="__('Connections')" url="forms" />
     </div>
 </template>
