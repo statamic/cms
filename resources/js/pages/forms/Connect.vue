@@ -35,18 +35,21 @@ const integrations = [
         name: 'Email Notifications',
         logo: emailNotificationsLogo,
         vendorLogo: statamicVendorLogo,
+        vendorName: 'Statamic',
         count: 3,
     },
     {
         name: 'Zapier Workflows',
         logo: zapierLogo,
         vendorLogo: statamicVendorLogo,
+        vendorName: 'Statamic',
         count: null,
     },
     {
         name: 'IFTTT Workflows',
         logo: iftttLogo,
         vendorLogo: statamicVendorLogo,
+        vendorName: 'Statamic',
         count: 1,
     },
 ];
@@ -114,14 +117,19 @@ const integrations = [
                         href="#"
                         class="flex items-center justify-between gap-3 rounded-lg border border-gray-300 bg-gray-50/30 p-3 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
                     >
-                        <div class="flex min-w-0 items-center gap-2">
-                            <span class="h-7 w-7 shrink-0 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                        <div class="flex items-center gap-2">
+                            <span class="h-7 w-7 overflow-hidden rounded-full shape-squircle [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
                                 <span v-html="integration.logo" />
                             </span>
-                            <span class="h-4 w-4 shrink-0 overflow-hidden [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
-                                <span v-html="integration.vendorLogo" />
+                            <span class="inline-flex items-center text-sm text-gray-800 dark:text-gray-200">
+                                {{ __(':integration by', { integration: __(integration.name) }) }}
+                                <span class="inline-flex items-center ms-2">
+                                    <span class="h-4 w-4 overflow-hidden me-1 [&_svg]:h-full [&_svg]:w-full" aria-hidden="true">
+                                        <span v-html="integration.vendorLogo" />
+                                    </span>
+                                    {{ __(integration.vendorName) }}
+                                </span>
                             </span>
-                            <span class="truncate text-sm text-gray-800 dark:text-gray-200">{{ __(integration.name) }}</span>
                         </div>
                         <Badge v-if="integration.count" size="sm" color="white" pill>
                             {{ integration.count }}
