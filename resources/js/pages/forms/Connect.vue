@@ -83,7 +83,7 @@ const integrations = [
                 </Heading>
             </PanelHeader>
             <Card :class="{ 'p-0!': mode === 'table' }">
-                <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     <div
                         v-for="integration in integrations"
                         :key="integration.name"
@@ -91,8 +91,17 @@ const integrations = [
                     >
                         <a
                             href="#"
-                            class="block mb-2 aspect-square rounded-lg border border-gray-300 bg-gray-50/30 p-8 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
+                            class="relative block mb-2 aspect-square rounded-lg border border-gray-300 bg-gray-50/30 p-8 dark:border-gray-700 dark:bg-gray-950/40 dark:hover:bg-gray-900"
                         >
+                            <Badge
+                                v-if="integration.count"
+                                size="sm"
+                                color="white"
+                                pill
+                                class="absolute top-1 right-1"
+                            >
+                                {{ integration.count }}
+                            </Badge>
                             <div
                                 class="overflow-hidden rounded-full shape-squircle"
                                 v-html="integration.logo"
@@ -103,14 +112,6 @@ const integrations = [
                                 <span v-html="integration.vendorLogo" />
                             </span>
                             <span class="truncate">{{ __(integration.name) }}</span>
-                            <Badge
-                                v-if="integration.count"
-                                size="sm"
-                                color="white"
-                                pill
-                            >
-                                {{ integration.count }}
-                            </Badge>
                         </div>
                     </div>
                 </div>
