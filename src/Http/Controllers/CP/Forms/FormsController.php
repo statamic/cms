@@ -39,7 +39,6 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'fields_url' => cp_route('forms.fields.index', $form->handle()),
-                    'blueprint_url' => cp_route('blueprints.forms.edit', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
                 ];
@@ -74,7 +73,6 @@ class FormsController extends CpController
                 'handle' => $form->handle(),
                 'editUrl' => $form->editUrl(),
                 'deleteUrl' => $form->deleteUrl(),
-                'blueprintUrl' => cp_route('blueprints.forms.edit', $form->handle()),
                 'canEdit' => User::current()->can('edit', $form),
                 'canDelete' => User::current()->can('delete', $form),
                 'canConfigureFields' => User::current()->can('configure form fields'),
@@ -236,18 +234,6 @@ class FormsController extends CpController
             'fields' => [
                 'display' => __('Fields'),
                 'fields' => [
-                    'blueprint' => [
-                        'display' => __('Blueprint'),
-                        'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'type' => 'blueprints',
-                        'options' => [
-                            [
-                                'handle' => 'default',
-                                'title' => __('Edit Blueprint'),
-                                'edit_url' => cp_route('blueprints.forms.edit', $form->handle()),
-                            ],
-                        ],
-                    ],
                     'honeypot' => [
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),

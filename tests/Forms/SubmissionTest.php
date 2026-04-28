@@ -12,7 +12,6 @@ use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -76,10 +75,18 @@ class SubmissionTest extends TestCase
     #[Test]
     public function it_sets_and_gets_data()
     {
-        $submission = Form::make('test')->makeSubmission();
+        $form = Form::make('test')
+            ->formFields([
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'foo', 'field' => ['type' => 'short_answer']],
+                        ],
+                    ],
+                ],
+            ]);
 
-        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
-        Blueprint::shouldReceive('find')->with('forms.test')->andReturn($blueprint);
+        $submission = $form->makeSubmission();
 
         $this->assertInstanceOf(Collection::class, $data = $submission->data());
         $this->assertEquals([], $data->all());

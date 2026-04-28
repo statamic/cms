@@ -72,7 +72,6 @@ class EditFormTest extends TestCase
             ->assertSuccessful()
             ->assertSeeInOrder([
                 'Title',
-                'Blueprint',
                 'Honeypot',
                 'First injected into fields section',
                 'Second injected into fields section',

@@ -18,13 +18,15 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
-use Statamic\Facades\Blueprint;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
-use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exporters\Exporter;
+use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -36,7 +38,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     protected $handle;
     protected $title;
-    protected $blueprint;
+    protected $fields;
     protected $honeypot;
     protected $store;
     protected $email;
@@ -78,6 +80,83 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->fluentlyGetOrSet('title')->args(func_get_args());
     }
 
+    public function formFields($fields = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('fields')
+            ->getter(function ($fields) {
+                if (empty($fields) && $blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
+                    $fields = $this->convertFieldsFromBlueprint($blueprint);
+                }
+
+                return new FormFields($fields ?? []);
+            })
+            ->setter(function ($fields) {
+                Blink::forget('form-blueprint-'.$this->handle());
+
+                if (isset($fields['tabs'])) {
+                    $fields = [
+                        'sections' => collect($fields['tabs'])->flatMap(fn ($tab) => $tab['sections'])->all(),
+                    ];
+                }
+
+                if (isset($fields['fields'])) {
+                    $fields = [
+                        'sections' => [
+                            ['fields' => $fields['fields']],
+                        ],
+                    ];
+                }
+
+                return $fields;
+            })
+            ->args(func_get_args());
+    }
+
+    private function convertFieldsFromBlueprint(Blueprint $blueprint): array
+    {
+        $sections = collect($blueprint->contents()['tabs'] ?? [])->flatMap(function (array $tab): array {
+            return collect($tab['sections'] ?? [])->map(function (array $section): array {
+                return [
+                    ...$section,
+                    'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
+                        $validate = Arr::get($field, 'field.validate');
+                        $validateRules = is_string($validate) ? explode('|', $validate) : ($validate ?? []);
+
+                        $isEmailRule = fn ($rule) => is_string($rule) && ($rule === 'email' || str_starts_with($rule, 'email:'));
+
+                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isEmailRule)) {
+                            Arr::set($field, 'field.type', 'email');
+                            Arr::pull($field, 'field.input_type');
+
+                            $remainingValidationRules = collect($validateRules)
+                                ->reject($isEmailRule)
+                                ->values();
+
+                            if ($remainingValidationRules->isEmpty()) {
+                                unset($field['field']['validate']);
+                            } else {
+                                $field['field']['validate'] = $remainingValidationRules->all();
+                            }
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'text') {
+                            Arr::set($field, 'field.type', 'short_answer');
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'textarea') {
+                            Arr::set($field, 'field.type', 'long_answer');
+                        }
+
+                        return $field;
+                    })->all(),
+                ];
+            })->all();
+        })->all();
+
+        return ['sections' => $sections];
+    }
+
     /**
      * Get the blueprint.
      *
@@ -85,20 +164,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function blueprint()
     {
-        $blueprint = Blueprint::find('forms.'.$this->handle())
-            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
+        if (Blink::has($blink = 'form-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
+        $blueprint = $this->formFields()->toBlueprint();
+
+        Blink::put($blink, $blueprint);
 
         FormBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
-    }
-
-    public function blueprintCommandPaletteLink()
-    {
-        return $this->blueprint()?->commandPaletteLink(
-            type: 'Forms',
-            url: $this->editBlueprintUrl(),
-        );
     }
 
     /**
@@ -155,11 +231,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function fields()
     {
-        if (! $blueprint = $this->blueprint()) {
-            throw BlueprintUndefinedException::create($this);
-        }
-
-        return $blueprint->fields()->all();
+        return $this->blueprint()->fields()->all();
     }
 
     /**
@@ -211,6 +283,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         $data = $this->data->merge(collect([
             'title' => $this->title,
+            'fields' => $this->formFields()->contents(),
             'honeypot' => $this->honeypot,
             'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
                 $email['markdown'] = Arr::get($email, 'markdown') === true ? true : null;
@@ -230,6 +303,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        if ($blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
+            $blueprint->delete();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -290,7 +367,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             'email',
         ];
 
-        $this->merge(collect($contents)->except($methods));
+        $this->merge(collect($contents)->except([...$methods, 'fields']));
 
         collect($contents)
             ->filter(function ($value, $property) use ($methods) {
@@ -299,6 +376,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->each(function ($value, $property) {
                 $this->{$property}($value);
             });
+
+        if (isset($contents['fields'])) {
+            $this->formFields($contents['fields']);
+        }
 
         return $this;
     }
@@ -404,9 +485,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return cp_route('forms.destroy', $this->handle());
     }
 
+    /** @deprecated */
     public function editBlueprintUrl()
     {
-        return cp_route('blueprints.forms.edit', $this->handle());
+        return cp_route('forms.fields.index', $this->handle());
     }
 
     public function hasFiles()

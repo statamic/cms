@@ -12,6 +12,8 @@ use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
@@ -127,6 +129,12 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $formFieldtypes = [
+        Forms\Fields\Email::class,
+        Forms\Fields\LongAnswer::class,
+        Forms\Fields\ShortAnswer::class,
     ];
 
     protected $modifierAliases = [
@@ -304,6 +312,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Fieldtype::class,
                 'directory' => 'Fieldtypes',
                 'extensions' => $this->fieldtypes,
+            ],
+            'form-fieldtypes' => [
+                'class' => FormFieldtype::class,
+                'directory' => 'FormFieldtypes',
+                'extensions' => $this->formFieldtypes,
             ],
             'modifiers' => [
                 'class' => Modifier::class,

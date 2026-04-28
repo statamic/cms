@@ -97,9 +97,11 @@ class SendEmailsTest extends TestCase
             'from' => 'first@sender.com',
             'to' => 'first@recipient.com',
             'foo' => 'bar',
+        ])->formFields([
+            'fields' => [
+                ['handle' => 'attachments', 'field' => ['type' => 'files']],
+            ],
         ]))->save();
-
-        $form->blueprint()->ensureField('attachments', ['type' => 'files'])->save();
 
         (new SendEmails(
             $submission = $form->makeSubmission(),

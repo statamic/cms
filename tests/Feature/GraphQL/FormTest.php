@@ -3,11 +3,9 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
-use Facades\Statamic\Fields\BlueprintRepository;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -23,8 +21,6 @@ class FormTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        BlueprintRepository::partialMock();
 
         Form::all()->each->delete();
     }
@@ -111,22 +107,24 @@ GQL;
     #[Test]
     public function it_queries_the_fields()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => [
-                'type' => 'text',
-                'display' => 'Your Name',
-                'instructions' => 'Enter your name',
-                'placeholder' => 'Type here...',
-                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
-                'width' => 50,
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => [
+                            'type' => 'short_answer',
+                            'display' => 'Your Name',
+                            'instructions' => 'Enter your name',
+                            'placeholder' => 'Type here...',
+                            'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                            'width' => 50,
+                        ]],
+                        ['handle' => 'subject', 'field' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House'], 'if' => ['name' => 'not empty']]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'width' => 33, 'unless' => ['subject' => 'equals spam']]],
+                    ],
+                ],
             ],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House'], 'if' => ['name' => 'not empty']],
-            'message' => ['type' => 'textarea', 'width' => 33, 'unless' => ['subject' => 'equals spam']],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        ])->save();
 
         $query = <<<'GQL'
 {
@@ -194,15 +192,17 @@ GQL;
     #[Test]
     public function it_queries_the_validation_rules()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text', 'validate' => ['required']],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea', 'validate' => ['required_if:select_field,disco']],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'validate' => ['required']]],
+                        ['handle' => 'subject', 'field' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'validate' => ['required_if:select_field,disco']]],
+                    ],
+                ],
+            ],
+        ])->save();
 
         $query = <<<'GQL'
 {
@@ -230,29 +230,26 @@ GQL;
     #[Test]
     public function it_queries_the_sections()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => [
-                'type' => 'text',
-                'display' => 'Your Name',
-                'instructions' => 'Enter your name',
-                'placeholder' => 'Type here...',
-                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
-                'width' => 50,
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'display' => 'My Section',
+                    'instructions' => 'The section instructions',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => [
+                            'type' => 'short_answer',
+                            'display' => 'Your Name',
+                            'instructions' => 'Enter your name',
+                            'placeholder' => 'Type here...',
+                            'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                            'width' => 50,
+                        ]],
+                        ['handle' => 'subject', 'field' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'width' => 33]],
+                    ],
+                ],
             ],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea', 'width' => 33],
-        ]);
-
-        // Set section display and instructions. You wouldn't really do this for a form blueprint,
-        // but this is just to test the section type which doesn't get tested anywhere else.
-        $contents = $blueprint->contents();
-        $contents['tabs']['main']['sections'][0]['display'] = 'My Section';
-        $contents['tabs']['main']['sections'][0]['instructions'] = 'The section instructions';
-        $blueprint->setContents($contents);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        ])->save();
 
         $query = <<<'GQL'
 {
@@ -322,25 +319,27 @@ GQL;
     #[Test]
     public function it_returns_string_based_validation_rules_for_mimes_mimetypes_dimension_size_and_image()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => [
-                'type' => 'assets',
-                'display' => 'Asset',
-                'validate' => [
-                    'mimes:image/jpeg,image/png',
-                    'mimetypes:image/jpeg,image/png',
-                    'dimensions:1024',
-                    'size:1000',
-                    'image:jpeg',
-                    'new Tests\Feature\GraphQL\TestValidationRuleWithToString',
-                    'new Tests\Feature\GraphQL\TestValidationRuleWithoutToString',
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => [
+                            'type' => 'assets',
+                            'display' => 'Asset',
+                            'validate' => [
+                                'mimes:image/jpeg,image/png',
+                                'mimetypes:image/jpeg,image/png',
+                                'dimensions:1024',
+                                'size:1000',
+                                'image:jpeg',
+                                'new Tests\Feature\GraphQL\TestValidationRuleWithToString',
+                                'new Tests\Feature\GraphQL\TestValidationRuleWithoutToString',
+                            ],
+                        ]],
+                    ],
                 ],
             ],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        ])->save();
 
         $query = <<<'GQL'
 {
