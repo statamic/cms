@@ -13,6 +13,7 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
+    fieldtypes: Array,
 });
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
@@ -279,6 +280,11 @@ const notificationOptions = [
             <!-- This is the desktop nav - the content is repeated from the left panel -->
             <ul class="px-0.5 grid gap-8 @container py-10 max-[1000px]:hidden">
                 <li>
+<!--                    <ul>-->
+<!--                        <li v-for="fieldtype in fieldtypes" :key="fieldtype.handle">-->
+<!--                            {{ fieldtype.title }}-->
+<!--                        </li>-->
+<!--                    </ul>-->
                     <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
                         <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
                         Information

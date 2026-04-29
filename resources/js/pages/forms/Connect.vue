@@ -11,7 +11,6 @@ defineOptions({ layout: [Layout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
-    fieldtypes: Array,
 });
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
@@ -244,14 +243,5 @@ function sortIcon(column) {
             </Card>
         </Panel>
         <DocsCallout :topic="__('Connections')" url="forms" />
-    </div>
-
-    <div class="py-4">
-        <!-- TODO: Remove from this component when wiring up the form builder. -->
-        <ul>
-            <li v-for="fieldtype in fieldtypes" :key="fieldtype.handle">
-                {{ fieldtype.title }}
-            </li>
-        </ul>
     </div>
 </template>
