@@ -88,44 +88,31 @@ class GlideController extends Controller
     /**
      * Generate an on-demand image for the hybrid caching strategy.
      *
-     * The URL path is the predicted cache path. Query parameters contain
-     * the source identifier and manipulation parameters needed to generate.
+     * The URL path is the predicted cache path. A mapping stored in the
+     * Glide cache store links it back to the source and manipulation params.
      */
     private function generateOnDemand(string $path)
     {
-        $this->validateSignature();
-
         if (Glide::cacheDisk()->exists($path)) {
             Log::debug('Glide hybrid cache loaded ['.$path.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
 
             return $this->createResponse($path);
         }
 
-        $params = collect($this->request->all())
-            ->except(['asset', 'url', 'src', 's'])
-            ->all();
+        $mapping = Glide::cacheStore()->get('hybrid::'.$path);
 
-        if ($encoded = $this->request->query->get('asset')) {
-            $decoded = Str::fromBase64Url($encoded);
+        throw_unless($mapping, new NotFoundHttpException);
 
-            [$container, $assetPath] = explode('/', $decoded, 2);
+        $type = $mapping['type'];
+        $params = $mapping['params'];
 
-            throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
+        $item = match ($type) {
+            'asset' => Asset::find($mapping['id']) ?? throw new NotFoundHttpException,
+            'url' => $mapping['url'],
+            'path' => $mapping['path'],
+        };
 
-            throw_unless($asset = $container->asset($assetPath), new NotFoundHttpException);
-
-            return $this->createResponse($this->ensureGenerated('asset', $asset, $params));
-        }
-
-        if ($url = $this->request->query->get('url')) {
-            return $this->createResponse($this->ensureGenerated('url', Str::fromBase64Url($url), $params));
-        }
-
-        if ($src = $this->request->query->get('src')) {
-            return $this->createResponse($this->ensureGenerated('path', $src, $params));
-        }
-
-        throw new NotFoundHttpException;
+        return $this->createResponse($this->ensureGenerated($type, $item, $params));
     }
 
     /**

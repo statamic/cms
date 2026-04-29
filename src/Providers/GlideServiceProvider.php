@@ -62,10 +62,7 @@ class GlideServiceProvider extends ServiceProvider
         if (Glide::isUsingHybridCaching()) {
             return new HybridUrlBuilder(
                 $this->app->make(GlideCachePathResolver::class),
-                [
-                    'key' => (Config::get('statamic.assets.image_manipulation.secure')) ? Config::getAppKey() : null,
-                    'route' => Glide::url(),
-                ]
+                ['route' => Glide::url()]
             );
         }
 

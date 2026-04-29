@@ -157,15 +157,15 @@ class GlideTest extends TestCase
         $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
         tap($container->makeAsset('foo/hoff.jpg'))->save();
 
-        $encoded = Str::toBase64Url('test_container/foo/hoff.jpg');
+        $asset = Asset::find('test_container::foo/hoff.jpg');
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
 
         $resolver = new GlideCachePathResolver($this->app->make(Server::class));
-        $asset = Asset::find('test_container::foo/hoff.jpg');
         $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
 
         $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
 
-        $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
+        $response = $this->get($url);
 
         $response->assertOk();
         $response->assertHeader('content-type', 'image/jpeg');
@@ -187,7 +187,7 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('hybridCaching')]
-    public function hybrid_caching_returns_404_without_query_params_when_file_not_cached()
+    public function hybrid_caching_returns_404_when_no_mapping_exists()
     {
         $response = $this->get('/img/containers/nonexistent/hash/image.jpg');
 
@@ -196,7 +196,7 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('hybridCaching')]
-    public function hybrid_caching_regenerates_when_file_deleted_but_cache_store_exists()
+    public function hybrid_caching_regenerates_when_file_deleted_but_mapping_exists()
     {
         Storage::fake('test');
         $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
@@ -204,41 +204,43 @@ class GlideTest extends TestCase
         $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
         tap($container->makeAsset('foo/hoff.jpg'))->save();
 
-        $encoded = Str::toBase64Url('test_container/foo/hoff.jpg');
         $asset = Asset::find('test_container::foo/hoff.jpg');
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
 
         $resolver = new GlideCachePathResolver($this->app->make(Server::class));
         $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
 
-        $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
+        // Generate the image
+        $response = $this->get($url);
         $response->assertOk();
         $response->streamedContent(); // Ensure the file handle is closed (Windows compat)
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
 
+        // Delete the file but leave the mapping
         Glide::cacheDisk()->delete($expectedPath);
         $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
 
-        $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
+        // Request again — should regenerate via the mapping
+        $response = $this->get($url);
         $response->assertOk();
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
     }
 
     #[Test]
-    #[DefineEnvironment('halfMeasureSecureCaching')]
-    public function hybrid_caching_rejects_request_with_invalid_signature()
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_url_has_no_query_params()
     {
-        $response = $this->get('/img/containers/test/fake-hash/image.jpg?asset=dGVzdC9pbWFnZS5qcGc&w=100&s=invalid');
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        tap($container->makeAsset('foo/hoff.jpg'))->save();
 
-        $response->assertStatus(400);
-    }
+        $asset = Asset::find('test_container::foo/hoff.jpg');
+        $url = $this->app->make(UrlBuilder::class)->build($asset, ['w' => 100]);
 
-    #[Test]
-    #[DefineEnvironment('halfMeasureSecureCaching')]
-    public function hybrid_caching_rejects_request_with_missing_signature()
-    {
-        $response = $this->get('/img/containers/test/fake-hash/image.jpg?asset=dGVzdC9pbWFnZS5qcGc&w=100');
-
-        $response->assertStatus(400);
+        $this->assertStringNotContainsString('?', $url);
+        $this->assertStringStartsWith('/img/', $url);
     }
 
     #[Test]
@@ -250,12 +252,14 @@ class GlideTest extends TestCase
 
         file_put_contents(public_path($imagePath), file_get_contents($fakeImage->getPathname()));
 
+        $url = $this->app->make(UrlBuilder::class)->build($imagePath, ['w' => 100]);
+
         $resolver = new GlideCachePathResolver($this->app->make(Server::class));
         $expectedPath = $resolver->resolveForPath($imagePath, ['w' => 100]);
 
         $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
 
-        $response = $this->get('/img/'.$expectedPath.'?src='.$imagePath.'&w=100');
+        $response = $this->get($url);
 
         $response->assertOk();
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
@@ -447,11 +451,4 @@ class GlideTest extends TestCase
         $app['config']->set('statamic.assets.image_manipulation.route', 'img');
     }
 
-    protected function halfMeasureSecureCaching($app)
-    {
-        $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
-        $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
-        $app['config']->set('statamic.assets.image_manipulation.secure', true);
-        $app['config']->set('statamic.assets.image_manipulation.route', 'img');
-    }
 }
