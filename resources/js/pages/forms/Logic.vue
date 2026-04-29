@@ -25,7 +25,7 @@ const logicBlocks = ref([
     { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('equals Friend referral, then go to How long have you been a fan?') },
     { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('contains years, then go to Sign up for email notifications from The Midnight') },
     { _id: 'favorite_album', type: 'favorite_album', enabled: true, summary: __('equals Days of Thunder, and ‘:fieldname’ contains referral, then go to Which album was your second favorite?', { fieldname: __('How did you hear about us?') }) },
-    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('No conditions configured yet.') },
+    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('equals Endless Summer, then go to Sign up for email notifications from The Midnight') },
     { _id: 'age', type: 'age', enabled: true, summary: __('is greater than 21, then go to I want a free drink voucher') },
 ]);
 

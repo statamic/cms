@@ -100,7 +100,8 @@ const collapsedSummaryParts = computed(() => {
     const summary = props.values?.summary;
     const noConditionsText = __('No conditions configured yet.');
 
-    if (!summary || summary.trim() === noConditionsText) return [];
+    if (!summary) return [];
+    if (summary.trim() === noConditionsText) return [{ type: 'text', text: noConditionsText }];
 
     const marker = __('then go to');
     const markerIndex = summary.toLowerCase().indexOf(marker.toLowerCase());
