@@ -98,7 +98,7 @@ const collapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});
 const meta = ref({});
 const setConfigs = [
-    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), icon: 'fieldtype-select', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), icon: 'mail-sign-at', iconClass: 'bg-blue-50 text-blue-600 dark:bg-transparent dark:text-blue-400', fields: [] },
     { handle: 'like_most', display: __('What do you like most about our band?'), icon: 'text-long', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
     { handle: 'fan_length', display: __('How long have you been a fan?'), icon: 'text-short', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
     { handle: 'favorite_album', display: __('Which album was your favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
