@@ -91,7 +91,7 @@ class TwoFactorChallengeController extends Controller
             return $redirect;
         }
 
-        return redirect()->intended($this->defaultRedirectPath())->getTargetUrl();
+        return $request->session()->pull('url.intended', $this->defaultRedirectPath());
     }
 
     protected function defaultRedirectPath(): string
