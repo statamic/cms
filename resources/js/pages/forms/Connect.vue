@@ -1,11 +1,15 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
-import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem } from '@ui';
-import { computed, ref } from 'vue';
+import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
+import { computed, provide, ref, watchEffect } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
 import iftttLogoRaw from '../../../svg/forms/connect/ifttt.svg?raw';
+import LogicAddRuleButton from './logic-list/LogicAddRuleButton.vue';
+import LogicRule from './logic-list/LogicRule.vue';
+import { data_set } from '@/bootstrap/globals.js';
+import { nanoid as uniqid } from 'nanoid';
 
 defineOptions({ layout: [Layout, FormsLayout] });
 
@@ -83,6 +87,113 @@ const selectedIntegration = computed(() => {
     if (!selectedIntegrationName.value) return null;
     return integrations.value.find((integration) => integration.name === selectedIntegrationName.value) ?? null;
 });
+const fieldPath = 'logic_rules';
+const metaPath = 'logic_rules';
+const sortableItemClass = 'logic-rule-block';
+const loadingSet = ref(null);
+const logicBlocks = ref([
+    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('equals Friend referral, then go to How long have you been a fan?') },
+    { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('contains years, then go to Sign up for email notifications from The Midnight') },
+    { _id: 'favorite_album', type: 'favorite_album', enabled: true, summary: __('equals Days of Thunder, and ‘:fieldname’ contains referral, then go to Which album was your second favorite?', { fieldname: __('How did you hear about us?') }) },
+    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('equals Endless Summer, then go to Sign up for email notifications from The Midnight') },
+    { _id: 'age', type: 'age', enabled: true, summary: __('is greater than 21, then go to I want a free drink voucher') },
+]);
+const collapsed = ref(logicBlocks.value.map((block) => block._id));
+const previews = ref({});
+const meta = ref({});
+const setConfigs = [
+    { handle: 'heard_about_us', display: __('How did you hear about us?'), icon: 'fieldtype-select', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'like_most', display: __('What do you like most about our band?'), icon: 'text-long', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
+    { handle: 'fan_length', display: __('How long have you been a fan?'), icon: 'text-short', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
+    { handle: 'favorite_album', display: __('Which album was your favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'second_favorite_album', display: __('Which album was your second favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'email_notifications_signup', display: __('Sign up for email notifications from The Midnight'), icon: 'fieldtype-checkboxes', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'age', display: __('How old are you?'), icon: 'number', iconClass: 'bg-teal-50 text-teal-600 dark:bg-transparent dark:text-teal-400', fields: [] },
+    { handle: 'free_drink_voucher', display: __('I want a free drink voucher'), icon: 'fieldtype-toggle', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+];
+const groupConfigs = [
+    {
+        handle: 'logic',
+        display: __('Logic Rules'),
+        sets: setConfigs,
+    },
+];
+const setConfigByHandle = computed(() => {
+    return setConfigs.reduce((carry, config) => {
+        carry[config.handle] = config;
+        return carry;
+    }, {});
+});
+const remainingSetConfigs = computed(() => {
+    const usedHandles = new Set(logicBlocks.value.map((block) => block.type));
+    return setConfigs.filter((config) => !usedHandles.has(config.handle));
+});
+const remainingGroupConfigs = computed(() => {
+    return [
+        {
+            handle: 'logic',
+            display: __('Logic Rules'),
+            sets: remainingSetConfigs.value,
+        },
+    ];
+});
+
+watchEffect(() => {
+    const nextPreviews = {};
+    logicBlocks.value.forEach((block, index) => {
+        data_set(nextPreviews, `${fieldPath}.${index}.summary_`, block.summary);
+    });
+    previews.value = nextPreviews;
+});
+
+function setFieldValue(path, value) {
+    data_set(logicBlocks.value, path.replace(`${fieldPath}.`, ''), value);
+}
+
+function setFieldMeta(path, value) {
+    data_set(meta.value, path.replace(`${metaPath}.`, ''), value);
+}
+
+function addSet(handle, index = logicBlocks.value.length) {
+    if (logicBlocks.value.some((block) => block.type === handle)) return;
+
+    loadingSet.value = handle;
+    const config = setConfigByHandle.value[handle];
+    const newRule = {
+        _id: uniqid(),
+        type: handle,
+        enabled: true,
+        summary: config?.display
+            ? __('If :rule has matching conditions, continue to the configured destination.', { rule: config.display })
+            : __('No conditions yet.'),
+    };
+
+    logicBlocks.value.splice(index, 0, newRule);
+    collapsed.value.push(newRule._id);
+    loadingSet.value = null;
+}
+
+function collapseSet(id) {
+    if (!collapsed.value.includes(id)) {
+        collapsed.value.push(id);
+    }
+}
+
+function expandSet(id) {
+    collapsed.value = collapsed.value.filter((setId) => setId !== id);
+}
+
+function removeSet(id) {
+    logicBlocks.value = logicBlocks.value.filter((block) => block._id !== id);
+    collapsed.value = collapsed.value.filter((setId) => setId !== id);
+}
+
+provide('replicatorSets', groupConfigs);
+provide(publishContextKey, {
+    setFieldValue,
+    setFieldMeta,
+    previews,
+});
 
 function setSort(column) {
     if (sortColumn.value === column) {
@@ -149,8 +260,43 @@ function sortIcon(column) {
                     </template>
                 </Heading>
             </PanelHeader>
-            <Card :class="{ 'p-0!': mode === 'table' }">
-                <div v-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <Card :class="{ 'p-0!': mode === 'table' && selectedIntegrationName !== 'Email Notifications' }">
+                <div v-if="selectedIntegrationName === 'Email Notifications'">
+                    <div class="relative space-y-6 mb-0" data-logic-list>
+                        <LogicRule
+                            v-for="(block, index) in logicBlocks"
+                            :id="block._id"
+                            :key="block._id"
+                            :index
+                            :field-path="fieldPath"
+                            :meta-path="metaPath"
+                            :values="block"
+                            :config="setConfigByHandle[block.type]"
+                            :sortable-item-class="sortableItemClass"
+                            :collapsed="collapsed.includes(block._id)"
+                            :enabled="block.enabled"
+                            :read-only="false"
+                            :can-add-rule="true"
+                            :has-error="false"
+                            :show-field-previews="true"
+                            @collapsed="collapseSet(block._id)"
+                            @expanded="expandSet(block._id)"
+                            @removed="removeSet(block._id)"
+                        />
+                    </div>
+                    <LogicAddRuleButton
+                        :groups="remainingGroupConfigs"
+                        :sets="remainingSetConfigs"
+                        :show-connector="logicBlocks.length > 0"
+                        :index="logicBlocks.length"
+                        :label="__('Add Rule')"
+                        :is-first="logicBlocks.length === 0"
+                        :loading-set="loadingSet"
+                        :search-placeholder="__('Search Fields')"
+                        @added="addSet"
+                    />
+                </div>
+                <div v-else-if="mode === 'grid'" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     <div
                         v-for="integration in integrations"
                         :key="integration.name"
@@ -245,3 +391,18 @@ function sortIcon(column) {
         <DocsCallout :topic="__('Connections')" url="forms" />
     </div>
 </template>
+
+<style scoped>
+[data-logic-list]::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    bottom: 0;
+    inset-inline-start: 0.875rem;
+    border-inline-start: 1px dashed var(--color-gray-400);
+}
+
+.dark [data-logic-list]::before {
+    border-inline-start-color: var(--color-gray-600);
+}
+</style>

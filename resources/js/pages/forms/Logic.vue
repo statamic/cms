@@ -223,3 +223,18 @@ provide(publishContextKey, {
         </Panel>
     </div>
 </template>
+
+<style scoped>
+[data-logic-list]::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    bottom: 0;
+    inset-inline-start: 0.875rem;
+    border-inline-start: 1px dashed var(--color-gray-400);
+}
+
+.dark [data-logic-list]::before {
+    border-inline-start-color: var(--color-gray-600);
+}
+</style>
