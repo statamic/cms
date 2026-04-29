@@ -212,6 +212,7 @@ class GlideTest extends TestCase
 
         $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
         $response->assertOk();
+        $response->streamedContent(); // Ensure the file handle is closed (Windows compat)
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
 
         Glide::cacheDisk()->delete($expectedPath);
