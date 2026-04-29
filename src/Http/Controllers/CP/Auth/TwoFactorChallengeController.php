@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Statamic\Http\Controllers\TwoFactorChallengeController as Controller;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
-use Statamic\Support\Str;
 
 class TwoFactorChallengeController extends Controller
 {
@@ -24,11 +23,7 @@ class TwoFactorChallengeController extends Controller
 
     protected function redirectPath(Request $request)
     {
-        $cp = cp_route('index');
-        $referer = $request->input('referer');
-        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
-
-        return $referredFromCp ? $referer : $cp;
+        return $request->session()->pull('url.intended', cp_route('index'));
     }
 
     protected function failedRedirectPath()
