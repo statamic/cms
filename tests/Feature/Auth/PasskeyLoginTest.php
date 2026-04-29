@@ -93,47 +93,17 @@ class PasskeyLoginTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_referer_after_successful_login()
-    {
-        $user = $this->createUser();
-        $refererUrl = 'http://localhost/cp/collections';
-        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
-        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
-
-        $this
-            ->loginRequest(['referer' => $refererUrl])
-            ->assertOk()
-            ->assertJson(['redirect' => $refererUrl]);
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
-    public function it_does_not_redirect_to_non_cp_referer()
+    public function it_redirects_to_intended_url_after_successful_login()
     {
         $user = $this->createUser();
         WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
         WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
 
         $this
-            ->loginRequest(['referer' => 'http://localhost/some-other-page'])
+            ->withSession(['url.intended' => 'http://localhost/cp/collections'])
+            ->loginRequest()
             ->assertOk()
-            ->assertJson(['redirect' => cp_route('index')]);
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
-    public function it_does_not_redirect_to_external_cp_referer()
-    {
-        $user = $this->createUser();
-        WebAuthn::shouldReceive('getUserFromCredentials')->once()->andReturn($user);
-        WebAuthn::shouldReceive('validateAssertion')->once()->andReturnTrue();
-
-        $this
-            ->loginRequest(['referer' => 'https://evil.com/cp/collections'])
-            ->assertOk()
-            ->assertJson(['redirect' => cp_route('index')]);
+            ->assertJson(['redirect' => 'http://localhost/cp/collections']);
 
         $this->assertAuthenticatedAs($user);
     }
