@@ -51,11 +51,11 @@ return [
         | false  - Images are generated on each HTTP request via Glide routes.
         | true   - Images are eagerly generated during template rendering and
         |          saved to a publicly accessible location.
-        | 'half' - Images are generated on-demand on the first HTTP request,
+        | 'hybrid' - Images are generated on-demand on the first HTTP request,
         |          then saved to a publicly accessible location so the web
         |          server can serve them directly on subsequent requests.
         |
-        | When using true or 'half', you should configure the cache_path below.
+        | When using true or 'hybrid', you should configure the cache_path below.
         |
         */
 

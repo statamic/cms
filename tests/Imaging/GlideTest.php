@@ -19,7 +19,7 @@ use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
 use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideUrlBuilder;
-use Statamic\Imaging\HalfMeasureUrlBuilder;
+use Statamic\Imaging\HybridUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
 use Statamic\Support\Str;
@@ -78,11 +78,11 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    public function half_measure_caching_will_make_a_filesystem_using_the_cache_path_location()
+    public function hybrid_caching_will_make_a_filesystem_using_the_cache_path_location()
     {
         config([
             'statamic.assets.image_manipulation.route' => 'imgs',
-            'statamic.assets.image_manipulation.cache' => 'half',
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
             'statamic.assets.image_manipulation.cache_path' => public_path('imgcache'),
         ]);
 
@@ -91,19 +91,19 @@ class GlideTest extends TestCase
         $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
         $this->assertEquals('public', $this->defaultFolderVisibility($cache));
         $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
-        $this->assertInstanceOf(HalfMeasureUrlBuilder::class, $this->app[UrlBuilder::class]);
+        $this->assertInstanceOf(HybridUrlBuilder::class, $this->app[UrlBuilder::class]);
         $this->assertEquals('/imgs', Glide::url());
     }
 
     #[Test]
-    public function half_measure_caching_without_cache_path_will_throw_exception()
+    public function hybrid_caching_without_cache_path_will_throw_exception()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Image manipulation cache path is not defined.');
 
         config([
             'statamic.assets.image_manipulation.route' => 'imgs',
-            'statamic.assets.image_manipulation.cache' => 'half',
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
             'statamic.assets.image_manipulation.cache_path' => null,
         ]);
 
@@ -111,17 +111,17 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    public function half_measure_caching_is_detected_as_half_measure()
+    public function hybrid_caching_is_detected_as_half_measure()
     {
-        config(['statamic.assets.image_manipulation.cache' => 'half']);
+        config(['statamic.assets.image_manipulation.cache' => 'hybrid']);
 
-        $this->assertTrue(Glide::isUsingHalfMeasureCaching());
+        $this->assertTrue(Glide::isUsingHybridCaching());
         $this->assertFalse(Glide::shouldServeDirectly());
         $this->assertFalse(Glide::shouldServeByHttp());
     }
 
     #[Test]
-    public function half_measure_caching_predicted_path_matches_generated_path()
+    public function hybrid_caching_predicted_path_matches_generated_path()
     {
         config([
             'statamic.assets.image_manipulation.cache' => false,
@@ -148,8 +148,8 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    #[DefineEnvironment('halfMeasureCaching')]
-    public function half_measure_caching_generates_image_on_first_request()
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request()
     {
         Storage::fake('test');
         $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
@@ -173,8 +173,8 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    #[DefineEnvironment('halfMeasureCaching')]
-    public function half_measure_caching_serves_existing_cached_file()
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_serves_existing_cached_file()
     {
         $fakePath = 'containers/test/fake-hash/image.jpg';
         $image = UploadedFile::fake()->image('image.jpg', 10, 10);
@@ -186,8 +186,8 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    #[DefineEnvironment('halfMeasureCaching')]
-    public function half_measure_caching_returns_404_without_query_params_when_file_not_cached()
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_returns_404_without_query_params_when_file_not_cached()
     {
         $response = $this->get('/img/containers/nonexistent/hash/image.jpg');
 
@@ -195,8 +195,8 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    #[DefineEnvironment('halfMeasureCaching')]
-    public function half_measure_caching_regenerates_when_file_deleted_but_cache_store_exists()
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_regenerates_when_file_deleted_but_cache_store_exists()
     {
         Storage::fake('test');
         $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
@@ -225,7 +225,7 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('halfMeasureSecureCaching')]
-    public function half_measure_caching_rejects_request_with_invalid_signature()
+    public function hybrid_caching_rejects_request_with_invalid_signature()
     {
         $response = $this->get('/img/containers/test/fake-hash/image.jpg?asset=dGVzdC9pbWFnZS5qcGc&w=100&s=invalid');
 
@@ -234,7 +234,7 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('halfMeasureSecureCaching')]
-    public function half_measure_caching_rejects_request_with_missing_signature()
+    public function hybrid_caching_rejects_request_with_missing_signature()
     {
         $response = $this->get('/img/containers/test/fake-hash/image.jpg?asset=dGVzdC9pbWFnZS5qcGc&w=100');
 
@@ -242,8 +242,8 @@ class GlideTest extends TestCase
     }
 
     #[Test]
-    #[DefineEnvironment('halfMeasureCaching')]
-    public function half_measure_caching_generates_image_on_first_request_by_path()
+    #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request_by_path()
     {
         $fakeImage = UploadedFile::fake()->image('test-path.jpg', 30, 60);
         $imagePath = 'test-path.jpg';
@@ -439,9 +439,9 @@ class GlideTest extends TestCase
         return collect(array_merge([$manifestCacheKey], $manifest));
     }
 
-    protected function halfMeasureCaching($app)
+    protected function hybridCaching($app)
     {
-        $app['config']->set('statamic.assets.image_manipulation.cache', 'half');
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
         $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
         $app['config']->set('statamic.assets.image_manipulation.secure', false);
         $app['config']->set('statamic.assets.image_manipulation.route', 'img');
@@ -449,7 +449,7 @@ class GlideTest extends TestCase
 
     protected function halfMeasureSecureCaching($app)
     {
-        $app['config']->set('statamic.assets.image_manipulation.cache', 'half');
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
         $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
         $app['config']->set('statamic.assets.image_manipulation.secure', true);
         $app['config']->set('statamic.assets.image_manipulation.route', 'img');

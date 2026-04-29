@@ -8,7 +8,7 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
-class HalfMeasureUrlBuilder extends ImageUrlBuilder
+class HybridUrlBuilder extends ImageUrlBuilder
 {
     protected GlideCachePathResolver $resolver;
 
@@ -40,7 +40,7 @@ class HalfMeasureUrlBuilder extends ImageUrlBuilder
             'url' => ['url' => Str::toBase64Url($this->item)],
             'id' => ['asset' => Str::toBase64Url(str_replace('::', '/', $this->item))],
             'path' => ['src' => $this->item],
-            default => throw new Exception('Cannot build a half-measure Glide URL without a URL, path, or asset.'),
+            default => throw new Exception('Cannot build a hybrid Glide URL without a URL, path, or asset.'),
         };
 
         if (isset($params['mark']) && $params['mark'] instanceof Asset) {

@@ -29,7 +29,7 @@ if (config('statamic.cp.enabled')) {
     });
 }
 
-if (Glide::shouldServeByHttp() || Glide::isUsingHalfMeasureCaching()) {
+if (Glide::shouldServeByHttp() || Glide::isUsingHybridCaching()) {
     require __DIR__.'/glide.php';
 }
 

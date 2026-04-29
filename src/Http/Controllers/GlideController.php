@@ -53,7 +53,7 @@ class GlideController extends Controller
      */
     public function generateByPath($path)
     {
-        if (Glide::isUsingHalfMeasureCaching()) {
+        if (Glide::isUsingHybridCaching()) {
             return $this->generateOnDemand($path);
         }
 
@@ -86,7 +86,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Generate an on-demand image for the half-measure caching strategy.
+     * Generate an on-demand image for the hybrid caching strategy.
      *
      * The URL path is the predicted cache path. Query parameters contain
      * the source identifier and manipulation parameters needed to generate.
@@ -96,7 +96,7 @@ class GlideController extends Controller
         $this->validateSignature();
 
         if (Glide::cacheDisk()->exists($path)) {
-            Log::debug('Glide half-measure cache loaded ['.$path.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
+            Log::debug('Glide hybrid cache loaded ['.$path.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
 
             return $this->createResponse($path);
         }
@@ -131,7 +131,7 @@ class GlideController extends Controller
     /**
      * Forget any stale cache store entry, then generate the image.
      *
-     * In half-measure mode, the file on disk is the source of truth.
+     * In hybrid mode, the file on disk is the source of truth.
      * If we're here, the file doesn't exist, so the cache store
      * entry (if any) is stale and should be cleared first.
      */
