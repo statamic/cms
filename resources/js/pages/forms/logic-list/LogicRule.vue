@@ -206,7 +206,10 @@ reveal.use(rootEl, () => emit('expanded'));
         >
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
-                :class="{ 'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed }"
+                :class="{
+                    'bg-white dark:bg-gray-900 hover:bg-gray-100/70 dark:hover:bg-gray-925': collapsed,
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed,
+                }"
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <span v-if="collapsed" class="text-sm text-gray-700 dark:text-gray-300">{{ __('If') }}</span>
