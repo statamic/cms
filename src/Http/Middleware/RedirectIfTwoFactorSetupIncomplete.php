@@ -23,7 +23,9 @@ class RedirectIfTwoFactorSetupIncomplete
                 app(EnableTwoFactorAuthentication::class)($user);
             }
 
-            return redirect($this->redirectUrl($request));
+            redirect()->setIntendedUrl($request->fullUrl());
+
+            return redirect($this->redirectUrl());
         }
 
         return $next($request);
@@ -41,15 +43,9 @@ class RedirectIfTwoFactorSetupIncomplete
         return $currentPath === $customPath;
     }
 
-    protected function redirectUrl(Request $request): string
+    protected function redirectUrl(): string
     {
-        if ($url = config('statamic.users.two_factor_setup_url')) {
-            return $url;
-        }
-
-        return route($this->redirectRoute(), [
-            'referer' => $request->fullUrl(),
-        ]);
+        return config('statamic.users.two_factor_setup_url') ?? route($this->redirectRoute());
     }
 
     protected function redirectRoute(): string

@@ -63,7 +63,8 @@ class TwoFactorRoutesTest extends TestCase
         $this
             ->actingAs($user)
             ->get(cp_route('dashboard'))
-            ->assertRedirect(cp_route('two-factor-setup', ['referer' => cp_route('dashboard')]));
+            ->assertRedirect(cp_route('two-factor-setup'))
+            ->assertSessionHas('url.intended', cp_route('dashboard'));
     }
 
     #[Test]
@@ -93,7 +94,8 @@ class TwoFactorRoutesTest extends TestCase
         $this
             ->actingAs($user)
             ->get(cp_route('dashboard'))
-            ->assertRedirect(cp_route('two-factor-setup', ['referer' => cp_route('dashboard')]));
+            ->assertRedirect(cp_route('two-factor-setup'))
+            ->assertSessionHas('url.intended', cp_route('dashboard'));
     }
 
     #[Test]
@@ -106,7 +108,8 @@ class TwoFactorRoutesTest extends TestCase
         $this
             ->actingAs($user)
             ->get('/test-frontend-route')
-            ->assertRedirect(route('statamic.two-factor-setup', ['referer' => url('/test-frontend-route')]));
+            ->assertRedirect(route('statamic.two-factor-setup'))
+            ->assertSessionHas('url.intended', url('/test-frontend-route'));
     }
 
     #[Test]
@@ -121,7 +124,8 @@ class TwoFactorRoutesTest extends TestCase
         $this
             ->actingAs($user)
             ->get('/test-frontend-route')
-            ->assertRedirect(route('statamic.two-factor-setup', ['referer' => url('/test-frontend-route')]));
+            ->assertRedirect(route('statamic.two-factor-setup'))
+            ->assertSessionHas('url.intended', url('/test-frontend-route'));
 
         $this->assertNotNull($user->fresh()->two_factor_secret);
     }
@@ -138,7 +142,8 @@ class TwoFactorRoutesTest extends TestCase
         $this
             ->actingAs($user)
             ->get('/test-frontend-route')
-            ->assertRedirect(route('statamic.two-factor-setup', ['referer' => url('/test-frontend-route')]));
+            ->assertRedirect(route('statamic.two-factor-setup'))
+            ->assertSessionHas('url.intended', url('/test-frontend-route'));
 
         $this->assertEquals($existing, $user->fresh()->two_factor_secret);
     }
