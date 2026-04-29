@@ -212,7 +212,7 @@ reveal.use(rootEl, () => emit('expanded'));
                 }"
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
-                    <span v-if="collapsed" class="text-sm text-gray-700 dark:text-gray-300">{{ __('If') }}</span>
+                    <Badge v-if="collapsed" pill size="sm" color="white">{{ __('If') }}</Badge>
                     <Badge size="lg" pill color="white" class="px-3 text-gray-950">
                         <span v-if="isRuleGroupVisible" class="flex items-center gap-2">
                             {{ __(ruleGroup.display) }}
