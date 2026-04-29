@@ -2,7 +2,7 @@
 
 namespace Statamic\Hooks\CP;
 
-use Statamic\Assets\AssetContainer;
+use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Support\Traits\Hookable;
 
 class AssetsIndexQuery
