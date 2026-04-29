@@ -6,8 +6,8 @@ import { computed, provide, ref, watchEffect } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
 import iftttLogoRaw from '../../../svg/forms/connect/ifttt.svg?raw';
-import LogicAddRuleButton from './logic-list/LogicAddRuleButton.vue';
-import LogicRule from './logic-list/LogicRule.vue';
+import ConnectAddRuleButton from './connect-list/ConnectAddRuleButton.vue';
+import ConnectRule from './connect-list/ConnectRule.vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
 
@@ -93,16 +93,12 @@ const sortableItemClass = 'logic-rule-block';
 const loadingSet = ref(null);
 const logicBlocks = ref([
     { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('equals Friend referral, then go to How long have you been a fan?') },
-    { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('contains years, then go to Sign up for email notifications from The Midnight') },
-    { _id: 'favorite_album', type: 'favorite_album', enabled: true, summary: __('equals Days of Thunder, and ‘:fieldname’ contains referral, then go to Which album was your second favorite?', { fieldname: __('How did you hear about us?') }) },
-    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('equals Endless Summer, then go to Sign up for email notifications from The Midnight') },
-    { _id: 'age', type: 'age', enabled: true, summary: __('is greater than 21, then go to I want a free drink voucher') },
 ]);
 const collapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});
 const meta = ref({});
 const setConfigs = [
-    { handle: 'heard_about_us', display: __('How did you hear about us?'), icon: 'fieldtype-select', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), icon: 'fieldtype-select', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
     { handle: 'like_most', display: __('What do you like most about our band?'), icon: 'text-long', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
     { handle: 'fan_length', display: __('How long have you been a fan?'), icon: 'text-short', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
     { handle: 'favorite_album', display: __('Which album was your favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
@@ -263,7 +259,7 @@ function sortIcon(column) {
             <Card :class="{ 'p-0!': mode === 'table' && selectedIntegrationName !== 'Email Notifications' }">
                 <div v-if="selectedIntegrationName === 'Email Notifications'">
                     <div class="relative space-y-6 mb-0" data-logic-list>
-                        <LogicRule
+                        <ConnectRule
                             v-for="(block, index) in logicBlocks"
                             :id="block._id"
                             :key="block._id"
@@ -284,7 +280,7 @@ function sortIcon(column) {
                             @removed="removeSet(block._id)"
                         />
                     </div>
-                    <LogicAddRuleButton
+                    <ConnectAddRuleButton
                         :groups="remainingGroupConfigs"
                         :sets="remainingSetConfigs"
                         :show-connector="logicBlocks.length > 0"
