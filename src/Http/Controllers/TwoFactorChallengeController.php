@@ -87,11 +87,13 @@ class TwoFactorChallengeController extends Controller
 
     protected function redirectPath(Request $request)
     {
+        $intended = $request->session()->pull('url.intended', $this->defaultRedirectPath());
+
         if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
             return $redirect;
         }
 
-        return $request->session()->pull('url.intended', $this->defaultRedirectPath());
+        return $intended;
     }
 
     protected function defaultRedirectPath(): string
