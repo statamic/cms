@@ -49,6 +49,13 @@ const ruleGroup = computed(() => {
 });
 
 const isRuleGroupVisible = computed(() => replicatorSets.length > 1 && ruleGroup.value.display);
+const operatorLabels = [
+    __('does not equal'),
+    __('is greater than'),
+    __('is less than'),
+    __('equals'),
+    __('contains'),
+];
 
 const previewText = computed(() => {
     return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
@@ -77,58 +84,48 @@ const previewText = computed(() => {
 
 const collapsedPreviewText = computed(() => {
     if (previewText.value && previewText.value.trim() !== '') return previewText.value;
-    if (props.values?.summary) {
-        const summary = props.values.summary;
-        const noConditionsText = __('No conditions configured yet.');
-
-        if (summary.trim() === noConditionsText) return '';
-
-        const marker = __('then go to');
-        const markerIndex = summary.toLowerCase().indexOf(marker.toLowerCase());
-
-        const operatorLabels = [
-            __('does not equal'),
-            __('is greater than'),
-            __('is less than'),
-            __('equals'),
-            __('contains'),
-        ];
-
-        const operatorChipClass = 'inline-flex items-center rounded-md bg-gray-200/70 px-1.5 py-0.25 text-[12px] font-medium text-gray-800 dark:bg-gray-850 dark:text-gray-200';
-        const formatOperators = (text) => {
-            let formatted = escapeHtml(text);
-
-            operatorLabels.forEach((label) => {
-                const escapedLabel = escapeHtml(label);
-                formatted = formatted
-                    .split(escapedLabel)
-                    .join(`<span class="${operatorChipClass}">${escapedLabel}</span>`);
-            });
-
-            return formatted;
-        };
-
-        if (markerIndex === -1) return formatOperators(summary);
-
-        const before = summary.slice(0, markerIndex + marker.length);
-        const destination = summary.slice(markerIndex + marker.length).trimStart();
-
-        // Saved summaries may contain destination *handles* rather than the human-readable display text.
-        // If so, map handles back to the configured destination label.
-        const destinationHandle = destination.trim().replace(/^(["'`]|[“”‘’])/, '').replace(/(["'`]|[“”‘’])$/, '');
-
-        const destinationDisplayByHandle = (replicatorSets ?? [])
-            .flatMap((group) => group?.sets ?? [])
-            .reduce((carry, set) => {
-                carry[set.handle] = set.display;
-                return carry;
-            }, {});
-
-        const destinationResolved = destinationDisplayByHandle[destinationHandle] ?? destinationDisplayByHandle[destination] ?? destination;
-
-        return `${formatOperators(before)} ‘${escapeHtml(destinationResolved)}’`;
-    }
     return '';
+});
+
+const destinationDisplayByHandle = computed(() => {
+    return (replicatorSets ?? [])
+        .flatMap((group) => group?.sets ?? [])
+        .reduce((carry, set) => {
+            carry[set.handle] = set.display;
+            return carry;
+        }, {});
+});
+
+const collapsedSummaryParts = computed(() => {
+    const summary = props.values?.summary;
+    const noConditionsText = __('No conditions configured yet.');
+
+    if (!summary || summary.trim() === noConditionsText) return [];
+
+    const marker = __('then go to');
+    const markerIndex = summary.toLowerCase().indexOf(marker.toLowerCase());
+    const before = markerIndex === -1 ? summary : summary.slice(0, markerIndex + marker.length);
+    const after = markerIndex === -1 ? '' : summary.slice(markerIndex + marker.length).trimStart();
+
+    const destinationHandle = after.trim().replace(/^(["'`]|[“”‘’])/, '').replace(/(["'`]|[“”‘’])$/, '');
+    const destinationResolved = destinationDisplayByHandle.value[destinationHandle] ?? destinationDisplayByHandle.value[after] ?? after;
+
+    const operatorPattern = new RegExp(`(${operatorLabels.map((label) => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+
+    const parts = before
+        .split(operatorPattern)
+        .filter((part) => part !== '')
+        .map((part) => {
+            const isOperator = operatorLabels.some((label) => label.toLowerCase() === part.toLowerCase());
+            return { type: isOperator ? 'operator' : 'text', text: part };
+        });
+
+    if (markerIndex !== -1) {
+        parts.push({ type: 'text', text: ' ' });
+        parts.push({ type: 'destination', text: destinationResolved });
+    }
+
+    return parts;
 });
 
 const showSecondaryCondition = computed(() => {
@@ -233,11 +230,25 @@ reveal.use(rootEl, () => emit('expanded'));
                         class="size-3.5! text-gray-500"
                         v-tooltip="__(config.instructions)"
                     />
-                    <Subheading
-                        v-show="collapsed"
-                        v-html="collapsedPreviewText"
-                        class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!"
-                    />
+                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
+                        <span v-if="collapsedPreviewText" v-html="collapsedPreviewText" />
+                        <template v-else>
+                            <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
+                                <Badge
+                                    v-if="part.type === 'operator'"
+                                    size="xs"
+                                    pill
+                                    color="white"
+                                    class="inline-block px-1.5 py-0 text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
+                                    style="text-box: trim-start text;"
+                                >
+                                    {{ part.text }}
+                                </Badge>
+                                <span v-else-if="part.type === 'destination'">‘{{ part.text }}’</span>
+                                <span v-else>{{ part.text }}</span>
+                            </template>
+                        </template>
+                    </Subheading>
                 </button>
                 <Dropdown>
                     <template #trigger>
