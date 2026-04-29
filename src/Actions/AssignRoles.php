@@ -7,6 +7,8 @@ use Statamic\Facades\Role;
 
 class AssignRoles extends Action
 {
+    public $icon = 'permissions';
+
     public static function title()
     {
         return __('Assign Roles');
@@ -20,6 +22,11 @@ class AssignRoles extends Action
     public function authorize($authed, $user)
     {
         return $authed->can('assign roles');
+    }
+
+    public function requiresElevatedSession(): bool
+    {
+        return true;
     }
 
     public function confirmationText()

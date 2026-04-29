@@ -8,6 +8,8 @@ use Statamic\Facades\Blink;
 
 class MoveAsset extends Action
 {
+    protected $icon = 'move-folder';
+
     public static function title()
     {
         return __('Move');

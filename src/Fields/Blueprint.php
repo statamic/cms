@@ -7,6 +7,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
@@ -26,6 +28,7 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -74,7 +77,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
         return $this->namespace;
     }
 
-    public function fullyQualifiedHandle(): string
+    public function renderableNamespace(): string
+    {
+        return str_replace('.', ' ', Str::humanize($this->namespace));
+    }
+
+    public function fullyQualifiedHandle(): ?string
     {
         $handle = $this->handle();
 
@@ -446,6 +454,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
             'handle' => $this->handle(),
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
+            'fqh' => $this->fullyQualifiedHandle(),
+            'token' => encrypt([
+                'fqh' => $this->fullyQualifiedHandle(),
+                'user_id' => User::current()->id(),
+            ]),
         ];
     }
 
@@ -784,14 +797,30 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
         return $this->handle();
     }
 
-    public function resetUrl()
+    public function editAdditionalBlueprintUrl()
     {
-        return cp_route('blueprints.reset', [$this->namespace(), $this->handle()]);
+        return cp_route('blueprints.additional.edit', [$this->namespace(), $this->handle()]);
+    }
+
+    public function resetAdditionalBlueprintUrl()
+    {
+        return cp_route('blueprints.additional.reset', [$this->namespace(), $this->handle()]);
     }
 
     public function writeFile($path = null)
     {
         File::put($path ?? $this->buildPath(), $this->fileContents());
+    }
+
+    public function commandPaletteLink(string|array $type, string $url): Link
+    {
+        $type = is_array($type) ? $type : [__($type)];
+
+        $text = [__('Blueprints'), ...$type, __($this->title())];
+
+        return (new Link($text, Category::Fields))
+            ->url($url)
+            ->icon('blueprints');
     }
 
     public function getQueryableValue(string $field)

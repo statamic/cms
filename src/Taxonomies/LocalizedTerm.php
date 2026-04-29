@@ -503,7 +503,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return [
             'absoluteUrl', 'apiUrl', 'blueprint', 'editUrl', 'entriesCount', 'hasOrigin', 'id', 'isRedirect',
             'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'path', 'private', 'published',
-            'redirectUrl', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
+            'redirectUrl', 'reference', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
             'uri', 'url', 'urlWithoutRedirect', 'values',
         ];
     }
@@ -511,6 +511,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function getCpSearchResultBadge()
     {
         return $this->taxonomy()->title();
+    }
+
+    public function getCpSearchResultIcon()
+    {
+        return 'taxonomies';
     }
 
     public function getBulkAugmentationReferenceKey(): ?string

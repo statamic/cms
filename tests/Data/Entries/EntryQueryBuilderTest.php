@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -461,10 +462,10 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
@@ -966,6 +967,9 @@ class EntryQueryBuilderTest extends TestCase
             '/ test',
             'test /',
             'test / test',
+            'Über dem Meer',
+            'über dem meer',
+            'Ärger',
         ])->each(function ($val, $i) {
             EntryFactory::id($i)
                 ->slug('post-'.$i)
@@ -998,6 +1002,10 @@ class EntryQueryBuilderTest extends TestCase
             '%/' => ['/', 'test /'],
             '/%' => ['/', '/ test'],
             '%/%' => ['/', '/ test', 'test /', 'test / test'],
+            '%über%' => ['Über dem Meer', 'über dem meer'],
+            '%Über%' => ['Über dem Meer', 'über dem meer'],
+            '%ärger%' => ['Ärger'],
+            '%Ärger%' => ['Ärger'],
         ])->mapWithKeys(function ($expected, $like) {
             return [$like => [$like, $expected]];
         });
@@ -1008,10 +1016,131 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $count = 0;
-        Entry::query()->chunk(2, function ($entries) use (&$count) {
-            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        $chunks = 0;
+
+        Entry::query()->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            }
+
+            $chunks++;
         });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_less_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(2)->chunk(1, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 1'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 2'], $entries->map->title->all());
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(10)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(1)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset_where_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            $chunks++;
+        });
+
+        $this->assertEquals(0, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_and_offsets()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        EntryFactory::id('id-4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('id-5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('id-6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+        EntryFactory::id('id-7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7'])->create();
+
+        $chunks = 0;
+
+        Entry::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 5'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
     }
 
     #[Test]
@@ -1036,11 +1165,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_where_status_column_writes_deprecation_log()
+    public function filtering_using_where_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
@@ -1048,11 +1177,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    public function filtering_using_whereIn_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
@@ -1093,6 +1222,18 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::collection('calendar')->id('calendar-past')->published(true)->date(now()->subDay())->create();
         EntryFactory::collection('calendar')->id('calendar-past-draft')->published(false)->date(now()->subDay())->create();
 
+        Collection::make('news')->dated(true)->futureDateBehavior('unlisted')->pastDateBehavior('public')->save();
+        EntryFactory::collection('news')->id('news-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('news')->id('news-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('news')->id('news-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('news')->id('news-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('alerts')->dated(true)->futureDateBehavior('public')->pastDateBehavior('unlisted')->save();
+        EntryFactory::collection('alerts')->id('alerts-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-past-draft')->published(false)->date(now()->subDay())->create();
+
         // Undated, but with customized date behavior. Nonsensical situation, but it can happen.
         // See https://github.com/statamic/eloquent-driver/issues/288
         Collection::make('undated')->dated(false)->futureDateBehavior('private')->pastDateBehavior('private')->save();
@@ -1113,6 +1254,10 @@ class EntryQueryBuilderTest extends TestCase
                 'event-past-draft',
                 'calendar-future-draft',
                 'calendar-past-draft',
+                'news-future-draft',
+                'news-past-draft',
+                'alerts-future-draft',
+                'alerts-past-draft',
                 'undated-draft',
             ]],
             'published' => ['published', [
@@ -1121,6 +1266,10 @@ class EntryQueryBuilderTest extends TestCase
                 'event-future',
                 'calendar-future',
                 'calendar-past',
+                'news-future',
+                'news-past',
+                'alerts-future',
+                'alerts-past',
                 'undated',
             ]],
             'scheduled' => ['scheduled', [
@@ -1132,6 +1281,7 @@ class EntryQueryBuilderTest extends TestCase
         ];
     }
 
+    #[Test]
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
@@ -1163,6 +1313,82 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function can_get_min_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(2, Entry::query()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(5, Entry::query()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(14, Entry::query()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(10, Entry::query()->where('type', 'b')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, Entry::query()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(3.5, Entry::query()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->average('quantity'));
     }
 
     #[Test]

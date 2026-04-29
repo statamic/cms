@@ -2,31 +2,63 @@
 
 namespace Statamic\Http\Controllers\User;
 
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Statamic\Auth\ThrottlesLogins;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
 class LoginController extends Controller
 {
-    use ThrottlesLogins;
+    use HandlesLogins;
 
     public function login(UserLoginRequest $request)
     {
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
+        $this->handleTooManyLoginAttempts($request);
 
-            return $this->sendLockoutResponse($request);
+        $this->checkPasskeyEnforcement($request);
+
+        $user = User::fromUser($this->validateCredentials($request));
+
+        if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
+            return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        if (Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
-            $redirect = $request->input('_redirect', '/');
+        $redirect = $request->input('_redirect');
+        $redirect = $redirect && ! URL::isExternalToApplication($redirect) ? $redirect : null;
 
-            return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect)->withSuccess(__('Login successful.'));
+        // If 2FA setup is required, stash the redirect so the setup flow can use it after completion.
+        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication()) {
+            $request->session()->forget('login.redirect');
+
+            if ($redirect) {
+                $request->session()->put('login.redirect', $redirect);
+            }
         }
 
-        $this->incrementLoginAttempts($request);
+        $this->authenticate($request, $user);
+
+        return redirect($redirect ?? route('statamic.site'))->withSuccess(__('Login successful.'));
+    }
+
+    private function checkPasskeyEnforcement(Request $request)
+    {
+        if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            return;
+        }
+
+        if (! $user = User::findByEmail($request->get($this->username()))) {
+            return;
+        }
+
+        if ($user->passkeys()->isEmpty()) {
+            return;
+        }
 
         $errorRedirect = $request->input('_error_redirect');
 
@@ -34,16 +66,60 @@ class LoginController extends Controller
             ? redirect($errorRedirect)
             : back();
 
-        return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
+        throw new HttpResponseException(
+            $errorResponse->withInput()->withErrors(__('statamic::messages.password_passkeys_only'))
+        );
+    }
+
+    protected function twoFactorChallengeRedirect(): string
+    {
+        return config('statamic.users.two_factor_challenge_url') ?? route('statamic.two-factor-challenge');
+    }
+
+    /**
+     * Throw a failed authentication validation exception.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function throwFailedAuthenticationException(Request $request)
+    {
+        $errorRedirect = $request->input('_error_redirect');
+
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect)
+            ? redirect($errorRedirect)
+            : back();
+
+        throw new HttpResponseException($errorResponse->withInput()->withErrors(__('Invalid credentials.')));
+    }
+
+    /**
+     * Fire the failed authentication attempt event with the given arguments.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    protected function fireFailedEvent($request, $user = null)
+    {
+        event(new Failed(Auth::getName(), $user, [
+            $this->username() => $request->{$this->username()},
+            'password' => $request->password,
+        ]));
     }
 
     public function logout()
     {
         Auth::logout();
 
-        $redirect = request()->get('redirect', '/');
+        $redirect = request()->get('redirect');
 
-        return redirect(URL::isExternalToApplication($redirect) ? '/' : $redirect);
+        $url = $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
+
+        return redirect($url);
     }
 
     protected function username()

@@ -116,6 +116,11 @@ class Nav extends Structure implements ContainsQueryableValues, Contract
         return cp_route('navigation.destroy', $this->handle());
     }
 
+    public function editBlueprintUrl()
+    {
+        return cp_route('blueprints.navigation.edit', $this->handle());
+    }
+
     public function newTreeInstance()
     {
         return app(NavTree::class);
@@ -161,6 +166,14 @@ class Nav extends Structure implements ContainsQueryableValues, Contract
         NavBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Navigation',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     public function canSelectAcrossSites($canSelect = null)

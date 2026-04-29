@@ -7,6 +7,8 @@ use Statamic\Facades\UserGroup;
 
 class AssignGroups extends Action
 {
+    public $icon = 'add-group';
+
     public static function title()
     {
         return __('Assign Groups');
@@ -20,6 +22,11 @@ class AssignGroups extends Action
     public function authorize($authed, $user)
     {
         return $authed->can('assign user groups');
+    }
+
+    public function requiresElevatedSession(): bool
+    {
+        return true;
     }
 
     public function confirmationText()

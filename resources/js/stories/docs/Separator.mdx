@@ -1,0 +1,23 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SeparatorStories from '../Separator.stories';
+
+<Meta of={SeparatorStories} />
+
+# Separator
+Clean and consistent visual separators for content sections.
+<Canvas of={SeparatorStories._DocsIntro} sourceState={'shown'} />
+
+## Variants
+Separators come in two styles. Use them to match the aesthetic of your interface.
+<Canvas of={SeparatorStories._Variants} sourceState={'shown'} />
+
+## Text
+Add text to your separator with the `text` prop.
+<Canvas of={SeparatorStories._Text} sourceState={'shown'} />
+
+## Vertical
+Use the `vertical` prop to create a vertical separator.
+<Canvas of={SeparatorStories._Vertical} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={SeparatorStories} />

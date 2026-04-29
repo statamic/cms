@@ -1,5 +1,4 @@
 export default class Callbacks {
-
     constructor() {
         this.callbacks = [];
     }
@@ -13,5 +12,4 @@ export default class Callbacks {
             return this.callbacks[name](...args);
         }
     }
-
 }

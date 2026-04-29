@@ -66,7 +66,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         return $this->fluentlyGetOrSet('id')
             ->getter(function ($id) {
-                return $this->id = $id ?: str_replace(',', '.', microtime(true));
+                $micro = Carbon::now()->timestamp + Carbon::now()->micro / 1000000;
+
+                return $this->id = $id ?: str_replace(',', '.', $micro);
             })
             ->args(func_get_args());
     }
@@ -109,19 +111,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
      */
     public function date()
     {
-        return Carbon::createFromTimestamp($this->id(), config('app.timezone'));
-    }
-
-    /**
-     * Get the date, formatted by what's specified in the form config.
-     *
-     * @return string
-     */
-    public function formattedDate()
-    {
-        return $this->date()->format(
-            $this->form()->dateFormat()
-        );
+        return Carbon::createFromTimestamp($this->id());
     }
 
     /**

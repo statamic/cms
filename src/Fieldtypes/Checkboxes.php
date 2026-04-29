@@ -6,7 +6,9 @@ use Statamic\Fields\Fieldtype;
 
 class Checkboxes extends Fieldtype
 {
-    use HasSelectOptions;
+    use HasSelectOptions {
+        process as traitProcess;
+    }
 
     protected $categories = ['controls'];
     protected $selectableInForms = true;
@@ -16,13 +18,14 @@ class Checkboxes extends Fieldtype
     {
         return [
             [
-                'display' => __('Checkbox Options'),
+                'display' => __('Selection & Options'),
                 'fields' => [
                     'options' => [
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
                         'type' => 'array',
                         'expand' => true,
+                        'value_header' => __('Label').' ('.__('Optional').')',
                         'field' => [
                             'type' => 'text',
                         ],
@@ -30,13 +33,18 @@ class Checkboxes extends Fieldtype
                 ],
             ],
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.inline'),
                         'type' => 'toggle',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
@@ -50,5 +58,18 @@ class Checkboxes extends Fieldtype
     protected function multiple()
     {
         return true;
+    }
+
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->filter()->values()->all();
+    }
+
+    public function process($data)
+    {
+        return collect($this->traitProcess($data))
+            ->reject(fn ($value) => $value === null)
+            ->values()
+            ->all();
     }
 }

@@ -10,9 +10,6 @@ use Tests\TestCase;
 
 class OrderByTest extends TestCase
 {
-    protected $shouldFakeVersion = false;
-    protected $shouldPreventNavBeingBuilt = false;
-
     #[Test]
     #[DataProvider('parseProvider')]
     public function it_parses_string($string, $sort, $dir)

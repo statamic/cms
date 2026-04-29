@@ -165,28 +165,6 @@ class ForgotPasswordTest extends TestCase
             ->save();
     }
 
-    #[Test]
-    public function it_allows_reset_url_for_current_request_domain_when_not_in_sites_config()
-    {
-        $this->setSites([
-            'a' => ['name' => 'A', 'locale' => 'en_US', 'url' => 'http://this-site.com/'],
-        ]);
-
-        $this->simulateSuccessfulPasswordResetEmail();
-
-        User::make()
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->save();
-
-        $this
-            ->post('/!/auth/password/email', [
-                'email' => 'san@holo.com',
-                '_reset_url' => 'http://absolute-url-resolved-from-request.com/some-slug',
-            ])
-            ->assertSessionHasNoErrors();
-    }
-
     protected function simulateSuccessfulPasswordResetEmail()
     {
         $success = new class

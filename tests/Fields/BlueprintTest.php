@@ -20,6 +20,7 @@ use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
+use Statamic\Facades\Collection as StatamicCollection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -30,6 +31,8 @@ use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
+    use \Tests\PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_gets_the_handle()
     {
@@ -414,6 +417,17 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->actingAs($user);
+
+        $publishArray = $blueprint->toPublishArray();
+
+        $this->assertSame([
+            'fqh' => 'test',
+            'user_id' => $user->id(),
+        ], decrypt($publishArray['token']));
+        $publishArray['token'] = '__token__';
+
         $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
@@ -432,19 +446,19 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'One instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
-                                    'validate' => 'required|min:2',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => null,
@@ -470,14 +484,14 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'Two instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'textarea',
                                     'placeholder' => null,
-                                    'validate' => 'min:2',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',
@@ -492,7 +506,9 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
-        ], $blueprint->toPublishArray());
+            'fqh' => 'test',
+            'token' => '__token__',
+        ], $publishArray);
     }
 
     #[Test]
@@ -541,6 +557,17 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->actingAs($user);
+
+        $publishArray = $blueprint->toPublishArray();
+
+        $this->assertSame([
+            'fqh' => 'test',
+            'user_id' => $user->id(),
+        ], decrypt($publishArray['token']));
+        $publishArray['token'] = '__token__';
+
         $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
@@ -559,18 +586,19 @@ class BlueprintTest extends TestCase
                                     'instructions' => null,
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => 'nested_',
@@ -585,18 +613,19 @@ class BlueprintTest extends TestCase
                                     'instructions' => null,
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => 'nested_deeper_',
@@ -610,7 +639,9 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
-        ], $blueprint->toPublishArray());
+            'fqh' => 'test',
+            'token' => '__token__',
+        ], $publishArray);
     }
 
     #[Test]
@@ -817,7 +848,7 @@ class BlueprintTest extends TestCase
             ->setHandle('blueprint_one');
 
         $entry = (new Entry)
-            ->collection('collection_one')
+            ->collection(tap(StatamicCollection::make('collection_one'))->save())
             ->blueprint($blueprint);
 
         $blueprint->setParent($entry);

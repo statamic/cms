@@ -44,6 +44,8 @@ class CollectionStructure extends Structure
             ->keyBy->reference()
             ->get($entry->id());
 
+        $page?->setEntry($entry);
+
         return optional($page)->uri();
     }
 
