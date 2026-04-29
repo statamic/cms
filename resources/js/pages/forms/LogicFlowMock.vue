@@ -13,7 +13,7 @@ const props = defineProps({
     },
     initialConditionIconClass: {
         type: String,
-        default: 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400',
+        default: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400',
     },
     showSecondaryCondition: {
         type: Boolean,
@@ -77,8 +77,8 @@ const optionIconClasses = (option) => {
 };
 
 const optionChipClasses = (option) => {
-    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 rounded-sm';
-    return 'flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-sm';
+    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-transparent dark:text-purple-400 rounded-sm';
+    return 'flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400 rounded-sm';
 };
 
 const optionChipIconClasses = (option) => {
@@ -103,10 +103,10 @@ const optionChipIconClasses = (option) => {
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-6 rounded-full"
+                                class="logic-text__pill-icon size-5 rounded-sm"
                                 :class="props.initialConditionIconClass"
                             >
-                                <Icon :name="props.initialConditionIcon" class="size-3.5" />
+                                <Icon :name="props.initialConditionIcon" class="size-3" />
                             </span>
                             <span class="logic-text__pill-text" :title="props.initialConditionLabel || __('Which album was your favorite?')">
                                 {{ props.initialConditionLabel || __('Which album was your favorite?') }}
@@ -166,7 +166,7 @@ const optionChipIconClasses = (option) => {
                             </template>
                             <template #selected-option="{ option }">
                                 <div class="flex items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400 rounded-full">
+                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400 rounded-full">
                                         <Icon
                                             v-if="option.icon"
                                             :name="option.icon"
