@@ -55,6 +55,8 @@ const operatorLabels = [
     __('is less than'),
     __('equals'),
     __('contains'),
+    __('and'),
+    __('or'),
 ];
 
 const previewText = computed(() => {
