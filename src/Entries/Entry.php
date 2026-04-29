@@ -508,7 +508,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return;
         }
 
-        if (empty($ids = $page->flattenedPages()->pluck('id'))) {
+        $ids = $page->flattenedPages()->pluck('id');
+
+        if ($ids->isEmpty()) {
             return;
         }
 

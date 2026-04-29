@@ -139,10 +139,12 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
         if (is_object($reference)) {
             throw_unless($id = $reference->id(), new \Exception('Cannot set an entry without an ID'));
             Blink::store('structure-entries')->put($id, $reference);
+            Blink::store('structure-uris')->forget($id);
             $reference = $id;
         }
 
         $this->reference = $reference;
+        $this->routeData = null;
 
         return $this;
     }

@@ -273,6 +273,10 @@ function blurField(handle, user = Statamic.user) {
 function pushComponent(name, { props }) {
     const component = new Component(uniqid(), name, props);
     components.value.push(component);
+    component.destroy = () => {
+        const index = components.value.indexOf(component);
+        if (index !== -1) components.value.splice(index, 1);
+    };
     return component;
 }
 
@@ -336,8 +340,8 @@ provideContainerContext({ ...provided, container: provided });
 onMounted(() => {
     Statamic.$events.$emit('publish-container-created', {
         name: props.name,
-        reference: props.reference,
-        site: props.site,
+        reference: toRef(() => props.reference),
+        site: toRef(() => props.site),
         values,
         setFieldValue,
         setValues,
