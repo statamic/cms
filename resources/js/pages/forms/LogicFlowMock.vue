@@ -49,13 +49,16 @@ const logicDestinationOptions = [
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
+    { label: __('I want a free drink voucher'), value: 'free_drink_voucher', icon: 'fieldtype-toggle', category: 'choice' },
 ];
 const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
 const logicConditionFieldOptions = [
     { label: __('What do you like most about our band? '), value: 'long_answer', icon: 'text-long', category: 'text' },
+    { label: __('How did you hear about us?'), value: 'heard_about_us', icon: 'fieldtype-select', category: 'choice' },
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
+    { label: __('How old are you?'), value: 'age', icon: 'number', category: 'text' },
 ];
 
 const logicJoin = ref(props.mockPreset.logicJoin || 'and');

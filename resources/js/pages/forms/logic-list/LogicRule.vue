@@ -113,7 +113,20 @@ const collapsedPreviewText = computed(() => {
         const before = summary.slice(0, markerIndex + marker.length);
         const destination = summary.slice(markerIndex + marker.length).trimStart();
 
-        return `${formatOperators(before)} ‘${escapeHtml(destination)}’`;
+        // Saved summaries may contain destination *handles* rather than the human-readable display text.
+        // If so, map handles back to the configured destination label.
+        const destinationHandle = destination.trim().replace(/^(["'`]|[“”‘’])/, '').replace(/(["'`]|[“”‘’])$/, '');
+
+        const destinationDisplayByHandle = (replicatorSets ?? [])
+            .flatMap((group) => group?.sets ?? [])
+            .reduce((carry, set) => {
+                carry[set.handle] = set.display;
+                return carry;
+            }, {});
+
+        const destinationResolved = destinationDisplayByHandle[destinationHandle] ?? destinationDisplayByHandle[destination] ?? destination;
+
+        return `${formatOperators(before)} ‘${escapeHtml(destinationResolved)}’`;
     }
     return '';
 });
