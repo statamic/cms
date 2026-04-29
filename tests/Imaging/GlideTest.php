@@ -34,7 +34,6 @@ class GlideTest extends TestCase
     {
         $this->clearGlideCache();
 
-        // Clean up half-measure cache directory if it was created
         if (file_exists($path = storage_path('glide-test-cache'))) {
             File::delete($path);
         }
@@ -140,10 +139,8 @@ class GlideTest extends TestCase
 
         $params = ['w' => 100, 'h' => 50];
 
-        // Predict the path
         $predictedPath = $resolver->resolveForAsset($asset, $params);
 
-        // Actually generate the image
         $generator = new ImageGenerator($server);
         $generatedPath = $generator->generateByAsset($asset, $params);
 
@@ -179,7 +176,6 @@ class GlideTest extends TestCase
     #[DefineEnvironment('halfMeasureCaching')]
     public function half_measure_caching_serves_existing_cached_file()
     {
-        // Write a real image to the cache disk at a known path
         $fakePath = 'containers/test/fake-hash/image.jpg';
         $image = UploadedFile::fake()->image('image.jpg', 10, 10);
         Glide::cacheDisk()->put($fakePath, file_get_contents($image->getPathname()));
@@ -214,16 +210,13 @@ class GlideTest extends TestCase
         $resolver = new GlideCachePathResolver($this->app->make(Server::class));
         $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
 
-        // Generate the image first
         $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
         $response->assertOk();
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
 
-        // Delete the file but leave the cache store entry
         Glide::cacheDisk()->delete($expectedPath);
         $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
 
-        // Request again — should regenerate
         $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
         $response->assertOk();
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
@@ -254,7 +247,6 @@ class GlideTest extends TestCase
         $fakeImage = UploadedFile::fake()->image('test-path.jpg', 30, 60);
         $imagePath = 'test-path.jpg';
 
-        // Place the image in the source filesystem (public path by default)
         file_put_contents(public_path($imagePath), file_get_contents($fakeImage->getPathname()));
 
         $resolver = new GlideCachePathResolver($this->app->make(Server::class));
@@ -267,7 +259,6 @@ class GlideTest extends TestCase
         $response->assertOk();
         $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
 
-        // Clean up
         @unlink(public_path($imagePath));
     }
 
