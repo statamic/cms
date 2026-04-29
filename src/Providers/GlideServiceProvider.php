@@ -9,8 +9,10 @@ use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Config;
 use Statamic\Facades\Glide;
+use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Imaging\GlideUrlBuilder;
+use Statamic\Imaging\HalfMeasureUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\ImageValidator;
 use Statamic\Imaging\PresetGenerator;
@@ -57,6 +59,16 @@ class GlideServiceProvider extends ServiceProvider
 
     private function getBuilder()
     {
+        if (Glide::isUsingHalfMeasureCaching()) {
+            return new HalfMeasureUrlBuilder(
+                $this->app->make(GlideCachePathResolver::class),
+                [
+                    'key' => (Config::get('statamic.assets.image_manipulation.secure')) ? Config::getAppKey() : null,
+                    'route' => Glide::url(),
+                ]
+            );
+        }
+
         if (Glide::shouldServeDirectly()) {
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
                 'route' => Glide::url(),

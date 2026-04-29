@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use League\Flysystem\UnableToReadFile;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
@@ -12,6 +13,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Config;
+use Statamic\Facades\Glide;
 use Statamic\Facades\Site;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
@@ -51,6 +53,10 @@ class GlideController extends Controller
      */
     public function generateByPath($path)
     {
+        if (Glide::isUsingHalfMeasureCaching()) {
+            return $this->generateOnDemand($path);
+        }
+
         $this->validateSignature();
 
         // If the auto crop setting is enabled, we will attempt to resolve an asset from the
@@ -77,6 +83,63 @@ class GlideController extends Controller
         $url = Str::fromBase64Url($url);
 
         return $this->createResponse($this->generateBy('url', $url));
+    }
+
+    /**
+     * Generate an on-demand image for the half-measure caching strategy.
+     *
+     * The URL path is the predicted cache path. Query parameters contain
+     * the source identifier and manipulation parameters needed to generate.
+     */
+    private function generateOnDemand(string $path)
+    {
+        $this->validateSignature();
+
+        if (Glide::cacheDisk()->exists($path)) {
+            Log::debug('Glide half-measure cache loaded ['.$path.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
+
+            return $this->createResponse($path);
+        }
+
+        $params = collect($this->request->all())
+            ->except(['asset', 'url', 'src', 's'])
+            ->all();
+
+        if ($encoded = $this->request->query->get('asset')) {
+            $decoded = Str::fromBase64Url($encoded);
+
+            [$container, $assetPath] = explode('/', $decoded, 2);
+
+            throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
+
+            throw_unless($asset = $container->asset($assetPath), new NotFoundHttpException);
+
+            return $this->createResponse($this->ensureGenerated('asset', $asset, $params));
+        }
+
+        if ($url = $this->request->query->get('url')) {
+            return $this->createResponse($this->ensureGenerated('url', Str::fromBase64Url($url), $params));
+        }
+
+        if ($src = $this->request->query->get('src')) {
+            return $this->createResponse($this->ensureGenerated('path', $src, $params));
+        }
+
+        throw new NotFoundHttpException;
+    }
+
+    /**
+     * Forget any stale cache store entry, then generate the image.
+     *
+     * In half-measure mode, the file on disk is the source of truth.
+     * If we're here, the file doesn't exist, so the cache store
+     * entry (if any) is stale and should be cleared first.
+     */
+    private function ensureGenerated(string $type, $item, array $params)
+    {
+        Glide::cacheStore()->forget(ImageGenerator::manipulationCacheKey($type, $item, $params));
+
+        return $this->generateBy($type, $item, $params);
     }
 
     /**
@@ -108,12 +171,12 @@ class GlideController extends Controller
      *
      * @return mixed
      */
-    private function generateBy($type, $item)
+    private function generateBy($type, $item, ?array $params = null)
     {
         $method = 'generateBy'.ucfirst($type);
 
         try {
-            return $this->generator->$method($item, $this->request->all());
+            return $this->generator->$method($item, $params ?? $this->request->all());
         } catch (InvalidRemoteUrlException $e) {
             abort(400, $e->getMessage());
         } catch (UnableToReadFile $e) {

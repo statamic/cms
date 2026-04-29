@@ -83,7 +83,7 @@ class ImageGenerator
     public function generateByPath($path, array $params)
     {
         return Glide::cacheStore()->rememberForever(
-            'path::'.$path.'::'.md5(json_encode($params)),
+            static::manipulationCacheKey('path', $path, $params),
             fn () => $this->doGenerateByPath($path, $params)
         );
     }
@@ -109,7 +109,7 @@ class ImageGenerator
     public function generateByUrl($url, array $params)
     {
         return Glide::cacheStore()->rememberForever(
-            'url::'.$url.'::'.md5(json_encode($params)),
+            static::manipulationCacheKey('url', $url, $params),
             fn () => $this->doGenerateByUrl($url, $params)
         );
     }
@@ -159,7 +159,7 @@ class ImageGenerator
             return $this->generateVideoThumbnail($asset, $params);
         }
 
-        $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
+        $manipulationCacheKey = static::manipulationCacheKey('asset', $asset, $params);
         $manifestCacheKey = static::assetCacheManifestKey($asset);
 
         // Store the cache key for this manipulation in a manifest so that we can easily remove when deleting an asset.
@@ -188,6 +188,17 @@ class ImageGenerator
         $this->server->setCachePathPrefix(self::assetCachePathPrefix($this->asset).'/'.$this->asset->folder());
 
         return $this->generate($this->asset->basename());
+    }
+
+    public static function manipulationCacheKey(string $type, $item, array $params): string
+    {
+        $id = $item;
+
+        if ($type === 'asset') {
+            $id = $item->id();
+        }
+
+        return "{$type}::{$id}::".md5(json_encode($params));
     }
 
     public static function assetCacheManifestKey($asset)
@@ -290,22 +301,29 @@ class ImageGenerator
     }
 
     /**
+     * Get the default Glide manipulation parameters for an asset.
+     */
+    public static function getDefaultManipulations(?Asset $asset = null): array
+    {
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
+
+        if (Config::get('statamic.assets.auto_crop') && $asset) {
+            $defaults['fit'] = 'crop-'.$asset->get('focus', '50-50');
+        }
+
+        return $defaults;
+    }
+
+    /**
      * Apply default Glide manipulations on the image.
      *
      * @return void
      */
     private function applyDefaultManipulations()
     {
-        $defaults = Glide::normalizeParameters(
-            Config::get('statamic.assets.image_manipulation.defaults') ?: []
-        );
-
-        // Enable automatic cropping
-        if (Config::get('statamic.assets.auto_crop') && $this->asset) {
-            $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
-        }
-
-        $this->server->setDefaults($defaults);
+        $this->server->setDefaults(static::getDefaultManipulations($this->asset));
     }
 
     /**

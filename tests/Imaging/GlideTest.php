@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Server;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset;
@@ -16,7 +17,9 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
+use Statamic\Imaging\GlideCachePathResolver;
 use Statamic\Imaging\GlideUrlBuilder;
+use Statamic\Imaging\HalfMeasureUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
 use Statamic\Support\Str;
@@ -30,6 +33,11 @@ class GlideTest extends TestCase
     public function tearDown(): void
     {
         $this->clearGlideCache();
+
+        // Clean up half-measure cache directory if it was created
+        if (file_exists($path = storage_path('glide-test-cache'))) {
+            File::delete($path);
+        }
 
         parent::tearDown();
     }
@@ -68,6 +76,199 @@ class GlideTest extends TestCase
         $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
         $this->assertInstanceOf(StaticUrlBuilder::class, $this->app[UrlBuilder::class]);
         $this->assertEquals('/imgs', Glide::url());
+    }
+
+    #[Test]
+    public function half_measure_caching_will_make_a_filesystem_using_the_cache_path_location()
+    {
+        config([
+            'statamic.assets.image_manipulation.route' => 'imgs',
+            'statamic.assets.image_manipulation.cache' => 'half',
+            'statamic.assets.image_manipulation.cache_path' => public_path('imgcache'),
+        ]);
+
+        $cache = Glide::server()->getCache();
+
+        $this->assertLocalAdapter($adapter = $this->getAdapterFromFilesystem($cache));
+        $this->assertEquals('public', $this->defaultFolderVisibility($cache));
+        $this->assertEquals(public_path('imgcache').DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
+        $this->assertInstanceOf(HalfMeasureUrlBuilder::class, $this->app[UrlBuilder::class]);
+        $this->assertEquals('/imgs', Glide::url());
+    }
+
+    #[Test]
+    public function half_measure_caching_without_cache_path_will_throw_exception()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Image manipulation cache path is not defined.');
+
+        config([
+            'statamic.assets.image_manipulation.route' => 'imgs',
+            'statamic.assets.image_manipulation.cache' => 'half',
+            'statamic.assets.image_manipulation.cache_path' => null,
+        ]);
+
+        Glide::server()->getCache();
+    }
+
+    #[Test]
+    public function half_measure_caching_is_detected_as_half_measure()
+    {
+        config(['statamic.assets.image_manipulation.cache' => 'half']);
+
+        $this->assertTrue(Glide::isUsingHalfMeasureCaching());
+        $this->assertFalse(Glide::shouldServeDirectly());
+        $this->assertFalse(Glide::shouldServeByHttp());
+    }
+
+    #[Test]
+    public function half_measure_caching_predicted_path_matches_generated_path()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => false,
+            'statamic.assets.auto_crop' => true,
+        ]);
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $server = $this->app->make(Server::class);
+        $resolver = new GlideCachePathResolver($server);
+
+        $params = ['w' => 100, 'h' => 50];
+
+        // Predict the path
+        $predictedPath = $resolver->resolveForAsset($asset, $params);
+
+        // Actually generate the image
+        $generator = new ImageGenerator($server);
+        $generatedPath = $generator->generateByAsset($asset, $params);
+
+        $this->assertEquals($generatedPath, $predictedPath);
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureCaching')]
+    public function half_measure_caching_generates_image_on_first_request()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $encoded = Str::toBase64Url('test_container/foo/hoff.jpg');
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $asset = Asset::find('test_container::foo/hoff.jpg');
+        $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureCaching')]
+    public function half_measure_caching_serves_existing_cached_file()
+    {
+        // Write a real image to the cache disk at a known path
+        $fakePath = 'containers/test/fake-hash/image.jpg';
+        $image = UploadedFile::fake()->image('image.jpg', 10, 10);
+        Glide::cacheDisk()->put($fakePath, file_get_contents($image->getPathname()));
+
+        $response = $this->get('/img/'.$fakePath);
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureCaching')]
+    public function half_measure_caching_returns_404_without_query_params_when_file_not_cached()
+    {
+        $response = $this->get('/img/containers/nonexistent/hash/image.jpg');
+
+        $response->assertNotFound();
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureCaching')]
+    public function half_measure_caching_regenerates_when_file_deleted_but_cache_store_exists()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $encoded = Str::toBase64Url('test_container/foo/hoff.jpg');
+        $asset = Asset::find('test_container::foo/hoff.jpg');
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
+
+        // Generate the image first
+        $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
+        $response->assertOk();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+
+        // Delete the file but leave the cache store entry
+        Glide::cacheDisk()->delete($expectedPath);
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        // Request again — should regenerate
+        $response = $this->get('/img/'.$expectedPath.'?asset='.$encoded.'&w=100');
+        $response->assertOk();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureSecureCaching')]
+    public function half_measure_caching_rejects_request_with_invalid_signature()
+    {
+        $response = $this->get('/img/containers/test/fake-hash/image.jpg?asset=dGVzdC9pbWFnZS5qcGc&w=100&s=invalid');
+
+        $response->assertStatus(400);
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureSecureCaching')]
+    public function half_measure_caching_rejects_request_with_missing_signature()
+    {
+        $response = $this->get('/img/containers/test/fake-hash/image.jpg?asset=dGVzdC9pbWFnZS5qcGc&w=100');
+
+        $response->assertStatus(400);
+    }
+
+    #[Test]
+    #[DefineEnvironment('halfMeasureCaching')]
+    public function half_measure_caching_generates_image_on_first_request_by_path()
+    {
+        $fakeImage = UploadedFile::fake()->image('test-path.jpg', 30, 60);
+        $imagePath = 'test-path.jpg';
+
+        // Place the image in the source filesystem (public path by default)
+        file_put_contents(public_path($imagePath), file_get_contents($fakeImage->getPathname()));
+
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForPath($imagePath, ['w' => 100]);
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get('/img/'.$expectedPath.'?src='.$imagePath.'&w=100');
+
+        $response->assertOk();
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+
+        // Clean up
+        @unlink(public_path($imagePath));
     }
 
     #[Test]
@@ -244,5 +445,21 @@ class GlideTest extends TestCase
         }
 
         return collect(array_merge([$manifestCacheKey], $manifest));
+    }
+
+    protected function halfMeasureCaching($app)
+    {
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'half');
+        $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
+        $app['config']->set('statamic.assets.image_manipulation.secure', false);
+        $app['config']->set('statamic.assets.image_manipulation.route', 'img');
+    }
+
+    protected function halfMeasureSecureCaching($app)
+    {
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'half');
+        $app['config']->set('statamic.assets.image_manipulation.cache_path', storage_path('glide-test-cache'));
+        $app['config']->set('statamic.assets.image_manipulation.secure', true);
+        $app['config']->set('statamic.assets.image_manipulation.route', 'img');
     }
 }
