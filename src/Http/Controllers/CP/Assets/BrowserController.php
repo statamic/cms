@@ -154,6 +154,8 @@ class BrowserController extends CpController
             $query->where('folder', $path);
         }
 
+        $query = (new AssetsIndexQuery($query, $container))->query();
+
         if ($sort = OrderBy::column($request->sort)) {
             $query->orderBy($sort, $request->order ?? 'asc');
         }
