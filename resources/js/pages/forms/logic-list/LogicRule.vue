@@ -121,7 +121,6 @@ const collapsedSummaryParts = computed(() => {
         });
 
     if (markerIndex !== -1) {
-        parts.push({ type: 'text', text: ' ' });
         parts.push({ type: 'destination', text: destinationResolved });
     }
 
@@ -236,7 +235,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
                                 <Badge
                                     v-if="part.type === 'operator'"
-                                    size="xs"
+                                    size="sm"
                                     pill
                                     color="white"
                                     class="inline-block px-1.5 py-0 text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
@@ -244,8 +243,8 @@ reveal.use(rootEl, () => emit('expanded'));
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <span v-else-if="part.type === 'destination'">‘{{ part.text }}’</span>
-                                <span v-else>{{ part.text }}</span>
+                                <template v-else-if="part.type === 'destination'"> ‘{{ part.text }}’ </template>
+                                <template v-else>{{ part.text }}</template>
                             </template>
                         </template>
                     </Subheading>
