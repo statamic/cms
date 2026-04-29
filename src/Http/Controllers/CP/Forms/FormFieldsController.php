@@ -12,6 +12,8 @@ class FormFieldsController extends CpController
 {
     public function __invoke($form)
     {
+        $this->authorize('edit', $form);
+
         $formFieldtypes = app('statamic.form-fieldtypes')
             ->unique()
             ->map(fn ($class) => app($class))

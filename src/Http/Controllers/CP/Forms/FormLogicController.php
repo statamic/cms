@@ -9,6 +9,8 @@ class FormLogicController extends CpController
 {
     public function __invoke($form)
     {
+        $this->authorize('edit', $form);
+
         return Inertia::render('forms/Logic', [
             'form' => $form,
         ]);
