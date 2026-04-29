@@ -102,19 +102,11 @@ class TwoFactorAuthenticationController extends CpController
     {
         $successKey = "{$formName}.success";
 
-        if ($redirect = $request->input('_redirect')) {
-            if (! URL::isExternalToApplication($redirect)) {
-                return redirect($redirect)->with($successKey, $message);
-            }
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            return redirect($redirect)->with($successKey, $message);
         }
 
-        if ($loginRedirect = $request->session()->pull('login.redirect')) {
-            if (! URL::isExternalToApplication($loginRedirect)) {
-                return redirect($loginRedirect)->with($successKey, $message);
-            }
-        }
-
-        return back()->with($successKey, $message);
+        return redirect()->intended(back()->getTargetUrl())->with($successKey, $message);
     }
 
     protected function confirmUrl()

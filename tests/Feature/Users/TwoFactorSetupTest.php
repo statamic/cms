@@ -52,7 +52,7 @@ class TwoFactorSetupTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->withSession(['login.redirect' => '/dashboard'])
+            ->withSession(['url.intended' => '/dashboard'])
             ->get(route('statamic.two-factor-setup'))
             ->assertInertia(fn ($page) => $page->where('redirect', '/dashboard'));
 

@@ -2,13 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Illuminate\Http\Request;
 use Statamic\Http\Controllers\User\PasskeyLoginController as Controller;
 
 class PasskeyLoginController extends Controller
 {
-    protected function successRedirectUrl(Request $request): string
+    protected function defaultRedirectUrl(): string
     {
-        return $request->session()->pull('url.intended', cp_route('index'));
+        return cp_route('index');
     }
 }

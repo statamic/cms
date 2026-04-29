@@ -29,21 +29,20 @@ class LoginController extends Controller
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        $redirect = $request->input('_redirect');
-        $redirect = $redirect && ! URL::isExternalToApplication($redirect) ? $redirect : null;
-
-        // If 2FA setup is required, stash the redirect so the setup flow can use it after completion.
-        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication()) {
-            $request->session()->forget('login.redirect');
-
-            if ($redirect) {
-                $request->session()->put('login.redirect', $redirect);
-            }
+        // An explicit form redirect overrides any URL stashed by the auth middleware.
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            redirect()->setIntendedUrl($redirect);
         }
 
         $this->authenticate($request, $user);
 
-        return redirect($redirect ?? route('statamic.site'))->withSuccess(__('Login successful.'));
+        // Preserve the intended URL for the setup flow to consume after the user completes setup.
+        if (TwoFactor::enabled() && $user->isTwoFactorAuthenticationRequired() && ! $user->hasEnabledTwoFactorAuthentication()) {
+            return redirect(redirect()->getIntendedUrl() ?? route('statamic.site'))
+                ->withSuccess(__('Login successful.'));
+        }
+
+        return redirect()->intended(route('statamic.site'))->withSuccess(__('Login successful.'));
     }
 
     private function checkPasskeyEnforcement(Request $request)

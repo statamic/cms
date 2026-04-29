@@ -33,19 +33,11 @@ class TwoFactorSetupController extends Controller
 
     protected function redirectPath()
     {
-        if ($redirect = request('redirect')) {
-            if (! URL::isExternalToApplication($redirect)) {
-                return $redirect;
-            }
+        if (($redirect = request('redirect')) && ! URL::isExternalToApplication($redirect)) {
+            return $redirect;
         }
 
-        if ($redirect = session()->get('login.redirect')) {
-            if (! URL::isExternalToApplication($redirect)) {
-                return $redirect;
-            }
-        }
-
-        return route('statamic.site');
+        return redirect()->getIntendedUrl() ?? route('statamic.site');
     }
 
     protected function routes($user): array

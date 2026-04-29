@@ -193,14 +193,14 @@ class TwoFactorChallengeFormTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_login_redirect_from_session_when_no_redirect_param()
+    public function it_uses_intended_url_from_session_when_no_redirect_param()
     {
         $user = $this->userWithTwoFactorEnabled();
 
         $this
             ->session([
                 'login.id' => $user->id(),
-                'login.redirect' => '/account',
+                'url.intended' => '/account',
             ])
             ->post(route('statamic.two-factor-challenge'), [
                 'code' => $this->getOneTimeCode($user),
