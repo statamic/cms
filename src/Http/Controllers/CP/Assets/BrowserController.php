@@ -13,6 +13,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\AssetsIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
@@ -106,7 +107,8 @@ class BrowserController extends CpController
         $totalFolders = $folders->count();
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
-        $totalAssets = $folder->queryAssets()->count();
+        $query = (new AssetsIndexQuery($folder->queryAssets(), $container))->query();
+        $totalAssets = $query->count();
         $totalItems = $totalAssets + $totalFolders;
 
         if ($sort = OrderBy::column($request->sort)) {
@@ -125,7 +127,6 @@ class BrowserController extends CpController
         $folders = $folders->slice(($page - 1) * $perPage, $perPage);
 
         if ($page >= $lastFolderPage) {
-            $query = $folder->queryAssets();
             $query->orderBy($sort, $order);
             $this->applyQueryScopes($query, $request->all());
 
@@ -189,6 +190,8 @@ class BrowserController extends CpController
         if ($path) {
             $query->where('folder', $path);
         }
+
+        $query = (new AssetsIndexQuery($query, $container))->query();
 
         if ($sort = OrderBy::column($request->sort)) {
             $query->orderBy($sort, $request->order ?? 'asc');
