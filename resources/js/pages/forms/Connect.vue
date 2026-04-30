@@ -2,7 +2,7 @@
 import Layout from '@/pages/layout/Layout.vue';
 import FormsLayout from './Layout.vue';
 import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
-import { computed, provide, ref, watchEffect } from 'vue';
+import { computed, onMounted, provide, ref, watch, watchEffect } from 'vue';
 import emailNotificationsLogoRaw from '../../../svg/forms/connect/email-notifications.svg?raw';
 import zapierLogoRaw from '../../../svg/forms/connect/zapier.svg?raw';
 import iftttLogoRaw from '../../../svg/forms/connect/ifttt.svg?raw';
@@ -86,6 +86,10 @@ const sortedIntegrations = computed(() => {
 const selectedIntegration = computed(() => {
     if (!selectedIntegrationName.value) return null;
     return integrations.value.find((integration) => integration.name === selectedIntegrationName.value) ?? null;
+});
+const connectStateKey = computed(() => {
+    const formKey = props.form?.handle ?? props.form?.id ?? props.form?.title ?? 'default';
+    return `forms.connect.selectedIntegration.${formKey}`;
 });
 const fieldPath = 'logic_rules';
 const metaPath = 'logic_rules';
@@ -205,6 +209,25 @@ function sortIcon(column) {
     if (sortColumn.value !== column) return null;
     return sortDirection.value === 'asc' ? 'sort-asc' : 'sort-desc';
 }
+
+onMounted(() => {
+    const savedIntegrationName = sessionStorage.getItem(connectStateKey.value);
+    if (!savedIntegrationName) return;
+
+    const integrationExists = integrations.value.some((integration) => integration.name === savedIntegrationName);
+    if (integrationExists) {
+        selectedIntegrationName.value = savedIntegrationName;
+    }
+});
+
+watch(selectedIntegrationName, (integrationName) => {
+    if (integrationName) {
+        sessionStorage.setItem(connectStateKey.value, integrationName);
+        return;
+    }
+
+    sessionStorage.removeItem(connectStateKey.value);
+});
 
 </script>
 
