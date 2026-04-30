@@ -42,6 +42,7 @@ import Fieldtype from './Fieldtype.vue';
 import { Input, Select } from '@/components/ui';
 import debounce from '@/util/debounce.js';
 import { markRaw } from 'vue';
+import { UPDATE_DEBOUNCE_MS } from './constants';
 
 export default {
     components: { Input, Text, Select },
@@ -66,7 +67,7 @@ export default {
         this.syncUrlDebounced = markRaw(debounce((url) => {
             this.update(url);
             this.updateMeta({ ...this.meta, initialUrl: url });
-        }, 150));
+        }, UPDATE_DEBOUNCE_MS));
     },
 
     computed: {

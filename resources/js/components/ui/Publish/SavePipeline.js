@@ -1,6 +1,7 @@
 import axios from 'axios';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import { reveal } from '@api';
+import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants';
 
 let container = null;
 let errors = null;
@@ -15,8 +16,8 @@ export class Pipeline {
     }
 
     async through(steps) {
-        // 150ms is the debounce time for fieldtype updates
-        const initialPromise = new Promise((resolve) => setTimeout(resolve, 151));
+        // Wait just past the fieldtype update debounce so any in-flight value updates are flushed first.
+        const initialPromise = new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 1));
 
         return [new Start(), ...steps, new Finish()].reduce(async (promise, step) => {
             const payload = await promise;
