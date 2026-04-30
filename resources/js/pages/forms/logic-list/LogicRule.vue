@@ -114,7 +114,7 @@ const collapsedSummaryParts = computed(() => {
 
     const marker = __('then go to');
     const markerIndex = summary.toLowerCase().indexOf(marker.toLowerCase());
-    const before = markerIndex === -1 ? summary : summary.slice(0, markerIndex + marker.length);
+    const before = (markerIndex === -1 ? summary : summary.slice(0, markerIndex + marker.length)).replace(/,/g, '');
     const after = markerIndex === -1 ? '' : summary.slice(markerIndex + marker.length).trimStart();
 
     const destinationHandle = after.trim().replace(/^(["'`]|[“”‘’])/, '').replace(/(["'`]|[“”‘’])$/, '');
