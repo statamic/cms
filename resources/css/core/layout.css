@@ -145,21 +145,31 @@ main.nav-closed {
 /* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
 =================================================== */
 /* Three panels exist */
-.main-content:has([data-left-panel], [data-right-panel]) {
-    display: flex;
+body:has(#global-header-slot) {
+    .main-content {
+        display: flex;
 
-    #content-card {
-        flex: 1;
+        #content-card {
+            flex: 1;
+        }
+
+        @media (max-width: 1000px) {
+            [data-max-width-wrapper] {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+            }
+        }
     }
 
-    @media (max-width: 1000px) {
-        [data-max-width-wrapper] {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-        }
+    /* Kill panel transitions for three-panel states because they're too sluggish */
+    #main,
+    .nav-main {
+        transition: unset;
     }
 }
 
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES / LEFT AND RIGHT PANEL QUERIES
+=================================================== */
 /* When the left panel exists, e.g. Form Builder with fields */
 
 /* If the left panel exists with content */
