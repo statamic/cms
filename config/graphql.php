@@ -29,6 +29,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Improved Types
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, fields like entries and terms can return dynamically
+    | generated union types when multiple blueprints are possible. Also will
+    | use non-nullable types for entries and terms.
+    |
+    */
+
+    'improved_types' => env('STATAMIC_GRAPHQL_IMPROVED_TYPES', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication
     |--------------------------------------------------------------------------
     |

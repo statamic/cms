@@ -458,6 +458,17 @@ class Entries extends Relationship
 
     public function toGqlType()
     {
+        // Fallback to old behaviour if improved types are disabled.
+        if (! config('statamic.graphql.improved_types', false)) {
+            $type = GraphQL::type('EntryInterface');
+
+            if ($this->config('max_items') !== 1) {
+                $type = GraphQL::listOf($type);
+            }
+
+            return $type;
+        }
+
         // If the fieldtype isn't constrained to specific collections, return the generic EntryInterface.
         if (empty($this->config('collections'))) {
             $type = GraphQL::type(EntryInterface::NAME);
