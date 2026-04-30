@@ -313,7 +313,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             size="sm"
                             variant="subtle"
                             class="-ms-2 mt-2 bg-transparent!"
-                            :text="__('+ Add Condition')"
+                            :text="__('+ Add Condition (The above badge should be an expandable form)')"
                         />
                     </div>
                 </div>
@@ -321,3 +321,9 @@ reveal.use(rootEl, () => emit('expanded'));
         </div>
     </div>
 </template>
+
+<style scoped>
+:deep(.logic-text-badge.logic-text__condition) {
+    margin-top: 0.5rem;
+}
+</style>

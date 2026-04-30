@@ -285,7 +285,7 @@ function sortIcon(column) {
                         :sets="remainingSetConfigs"
                         :show-connector="logicBlocks.length > 0"
                         :index="logicBlocks.length"
-                        :label="__('Add Rule')"
+                        :label="__('Add Email Notification')"
                         :is-first="logicBlocks.length === 0"
                         :loading-set="loadingSet"
                         :search-placeholder="__('Search Fields')"
