@@ -92,13 +92,13 @@ const metaPath = 'logic_rules';
 const sortableItemClass = 'logic-rule-block';
 const loadingSet = ref(null);
 const logicBlocks = ref([
-    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('equals Friend referral, then go to How long have you been a fan?') },
+    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('‘How did you hear about us’ equals Friend referral') },
 ]);
 const collapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});
 const meta = ref({});
 const setConfigs = [
-    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), icon: 'mail-sign-at', iconClass: 'bg-blue-50 text-blue-600 dark:bg-transparent dark:text-blue-400', fields: [] },
+    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), conditionDisplay: __('How did you hear about us?'), conditionIcon: 'fieldtype-select', conditionIconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', icon: 'mail-sign-at', iconClass: 'bg-blue-50 text-blue-600 dark:bg-transparent dark:text-blue-400', fields: [] },
     { handle: 'like_most', display: __('What do you like most about our band?'), icon: 'text-long', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
     { handle: 'fan_length', display: __('How long have you been a fan?'), icon: 'text-short', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
     { handle: 'favorite_album', display: __('Which album was your favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },

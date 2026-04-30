@@ -135,6 +135,16 @@ const showSecondaryCondition = computed(() => {
     return summary.includes(', and ') || summary.includes(' and ');
 });
 
+const initialConditionIcon = computed(() => {
+    if (props.config?.handle === 'heard_about_us') return 'fieldtype-select';
+    return props.config?.conditionIcon || props.config?.icon || 'fieldtype-radio';
+});
+
+const initialConditionIconClass = computed(() => {
+    if (props.config?.handle === 'heard_about_us') return 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400';
+    return props.config?.conditionIconClass || props.config?.iconClass || 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400';
+});
+
 const mockPresetByHandle = {
     heard_about_us: {
         logicOperator: 'equals',
@@ -228,16 +238,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         />
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Badge
-                        v-if="collapsed"
-                        pill
-                        size="sm"
-                        color="white"
-                        class="inline-block px-1.5 py-0 text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
-                        style="text-box: trim-start text;"
-                    >
-                        {{ __('If') }}
-                    </Badge>
+                    <Badge v-if="collapsed" pill size="sm" color="white">{{ __('if') }}</Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"
                         name="info-square"
@@ -287,9 +288,9 @@ reveal.use(rootEl, () => emit('expanded'));
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <div class="p-4">
                         <LogicFlowMock
-                            :initial-condition-label="__(config.display) || config.handle"
-                            :initial-condition-icon="config.icon || 'fieldtype-radio'"
-                            :initial-condition-icon-class="config.iconClass || 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400'"
+                            :initial-condition-label="__(config.conditionDisplay || config.display) || config.handle"
+                            :initial-condition-icon="initialConditionIcon"
+                            :initial-condition-icon-class="initialConditionIconClass"
                             :show-secondary-condition="showSecondaryCondition"
                             :mock-preset="mockPreset"
                         />
