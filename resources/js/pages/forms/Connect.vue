@@ -92,7 +92,7 @@ const metaPath = 'logic_rules';
 const sortableItemClass = 'logic-rule-block';
 const loadingSet = ref(null);
 const logicBlocks = ref([
-    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('‘How did you hear about us’ equals Friend referral') },
+    { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('How did you hear about us equals Friend referral') },
 ]);
 const collapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});

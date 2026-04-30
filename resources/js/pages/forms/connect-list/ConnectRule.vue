@@ -123,11 +123,23 @@ const collapsedSummaryParts = computed(() => {
             return { type: isOperator ? 'operator' : 'text', text: part };
         });
 
+    const answerLabel = __('Friend referral');
+    const partsWithAnswerClass = parts.flatMap((part) => {
+        if (part.type !== 'text' || !part.text?.includes(answerLabel)) return [part];
+
+        const [beforeAnswer, afterAnswer] = part.text.split(answerLabel);
+        const nextParts = [];
+        if (beforeAnswer) nextParts.push({ type: 'text', text: beforeAnswer });
+        nextParts.push({ type: 'answer', text: answerLabel });
+        if (afterAnswer) nextParts.push({ type: 'text', text: afterAnswer });
+        return nextParts;
+    });
+
     if (markerIndex !== -1) {
-        parts.push({ type: 'destination', text: destinationResolved });
+        partsWithAnswerClass.push({ type: 'destination', text: destinationResolved });
     }
 
-    return parts;
+    return partsWithAnswerClass;
 });
 
 const showSecondaryCondition = computed(() => {
@@ -260,6 +272,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                     {{ part.text }}
                                 </Badge>
                                 <template v-else-if="part.type === 'destination'"> ‘{{ part.text }}’ </template>
+                                <span v-else-if="part.type === 'answer'" class="font-mono text-[0.725rem]">{{ part.text }}</span>
                                 <template v-else>{{ part.text }}</template>
                             </template>
                         </template>
