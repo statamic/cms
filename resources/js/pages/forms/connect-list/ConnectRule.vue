@@ -7,6 +7,7 @@ import {
     DropdownItem,
     DropdownMenu,
     Icon,
+    Switch,
     Subheading,
     injectPublishContext as injectContainerContext,
 } from '@/components/ui';
@@ -34,7 +35,7 @@ const props = defineProps({
     showFieldPreviews: Boolean,
 });
 
-const { previews } = injectContainerContext();
+const { previews, setFieldValue } = injectContainerContext();
 const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
 
@@ -210,6 +211,10 @@ function toggleCollapsedState() {
     props.collapsed ? emit('expanded') : emit('collapsed');
 }
 
+function toggleEnabledState() {
+    setFieldValue(`${fieldPathPrefix.value}.enabled`, !props.enabled);
+}
+
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
 </script>
@@ -278,19 +283,27 @@ reveal.use(rootEl, () => emit('expanded'));
                         </template>
                     </Subheading>
                 </button>
-                <Dropdown>
-                    <template #trigger>
-                        <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open row actions')" />
-                    </template>
-                    <DropdownMenu>
-                        <DropdownItem
-                            :text="__('Delete row')"
-                            icon="trash"
-                            variant="destructive"
-                            @click="emit('removed')"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+                <div class="flex items-center gap-2" v-if="!readOnly">
+                    <Switch
+                        size="xs"
+                        :model-value="enabled"
+                        @update:model-value="toggleEnabledState"
+                        v-tooltip="enabled ? __('Email notification enabled') : __('Email notification disabled')"
+                    />
+                    <Dropdown>
+                        <template #trigger>
+                            <Button icon="dots" variant="ghost" size="xs" class="me-2" :aria-label="__('Open row actions')" />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem
+                                :text="__('Delete row')"
+                                icon="trash"
+                                variant="destructive"
+                                @click="emit('removed')"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
             </header>
 
             <div
