@@ -188,21 +188,24 @@ body:has(#global-header-slot) {
 
 /* If the left panel exists with content and the nav closes */
 #main:has([data-left-panel]:not(:empty)).nav-closed .main-content {
-    border-inline-start: 1px solid transparent;
+    /* border-inline-start: 1px solid transparent; */
     transition:
         /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
         box-shadow 0s ease-out 0.3s,
         border-inline-start 0s ease-out 0.3s
     ;
 }
-/* If the left panel exists with content and the nav opens */
-#main.nav-open:has([data-left-panel]:not(:empty)) {
-    /* Add separation between the nav and the left panel, when the nav is open */
-    .main-content {
-        @apply border-s border-content-border;
-        /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
-        transition: border-inline-start 0s ease-out 0.1s;
-        @apply shadow-xl dark:rounded-none;
+/* Make sure we're not switching tabs, because then we don't want to animate the border until things are stable. */
+html:not(.switching-global-header-slot) {
+    /* If the left panel exists with content and the nav opens */
+    #main.nav-open:has([data-left-panel]:not(:empty)) {
+        /* Add separation between the nav and the left panel, when the nav is open */
+        .main-content {
+            @apply border-s border-content-border;
+            /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
+            transition: border-inline-start 0s ease-out 0.1s;
+            @apply shadow-xl dark:rounded-none;
+        }
     }
 }
 
