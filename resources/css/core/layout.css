@@ -161,10 +161,13 @@ body:has(#global-header-slot) {
         }
     }
 
-    /* Kill panel transitions for three-panel states because they're too sluggish */
-    #main,
-    .nav-main {
-        transition: unset;
+    /* Only as we switch to a different tab. After that we essentially want to restore the transition. */
+    .switching-global-header-slot & {
+        /* Kill panel transitions for three-panel states because they're too sluggish */
+        #main,
+        .nav-main {
+            transition: unset;
+        }
     }
 }
 

@@ -25,6 +25,22 @@ const closeMobileNavPopover = () => {
     const popover = document.getElementById('popover-global-header-nav');
     popover?.hidePopover?.();
 };
+
+const switchingGlobalHeaderSlotClass = 'switching-global-header-slot';
+let switchingGlobalHeaderSlotTimeoutId = null;
+const switchingGlobalHeaderSlotDuration = 350;
+
+const markSwitchingGlobalHeaderSlot = () => {
+    if (switchingGlobalHeaderSlotTimeoutId) {
+        window.clearTimeout(switchingGlobalHeaderSlotTimeoutId);
+    }
+
+    document.documentElement.classList.add(switchingGlobalHeaderSlotClass);
+
+    switchingGlobalHeaderSlotTimeoutId = window.setTimeout(() => {
+        document.documentElement.classList.remove(switchingGlobalHeaderSlotClass);
+    }, switchingGlobalHeaderSlotDuration);
+};
 </script>
 
 <template>
@@ -46,7 +62,7 @@ const closeMobileNavPopover = () => {
                                 :href="navItem.href"
                                 :class="{ active: isActive(navItem.href) }"
                                 :aria-current="isActive(navItem.href) ? 'page' : undefined"
-                                @click="closeMobileNavPopover"
+                                @click="markSwitchingGlobalHeaderSlot(); closeMobileNavPopover()"
                             >
                                 {{ navItem.label }}
                             </Link>
@@ -62,6 +78,7 @@ const closeMobileNavPopover = () => {
                             :href="navItem.href"
                             :class="{ active: isActive(navItem.href) }"
                             :aria-current="isActive(navItem.href) ? 'page' : undefined"
+                            @click="markSwitchingGlobalHeaderSlot"
                         >
                             {{ navItem.label }}
                         </Link>
