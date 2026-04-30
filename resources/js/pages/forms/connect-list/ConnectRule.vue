@@ -305,6 +305,8 @@ reveal.use(rootEl, () => emit('expanded'));
                             :initial-condition-icon="initialConditionIcon"
                             :initial-condition-icon-class="initialConditionIconClass"
                             :show-secondary-condition="showSecondaryCondition"
+                            :destination-step-label="__('Send an email to jack@statamic.com')"
+                            :show-destination-selector="false"
                             :mock-preset="mockPreset"
                         />
                         <Button

@@ -23,6 +23,14 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    destinationStepLabel: {
+        type: String,
+        default: null,
+    },
+    showDestinationSelector: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const logicOperator = ref(props.mockPreset.logicOperator || 'equals');
@@ -140,9 +148,9 @@ const optionChipIconClasses = (option) => {
 
             <li>
                 <div class="logic-text-badge logic-text__condition" aria-hidden="true">
-                    {{ __('Then go to …') }}
+                    {{ props.destinationStepLabel || __('Then go to …') }}
                 </div>
-                <ol>
+                <ol v-if="props.showDestinationSelector">
                     <li>
                         <Combobox
                             v-model="logicDestination"
@@ -309,9 +317,9 @@ const optionChipIconClasses = (option) => {
 
             <li>
                 <div class="logic-text-badge logic-text__condition" aria-hidden="true">
-                    {{ __('Then go to …') }}
+                    {{ props.destinationStepLabel || __('Then go to …') }}
                 </div>
-                <ol>
+                <ol v-if="props.showDestinationSelector">
                     <li>
                         <Combobox
                             v-model="logicDestination"
