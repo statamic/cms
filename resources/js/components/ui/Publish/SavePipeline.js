@@ -15,6 +15,9 @@ export class Pipeline {
     }
 
     async through(steps) {
+        // 150ms is the debounce time for fieldtype updates
+        const initialPromise = new Promise((resolve) => setTimeout(resolve, 151));
+
         return [new Start(), ...steps, new Finish()].reduce(async (promise, step) => {
             const payload = await promise;
 
@@ -32,10 +35,6 @@ export class Pipeline {
         }, initialPromise);
     }
 }
-
-const initialPromise = new Promise((resolve) => {
-    setTimeout(() => resolve(), 151); // 150ms is the debounce time for fieldtype updates
-});
 
 export class PipelineStopped extends Error {
     constructor(payload) {
