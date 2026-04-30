@@ -58,6 +58,13 @@ const operatorLabels = [
     __('and'),
     __('or'),
 ];
+const valueOperators = new Set([
+    __('does not equal').toLowerCase(),
+    __('is greater than').toLowerCase(),
+    __('is less than').toLowerCase(),
+    __('equals').toLowerCase(),
+    __('contains').toLowerCase(),
+]);
 
 const previewText = computed(() => {
     return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
@@ -123,11 +130,38 @@ const collapsedSummaryParts = computed(() => {
             return { type: isOperator ? 'operator' : 'text', text: part };
         });
 
+    const markerLower = marker.toLowerCase();
+    const partsWithValueSegments = [];
+
+    parts.forEach((part, index) => {
+        const previous = parts[index - 1];
+        const followsOperator = previous?.type === 'operator' && part.type === 'text';
+        const shouldTreatAsValueSegment = followsOperator && valueOperators.has(previous.text.toLowerCase());
+
+        if (!shouldTreatAsValueSegment) {
+            partsWithValueSegments.push(part);
+            return;
+        }
+
+        const markerInPart = part.text.toLowerCase().indexOf(markerLower);
+
+        if (markerInPart === -1) {
+            partsWithValueSegments.push({ type: 'operatorValue', text: part.text });
+            return;
+        }
+
+        const valueText = part.text.slice(0, markerInPart).trimEnd();
+        const trailingText = part.text.slice(markerInPart);
+
+        if (valueText) partsWithValueSegments.push({ type: 'operatorValue', text: valueText });
+        if (trailingText) partsWithValueSegments.push({ type: 'text', text: trailingText });
+    });
+
     if (markerIndex !== -1) {
-        parts.push({ type: 'destination', text: destinationResolved });
+        partsWithValueSegments.push({ type: 'destination', text: destinationResolved });
     }
 
-    return parts;
+    return partsWithValueSegments;
 });
 
 const showSecondaryCondition = computed(() => {
@@ -235,7 +269,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         class="size-3.5! text-gray-500"
                         v-tooltip="__(config.instructions)"
                     />
-                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
+                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5! lowercase">
                         <span v-if="collapsedPreviewText" v-html="collapsedPreviewText" />
                         <template v-else>
                             <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
@@ -249,7 +283,10 @@ reveal.use(rootEl, () => emit('expanded'));
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <template v-else-if="part.type === 'destination'"> ‘{{ part.text }}’ </template>
+                                <template v-else-if="part.type === 'destination'">&nbsp;{{ part.text }}</template>
+                                <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.725rem]">
+                                    {{ part.text }}
+                                </span>
                                 <template v-else>{{ part.text }}</template>
                             </template>
                         </template>

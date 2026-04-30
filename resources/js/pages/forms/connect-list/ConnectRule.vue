@@ -257,7 +257,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         class="size-3.5! text-gray-500"
                         v-tooltip="__(config.instructions)"
                     />
-                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5!">
+                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5! lowercase">
                         <span v-if="collapsedPreviewText" v-html="collapsedPreviewText" />
                         <template v-else>
                             <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
@@ -271,7 +271,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <template v-else-if="part.type === 'destination'"> ‘{{ part.text }}’ </template>
+                                <template v-else-if="part.type === 'destination'">&nbsp;{{ part.text }}</template>
                                 <span v-else-if="part.type === 'answer'" class="font-mono text-[0.725rem]">{{ part.text }}</span>
                                 <template v-else>{{ part.text }}</template>
                             </template>
