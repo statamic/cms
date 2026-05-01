@@ -175,8 +175,8 @@ main.nav-closed {
     @apply dark:border-s dark:border-content-border dark:rounded-none;
 }
 
-/* If the left panel exists with content and the nav closes */
-#main:has([data-left-panel]:not(:empty)).nav-closed .main-content {
+/* We need this CSS when transitioning the left panel to reveal the sidebar nav. Technically this border should only exist when we have three panels and the nav closes, but querying that is too slow and causes a 1px border layout shift - so instead we just always apply it and hope no one notices the 1px discrepancy when the nav is closed. */
+.main-content {
     border-inline-start: 1px solid transparent;
     transition:
         /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
@@ -184,6 +184,7 @@ main.nav-closed {
         border-inline-start 0s ease-out 0.3s
     ;
 }
+
 /* If the left panel exists with content and the nav opens */
 #main.nav-open:has([data-left-panel]:not(:empty)) {
     /* Add separation between the nav and the left panel, when the nav is open */
