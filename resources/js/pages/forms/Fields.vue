@@ -513,13 +513,22 @@ const notificationOptions = [
         </Header>
 
         <div
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-3"
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-8"
+            role="separator"
+            :aria-label="__('Page :current of :total', { current: 1, total: formPageTotal })"
             data-form-page-label
             data-form-page="1"
         >
-            <p id="form-page-1-label" class="text-2xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {{ __('Page :current of :total', { current: 1, total: formPageTotal }) }}
-            </p>
+            <div class="flex items-center gap-4 cursor-pointer">
+                <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
+                <div
+                    class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                >
+                    <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                    {{ __('Page :current of :total', { current: 1, total: formPageTotal }) }}
+                </div>
+                <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
+            </div>
         </div>
 
         <Panel
@@ -824,28 +833,20 @@ const notificationOptions = [
         <div
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-8"
             role="separator"
-            :aria-label="__('Page Break')"
+            :aria-label="__('Page :current of :total', { current: 2, total: formPageTotal })"
+            data-form-page-label
+            data-form-page="2"
         >
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 cursor-pointer">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                    {{ __('Page Break') }}
+                    {{ __('Page :current of :total', { current: 2, total: formPageTotal }) }}
                 </div>
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>
-        </div>
-
-        <div
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-3"
-            data-form-page-label
-            data-form-page="2"
-        >
-            <p id="form-page-2-label" class="text-2xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {{ __('Page :current of :total', { current: 2, total: formPageTotal }) }}
-            </p>
         </div>
 
         <Panel
