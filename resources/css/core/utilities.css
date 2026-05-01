@@ -380,7 +380,7 @@
     }
     .dark &::before {
         --c1: var(--color-gray-800);
-        opacity: 0.45;
+        opacity: 0.35;
     }
 }
 

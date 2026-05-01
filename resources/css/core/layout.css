@@ -167,17 +167,13 @@ main.nav-closed {
     }
 }
 
-/* When the left panel exists, e.g. Form Builder with fields */
-
-/* If the left panel exists with content */
-.main-content:has([data-left-panel]:not(:empty)) {
-    .content-card {
-        @apply dark:border-s dark:border-content-border dark:rounded-none;
+[data-left-panel] {
+    [data-resize-handle] {
+        @apply dark:border-e dark:border-content-border;
     }
 }
-/* If the right panel exists with content */
-#main [data-right-panel]:not(:empty) {
-    @apply dark:border-s dark:border-content-border dark:rounded-none;
+[data-right-panel] {
+    @apply dark:border-s dark:border-content-border;
 }
 
 /* We need this CSS when transitioning the left panel to reveal the sidebar nav. Technically this border should only exist when we have three panels and the nav closes, but querying that is too slow and causes a 1px border layout shift - so instead we just always apply it and hope no one notices the 1px discrepancy when the nav is closed. */
@@ -206,7 +202,7 @@ main.nav-closed {
 .global-header-slot {
     position: relative;
     background: var(--color-gray-950);
-    @apply rounded-lg;
+    @apply rounded-lg dark:bg-gray-925;
 
     /* When .global-header-slot has stuff */
     header:has(&:not(:empty)) {

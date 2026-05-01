@@ -24,6 +24,7 @@ export default function useResizable() {
                     }
 
                     const handle = document.createElement('div');
+                    handle.dataset.resizeHandle = '';
                     handle.style.position = 'absolute';
                     handle.style.top = '0';
                     handle.style.bottom = '0';

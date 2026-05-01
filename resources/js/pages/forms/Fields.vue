@@ -801,7 +801,7 @@ const notificationOptions = [
                         <Button
                             variant="primary"
                             @click.prevent
-                            class="hover:cursor-not-allowed"
+                            class="hover:cursor-not-allowed border-0! dark:border-0! ring-0! shadow-none!"
                             style="--theme-color-primary: var(--theme-color-gray-950)"
                             :text="__('Submit')"
                         />
