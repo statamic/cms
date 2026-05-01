@@ -160,6 +160,11 @@ main.nav-closed {
             grid-template-columns: auto 1fr auto;
         }
     }
+
+    &:has([data-fieldset-label]) [data-ui-panel] {
+        /* UI panels should be slightly narrower on mobile, less fieldset indicators will hang off the edge of the screen */
+        @apply max-sm:w-[96%];
+    }
 }
 
 /* When the left panel exists, e.g. Form Builder with fields */

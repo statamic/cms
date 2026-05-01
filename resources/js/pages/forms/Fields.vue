@@ -646,7 +646,7 @@ const notificationOptions = [
                                     </Label>
                                 </template>
                                 <!-- TODO: Add logic tree icon for fields with logic -->
-                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 max-sm:-right-2 sm:-left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                 <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
                             </Field>
                         </div>
@@ -661,7 +661,7 @@ const notificationOptions = [
                                         </span>
                                     </Label>
                                 </template>
-                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 -left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                <Icon data-logic-attached name="logic-tree" class="absolute z-(--z-index-above) top-1 max-sm:-right-2 sm:-left-14 size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                 <Input id="fan-length-field" v-model="fanLength" />
                             </Field>
                         </div>
