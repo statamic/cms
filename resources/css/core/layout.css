@@ -10,6 +10,7 @@
     body:has([data-toggle-nav-button]:hover) & {
         /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
         transition: inset 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        will-change: inset, box-shadow;
     }
     /* On mobile, hide by default and overlay on top */
     z-index: var(--z-index-draggable);
@@ -129,6 +130,7 @@ main {
     body:has([data-toggle-nav-button]:hover) & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
         transition: padding 0.3s ease-in-out;
+        will-change: padding;
     }
 }
 
