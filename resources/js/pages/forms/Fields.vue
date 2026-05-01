@@ -513,7 +513,7 @@ const notificationOptions = [
         </Header>
 
         <div
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-8"
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-4 mb-4 -mt-2"
             role="separator"
             :aria-label="__('Page :current of :total', { current: 1, total: formPageTotal })"
             data-form-page-label
@@ -831,7 +831,7 @@ const notificationOptions = [
         </Panel>
 
         <div
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-8"
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 mt-12"
             role="separator"
             :aria-label="__('Page :current of :total', { current: 2, total: formPageTotal })"
             data-form-page-label
