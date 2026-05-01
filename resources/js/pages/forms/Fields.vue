@@ -17,6 +17,7 @@ const props = defineProps({
 });
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
+const formPageTotal = 2;
 const activeSettingsTab = ref('settings');
 const age = ref(null);
 const fanLength = ref('');
@@ -511,6 +512,16 @@ const notificationOptions = [
             </template>
         </Header>
 
+        <div
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-3"
+            data-form-page-label
+            data-form-page="1"
+        >
+            <p id="form-page-1-label" class="text-2xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {{ __('Page :current of :total', { current: 1, total: formPageTotal }) }}
+            </p>
+        </div>
+
         <Panel
             class="mx-auto max-w-5xl mb-6"
             :class="{ 'pb-0': introSectionCollapsed }"
@@ -825,6 +836,16 @@ const notificationOptions = [
                 </div>
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>
+        </div>
+
+        <div
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-3"
+            data-form-page-label
+            data-form-page="2"
+        >
+            <p id="form-page-2-label" class="text-2xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {{ __('Page :current of :total', { current: 2, total: formPageTotal }) }}
+            </p>
         </div>
 
         <Panel
