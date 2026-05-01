@@ -28,6 +28,23 @@ function deferred() {
     return { promise, resolve, reject };
 }
 
+function signalAwareDeferred() {
+    const d = deferred();
+    return {
+        promise: d.promise,
+        resolve: d.resolve,
+        reject: d.reject,
+        attach(signal) {
+            if (!signal) return;
+            signal.addEventListener('abort', () => {
+                const err = new Error('canceled');
+                err.__CANCEL__ = true;
+                d.reject(err);
+            });
+        },
+    };
+}
+
 function mountInput({ axiosPost, itemDataUrl, site = 'default' }) {
     return mount(RelationshipInput, {
         props: {
@@ -136,6 +153,65 @@ describe('RelationshipInput in-flight request deduplication', () => {
 
         a.unmount();
         b.unmount();
+    });
+
+    test('leader changing selections mid-flight does not abort the shared request for followers', async () => {
+        const d1 = signalAwareDeferred();
+        const d2 = signalAwareDeferred();
+        const post = vi.fn((url, body, config) => {
+            const next = post.mock.calls.length === 1 ? d1 : d2;
+            next.attach(config?.signal);
+            return next.promise;
+        });
+
+        const a = mountInput({ axiosPost: post, itemDataUrl: '/test/leader-changes' });
+        const b = mountInput({ axiosPost: post, itemDataUrl: '/test/leader-changes' });
+
+        a.vm.getDataForSelections(['1']);
+        b.vm.getDataForSelections(['1']);
+        await flushPromises();
+        expect(post).toHaveBeenCalledTimes(1);
+
+        a.vm.getDataForSelections(['2']);
+        await flushPromises();
+        expect(post).toHaveBeenCalledTimes(2);
+
+        d1.resolve({ data: { data: [{ id: '1' }] } });
+        await flushPromises();
+        expect(b.emitted('item-data-updated')).toBeTruthy();
+        expect(b.emitted('item-data-updated')[0]).toEqual([[{ id: '1' }]]);
+
+        d2.resolve({ data: { data: [{ id: '2' }] } });
+        await flushPromises();
+        expect(a.emitted('item-data-updated')).toBeTruthy();
+        expect(a.emitted('item-data-updated').at(-1)).toEqual([[{ id: '2' }]]);
+
+        a.unmount();
+        b.unmount();
+    });
+
+    test('aborts the shared request when the last subscriber detaches', async () => {
+        const d = signalAwareDeferred();
+        const post = vi.fn((url, body, config) => {
+            d.attach(config?.signal);
+            return d.promise;
+        });
+
+        const a = mountInput({ axiosPost: post, itemDataUrl: '/test/abort-last' });
+        const b = mountInput({ axiosPost: post, itemDataUrl: '/test/abort-last' });
+
+        a.vm.getDataForSelections(['1']);
+        b.vm.getDataForSelections(['1']);
+        await flushPromises();
+        expect(post).toHaveBeenCalledTimes(1);
+
+        a.unmount();
+        await flushPromises();
+
+        b.unmount();
+        await flushPromises();
+
+        await expect(d.promise).rejects.toMatchObject({ __CANCEL__: true });
     });
 
     test('cache entry clears after settle so a later identical request fires fresh', async () => {
