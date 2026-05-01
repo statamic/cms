@@ -35,13 +35,12 @@ class TwoFactorSetupTest extends TestCase
     }
 
     #[Test]
-    public function redirect_url_is_referer()
+    public function redirect_url_is_intended_url()
     {
         $this
             ->actingAs($this->user())
-            ->get(cp_route('two-factor-setup', [
-                'referer' => 'http://localhost/cp/collections',
-            ]))
+            ->withSession(['url.intended' => 'http://localhost/cp/collections'])
+            ->get(cp_route('two-factor-setup'))
             ->assertInertia(fn ($page) => $page->where('redirect', 'http://localhost/cp/collections'));
     }
 
@@ -52,7 +51,7 @@ class TwoFactorSetupTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->withSession(['login.redirect' => '/dashboard'])
+            ->withSession(['url.intended' => '/dashboard'])
             ->get(route('statamic.two-factor-setup'))
             ->assertInertia(fn ($page) => $page->where('redirect', '/dashboard'));
 

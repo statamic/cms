@@ -221,7 +221,7 @@ class TwoFactorSetupFormTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_login_redirect_from_session_when_redirect_param_is_empty()
+    public function it_uses_intended_url_from_session_when_redirect_param_is_empty()
     {
         $user = $this->userWithTwoFactorPending();
 
@@ -229,7 +229,7 @@ class TwoFactorSetupFormTest extends TestCase
             ->actingAs($user)
             ->session([
                 'statamic_elevated_session' => now()->timestamp,
-                'login.redirect' => '/account',
+                'url.intended' => '/account',
             ])
             ->post(route('statamic.users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
