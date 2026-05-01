@@ -37,7 +37,10 @@ const introSectionCollapsed = ref(false);
 const introFanName = ref('');
 const introCity = ref('');
 const introSeenLive = ref(null);
-const totalFieldCount = computed(() => 11);
+const postPageSectionCollapsed = ref(false);
+const postPageEmail = ref('');
+const postPageFinalNote = ref('');
+const totalFieldCount = computed(() => 13);
 const introSeenLiveOptions = [
     { label: __('Yes'), value: 'yes' },
     { label: __('Not yet'), value: 'no' },
@@ -536,7 +539,7 @@ const notificationOptions = [
                             <template #label>
                                 <Label for="intro-name-field">
                                     <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                        <Icon name="user-avatar-flush" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400" aria-hidden="true" />
                                         {{ __('What should we call you?') }}
                                         <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
                                     </span>
@@ -649,7 +652,7 @@ const notificationOptions = [
                         </div>
 
                         <div id="fieldset-end">
-                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate.')">
+                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate')">
                                 <template #label>
                                     <Label for="fan-length-field">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -810,7 +813,7 @@ const notificationOptions = [
         <div
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-6"
             role="separator"
-            :aria-label="__('Page break')"
+            :aria-label="__('Page Break')"
         >
             <div class="flex items-center gap-4">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
@@ -818,13 +821,69 @@ const notificationOptions = [
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                    {{ __('Page break') }}
+                    {{ __('Page Break') }}
                 </div>
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>
         </div>
 
-        <p class="mx-auto max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300">
+        <Panel
+            class="mx-auto max-w-5xl mb-6"
+            :class="{ 'pb-0': postPageSectionCollapsed }"
+            :data-panel-collapsed="postPageSectionCollapsed ? 'true' : 'false'"
+        >
+            <PanelHeader class="relative flex items-center justify-between">
+                <Heading :text="__('Before you go')" />
+                <Button
+                    @click="postPageSectionCollapsed = !postPageSectionCollapsed"
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="postPageSectionCollapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                />
+            </PanelHeader>
+
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! invisible! overflow-clip': postPageSectionCollapsed }"
+            >
+                <Card>
+                    <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                        <Field id="post-page-email-field" :label="__('Where should we send your confirmation?')" required>
+                            <template #label>
+                                <Label for="post-page-email-field">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="mail-sign-at" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400" aria-hidden="true" />
+                                        {{ __('Where should we send your confirmation?') }}
+                                        <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                    </span>
+                                </Label>
+                            </template>
+                            <Input id="post-page-email-field" v-model="postPageEmail" type="email" :placeholder="__('you@example.com')" />
+                        </Field>
+
+                        <Field id="post-page-note-field" :label="__('Anything else we should know?')" :instructions="__('Song requests, accessibility needs, or shout-outs for the crew (optional)')">
+                            <template #label>
+                                <Label for="post-page-note-field">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                        {{ __('Anything else we should know?') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <Textarea id="post-page-note-field" v-model="postPageFinalNote" :rows="3" resize="vertical" />
+                        </Field>
+                    </div>
+                </Card>
+            </div>
+        </Panel>
+
+        <p
+            v-if="fieldView === 'collapsed'"
+            class="mx-auto text-center max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300"
+        >
             <strong>{{ totalFieldCount }}</strong> {{ __n('field on this form|fields on this form', totalFieldCount) }}
         </p>
     </div>
