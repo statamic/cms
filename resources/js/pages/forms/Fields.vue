@@ -907,7 +907,7 @@ const notificationOptions = [
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                         <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
-                            <TabTrigger name="logic" :text="__('Logic')" />
+                            <TabTrigger name="conditions" :text="__('Conditions')" />
                             <TabTrigger name="validation" :text="__('Validation')" />
                         </TabList>
 
@@ -950,7 +950,7 @@ const notificationOptions = [
                                 </Field>
                             </div>
                         </TabContent>
-                        <TabContent name="logic">
+                        <TabContent name="conditions">
                             <div class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
                                     <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
@@ -980,7 +980,7 @@ const notificationOptions = [
             <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger name="settings" :text="__('Settings')" />
-                    <TabTrigger name="logic" :text="__('Logic')" />
+                    <TabTrigger name="conditions" :text="__('Conditions')" />
                     <TabTrigger name="validation" :text="__('Validation')" />
                 </TabList>
 
@@ -1059,7 +1059,7 @@ const notificationOptions = [
                         </Field> -->
                     </div>
                 </TabContent>
-                <TabContent name="logic">
+                <TabContent name="conditions">
                     <div class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2.5">
                             <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
