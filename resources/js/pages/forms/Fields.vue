@@ -811,7 +811,7 @@ const notificationOptions = [
         </Panel>
 
         <div
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-6"
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-8"
             role="separator"
             :aria-label="__('Page Break')"
         >
