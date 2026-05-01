@@ -108,6 +108,8 @@ import { Button, Icon, Stack } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
+const inFlightRequests = new Map();
+
 export default {
     props: {
         canCreate: { type: Boolean },
@@ -246,7 +248,7 @@ export default {
 
     created() {
         this.removeNavigationListener = router.on('before', () => {
-            if (this.abortController) this.abortController.abort();
+            if (this.abortController && this._ownsRequest) this.abortController.abort();
         });
     },
 
@@ -260,7 +262,7 @@ export default {
     },
 
     beforeUnmount() {
-        if (this.abortController) this.abortController.abort();
+        if (this.abortController && this._ownsRequest) this.abortController.abort();
         if (this.removeNavigationListener) this.removeNavigationListener();
         if (this.sortable) {
             this.sortable.destroy();
@@ -331,8 +333,18 @@ export default {
             if (this.abortController) this.abortController.abort();
             this.abortController = new AbortController();
 
-            return this.$axios
+            const cacheKey = this.itemDataUrl + '|' + (this.site || '') + '|' + JSON.stringify(selections?.slice().sort());
+            const existing = inFlightRequests.get(cacheKey);
+
+            this._ownsRequest = !existing;
+
+            const request = existing ?? this.$axios
                 .post(this.itemDataUrl, { site: this.site, selections }, { signal: this.abortController.signal })
+                .finally(() => inFlightRequests.delete(cacheKey));
+
+            if (!existing) inFlightRequests.set(cacheKey, request);
+
+            return request
                 .then((response) => {
                     this.$emit('item-data-updated', response.data.data);
                 })
