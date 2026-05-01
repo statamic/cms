@@ -6,8 +6,8 @@
     @apply h-[calc(100vh-3.5rem)];
     @apply overflow-y-auto fixed top-14 start-0 w-48;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
-    /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
-    .page-fully-loaded & {
+    /* Only allow a transition when we're interacting with the nav otherwise we'll see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
+    body:has([data-toggle-nav-button]:hover) & {
         /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
         transition: inset 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
@@ -125,8 +125,8 @@
 
 main {
     @apply ps-0 lg:ps-46;
-    /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
-    .page-fully-loaded & {
+    /* Only allow a transition when we're interacting with the nav otherwise we'll see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
+    body:has([data-toggle-nav-button]:hover) & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
         transition: padding 0.3s ease-in-out;
     }
