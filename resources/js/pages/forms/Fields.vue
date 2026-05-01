@@ -33,7 +33,16 @@ const settingsPlaceholder = ref('');
 const settingsCharacterLimit = ref(null);
 const fieldView = ref('expanded');
 const panelCollapsed = ref(false);
-const totalFieldCount = computed(() => 8);
+const introSectionCollapsed = ref(false);
+const introFanName = ref('');
+const introCity = ref('');
+const introSeenLive = ref(null);
+const totalFieldCount = computed(() => 11);
+const introSeenLiveOptions = [
+    { label: __('Yes'), value: 'yes' },
+    { label: __('Not yet'), value: 'no' },
+    { label: __('Planning my first'), value: 'planning' },
+];
 const heardAboutOptions = [
     { label: __('Instagram'), value: 'instagram' },
     { label: __('Friend referral'), value: 'referral' },
@@ -498,6 +507,78 @@ const notificationOptions = [
                 </ToggleGroup>
             </template>
         </Header>
+
+        <Panel
+            class="mx-auto max-w-5xl mb-6"
+            :class="{ 'pb-0': introSectionCollapsed }"
+            :data-panel-collapsed="introSectionCollapsed ? 'true' : 'false'"
+        >
+            <PanelHeader class="relative flex items-center justify-between">
+                <Heading :text="__('Getting started')" />
+                <Button
+                    @click="introSectionCollapsed = !introSectionCollapsed"
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="introSectionCollapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                />
+            </PanelHeader>
+
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! invisible! overflow-clip': introSectionCollapsed }"
+            >
+                <Card>
+                    <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                        <Field id="intro-name-field" :label="__('What should we call you?')" required>
+                            <template #label>
+                                <Label for="intro-name-field">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                        {{ __('What should we call you?') }}
+                                        <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                    </span>
+                                </Label>
+                            </template>
+                            <Input id="intro-name-field" v-model="introFanName" :placeholder="__('Your name')" />
+                        </Field>
+
+                        <Field id="intro-city-field" :label="__('Where are you joining us from?')" :instructions="__('City or region is enough (we use this for tour and timezone hints)')">
+                            <template #label>
+                                <Label for="intro-city-field">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-purple-50 text-purple-500 dark:bg-purple-950 dark:text-purple-400" aria-hidden="true" />
+                                        {{ __('Where are you joining us from?') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <Input id="intro-city-field" v-model="introCity" :placeholder="__('e.g. Nashville')" />
+                        </Field>
+
+                        <Field id="intro-seen-live-field" :label="__('Have you seen us live before?')">
+                            <template #label>
+                                <Label for="intro-seen-live-field">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 me-1 rounded-sm bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400" aria-hidden="true" />
+                                        {{ __('Have you seen us live before?') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <Select
+                                id="intro-seen-live-field"
+                                v-model="introSeenLive"
+                                :options="introSeenLiveOptions"
+                                option-label="label"
+                                option-value="value"
+                                :placeholder="__('Choose one')"
+                            />
+                        </Field>
+                    </div>
+                </Card>
+            </div>
+        </Panel>
 
         <Panel
             class="mx-auto max-w-5xl"
