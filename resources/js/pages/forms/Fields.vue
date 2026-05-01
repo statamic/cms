@@ -513,7 +513,7 @@ const notificationOptions = [
         </Header>
 
         <div
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-4 mb-4 -mt-2"
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
             role="separator"
             :aria-label="__('Page :current of :total', { current: 1, total: formPageTotal })"
             data-form-page-label
@@ -817,14 +817,6 @@ const notificationOptions = [
                         </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
                         </Field>
-
-                        <Button
-                            variant="primary"
-                            @click.prevent
-                            class="hover:cursor-not-allowed border-0! dark:border-0! ring-0! shadow-none!"
-                            style="--theme-color-primary: var(--theme-color-gray-950)"
-                            :text="__('Submit')"
-                        />
                     </div>
                 </Card>
             </div>
@@ -897,6 +889,14 @@ const notificationOptions = [
                             </template>
                             <Textarea id="post-page-note-field" v-model="postPageFinalNote" :rows="3" resize="vertical" />
                         </Field>
+
+                        <Button
+                            variant="primary"
+                            @click.prevent
+                            class="hover:cursor-not-allowed border-0! dark:border-0! ring-0! shadow-none!"
+                            style="--theme-color-primary: var(--theme-color-gray-950)"
+                            :text="__('Submit')"
+                        />
                     </div>
                 </Card>
             </div>
