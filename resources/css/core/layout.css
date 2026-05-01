@@ -145,34 +145,21 @@ main.nav-closed {
 /* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
 =================================================== */
 /* Three panels exist */
-body:has(#global-header-slot) {
-    .main-content {
-        display: flex;
+.main-content:has([data-left-panel], [data-right-panel]) {
+    display: flex;
 
-        #content-card {
-            flex: 1;
-        }
-
-        @media (max-width: 1000px) {
-            [data-max-width-wrapper] {
-                display: grid;
-                grid-template-columns: auto 1fr auto;
-            }
-        }
+    #content-card {
+        flex: 1;
     }
 
-    /* Only as we switch to a different tab. After that we essentially want to restore the transition. */
-    .switching-global-header-slot & {
-        /* Kill panel transitions for three-panel states because they're too sluggish */
-        #main,
-        .nav-main {
-            transition: unset;
+    @media (max-width: 1000px) {
+        [data-max-width-wrapper] {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
         }
     }
 }
 
-/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES / LEFT AND RIGHT PANEL QUERIES
-=================================================== */
 /* When the left panel exists, e.g. Form Builder with fields */
 
 /* If the left panel exists with content */
@@ -188,24 +175,21 @@ body:has(#global-header-slot) {
 
 /* If the left panel exists with content and the nav closes */
 #main:has([data-left-panel]:not(:empty)).nav-closed .main-content {
-    /* border-inline-start: 1px solid transparent; */
+    border-inline-start: 1px solid transparent;
     transition:
         /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
         box-shadow 0s ease-out 0.3s,
         border-inline-start 0s ease-out 0.3s
     ;
 }
-/* Make sure we're not switching tabs, because then we don't want to animate the border until things are stable. */
-html:not(.switching-global-header-slot) {
-    /* If the left panel exists with content and the nav opens */
-    #main.nav-open:has([data-left-panel]:not(:empty)) {
-        /* Add separation between the nav and the left panel, when the nav is open */
-        .main-content {
-            @apply border-s border-content-border;
-            /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
-            transition: border-inline-start 0s ease-out 0.1s;
-            @apply shadow-xl dark:rounded-none;
-        }
+/* If the left panel exists with content and the nav opens */
+#main.nav-open:has([data-left-panel]:not(:empty)) {
+    /* Add separation between the nav and the left panel, when the nav is open */
+    .main-content {
+        @apply border-s border-content-border;
+        /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
+        transition: border-inline-start 0s ease-out 0.1s;
+        @apply shadow-xl dark:rounded-none;
     }
 }
 
