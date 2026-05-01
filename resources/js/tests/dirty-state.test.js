@@ -68,10 +68,8 @@ test('popstate prompts the user when the form is dirty', () => {
 test('cancelling the prompt re-pushes the dirty page state and keeps form dirty', () => {
     const { add, count } = useDirtyState();
 
-    // Capture the dirty page's URL/state via inertia:navigate
+    // The dirty URL/state is captured at the moment add() is called.
     window.history.replaceState({ page: 'B', url: '/b' }, '', '/b');
-    document.dispatchEvent(new CustomEvent('inertia:navigate'));
-
     add('entry');
 
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);

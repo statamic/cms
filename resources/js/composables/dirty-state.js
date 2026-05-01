@@ -3,8 +3,8 @@ import { router } from '@inertiajs/vue3';
 
 const dirty = ref([]);
 let inertiaWarningListener = null;
-let lastUrl = typeof window !== 'undefined' ? window.location.href : null;
-let lastState = typeof window !== 'undefined' ? window.history.state : null;
+let dirtyUrl = null;
+let dirtyState = null;
 
 function names() {
     return dirty.value;
@@ -20,6 +20,10 @@ function count() {
 
 function add(name) {
     if (dirty.value.indexOf(name) == -1) {
+        if (! dirty.value.length) {
+            dirtyUrl = window.location.href;
+            dirtyState = window.history.state;
+        }
         dirty.value = [...dirty.value, name];
     }
 }
@@ -64,14 +68,6 @@ function disableWarning() {
 // to ensure our listener runs first and can block Inertia via
 // `stopImmediatePropagation()`. See statamic/cms#14055.
 if (typeof window !== 'undefined') {
-    // Track Inertia's current URL/state so we can re-push it if the user cancels
-    // a back navigation. By the time popstate fires, window.location/state are
-    // already the previous page's, so we have to capture this proactively.
-    document.addEventListener('inertia:navigate', () => {
-        lastUrl = window.location.href;
-        lastState = window.history.state;
-    });
-
     window.addEventListener('popstate', (event) => {
         if (! dirty.value.length) return;
         if (! isWarningEnabled()) return;
@@ -80,10 +76,10 @@ if (typeof window !== 'undefined') {
         // and wipe the in-memory form data before we've confirmed.
         event.stopImmediatePropagation();
 
-        // Re-push the page we were just on so the URL/Inertia state are restored
-        // while the (synchronous) confirm() is open and after a cancel.
-        if (lastUrl && lastState) {
-            window.history.pushState(lastState, '', lastUrl);
+        // Re-push the dirty page we were just on so the URL/Inertia state are
+        // restored while the (synchronous) confirm() is open and after a cancel.
+        if (dirtyUrl && dirtyState) {
+            window.history.pushState(dirtyState, '', dirtyUrl);
         }
 
         const confirmed = confirm(__('statamic::messages.dirty_navigation_warning'));
