@@ -67,34 +67,32 @@ function disableWarning() {
 // module load — before `createInertiaApp()` calls `eventHandler.init()` —
 // to ensure our listener runs first and can block Inertia via
 // `stopImmediatePropagation()`. See statamic/cms#14055.
-if (typeof window !== 'undefined') {
-    window.addEventListener('popstate', (event) => {
-        if (! dirty.value.length) return;
-        if (! isWarningEnabled()) return;
+window.addEventListener('popstate', (event) => {
+    if (! dirty.value.length) return;
+    if (! isWarningEnabled()) return;
 
-        // Block Inertia's listener so it doesn't `setQuietly(..., { preserveState: false })`
-        // and wipe the in-memory form data before we've confirmed.
-        event.stopImmediatePropagation();
+    // Block Inertia's listener so it doesn't `setQuietly(..., { preserveState: false })`
+    // and wipe the in-memory form data before we've confirmed.
+    event.stopImmediatePropagation();
 
-        // Re-push the dirty page we were just on so the URL/Inertia state are
-        // restored while the (synchronous) confirm() is open and after a cancel.
-        if (dirtyUrl && dirtyState) {
-            window.history.pushState(dirtyState, '', dirtyUrl);
-        }
+    // Re-push the dirty page we were just on so the URL/Inertia state are
+    // restored while the (synchronous) confirm() is open and after a cancel.
+    if (dirtyUrl && dirtyState) {
+        window.history.pushState(dirtyState, '', dirtyUrl);
+    }
 
-        const confirmed = confirm(__('statamic::messages.dirty_navigation_warning'));
+    const confirmed = confirm(__('statamic::messages.dirty_navigation_warning'));
 
-        if (! confirmed) return;
+    if (! confirmed) return;
 
-        clear();
-        disableWarning();
+    clear();
+    disableWarning();
 
-        // We're now on a re-pushed entry of the dirty page. Going back fires
-        // popstate again with the user's intended target; dirty is clean so
-        // Inertia handles it normally.
-        window.history.back();
-    });
-}
+    // We're now on a re-pushed entry of the dirty page. Going back fires
+    // popstate again with the user's intended target; dirty is clean so
+    // Inertia handles it normally.
+    window.history.back();
+});
 
 function state(name, state) {
     state ? add(name) : remove(name);
