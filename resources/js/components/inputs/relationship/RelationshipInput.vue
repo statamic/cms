@@ -333,7 +333,7 @@ export default {
             if (this.abortController) this.abortController.abort();
             this.abortController = new AbortController();
 
-            const cacheKey = this.itemDataUrl + '|' + (this.site || '') + '|' + JSON.stringify(selections?.slice().sort());
+            const cacheKey = JSON.stringify([this.itemDataUrl, this.site, selections?.slice().sort()]);
             const existing = inFlightRequests.get(cacheKey);
 
             this._ownsRequest = !existing;
