@@ -17,12 +17,16 @@ const timezoneOption = computed(() => {
     return tz && tz !== 'auto' ? { timeZone: tz } : {};
 });
 
+const showTimeInValue = computed(() => props.value?.format_has_time && props.value?.time_enabled);
+
+const showTooltip = computed(() => props.value?.format_has_time);
+
 const formatted = computed(() => {
     if (!props.value) {
         return null;
     }
 
-    const preset = props.value.time_enabled ? 'datetime' : 'date';
+    const preset = showTimeInValue.value ? 'datetime' : 'date';
     const formatter = new DateFormatter().options({ ...DateFormatter.presets[preset], ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
@@ -36,7 +40,7 @@ const formatted = computed(() => {
 });
 
 const tooltip = computed(() => {
-    if (!props.value) {
+    if (!props.value || !showTooltip.value) {
         return null;
     }
 

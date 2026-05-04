@@ -264,6 +264,7 @@ class Date extends Fieldtype
             'mode' => $this->config('mode', 'single'),
             'time_enabled' => $this->config('time_enabled'),
             'timezone' => $this->resolvedTimezone(),
+            'format_has_time' => $this->formatHasTime(),
         ];
 
         if ($this->config('mode') === 'range') {
