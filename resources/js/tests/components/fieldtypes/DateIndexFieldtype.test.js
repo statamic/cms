@@ -109,7 +109,7 @@ test.each([
 ])('date is formatted to the users browser language (%s)', async (lang, expected) => {
     DateFormatter.defaultLocale = lang;
 
-    const dateIndexField = makeDateIndexField({ date: '2025-12-25T13:29:00Z' });
+    const dateIndexField = makeDateIndexField({ date: '2025-12-25T13:29:00Z', format_has_time: true });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
@@ -141,6 +141,7 @@ test.each([
         start: '2025-12-25T02:13:00Z',
         end: '2025-12-28T03:59:00Z',
         mode: 'range',
+        format_has_time: true,
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
