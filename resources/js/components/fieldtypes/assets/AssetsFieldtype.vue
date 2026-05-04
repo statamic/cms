@@ -88,6 +88,10 @@
                     />
                 </div>
 
+                <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
+                    <ui-icon name="assets" class="size-5 text-gray-300 dark:text-gray-700 mx-auto" />
+                </div>
+
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"

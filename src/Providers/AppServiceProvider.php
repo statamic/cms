@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
@@ -301,6 +302,7 @@ class AppServiceProvider extends ServiceProvider
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
             'Addons' => $addons->count(),
+            'License Key' => fn () => Config::getLicenseKey() ? 'Set' : 'Not set',
             'Stache Watcher' => fn () => $this->stacheWatcher(),
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
             'Sites' => fn () => $this->sitesAboutCommandInfo(),

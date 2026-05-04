@@ -362,7 +362,7 @@ EOT
     }
 
     #[Test]
-    public function it_stores_redirect_in_session_for_two_factor_challenge()
+    public function it_stores_redirect_as_intended_url_for_two_factor_challenge()
     {
         User::make()
             ->id(1)
@@ -384,12 +384,55 @@ EOT
                 'password' => 'chewy',
                 '_redirect' => '/dashboard',
             ])
-            ->assertSessionHas('login.redirect', '/dashboard');
+            ->assertSessionHas('url.intended', '/dashboard');
     }
 
     #[Test]
-    public function it_does_not_stash_login_redirect_when_two_factor_is_not_enforced()
+    public function it_redirects_to_intended_url_when_no_redirect_param_is_provided()
     {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->withSession(['url.intended' => '/protected'])
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertRedirect('/protected')
+            ->assertSessionMissing('url.intended');
+    }
+
+    #[Test]
+    public function it_prefers_redirect_param_over_intended_url()
+    {
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->withSession(['url.intended' => '/protected'])
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                '_redirect' => '/dashboard',
+            ])
+            ->assertRedirect('/dashboard')
+            ->assertSessionMissing('url.intended');
+    }
+
+    #[Test]
+    public function it_stashes_redirect_as_intended_url_when_two_factor_setup_is_required()
+    {
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
+
         User::make()
             ->id(1)
             ->email('san@holo.com')
@@ -404,73 +447,7 @@ EOT
                 '_redirect' => '/dashboard',
             ])
             ->assertRedirect('/dashboard')
-            ->assertSessionMissing('login.redirect');
-    }
-
-    #[Test]
-    public function it_stashes_login_redirect_when_two_factor_setup_is_required()
-    {
-        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
-
-        User::make()
-            ->id(1)
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->save();
-
-        $this
-            ->post('/!/auth/login', [
-                'token' => 'test-token',
-                'email' => 'san@holo.com',
-                'password' => 'chewy',
-                '_redirect' => '/dashboard',
-            ])
-            ->assertSessionHas('login.redirect', '/dashboard');
-    }
-
-    #[Test]
-    public function it_clears_stale_login_redirect_on_two_factor_challenge()
-    {
-        User::make()
-            ->id(1)
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->data([
-                'two_factor_confirmed_at' => now()->timestamp,
-                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
-                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, fn () => RecoveryCode::generate())->all())),
-            ])
-            ->save();
-
-        $this
-            ->withSession(['login.redirect' => '/stale'])
-            ->post('/!/auth/login', [
-                'token' => 'test-token',
-                'email' => 'san@holo.com',
-                'password' => 'chewy',
-            ])
-            ->assertSessionMissing('login.redirect');
-    }
-
-    #[Test]
-    public function it_clears_stale_login_redirect_when_two_factor_setup_is_required()
-    {
-        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
-
-        User::make()
-            ->id(1)
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->save();
-
-        $this
-            ->withSession(['login.redirect' => '/stale'])
-            ->post('/!/auth/login', [
-                'token' => 'test-token',
-                'email' => 'san@holo.com',
-                'password' => 'chewy',
-            ])
-            ->assertSessionMissing('login.redirect');
+            ->assertSessionHas('url.intended', '/dashboard');
     }
 
     #[Test]

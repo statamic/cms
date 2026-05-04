@@ -295,10 +295,14 @@ const keybinding = ref(
     }),
 );
 
-onUnmounted(() => keybinding.value.destroy());
+const refreshHandler = () => { if (props.enabled) update(); };
+const refreshEvent = `live-preview.${name.value}.refresh`;
 
-Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
-    if (props.enabled) update();
+Statamic.$events.$on(refreshEvent, refreshHandler);
+
+onUnmounted(() => {
+    keybinding.value.destroy();
+    Statamic.$events.$off(refreshEvent, refreshHandler);
 });
 </script>
 

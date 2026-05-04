@@ -40,6 +40,9 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { Input, Select } from '@/components/ui';
+import debounce from '@/util/debounce.js';
+import { markRaw } from 'vue';
+import { UPDATE_DEBOUNCE_MS } from './constants';
 
 export default {
     components: { Input, Text, Select },
@@ -58,6 +61,13 @@ export default {
             selectedAssets: this.meta.initialSelectedAssets,
             metaChanging: false,
         };
+    },
+
+    created() {
+        this.syncUrlDebounced = markRaw(debounce((url) => {
+            this.update(url);
+            this.updateMeta({ ...this.meta, initialUrl: url });
+        }, UPDATE_DEBOUNCE_MS));
     },
 
     computed: {
@@ -116,12 +126,11 @@ export default {
 
         urlValue(url) {
             if (this.metaChanging) return;
-
-            this.update(url);
-            this.updateMeta({ ...this.meta, initialUrl: url });
+            this.syncUrlDebounced(url);
         },
 
         meta(meta, oldMeta) {
+            if (meta === oldMeta) return;
             if (JSON.stringify(meta) === JSON.stringify(oldMeta)) return;
 
             this.metaChanging = true;

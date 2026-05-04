@@ -108,6 +108,20 @@ import { Button, Icon, Stack } from '@/components/ui';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
+const inFlightRequests = new Map();
+
+function detachFromInFlightRequest(component) {
+    const entry = component._activeRequest;
+    if (!entry) return;
+    component._activeRequest = null;
+    entry.subscribers--;
+    if (entry.subscribers > 0) return;
+    entry.controller.abort();
+    if (inFlightRequests.get(entry.cacheKey) === entry) {
+        inFlightRequests.delete(entry.cacheKey);
+    }
+}
+
 export default {
     props: {
         canCreate: { type: Boolean },
@@ -161,7 +175,6 @@ export default {
             loading: true,
             inline: false,
             sortable: null,
-            abortController: null,
             removeNavigationListener: null,
         };
     },
@@ -246,7 +259,7 @@ export default {
 
     created() {
         this.removeNavigationListener = router.on('before', () => {
-            if (this.abortController) this.abortController.abort();
+            detachFromInFlightRequest(this);
         });
     },
 
@@ -260,7 +273,7 @@ export default {
     },
 
     beforeUnmount() {
-        if (this.abortController) this.abortController.abort();
+        detachFromInFlightRequest(this);
         if (this.removeNavigationListener) this.removeNavigationListener();
         if (this.sortable) {
             this.sortable.destroy();
@@ -328,19 +341,39 @@ export default {
         getDataForSelections(selections) {
             this.loading = true;
 
-            if (this.abortController) this.abortController.abort();
-            this.abortController = new AbortController();
+            detachFromInFlightRequest(this);
 
-            return this.$axios
-                .post(this.itemDataUrl, { site: this.site, selections }, { signal: this.abortController.signal })
+            const cacheKey = JSON.stringify([this.itemDataUrl, this.site, selections?.slice().sort()]);
+            let entry = inFlightRequests.get(cacheKey);
+
+            if (!entry) {
+                const controller = new AbortController();
+                entry = { cacheKey, controller, subscribers: 0 };
+                entry.promise = this.$axios
+                    .post(this.itemDataUrl, { site: this.site, selections }, { signal: controller.signal })
+                    .finally(() => {
+                        if (inFlightRequests.get(cacheKey) === entry) {
+                            inFlightRequests.delete(cacheKey);
+                        }
+                    });
+                inFlightRequests.set(cacheKey, entry);
+            }
+
+            entry.subscribers++;
+            this._activeRequest = entry;
+
+            return entry.promise
                 .then((response) => {
+                    if (this._activeRequest !== entry) return;
                     this.$emit('item-data-updated', response.data.data);
                 })
                 .catch((e) => {
                     if (axios.isCancel(e)) return;
+                    if (this._activeRequest !== entry) return;
                     throw e;
                 })
                 .finally(() => {
+                    if (this._activeRequest !== entry) return;
                     this.loading = false;
                 });
         },

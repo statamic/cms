@@ -43,10 +43,13 @@ class RenameAsset extends Action
 
     public function run($assets, $values)
     {
-        $ids = $assets->each->rename($values['filename'], true)->map->id()->all();
+        $oldIds = $assets->map->id()->all();
+
+        $newIds = $assets->each->rename($values['filename'], true)->map->id()->all();
 
         return [
-            'ids' => $ids,
+            'ids' => $newIds,
+            'callback' => ['replaceInSelections', array_combine($oldIds, $newIds)],
         ];
     }
 
