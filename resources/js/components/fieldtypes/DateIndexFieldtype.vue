@@ -26,7 +26,10 @@ const formatted = computed(() => {
     const formatter = new DateFormatter().options({ ...DateFormatter.presets[preset], ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
-        return formatter.date(new Date(props.value.start)) + ' – ' + formatter.date(new Date(props.value.end));
+        let start = new Date(props.value.start);
+        let end = new Date(props.value.end);
+
+        return formatter.date(start) + ' – ' + formatter.date(end);
     }
 
     return formatter.date(props.value.date).toString();
@@ -44,7 +47,10 @@ const tooltip = computed(() => {
     const formatter = new DateFormatter().options({ ...tooltipOptions, ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
-        return formatter.date(new Date(props.value.start)) + ' – ' + formatter.date(new Date(props.value.end));
+        let start = new Date(props.value.start);
+        let end = new Date(props.value.end);
+
+        return formatter.date(start) + ' – ' + formatter.date(end);
     }
 
     return formatter.date(props.value.date).toString();
