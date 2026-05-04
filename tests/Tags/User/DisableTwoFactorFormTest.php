@@ -137,7 +137,7 @@ class DisableTwoFactorFormTest extends TestCase
     }
 
     #[Test]
-    public function it_prefers_redirect_param_over_login_redirect_in_session()
+    public function it_prefers_redirect_param_over_intended_url_in_session()
     {
         $user = $this->userWithTwoFactorEnabled();
 
@@ -145,7 +145,7 @@ class DisableTwoFactorFormTest extends TestCase
             ->actingAs($user)
             ->session([
                 'statamic_elevated_session' => now()->timestamp,
-                'login.redirect' => '/dashboard',
+                'url.intended' => '/dashboard',
             ])
             ->delete(route('statamic.users.two-factor.disable'), [
                 '_redirect' => '/account',

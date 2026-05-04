@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -186,12 +185,10 @@ class Validator
     {
         $request = request();
 
-        if (! $request->headers->has('Precognition-Validate-Only')) {
+        if (! $request->isPrecognitive()) {
             return $rules;
         }
 
-        return Collection::make($rules)
-            ->only(explode(',', $request->header('Precognition-Validate-Only')))
-            ->all();
+        return $request->filterPrecognitiveRules($rules);
     }
 }

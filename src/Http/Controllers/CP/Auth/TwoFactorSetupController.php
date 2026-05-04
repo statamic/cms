@@ -16,10 +16,10 @@ class TwoFactorSetupController extends Controller
     protected function redirectPath()
     {
         $cp = cp_route('index');
-        $referer = request('referer');
-        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
+        $intended = redirect()->getIntendedUrl();
+        $isCpUrl = $intended && Str::startsWith($intended, $cp) && ! Str::startsWith($intended, $cp.'/auth/');
 
-        return $referredFromCp ? $referer : $cp;
+        return $isCpUrl ? $intended : $cp;
     }
 
     protected function routes($user): array

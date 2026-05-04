@@ -58,13 +58,15 @@ class TwoFactorChallengeController extends Controller
 
         $request->session()->regenerate();
 
+        $redirect = $this->redirectPath($request);
+
         if ($request->inertia() || $request->expectsJson()) {
             return $request->inertia()
-                ? Inertia::location($this->redirectPath($request))
+                ? Inertia::location($redirect)
                 : response('Authenticated');
         }
 
-        return redirect()->intended($this->redirectPath($request));
+        return redirect($redirect);
     }
 
     protected function sendFailedResponse(TwoFactorChallengeRequest $request)
@@ -85,18 +87,17 @@ class TwoFactorChallengeController extends Controller
 
     protected function redirectPath(Request $request)
     {
-        if ($redirect = $request->input('_redirect')) {
-            if (! URL::isExternalToApplication($redirect)) {
-                return $redirect;
-            }
+        $intended = $request->session()->pull('url.intended', $this->defaultRedirectPath());
+
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            return $redirect;
         }
 
-        if ($redirect = $request->session()->pull('login.redirect')) {
-            if (! URL::isExternalToApplication($redirect)) {
-                return $redirect;
-            }
-        }
+        return $intended;
+    }
 
+    protected function defaultRedirectPath(): string
+    {
         return route('statamic.site');
     }
 
