@@ -111,7 +111,7 @@ export default {
             const preset = this.hasTime ? 'datetime' : 'date';
             const tz = this.displayTimezone;
 
-            return { ...DateFormatter.presets[preset], timeZone: tz };
+            return { preset, timeZone: tz };
         },
 
         replicatorPreview() {

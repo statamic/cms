@@ -27,7 +27,7 @@ const formatted = computed(() => {
     }
 
     const preset = showTimeInValue.value ? 'datetime' : 'date';
-    const formatter = new DateFormatter().options({ ...DateFormatter.presets[preset], ...timezoneOption.value });
+    const formatter = new DateFormatter().options({ preset, ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
         let start = new Date(props.value.start);
