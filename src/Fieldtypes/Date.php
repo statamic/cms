@@ -253,6 +253,7 @@ class Date extends Fieldtype
         $common = [
             'mode' => $this->config('mode', 'single'),
             'time_enabled' => $this->config('time_enabled'),
+            'format_has_time' => $this->formatHasTime(),
         ];
 
         if ($this->config('mode') === 'range') {

@@ -11,12 +11,16 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose } = Fieldtype.use(emit, props);
 
+const showTimeInValue = computed(() => props.value?.format_has_time && props.value?.time_enabled);
+
+const showTooltip = computed(() => props.value?.format_has_time);
+
 const formatted = computed(() => {
     if (!props.value) {
         return null;
     }
 
-    const formatter = new DateFormatter().options(props.value.time_enabled ? 'datetime' : 'date');
+    const formatter = new DateFormatter().options(showTimeInValue.value ? 'datetime' : 'date');
 
     if (props.value.mode === 'range') {
         let start = new Date(props.value.start);
@@ -29,7 +33,7 @@ const formatted = computed(() => {
 });
 
 const tooltip = computed(() => {
-    if (!props.value) {
+    if (!props.value || !showTooltip.value) {
         return null;
     }
 
