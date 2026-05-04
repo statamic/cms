@@ -102,14 +102,14 @@ const collapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});
 const meta = ref({});
 const setConfigs = [
-    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), conditionDisplay: __('How did you hear about us?'), conditionIcon: 'fieldtype-select', conditionIconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', icon: 'mail-sign-at', iconClass: 'bg-blue-50 text-blue-600 dark:bg-transparent dark:text-blue-400', fields: [] },
-    { handle: 'like_most', display: __('What do you like most about our band?'), icon: 'text-long', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
-    { handle: 'fan_length', display: __('How long have you been a fan?'), icon: 'text-short', iconClass: 'bg-purple-50 text-purple-500 dark:bg-transparent dark:text-purple-400', fields: [] },
-    { handle: 'favorite_album', display: __('Which album was your favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
-    { handle: 'second_favorite_album', display: __('Which album was your second favorite?'), icon: 'fieldtype-radio', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
-    { handle: 'email_notifications_signup', display: __('Sign up for email notifications from The Midnight'), icon: 'fieldtype-checkboxes', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
-    { handle: 'age', display: __('How old are you?'), icon: 'number', iconClass: 'bg-teal-50 text-teal-600 dark:bg-transparent dark:text-teal-400', fields: [] },
-    { handle: 'free_drink_voucher', display: __('I want a free drink voucher'), icon: 'fieldtype-toggle', iconClass: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400', fields: [] },
+    { handle: 'heard_about_us', display: __('Message sent to jack@statamic.com'), conditionDisplay: __('How did you hear about us?'), conditionIcon: 'fieldtype-select', conditionIconClass: 'text-orange-600 dark:text-orange-400', icon: 'mail-sign-at', iconClass: 'text-blue-600 dark:text-blue-400', fields: [] },
+    { handle: 'like_most', display: __('What do you like most about our band?'), icon: 'text-long', iconClass: 'text-purple-500 dark:text-purple-400', fields: [] },
+    { handle: 'fan_length', display: __('How long have you been a fan?'), icon: 'text-short', iconClass: 'text-purple-500 dark:text-purple-400', fields: [] },
+    { handle: 'favorite_album', display: __('Which album was your favorite?'), icon: 'fieldtype-radio', iconClass: 'text-orange-600 dark:text-orange-400', fields: [] },
+    { handle: 'second_favorite_album', display: __('Which album was your second favorite?'), icon: 'fieldtype-radio', iconClass: 'text-orange-600 dark:text-orange-400', fields: [] },
+    { handle: 'email_notifications_signup', display: __('Sign up for email notifications from The Midnight'), icon: 'fieldtype-checkboxes', iconClass: 'text-orange-600 dark:text-orange-400', fields: [] },
+    { handle: 'age', display: __('How old are you?'), icon: 'number', iconClass: 'text-teal-600 dark:text-teal-400', fields: [] },
+    { handle: 'free_drink_voucher', display: __('I want a free drink voucher'), icon: 'fieldtype-toggle', iconClass: 'text-orange-600 dark:text-orange-400', fields: [] },
 ];
 const groupConfigs = [
     {

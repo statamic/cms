@@ -13,7 +13,7 @@ const props = defineProps({
     },
     initialConditionIconClass: {
         type: String,
-        default: 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400',
+        default: 'text-orange-600 dark:text-orange-400',
     },
     showSecondaryCondition: {
         type: Boolean,
@@ -85,13 +85,13 @@ const optionIconClasses = (option) => {
 };
 
 const optionChipClasses = (option) => {
-    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 bg-purple-50 text-purple-600 dark:bg-transparent dark:text-purple-400 rounded-sm';
-    return 'flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400 rounded-sm';
+    if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 text-purple-600 dark:text-purple-400';
+    return 'flex shrink-0 items-center justify-center size-6 text-orange-600 dark:text-orange-400';
 };
 
 const optionChipIconClasses = (option) => {
-    if (option?.category === 'text') return 'size-4 shrink-0 rounded-sm text-purple-600 dark:text-purple-400';
-    return 'size-4 shrink-0 rounded-sm text-orange-600 dark:text-orange-400';
+    if (option?.category === 'text') return 'size-4 shrink-0 text-purple-600 dark:text-purple-400';
+    return 'size-4 shrink-0 text-orange-600 dark:text-orange-400';
 };
 </script>
 
@@ -111,7 +111,7 @@ const optionChipIconClasses = (option) => {
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-5 rounded-sm"
+                                class="logic-text__pill-icon size-5"
                                 :class="props.initialConditionIconClass"
                             >
                                 <Icon :name="props.initialConditionIcon" class="size-3" />
@@ -174,11 +174,11 @@ const optionChipIconClasses = (option) => {
                             </template>
                             <template #selected-option="{ option }">
                                 <div class="flex items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400 rounded-full">
+                                    <div class="flex shrink-0 items-center justify-center size-6 text-orange-600 dark:text-orange-400">
                                         <Icon
                                             v-if="option.icon"
                                             :name="option.icon"
-                                            class="size-4 shrink-0 rounded-full text-orange-600 dark:text-orange-400"
+                                            class="size-4 shrink-0 text-orange-600 dark:text-orange-400"
                                         />
                                     </div>
                                     <span>{{ option.label }}</span>
@@ -202,7 +202,7 @@ const optionChipIconClasses = (option) => {
                             class="logic-text__pill"
                         >
                             <span
-                                class="logic-text__pill-icon size-6 rounded-full"
+                                class="logic-text__pill-icon size-6"
                                 :class="props.initialConditionIconClass"
                             >
                                 <Icon :name="props.initialConditionIcon" class="size-3.5" />

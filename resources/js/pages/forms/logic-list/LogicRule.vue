@@ -317,7 +317,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         <LogicFlowMock
                             :initial-condition-label="__(config.display) || config.handle"
                             :initial-condition-icon="config.icon || 'fieldtype-radio'"
-                            :initial-condition-icon-class="config.iconClass || 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400'"
+                            :initial-condition-icon-class="config.iconClass || 'text-orange-600 dark:text-orange-400'"
                             :show-secondary-condition="showSecondaryCondition"
                             :mock-preset="mockPreset"
                         />

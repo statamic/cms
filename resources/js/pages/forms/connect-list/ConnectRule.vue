@@ -154,8 +154,8 @@ const initialConditionIcon = computed(() => {
 });
 
 const initialConditionIconClass = computed(() => {
-    if (props.config?.handle === 'heard_about_us') return 'bg-orange-50 text-orange-600 dark:bg-transparent dark:text-orange-400';
-    return props.config?.conditionIconClass || props.config?.iconClass || 'bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400';
+    if (props.config?.handle === 'heard_about_us') return 'text-orange-600 dark:text-orange-400';
+    return props.config?.conditionIconClass || props.config?.iconClass || 'text-orange-600 dark:text-orange-400';
 });
 
 const mockPresetByHandle = {
