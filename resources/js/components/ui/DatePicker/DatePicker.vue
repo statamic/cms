@@ -1,4 +1,5 @@
 <script setup>
+import { config } from '@api';
 import { computed } from 'vue';
 import {
     DatePickerAnchor,
@@ -98,13 +99,16 @@ const calendarEvents = computed(() => ({
 
 const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
 
-const timeZoneLabel = computed(() => {
+const formatTimeZone = (style) => {
     const tz = timeZoneName.value;
     if (!tz) return null;
 
-    const parts = new Intl.DateTimeFormat(undefined, { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: style }).formatToParts(props.modelValue.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
-});
+};
+
+const timeZoneLabel = computed(() => formatTimeZone('short'));
+const timeZoneTooltip = computed(() => formatTimeZone('long'));
 
 const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
@@ -201,7 +205,7 @@ const getInputLabel = (part) => {
                         <Text
                             class="text-gray-600 dark:text-gray-400 me-1"
                             size="xs"
-                            v-tooltip="timeZoneName"
+                            v-tooltip="timeZoneTooltip"
                             :text="timeZoneLabel"
                         />
                         <Button
