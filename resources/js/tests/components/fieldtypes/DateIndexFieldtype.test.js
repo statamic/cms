@@ -31,9 +31,40 @@ test.each([
     process.env.TZ = tz;
 
     const dateIndexField = makeDateIndexField({
-        date: '2025-12-25',
-        time: '02:13',
+        date: '2025-12-25T02:13:00Z',
         mode: 'single',
+        format_has_time: true,
+    });
+
+    expect(dateIndexField.vm.formatted).toBe(expected);
+});
+
+test.each([
+    ['UTC', '12/25/2025'],
+    ['America/New_York', '12/25/2025'],
+])('date-only value does not shift across timezones (%s)', async (tz, expected) => {
+    process.env.TZ = tz;
+
+    const dateIndexField = makeDateIndexField({
+        date: '2025-12-25',
+        mode: 'single',
+        format_has_time: false,
+    });
+
+    expect(dateIndexField.vm.formatted).toBe(expected);
+});
+
+test.each([
+    ['UTC', '12/25/2025 – 12/28/2025'],
+    ['America/New_York', '12/25/2025 – 12/28/2025'],
+])('date-only range does not shift across timezones (%s)', async (tz, expected) => {
+    process.env.TZ = tz;
+
+    const dateIndexField = makeDateIndexField({
+        start: '2025-12-25',
+        end: '2025-12-28',
+        mode: 'range',
+        format_has_time: false,
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
@@ -65,6 +96,7 @@ test.each([
         start: '2025-12-25T02:13:00Z',
         end: '2025-12-28T03:59:00Z',
         mode: 'range',
+        format_has_time: true,
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
