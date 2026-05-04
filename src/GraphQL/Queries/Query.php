@@ -6,6 +6,7 @@ use Closure;
 use Facades\Statamic\GraphQL\TypeRegistrar;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Query as BaseQuery;
+use Statamic\GraphQL\Middleware\ResolveSite;
 
 abstract class Query extends BaseQuery
 {
@@ -28,5 +29,13 @@ abstract class Query extends BaseQuery
         }
 
         return true;
+    }
+
+    protected function getMiddleware(): array
+    {
+        return array_merge(
+            [ResolveSite::class],
+            $this->middleware
+        );
     }
 }

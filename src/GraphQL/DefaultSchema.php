@@ -44,11 +44,17 @@ class DefaultSchema implements ConfigConvertible
     public function getConfig()
     {
         return [
+            'types' => $this->getTypes(),
             'query' => $this->getQueries(),
             'mutation' => $this->getMutations(),
             'middleware' => $this->getMiddleware(),
             'method' => ['GET', 'POST'],
         ];
+    }
+
+    private function getTypes()
+    {
+        return config('statamic.graphql.types', []);
     }
 
     private function getQueries()

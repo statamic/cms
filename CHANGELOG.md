@@ -1135,6 +1135,11 @@
 
 
 
+## 5.31.0.1 (2024-10-15)
+
+### What's new
+- The fork has been updated to [v5.31.0](https://github.com/statamic/cms/releases/tag/v5.31.0).
+
 ## 5.31.0 (2024-10-14)
 
 ### What's new
@@ -1232,6 +1237,13 @@
 - German translations [#10849](https://github.com/statamic/cms/issues/10849) by @helloDanuk
 - French translations [#10839](https://github.com/statamic/cms/issues/10839) by @ebeauchamps
 - Bump rollup from 3.29.4 to 3.29.5 [#10851](https://github.com/statamic/cms/issues/10851) by @dependabot
+
+
+
+## 5.26.0.1 (2024-09-25)
+
+### What's new
+- The fork has been updated to [v5.26.0](https://github.com/statamic/cms/releases/tag/v5.26.0).
 
 
 
@@ -1378,6 +1390,12 @@
 
 
 
+## 5.21.0.1 (2024-08-15)
+
+### What's new
+- The fork has been updated to [v5.21.0](https://github.com/statamic/cms/releases/tag/v5.21.0).
+
+
 ## 5.21.0 (2024-08-13)
 
 ### What's new
@@ -1440,6 +1458,12 @@
 - Fallback to `nocache` content when request is missing the `Cache` middleware [#9406](https://github.com/statamic/cms/issues/9406) by @duncanmcclean
 - Fix error toast when logging in. [#10308](https://github.com/statamic/cms/issues/10308) by @jelleroorda
 
+
+
+## 5.19.0.1 (2024-08-06)
+
+### What's new
+- The fork has been updated to [v5.19.0](https://github.com/statamic/cms/releases/tag/v5.19.0).
 
 
 ## 5.19.0 (2024-08-01)

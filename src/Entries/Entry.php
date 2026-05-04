@@ -927,6 +927,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'slug' => $this->slug(),
             'published' => $this->published(),
             'mount' => $this->collection()->uri($this->locale()),
+            'site' => $this->site()->absoluteUrl($this->locale()),
         ]);
 
         if ($this->hasDate()) {

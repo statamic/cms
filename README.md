@@ -1,5 +1,30 @@
 <p align="center"><img src="https://statamic.com/assets/branding/Statamic-Logo+Wordmark-Rad.svg" width="400" alt="Statamic Logo" /></p>
 
+## Teamnovu's Fork
+
+This is a fork of the [Statamic core](https://github.com/statamic/cms) with some additional features and bugfixes.
+The goal is to keep the fork as close to the original as possible. This makes it easier to merge changes from the core to the fork.
+
+To achieve this, changes should be made as an addon instead. If this is not possible, the changes should be documented in the [DIFF-TO-CORE.md](DIFF-TO-CORE.md) file.
+Ideally, a PR to the core should be opened.
+
+### Installation
+
+To install the fork, add the following to your `composer.json` file:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/teamnovu/cms.git"
+        }
+    ]
+}
+```
+
+Then run `composer update statamic/cms` to install the fork.
+
 ## About Statamic
 
 Statamic is the flat-first, Laravel + Git powered CMS designed for building beautiful, easy to manage websites.
