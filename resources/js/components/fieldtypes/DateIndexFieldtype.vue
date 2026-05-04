@@ -20,7 +20,10 @@ const formatted = computed(() => {
         return null;
     }
 
-    const formatter = new DateFormatter().options(showTimeInValue.value ? 'datetime' : 'date');
+    const options = { preset: showTimeInValue.value ? 'datetime' : 'date' };
+    if (!props.value.format_has_time) options.timeZone = 'UTC';
+
+    const formatter = new DateFormatter().options(options);
 
     if (props.value.mode === 'range') {
         let start = new Date(props.value.start);
