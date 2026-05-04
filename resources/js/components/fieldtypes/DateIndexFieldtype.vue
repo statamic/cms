@@ -26,8 +26,14 @@ const formatted = computed(() => {
         return null;
     }
 
-    const preset = showTimeInValue.value ? 'datetime' : 'date';
-    const formatter = new DateFormatter().options({ preset, ...timezoneOption.value });
+    const options = { preset: showTimeInValue.value ? 'datetime' : 'date' };
+    if (!props.value.format_has_time) {
+        options.timeZone = 'UTC';
+    } else {
+        Object.assign(options, timezoneOption.value);
+    }
+
+    const formatter = new DateFormatter().options(options);
 
     if (props.value.mode === 'range') {
         let start = new Date(props.value.start);
