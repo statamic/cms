@@ -49,6 +49,7 @@ test.each([
         date: '2025-12-25T02:13:00Z',
         mode: 'single',
         time_enabled: true,
+        format_has_time: true,
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
@@ -88,7 +89,11 @@ test.each([
 ])('date and time is formatted to the users browser language (%s)', async (lang, expected) => {
     DateFormatter.defaultLocale = lang;
 
-    const dateIndexField = makeDateIndexField({ date: '2025-12-25T13:29:00Z', time_enabled: true });
+    const dateIndexField = makeDateIndexField({
+        date: '2025-12-25T13:29:00Z',
+        time_enabled: true,
+        format_has_time: true,
+    });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
@@ -107,4 +112,41 @@ test.each([
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
+});
+
+test('date-only format omits time from value and tooltip', async () => {
+    const dateIndexField = makeDateIndexField({
+        date: '2025-12-25',
+        mode: 'single',
+        time_enabled: false,
+        format_has_time: false,
+    });
+
+    expect(dateIndexField.vm.formatted).toBe('12/25/2025');
+    expect(dateIndexField.vm.tooltip).toBeNull();
+});
+
+test('time-disabled but time-aware format shows date in value and time in tooltip', async () => {
+    const dateIndexField = makeDateIndexField({
+        date: '2025-12-25T02:13:00Z',
+        mode: 'single',
+        time_enabled: false,
+        format_has_time: true,
+    });
+
+    expect(dateIndexField.vm.formatted).toBe('12/25/2025');
+    expect(dateIndexField.vm.tooltip).not.toBeNull();
+    expect(dateIndexField.vm.tooltip).toContain('2025');
+});
+
+test('time-enabled value shows time in both value and tooltip', async () => {
+    const dateIndexField = makeDateIndexField({
+        date: '2025-12-25T02:13:00Z',
+        mode: 'single',
+        time_enabled: true,
+        format_has_time: true,
+    });
+
+    expect(dateIndexField.vm.formatted).toBe('12/25/2025, 2:13 AM');
+    expect(dateIndexField.vm.tooltip).not.toBeNull();
 });
