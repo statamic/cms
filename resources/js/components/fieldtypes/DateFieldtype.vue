@@ -109,9 +109,12 @@ export default {
 
         replicatorPreviewOptions() {
             const preset = this.hasTime ? 'datetime' : 'date';
-            const tz = this.displayTimezone;
 
-            return { preset, timeZone: tz };
+            return {
+                preset,
+                timeZone: this.displayTimezone,
+                ...(this.formatHasTime && { timeZoneName: 'short' }),
+            };
         },
 
         replicatorPreview() {
