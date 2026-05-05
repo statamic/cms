@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { test, expect } from 'vitest';
+import { test, expect, vi, afterEach } from 'vitest';
 import DateFieldtype from '@/components/fieldtypes/DateFieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { containerContextKey } from '@ui/Publish/Container.vue';
@@ -171,6 +171,62 @@ test.each([
 
     expect(() => dateField.vm.datePickerUpdated(value)).not.toThrow();
     expect(dateField.emitted('update:value')).toBeUndefined();
+});
+
+afterEach(() => vi.useRealTimers());
+
+test('addDate uses displayTimezone for date-only format', () => {
+    // 11pm Dec 24 in NY is already Dec 25 in London.
+    process.env.TZ = 'America/New_York';
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-12-25T04:00:00Z'));
+
+    const dateField = makeDateField({
+        meta: { formatHasTime: false, timezone: 'Europe/London' },
+    });
+
+    dateField.vm.addDate();
+
+    expect(dateField.emitted('update:value')[0][0]).toBe('2025-12-25');
+});
+
+test('addDate uses midnight in displayTimezone when time is disabled', () => {
+    // Without the displayTimezone anchor we'd get NY-midnight as UTC (Dec 24 05:00Z).
+    process.env.TZ = 'America/New_York';
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-12-25T04:00:00Z'));
+
+    const dateField = makeDateField({
+        meta: { formatHasTime: true, timezone: 'Europe/London' },
+        config: {
+            time_enabled: false,
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    dateField.vm.addDate();
+
+    expect(dateField.emitted('update:value')[0][0]).toBe('2025-12-25T00:00:00.000Z');
+});
+
+test('addDate preserves the current instant when time is enabled', () => {
+    process.env.TZ = 'America/New_York';
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-12-25T02:23:45.678Z'));
+
+    const dateField = makeDateField({
+        meta: { formatHasTime: true, timezone: 'Europe/London' },
+        config: {
+            time_enabled: true,
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    dateField.vm.addDate();
+
+    expect(dateField.emitted('update:value')[0][0]).toBe('2025-12-25T02:23:45.000Z');
 });
 
 test('date-only range format is not affected by timezone', async () => {

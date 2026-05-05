@@ -23,7 +23,7 @@
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { DatePicker, DateRangePicker, Button } from '@/components/ui';
-import { CalendarDate, getLocalTimeZone, parseAbsolute, toTimeZone, toZoned } from '@internationalized/date';
+import { CalendarDate, getLocalTimeZone, now, parseAbsolute, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -202,20 +202,20 @@ export default {
         },
 
         addDate() {
-            let now = new Date();
+            let zoned = now(this.displayTimezone);
 
             if (!this.formatHasTime) {
-                const str = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                const str = this.formatDateOnly(zoned);
                 return this.update(this.isRange ? { start: str, end: str } : str);
             }
 
-            now.setMilliseconds(0);
+            zoned = zoned.set({ millisecond: 0 });
 
             if (!this.config.time_enabled) {
-                now.setHours(0, 0, 0, 0);
+                zoned = zoned.set({ hour: 0, minute: 0, second: 0 });
             }
 
-            const str = now.toISOString();
+            const str = toTimeZone(zoned, 'UTC').toAbsoluteString();
 
             this.update(this.isRange ? { start: str, end: str } : str);
         },
