@@ -82,6 +82,7 @@ class JavascriptComposer
             'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
             'defaultTheme' => $this->defaultTheme(),
+            'appTimezone' => config('app.timezone'),
         ];
     }
 
