@@ -972,7 +972,9 @@ const selectedPageInternalName = computed({
                         <TabContent name="settings">
                             <div v-if="isPageInspector" class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
-                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <div class="size-4">
+                                        <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    </div>
                                     <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ selectedPageHeadingLabel }}
                                     </span>
@@ -986,7 +988,9 @@ const selectedPageInternalName = computed({
                             </div>
                             <div v-else class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
-                                    <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <div class="size-4">
+                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    </div>
                                     <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ __('Multi Choice') }}
                                         <div class="grid *:[grid-area:1/1]">
@@ -1025,7 +1029,9 @@ const selectedPageInternalName = computed({
                         <TabContent name="conditions">
                             <div v-if="isPageInspector" class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
-                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <div class="size-4">
+                                        <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    </div>
                                     <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ selectedPageHeadingLabel }}
                                     </span>
@@ -1035,7 +1041,9 @@ const selectedPageInternalName = computed({
                             </div>
                             <div v-else class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
-                                    <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <div class="size-4">
+                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    </div>
                                     <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ __('Multi Choice') }}
                                         <div class="grid *:[grid-area:1/1]">
@@ -1069,7 +1077,9 @@ const selectedPageInternalName = computed({
                 <TabContent name="settings">
                     <div v-if="isPageInspector" class="space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
-                            <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <div class="size-4">
+                                <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
                             <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ selectedPageHeadingLabel }}
                             </span>
@@ -1084,7 +1094,9 @@ const selectedPageInternalName = computed({
                     </div>
                     <div v-else class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2.5">
-                            <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <div class="size-4">
+                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
                             <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ __('Multi Choice') }}
                                 <div class="grid *:[grid-area:1/1]">
@@ -1159,7 +1171,9 @@ const selectedPageInternalName = computed({
                 <TabContent name="conditions">
                     <div v-if="isPageInspector" class="space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
-                            <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <div class="size-4">
+                                <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
                             <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ selectedPageHeadingLabel }}
                             </span>
@@ -1169,7 +1183,9 @@ const selectedPageInternalName = computed({
                     </div>
                     <div v-else class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2.5">
-                            <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <div class="size-4">
+                                <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
                             <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ __('Multi Choice') }}
                                 <div class="grid *:[grid-area:1/1]">
