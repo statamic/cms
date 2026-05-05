@@ -3,8 +3,8 @@ import { computed, useTemplateRef, watch, ref, inject } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import {
+    Avatar,
     Field,
-    Icon,
     Label,
 } from '@ui';
 import FieldActions from '@/components/field-actions/FieldActions.vue';
@@ -242,7 +242,16 @@ const fieldtypeComponentEvents = computed(() => ({
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">
-                <Label :for="fieldId" :required="isRequired">
+                <Label :for="fieldId" :required="isRequired" class="relative">
+                    <Transition name="lock-avatar-pop" mode="out-in">
+                        <Avatar
+                            v-if="isLocked"
+                            :key="`lock-avatar-${handle}-${lockedBy?.id}`"
+                            :user="lockedBy"
+                            class="inline-flex mx-1 -start-8 -top-0.5 absolute rounded-full size-6 text-3xs"
+                            v-tooltip="lockedBy.name"
+                        />
+                    </Transition>
                     <template v-if="shouldShowLabelText">
                         <span v-tooltip="config.handle">
                             {{ __(config.display) }}
@@ -251,7 +260,6 @@ const fieldtypeComponentEvents = computed(() => ({
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
-                    <ui-avatar v-if="isLocked" :user="lockedBy" class="rounded-full w-4 h-4 text-2xs" v-tooltip="lockedBy.name" />
                     <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                 </Label>
@@ -273,3 +281,16 @@ const fieldtypeComponentEvents = computed(() => ({
         </Field>
     </slot>
 </template>
+
+<style scoped>
+.lock-avatar-pop-enter-active,
+.lock-avatar-pop-leave-active {
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.lock-avatar-pop-enter-from,
+.lock-avatar-pop-leave-to {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.85);
+}
+</style>

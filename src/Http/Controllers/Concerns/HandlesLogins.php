@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Contracts\Auth\User;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
+use Statamic\Facades\URL;
 
 trait HandlesLogins
 {
@@ -63,6 +64,10 @@ trait HandlesLogins
             'login.id' => $user->getKey(),
             'login.remember' => $request->boolean('remember'),
         ]);
+
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            redirect()->setIntendedUrl($redirect);
+        }
 
         TwoFactorAuthenticationChallenged::dispatch($user);
 

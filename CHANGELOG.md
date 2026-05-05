@@ -1,5 +1,79 @@
 # Release Notes
 
+## 6.16.0 (2026-05-01)
+
+### What's new
+- Add support for strict null coalescence (`???`) in Antlers parsing [#14545](https://github.com/statamic/cms/issues/14545) by @marcorieser
+- Add hooks to asset listings [#14566](https://github.com/statamic/cms/issues/14566) by @edalzell
+- Show license key status in about and support:details commands [#14574](https://github.com/statamic/cms/issues/14574) by @jasonvarga
+- Support icon sets in names [#14579](https://github.com/statamic/cms/issues/14579) by @jasonvarga
+
+### What's fixed
+- Fix Comb search index delete() rewriting JSON when ref absent [#14550](https://github.com/statamic/cms/issues/14550) by @SUXUMI
+- Include missing time chars in `DateFormat::containsTime` [#14555](https://github.com/statamic/cms/issues/14555) by @jasonvarga
+- Update setup-cp-vite to install Vite 8 [#14559](https://github.com/statamic/cms/issues/14559) by @jasonvarga
+- Fix cache invalidation when using custom fields in URI route [#14564](https://github.com/statamic/cms/issues/14564) by @duncanmcclean
+- Fix validation bypass via spoofed Precognition-Validate-Only header [#14557](https://github.com/statamic/cms/issues/14557) by @duncanmcclean
+- Restore selected site when resuming session [#14562](https://github.com/statamic/cms/issues/14562) by @duncanmcclean
+- Fix relationship selector footer not sticking to bottom of stack [#14569](https://github.com/statamic/cms/issues/14569) by @duncanmcclean
+- Fix asset selector drag-to-upload covering footer but not handling drops [#14551](https://github.com/statamic/cms/issues/14551) by @duncanmcclean
+- Field margin balance [#14567](https://github.com/statamic/cms/issues/14567) by @jaygeorge
+- Harden OrderBys [#14572](https://github.com/statamic/cms/issues/14572) by @jasonvarga
+- Fix Asset field set to "Read-only" clipping filename [#14575](https://github.com/statamic/cms/issues/14575) by @jackmcdade
+- Fix login redirects [#14560](https://github.com/statamic/cms/issues/14560) by @jasonvarga
+- Design a better empty, read-only state for asset fields [#14578](https://github.com/statamic/cms/issues/14578) by @jackmcdade
+- Avoid per-icon requests in the Icon storybook [#14580](https://github.com/statamic/cms/issues/14580) by @jasonvarga
+- Fix updater crash when addon has no license [#14573](https://github.com/statamic/cms/issues/14573) by @duncanmcclean
+- Lazy load Inertia page components [#14582](https://github.com/statamic/cms/issues/14582) by @jasonvarga
+- Fix LivePreview listener leak and simplify Grid row updates [#14583](https://github.com/statamic/cms/issues/14583) by @jasonvarga
+- Fix SavePipeline initial debounce delay [#14586](https://github.com/statamic/cms/issues/14586) by @jasonvarga
+- Debounce LinkFieldtype URL writes [#14584](https://github.com/statamic/cms/issues/14584) by @jasonvarga
+- Extract fieldtype update debounce to shared constant [#14587](https://github.com/statamic/cms/issues/14587) by @jasonvarga
+- Wrap FieldAction instances with markRaw [#14589](https://github.com/statamic/cms/issues/14589) by @jasonvarga
+- Color swatches get borders for contrast [#14591](https://github.com/statamic/cms/issues/14591) by @jackmcdade
+- Deduplicate RelationshipInput in-flight item-data requests [#14590](https://github.com/statamic/cms/issues/14590) by @jasonvarga
+- German translations [#14561](https://github.com/statamic/cms/issues/14561) by @helloDanuk
+- French translations [#14585](https://github.com/statamic/cms/issues/14585) by @ebeauchamps
+
+
+
+## 6.15.0 (2026-04-27)
+
+### What's new
+- Frontend Elevated Sessions [#14424](https://github.com/statamic/cms/issues/14424) by @duncanmcclean
+- Frontend Two-Factor Authentication [#14525](https://github.com/statamic/cms/issues/14525) by @duncanmcclean
+- Add config for disabling Elevated Sessions [#14464](https://github.com/statamic/cms/issues/14464) by @1stevengrant
+
+### What's fixed
+- Better Collaboration Avatars [#14511](https://github.com/statamic/cms/issues/14511) by @jackmcdade
+- Fix addon settings blueprint cache collision with field settings blueprint [#14509](https://github.com/statamic/cms/issues/14509) by @duncanmcclean
+- Show dashed border in assets fieldtype when field is read-only [#14507](https://github.com/statamic/cms/issues/14507) by @duncanmcclean
+- Fix duplicate slugs allowed with depth-conditional routes [#14508](https://github.com/statamic/cms/issues/14508) by @duncanmcclean
+- Combobox 2.0 [#13843](https://github.com/statamic/cms/issues/13843) by @duncanmcclean
+- Persist active tab in URL hash on globals publish form [#14515](https://github.com/statamic/cms/issues/14515) by @duncanmcclean
+- Always display time zone in DatePicker [#14518](https://github.com/statamic/cms/issues/14518) by @jasonvarga
+- Fix blank page when visiting CP routes with invalid items [#14517](https://github.com/statamic/cms/issues/14517) by @jasonvarga
+- Improve rate limiting [#14475](https://github.com/statamic/cms/issues/14475) by @ryanmitchell
+- Hide default Statamic logo on frontend auth pages [#14522](https://github.com/statamic/cms/issues/14522) by @jasonvarga
+- Update currencies dictionary [#14520](https://github.com/statamic/cms/issues/14520) by @tdrayson
+- Allow extending asset preset generation command [#14521](https://github.com/statamic/cms/issues/14521) by @daun
+- Fix NavBuilder crash when nav item has an unresolved children Closure [#14523](https://github.com/statamic/cms/issues/14523) by @v-Woody
+- Fix Eloquent user merge setting roles and groups as model attributes [#14526](https://github.com/statamic/cms/issues/14526) by @duncanmcclean
+- Fix `/!/nocache` and `/!/csrf` CSRF exemption on Laravel 13 [#14533](https://github.com/statamic/cms/issues/14533) by @ynamite
+- Improve Link fieldtype in listings [#14535](https://github.com/statamic/cms/issues/14535) by @duncanmcclean
+- Fix TypeError when asset last_modified meta is null [#14530](https://github.com/statamic/cms/issues/14530) by @v-Woody
+- Fix Live Preview iframe becoming unscrollable after resizing in Chromium [#14542](https://github.com/statamic/cms/issues/14542) by @duncanmcclean
+- Fix CP auth error when using multiple user providers [#14543](https://github.com/statamic/cms/issues/14543) by @andjsch
+- Fix blank term edit screen and JS error for restricted users [#14537](https://github.com/statamic/cms/issues/14537) by @joshuablum
+- Fix `durationForHumans` deprecation warning and rounding [#14541](https://github.com/statamic/cms/issues/14541) by @duncanmcclean
+- Fix elevated session redirect for POST endpoints [#14544](https://github.com/statamic/cms/issues/14544) by @jasonvarga
+- Always show success when using forgot password form [#14539](https://github.com/statamic/cms/issues/14539) by @jasonvarga
+- Publish container tweaks [#14548](https://github.com/statamic/cms/issues/14548) by @jasonvarga
+- Fix `updateChildPageUris` empty check never short-circuiting [#14547](https://github.com/statamic/cms/issues/14547) by @duncanmcclean
+- French translations [#14514](https://github.com/statamic/cms/issues/14514) by @ebeauchamps
+
+
+
 ## 6.14.0 (2026-04-16)
 
 ### What's new

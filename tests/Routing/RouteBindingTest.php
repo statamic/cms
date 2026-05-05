@@ -129,6 +129,8 @@ class RouteBindingTest extends TestCase
     ) {
         $this->setupContent();
 
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
         $response = $this->get($uri);
 
         if ($expectationCallback) {
@@ -147,6 +149,8 @@ class RouteBindingTest extends TestCase
         $expectationCallback = null
     ) {
         $this->setupContent();
+
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
         $response = $this->get($uri);
 

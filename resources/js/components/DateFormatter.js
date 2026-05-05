@@ -148,6 +148,14 @@ export default class DateFormatter {
             return this.#presets[options];
         }
 
+        if (options.preset) {
+            const { preset, ...overrides } = options;
+
+            if (!this.#presets[preset]) throw new Error(`Invalid date format: ${preset}`);
+
+            return { ...this.#presets[preset], ...overrides };
+        }
+
         return options;
     }
 }

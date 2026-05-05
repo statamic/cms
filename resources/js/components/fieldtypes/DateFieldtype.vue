@@ -23,7 +23,7 @@
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { DatePicker, DateRangePicker, Button } from '@/components/ui';
-import { getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
+import { CalendarDate, getLocalTimeZone, parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
@@ -67,9 +67,24 @@ export default {
             return this.config.inline;
         },
 
+        formatHasTime() {
+            return this.meta?.formatHasTime ?? true;
+        },
+
         datePickerValue() {
             if (!this.value || this.value === 'now') {
                 return null;
+            }
+
+            if (!this.formatHasTime) {
+                if (this.isRange) {
+                    return {
+                        start: this.parseDateOnly(this.value.start),
+                        end: this.parseDateOnly(this.value.end),
+                    };
+                }
+
+                return this.parseDateOnly(this.value);
             }
 
             if (this.isRange) {
@@ -128,6 +143,17 @@ export default {
                 return this.update(null);
             }
 
+            if (!this.formatHasTime) {
+                if (this.isRange) {
+                    return this.update({
+                        start: this.formatDateOnly(value.start),
+                        end: this.formatDateOnly(value.end),
+                    });
+                }
+
+                return this.update(this.formatDateOnly(value));
+            }
+
             // Sometimes, we'll get a CalendarDateTime object, which doesn't include timezone
             // information. In that case, we need to convert it to a ZonedDateTime object.
             if (!this.isRange && !value.offset && !value.timeZone) {
@@ -157,6 +183,11 @@ export default {
         addDate() {
             let now = new Date();
 
+            if (!this.formatHasTime) {
+                const str = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                return this.update(this.isRange ? { start: str, end: str } : str);
+            }
+
             now.setMilliseconds(0);
 
             if (!this.config.time_enabled) {
@@ -166,6 +197,15 @@ export default {
             const str = now.toISOString();
 
             this.update(this.isRange ? { start: str, end: str } : str);
+        },
+
+        parseDateOnly(value) {
+            const [year, month, day] = value.split('-').map(Number);
+            return new CalendarDate(year, month, day);
+        },
+
+        formatDateOnly(value) {
+            return `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}`;
         },
     },
 };

@@ -486,12 +486,16 @@ class EntriesController extends CpController
 
         $parent = $parent ? $tree->find($parent) : null;
 
+        if ($parent && $parent->isRoot()) {
+            $parent = null;
+        }
+
         return app(\Statamic\Contracts\Routing\UrlBuilder::class)
             ->content($entry)
             ->merge([
                 'parent_uri' => $parent ? $parent->uri() : null,
                 'slug' => $entry->slug(),
-                // 'depth' => '', // todo
+                'depth' => $parent ? $parent->depth() + 1 : 1,
                 'is_root' => false,
             ])
             ->build($entry->route());

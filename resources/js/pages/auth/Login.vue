@@ -15,7 +15,6 @@ const props = defineProps([
     'passkeyVerifyUrl',
     'oauthEnabled',
     'providers',
-    'referer',
     'submitUrl',
     'forgotPasswordUrl',
 ])
@@ -42,11 +41,11 @@ const submit = () => {
             errors.value = {};
         },
         onSuccess: (page) => {
-			if (page.component === 'auth/two-factor/Challenge') {
-				return;
-			}
+            if (page.component === 'auth/two-factor/Challenge') {
+                return;
+            }
 
-	        window.location.href = props.referer;
+            window.location.href = page.url;
         },
         onError: () => processing.value = false
     });
@@ -113,7 +112,7 @@ onUnmounted(() => passkey.cancel());
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
-                            class="text-ui-accent-text text-sm hover:text-ui-accent-text/80"
+                            class="text-ui-accent-text mb-1.5 text-sm hover:text-ui-accent-text/80"
                             tabindex="6"
                             v-text="__('Forgot password?')"
                         />

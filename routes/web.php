@@ -7,6 +7,7 @@ use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectContr
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Http\Controllers\ActivateAccountController;
+use Statamic\Http\Controllers\Auth\ElevatedSessionController;
 use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
 use Statamic\Http\Controllers\FrontendController;
@@ -27,6 +28,7 @@ use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete;
+use Statamic\Http\Middleware\RequireElevatedSession;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\CsrfTokenController;
 use Statamic\StaticCaching\NoCache\NoCacheController;
@@ -34,7 +36,7 @@ use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
-        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class])->name('forms.submit');
+        Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
@@ -42,19 +44,28 @@ Route::name('statamic.')->group(function () {
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
             Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
-            Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
+            Route::group(['middleware' => [HandlePrecognitiveRequests::class, 'throttle:statamic.auth']], function () {
                 Route::post('login', [LoginController::class, 'login'])->name('login');
                 Route::post('register', RegisterController::class)->name('register');
                 Route::post('profile', ProfileController::class)->name('profile');
                 Route::post('password', PasswordController::class)->name('password');
             });
 
-            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.auth')->name('password.email');
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-            Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+            Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.auth')->name('password.reset.action');
+
+            if (config('statamic.users.elevated_sessions_enabled')) {
+                Route::middleware('auth')->group(function () {
+                    Route::get('confirm-password', [ElevatedSessionController::class, 'showForm'])->name('elevated-session')->middleware([HandleInertiaRequests::class]);
+                    Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.auth');
+                    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.passkeys');
+                    Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+                });
+            }
 
             Route::group(['prefix' => 'passkeys'], function () {
-                Route::middleware(ThrottleRequests::class.':30,1')->group(function () {
+                Route::middleware('throttle:statamic.passkeys')->group(function () {
                     Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.options');
                     Route::post('auth', [PasskeyLoginController::class, 'login'])->name('passkeys.login');
                 });
@@ -71,9 +82,10 @@ Route::name('statamic.')->group(function () {
                 Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
                 Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
-                Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
-                    Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+                Route::middleware(['auth', RequireElevatedSession::class])->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+                    Route::post('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
                     Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
+                    Route::delete('two-factor/disable', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
                     Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
                     Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
                     Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
@@ -88,11 +100,11 @@ Route::name('statamic.')->group(function () {
 
         Route::post('nocache', NoCacheController::class)
             ->middleware(NoCacheLocalize::class)
-            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
+            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\PreventRequestForgery'])
             ->name('nocache');
 
         Route::post('csrf', CsrfTokenController::class)
-            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
+            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\PreventRequestForgery']);
 
         Statamic::additionalActionRoutes();
     });
