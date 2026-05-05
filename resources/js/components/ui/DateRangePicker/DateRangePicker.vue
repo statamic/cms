@@ -110,7 +110,7 @@ const timeZoneTooltip = computed(() => formatTimeZone('long'));
 <template>
     <div class="group/input relative block w-full" data-ui-input>
         <DateRangePickerRoot
-            :modelValue="modelValue"
+            :modelValue="modelValue ?? { start: undefined, end: undefined }"
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"

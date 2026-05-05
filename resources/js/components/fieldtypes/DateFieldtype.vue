@@ -157,6 +157,10 @@ export default {
                 return this.update(null);
             }
 
+            if (this.isRange && (!value.start || !value.end)) {
+                return;
+            }
+
             if (!this.formatHasTime) {
                 if (this.isRange) {
                     return this.update({

@@ -156,6 +156,23 @@ test('date-only format formats date correctly', async () => {
     expect(formatted).toBe('2025-06-05');
 });
 
+test.each([
+    [{ start: { year: 2025, month: 12, day: 25 }, end: undefined }],
+    [{ start: undefined, end: { year: 2025, month: 12, day: 31 } }],
+])('partial range update is ignored', async (value) => {
+    const dateField = makeDateField({
+        meta: { formatHasTime: false },
+        config: {
+            mode: 'range',
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    expect(() => dateField.vm.datePickerUpdated(value)).not.toThrow();
+    expect(dateField.emitted('update:value')).toBeUndefined();
+});
+
 test('date-only range format is not affected by timezone', async () => {
     process.env.TZ = 'America/New_York';
 
