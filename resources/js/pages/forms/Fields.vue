@@ -1046,7 +1046,10 @@ const selectedPageInternalName = computed({
                                         {{ selectedPageHeadingLabel }}
                                     </span>
                                 </div>
-                                <LogicFlowMock />
+                                <LogicFlowMock
+                                    :destination-step-label="__('Then go to Goodbye')"
+                                    :show-destination-selector="false"
+                                />
                                 <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                             </div>
                             <div v-else class="space-y-6 pt-8">
@@ -1192,7 +1195,10 @@ const selectedPageInternalName = computed({
                                 {{ selectedPageHeadingLabel }}
                             </span>
                         </div>
-                        <LogicFlowMock />
+                        <LogicFlowMock
+                            :destination-step-label="__('Then go to Goodbye')"
+                            :show-destination-selector="false"
+                        />
                         <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                     </div>
                     <div v-else class="space-y-6 pt-8">
