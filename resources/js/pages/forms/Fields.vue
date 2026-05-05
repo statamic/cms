@@ -719,7 +719,10 @@ const selectedPageInternalName = computed({
                         :data-editing-field="isPageInspector ? undefined : ''"
                         @click="inspectorTarget = 'field'"
                     >
-                        <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
+                        <div
+                            v-if="!isPageInspector"
+                            class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
+                        >
                             <WidthSelector
                                 v-model="editingFieldWidth"
                                 size="base"
@@ -965,7 +968,7 @@ const selectedPageInternalName = computed({
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                         <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
-                            <TabTrigger name="conditions" :text="__('Conditions')" />
+                            <TabTrigger name="conditions" :text="isPageInspector ? __('Logic') : __('Conditions')" />
                             <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                         </TabList>
 
@@ -1070,7 +1073,7 @@ const selectedPageInternalName = computed({
             <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger name="settings" :text="__('Settings')" />
-                    <TabTrigger name="conditions" :text="__('Conditions')" />
+                    <TabTrigger name="conditions" :text="isPageInspector ? __('Logic') : __('Conditions')" />
                     <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                 </TabList>
 
