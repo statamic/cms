@@ -549,6 +549,7 @@ const selectedPageInternalName = computed({
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    :class="inspectorTarget === 'page_1' ? 'bg-blue-50 border-blue-400!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                     {{ __('Page :current of :total', { current: 1, total: formPageTotal }) }}
@@ -713,7 +714,11 @@ const selectedPageInternalName = computed({
                         </div>
                     </div>
 
-                    <div id="editing-field" data-editing-field @click="inspectorTarget = 'field'">
+                    <div
+                        id="editing-field"
+                        :data-editing-field="isPageInspector ? undefined : ''"
+                        @click="inspectorTarget = 'field'"
+                    >
                         <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                             <WidthSelector
                                 v-model="editingFieldWidth"
