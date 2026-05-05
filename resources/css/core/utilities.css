@@ -54,6 +54,43 @@
     }
 }
 
+/* Horizontal scroll shadows, handy to give a bit of a visual hint when there's horizontal overflow. Uses CSS scroll-driven animation. */
+@property --left-fade {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+@property --right-fade {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+@keyframes scrollfade {
+    0% {
+        --left-fade: 0;
+    }
+    10%, 100% {
+        --left-fade: 1.75rem;
+    }
+    0%, 90% {
+        --right-fade: 1.75rem;
+    }
+    100% {
+        --right-fade: 0;
+    }
+}
+@utility st-horizontal-scroll-shadow {
+    overflow-x: scroll;
+    mask: linear-gradient(to right,
+        #0000,
+        #ffff var(--left-fade) calc(100% - var(--right-fade)),
+        #0000
+    );
+    animation: scrollfade;
+    animation-timeline: --scrollfade;
+    scroll-timeline: --scrollfade x;
+}
+
 /* UTILITIES / TEXT
 =================================================== */
 /* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */

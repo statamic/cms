@@ -986,7 +986,7 @@ const selectedPageInternalName = computed({
                 </button>
                 <div class="@container pt-6 pb-40 px-2.5">
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                        <TabList class="inline-flex flex-nowrap max-w-full overflow-x-auto overflow-y-hidden [&_button]:w-auto! [&_button]:shrink-0 mb-4 mx-0! [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                        <TabList class="st-horizontal-scroll-shadow inline-flex flex-nowrap max-w-full overflow-x-auto overflow-y-hidden [&_button]:w-auto! [&_button]:shrink-0 mb-4 mx-0! [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                             <TabTrigger name="settings" :text="__('Settings')" />
                             <TabTrigger name="conditions" :text="isPageInspector ? __('Branching') : __('Conditions')" />
                             <TabTrigger name="calculations" :text="__('Calculations')" />
@@ -1113,7 +1113,7 @@ const selectedPageInternalName = computed({
         <!-- This is the desktop nav - the content is repeated from the right panel -->
         <div class="@container relative pt-6 pb-12 px-2.5 pe-4.5 max-[1000px]:hidden">
             <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                <TabList class="inline-flex flex-nowrap max-w-full overflow-x-auto overflow-y-hidden [&_button]:w-auto! [&_button]:shrink-0 mb-4 mx-0! [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <TabList class="st-horizontal-scroll-shadow inline-flex flex-nowrap max-w-full overflow-x-auto overflow-y-hidden [&_button]:w-auto! [&_button]:shrink-0 mb-4 mx-0! [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <TabTrigger name="settings" :text="__('Settings')" />
                     <TabTrigger name="conditions" :text="isPageInspector ? __('Branching') : __('Conditions')" />
                     <TabTrigger name="calculations" :text="__('Calculations')" />
