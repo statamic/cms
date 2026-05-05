@@ -549,6 +549,7 @@ const selectedPageInternalName = computed({
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    :data-editing-item="inspectorTarget === 'page_1' ? '' : undefined"
                     :class="inspectorTarget === 'page_1' ? 'bg-blue-50 border-blue-400!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
@@ -717,6 +718,7 @@ const selectedPageInternalName = computed({
                     <div
                         id="editing-field"
                         :data-editing-field="isPageInspector ? undefined : ''"
+                        :data-editing-item="isPageInspector ? undefined : ''"
                         @click="inspectorTarget = 'field'"
                     >
                         <div
@@ -871,6 +873,7 @@ const selectedPageInternalName = computed({
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    :data-editing-item="inspectorTarget === 'page_2' ? '' : undefined"
                     :class="inspectorTarget === 'page_2' ? 'bg-blue-50 border-blue-400!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
@@ -980,6 +983,10 @@ const selectedPageInternalName = computed({
                                     </div>
                                     <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ selectedPageHeadingLabel }}
+                                        <div class="grid *:[grid-area:1/1]">
+                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                        </div>
                                     </span>
                                 </div>
                                 <Field :label="__('Label')">
@@ -1085,6 +1092,10 @@ const selectedPageInternalName = computed({
                             </div>
                             <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ selectedPageHeadingLabel }}
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
                             </span>
                         </div>
 

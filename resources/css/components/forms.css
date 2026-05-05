@@ -3,7 +3,7 @@
     position: relative;
 }
 
-/* GROUP MAIN COLUMN / FIELD BACKGROUND
+/* GROUP MAIN COLUMN / FIELD BACKGROUND DECORATION
 =================================================== */
 [data-editing-field] {
     position: relative;
@@ -99,7 +99,7 @@
             margin-bottom: 0;
         }
     }
-    [data-editing-field] {
+    [data-editing-item] {
         /* Tweak things optically, since the field is no longer here */
         > *:first-child {
             top: -0.085rem;
@@ -115,12 +115,13 @@
 }
 
 
-/* GROUP SIDEBAR / FIELD DIRECTION
+/* GROUP SIDEBAR / EDITING ITEM DIRECTION
 =================================================== */
+/* No decoration of the editing item itself, just a hook to handle the editing item direction indicators. */
 #main-content {
     timeline-scope: --editing-field-scroll;
 }
-[data-editing-field] {
+[data-editing-item] {
     view-timeline-name: --editing-field-scroll;
 }
 
