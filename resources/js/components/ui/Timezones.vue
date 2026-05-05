@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { config } from '@api';
+import { dateFormatter } from '@api';
 import { getLocalTimeZone } from '@internationalized/date';
 import Text from './Text.vue';
 
@@ -11,7 +11,7 @@ const props = defineProps({
 
 const normalizedDate = computed(() => new Date(props.date));
 
-const locale = computed(() => config.get('translationLocale'));
+const locale = computed(() => dateFormatter.locale);
 
 const appTimezone = computed(() => {
     try {
