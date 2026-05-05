@@ -11,6 +11,12 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose } = Fieldtype.use(emit, props);
 
+const timezoneOption = computed(() => {
+    const tz = props.value?.timezone;
+
+    return tz && tz !== 'auto' ? { timeZone: tz } : {};
+});
+
 const showTimeInValue = computed(() => props.value?.format_has_time && props.value?.time_enabled);
 
 const showTooltip = computed(() => props.value?.format_has_time);
@@ -21,7 +27,11 @@ const formatted = computed(() => {
     }
 
     const options = { preset: showTimeInValue.value ? 'datetime' : 'date' };
-    if (!props.value.format_has_time) options.timeZone = 'UTC';
+    if (!props.value.format_has_time) {
+        options.timeZone = 'UTC';
+    } else {
+        Object.assign(options, timezoneOption.value);
+    }
 
     const formatter = new DateFormatter().options(options);
 
@@ -40,7 +50,7 @@ const tooltip = computed(() => {
         return null;
     }
 
-    const formatter = new DateFormatter().options({ dateStyle: 'long', timeStyle: 'long' });
+    const formatter = new DateFormatter().options({ dateStyle: 'long', timeStyle: 'long', ...timezoneOption.value });
 
     if (props.value.mode === 'range') {
         let start = new Date(props.value.start);
