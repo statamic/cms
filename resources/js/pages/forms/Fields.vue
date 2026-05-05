@@ -19,6 +19,9 @@ const props = defineProps({
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const formPageTotal = 2;
 const activeSettingsTab = ref('settings');
+const inspectorTarget = ref('field');
+const pageOneInternalName = ref('');
+const pageTwoInternalName = ref('');
 const age = ref(null);
 const fanLength = ref('');
 const heardAboutValue = ref(null);
@@ -85,6 +88,25 @@ const notificationOptions = [
     { label: __('Merchandise'), value: 'merchandise' },
     { label: __('Friends of The Midnight'), value: 'friends_of_the_midnight' },
 ];
+const isPageInspector = computed(() => inspectorTarget.value === 'page_1' || inspectorTarget.value === 'page_2');
+const selectedPageHeadingLabel = computed(() => {
+    if (inspectorTarget.value === 'page_1') return __('Page :current of :total', { current: 1, total: formPageTotal });
+    if (inspectorTarget.value === 'page_2') return __('Goodbye');
+    return __('Page');
+});
+const selectedPageInternalName = computed({
+    get() {
+        return inspectorTarget.value === 'page_2' ? pageTwoInternalName.value : pageOneInternalName.value;
+    },
+    set(value) {
+        if (inspectorTarget.value === 'page_2') {
+            pageTwoInternalName.value = value;
+            return;
+        }
+
+        pageOneInternalName.value = value;
+    },
+});
 </script>
 
 <template>
@@ -514,10 +536,14 @@ const notificationOptions = [
 
         <div
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
-            role="separator"
+            role="button"
+            tabindex="0"
             :aria-label="__('Page :current of :total', { current: 1, total: formPageTotal })"
             data-form-page-label
             data-form-page="1"
+            @click="inspectorTarget = 'page_1'; activeSettingsTab = 'settings'"
+            @keydown.enter.prevent="inspectorTarget = 'page_1'; activeSettingsTab = 'settings'"
+            @keydown.space.prevent="inspectorTarget = 'page_1'; activeSettingsTab = 'settings'"
         >
             <div class="flex items-center gap-4 cursor-pointer">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
@@ -687,7 +713,7 @@ const notificationOptions = [
                         </div>
                     </div>
 
-                    <div id="editing-field" data-editing-field>
+                    <div id="editing-field" data-editing-field @click="inspectorTarget = 'field'">
                         <div class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center">
                             <WidthSelector
                                 v-model="editingFieldWidth"
@@ -824,10 +850,14 @@ const notificationOptions = [
 
         <div
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 mt-12"
-            role="separator"
+            role="button"
+            tabindex="0"
             :aria-label="__('Goodbye')"
             data-form-page-label
             data-form-page="2"
+            @click="inspectorTarget = 'page_2'; activeSettingsTab = 'settings'"
+            @keydown.enter.prevent="inspectorTarget = 'page_2'; activeSettingsTab = 'settings'"
+            @keydown.space.prevent="inspectorTarget = 'page_2'; activeSettingsTab = 'settings'"
         >
             <div class="flex items-center gap-4 cursor-pointer">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
@@ -930,11 +960,22 @@ const notificationOptions = [
                         <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
                             <TabTrigger name="conditions" :text="__('Conditions')" />
-                            <TabTrigger name="validation" :text="__('Validation')" />
+                            <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                         </TabList>
 
                         <TabContent name="settings">
-                            <div class="space-y-6 pt-8">
+                            <div v-if="isPageInspector" class="space-y-6 pt-8">
+                                <div class="flex items-center gap-2.5">
+                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                        {{ selectedPageHeadingLabel }}
+                                    </span>
+                                </div>
+                                <Field :label="__('Name')" :instructions="__('Optionally name this page. This is just an internal name, only Section names are output')">
+                                    <Input v-model="selectedPageInternalName" />
+                                </Field>
+                            </div>
+                            <div v-else class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
                                     <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                     <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
@@ -973,7 +1014,17 @@ const notificationOptions = [
                             </div>
                         </TabContent>
                         <TabContent name="conditions">
-                            <div class="space-y-6 pt-8">
+                            <div v-if="isPageInspector" class="space-y-6 pt-8">
+                                <div class="flex items-center gap-2.5">
+                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                        {{ selectedPageHeadingLabel }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Conditions') }}</p>
+                                <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
+                            </div>
+                            <div v-else class="space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
                                     <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                     <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
@@ -989,7 +1040,7 @@ const notificationOptions = [
                                 <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                             </div>
                         </TabContent>
-                        <TabContent name="validation">
+                        <TabContent v-if="!isPageInspector" name="validation">
                             <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
                         </TabContent>
                     </Tabs>
@@ -1003,11 +1054,23 @@ const notificationOptions = [
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger name="settings" :text="__('Settings')" />
                     <TabTrigger name="conditions" :text="__('Conditions')" />
-                    <TabTrigger name="validation" :text="__('Validation')" />
+                    <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                 </TabList>
 
                 <TabContent name="settings">
-                    <div class="space-y-6 pt-8">
+                    <div v-if="isPageInspector" class="space-y-6 pt-8">
+                        <div class="flex items-center gap-2.5">
+                            <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                {{ selectedPageHeadingLabel }}
+                            </span>
+                        </div>
+
+                        <Field :label="__('Name')" :instructions="__('Optionally name this page. This is just an internal name, only Section names are output')">
+                            <Input v-model="selectedPageInternalName" />
+                        </Field>
+                    </div>
+                    <div v-else class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2.5">
                             <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                             <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
@@ -1082,7 +1145,17 @@ const notificationOptions = [
                     </div>
                 </TabContent>
                 <TabContent name="conditions">
-                    <div class="space-y-6 pt-8">
+                    <div v-if="isPageInspector" class="space-y-6 pt-8">
+                        <div class="flex items-center gap-2.5">
+                            <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                {{ selectedPageHeadingLabel }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Conditions') }}</p>
+                        <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
+                    </div>
+                    <div v-else class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2.5">
                             <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                             <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
@@ -1098,7 +1171,7 @@ const notificationOptions = [
                         <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                     </div>
                 </TabContent>
-                <TabContent name="validation">
+                <TabContent v-if="!isPageInspector" name="validation">
                     <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
                 </TabContent>
             </Tabs>
