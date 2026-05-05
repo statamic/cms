@@ -18,7 +18,8 @@ const props = defineProps({
 
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const formPageTotal = 2;
-const activeSettingsTab = ref('settings');
+const activeFieldSettingsTab = ref('settings');
+const activePageSettingsTab = ref('settings');
 const inspectorTarget = ref('field');
 const pageOneInternalName = ref('');
 const pageTwoInternalName = ref('Goodbye');
@@ -89,6 +90,19 @@ const notificationOptions = [
     { label: __('Friends of The Midnight'), value: 'friends_of_the_midnight' },
 ];
 const isPageInspector = computed(() => inspectorTarget.value === 'page_1' || inspectorTarget.value === 'page_2');
+const activeSettingsTab = computed({
+    get() {
+        return isPageInspector.value ? activePageSettingsTab.value : activeFieldSettingsTab.value;
+    },
+    set(value) {
+        if (isPageInspector.value) {
+            activePageSettingsTab.value = value;
+            return;
+        }
+
+        activeFieldSettingsTab.value = value;
+    },
+});
 const selectedPageHeadingLabel = computed(() => {
     if (inspectorTarget.value === 'page_1') return __('Page :current of :total', { current: 1, total: formPageTotal });
     if (inspectorTarget.value === 'page_2') return __('Goodbye');
@@ -541,9 +555,9 @@ const selectedPageInternalName = computed({
             :aria-label="__('Page :current of :total', { current: 1, total: formPageTotal })"
             data-form-page-label
             data-form-page="1"
-            @click="inspectorTarget = 'page_1'; activeSettingsTab = 'settings'"
-            @keydown.enter.prevent="inspectorTarget = 'page_1'; activeSettingsTab = 'settings'"
-            @keydown.space.prevent="inspectorTarget = 'page_1'; activeSettingsTab = 'settings'"
+            @click="inspectorTarget = 'page_1'"
+            @keydown.enter.prevent="inspectorTarget = 'page_1'"
+            @keydown.space.prevent="inspectorTarget = 'page_1'"
         >
             <div class="flex items-center gap-4 cursor-pointer">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
@@ -865,9 +879,9 @@ const selectedPageInternalName = computed({
             :aria-label="__('Goodbye')"
             data-form-page-label
             data-form-page="2"
-            @click="inspectorTarget = 'page_2'; activeSettingsTab = 'settings'"
-            @keydown.enter.prevent="inspectorTarget = 'page_2'; activeSettingsTab = 'settings'"
-            @keydown.space.prevent="inspectorTarget = 'page_2'; activeSettingsTab = 'settings'"
+            @click="inspectorTarget = 'page_2'"
+            @keydown.enter.prevent="inspectorTarget = 'page_2'"
+            @keydown.space.prevent="inspectorTarget = 'page_2'"
         >
             <div class="flex items-center gap-4 cursor-pointer">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
