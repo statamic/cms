@@ -125,6 +125,11 @@
     view-timeline-name: --editing-field-scroll;
 }
 
+/* Page 1 of 2, etc. */
+[data-form-page-label] {
+    scroll-margin-top: 7rem;
+}
+
 [data-field-direction-down],
 [data-field-direction-up] {
     @apply p-1 size-4.75! ms-1 text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 border-1 border-dotted border-blue-400 dark:border-blue-700 rounded-full;

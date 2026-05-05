@@ -103,6 +103,7 @@ const activeSettingsTab = computed({
         activeFieldSettingsTab.value = value;
     },
 });
+const selectedPageAnchor = computed(() => (inspectorTarget.value === 'page_2' ? '#form-page-2' : '#form-page-1'));
 const selectedPageHeadingLabel = computed(() => {
     if (inspectorTarget.value === 'page_1') return __('Page :current of :total', { current: 1, total: formPageTotal });
     if (inspectorTarget.value === 'page_2') return __('Goodbye');
@@ -549,6 +550,7 @@ const selectedPageInternalName = computed({
         </Header>
 
         <div
+            id="form-page-1"
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
             role="button"
             tabindex="0"
@@ -562,7 +564,7 @@ const selectedPageInternalName = computed({
             <div class="flex items-center gap-4 cursor-pointer">
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
-                    class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200 scroll-mt-[7rem]"
                     :data-editing-item="inspectorTarget === 'page_1' ? '' : undefined"
                     :class="inspectorTarget === 'page_1' ? 'bg-blue-50 border-blue-400!' : ''"
                 >
@@ -873,6 +875,7 @@ const selectedPageInternalName = computed({
         </Panel>
 
         <div
+            id="form-page-2"
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 mt-12"
             role="button"
             tabindex="0"
@@ -995,13 +998,13 @@ const selectedPageInternalName = computed({
                                     <div class="size-4">
                                         <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                                     </div>
-                                    <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                    <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ selectedPageHeadingLabel }}
                                         <div class="grid *:[grid-area:1/1]">
                                             <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                             <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                                         </div>
-                                    </span>
+                                    </a>
                                 </div>
                                 <Field :label="__('Label')">
                                     <Input v-model="selectedPageInternalName" />
@@ -1056,9 +1059,9 @@ const selectedPageInternalName = computed({
                                     <div class="size-4">
                                         <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                                     </div>
-                                    <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                    <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ selectedPageHeadingLabel }}
-                                    </span>
+                                    </a>
                                 </div>
                                 <LogicFlowMock
                                     :destination-step-label="__('Then go to Goodbye')"
@@ -1107,13 +1110,13 @@ const selectedPageInternalName = computed({
                             <div class="size-4">
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
-                            <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                            <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ selectedPageHeadingLabel }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                                 </div>
-                            </span>
+                            </a>
                         </div>
 
                         <Field :label="__('Label')">
@@ -1205,9 +1208,9 @@ const selectedPageInternalName = computed({
                             <div class="size-4">
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
-                            <span class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                            <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ selectedPageHeadingLabel }}
-                            </span>
+                            </a>
                         </div>
                         <LogicFlowMock
                             :destination-step-label="__('Then go to Goodbye')"
