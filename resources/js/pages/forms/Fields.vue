@@ -21,7 +21,7 @@ const formPageTotal = 2;
 const activeSettingsTab = ref('settings');
 const inspectorTarget = ref('field');
 const pageOneInternalName = ref('');
-const pageTwoInternalName = ref('');
+const pageTwoInternalName = ref('Goodbye');
 const age = ref(null);
 const fanLength = ref('');
 const heardAboutValue = ref(null);
@@ -868,6 +868,7 @@ const selectedPageInternalName = computed({
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    :class="inspectorTarget === 'page_2' ? 'bg-blue-50 border-blue-400!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                     {{ __('Goodbye') }}
@@ -976,8 +977,11 @@ const selectedPageInternalName = computed({
                                         {{ selectedPageHeadingLabel }}
                                     </span>
                                 </div>
-                                <Field :label="__('Name')" :instructions="__('Optionally name this page. This is just an internal name, only Section names are output')">
+                                <Field :label="__('Label')">
                                     <Input v-model="selectedPageInternalName" />
+                                </Field>
+                                <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                                    <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
                                 </Field>
                             </div>
                             <div v-else class="space-y-6 pt-8">
@@ -1071,8 +1075,11 @@ const selectedPageInternalName = computed({
                             </span>
                         </div>
 
-                        <Field :label="__('Name')" :instructions="__('Optionally name this page. This is just an internal name, only Section names are output')">
+                        <Field :label="__('Label')">
                             <Input v-model="selectedPageInternalName" />
+                        </Field>
+                        <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                            <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
                         </Field>
                     </div>
                     <div v-else class="space-y-6 pt-8">
