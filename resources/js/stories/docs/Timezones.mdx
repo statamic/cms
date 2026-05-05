@@ -1,0 +1,16 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as TimezonesStories from '../Timezones.stories';
+
+<Meta of={TimezonesStories} />
+
+# Timezones
+Displays a given instant rendered across the user's local timezone, the configured app timezone, and UTC.
+
+## Overview
+<Canvas of={TimezonesStories._DocsIntro} sourceState={'shown'} />
+
+## Hover Card
+<Canvas of={TimezonesStories._HoverCard} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={TimezonesStories} />
