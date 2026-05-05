@@ -24,7 +24,7 @@ const attrs = useAttrs();
 </script>
 
 <template>
-    <HoverCard :side :align :delay :offset inset>
+    <HoverCard :side :align :delay :offset>
         <template #trigger>
             <span v-bind="attrs"><slot /></span>
         </template>
