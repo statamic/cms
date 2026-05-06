@@ -37,7 +37,9 @@ use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
 
+use function Statamic\trans;
 use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class CoreModifiers extends Modifier
 {

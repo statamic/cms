@@ -16,6 +16,7 @@ use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\OAuth\Provider;
 use Statamic\Statamic;
 
+use function Statamic\trans;
 use function Statamic\trans as __;
 
 class LoginController extends CpController

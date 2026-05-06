@@ -7,6 +7,7 @@ use Statamic\Facades\User;
 use Statamic\Statamic;
 
 use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class DeleteMultisiteEntry extends Delete
 {

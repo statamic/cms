@@ -5,6 +5,8 @@ namespace Statamic\Licensing;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
+use function Statamic\trans;
+
 class StatamicLicense extends License
 {
     public function pro()

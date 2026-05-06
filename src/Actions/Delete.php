@@ -5,6 +5,7 @@ namespace Statamic\Actions;
 use Statamic\Contracts;
 
 use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class Delete extends Action
 {
