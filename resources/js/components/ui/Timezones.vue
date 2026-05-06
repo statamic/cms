@@ -45,20 +45,29 @@ const formatDateTime = (timeZone) => {
     return isRange.value ? formatter.formatRange(start.value, end.value) : formatter.format(start.value);
 };
 
-const rows = computed(() => [
-    ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
-    { timeZone: getLocalTimeZone(), sublabel: __('Your computer') },
-    { timeZone: appTimezone.value, sublabel: __('Application') },
-    { timeZone: 'UTC', sublabel: null },
-]);
+const rows = computed(() => {
+    const all = [
+        ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
+        { timeZone: getLocalTimeZone(), sublabel: __('Your computer') },
+        { timeZone: appTimezone.value, sublabel: __('Application') },
+        { timeZone: 'UTC', sublabel: null },
+    ];
+
+    const seen = new Set();
+    return all.map((row) => {
+        const isDuplicate = seen.has(row.timeZone);
+        seen.add(row.timeZone);
+        return { ...row, isDuplicate };
+    });
+});
 </script>
 
 <template>
     <div v-if="isValid" class="grid grid-cols-[auto_auto_auto] gap-x-3 gap-y-1 text-sm">
         <template v-for="(row, index) in rows" :key="index">
-            <Text :text="formatTimeZone(row.timeZone)" variant="strong" />
-            <Text :text="row.sublabel" variant="subtle" />
-            <Text :text="formatDateTime(row.timeZone)" />
+            <Text :text="formatTimeZone(row.timeZone)" variant="strong" :class="{ 'opacity-50': row.isDuplicate }" />
+            <Text :text="row.sublabel" variant="subtle" :class="{ 'opacity-50': row.isDuplicate }" />
+            <Text :text="formatDateTime(row.timeZone)" :class="{ 'opacity-50': row.isDuplicate }" />
         </template>
     </div>
 </template>
