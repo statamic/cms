@@ -538,6 +538,41 @@ const branchingActionLabel = computed(() => {
                             </DropdownMenu>
                         </Dropdown>
                     </li>
+                    <li v-if="logicBranchingAction === 'go_to'">
+                        <Combobox
+                            v-model="logicDestination"
+                            size="sm"
+                            variant="default"
+                            :options="logicDestinationOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Destination')"
+                            searchable
+                        >
+                            <template #option="{ icon, label, category }">
+                                <div class="flex min-w-0 gap-2 items-center text-left">
+                                    <Icon
+                                        v-if="icon"
+                                        :name="icon"
+                                        :class="optionIconClasses({ category })"
+                                    />
+                                    <span class="block truncate">{{ label }}</span>
+                                </div>
+                            </template>
+                            <template #selected-option="{ option }">
+                                <div class="flex min-w-0 items-center gap-1 -ms-0.75">
+                                    <div :class="optionChipClasses(option)">
+                                        <Icon
+                                            v-if="option.icon"
+                                            :name="option.icon"
+                                            :class="optionChipIconClasses(option)"
+                                        />
+                                    </div>
+                                    <span class="block truncate">{{ option.label }}</span>
+                                </div>
+                            </template>
+                        </Combobox>
+                    </li>
                 </ol>
             </li>
         </ol>
