@@ -11,8 +11,6 @@ const props = defineProps({
 
 const normalizedDate = computed(() => new Date(props.date));
 
-const locale = computed(() => dateFormatter.locale);
-
 const appTimezone = computed(() => {
     try {
         return config.get('appTimezone') ?? 'UTC';
@@ -23,7 +21,7 @@ const appTimezone = computed(() => {
 
 const formatTimeZone = (timeZone) => {
     try {
-        const parts = new Intl.DateTimeFormat(locale.value, {
+        const parts = new Intl.DateTimeFormat(config.get('translationLocale'), {
             timeZone,
             timeZoneName: 'short',
         }).formatToParts(normalizedDate.value);
@@ -35,7 +33,7 @@ const formatTimeZone = (timeZone) => {
 
 const formatDateTime = (timeZone) => {
     try {
-        return new Intl.DateTimeFormat(locale.value, { dateStyle: 'long', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
+        return new Intl.DateTimeFormat(dateFormatter.locale, { dateStyle: 'long', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
     } catch (e) {
         return '';
     }
