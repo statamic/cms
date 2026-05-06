@@ -100,6 +100,40 @@ class StatamicTest extends TestCase
     }
 
     #[Test]
+    public function it_translates_a_string()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('Hello', Statamic::trans('package::messages.hello'));
+        $this->assertEquals('Hello, Bob', Statamic::trans('package::messages.hello_name', ['name' => 'Bob']));
+    }
+
+    #[Test]
+    public function trans_returns_the_key_when_the_value_is_an_array()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('package::messages', Statamic::trans('package::messages'));
+    }
+
+    #[Test]
+    public function it_pluralizes_with_trans_choice()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('There is one apple', Statamic::transChoice('package::messages.apples', 1));
+        $this->assertEquals('There are 5 apples', Statamic::transChoice('package::messages.apples', 5));
+    }
+
+    #[Test]
+    public function trans_choice_returns_the_key_when_the_value_is_an_array()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('package::messages', Statamic::transChoice('package::messages', 1));
+    }
+
+    #[Test]
     public function it_aliases_query_builders()
     {
         app()->bind('statamic.queries.test', function () {
