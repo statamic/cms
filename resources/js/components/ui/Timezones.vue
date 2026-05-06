@@ -24,7 +24,7 @@ const formatTimeZone = (timeZone) => {
 };
 
 const formatDateTime = (timeZone) => {
-    return new Intl.DateTimeFormat(dateFormatter.locale, { dateStyle: 'long', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
+    return new Intl.DateTimeFormat(dateFormatter.locale, { dateStyle: 'medium', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
 };
 
 const rows = computed(() => [
