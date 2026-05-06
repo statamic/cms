@@ -1,5 +1,5 @@
 <script setup>
-import { Combobox, Icon, Input } from '@ui';
+import { Button, Combobox, Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Icon, Input } from '@ui';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -84,6 +84,10 @@ const logicDestination = ref(props.mockPreset.logicDestination || 'fan_length');
 const logicBranchingAction = ref(props.mockPreset.logicBranchingAction || 'go_to');
 const logicBranchingActionOptions = [
     { label: __('Go to'), value: 'go_to' },
+    { label: __('Add'), value: 'add' },
+    { label: __('Divide'), value: 'divide' },
+    { label: __('Subtract'), value: 'subtract' },
+    { label: __('Multiply'), value: 'multiply' },
 ];
 const logicDestinationOptions = [
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
@@ -154,6 +158,10 @@ const primarySelection = computed({
     },
 });
 const calculationUsesNumberInput = computed(() => props.calculationMode && primarySelection.value === 'number');
+const branchingActionLabel = computed(() => {
+    const selected = logicBranchingActionOptions.find((option) => option.value === logicBranchingAction.value);
+    return selected?.label || __('Branching');
+});
 </script>
 
 <template>
@@ -228,12 +236,13 @@ const calculationUsesNumberInput = computed(() => props.calculationMode && prima
                 <ol v-if="props.showDestinationSelector">
                     <li>
                         <Combobox
-                            v-model="logicDestination"
+                            v-model="logicBranchingCalculation"
                             size="sm"
                             variant="default"
-                            :options="logicDestinationOptions"
+                            :options="logicBranchingCalculationOptions"
                             option-label="label"
                             option-value="value"
+                            :dropdown-label="__('Calculations')"
                             :placeholder="__('Destination')"
                             searchable
                         >
@@ -487,50 +496,47 @@ const calculationUsesNumberInput = computed(() => props.calculationMode && prima
                 </div>
                 <ol v-if="props.showDestinationSelector">
                     <li>
-                        <Combobox
-                            v-model="logicBranchingAction"
-                            size="sm"
-                            :options="logicBranchingActionOptions"
-                            option-label="label"
-                            option-value="value"
-                            :placeholder="__('Branching')"
-                            :searchable="false"
-                        />
-                    </li>
-                    <li>
-                        <Combobox
-                            v-model="logicDestination"
-                            size="sm"
-                            variant="default"
-                            :options="logicDestinationOptions"
-                            option-label="label"
-                            option-value="value"
-                            :placeholder="__('Destination')"
-                            searchable
-                        >
-                            <template #option="{ icon, label, category }">
-                                <div class="flex min-w-0 gap-2 items-center text-left">
-                                    <Icon
-                                        v-if="icon"
-                                        :name="icon"
-                                        :class="optionIconClasses({ category })"
-                                    />
-                                    <span class="block truncate">{{ label }}</span>
-                                </div>
+                        <Dropdown>
+                            <template #trigger>
+                                <button
+                                    type="button"
+                                    class="w-full min-w-0 flex items-center justify-between rounded-lg border border-gray-300 bg-linear-to-b from-white to-gray-50 px-3 h-8 text-sm text-gray-900 shadow-ui-sm dark:from-gray-850 dark:to-gray-900 dark:border-gray-700 dark:text-gray-300 dark:shadow-ui-md"
+                                >
+                                    <span class="truncate">{{ branchingActionLabel }}</span>
+                                    <Icon name="chevron-down" class="ms-2 size-4 text-gray-400 dark:text-white/40" />
+                                </button>
                             </template>
-                            <template #selected-option="{ option }">
-                                <div class="flex min-w-0 items-center gap-1 -ms-0.75">
-                                    <div :class="optionChipClasses(option)">
-                                        <Icon
-                                            v-if="option.icon"
-                                            :name="option.icon"
-                                            :class="optionChipIconClasses(option)"
-                                        />
-                                    </div>
-                                    <span class="block truncate">{{ option.label }}</span>
-                                </div>
-                            </template>
-                        </Combobox>
+                            <DropdownMenu>
+                                <DropdownLabel :text="__('Branching')" />
+                                <DropdownItem :text="__('Go to')" @click="logicBranchingAction = 'go_to'" />
+                                <DropdownSeparator />
+                                <DropdownLabel :text="__('Calculation')" />
+                                <DropdownItem @click="logicBranchingAction = 'add'">
+                                    <span class="inline-flex items-center gap-2">
+                                        <span>+</span>
+                                        <span>{{ __('Add') }}</span>
+                                    </span>
+                                </DropdownItem>
+                                <DropdownItem @click="logicBranchingAction = 'divide'">
+                                    <span class="inline-flex items-center gap-2">
+                                        <span>÷</span>
+                                        <span>{{ __('Divide') }}</span>
+                                    </span>
+                                </DropdownItem>
+                                <DropdownItem @click="logicBranchingAction = 'subtract'">
+                                    <span class="inline-flex items-center gap-2">
+                                        <span>−</span>
+                                        <span>{{ __('Subtract') }}</span>
+                                    </span>
+                                </DropdownItem>
+                                <DropdownItem @click="logicBranchingAction = 'multiply'">
+                                    <span class="inline-flex items-center gap-2">
+                                        <span>×</span>
+                                        <span>{{ __('Multiply') }}</span>
+                                    </span>
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                     </li>
                 </ol>
             </li>
