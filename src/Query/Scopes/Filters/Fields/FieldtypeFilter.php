@@ -6,6 +6,8 @@ use Statamic\Extend\HasFields;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FieldtypeFilter
 {
     use HasFields;

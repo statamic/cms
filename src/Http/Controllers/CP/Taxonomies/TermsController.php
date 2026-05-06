@@ -18,6 +18,8 @@ use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
 
+use function Statamic\trans as __;
+
 class TermsController extends CpController
 {
     use ExtractsFromTermFields,

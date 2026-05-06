@@ -7,6 +7,8 @@ use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Filter;
 
+use function Statamic\trans as __;
+
 class Collection extends Filter
 {
     protected $pinned = true;

@@ -24,6 +24,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 
+use function Statamic\trans as __;
+
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,

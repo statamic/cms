@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Terms extends FieldtypeFilter
 {
     public function fieldItems()

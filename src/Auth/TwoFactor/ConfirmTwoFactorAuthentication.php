@@ -5,6 +5,8 @@ namespace Statamic\Auth\TwoFactor;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\User;
 
+use function Statamic\trans as __;
+
 class ConfirmTwoFactorAuthentication
 {
     public function __construct(private TwoFactorAuthenticationProvider $provider)

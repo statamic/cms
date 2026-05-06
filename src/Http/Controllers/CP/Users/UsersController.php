@@ -24,6 +24,8 @@ use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
 use Symfony\Component\Mailer\Exception\TransportException;
 
+use function Statamic\trans as __;
+
 class UsersController extends CpController
 {
     use ExtractsFromUserFields,

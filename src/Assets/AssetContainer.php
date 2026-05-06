@@ -31,6 +31,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable, ContainsQueryableValues
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
