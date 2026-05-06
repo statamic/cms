@@ -9,6 +9,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class TwoFactorRecoveryCodesController extends CpController
 {
     public function show(Request $request)

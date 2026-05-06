@@ -11,6 +11,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class TwoFactorAuthenticationController extends CpController
 {
     public function enable(Request $request, EnableTwoFactorAuthentication $enable)

@@ -7,6 +7,8 @@ use Illuminate\Support\MessageBag;
 use Statamic\Events\LicensesRefreshed;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class LicenseManager
 {
     protected $outpost;

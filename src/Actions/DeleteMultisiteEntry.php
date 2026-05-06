@@ -6,6 +6,8 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class DeleteMultisiteEntry extends Delete
 {
     public function visibleTo($item)

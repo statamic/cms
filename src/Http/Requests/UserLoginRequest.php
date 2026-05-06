@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 
+use function Statamic\trans as __;
+
 class UserLoginRequest extends FormRequest
 {
     use Localizable;

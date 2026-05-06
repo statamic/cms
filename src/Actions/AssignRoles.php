@@ -5,6 +5,8 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Role;
 
+use function Statamic\trans as __;
+
 class AssignRoles extends Action
 {
     public $icon = 'permissions';

@@ -10,6 +10,8 @@ use Statamic\Facades\Scope;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\OrderBy;
 
+use function Statamic\trans as __;
+
 abstract class Relationship extends Fieldtype
 {
     protected static $preloadable = true;

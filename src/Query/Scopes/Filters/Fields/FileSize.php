@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 /**
  * Special integer field that takes input in KB, queries in bytes, and displays a human-readable badge.
  */

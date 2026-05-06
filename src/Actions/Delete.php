@@ -4,6 +4,8 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts;
 
+use function Statamic\trans as __;
+
 class Delete extends Action
 {
     protected $dangerous = true;

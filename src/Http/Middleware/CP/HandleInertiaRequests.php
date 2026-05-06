@@ -7,6 +7,8 @@ use Inertia\Middleware;
 use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'statamic::layout';

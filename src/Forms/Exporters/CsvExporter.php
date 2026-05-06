@@ -6,6 +6,8 @@ use League\Csv\Writer;
 use SplTempFileObject;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class CsvExporter extends Exporter
 {
     private Writer $writer;

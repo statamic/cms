@@ -15,6 +15,8 @@ use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Replicator extends Fieldtype
 {
     use AddsEntryValidationReplacements, UpdatesReferences;

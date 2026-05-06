@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Contracts\Validation\Rule as ValidationRule;
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class GlobalSetSites extends Fieldtype
 {
     protected $selectable = false;

@@ -26,6 +26,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 
+use function Statamic\trans as __;
+
 class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls, Hookable;
