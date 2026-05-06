@@ -1083,7 +1083,7 @@ const selectedPageInternalName = computed({
                                     </a>
                                 </div>
 
-                                <LogicFlowMock />
+                                <LogicFlowMock :use-when-selector="true" />
                                 <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                             </div>
                         </TabContent>
@@ -1232,7 +1232,7 @@ const selectedPageInternalName = computed({
                             </a>
                         </div>
 
-                        <LogicFlowMock />
+                        <LogicFlowMock :use-when-selector="true" />
                         <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                     </div>
                 </TabContent>

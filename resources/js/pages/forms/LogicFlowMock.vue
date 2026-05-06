@@ -31,9 +31,19 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    useWhenSelector: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const logicOperator = ref(props.mockPreset.logicOperator || 'equals');
+const logicWhen = ref(props.mockPreset.logicWhen || 'show_when');
+const logicWhenOptions = [
+    { label: __('Always show'), value: 'always_show' },
+    { label: __('Show when'), value: 'show_when' },
+    { label: __('Hide when'), value: 'hide_when' },
+];
 const logicOperatorOptions = [
     { label: __('Equals'), value: 'equals' },
     { label: __('Does not equal'), value: 'not_equals' },
@@ -60,6 +70,7 @@ const logicDestinationOptions = [
     { label: __('I want a free drink voucher'), value: 'free_drink_voucher', icon: 'fieldtype-toggle', category: 'choice' },
 ];
 const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
+const logicPrimaryConditionField = ref(props.mockPreset.logicPrimaryConditionField || 'heard_about_us');
 const logicConditionFieldOptions = [
     { label: __('What do you like most about our band? '), value: 'long_answer', icon: 'text-long', category: 'text' },
     { label: __('How did you hear about us?'), value: 'heard_about_us', icon: 'fieldtype-select', category: 'choice' },
@@ -103,7 +114,14 @@ const optionChipIconClasses = (option) => {
         <!-- <ol>
             <li>
                 <div class="logic-text-badge logic-text__condition" aria-hidden="true">
-                    {{ __('If') }}
+                    <Combobox
+                        v-model="logicWhen"
+                        size="sm"
+                        :options="logicWhenOptions"
+                        option-label="label"
+                        option-value="value"
+                        :searchable="false"
+                    />
                 </div>
                 <ol>
                     <li>
@@ -146,7 +164,7 @@ const optionChipIconClasses = (option) => {
                 </ol>
             </li>
 
-            <li>
+            <li v-if="!props.useWhenSelector">
                 <div class="logic-text-badge logic-text__condition" aria-hidden="true">
                     {{ props.destinationStepLabel || __('Then go to …') }}
                 </div>
@@ -193,12 +211,58 @@ const optionChipIconClasses = (option) => {
         <!-- Demo 2 -->
         <ol>
             <li>
-                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
+                <div v-if="props.useWhenSelector" class="logic-text__condition" aria-hidden="true">
+                    <Combobox
+                        v-model="logicWhen"
+                        class="min-w-34"
+                        size="sm"
+                        :options="logicWhenOptions"
+                        option-label="label"
+                        option-value="value"
+                        :searchable="false"
+                    />
+                </div>
+                <div v-else class="logic-text-badge logic-text__condition" aria-hidden="true">
                     {{ __('If') }}
                 </div>
                 <ol>
                     <li>
+                        <Combobox
+                            v-if="props.useWhenSelector"
+                            v-model="logicPrimaryConditionField"
+                            size="sm"
+                            variant="default"
+                            :options="logicConditionFieldOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Field')"
+                            searchable
+                        >
+                            <template #option="{ icon, label, category }">
+                                <div class="flex min-w-0 gap-2 items-center text-left">
+                                    <Icon
+                                        v-if="icon"
+                                        :name="icon"
+                                        :class="optionIconClasses({ category })"
+                                    />
+                                    <span class="block truncate">{{ label }}</span>
+                                </div>
+                            </template>
+                            <template #selected-option="{ option }">
+                                <div class="flex min-w-0 items-center gap-1 -ms-0.75">
+                                    <div :class="optionChipClasses(option)">
+                                        <Icon
+                                            v-if="option.icon"
+                                            :name="option.icon"
+                                            :class="optionChipIconClasses(option)"
+                                        />
+                                    </div>
+                                    <span class="block truncate">{{ option.label }}</span>
+                                </div>
+                            </template>
+                        </Combobox>
                         <div
+                            v-else
                             class="logic-text__pill"
                         >
                             <span
@@ -315,7 +379,7 @@ const optionChipIconClasses = (option) => {
                 </ol>
             </li>
 
-            <li>
+            <li v-if="!props.useWhenSelector">
                 <div class="logic-text-badge logic-text__condition" aria-hidden="true">
                     {{ props.destinationStepLabel || __('Then go to …') }}
                 </div>
