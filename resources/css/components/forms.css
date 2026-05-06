@@ -294,6 +294,10 @@
 .logic-text__condition {
     position: relative;
     @apply mb-2.5;
+    &:only-child {
+        /* e.g. calcalations, variable > to > option */
+        @apply mb-0.25 ms-1.5;
+    }
     &:not(:last-child)::after {
         content: '';
         position: absolute;

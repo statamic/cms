@@ -117,6 +117,8 @@ const logicCalculationVariableOptions = [
     { label: __('attendance_points'), value: 'attendance_points' },
     { label: __('engagement_weight'), value: 'engagement_weight' },
 ];
+const logicBranchingCalculationSource = ref(props.mockPreset.logicBranchingCalculationSource || 'variable_score');
+const logicBranchingCalculationVariable = ref(props.mockPreset.logicBranchingCalculationVariable || 'bonus_multiplier');
 
 const logicJoin = ref(props.mockPreset.logicJoin || 'and');
 const logicJoinOptions = [
@@ -162,6 +164,8 @@ const branchingActionLabel = computed(() => {
     const selected = logicBranchingActionOptions.find((option) => option.value === logicBranchingAction.value);
     return selected?.label || __('Branching');
 });
+const isBranchingCalculationAction = computed(() => logicBranchingAction.value !== 'go_to');
+const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalculationSource.value === 'number');
 </script>
 
 <template>
@@ -572,6 +576,64 @@ const branchingActionLabel = computed(() => {
                                 </div>
                             </template>
                         </Combobox>
+                    </li>
+                    <li v-if="isBranchingCalculationAction">
+                        <Combobox
+                            v-model="logicBranchingCalculationSource"
+                            size="sm"
+                            variant="default"
+                            :options="logicCalculationSourceOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Variable or number')"
+                            :searchable="false"
+                        >
+                            <template #option="{ label, value }">
+                                <div class="flex min-w-0 items-center gap-2">
+                                    <span
+                                        v-if="isVariableOption({ value })"
+                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                    >
+                                        {{ __('Variable') }}
+                                    </span>
+                                    <span class="truncate">{{ label }}</span>
+                                </div>
+                            </template>
+                            <template #selected-option="{ option }">
+                                <div class="flex min-w-0 items-center gap-2">
+                                    <span
+                                        v-if="isVariableOption(option)"
+                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                    >
+                                        {{ __('Variable') }}
+                                    </span>
+                                    <span class="truncate" :class="{ 'font-mono lowercase text-xs tracking-tight': isVariableOption(option) }">{{ option.label }}</span>
+                                </div>
+                            </template>
+                        </Combobox>
+                    </li>
+                    <li v-if="isBranchingCalculationAction">
+                        <div class="logic-text-badge logic-text__condition" aria-hidden="true">
+                            {{ __('to') }}
+                        </div>
+                    </li>
+                    <li v-if="isBranchingCalculationAction">
+                        <Input
+                            v-if="branchingCalculationUsesNumberInput"
+                            v-model="logicValue"
+                            size="sm"
+                            :placeholder="__('Enter a number')"
+                        />
+                        <Combobox
+                            v-else
+                            v-model="logicBranchingCalculationVariable"
+                            size="sm"
+                            :options="logicCalculationVariableOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Variable')"
+                            :searchable="false"
+                        />
                     </li>
                 </ol>
             </li>
