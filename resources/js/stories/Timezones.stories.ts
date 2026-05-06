@@ -53,9 +53,7 @@ export const _HoverCard: Story = {
     },
     parameters: {
         docs: {
-            source: {
-                code: `<TimezoneHoverCard date="${exampleDate}">Hover the underlined text</TimezoneHoverCard>`
-            }
+            source: { code: hoverCardCode }
         }
     },
     render: (args) => ({

@@ -13,7 +13,7 @@ const props = defineProps({
 <template>
     <HoverCard>
         <template #trigger>
-            <span><slot /></span>
+            <slot />
         </template>
         <Timezones :date :additional-timezones="additionalTimezones" />
     </HoverCard>
