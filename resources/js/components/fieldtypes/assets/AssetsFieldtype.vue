@@ -88,6 +88,10 @@
                     />
                 </div>
 
+                <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
+                    <ui-icon name="assets" class="size-5 text-gray-300 dark:text-gray-700 mx-auto" />
+                </div>
+
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
@@ -104,7 +108,7 @@
                     >
                         <div
                             class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
-                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
@@ -126,7 +130,7 @@
 
                     <div
                         class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
-                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                         v-if="displayMode === 'list'"
                     >
                         <table class="table-fixed w-full">

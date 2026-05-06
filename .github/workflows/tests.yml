@@ -37,17 +37,16 @@ jobs:
         uses: tj-actions/changed-files@v46
         with:
           files: |
-            config
-            lang
-            resources/users
-            resources/views
-            routes
-            src
-            tests
+            config/**
+            lang/**
+            resources/users/**
+            resources/views/**
+            routes/**
+            src/**
+            tests/**
             composer.json
             phpunit.xml.dist
             .github/workflows/tests.yml
-            tests/Composer/__fixtures__
             **.php
 
       - name: Determine whether tests should run

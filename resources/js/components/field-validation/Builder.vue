@@ -76,7 +76,7 @@
                             <button
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
-                                :aria-label="__('Deselect option')"
+                                :aria-label="__('Remove :label', { label: rule })"
                                 @click="remove(rule)"
                             >
                                 &times;
@@ -236,6 +236,8 @@ export default {
             if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
+
+            this.$nextTick(() => this.$refs.rulesSelect.focus());
         },
 
         add(rule) {
@@ -258,8 +260,6 @@ export default {
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
             this.add(rule);
-
-            this.$nextTick(() => this.$refs.searchInput.blur());
         },
 
         remove(rule) {

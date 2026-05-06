@@ -3,6 +3,7 @@
         <div class="flex h-full min-h-0 flex-col">
             <Listing
                 v-if="filters != null && view === 'list'"
+                class="flex flex-1 flex-col min-h-0"
                 :url="selectionsUrl"
                 :filters="filters"
                 :max-selections="maxSelections"
@@ -100,7 +101,7 @@
                 </div>
             </template>
 
-            <footer class="flex items-center justify-between border-t dark:border-gray-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
+            <footer class="flex shrink-0 items-center justify-between border-t dark:border-gray-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
                 <ui-badge
                     v-text="
                         hasMaxSelections

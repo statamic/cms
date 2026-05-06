@@ -93,11 +93,6 @@ class ComposerTest extends TestCase
             __DIR__.'/__fixtures__/vendor/statamic/composer-test-example-dependency',
             Composer::installedPath('statamic/composer-test-example-dependency')
         );
-
-        $this->assertEquals(
-            __DIR__.'/__fixtures__/vendor/composer/composer',
-            Composer::installedPath('composer/composer')
-        );
     }
 
     #[Group('integration')]
@@ -224,9 +219,6 @@ class ComposerTest extends TestCase
         PackToTheFuture::generateComposerJson('test/two', '2.0.0', [], $this->basePath('tmp/two/composer.json'));
 
         $repositories = [
-            'require' => [
-                'composer/composer' => '^2.0.0',
-            ],
             'repositories' => [
                 ['type' => 'path', 'url' => $this->basePath('tmp/one'), 'options' => ['symlink' => false]],
                 ['type' => 'path', 'url' => $this->basePath('tmp/two'), 'options' => ['symlink' => false]],

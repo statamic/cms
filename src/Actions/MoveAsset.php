@@ -39,10 +39,13 @@ class MoveAsset extends Action
 
     public function run($assets, $values)
     {
-        $ids = $assets->each->move($values['folder'])->map->id()->all();
+        $oldIds = $assets->map->id()->all();
+
+        $newIds = $assets->each->move($values['folder'])->map->id()->all();
 
         return [
-            'ids' => $ids,
+            'ids' => $newIds,
+            'callback' => ['replaceInSelections', array_combine($oldIds, $newIds)],
         ];
     }
 

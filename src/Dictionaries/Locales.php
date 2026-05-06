@@ -20,6 +20,7 @@ class Locales extends BasicDictionary
         $output = Process::run($this->buildLocalesCommand());
 
         return collect(explode(PHP_EOL, $output))
+            ->filter(fn ($locale) => mb_check_encoding($locale, 'UTF-8'))
             ->map(fn ($locale) => Str::before($locale, '.'))
             ->reject(fn ($locale) => in_array($locale, ['C', 'POSIX']))
             ->filter()

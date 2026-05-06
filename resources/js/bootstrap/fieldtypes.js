@@ -17,6 +17,7 @@ import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
+import FormattingLocalesFieldtype from '../components/fieldtypes/FormattingLocalesFieldtype.vue';
 import DateIndexFieldtype from '../components/fieldtypes/DateIndexFieldtype.vue';
 import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
 import DictionaryIndexFieldtype from '../components/fieldtypes/DictionaryIndexFieldtype.vue';
@@ -34,6 +35,7 @@ import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
+import LinkIndexFieldtype from '../components/fieldtypes/LinkIndexFieldtype.vue';
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
 import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
@@ -88,6 +90,7 @@ export default function registerFieldtypes(app) {
     app.component('collection_title_formats-fieldtype', TitleFormats);
     app.component('color-fieldtype', ColorFieldtype);
     app.component('date-fieldtype', DateFieldtype);
+    app.component('formatting_locales-fieldtype', FormattingLocalesFieldtype);
     app.component('date-fieldtype-index', DateIndexFieldtype);
     app.component('dictionary-fieldtype', DictionaryFieldtype);
     app.component('dictionary-fieldtype-index', DictionaryIndexFieldtype);
@@ -105,6 +108,7 @@ export default function registerFieldtypes(app) {
     app.component('icon-fieldtype', IconFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
+    app.component('link-fieldtype-index', LinkIndexFieldtype);
     app.component('list-fieldtype', ListFieldtype);
     app.component('list-fieldtype-index', ListIndexFieldtype);
     app.component(

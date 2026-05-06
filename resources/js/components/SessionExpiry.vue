@@ -300,6 +300,12 @@ export default {
             this.$toast.success(__('Logged in'));
             this.restartCountdown();
             this.updateCsrfToken();
+            this.restoreSelectedSite();
+        },
+
+        restoreSelectedSite() {
+            const site = Statamic.$config.get('selectedSite');
+            if (site) this.$axios.get(cp_url(`select-site/${site}`));
         },
     },
 };
