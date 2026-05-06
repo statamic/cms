@@ -20,8 +20,6 @@ abstract class Settings implements Contract
     {
         $this->addon = $addon;
         $this->setValues($settings);
-
-        $foo = trans_choice('foo', 8);
     }
 
     public function addon(): Addon
