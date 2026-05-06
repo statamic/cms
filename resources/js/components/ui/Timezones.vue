@@ -43,7 +43,7 @@ const formatDateTime = (timeZone) => {
 
 const rows = computed(() => [
     { timeZone: getLocalTimeZone(), sublabel: __('Your computer') },
-    { timeZone: appTimezone.value, sublabel: __('App timezone') },
+    { timeZone: appTimezone.value, sublabel: __('Application') },
     { timeZone: 'UTC', sublabel: null },
 ]);
 </script>
