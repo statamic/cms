@@ -40,7 +40,7 @@ export const _DocsIntro: Story = {
 };
 
 const hoverCardCode = `
-<TimezoneHoverCard :date="date" :side="side" :align="align">
+<TimezoneHoverCard :date="date">
     <span class="underline decoration-dotted">Hover the underlined text</span>
 </TimezoneHoverCard>
 `;
@@ -49,18 +49,6 @@ export const _HoverCard: Story = {
     tags: ['!dev'],
     args: {
         date: exampleDate,
-        side: 'bottom',
-        align: 'center',
-    },
-    argTypes: {
-        side: {
-            control: 'select',
-            options: ['top', 'bottom', 'left', 'right'],
-        },
-        align: {
-            control: 'select',
-            options: ['start', 'center', 'end'],
-        },
     },
     parameters: {
         docs: {
@@ -72,7 +60,7 @@ export const _HoverCard: Story = {
     render: (args) => ({
         components: { TimezoneHoverCard },
         setup() {
-            return { date: args.date, side: args.side, align: args.align };
+            return { date: args.date };
         },
         template: `
             <div class="flex justify-center p-12">
