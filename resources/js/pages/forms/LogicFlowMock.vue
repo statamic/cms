@@ -1,6 +1,6 @@
 <script setup>
 import { Combobox, Icon, Input } from '@ui';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     initialConditionLabel: {
@@ -35,21 +35,39 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    calculationMode: {
+        type: Boolean,
+        default: false,
+    },
 });
 
-const logicOperator = ref(props.mockPreset.logicOperator || 'equals');
-const logicWhen = ref(props.mockPreset.logicWhen || 'show_when');
-const logicWhenOptions = [
-    { label: __('Always show'), value: 'always_show' },
-    { label: __('Show when'), value: 'show_when' },
-    { label: __('Hide when'), value: 'hide_when' },
-];
-const logicOperatorOptions = [
-    { label: __('Equals'), value: 'equals' },
-    { label: __('Does not equal'), value: 'not_equals' },
-    { label: __('Contains'), value: 'contains' },
-    { label: __('Is empty'), value: 'is_empty' },
-];
+const logicOperator = ref(props.mockPreset.logicOperator || (props.calculationMode ? 'add' : 'equals'));
+const logicWhen = ref(props.mockPreset.logicWhen || (props.calculationMode ? 'add' : 'show_when'));
+const logicWhenOptions = props.calculationMode
+    ? [
+        { label: `+ ${__('Add')}`, value: 'add' },
+        { label: `÷ ${__('Divide')}`, value: 'divide' },
+        { label: `− ${__('Subtract')}`, value: 'subtract' },
+        { label: `× ${__('Multiply')}`, value: 'multiply' },
+    ]
+    : [
+        { label: __('Always show'), value: 'always_show' },
+        { label: __('Show when'), value: 'show_when' },
+        { label: __('Hide when'), value: 'hide_when' },
+    ];
+const logicOperatorOptions = props.calculationMode
+    ? [
+        { label: `+ ${__('Add')}`, value: 'add' },
+        { label: `÷ ${__('Divide')}`, value: 'divide' },
+        { label: `− ${__('Subtract')}`, value: 'subtract' },
+        { label: `× ${__('Multiply')}`, value: 'multiply' },
+    ]
+    : [
+        { label: __('Equals'), value: 'equals' },
+        { label: __('Does not equal'), value: 'not_equals' },
+        { label: __('Contains'), value: 'contains' },
+        { label: __('Is empty'), value: 'is_empty' },
+    ];
 
 const logicValue = ref(props.mockPreset.logicValue || 'referral');
 const logicValueOptions = [
@@ -71,6 +89,8 @@ const logicDestinationOptions = [
 ];
 const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
 const logicPrimaryConditionField = ref(props.mockPreset.logicPrimaryConditionField || 'heard_about_us');
+const logicCalculationSource = ref(props.mockPreset.logicCalculationSource || 'variable_score');
+const logicCalculationVariable = ref(props.mockPreset.logicCalculationVariable || 'bonus_multiplier');
 const logicConditionFieldOptions = [
     { label: __('What do you like most about our band? '), value: 'long_answer', icon: 'text-long', category: 'text' },
     { label: __('How did you hear about us?'), value: 'heard_about_us', icon: 'fieldtype-select', category: 'choice' },
@@ -78,6 +98,16 @@ const logicConditionFieldOptions = [
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
     { label: __('How old are you?'), value: 'age', icon: 'number', category: 'text' },
+];
+const logicCalculationSourceOptions = [
+    { label: __('Score'), value: 'variable_score' },
+    { label: __('Number'), value: 'number' },
+];
+const logicCalculationVariableOptions = [
+    { label: __('bonus_multiplier'), value: 'bonus_multiplier' },
+    { label: __('base_score'), value: 'base_score' },
+    { label: __('attendance_points'), value: 'attendance_points' },
+    { label: __('engagement_weight'), value: 'engagement_weight' },
 ];
 
 const logicJoin = ref(props.mockPreset.logicJoin || 'and');
@@ -104,6 +134,22 @@ const optionChipIconClasses = (option) => {
     if (option?.category === 'text') return 'size-4 shrink-0 text-purple-600 dark:text-purple-400';
     return 'size-4 shrink-0 text-orange-600 dark:text-orange-400';
 };
+const isVariableOption = (option) => option?.value === 'variable_score';
+
+const primarySelection = computed({
+    get() {
+        return props.calculationMode ? logicCalculationSource.value : logicPrimaryConditionField.value;
+    },
+    set(value) {
+        if (props.calculationMode) {
+            logicCalculationSource.value = value;
+            return;
+        }
+
+        logicPrimaryConditionField.value = value;
+    },
+});
+const calculationUsesNumberInput = computed(() => props.calculationMode && primarySelection.value === 'number');
 </script>
 
 <template>
@@ -151,10 +197,17 @@ const optionChipIconClasses = (option) => {
                         />
                     </li>
                     <li>
-                        <Combobox
+                        <Input
+                            v-if="calculationUsesNumberInput"
                             v-model="logicValue"
                             size="sm"
-                            :options="logicValueOptions"
+                            :placeholder="__('Enter a number')"
+                        />
+                        <Combobox
+                            v-else
+                            v-model="logicValue"
+                            size="sm"
+                            :options="props.calculationMode ? logicCalculationSourceOptions : logicValueOptions"
                             option-label="label"
                             option-value="value"
                             :placeholder="__('Value')"
@@ -187,7 +240,7 @@ const optionChipIconClasses = (option) => {
                                         :name="icon"
                                         class="size-4 shrink-0 text-orange-500 dark:text-orange-400"
                                     />
-                                    <span class="truncate">{{ label }}</span>
+                                    <span class="truncate" :class="{ 'font-mono': isVariableOption({ value }) }">{{ label }}</span>
                                 </div>
                             </template>
                             <template #selected-option="{ option }">
@@ -229,16 +282,50 @@ const optionChipIconClasses = (option) => {
                     <li>
                         <Combobox
                             v-if="props.useWhenSelector"
-                            v-model="logicPrimaryConditionField"
+                            v-model="primarySelection"
                             size="sm"
                             variant="default"
-                            :options="logicConditionFieldOptions"
+                            :options="props.calculationMode ? logicCalculationSourceOptions : logicConditionFieldOptions"
                             option-label="label"
                             option-value="value"
-                            :placeholder="__('Field')"
-                            searchable
+                            :placeholder="props.calculationMode ? __('Variable or number') : __('Field')"
+                            :searchable="!props.calculationMode"
                         >
-                            <template #option="{ icon, label, category }">
+                            <template v-if="props.calculationMode" #option="{ label, value }">
+                                <div class="flex min-w-0 items-center gap-2">
+                                    <span
+                                        v-if="isVariableOption({ value })"
+                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                    >
+                                        {{ __('Variable') }}
+                                    </span>
+                                    <span
+                                        v-else
+                                        class="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-2xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                    >
+                                        {{ __('Number') }}
+                                    </span>
+                                    <span class="truncate">{{ label }}</span>
+                                </div>
+                            </template>
+                            <template v-if="props.calculationMode" #selected-option="{ option }">
+                                <div class="flex min-w-0 items-center gap-2">
+                                    <span
+                                        v-if="isVariableOption(option)"
+                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                    >
+                                        {{ __('Variable') }}
+                                    </span>
+                                    <span
+                                        v-else
+                                        class="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-2xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                    >
+                                        {{ __('Number') }}
+                                    </span>
+                                    <span class="truncate" :class="{ 'font-mono lowercase text-xs tracking-tight': isVariableOption(option) }">{{ option.label }}</span>
+                                </div>
+                            </template>
+                            <template v-if="!props.calculationMode" #option="{ icon, label, category }">
                                 <div class="flex min-w-0 gap-2 items-center text-left">
                                     <Icon
                                         v-if="icon"
@@ -248,7 +335,7 @@ const optionChipIconClasses = (option) => {
                                     <span class="block truncate">{{ label }}</span>
                                 </div>
                             </template>
-                            <template #selected-option="{ option }">
+                            <template v-if="!props.calculationMode" #selected-option="{ option }">
                                 <div class="flex min-w-0 items-center gap-1 -ms-0.75">
                                     <div :class="optionChipClasses(option)">
                                         <Icon
@@ -277,7 +364,25 @@ const optionChipIconClasses = (option) => {
                         </div>
                     </li>
                     <li>
+                        <Input
+                            v-if="props.calculationMode && calculationUsesNumberInput"
+                            v-model="logicValue"
+                            size="sm"
+                            :placeholder="__('Enter a number')"
+                        />
                         <Combobox
+                            v-else-if="props.calculationMode"
+                            v-model="logicCalculationVariable"
+                            size="sm"
+                            :options="logicCalculationVariableOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Variable')"
+                            :searchable="false"
+                            class="font-mono lowercase [&_span]:text-xs tracking-tight"
+                        />
+                        <Combobox
+                            v-else
                             v-model="logicOperator"
                             size="sm"
                             :options="logicOperatorOptions"
@@ -287,7 +392,7 @@ const optionChipIconClasses = (option) => {
                             :searchable="false"
                         />
                     </li>
-                    <li>
+                    <li v-if="!props.calculationMode">
                         <Combobox
                             v-model="logicValue"
                             size="sm"
@@ -301,7 +406,7 @@ const optionChipIconClasses = (option) => {
                 </ol>
             </li>
 
-            <li v-if="props.showSecondaryCondition">
+            <li v-if="props.showSecondaryCondition && !props.calculationMode">
                 <div class="logic-text__condition" aria-hidden="true">
                     <Combobox
                         v-model="logicJoin"
