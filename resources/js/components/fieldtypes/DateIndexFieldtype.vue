@@ -1,18 +1,7 @@
 <template>
-    <div v-if="showTimezoneCard">
-        <template v-if="isRange">
-            <TimezoneHoverCard :date="value.start" side="top" :offset="10">
-                <span v-text="formattedStart"></span>
-            </TimezoneHoverCard>
-            <span> – </span>
-            <TimezoneHoverCard :date="value.end" side="top" :offset="10">
-                <span v-text="formattedEnd"></span>
-            </TimezoneHoverCard>
-        </template>
-        <TimezoneHoverCard v-else :date="value.date" side="top" :offset="10">
-            <span v-text="formatted"></span>
-        </TimezoneHoverCard>
-    </div>
+    <TimezoneHoverCard v-if="showTimezoneCard" :date="hoverCardDate" side="top" :offset="10">
+        <span v-text="formatted"></span>
+    </TimezoneHoverCard>
     <div v-else v-text="formatted"></div>
 </template>
 
@@ -52,6 +41,8 @@ const formatter = computed(() => {
 const formattedStart = computed(() => formatter.value.date(new Date(props.value.start)).toString());
 
 const formattedEnd = computed(() => formatter.value.date(new Date(props.value.end)).toString());
+
+const hoverCardDate = computed(() => isRange.value ? props.value : props.value.date);
 
 const formatted = computed(() => {
     if (!props.value) {

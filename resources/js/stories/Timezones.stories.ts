@@ -2,6 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3';
 import {Timezones, TimezoneHoverCard} from '@ui';
 
 const exampleDate = '2026-05-05T12:00:00.000Z';
+const exampleRange = { start: '2026-05-05T12:00:00.000Z', end: '2026-05-08T17:30:00.000Z' };
 
 const meta = {
     title: 'Overlays/Timezones',
@@ -67,6 +68,26 @@ export const _HoverCard: Story = {
                 ${hoverCardCode}
             </div>
         `,
+    }),
+};
+
+const rangeCode = `
+<Timezones :date="{ start, end }" />
+`;
+
+export const _Range: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: rangeCode }
+        }
+    },
+    render: () => ({
+        components: { Timezones },
+        setup() {
+            return { range: exampleRange };
+        },
+        template: `<Timezones :date="range" />`,
     }),
 };
 

@@ -5,13 +5,24 @@ import { getLocalTimeZone } from '@internationalized/date';
 import Text from './Text.vue';
 
 const props = defineProps({
-    /** The date to display across timezones. Accepts a `Date`, ISO string, or epoch number. */
-    date: { type: [String, Date, Number], required: true },
+    /** The date to display across timezones. Accepts a `Date`, ISO string, epoch number, or a `{ start, end }` range object. */
+    date: { type: [String, Date, Number, Object], required: true },
 });
 
-const normalizedDate = computed(() => new Date(props.date));
+const isRange = computed(() => {
+    const value = props.date;
+    return value !== null && typeof value === 'object' && !(value instanceof Date) && 'start' in value && 'end' in value;
+});
 
-const isValid = computed(() => !isNaN(normalizedDate.value.getTime()));
+const start = computed(() => new Date(isRange.value ? props.date.start : props.date));
+
+const end = computed(() => isRange.value ? new Date(props.date.end) : null);
+
+const isValid = computed(() => {
+    if (isNaN(start.value.getTime())) return false;
+    if (isRange.value && isNaN(end.value.getTime())) return false;
+    return true;
+});
 
 const appTimezone = computed(() => config.get('appTimezone') ?? 'UTC');
 
@@ -19,12 +30,17 @@ const formatTimeZone = (timeZone) => {
     const parts = new Intl.DateTimeFormat(config.get('translationLocale'), {
         timeZone,
         timeZoneName: 'short',
-    }).formatToParts(normalizedDate.value);
+    }).formatToParts(start.value);
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? timeZone;
 };
 
 const formatDateTime = (timeZone) => {
-    return new Intl.DateTimeFormat(dateFormatter.locale, { dateStyle: 'medium', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
+    const formatter = new Intl.DateTimeFormat(dateFormatter.locale, {
+        dateStyle: isRange.value ? 'short' : 'medium',
+        timeStyle: 'medium',
+        timeZone,
+    });
+    return isRange.value ? formatter.formatRange(start.value, end.value) : formatter.format(start.value);
 };
 
 const rows = computed(() => [
