@@ -17,6 +17,8 @@ class AddonRepository
     {
         $method = is_array($addon) ? 'makeFromPackage' : 'make';
 
+        $foo = trans('wat');
+
         return Addon::$method($addon);
     }
 
