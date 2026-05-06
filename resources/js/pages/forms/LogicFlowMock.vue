@@ -295,15 +295,9 @@ const calculationUsesNumberInput = computed(() => props.calculationMode && prima
                                 <div class="flex min-w-0 items-center gap-2">
                                     <span
                                         v-if="isVariableOption({ value })"
-                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
                                     >
                                         {{ __('Variable') }}
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-2xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                                    >
-                                        {{ __('Number') }}
                                     </span>
                                     <span class="truncate">{{ label }}</span>
                                 </div>
@@ -312,15 +306,9 @@ const calculationUsesNumberInput = computed(() => props.calculationMode && prima
                                 <div class="flex min-w-0 items-center gap-2">
                                     <span
                                         v-if="isVariableOption(option)"
-                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                                        class="inline-flex items-center rounded-md bg-violet-50 px-1.5 py-0.5 text-2xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
                                     >
                                         {{ __('Variable') }}
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-2xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                                    >
-                                        {{ __('Number') }}
                                     </span>
                                     <span class="truncate" :class="{ 'font-mono lowercase text-xs tracking-tight': isVariableOption(option) }">{{ option.label }}</span>
                                 </div>
@@ -361,6 +349,11 @@ const calculationUsesNumberInput = computed(() => props.calculationMode && prima
                             <span class="logic-text__pill-text" :title="props.initialConditionLabel || __('Which album was your favorite?')">
                                 {{ props.initialConditionLabel || __('Which album was your favorite?') }}
                             </span>
+                        </div>
+                    </li>
+                    <li v-if="props.calculationMode">
+                        <div class="logic-text-badge logic-text__condition mb-0.25! ms-1.5" aria-hidden="true">
+                            {{ __('to') }}
                         </div>
                     </li>
                     <li>
