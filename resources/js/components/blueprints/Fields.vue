@@ -60,6 +60,7 @@
                 :config="pendingCreatedField.config"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :is-inside-set="isInsideSet"
+                :show-save-only-at-top-level="true"
                 @committed="fieldCreated"
                 @closed="close"
             />

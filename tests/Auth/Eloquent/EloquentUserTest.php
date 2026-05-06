@@ -336,6 +336,20 @@ class EloquentUserTest extends TestCase
     }
 
     #[Test]
+    public function merge_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->merge(['name' => 'Updated Name']);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
     #[Group('passkeys')]
     public function it_gets_passkeys()
     {

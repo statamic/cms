@@ -45,6 +45,21 @@ class FormSubmissionStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_non_utf8_data()
+    {
+        $item = $this->parent->store('contact_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/contact_form/1631083591.2832.yaml',
+            "name: 'Test User'\nmessage: !!binary dGVzdCBtZXNzYWdlIHdpdGggYmFkIGJ5dGVzOiDtoL3tsYk="
+        );
+
+        $this->assertInstanceOf(Submission::class, $item);
+        $this->assertEquals('Test User', $item->get('name'));
+        $this->assertStringContainsString('test message with bad bytes:', $item->get('message'));
+        $this->assertTrue(mb_check_encoding($item->get('message'), 'UTF-8'));
+        $this->assertNotNull(json_encode($item->data()->all()));
+    }
+
+    #[Test]
     public function it_saves_to_disk()
     {
         $form = tap(Facades\Form::make('test_form'))->save();

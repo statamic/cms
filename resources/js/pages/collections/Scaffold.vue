@@ -9,8 +9,8 @@ const props = defineProps({
     route: String,
 });
 
-const index = `${props.collection.handle}/index`;
-const show = `${props.collection.handle}/show`;
+const index = ref(`${props.collection.handle}/index`);
+const show = ref(`${props.collection.handle}/show`);
 
 const selected = ref({
     index: true,
@@ -25,11 +25,11 @@ const files = computed(() => {
     var files = {};
 
     if (selected.value.index) {
-        files.index = index;
+        files.index = index.value;
     }
 
     if (selected.value.show) {
-        files.show = show;
+        files.show = show.value;
     }
 
     return files;

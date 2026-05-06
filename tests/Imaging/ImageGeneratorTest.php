@@ -445,7 +445,6 @@ class ImageGeneratorTest extends TestCase
     {
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
-        $property->setAccessible(true);
         $prefixer = $property->getValue($adapter);
 
         return $prefixer->prefixPath('');
@@ -455,7 +454,6 @@ class ImageGeneratorTest extends TestCase
     {
         $reflection = new \ReflectionClass($filesystem);
         $property = $reflection->getProperty('adapter');
-        $property->setAccessible(true);
 
         return $property->getValue($filesystem);
     }
