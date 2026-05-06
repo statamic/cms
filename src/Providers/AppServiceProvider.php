@@ -129,12 +129,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->addAboutCommandInfo();
 
+        $this->registerElevatedSessionMacros();
+
         tap($this->app->make(Schedule::class), function (Schedule $scheduler) {
             $scheduler->job(new HandleEntrySchedule)->everyMinute();
             $scheduler->job(new HandleRevisionSchedule)->everyMinute();
         });
-
-        $this->registerElevatedSessionMacros();
     }
 
     public function register()
