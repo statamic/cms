@@ -1061,6 +1061,10 @@ const selectedPageInternalName = computed({
                                     </div>
                                     <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                         {{ selectedPageHeadingLabel }}
+                                        <div class="grid *:[grid-area:1/1]">
+                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                        </div>
                                     </a>
                                 </div>
                                 <LogicFlowMock
@@ -1224,6 +1228,10 @@ const selectedPageInternalName = computed({
                             </div>
                             <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                                 {{ selectedPageHeadingLabel }}
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
                             </a>
                         </div>
                         <LogicFlowMock
