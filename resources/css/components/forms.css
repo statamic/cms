@@ -257,6 +257,7 @@
 .logic-text {
     --logic-line: 1px dashed var(--color-gray-400);
     --outer-indent-connector: calc(1rem - 2px);
+    @apply mb-0;
     /* Inner structure */
     ol ol {
         position: relative;
