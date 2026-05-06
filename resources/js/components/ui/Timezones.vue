@@ -65,9 +65,9 @@ const rows = computed(() => {
 <template>
     <div v-if="isValid" class="grid grid-cols-[auto_auto_auto] gap-x-3 gap-y-1 text-sm">
         <template v-for="(row, index) in rows" :key="index">
-            <Text :text="formatTimeZone(row.timeZone)" variant="strong" :class="{ 'opacity-50': row.isDuplicate }" />
-            <Text :text="row.sublabel" variant="subtle" :class="{ 'opacity-50': row.isDuplicate }" />
-            <Text :text="formatDateTime(row.timeZone)" :class="{ 'opacity-50': row.isDuplicate }" />
+            <Text :text="formatTimeZone(row.timeZone)" :variant="row.isDuplicate ? 'subtle' : 'strong'" />
+            <Text :text="row.sublabel" variant="subtle" />
+            <Text :text="formatDateTime(row.timeZone)" :variant="row.isDuplicate ? 'subtle' : 'default'" />
         </template>
     </div>
 </template>
