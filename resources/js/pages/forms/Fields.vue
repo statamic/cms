@@ -986,10 +986,9 @@ const selectedPageInternalName = computed({
                 </button>
                 <div class="@container pt-6 pb-40 px-2.5">
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                        <TabList class="inline-flex flex-nowrap max-w-full overflow-x-auto overflow-y-hidden [&_button]:w-auto! [&_button]:shrink-0 mb-4 mx-0! [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                        <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
                             <TabTrigger name="conditions" :text="isPageInspector ? __('Branching') : __('Conditions')" />
-                            <TabTrigger name="calculations" :text="__('Calculations')" />
                             <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                         </TabList>
 
@@ -1088,20 +1087,6 @@ const selectedPageInternalName = computed({
                                 <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                             </div>
                         </TabContent>
-                        <TabContent name="calculations">
-                            <div class="space-y-6 pt-8">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="size-4">
-                                        <Icon :name="isPageInspector ? 'page' : 'function'" class="size-4 text-gray-500 dark:text-gray-300" />
-                                    </div>
-                                    <a :href="isPageInspector ? selectedPageAnchor : '#editing-field'" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                        {{ isPageInspector ? selectedPageHeadingLabel : __('Multi Choice') }}
-                                    </a>
-                                </div>
-                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Calculations') }}</p>
-                                <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Calculation')" />
-                            </div>
-                        </TabContent>
                         <TabContent v-if="!isPageInspector" name="validation">
                             <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
                         </TabContent>
@@ -1113,10 +1098,9 @@ const selectedPageInternalName = computed({
         <!-- This is the desktop nav - the content is repeated from the right panel -->
         <div class="@container relative pt-6 pb-12 px-2.5 pe-4.5 max-[1000px]:hidden">
             <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
-                <TabList class="inline-flex flex-nowrap max-w-full overflow-x-auto overflow-y-hidden [&_button]:w-auto! [&_button]:shrink-0 mb-4 mx-0! [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger name="settings" :text="__('Settings')" />
                     <TabTrigger name="conditions" :text="isPageInspector ? __('Branching') : __('Conditions')" />
-                    <TabTrigger name="calculations" :text="__('Calculations')" />
                     <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                 </TabList>
 
@@ -1250,20 +1234,6 @@ const selectedPageInternalName = computed({
 
                         <LogicFlowMock />
                         <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
-                    </div>
-                </TabContent>
-                <TabContent name="calculations">
-                    <div class="space-y-6 pt-8">
-                        <div class="flex items-center gap-2.5">
-                            <div class="size-4">
-                                <Icon :name="isPageInspector ? 'page' : 'function'" class="size-4 text-gray-500 dark:text-gray-300" />
-                            </div>
-                            <a :href="isPageInspector ? selectedPageAnchor : '#editing-field'" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ isPageInspector ? selectedPageHeadingLabel : __('Multi Choice') }}
-                            </a>
-                        </div>
-                        <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Calculations') }}</p>
-                        <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Calculation')" />
                     </div>
                 </TabContent>
                 <TabContent v-if="!isPageInspector" name="validation">
