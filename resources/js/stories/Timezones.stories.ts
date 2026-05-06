@@ -87,6 +87,24 @@ const customDateCode = `
 <Timezones :date="dateObject" />
 `;
 
+export const _Invalid: Story = {
+    args: {
+        date: "not a date",
+    },
+    render: (args) => ({
+        components: { Timezones },
+        setup() {
+            return { date: args.date };
+        },
+        template: `
+            <div>
+                <p class="mb-2 text-sm">Nothing should render below:</p>
+                <Timezones :date="date" />
+            </div>
+        `,
+    }),
+};
+
 export const _CustomDate: Story = {
     tags: ['!dev'],
     parameters: {

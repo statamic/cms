@@ -11,32 +11,20 @@ const props = defineProps({
 
 const normalizedDate = computed(() => new Date(props.date));
 
-const appTimezone = computed(() => {
-    try {
-        return config.get('appTimezone') ?? 'UTC';
-    } catch (e) {
-        return 'UTC';
-    }
-});
+const isValid = computed(() => !isNaN(normalizedDate.value.getTime()));
+
+const appTimezone = computed(() => config.get('appTimezone') ?? 'UTC');
 
 const formatTimeZone = (timeZone) => {
-    try {
-        const parts = new Intl.DateTimeFormat(config.get('translationLocale'), {
-            timeZone,
-            timeZoneName: 'short',
-        }).formatToParts(normalizedDate.value);
-        return parts.find((p) => p.type === 'timeZoneName')?.value ?? timeZone;
-    } catch (e) {
-        return timeZone;
-    }
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), {
+        timeZone,
+        timeZoneName: 'short',
+    }).formatToParts(normalizedDate.value);
+    return parts.find((p) => p.type === 'timeZoneName')?.value ?? timeZone;
 };
 
 const formatDateTime = (timeZone) => {
-    try {
-        return new Intl.DateTimeFormat(dateFormatter.locale, { dateStyle: 'long', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
-    } catch (e) {
-        return '';
-    }
+    return new Intl.DateTimeFormat(dateFormatter.locale, { dateStyle: 'long', timeStyle: 'medium', timeZone }).format(normalizedDate.value);
 };
 
 const rows = computed(() => [
@@ -47,7 +35,7 @@ const rows = computed(() => [
 </script>
 
 <template>
-    <div class="grid grid-cols-[auto_auto] gap-x-3 gap-y-1 text-sm">
+    <div v-if="isValid" class="grid grid-cols-[auto_auto] gap-x-3 gap-y-1 text-sm">
         <template v-for="(row, index) in rows" :key="index">
             <div class="flex items-center gap-4">
                 <Text :text="formatTimeZone(row.timeZone)" variant="strong" />
