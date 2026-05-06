@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { dateFormatter } from '@api';
+import { dateFormatter, config } from '@api';
 import { getLocalTimeZone } from '@internationalized/date';
 import Text from './Text.vue';
 
@@ -15,7 +15,7 @@ const locale = computed(() => dateFormatter.locale);
 
 const appTimezone = computed(() => {
     try {
-        return window.Statamic?.$config?.get('appTimezone') ?? 'UTC';
+        return config.get('appTimezone') ?? 'UTC';
     } catch (e) {
         return 'UTC';
     }
