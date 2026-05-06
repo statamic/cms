@@ -41,7 +41,7 @@ while IFS= read -r file; do
 done < <(git ls-files 'src/**/*.php' 'resources/views/**/*.blade.php')
 
 if [ -n "$errors" ]; then
-    echo "Files with missing Statamic\\trans imports (see issue #14609):"
+    echo "Files with missing Statamic\\trans imports (see PR #14610):"
     echo
     printf '%s' "$errors"
     exit 1
