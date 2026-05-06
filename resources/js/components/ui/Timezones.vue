@@ -7,6 +7,8 @@ import Text from './Text.vue';
 const props = defineProps({
     /** The date to display across timezones. Accepts a `Date`, ISO string, epoch number, or a `{ start, end }` range object. */
     date: { type: [String, Date, Number, Object], required: true },
+    /** Extra `{ timezone, label }` rows to render above the defaults. */
+    additionalTimezones: { type: Array, default: () => [] },
 });
 
 const isRange = computed(() => {
@@ -44,6 +46,7 @@ const formatDateTime = (timeZone) => {
 };
 
 const rows = computed(() => [
+    ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
     { timeZone: getLocalTimeZone(), sublabel: __('Your computer') },
     { timeZone: appTimezone.value, sublabel: __('Application') },
     { timeZone: 'UTC', sublabel: null },

@@ -25,6 +25,7 @@ import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
+import TimezoneHoverCard from '../TimezoneHoverCard.vue';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);
@@ -95,16 +96,18 @@ const calendarEvents = computed(() => ({
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
 
-const formatTimeZone = (style) => {
+const timeZoneLabel = computed(() => {
     const tz = timeZoneName.value;
     if (!tz) return null;
 
-    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: style }).formatToParts(props.modelValue.start.toDate());
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.start.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
-};
+});
 
-const timeZoneLabel = computed(() => formatTimeZone('short'));
-const timeZoneTooltip = computed(() => formatTimeZone('long'));
+const hoverCardDate = computed(() => {
+    if (!props.modelValue?.start || !props.modelValue?.end) return null;
+    return { start: props.modelValue.start.toDate(), end: props.modelValue.end.toDate() };
+});
 </script>
 
 <template>
@@ -170,13 +173,14 @@ const timeZoneTooltip = computed(() => formatTimeZone('long'));
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Text
-                        v-if="timeZoneLabel"
-                        class="text-gray-600 dark:text-gray-400 me-1"
-                        size="xs"
-                        v-tooltip="timeZoneTooltip"
-                        :text="timeZoneLabel"
-                    />
+                    <TimezoneHoverCard
+                        v-if="timeZoneLabel && hoverCardDate"
+                        :date="hoverCardDate"
+                        :additional-timezones="[{ timezone: timeZoneName, label: __('This field') }]"
+                        side="top"
+                    >
+                        <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
+                    </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
