@@ -1065,7 +1065,7 @@ const selectedPageInternalName = computed({
                                 </div>
                                 <LogicFlowMock
                                     :destination-step-label="__('Then go to Goodbye')"
-                                    :show-destination-selector="false"
+                                    :show-destination-selector="true"
                                 />
                                 <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                             </div>
@@ -1228,7 +1228,7 @@ const selectedPageInternalName = computed({
                         </div>
                         <LogicFlowMock
                             :destination-step-label="__('Then go to Goodbye')"
-                            :show-destination-selector="false"
+                            :show-destination-selector="true"
                         />
                         <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
                     </div>
@@ -1249,10 +1249,10 @@ const selectedPageInternalName = computed({
                         <div class="space-y-4">
                             <LogicFlowMock :use-when-selector="true" />
                             <Button size="sm" variant="subtle" class="-ms-2 bg-transparent!" :text="__('+ Add Condition')" />
-                            <div class="mt-6 border-t border-gray-300 dark:border-gray-700">
+                            <div class="border-t border-b border-gray-200 dark:border-gray-700">
                                 <details class="group">
-                                    <summary class="flex cursor-pointer list-none items-center justify-between py-3 [&::-webkit-details-marker]:hidden">
-                                        <span class="text-sm">{{ __('Calculations') }}</span>
+                                    <summary class="flex cursor-pointer list-none items-center justify-between py-3 text-base font-medium text-gray-900 dark:text-gray-100 [&::-webkit-details-marker]:hidden">
+                                        <span>{{ __('Calculations') }}</span>
                                         <Icon name="chevron-down" class="size-4 text-gray-500 transition-transform duration-200 group-open:rotate-180 dark:text-gray-300" />
                                     </summary>
                                     <div class="pt-2 pb-4">

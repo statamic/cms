@@ -305,11 +305,7 @@
         top: 100%;
         width: calc(var(--spacing) * 4);
         /* Don't overlap/clash with subsequent connectors */
-        height: 70%;
-    }
-    &.logic-text-badge::after {
-        /* Increase height of the connectors for the entry/exit badges because there's an increased distance for these. */
-        height: 100%;
+        height: 85%;
     }
 }
 

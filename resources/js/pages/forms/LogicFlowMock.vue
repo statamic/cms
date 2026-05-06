@@ -81,6 +81,10 @@ const logicValueOptions = [
 ];
 
 const logicDestination = ref(props.mockPreset.logicDestination || 'fan_length');
+const logicBranchingAction = ref(props.mockPreset.logicBranchingAction || 'go_to');
+const logicBranchingActionOptions = [
+    { label: __('Go to'), value: 'go_to' },
+];
 const logicDestinationOptions = [
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
@@ -478,10 +482,21 @@ const calculationUsesNumberInput = computed(() => props.calculationMode && prima
             </li>
 
             <li v-if="!props.useWhenSelector">
-                <div class="logic-text-badge logic-text__condition mb-0!" aria-hidden="true">
-                    {{ props.destinationStepLabel || __('Then go to …') }}
+                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
+                    {{ __('Then') }}
                 </div>
                 <ol v-if="props.showDestinationSelector">
+                    <li>
+                        <Combobox
+                            v-model="logicBranchingAction"
+                            size="sm"
+                            :options="logicBranchingActionOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Branching')"
+                            :searchable="false"
+                        />
+                    </li>
                     <li>
                         <Combobox
                             v-model="logicDestination"
