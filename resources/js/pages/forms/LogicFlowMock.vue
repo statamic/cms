@@ -380,7 +380,7 @@ const optionChipIconClasses = (option) => {
             </li>
 
             <li v-if="!props.useWhenSelector">
-                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
+                <div class="logic-text-badge logic-text__condition mb-0!" aria-hidden="true">
                     {{ props.destinationStepLabel || __('Then go to …') }}
                 </div>
                 <ol v-if="props.showDestinationSelector">
