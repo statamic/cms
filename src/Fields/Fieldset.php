@@ -2,8 +2,10 @@
 
 namespace Statamic\Fields;
 
+use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -23,7 +25,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Fieldset
+class Fieldset implements ContainsQueryableValues
 {
     protected $handle;
     protected $contents = [];
@@ -62,18 +64,24 @@ class Fieldset
         return $this;
     }
 
+    /**
+     * Canonical storage: either top-level `fields` (flat) or non-empty `sections`, never both.
+     * Hand-edited YAML or mixed input is normalized on save.
+     */
     public function setContents(array $contents)
     {
-        $fields = Arr::get($contents, 'fields', []);
-
-        // Support legacy syntax
-        if (! empty($fields) && array_keys($fields)[0] !== 0) {
-            $fields = collect($fields)->map(function ($field, $handle) {
-                return compact('handle', 'field');
-            })->values()->all();
+        if (array_key_exists('sections', $contents)) {
+            $contents['sections'] = $this->normalizeSections(Arr::get($contents, 'sections', []));
         }
 
-        $contents['fields'] = $fields;
+        $usesSections = array_key_exists('sections', $contents) && ! empty($contents['sections']);
+
+        if ($usesSections) {
+            unset($contents['fields']);
+        } else {
+            unset($contents['sections']);
+            $contents['fields'] = $this->normalizeFields(Arr::get($contents, 'fields', []));
+        }
 
         $this->contents = $contents;
 
@@ -100,9 +108,21 @@ class Fieldset
 
     public function fields(): Fields
     {
-        $fields = Arr::get($this->contents, 'fields', []);
+        $fields = $this->hasSections()
+            ? $this->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))->values()->all()
+            : Arr::get($this->contents, 'fields', []);
 
         return new Fields($fields);
+    }
+
+    public function sections(): IlluminateCollection
+    {
+        return collect(Arr::get($this->contents, 'sections', []));
+    }
+
+    public function hasSections(): bool
+    {
+        return $this->sections()->isNotEmpty();
     }
 
     public function field(string $handle): ?Field
@@ -159,9 +179,12 @@ class Fieldset
         })->values();
 
         $fieldsets = \Statamic\Facades\Fieldset::all()
-            ->filter(fn (Fieldset $fieldset) => isset($fieldset->contents()['fields']))
             ->filter(function (Fieldset $fieldset) {
-                return collect($fieldset->contents()['fields'])
+                $fields = $fieldset->hasSections()
+                    ? $fieldset->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))->all()
+                    : Arr::get($fieldset->contents(), 'fields', []);
+
+                return collect($fields)
                     ->filter(fn ($field) => $this->fieldImportsFieldset($field))
                     ->isNotEmpty();
             })
@@ -307,8 +330,46 @@ class Fieldset
             ->icon('fieldsets');
     }
 
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'editUrl', 'fields', 'handle', 'isDeletable', 'isResettable',
+            'namespace', 'path', 'title',
+        ];
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Fieldset::{$method}(...$parameters);
+    }
+
+    private function normalizeFields(array $fields): array
+    {
+        // Support legacy syntax where handles are array keys.
+        if (! empty($fields) && array_keys($fields)[0] !== 0) {
+            $fields = collect($fields)->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            })->values()->all();
+        }
+
+        return $fields;
+    }
+
+    private function normalizeSections(array $sections): array
+    {
+        return collect($sections)->map(function ($section) {
+            $section['fields'] = $this->normalizeFields(Arr::get($section, 'fields', []));
+
+            return $section;
+        })->all();
     }
 }

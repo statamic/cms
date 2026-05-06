@@ -6,6 +6,6 @@ class DateFormat
 {
     public static function containsTime($format)
     {
-        return Str::contains($format, ['G', 'g', 'H', 'h', 'U', 'c', 'r']);
+        return Str::contains($format, ['a', 'A', 'B', 'g', 'G', 'h', 'H', 'i', 's', 'u', 'v', 'U', 'c', 'r']);
     }
 }

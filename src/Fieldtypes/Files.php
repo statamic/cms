@@ -70,6 +70,10 @@ class Files extends Fieldtype
         ];
 
         return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
+            if (! is_string($rule)) {
+                return $rule;
+            }
+
             $name = Str::before($rule, ':');
 
             if ($class = Arr::get($classes, $name)) {

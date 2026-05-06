@@ -1,7 +1,35 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {CardPanel, Icon, Input} from '@ui';
+import {CardPanel, Icon, Input, registerIconSetFromStrings} from '@ui';
 import {computed, ref} from 'vue';
 import {icons} from "@/stories/icons";
+
+// Inline all SVGs into the Storybook bundle so the AllIcons grid doesn't fire
+// hundreds of requests (which Cloudflare flags as abuse). The CP bundle keeps
+// the lazy glob in registry.js.
+const eagerIcons = import.meta.glob('../../svg/icons/*.svg', {
+    eager: true,
+    query: '?raw',
+    import: 'default',
+}) as Record<string, string>;
+
+registerIconSetFromStrings(
+    'default',
+    Object.fromEntries(
+        Object.entries(eagerIcons).map(([path, svg]) => [
+            path.split('/').pop()!.replace('.svg', ''),
+            svg,
+        ])
+    )
+);
+
+registerIconSetFromStrings('storybook', {
+    spark: `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9L12 2z" />
+            <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" />
+        </svg>
+    `,
+});
 
 const meta = {
     title: 'Components/Icon',
@@ -20,6 +48,19 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
     args: {
         name: 'plus',
+    },
+};
+
+export const AlternateSetInName: Story = {
+    args: {
+        name: 'storybook::spark',
+    },
+    parameters: {
+        docs: {
+            source: {
+                code: '<Icon name="storybook::spark" />',
+            },
+        },
     },
 };
 

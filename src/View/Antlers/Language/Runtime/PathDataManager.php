@@ -700,7 +700,7 @@ class PathDataManager
 
                 if ($this->reducedVar instanceof Model) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
-                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name)) {
+                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name) && (new \ReflectionProperty($this->reducedVar, $pathItem->name))->isPublic()) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
                 } else {
                     $this->reduceVar($pathItem, $data);
@@ -861,9 +861,24 @@ class PathDataManager
             $this->unlockData();
         }
 
-        if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {
-            $this->reducedVar = call_user_func_array([$this->reducedVar, Str::camel($varPath)], []);
+        if (is_object($this->reducedVar) && method_exists($this->reducedVar, $camelVar = Str::camel($varPath)) && (new \ReflectionMethod($this->reducedVar, $camelVar))->isPublic()) {
+            $this->reducedVar = call_user_func_array([$this->reducedVar, $camelVar], []);
             $this->resolvedPath[] = '{method:'.$varPath.'}';
+
+            if ($doCompact) {
+                $this->compact($path->isFinal);
+            }
+        } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $camelVar = Str::camel($varPath)) && (new \ReflectionProperty($this->reducedVar, $camelVar))->isPublic()) {
+            $this->reducedVar = $this->reducedVar->{$camelVar};
+            $this->resolvedPath[] = '{property:'.$varPath.'}';
+
+            if ($doCompact) {
+                $this->compact($path->isFinal);
+            }
+        } elseif (is_object($this->reducedVar)) {
+            $this->reducedVar = null;
+            $this->didFind = false;
+            $this->doBreak = true;
 
             if ($doCompact) {
                 $this->compact($path->isFinal);

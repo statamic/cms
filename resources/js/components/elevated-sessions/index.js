@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 export async function requireElevatedSession() {
+    if (!Statamic.$config.get('elevatedSessionsEnabled')) return;
+
     const response = await axios.get(cp_url('elevated-session'));
 
     if (response.data.elevated) return;

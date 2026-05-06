@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasDirtyState;
@@ -10,9 +11,10 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-abstract class Tree implements Contract, Localization
+abstract class Tree implements ContainsQueryableValues, Contract, Localization
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState;
 
@@ -386,6 +388,22 @@ abstract class Tree implements Contract, Localization
         $this->withEntries = true;
 
         return $this;
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'editUrl', 'handle', 'locale', 'path', 'route', 'showUrl', 'site',
+        ];
     }
 
     public function getCurrentDirtyStateAttributes(): array

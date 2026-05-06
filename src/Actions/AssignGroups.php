@@ -24,6 +24,11 @@ class AssignGroups extends Action
         return $authed->can('assign user groups');
     }
 
+    public function requiresElevatedSession(): bool
+    {
+        return true;
+    }
+
     public function confirmationText()
     {
         /** @translation */

@@ -788,7 +788,7 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = Str::after($url, 'statamic://');
+        $ref = str($url)->after('statamic://')->before('?')->before('#')->toString();
         [$type, $id] = explode('::', $ref, 2);
 
         $data = null;

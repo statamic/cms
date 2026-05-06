@@ -9,6 +9,7 @@ import {
 	Stack,
 } from '@ui';
 import { injectListingContext } from '../Listing/Listing.vue';
+import { dateFormatter } from '@/api';
 import { computed, ref, watch, nextTick } from 'vue';
 import FieldFilter from './FieldFilter.vue';
 import DataListFilter from './Filter.vue';
@@ -37,6 +38,27 @@ function removeFieldFilter(filterHandle, fieldHandle) {
     const fields = { ...activeFilters.value[filterHandle] };
     delete fields[fieldHandle];
     setFilter(filterHandle, fields);
+}
+
+function getFieldFilterBadgeLabel(handle, badge) {
+    if (handle === 'date') {
+        const df = dateFormatter.options('date');
+        const parts = [badge.field, badge.translatedOperator];
+
+        if (badge.operator === 'between') {
+            parts.push(df.date(badge.value.start), __('and'), df.date(badge.value.end));
+        } else {
+            parts.push(df.date(badge.value));
+        }
+
+        return parts.filter(Boolean).join(' ');
+    }
+
+    return badge;
+}
+
+function getClearFilterLabel(label) {
+    return __('Clear :filter', { filter: label });
 }
 
 function isActive(handle) {
@@ -172,38 +194,47 @@ function handleStackClosed() {
         </Stack>
 
         <Button
+            as="div"
+            variant="filled"
             v-for="({ filter, handle, badge }, index) in fieldFilterBadges"
             :key="`${filter}-${handle}`"
-            variant="filled"
-            :icon-append="reorderable ? null : 'x'"
-            :disabled="reorderable"
-            class="last:me-12"
-            @click="removeFieldFilter(filter, handle)"
+            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
         >
-            <template v-if="handle == 'date'">
-                {{ badge.field }}
-                {{ badge.translatedOperator }}
-                <template v-if="badge.operator === 'between'">
-                    <date-time :of="badge.value.start" options="date" />
-                    {{ __('and') }}
-                    <date-time :of="badge.value.end" options="date" />
-                </template>
-                <date-time v-else :of="badge.value" options="date" />
-            </template>
+            <span class="whitespace-nowrap" v-text="getFieldFilterBadgeLabel(handle, badge)" />
 
-            <template v-else>
-                {{ badge }}
-            </template>
+            <Button
+                v-if="!reorderable"
+                variant="ghost"
+                size="xs"
+                icon="x"
+                iconOnly
+                inset
+                class="opacity-100 [&_svg]:size-4"
+                :aria-label="getClearFilterLabel(getFieldFilterBadgeLabel(handle, badge))"
+                @click="removeFieldFilter(filter, handle)"
+            />
         </Button>
         <Button
+            as="div"
+            variant="filled"
             v-for="(badge, handle, index) in standardBadges"
             :key="handle"
-            variant="filled"
-            :icon-append="reorderable ? null : 'x'"
-            :text="badge"
-            :disabled="reorderable"
-            class="last:me-12"
-            @click="setFilter(handle, null)"
-        />
+            class="cursor-default ps-4 gap-1 text-gray-900 dark:text-gray-200 last:me-12 hover:bg-gray-950/5 dark:hover:bg-white/4"
+            :class="reorderable ? 'pe-4 text-gray-400 dark:text-gray-600' : 'pe-2'"
+        >
+            <span class="whitespace-nowrap">{{ badge }}</span>
+            <Button
+                v-if="!reorderable"
+                variant="ghost"
+                size="xs"
+                icon="x"
+                iconOnly
+                inset
+                class="opacity-100 [&_svg]:size-4"
+                :aria-label="getClearFilterLabel(badge)"
+                @click="setFilter(handle, null)"
+            />
+        </Button>
     </div>
 </template>

@@ -13,6 +13,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
@@ -33,7 +34,7 @@ class TermsController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -86,8 +87,6 @@ class TermsController extends CpController
     {
         $this->authorize('view', $term);
 
-        $term = $term->fromWorkingCopy();
-
         $blueprint = $term->blueprint();
 
         [$values, $meta] = $this->extractFromFields($term, $blueprint);
@@ -104,9 +103,6 @@ class TermsController extends CpController
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
                 'unpublish' => $term->unpublishUrl(),
-                'revisions' => $term->revisionsUrl(),
-                'restore' => $term->restoreRevisionUrl(),
-                'createRevision' => $term->createRevisionUrl(),
                 'editBlueprint' => cp_route('blueprints.taxonomies.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
@@ -135,9 +131,7 @@ class TermsController extends CpController
                     'url' => $localized->editUrl(),
                     'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
-            })->all(),
-            'hasWorkingCopy' => $term->hasWorkingCopy(),
-            'revisionsEnabled' => $term->revisionsEnabled(),
+            })->values()->all(),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
@@ -165,8 +159,6 @@ class TermsController extends CpController
         $term = $term->in($site->handle());
 
         $this->authorize('update', $term);
-
-        $term = $term->fromWorkingCopy();
 
         $term->term()->syncOriginal();
 
@@ -197,18 +189,9 @@ class TermsController extends CpController
 
         $term->slug($request->slug);
 
-        if ($term->revisionsEnabled() && $term->published()) {
-            $term
-                ->makeWorkingCopy()
-                ->user(User::current())
-                ->save();
-        } else {
-            if (! $term->revisionsEnabled()) {
-                $term->published($request->published);
-            }
+        $term->published($request->published);
 
-            $saved = $term->updateLastModified(User::current())->save();
-        }
+        $saved = $term->updateLastModified(User::current())->save();
 
         [$values] = $this->extractFromFields($term, $term->blueprint());
 
@@ -319,14 +302,7 @@ class TermsController extends CpController
             ->data($values)
             ->slug($slug);
 
-        if ($term->revisionsEnabled()) {
-            $term->store([
-                'message' => $request->message,
-                'user' => User::current(),
-            ]);
-        } else {
-            $saved = $term->updateLastModified(User::current())->save();
-        }
+        $saved = $term->updateLastModified(User::current())->save();
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);

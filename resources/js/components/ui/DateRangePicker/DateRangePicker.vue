@@ -1,4 +1,5 @@
 <script setup>
+import { config } from '@api';
 import { computed } from 'vue';
 import {
     DateRangePickerCalendar,
@@ -23,6 +24,7 @@ import Card from '../Card/Card.vue';
 import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
+import Text from '../Text.vue';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);
@@ -31,11 +33,11 @@ const props = defineProps({
     /** Badge text to display. */
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
-    /** The controlled date range value. <br><br> Should be a [`DateRange` object](https://reka-ui.com/docs/guides/dates) or an object with `start` and `end` keys, where each value is an ISO 8601 datetime string with a UTC offset. */
+    /** The controlled date range value. <br><br> Should be a [`DateRange` object](https://reka-ui.com/docs/guides/dates). */
     modelValue: { type: [Object, String], default: null },
-    /** The minimum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) or an ISO 8601 datetime string with a UTC offset. */
+    /** The minimum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates). */
     min: { type: [String, Object], default: null },
-    /** The maximum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) or an ISO 8601 datetime string with a UTC offset. */
+    /** The maximum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates). */
     max: { type: [String, Object], default: null },
     /** The granularity of the date range picker. <br><br> Options: `day`, `hour`, `minute`, `second` */
     granularity: { type: String, default: null },
@@ -90,12 +92,25 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event)
     },
 }));
+
+const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
+
+const formatTimeZone = (style) => {
+    const tz = timeZoneName.value;
+    if (!tz) return null;
+
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: style }).formatToParts(props.modelValue.start.toDate());
+    return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
+};
+
+const timeZoneLabel = computed(() => formatTimeZone('short'));
+const timeZoneTooltip = computed(() => formatTimeZone('long'));
 </script>
 
 <template>
     <div class="group/input relative block w-full" data-ui-input>
         <DateRangePickerRoot
-            :modelValue="modelValue"
+            :modelValue="modelValue ?? { start: undefined, end: undefined }"
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"
@@ -155,6 +170,13 @@ const calendarEvents = computed(() => ({
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
+                    <Text
+                        v-if="timeZoneLabel"
+                        class="text-gray-600 dark:text-gray-400 me-1"
+                        size="xs"
+                        v-tooltip="timeZoneTooltip"
+                        :text="timeZoneLabel"
+                    />
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>

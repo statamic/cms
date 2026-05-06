@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use Carbon\Carbon;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
@@ -21,9 +22,10 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements Augmentable, SubmissionContract
+class Submission implements Augmentable, ContainsQueryableValues, SubmissionContract
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -85,7 +87,7 @@ class Submission implements Augmentable, SubmissionContract
     /**
      * Get the form fields.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection<string, array>
      */
     public function fields()
     {
@@ -93,9 +95,9 @@ class Submission implements Augmentable, SubmissionContract
     }
 
     /**
-     * Get or set the columns.
+     * Get the columns.
      *
-     * @return array
+     * @return \Statamic\CP\Columns
      */
     public function columns()
     {
@@ -262,6 +264,28 @@ class Submission implements Augmentable, SubmissionContract
     public function fileData()
     {
         return $this->data()->all();
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        $value = $this->get($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'date', 'form', 'formattedDate', 'id', 'path',
+        ];
     }
 
     public function __get($key)

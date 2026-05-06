@@ -242,6 +242,22 @@ class ValidatorTest extends TestCase
     }
 
     #[Test]
+    public function it_only_pre_processes_validatables_once_per_validator_call()
+    {
+        $field = Mockery::mock(Field::class);
+        $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
+        $field->shouldReceive('rules')->andReturn(['one' => ['required']]);
+        $field->shouldReceive('validationAttributes')->andReturn(['one' => 'One']);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('preProcessValidatables')->once()->andReturnSelf();
+        $fields->shouldReceive('all')->andReturn(collect([$field]));
+        $fields->shouldReceive('values')->andReturn(collect(['one' => 'foo']));
+
+        (new Validator)->fields($fields)->validator();
+    }
+
+    #[Test]
     public function it_replaces_this_in_sets()
     {
         $replicator = [
