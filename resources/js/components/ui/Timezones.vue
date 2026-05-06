@@ -54,12 +54,10 @@ const rows = computed(() => [
 </script>
 
 <template>
-    <div v-if="isValid" class="grid grid-cols-[auto_auto] gap-x-3 gap-y-1 text-sm">
+    <div v-if="isValid" class="grid grid-cols-[auto_auto_auto] gap-x-3 gap-y-1 text-sm">
         <template v-for="(row, index) in rows" :key="index">
-            <div class="flex items-center gap-4">
-                <Text :text="formatTimeZone(row.timeZone)" variant="strong" />
-                <Text :text="row.sublabel" variant="subtle" />
-            </div>
+            <Text :text="formatTimeZone(row.timeZone)" variant="strong" />
+            <Text :text="row.sublabel" variant="subtle" />
             <Text :text="formatDateTime(row.timeZone)" />
         </template>
     </div>
