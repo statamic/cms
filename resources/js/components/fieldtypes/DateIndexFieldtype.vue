@@ -1,9 +1,15 @@
 <template>
     <div v-if="showTimezoneCard">
         <template v-if="isRange">
-            <TimezoneHoverCard :date="value.start" side="top"><span v-text="formattedStart"></span></TimezoneHoverCard><span> – </span><TimezoneHoverCard :date="value.end" side="top"><span v-text="formattedEnd"></span></TimezoneHoverCard>
+            <TimezoneHoverCard :date="value.start" side="top" :offset="10">
+                <span v-text="formattedStart"></span>
+            </TimezoneHoverCard>
+            <span> – </span>
+            <TimezoneHoverCard :date="value.end" side="top" :offset="10">
+                <span v-text="formattedEnd"></span>
+            </TimezoneHoverCard>
         </template>
-        <TimezoneHoverCard v-else :date="value.date" side="top">
+        <TimezoneHoverCard v-else :date="value.date" side="top" :offset="10">
             <span v-text="formatted"></span>
         </TimezoneHoverCard>
     </div>
