@@ -315,7 +315,7 @@ class Tags extends BaseTags
         $form = $this->form();
 
         return collect($fields ?? $form->fields())
-            ->each(fn ($field) => $field->setForm($form))
+            ->each(fn ($field) => $field->setForm($form)->setFormField($form->formFields()->field($field->handle())))
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     return $jsDriver

@@ -129,6 +129,18 @@ abstract class FormFieldtype implements Arrayable
 
     abstract public function toFieldArray(): array;
 
+    public function view(): string
+    {
+        $default = "statamic::forms.fields.{$this->handle()}";
+
+        if (view()->exists($default)) {
+            return $default;
+        }
+
+        // Should return 'statamic::forms.fields.default' in v7.
+        return $this->toField()->fieldtype()->view();
+    }
+
     public function isSelectable(): bool
     {
         if (FormFieldtypeRepository::selectableIsOverriden($this->handle())) {

@@ -347,6 +347,9 @@ abstract class Fieldtype implements Arrayable
         return $data;
     }
 
+    /**
+     * @deprecated Implement FormFieldtype::view() instead.
+     */
     public function view()
     {
         $default = 'statamic::forms.fields.'.$this->handle();

@@ -30,7 +30,7 @@ class RenderableField implements Htmlable
         ]);
 
         return static::minify(
-            view($this->field->fieldtype()->view(), $data)->render(),
+            view($this->field->formField()->fieldtype()->view(), $data)->render(),
         );
     }
 

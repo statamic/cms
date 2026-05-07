@@ -10,6 +10,7 @@ use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -27,6 +28,7 @@ class Field implements Arrayable
     protected $parentIndex;
     protected $validationContext;
     protected ?Form $form = null;
+    protected ?FormField $formField = null;
 
     public function __construct($handle, array $config)
     {
@@ -476,7 +478,7 @@ class Field implements Arrayable
         return $this->fieldtype()->isRelationship();
     }
 
-    public function setForm(Form $form)
+    public function setForm(Form $form): self
     {
         $this->form = $form;
 
@@ -486,6 +488,18 @@ class Field implements Arrayable
     public function form(): ?Form
     {
         return $this->form;
+    }
+
+    public function setFormField(FormField $formField): self
+    {
+        $this->formField = $formField;
+
+        return $this;
+    }
+
+    public function formField(): ?FormField
+    {
+        return $this->formField;
     }
 
     public static function commonFieldOptions(): Fields
