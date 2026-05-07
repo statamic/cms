@@ -12,13 +12,28 @@
         /* Pull everything inside above */
         position: relative;
     }
-    &::before {
-        content: '';
-        position: absolute;
-        inset: -0.5rem calc(-1rem - 2px) -1rem;
-        border: 1px dashed var(--color-blue-400);
-        background: var(--color-blue-50);
-        border-radius: 10px;
+    /* Field Editing */
+    &:not(button) {
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -0.5rem calc(-1rem - 2px) -1rem;
+            border: 1px dashed var(--color-blue-400);
+            border-radius: 10px;
+            @apply bg-blue-50;
+        }
+    }
+    /* Editing a button like "Next page" and "Submit" */
+    :has(> button&) {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -1rem calc(-1.25rem + 1px) -1.25rem;
+            border: 1px dashed var(--color-blue-400);
+            border-radius: 10px;
+            @apply bg-blue-50;
+        }
     }
     :where(.dark) &::before {
         @apply bg-blue-950/75 border-blue-500/75;

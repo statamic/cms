@@ -48,6 +48,9 @@ const postPageFinalNote = ref('');
 const postPageContactMethod = ref(null);
 const postPageBestTime = ref(null);
 const postPageSmsUpdates = ref(false);
+const nextPageButtonLabel = ref(__('Next Page'));
+const previousPageButtonLabel = ref(__('Previous Page'));
+const submitButtonLabel = ref(__('Submit'));
 const totalFieldCount = computed(() => 13);
 const introSeenLiveOptions = [
     { label: __('Yes'), value: 'yes' },
@@ -103,6 +106,7 @@ const postPageBestTimeOptions = [
     { label: __('Evening'), value: 'evening' },
 ];
 const isPageInspector = computed(() => inspectorTarget.value === 'page_1' || inspectorTarget.value === 'page_2');
+const isActionInspector = computed(() => inspectorTarget.value === 'action_next' || inspectorTarget.value === 'action_submit');
 const activeSettingsTab = computed({
     get() {
         return isPageInspector.value ? activePageSettingsTab.value : activeFieldSettingsTab.value;
@@ -116,6 +120,38 @@ const activeSettingsTab = computed({
         activeFieldSettingsTab.value = value;
     },
 });
+const selectedActionButtonHeading = computed(() => (
+    inspectorTarget.value === 'action_submit'
+        ? __('Submit button')
+        : __('Next Page button')
+));
+const selectedActionButtonLabel = computed({
+    get() {
+        return inspectorTarget.value === 'action_submit' ? submitButtonLabel.value : nextPageButtonLabel.value;
+    },
+    set(value) {
+        if (inspectorTarget.value === 'action_submit') {
+            submitButtonLabel.value = value;
+            return;
+        }
+
+        nextPageButtonLabel.value = value;
+    },
+});
+const selectedActionPrimaryLabel = computed(() => (
+    inspectorTarget.value === 'action_submit'
+        ? __('Submit Button Label')
+        : __('Next Button Label')
+));
+const selectedActionButtonAnchor = computed(() => (
+    inspectorTarget.value === 'action_submit' ? '#action-submit-button' : '#action-next-button'
+));
+
+const inspectActionButton = (target) => {
+    inspectorTarget.value = target;
+    activeFieldSettingsTab.value = 'settings';
+    activePageSettingsTab.value = 'settings';
+};
 const selectedPageAnchor = computed(() => (inspectorTarget.value === 'page_2' ? '#form-page-2' : '#form-page-1'));
 const selectedPageHeadingLabel = computed(() => {
     if (inspectorTarget.value === 'page_1') return __('Page :current of :total', { current: 1, total: formPageTotal });
@@ -785,12 +821,12 @@ const selectedPageInternalName = computed({
 
                     <div
                         id="editing-field"
-                        :data-editing-field="isPageInspector ? undefined : ''"
-                        :data-editing-item="isPageInspector ? undefined : ''"
+                        :data-editing-field="isPageInspector || isActionInspector ? undefined : ''"
+                        :data-editing-item="isPageInspector || isActionInspector ? undefined : ''"
                         @click="inspectorTarget = 'field'"
                     >
                         <div
-                            v-if="!isPageInspector"
+                            v-if="!isPageInspector && !isActionInspector"
                             class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
                         >
                             <WidthSelector
@@ -921,13 +957,18 @@ const selectedPageInternalName = computed({
                         </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
                         </Field>
-                        <div class="pt-2">
+                        <div
+                            id="action-next-button"
+                            class="mt-8"
+                        >
                             <Button
                                 variant="primary"
-                                @click.prevent
-                                class="hover:cursor-not-allowed border-0! dark:border-0! ring-0! shadow-none!"
+                                @click.prevent="inspectActionButton('action_next')"
+                                :data-editing-field="inspectorTarget === 'action_next' ? '' : undefined"
+                                :data-editing-item="inspectorTarget === 'action_next' ? '' : undefined"
+                                class="border-0! dark:border-0! ring-0! shadow-none!"
                                 style="--theme-color-primary: var(--theme-color-gray-950)"
-                                :text="__('Next Page')"
+                                :text="nextPageButtonLabel"
                             />
                         </div>
                     </div>
@@ -1057,13 +1098,17 @@ const selectedPageInternalName = computed({
                             <Switch v-model="postPageSmsUpdates" />
                         </Field>
 
-                        <Button
-                            variant="primary"
-                            @click.prevent
-                            class="hover:cursor-not-allowed border-0! dark:border-0! ring-0! shadow-none!"
-                            style="--theme-color-primary: var(--theme-color-gray-950)"
-                            :text="__('Submit')"
-                        />
+                        <div id="action-submit-button">
+                            <Button
+                                variant="primary"
+                                @click.prevent="inspectActionButton('action_submit')"
+                                :data-editing-field="inspectorTarget === 'action_submit' ? '' : undefined"
+                                :data-editing-item="inspectorTarget === 'action_submit' ? '' : undefined"
+                                class="border-0! dark:border-0! ring-0! shadow-none!"
+                                style="--theme-color-primary: var(--theme-color-gray-950)"
+                                :text="submitButtonLabel"
+                            />
+                        </div>
                     </div>
                 </Card>
             </div>
@@ -1096,8 +1141,8 @@ const selectedPageInternalName = computed({
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                         <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
-                            <TabTrigger name="conditions" :text="__('Logic')" />
-                            <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
+                            <TabTrigger v-if="!isActionInspector" name="conditions" :text="__('Logic')" />
+                            <TabTrigger v-if="!isPageInspector && !isActionInspector" name="validation" :text="__('Validation')" />
                         </TabList>
 
                         <TabContent name="settings">
@@ -1119,6 +1164,26 @@ const selectedPageInternalName = computed({
                                 </Field>
                                 <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
                                     <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                                </Field>
+                            </div>
+                            <div v-else-if="isActionInspector" class="space-y-6 pt-8">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="size-4">
+                                        <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                                    </div>
+                                    <a :href="selectedActionButtonAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                        {{ selectedActionButtonHeading }}
+                                        <div class="grid *:[grid-area:1/1]">
+                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                        </div>
+                                    </a>
+                                </div>
+                                <Field :label="selectedActionPrimaryLabel">
+                                    <Input v-model="selectedActionButtonLabel" />
+                                </Field>
+                                <Field v-if="inspectorTarget === 'action_next'" :label="__('Previous Button Label')">
+                                    <Input v-model="previousPageButtonLabel" />
                                 </Field>
                             </div>
                             <div v-else class="space-y-6 pt-8">
@@ -1161,7 +1226,7 @@ const selectedPageInternalName = computed({
                                 </Field>
                             </div>
                         </TabContent>
-                        <TabContent name="conditions">
+                        <TabContent v-if="!isActionInspector" name="conditions">
                             <div v-if="isPageInspector" class="group/logic-tab space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
                                     <div class="size-4">
@@ -1216,7 +1281,7 @@ const selectedPageInternalName = computed({
                                 </div>
                             </div>
                         </TabContent>
-                        <TabContent v-if="!isPageInspector" name="validation">
+                        <TabContent v-if="!isPageInspector && !isActionInspector" name="validation">
                             <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
                         </TabContent>
                     </Tabs>
@@ -1229,8 +1294,8 @@ const selectedPageInternalName = computed({
             <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger name="settings" :text="__('Settings')" />
-                    <TabTrigger name="conditions" :text="__('Logic')" />
-                    <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
+                    <TabTrigger v-if="!isActionInspector" name="conditions" :text="__('Logic')" />
+                    <TabTrigger v-if="!isPageInspector && !isActionInspector" name="validation" :text="__('Validation')" />
                 </TabList>
 
                 <TabContent name="settings">
@@ -1253,6 +1318,26 @@ const selectedPageInternalName = computed({
                         </Field>
                         <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
                             <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
+                        </Field>
+                    </div>
+                    <div v-else-if="isActionInspector" class="space-y-6 pt-8">
+                        <div class="flex items-center gap-2.5">
+                            <div class="size-4">
+                                <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
+                            <a :href="selectedActionButtonAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                {{ selectedActionButtonHeading }}
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
+                        </div>
+                        <Field :label="selectedActionPrimaryLabel">
+                            <Input v-model="selectedActionButtonLabel" />
+                        </Field>
+                        <Field v-if="inspectorTarget === 'action_next'" :label="__('Previous Button Label')">
+                            <Input v-model="previousPageButtonLabel" />
                         </Field>
                     </div>
                     <div v-else class="space-y-6 pt-8">
@@ -1331,7 +1416,7 @@ const selectedPageInternalName = computed({
                         </Field> -->
                     </div>
                 </TabContent>
-                <TabContent name="conditions">
+                <TabContent v-if="!isActionInspector" name="conditions">
                     <div v-if="isPageInspector" class="group/logic-tab space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
                             <div class="flex items-center gap-2.5">
@@ -1388,7 +1473,7 @@ const selectedPageInternalName = computed({
                         </div>
                     </div>
                 </TabContent>
-                <TabContent v-if="!isPageInspector" name="validation">
+                <TabContent v-if="!isPageInspector && !isActionInspector" name="validation">
                     <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>
                 </TabContent>
             </Tabs>
