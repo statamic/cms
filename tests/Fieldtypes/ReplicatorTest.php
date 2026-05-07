@@ -1184,7 +1184,7 @@ class ReplicatorTest extends TestCase
     }
 
     #[Test]
-    public function fields_blink_cache_key_is_locale_aware()
+    public function fields_blink_cache_key_is_site_aware()
     {
         $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
