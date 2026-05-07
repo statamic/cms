@@ -1,8 +1,7 @@
 export default {
-
     data() {
         return {
-            currentStep: 0
+            currentStep: 0,
         };
     },
 
@@ -17,7 +16,7 @@ export default {
 
         canContinue() {
             return this.canGoToStep(this.currentStep + 1);
-        }
+        },
     },
 
     methods: {
@@ -28,16 +27,15 @@ export default {
         },
 
         next() {
-            if (! this.onLastStep) {
+            if (!this.onLastStep) {
                 this.goToStep(this.currentStep + 1);
             }
         },
 
         previous() {
-            if (! this.onFirstStep) {
+            if (!this.onFirstStep) {
                 this.goToStep(this.currentStep - 1);
             }
-        }
-    }
-
-}
+        },
+    },
+};

@@ -176,66 +176,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_and_sets_whether_uploads_are_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowUploads());
-
-        $return = $container->allowUploads(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowUploads());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_folders_can_be_created()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->createFolders());
-
-        $return = $container->createFolders(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->createFolders());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_renaming_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowRenaming());
-
-        $return = $container->allowRenaming(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowRenaming());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_moving_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowMoving());
-
-        $return = $container->allowMoving(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowMoving());
-    }
-
-    #[Test]
-    public function it_gets_and_sets_whether_downloading_is_allowed()
-    {
-        $container = new AssetContainer;
-        $this->assertTrue($container->allowDownloading());
-
-        $return = $container->allowDownloading(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertFalse($container->allowDownloading());
-    }
-
-    #[Test]
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;
@@ -800,6 +740,42 @@ class AssetContainerTest extends TestCase
         $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
         $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
         $this->assertEquals(3, $cacheHits);
+    }
+
+    #[Test]
+    public function it_does_not_leak_stale_contents_state_across_calls_when_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Request::swap(new FakeArtisanRequest('queue:work'));
+
+        // First job populates the instance's $metaFiles cache. metaFilesIn() has no
+        // isWorker() guard, so if contents() reused the same instance across jobs
+        // the filtered result would stick around and bleed into the next job.
+        $this->assertEquals(
+            ['.meta/a.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->all()
+        );
+
+        // Simulate the next job seeing a different state on disk.
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+            'b.txt' => ['type' => 'file', 'path' => 'b.txt', 'dirname' => ''],
+            '.meta/b.txt.yaml' => ['type' => 'file', 'path' => '.meta/b.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        $this->assertEquals(
+            ['.meta/a.txt.yaml', '.meta/b.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->sort()->values()->all()
+        );
     }
 
     #[Test]

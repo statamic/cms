@@ -8,8 +8,12 @@ use Statamic\Facades\Entry as Entries;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class DuplicateEntry extends Action
 {
+    protected $icon = 'duplicate';
+
     private $newItems;
 
     public static function title()

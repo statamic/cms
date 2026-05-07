@@ -19,6 +19,8 @@ use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FormController extends Controller
 {
     /**
@@ -32,12 +34,6 @@ class FormController extends Controller
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
         $values = $request->all();
-
-        $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'checkboxes')
-            ->each(function ($field) use (&$values) {
-                return Arr::set($values, $field->handle(), collect(Arr::get($values, $field->handle(), []))->filter(fn ($value) => $value !== null)->values()->all());
-            });
 
         $values = array_merge($values, $assets = $request->assets());
         $params = collect($request->all())->filter(function ($value, $key) {
@@ -124,7 +120,9 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_error_redirect');
 
-        $response = $redirect ? redirect($redirect) : back();
+        $response = $redirect && ! \Statamic\Facades\URL::isExternalToApplication($redirect)
+            ? redirect($redirect)
+            : back();
 
         return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
@@ -165,8 +163,14 @@ class FormController extends Controller
 
     private function formSuccessRedirect($params, $submission)
     {
-        if (! $redirect = Form::getSubmissionRedirect($submission)) {
-            $redirect = Arr::get($params, '_redirect');
+        if ($redirect = Form::getSubmissionRedirect($submission)) {
+            return $redirect;
+        }
+
+        $redirect = Arr::get($params, '_redirect');
+
+        if ($redirect && \Statamic\Facades\URL::isExternalToApplication($redirect)) {
+            return null;
         }
 
         return $redirect;

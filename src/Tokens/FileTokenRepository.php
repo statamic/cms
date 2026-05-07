@@ -22,7 +22,15 @@ class FileTokenRepository extends TokenRepository
             return null;
         }
 
-        return $this->makeFromPath($path);
+        $token = $this->makeFromPath($path);
+
+        if ($token->hasExpired()) {
+            $this->delete($token);
+
+            return null;
+        }
+
+        return $token;
     }
 
     public function save(TokenContract $token): bool

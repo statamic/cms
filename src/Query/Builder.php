@@ -707,6 +707,31 @@ abstract class Builder implements Contract
 
     abstract public function pluck($column, $key = null);
 
+    public function min($column)
+    {
+        return $this->pluck($column)->min();
+    }
+
+    public function max($column)
+    {
+        return $this->pluck($column)->max();
+    }
+
+    public function sum($column)
+    {
+        return $this->pluck($column)->sum();
+    }
+
+    public function avg($column)
+    {
+        return $this->pluck($column)->avg();
+    }
+
+    public function average($column)
+    {
+        return $this->avg($column);
+    }
+
     public function when($value, $callback, $default = null)
     {
         if ($value) {
@@ -780,7 +805,7 @@ abstract class Builder implements Contract
 
         $pattern = Pattern::sqlLikeToRegex($like);
 
-        return preg_match('/'.$pattern.'/im', (string) $item);
+        return preg_match('/'.$pattern.'/imu', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)
@@ -790,7 +815,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", (string) $item);
+        return preg_match("/{$pattern}/imu", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)
@@ -813,13 +838,21 @@ abstract class Builder implements Contract
      */
     public function chunk($count, callable $callback)
     {
+        $skip = $this->offset;
+        $remaining = $this->limit;
+
         $page = 1;
 
         do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $offset = (($page - 1) * $count) + intval($skip);
+
+            $limit = is_null($remaining) ? $count : min($count, $remaining);
+
+            if ($limit == 0) {
+                break;
+            }
+
+            $results = $this->offset($offset)->limit($limit)->get();
 
             $countResults = $results->count();
 
@@ -827,9 +860,10 @@ abstract class Builder implements Contract
                 break;
             }
 
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
+            if (! is_null($remaining)) {
+                $remaining = max($remaining - $countResults, 0);
+            }
+
             if ($callback($results, $page) === false) {
                 return false;
             }

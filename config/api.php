@@ -31,12 +31,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Middleware & Authentication
+    | Authentication
+    |--------------------------------------------------------------------------
+    |
+    | By default, the API will be publicly accessible. However, you may define
+    | an API token here which will be used to authenticate requests.
+    |
+    */
+
+    'auth_token' => env('STATAMIC_API_AUTH_TOKEN'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware
     |--------------------------------------------------------------------------
     |
     | Define the middleware / middleware group that will be applied to the
     | API route group. If you want to externally expose this API, here
-    | you can configure a middleware based authentication layer.
+    | you can configure a middleware-based authentication layer.
     |
     */
 

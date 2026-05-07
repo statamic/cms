@@ -8,6 +8,8 @@ use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\Page;
 
+use function Statamic\trans as __;
+
 class NavigationPagesController extends CpController
 {
     /**
@@ -27,7 +29,8 @@ class NavigationPagesController extends CpController
         [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
+            $values = collect($originValues)->merge($values)->all();
         }
 
         return [
@@ -36,7 +39,6 @@ class NavigationPagesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'localizedFields' => $this->getLocalizedFields($page),
-            'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
     }
 
@@ -55,7 +57,8 @@ class NavigationPagesController extends CpController
         [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $entry->blueprint());
+            $values = collect($originValues)->merge($values)->all();
         }
 
         return [
@@ -65,7 +68,6 @@ class NavigationPagesController extends CpController
             'originMeta' => $originMeta ?? null,
             'extraValues' => $extraValues,
             'localizedFields' => $this->getLocalizedFields($page),
-            'syncableFields' => $this->getSyncableFields($nav, $entry),
         ];
     }
 
@@ -82,21 +84,6 @@ class NavigationPagesController extends CpController
         }
 
         return $fields;
-    }
-
-    private function getSyncableFields($nav, $entry)
-    {
-        $navFields = $nav->blueprint()->fields()->all()->keys();
-
-        if (! $entry) {
-            return $navFields;
-        }
-
-        return $entry->blueprint()
-            ->fields()->all()->keys()
-            ->intersect($navFields)->values()
-            ->flip()->forget('url')
-            ->flip()->all();
     }
 
     private function extractValuesAndMeta($page, $blueprint)

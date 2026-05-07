@@ -23,6 +23,7 @@ use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Position;
+use Statamic\View\Antlers\Language\Parser\ComponentCompiler;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
@@ -117,12 +118,16 @@ class RuntimeParser implements Parser
      */
     private $isolateRuntimes = false;
 
+    protected $componentCompiler;
+
     public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
         $this->nodeProcessor = $nodeProcessor;
         $this->antlersLexer = $lexer;
         $this->antlersParser = $antlersParser;
+
+        $this->componentCompiler = new ComponentCompiler();
     }
 
     /**
@@ -134,13 +139,16 @@ class RuntimeParser implements Parser
     public function setRuntimeConfiguration(RuntimeConfiguration $configuration)
     {
         GlobalRuntimeState::$allowPhpInContent = $configuration->allowPhpInUserContent;
+        GlobalRuntimeState::$allowMethodsInContent = $configuration->allowMethodsInUserContent;
         GlobalRuntimeState::$throwErrorOnAccessViolation = $configuration->throwErrorOnAccessViolation;
         GlobalRuntimeState::$bannedVarPaths = $configuration->guardedVariablePatterns;
         GlobalRuntimeState::$bannedContentVarPaths = $configuration->guardedContentVariablePatterns;
         GlobalRuntimeState::$bannedTagPaths = $configuration->guardedTagPatterns;
         GlobalRuntimeState::$bannedContentTagPaths = $configuration->guardedContentTagPatterns;
+        GlobalRuntimeState::$allowedContentTagPaths = $configuration->allowedContentTagPatterns;
         GlobalRuntimeState::$bannedModifierPaths = $configuration->guardedModifiers;
         GlobalRuntimeState::$bannedContentModifierPaths = $configuration->guardedContentModifiers;
+        GlobalRuntimeState::$allowedContentModifierPaths = $configuration->allowedContentModifiers;
 
         $this->nodeProcessor->setRuntimeConfiguration($configuration);
 
@@ -270,7 +278,7 @@ class RuntimeParser implements Parser
             return true;
         }
 
-        if (Str::contains($text, DocumentParser::LeftBrace)) {
+        if (Str::contains($text, [DocumentParser::LeftBrace, '@props', '@aware', '@cascade'])) {
             return true;
         }
 
@@ -333,6 +341,8 @@ class RuntimeParser implements Parser
      */
     protected function renderText($text, $data = [])
     {
+        $text = $this->componentCompiler->compile($text);
+
         $this->parseStack += 1;
         $text = $this->runPreParserCallbacks($text);
 
@@ -500,7 +510,6 @@ class RuntimeParser implements Parser
         $rebuiltTrace = array_merge($rebuiltTrace, $exception->getTrace());
 
         $traceProperty = new ReflectionProperty('Exception', 'trace');
-        $traceProperty->setAccessible(true);
         $traceProperty->setValue($newException, $rebuiltTrace);
 
         $this->cleanUpTempFiles();
@@ -596,7 +605,6 @@ INFO;
 
         $ignitionException = new $exceptionClass($newMessage, 0, 1, $exceptionView, $exceptionLine, $antlersException);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
-        $traceProperty->setAccessible(true);
         $traceProperty->setValue($ignitionException, $rebuiltTrace);
 
         $ignitionException->setViewData($data);
@@ -687,10 +695,11 @@ INFO;
             $this->antlersLexer, $this->antlersParser
         ))->allowPhp($this->allowPhp);
 
-        // If we are evaluating a tag's scope, we still
-        // want the overall parser instances to be
-        // isolated, but we also need the Cascade.
-        if (GlobalRuntimeState::$evaulatingTagContents) {
+        foreach ($this->preParsers as $preParser) {
+            $parser->preparse($preParser);
+        }
+
+        if ($this->cascade != null) {
             $parser->cascade($this->cascade);
         }
 
@@ -757,7 +766,22 @@ INFO;
 
     public function parseView($view, $text, $data = [])
     {
+        $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingUserData = false;
+
         $existingView = $this->view;
+        try {
+            return $this->renderViewContent($view, $text, $data);
+        } finally {
+            $this->view = $existingView;
+            array_pop(GlobalRuntimeState::$templateFileStack);
+            GlobalRuntimeState::$currentExecutionFile = $this->view;
+            GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
+        }
+    }
+
+    private function renderViewContent($view, $text, $data = [])
+    {
         $this->view = $view;
         GlobalRuntimeState::$templateFileStack[] = [$view, null];
 
@@ -775,15 +799,7 @@ INFO;
             'view' => $this->cascade->getViewData($view),
         ]);
 
-        $parsed = $this->renderText($text, $data);
-
-        $this->view = $existingView;
-
-        array_pop(GlobalRuntimeState::$templateFileStack);
-
-        GlobalRuntimeState::$currentExecutionFile = $this->view;
-
-        return $parsed;
+        return $this->renderText($text, $data);
     }
 
     public function injectNoparse($text)

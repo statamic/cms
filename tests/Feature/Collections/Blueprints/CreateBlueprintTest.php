@@ -23,9 +23,9 @@ class CreateBlueprintTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('collections.blueprints.create', 'test'))
+            ->get(cp_route('blueprints.collections.create', 'test'))
             ->assertOk()
-            ->assertViewIs('statamic::collections.blueprints.create');
+            ->assertInertia(fn ($page) => $page->component('blueprints/Create'));
     }
 
     #[Test]
@@ -38,7 +38,7 @@ class CreateBlueprintTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->get(cp_route('collections.blueprints.create', 'test'))
+            ->get(cp_route('blueprints.collections.create', 'test'))
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }

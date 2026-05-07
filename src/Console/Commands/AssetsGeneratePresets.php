@@ -78,7 +78,7 @@ class AssetsGeneratePresets extends Command
      * @param  \Statamic\Contracts\Assets\AssetContainer  $container
      * @return void
      */
-    private function generatePresets($container)
+    protected function generatePresets($container)
     {
         $assets = $container->assets()->filter->isImage();
         $counts = [];

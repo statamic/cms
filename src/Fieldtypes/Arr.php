@@ -8,6 +8,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
 use Statamic\Support\Arr as SupportArr;
 
+use function Statamic\trans as __;
+
 class Arr extends Fieldtype
 {
     protected $categories = ['structured'];
@@ -17,7 +19,7 @@ class Arr extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
@@ -30,6 +32,21 @@ class Arr extends Fieldtype
                             'single' => __('Single'),
                         ],
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'expand' => [
+                        'type' => 'toggle',
+                        'display' => __('Expanded format'),
+                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Selection & Options'),
+                'fields' => [
                     'keys' => [
                         'display' => __('Keys'),
                         'instructions' => __('statamic::fieldtypes.array.config.keys'),
@@ -41,11 +58,6 @@ class Arr extends Fieldtype
                         'unless' => [
                             'mode' => 'dynamic',
                         ],
-                    ],
-                    'expand' => [
-                        'type' => 'toggle',
-                        'display' => __('Expand'),
-                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
                     ],
                 ],
             ],

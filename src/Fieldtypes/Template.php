@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Template as TemplateFilter;
 
+use function Statamic\trans as __;
+
 class Template extends Fieldtype
 {
     protected $categories = ['special'];
@@ -13,25 +15,28 @@ class Template extends Fieldtype
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
+                    'folder' => [
+                        'display' => __('Restrict to Folder'),
+                        'instructions' => __('statamic::fieldtypes.template.config.folder'),
+                        'type' => 'template_folder',
+                        'max_items' => 1,
+                        'width' => 50,
+                    ],
                     'hide_partials' => [
                         'display' => __('Hide Partials'),
                         'instructions' => __('statamic::fieldtypes.template.config.hide_partials'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => 50,
                     ],
                     'blueprint' => [
                         'display' => __('Blueprint'),
                         'instructions' => __('statamic::fieldtypes.template.config.blueprint'),
                         'type' => 'toggle',
                         'default' => false,
-                    ],
-                    'folder' => [
-                        'display' => __('Restrict to Folder'),
-                        'instructions' => __('statamic::fieldtypes.template.config.folder'),
-                        'type' => 'template_folder',
-                        'max_items' => 1,
+                        'width' => 50,
                     ],
                 ],
             ],

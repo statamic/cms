@@ -87,6 +87,8 @@ YAML;
     #[Test]
     public function it_finds_a_token()
     {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 0, 0, 0));
+
         $contents = <<<YAML
 handler: 'The\Test\Class'
 expires_at: 1577849700
@@ -110,6 +112,18 @@ YAML;
     }
 
     #[Test]
+    public function it_returns_null_and_deletes_expired_token_on_find()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
+
+        $this->tokens->make('expired-token', 'test')->expireAt(Carbon::now()->subMinute())->save();
+
+        $this->assertFileExists(storage_path('statamic/tokens/expired-token.yaml'));
+        $this->assertNull($this->tokens->find('expired-token'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/expired-token.yaml'));
+    }
+
+    #[Test]
     public function attempting_to_find_a_non_existent_token_returns_null()
     {
         $this->assertNull($this->tokens->find('missing-token'));
@@ -125,16 +139,16 @@ YAML;
         $this->tokens->make('c', 'test')->expireAt(Carbon::now()->subHour())->save();
         $this->tokens->make('d', 'test')->expireAt(Carbon::now()->addMinute())->save();
 
-        $this->assertNotNull($this->tokens->find('a'));
-        $this->assertNotNull($this->tokens->find('b'));
-        $this->assertNotNull($this->tokens->find('c'));
-        $this->assertNotNull($this->tokens->find('d'));
+        $this->assertFileExists(storage_path('statamic/tokens/a.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/b.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/c.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/d.yaml'));
 
         $this->tokens->collectGarbage();
 
-        $this->assertNotNull($this->tokens->find('a'));
-        $this->assertNull($this->tokens->find('b'));
-        $this->assertNull($this->tokens->find('c'));
-        $this->assertNotNull($this->tokens->find('d'));
+        $this->assertFileExists(storage_path('statamic/tokens/a.yaml'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/b.yaml'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/c.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/d.yaml'));
     }
 }

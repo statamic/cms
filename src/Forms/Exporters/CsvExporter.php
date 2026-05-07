@@ -6,6 +6,8 @@ use League\Csv\Writer;
 use SplTempFileObject;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class CsvExporter extends Exporter
 {
     private Writer $writer;
@@ -37,7 +39,7 @@ class CsvExporter extends Exporter
 
     private function insertData()
     {
-        $data = $this->form->submissions()->map(function ($submission) {
+        $data = $this->submissions()->map(function ($submission) {
             $submission = $submission->toArray();
 
             $submission['date'] = (string) $submission['date'];

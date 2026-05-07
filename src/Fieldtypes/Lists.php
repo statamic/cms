@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Lists extends Fieldtype
 {
     protected $categories = ['structured'];

@@ -1,3 +1,5 @@
-<div class="card p-0 content">
-    👋 I'm the {{ name }} widget!
-</div>
+<ui-widget title="{{ name }}">
+    <div class="px-4 py-3">
+        <p>👋 @{{ $message }}!</p>
+    </div>
+</ui-widget>

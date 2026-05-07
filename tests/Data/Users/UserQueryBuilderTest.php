@@ -483,7 +483,71 @@ class UserQueryBuilderTest extends TestCase
         ], User::query()->where('type', 'b')->pluck('name')->all());
     }
 
-    /** @test **/
+    #[Test]
+    public function can_get_min_value()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a', 'quantity' => 1])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'type' => 'b', 'quantity' => 2])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'type' => 'b', 'quantity' => 3])->save();
+
+        $this->assertEquals(1, User::query()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(2, User::query()->where('type', 'b')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(User::query()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a', 'quantity' => 1])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'type' => 'b', 'quantity' => 2])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'type' => 'b', 'quantity' => 3])->save();
+
+        $this->assertEquals(3, User::query()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(1, User::query()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(User::query()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a', 'quantity' => 1])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'type' => 'b', 'quantity' => 2])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'type' => 'b', 'quantity' => 3])->save();
+
+        $this->assertEquals(6, User::query()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(5, User::query()->where('type', 'b')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, User::query()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a', 'quantity' => 1])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'type' => 'b', 'quantity' => 2])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'type' => 'b', 'quantity' => 3])->save();
+
+        $this->assertEquals(2, User::query()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(2.5, User::query()->where('type', 'b')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(User::query()->where('type', 'c')->average('quantity'));
+    }
+
+    #[Test]
     public function users_are_found_using_scopes()
     {
         CustomScope::register();
@@ -495,6 +559,20 @@ class UserQueryBuilderTest extends TestCase
 
         $this->assertCount(1, User::query()->customScope(['email' => 'gandalf@precious.com'])->get());
         $this->assertCount(1, User::query()->whereCustom(['email' => 'gandalf@precious.com'])->get());
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        User::make()->email('a@example.com')->data(['name' => 'Alpha'])->save();
+        User::make()->email('b@example.com')->data(['name' => 'Bravo'])->save();
+
+        $count = User::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        User::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, User::all());
     }
 }
 

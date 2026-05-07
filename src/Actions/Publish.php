@@ -5,8 +5,13 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
+
 class Publish extends Action
 {
+    protected $icon = 'eye';
+
     public static function title()
     {
         return __('Publish');

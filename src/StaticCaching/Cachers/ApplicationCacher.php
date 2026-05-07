@@ -117,12 +117,18 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
+        // For CLI contexts where Site::current()->url() may return the wrong
+        // domain causing getUrls() to look under the wrong cache key.
+        if ($domain === null) {
+            [$url, $domain] = $this->getPathAndDomain($url);
+        }
+
         $this
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-            ->each(function ($value, $key) {
+            ->each(function ($value, $key) use ($domain) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
-                $this->forgetUrl($key);
+                $this->forgetUrl($key, $domain);
             });
 
         UrlInvalidated::dispatch($url, $domain);
