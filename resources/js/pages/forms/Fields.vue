@@ -125,6 +125,17 @@ const selectedPageLogicMockPreset = computed(() => {
 
     return {};
 });
+const goodbyeSecondRuleMockPreset = {
+    logicBranchingConditionField: 'email_notifications',
+    logicOperator: 'equals',
+    logicValue: 'referral',
+    logicJoin: 'or',
+    logicConditionField: 'fan_length',
+    logicContainsOperator: 'contains',
+    logicContainsAnswer: 'friend',
+    logicBranchingAction: 'go_to',
+    logicDestination: 'second_favorite',
+};
 const selectedPageDestinationStepLabel = computed(() => (
     inspectorTarget.value === 'page_2'
         ? __('Then go to Page 1')
@@ -1102,6 +1113,15 @@ const selectedPageInternalName = computed({
                                     :show-rule-controls="true"
                                     :mock-preset="selectedPageLogicMockPreset"
                                 />
+                                <div v-if="inspectorTarget === 'page_2'" class="mt-8 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
+                                <LogicFlowMock
+                                    v-if="inspectorTarget === 'page_2'"
+                                    :key="`mobile-page-logic-secondary-${inspectorTarget}`"
+                                    :destination-step-label="__('Then go to Page 1')"
+                                    :show-destination-selector="true"
+                                    :show-rule-controls="true"
+                                    :mock-preset="goodbyeSecondRuleMockPreset"
+                                />
                                 <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
                                 <div class="mt-6 border-t border-gray-300 dark:border-gray-700">
                                     <Button size="sm" variant="default" class="-ms-2" :text="__('+ Add Rule')" />
@@ -1264,6 +1284,15 @@ const selectedPageInternalName = computed({
                             :show-destination-selector="true"
                             :show-rule-controls="true"
                             :mock-preset="selectedPageLogicMockPreset"
+                        />
+                        <div v-if="inspectorTarget === 'page_2'" class="mt-8 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
+                        <LogicFlowMock
+                            v-if="inspectorTarget === 'page_2'"
+                            :key="`desktop-page-logic-secondary-${inspectorTarget}`"
+                            :destination-step-label="__('Then go to Page 1')"
+                            :show-destination-selector="true"
+                            :show-rule-controls="true"
+                            :mock-preset="goodbyeSecondRuleMockPreset"
                         />
                         <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
                         <div class="mt-3 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
