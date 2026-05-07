@@ -135,7 +135,9 @@ class Replicator extends Fieldtype
     public function fields($set, $index = -1)
     {
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
-        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
+        $parent = $this->field()->parent();
+        $locale = $parent && method_exists($parent, 'locale') ? $parent->locale() : null;
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
 
         return Blink::once($hash, function () use ($config, $index) {
             return new Fields(
