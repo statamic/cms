@@ -148,6 +148,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::set($field, 'field.type', 'long_answer');
                         }
 
+                        if (Arr::get($field, 'field.type') === 'integer') {
+                            Arr::set($field, 'field.type', 'number');
+                        }
+
                         if (Arr::get($field, 'field.type') === 'select' && Arr::get($field, 'field.multiple', false)) {
                             Arr::set($field, 'field.type', 'multi_choice');
                             Arr::forget($field, 'field.multiple');

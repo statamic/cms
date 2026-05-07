@@ -84,6 +84,10 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'textarea', 'display' => 'Message'],
                 ['type' => 'long_answer', 'display' => 'Message'],
             ],
+            'number' => [
+                ['type' => 'integer', 'display' => 'Age'],
+                ['type' => 'number', 'display' => 'Age'],
+            ],
             'dropdown' => [
                 ['type' => 'select', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
                 ['type' => 'dropdown', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
