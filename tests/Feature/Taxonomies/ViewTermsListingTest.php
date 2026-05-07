@@ -6,13 +6,12 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
-use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewTermsListingTest extends TestCase
 {
-    use FakesRoles, PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk;
 
     #[Test]
     public function it_does_not_eager_load_actions_in_listing()
@@ -26,6 +25,7 @@ class ViewTermsListingTest extends TestCase
             ->actingAs($user)
             ->getJson(cp_route('taxonomies.terms.index', $taxonomy->handle()))
             ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
             ->assertJsonMissingPath('data.0.actions');
     }
 }

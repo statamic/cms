@@ -6,13 +6,11 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
-use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewSubmissionsListingTest extends TestCase
 {
-    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     protected function resolveApplicationConfiguration($app)
@@ -33,6 +31,7 @@ class ViewSubmissionsListingTest extends TestCase
             ->actingAs($user)
             ->getJson(cp_route('forms.submissions.index', $form->handle()))
             ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
             ->assertJsonMissingPath('data.0.actions');
     }
 }
