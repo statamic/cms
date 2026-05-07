@@ -289,11 +289,12 @@ class NavTransformer
         // we must include enough of newList to anchor the position of any custom items
         // that appear before original items. Custom items at the end auto-append.
         $originalSet = collect($originalList);
+        $newListValues = collect($newList)->values();
         $lastCustomPositionInMiddle = 0;
 
-        foreach ($newList as $index => $item) {
+        foreach ($newListValues as $index => $item) {
             if (! $originalSet->contains($item)) {
-                $hasOriginalItemsAfter = collect($newList)
+                $hasOriginalItemsAfter = $newListValues
                     ->slice($index + 1)
                     ->contains(fn ($futureItem) => $originalSet->contains($futureItem));
 
