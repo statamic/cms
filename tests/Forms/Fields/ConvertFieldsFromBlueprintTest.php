@@ -76,6 +76,14 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => 'required|email:rfc'],
                 ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
             ],
+            'website' => [
+                ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['url']],
+                ['type' => 'website', 'display' => 'Website'],
+            ],
+            'website, with validation rules' => [
+                ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['required', 'url']],
+                ['type' => 'website', 'display' => 'Website', 'validate' => ['required']],
+            ],
             'short_answer' => [
                 ['type' => 'text', 'display' => 'Name'],
                 ['type' => 'short_answer', 'display' => 'Name'],

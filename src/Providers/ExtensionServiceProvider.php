@@ -141,6 +141,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fields\Number::class,
         Forms\Fields\ShortAnswer::class,
         Forms\Fields\Toggle::class,
+        Forms\Fields\Website::class,
     ];
 
     protected $modifierAliases = [

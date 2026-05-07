@@ -140,6 +140,23 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             }
                         }
 
+                        $isUrlRule = fn ($rule) => is_string($rule) && ($rule === 'url' || str_starts_with($rule, 'url:'));
+
+                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isUrlRule)) {
+                            Arr::set($field, 'field.type', 'website');
+                            Arr::pull($field, 'field.input_type');
+
+                            $remainingValidationRules = collect($validateRules)
+                                ->reject($isUrlRule)
+                                ->values();
+
+                            if ($remainingValidationRules->isEmpty()) {
+                                unset($field['field']['validate']);
+                            } else {
+                                $field['field']['validate'] = $remainingValidationRules->all();
+                            }
+                        }
+
                         if (Arr::get($field, 'field.type') === 'text') {
                             Arr::set($field, 'field.type', 'short_answer');
                         }
