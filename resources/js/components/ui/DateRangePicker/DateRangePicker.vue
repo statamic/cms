@@ -34,7 +34,7 @@ const props = defineProps({
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
     /** The controlled date range value. <br><br> Should be a [`DateRange` object](https://reka-ui.com/docs/guides/dates). */
-    modelValue: { type: [Object, String], required: true, default: () => ({start: null, end: null}) },
+    modelValue: { type: [Object, String], default: null },
     /** The minimum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates). */
     min: { type: [String, Object], default: null },
     /** The maximum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates). */
@@ -98,12 +98,6 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event)
     },
 }));
-
-const hasDates = computed(() => {
-    return calendarBindings.value.modelValue != null
-        &&  calendarBindings.value.modelValue.end != null
-        &&  calendarBindings.value.modelValue?.start != null
-})
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
 
@@ -189,7 +183,7 @@ const timeZoneTooltip = computed(() => formatTimeZone('long'));
                         v-tooltip="timeZoneTooltip"
                         :text="timeZoneLabel"
                     />
-                    <Button v-if="!readOnly && hasDates" @click="emit('update:modelValue', {start: null, end: null})" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
+                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
 

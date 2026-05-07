@@ -12,10 +12,10 @@ const meta = {
             options: ['day', 'hour', 'minute', 'second'],
         },
         'update:modelValue': {
-            description: 'Event handler called when the date range value changes. <br><br> Returns a range object with `start` and `end` values as `@internationalized/date` instances (e.g. `CalendarDate`, `CalendarDateTime`, `ZonedDateTime`) or `null` when the selection is cleared.',
+            description: 'Event handler called when the date range value changes. <br><br> Returns a [`DateRange` object](https://reka-ui.com/docs/guides/dates).',
             table: {
                 category: 'events',
-                type: { summary: '(value: { start: DateValue | null; end: DateValue | null } | null) => void' }
+                type: { summary: '(value: DateRange) => void' }
             }
         }
     },
@@ -71,27 +71,6 @@ export const _MinMax: Story = {
     }),
 };
 
-const granularityDayCode = `
-<DateRangePicker v-model="range" granularity="day" />
-`;
-
-export const _GranularityDay: Story = {
-    tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: granularityDayCode }
-        }
-    },
-    render: () => ({
-        components: { DateRangePicker },
-        setup() {
-            const range = ref({start: null, end: null});
-            return { range };
-        },
-        template: granularityDayCode,
-    }),
-};
-
 const inlineCode = `
 <DateRangePicker v-model="range" inline />
 `;
@@ -106,7 +85,7 @@ export const _Inline: Story = {
     render: () => ({
         components: { DateRangePicker },
         setup() {
-            const range = ref({start: null, end: null});
+            const range = ref(null);
             return { range };
         },
         template: inlineCode,
