@@ -97,6 +97,7 @@ const logicDestinationOptions = [
 ];
 const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
 const logicPrimaryConditionField = ref(props.mockPreset.logicPrimaryConditionField || 'heard_about_us');
+const logicBranchingConditionField = ref(props.mockPreset.logicBranchingConditionField || 'second_favorite');
 const logicCalculationSource = ref(props.mockPreset.logicCalculationSource || 'variable_score');
 const logicCalculationVariable = ref(props.mockPreset.logicCalculationVariable || 'bonus_multiplier');
 const logicConditionFieldOptions = [
@@ -353,20 +354,40 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                                 </div>
                             </template>
                         </Combobox>
-                        <div
+                        <Combobox
                             v-else
-                            class="logic-text__pill"
+                            v-model="logicBranchingConditionField"
+                            size="sm"
+                            variant="default"
+                            :options="logicConditionFieldOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('Field')"
+                            searchable
                         >
-                            <span
-                                class="logic-text__pill-icon size-6"
-                                :class="props.initialConditionIconClass"
-                            >
-                                <Icon :name="props.initialConditionIcon" class="size-3.5" />
-                            </span>
-                            <span class="logic-text__pill-text" :title="props.initialConditionLabel || __('Which album was your favorite?')">
-                                {{ props.initialConditionLabel || __('Which album was your favorite?') }}
-                            </span>
-                        </div>
+                            <template #option="{ icon, label, category }">
+                                <div class="flex min-w-0 gap-2 items-center text-left">
+                                    <Icon
+                                        v-if="icon"
+                                        :name="icon"
+                                        :class="optionIconClasses({ category })"
+                                    />
+                                    <span class="block truncate">{{ label }}</span>
+                                </div>
+                            </template>
+                            <template #selected-option="{ option }">
+                                <div class="flex min-w-0 items-center gap-1 -ms-0.75">
+                                    <div :class="optionChipClasses(option)">
+                                        <Icon
+                                            v-if="option.icon"
+                                            :name="option.icon"
+                                            :class="optionChipIconClasses(option)"
+                                        />
+                                    </div>
+                                    <span class="block truncate">{{ option.label }}</span>
+                                </div>
+                            </template>
+                        </Combobox>
                     </li>
                     <li v-if="props.calculationMode">
                         <div class="logic-text-badge logic-text__condition mb-0.25! ms-1.5" aria-hidden="true">
