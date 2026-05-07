@@ -84,6 +84,18 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'textarea', 'display' => 'Message'],
                 ['type' => 'long_answer', 'display' => 'Message'],
             ],
+            'dropdown' => [
+                ['type' => 'select', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
+                ['type' => 'dropdown', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
+            ],
+            'dropdown, removes multiple and max_items' => [
+                ['type' => 'select', 'display' => 'Color', 'multiple' => false, 'max_items' => 1, 'options' => ['red' => 'Red']],
+                ['type' => 'dropdown', 'display' => 'Color', 'options' => ['red' => 'Red']],
+            ],
+            'multi-select should not convert to dropdown' => [
+                ['type' => 'select', 'display' => 'Colors', 'multiple' => true, 'options' => ['red' => 'Red']],
+                ['type' => 'select', 'display' => 'Colors', 'multiple' => true, 'options' => ['red' => 'Red']],
+            ],
             'non-form field should be preserved' => [
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
