@@ -345,11 +345,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
     public function contents()
     {
-        if (Statamic::isWorker()) {
-            return app(AssetContainerContents::class)->container($this);
-        }
-
-        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
+        return Blink::onceIf(! Statamic::isWorker(), 'asset-listing-cache-'.$this->handle(), function () {
             return app(AssetContainerContents::class)->container($this);
         });
     }
