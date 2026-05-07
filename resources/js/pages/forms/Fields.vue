@@ -995,7 +995,7 @@ const selectedPageInternalName = computed({
                     <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                         <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                             <TabTrigger name="settings" :text="__('Settings')" />
-                            <TabTrigger name="conditions" :text="isPageInspector ? __('Logic') : __('Conditions')" />
+                            <TabTrigger name="conditions" :text="__('Logic')" />
                             <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                         </TabList>
 
@@ -1116,7 +1116,7 @@ const selectedPageInternalName = computed({
             <Tabs v-model:modelValue="activeSettingsTab" :unmount-on-hide="false">
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger name="settings" :text="__('Settings')" />
-                    <TabTrigger name="conditions" :text="isPageInspector ? __('Logic') : __('Conditions')" />
+                    <TabTrigger name="conditions" :text="__('Logic')" />
                     <TabTrigger v-if="!isPageInspector" name="validation" :text="__('Validation')" />
                 </TabList>
 
