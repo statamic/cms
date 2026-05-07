@@ -135,7 +135,7 @@ class Replicator extends Fieldtype
     public function fields($set, $index = -1)
     {
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
-        $parent = $this->field()->parent();
+        $parent = $this->field->parent();
         $locale = $parent && method_exists($parent, 'locale') ? $parent->locale() : null;
         $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
 
