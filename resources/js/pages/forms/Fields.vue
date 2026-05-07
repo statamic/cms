@@ -1000,7 +1000,7 @@ const selectedPageInternalName = computed({
                         </TabList>
 
                         <TabContent name="settings">
-                            <div v-if="isPageInspector" class="space-y-6 pt-8">
+                            <div v-if="isPageInspector" class="group/logic-tab space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
                                     <div class="size-4">
                                         <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
@@ -1061,7 +1061,7 @@ const selectedPageInternalName = computed({
                             </div>
                         </TabContent>
                         <TabContent name="conditions">
-                            <div v-if="isPageInspector" class="space-y-6 pt-8">
+                            <div v-if="isPageInspector" class="group/logic-tab space-y-6 pt-8">
                                 <div class="flex items-center gap-2.5">
                                     <div class="size-4">
                                         <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
@@ -1077,6 +1077,7 @@ const selectedPageInternalName = computed({
                                 <LogicFlowMock
                                     :destination-step-label="__('Then go to Goodbye')"
                                     :show-destination-selector="true"
+                                    :show-rule-controls="true"
                                 />
                                 <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
                                 <div class="mt-6 border-t border-gray-300 dark:border-gray-700">
@@ -1121,7 +1122,7 @@ const selectedPageInternalName = computed({
                 </TabList>
 
                 <TabContent name="settings">
-                    <div v-if="isPageInspector" class="space-y-6 pt-8">
+                    <div v-if="isPageInspector" class="group/logic-tab space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
                             <div class="size-4">
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
@@ -1219,26 +1220,29 @@ const selectedPageInternalName = computed({
                     </div>
                 </TabContent>
                 <TabContent name="conditions">
-                    <div v-if="isPageInspector" class="space-y-6 pt-8">
+                    <div v-if="isPageInspector" class="group/logic-tab space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
-                            <div class="size-4">
-                                <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
-                            </div>
-                            <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ selectedPageHeadingLabel }}
-                                <div class="grid *:[grid-area:1/1]">
-                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
-                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                            <div class="flex items-center gap-2.5">
+                                <div class="size-4">
+                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                                 </div>
-                            </a>
+                                <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                    {{ selectedPageHeadingLabel }}
+                                    <div class="grid *:[grid-area:1/1]">
+                                        <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                        <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                         <LogicFlowMock
                             :destination-step-label="__('Then go to Goodbye')"
                             :show-destination-selector="true"
+                            :show-rule-controls="true"
                         />
                         <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
                         <div class="mt-3 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
-                            <Button size="sm" variant="default" :text="__('+ Add Rule')" />
+                            <Button size="sm" :text="__('+ Add Rule')" />
                         </div>
                     </div>
                     <div v-else class="space-y-6 pt-8">

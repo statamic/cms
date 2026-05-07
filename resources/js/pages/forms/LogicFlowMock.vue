@@ -39,6 +39,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    showRuleControls: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const logicOperator = ref(props.mockPreset.logicOperator || (props.calculationMode ? 'add' : 'equals'));
@@ -293,8 +297,17 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                         :searchable="false"
                     />
                 </div>
-                <div v-else class="logic-text-badge logic-text__condition" aria-hidden="true">
-                    {{ __('If') }}
+                <div v-else class="flex items-center gap-2">
+                    <div class="logic-text-badge logic-text__condition" aria-hidden="true">
+                        {{ __('If') }}
+                    </div>
+                    <div
+                        v-if="props.showRuleControls"
+                        class="ms-1 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-100 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto"
+                    >
+                        <Button size="sm" inset variant="subtle" icon="duplicate" v-tooltip="__('Duplicate')" />
+                        <Button size="sm" inset variant="subtle" icon="trash" v-tooltip="__('Delete')" />
+                    </div>
                 </div>
                 <ol>
                     <li>
