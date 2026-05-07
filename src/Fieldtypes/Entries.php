@@ -17,6 +17,9 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Types\EntriesSelectType;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\EntryType;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderBy;
@@ -27,11 +30,7 @@ use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Index;
 use Statamic\Search\Result;
-use Statamic\GraphQL\Types\EntriesSelectType;
-use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\GraphQL\Types\EntryType;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
