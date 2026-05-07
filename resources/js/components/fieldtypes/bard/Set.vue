@@ -18,12 +18,14 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
-                <Icon data-drag-handle name="handles" class="size-4 cursor-grab text-gray-400" v-if="!isReadOnly" />
+                <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
+                    <Icon name="handles" class="size-4 text-gray-400" />
+                </span>
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
@@ -49,7 +51,7 @@
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -75,23 +77,22 @@
                 </div>
             </header>
 
-            <Motion
-                layout
-                v-if="index !== undefined"
-                class="contain-paint"
-                :initial="{ height: collapsed ? '0px' : 'auto' }"
-                :animate="{ height: collapsed ? '0px' : 'auto' }"
-                :transition="{ duration: 0.25, type: 'tween' }"
+            <div
+                v-if="index !== undefined && hasFields"
+                v-show="!collapsed"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
+                    :read-only="isReadOnly"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >
                     <Fields class="p-4" />
                 </FieldsProvider>
-            </Motion>
+            </div>
         </div>
     </node-view-wrapper>
 </template>
@@ -100,7 +101,6 @@
 import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import { Motion } from 'motion-v';
 import {
     Badge,
     Button,
@@ -134,7 +134,6 @@ export default {
         Badge,
         Icon,
         NodeViewWrapper,
-        Motion,
     },
 
     mixins: [ManagesPreviewText, HasFieldActions],
@@ -148,6 +147,12 @@ export default {
     computed: {
         fields() {
             return this.config.fields;
+        },
+
+        hasFields() {
+            return Array.isArray(this.fields)
+                ? this.fields.length > 0
+                : Object.keys(this.fields || {}).length > 0;
         },
 
         display() {
@@ -171,7 +176,7 @@ export default {
         },
 
         collapsed() {
-            return this.extension.options.bard.meta.collapsed.includes(this.node.attrs.id);
+            return this.extension.options.bard.collapsed.includes(this.node.attrs.id);
         },
 
         config() {
@@ -325,6 +330,19 @@ export default {
                 this.getPos,
             );
         },
+
+        enableDragging() {
+            this._draggableObserver?.disconnect();
+            this.$el.setAttribute('draggable', true);
+
+            document.addEventListener('mouseup', this.disableDragging, { once: true });
+            document.addEventListener('dragend', this.disableDragging, { once: true });
+        },
+
+        disableDragging() {
+            this.$el.setAttribute('draggable', false);
+            this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
     },
 
     mounted() {
@@ -332,6 +350,7 @@ export default {
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
 				if (! values) return;
+                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
 
                 this.updateAttributes({ values });
             },
@@ -339,12 +358,25 @@ export default {
         );
 
         reveal.mount(this.$refs.container, this.expand);
+
+        // Firefox bug 739071: text selection doesn't work inside elements with a
+        // draggable ancestor. ProseMirror sets draggable=true on the node-view-wrapper
+        // because the Set node spec has draggable:true. We must keep it false.
+        this.$el.setAttribute('draggable', false);
+        this._draggableObserver = new MutationObserver(() => {
+            if (this.$el.getAttribute('draggable') !== 'false') {
+                this.$el.setAttribute('draggable', false);
+            }
+        });
+        this._draggableObserver.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
     },
 
     updated() {
-        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
-        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
         this.$el.setAttribute('draggable', false);
+    },
+
+    beforeUnmount() {
+        this._draggableObserver?.disconnect();
     },
 };
 </script>

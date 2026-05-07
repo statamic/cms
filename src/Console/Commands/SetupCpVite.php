@@ -46,29 +46,34 @@ class SetupCpVite extends Command
 
     private function installDependencies(): self
     {
-        spin(
+        $result = spin(
             callback: function () {
                 $packageJsonPath = base_path('package.json');
                 $contents = File::json($packageJsonPath);
 
                 $installedDependencies = collect($contents['dependencies'] ?? [])->merge($contents['devDependencies'] ?? []);
 
-                if (! $installedDependencies->contains('vite')) {
-                    $contents['devDependencies']['vite'] = '^7.0.4';
+                if (! $installedDependencies->has('vite')) {
+                    $contents['devDependencies']['vite'] = '^8.0.0';
                 }
 
-                if (! $installedDependencies->contains('@statamic/cms')) {
+                if (! $installedDependencies->has('@statamic/cms')) {
                     $contents['dependencies']['@statamic/cms'] = 'file:./vendor/statamic/cms/resources/dist-package';
                 }
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                Process::path(base_path())->run('npm install', function (string $type, string $buffer) {
-                    echo $buffer;
-                });
+                return Process::path(base_path())->run('npm install --ignore-scripts');
             },
             message: 'Installing dependencies...'
         );
+
+        if ($result->failed()) {
+            $this->line($result->errorOutput() ?: $result->output());
+            $this->components->error('Failed to install dependencies. You need to run "npm install --ignore-scripts" manually.');
+
+            return $this;
+        }
 
         $this->components->info('Installed dependencies');
 
@@ -82,7 +87,7 @@ class SetupCpVite extends Command
 
         $contents['scripts'] = [
             ...$contents['scripts'] ?? [],
-            'cp:dev' => 'vite build --config vite-cp.config.js --watch',
+            'cp:dev' => 'vite --config vite-cp.config.js',
             'cp:build' => 'vite build --config vite-cp.config.js',
         ];
 
@@ -158,6 +163,7 @@ class SetupCpVite extends Command
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => public_path('cp-hot'),
             'buildDirectory' => 'vendor/app',
         ]);
 PHP);

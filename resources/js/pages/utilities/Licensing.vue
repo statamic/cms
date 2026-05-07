@@ -16,9 +16,9 @@ const props = defineProps([
 </script>
 
 <template>
-    <Head :title="[__('Licensing'), __('Utilities')]" />
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+        <Head :title="[__('Licensing'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
         <Header :title="__('Licensing')" icon="license">
             <Button
                 :href="site.url"
@@ -122,7 +122,7 @@ const props = defineProps([
                                 </div>
                             </TableCell>
                             <TableCell>{{ addon.version }}</TableCell>
-                            <TableCell class="text-red-700 text-end">{{ addon.invalidReason }}</TableCell>
+                            <TableCell class="text-red-600 text-end">{{ addon.invalidReason }}</TableCell>
                         </TableRow>
                     </Table>
                 </Card>

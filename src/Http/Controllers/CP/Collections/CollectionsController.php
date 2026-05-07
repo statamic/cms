@@ -94,7 +94,6 @@ class CollectionsController extends CpController
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
-                'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run'),
                 'icon' => $collection->icon(),
                 'create_label' => $collection->createLabel(),

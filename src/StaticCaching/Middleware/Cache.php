@@ -14,6 +14,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
@@ -21,6 +22,8 @@ use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
+
+use function Statamic\trans as __;
 
 class Cache
 {
@@ -51,15 +54,13 @@ class Cache
     public function handle($request, Closure $next)
     {
         if ($response = $this->attemptToServeCachedResponse($request)) {
-            return $this->addEtagToResponse($request, $response);
+            return $response;
         }
 
         $lock = $this->createLock($request);
 
         try {
-            return $lock->block($this->lockFor,
-                fn () => $this->addEtagToResponse($request, $this->handleRequest($request, $next))
-            );
+            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
         }
@@ -216,6 +217,10 @@ class Cache
             return false;
         }
 
+        if ($this->cacher instanceof AbstractCacher && $this->cacher->isExcluded($this->cacher->getUrl($request))) {
+            return false;
+        }
+
         return true;
     }
 
@@ -254,16 +259,5 @@ class Cache
             : sprintf('<meta http-equiv="refresh" content="1; URL=\'%s\'" />', $request->getUri());
 
         return response($html, 503, ['Retry-After' => 1]);
-    }
-
-    private function addEtagToResponse($request, $response)
-    {
-        if (! $response->isRedirect() && $content = $response->getContent()) {
-            $response
-                ->setEtag(md5($content))
-                ->isNotModified($request);
-        }
-
-        return $response;
     }
 }

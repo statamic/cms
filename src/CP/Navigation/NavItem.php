@@ -8,10 +8,11 @@ use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
-use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Statamic\trans as __;
 
 class NavItem
 {
@@ -149,6 +150,7 @@ class NavItem
         $cpUrl = url(config('statamic.cp.route')).'/';
 
         $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+        $relativeUrl = rtrim($relativeUrl, '/');
 
         return $relativeUrl.'(/(.*)?|$)';
     }
@@ -208,7 +210,18 @@ class NavItem
             $value = Statamic::svg("icons/{$value}");
         }
 
+        $value = $this->sanitizeSvg($value);
+
         return Svg::withClasses($value, 'size-4 shrink-0');
+    }
+
+    private function sanitizeSvg(string $svg): string
+    {
+        try {
+            return Svg::sanitize($svg);
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     /**
@@ -409,7 +422,7 @@ class NavItem
             }
         }
 
-        return request()->url() === URL::removeQueryAndFragment($this->url);
+        return URL::tidy(request()->url()) === URL::removeQueryAndFragment($this->url);
     }
 
     /**
@@ -438,7 +451,7 @@ class NavItem
         if ($childrenUrls = NavBuilder::getUnresolvedChildrenUrlsForItem($this)) {
             return collect($childrenUrls)
                 ->map(fn ($url) => URL::removeQueryAndFragment($url))
-                ->contains(request()->url());
+                ->contains(URL::tidy(request()->url()));
         }
 
         return false;
@@ -451,7 +464,7 @@ class NavItem
      */
     protected function currentUrlIsNotExplicitlyReferencedInNav()
     {
-        return ! NavBuilder::getAllUrls()->contains(request()->url());
+        return ! NavBuilder::getAllUrls()->contains(URL::tidy(request()->url()));
     }
 
     /**

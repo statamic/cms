@@ -27,14 +27,14 @@
                                 <div class="flex items-center">
                                     <span
                                         v-text="option.fieldset"
-                                        class="text-2xs text-gray-500 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
+                                        class="text-2xs text-gray-500 dark:text-gray-300 ltr:mr-2 rtl:ml-2"
                                     />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="px-4 py-2 text-sm text-gray-700 dark:text-gray-500 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -50,9 +50,9 @@
                     />
 
                     <div class="my-4 flex items-center">
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
-                        <div class="mx-4 text-2xs text-gray-600 dark:text-dark-175" v-text="__('or')"></div>
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
+                        <div class="flex-1 border-b border-gray-300 dark:border-gray-500" />
+                        <div class="mx-4 text-2xs text-gray-600 dark:text-gray-400" v-text="__('or')"></div>
+                        <div class="flex-1 border-b border-gray-300 dark:border-gray-500" />
                     </div>
 
                     <Field
@@ -69,7 +69,7 @@
                         >
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="px-4 py-2 text-sm text-gray-700 dark:text-gray-500 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -81,6 +81,18 @@
                         :instructions="__('messages.fieldset_link_fields_prefix_instructions')"
                     >
                         <Input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
+                    </Field>
+
+                    <Field
+                        v-if="selectedFieldsetHasSections"
+                        :label="__('Section Behavior')"
+                        :instructions="__('messages.fieldset_import_section_behavior_instructions')"
+                        class="mt-6"
+                    >
+                        <RadioGroup v-model="sectionBehavior">
+                            <Radio :label="__('Preserve')" :description="__('Keep imported sections as-is.')" value="preserve" />
+                            <Radio :label="__('Flatten')" :description="__('Merge all fields into this section.')" value="flatten" />
+                        </RadioGroup>
                     </Field>
 
                     <Button
@@ -97,12 +109,12 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
-import { Combobox, Button, Input, Heading, Field, Stack, StackClose } from '@/components/ui';
+import { nanoid as uniqid } from 'nanoid';
+import { Combobox, Button, Input, Heading, Field, Stack, StackClose, RadioGroup, Radio } from '@/components/ui';
 import { usePage } from '@inertiajs/vue3';
 
 export default {
-    components: { Heading, Combobox, Button, Input, Field, Stack, StackClose },
+    components: { Heading, Combobox, Button, Input, Field, Stack, StackClose, RadioGroup, Radio },
 
     props: {
         excludeFieldset: String,
@@ -134,6 +146,7 @@ export default {
             reference: null,
             fieldset: null,
             importPrefix: null,
+            sectionBehavior: 'preserve',
             fieldSuggestions,
             fieldsetSuggestions: fieldsets.map((fieldset) => ({
                 value: fieldset.handle,
@@ -141,6 +154,22 @@ export default {
             })),
             fieldsets,
         };
+    },
+
+    computed: {
+        selectedFieldsetHasSections() {
+            if (!this.fieldset) return false;
+
+            return this.fieldsets.find((f) => f.handle === this.fieldset)?.has_sections === true;
+        },
+    },
+
+    watch: {
+        fieldset() {
+            if (!this.selectedFieldsetHasSections) {
+                this.sectionBehavior = 'preserve';
+            }
+        },
     },
 
     mounted() {
@@ -171,12 +200,18 @@ export default {
         },
 
         linkFieldset() {
-            this.linkAndClose({
+            const field = {
                 _id: uniqid(),
                 type: 'import',
                 fieldset: this.fieldset,
                 prefix: this.importPrefix,
-            });
+            };
+
+            if (this.selectedFieldsetHasSections) {
+                field.section_behavior = this.sectionBehavior;
+            }
+
+            this.linkAndClose(field);
         },
 
         linkAndClose(field) {
@@ -185,6 +220,7 @@ export default {
             this.reference = null;
             this.fieldset = null;
             this.importPrefix = null;
+            this.sectionBehavior = 'preserve';
         },
 
         addToCommandPalette() {

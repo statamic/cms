@@ -25,7 +25,7 @@
                 @removed="remove(index)"
             />
 
-            <div class="border-t pt-6 dark:border-dark-900" v-if="hasConditions && isStandard">
+            <div class="border-t pt-6 dark:border-gray-900" v-if="hasConditions && isStandard">
                 <Button :text="__('Add Condition')" @click="add" />
             </div>
         </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';

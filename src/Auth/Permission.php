@@ -20,6 +20,9 @@ class Permission
     protected $description;
     protected $group;
 
+    /**
+     * @return ($value is null ? string|string[] : static)
+     */
     public function value(?string $value = null)
     {
         if (func_num_args() > 0) {
@@ -41,6 +44,9 @@ class Permission
         return $this->label;
     }
 
+    /**
+     * @return ($label is null ? string|null : static)
+     */
     public function label(?string $label = null)
     {
         if (func_num_args() > 0) {

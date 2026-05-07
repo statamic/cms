@@ -135,7 +135,7 @@
             }
         }
 
-        /* When there's a fixed toolbar the the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
+        /* When there's a fixed toolbar the bard editor should have square radius in the top corners to but up against the bottom of the toolbar */
         .bard-fieldtype:has(> &) {
             .bard-editor:focus-within {
                 border-top-left-radius: 0!important;
@@ -154,7 +154,9 @@
     .bard-fixed-toolbar {
         z-index: var(--z-index-portal);
         position: sticky;
-        @apply -top-2;
+        /* Opt out the toolbar of scroll anchoring. Firefox's scroll anchoring adjusts the scroll position to compensate for the perceived layout change, scrolling up to the parent Bard's top. */
+        overflow-anchor: none;
+        @apply sm:-top-2;
         /* Prevent the sticky toolbar from hitting the very end of container, which causes it to overlap the container's border-radius */
         margin-block-end: 8px;
         /* Pull the subsequent element up to compensate for this. The focus ring adjustment here keeps the focus ring from disappearing into the toolbar, which would make the focus ring appear bottom heavy. */
@@ -164,10 +166,17 @@
         }
     }
 
-    /* Bard field with a fixed toolbar > then another fixed toolbar inside this */
-    .bard-fieldtype:has(> .bard-fixed-toolbar) .bard-content .bard-fixed-toolbar {
-        @apply top-8;
+    /* [1] Where a Bard fieldtype with a fixed toolbar... */
+    .bard-fieldtype:has(> .bard-fixed-toolbar) {
+        /* [2] has a any nested fieldtype with focus, e.g. a Markdown toolbar or another Bard toolbar */
+        &:has(.publish-fields:focus-within) {
+            /* [/3] release the sticky positioning so that it doesn't cover other UI elements */
+            > .bard-fixed-toolbar {
+                position: unset;
+            }
+        }
     }
+
     /* Bard > Grid > Bard */
     .bard-content .grid-fieldtype .bard-fixed-toolbar {
         @apply top-16;
@@ -178,7 +187,7 @@
         top: -24px;
     }
 
-    /*  Responive Wangjangling */
+    /* Responsive Wangjangling */
     @media (width >= theme(--breakpoint-md)) {
         /*  Fixed toolbar below fixed global header */
         .bard-fixed-toolbar {
@@ -255,21 +264,24 @@
         @apply fixed inset-0 min-h-screen overflow-scroll border-none rounded-none bg-gray-100 pt-14 dark:bg-gray-850;
 
         & > .bard-editor {
-            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
+            @apply relative mx-auto my-6 max-w-[65rem] rounded-lg bg-white px-8 shadow-ui-md dark:bg-gray-925 dark:shadow-lg;
         }
         .bard-content {
             @apply dark:bg-gray-925;
         }
 
         .bard-fixed-toolbar {
-            padding: 7px 8px;
-            margin-block-end: 0;
-            top: 0;
-            background: unset;
-            border: unset;
+            /* Don't affect nested toolbars; only the one at the very top */
+            &:not(.bard-fieldtype.form-group .bard-fieldtype.form-group &) {
+                padding: 7px 8px;
+                margin-block-end: 0;
+                top: 0;
+                background: unset;
+                border: unset;
 
-            button {
-                @apply mx-1;
+                button {
+                    @apply mx-1;
+                }
             }
         }
 
@@ -321,7 +333,7 @@
         ul {
             margin-top: 0;
             margin-bottom: 0.85em;
-            table &:last-child {
+            table &:where(:last-child, :nth-last-child(2):has(+ .column-resize-handle)) {
                 /* If you type a single line of text in a table fieldtype cell you don't want it to have a bottom margin */
                 margin-block-end: 0;
             }
@@ -459,15 +471,18 @@
             .tableWrapper &,
             blockquote > .tableWrapper &,
             :is(ol, ul) li > .tableWrapper & {
-                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500 border-collapse table-fixed;
+                @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-gray-900 border-collapse table-fixed;
 
                 th {
-                    @apply bg-gray-200 font-bold dark:bg-gray-600 text-start;
+                    @apply bg-gray-50 dark:bg-gray-950/30 text-start;
+                    p {
+                        @apply font-medium dark:font-semibold;
+                    }
                 }
 
                 td,
                 th {
-                    @apply relative border px-2 py-1 align-top dark:border-gray-600;
+                    @apply relative border px-2 py-1 align-top dark:border-gray-700/75;
                     min-width: 1em;
                 }
 

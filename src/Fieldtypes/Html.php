@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Html extends Fieldtype
 {
     protected $categories = ['special'];
@@ -20,6 +22,12 @@ class Html extends Fieldtype
                         'type' => 'code',
                         'mode' => 'htmlmixed',
                         'mode_selectable' => false,
+                    ],
+                    'sanitize' => [
+                        'display' => __('Sanitize'),
+                        'instructions' => __('statamic::fieldtypes.html.config.sanitize_instruct'),
+                        'type' => 'toggle',
+                        'default' => true,
                     ],
                 ],
             ],

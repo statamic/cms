@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Addons\AddonsController;
 use Statamic\Http\Controllers\CP\Addons\AddonSettingsController;
@@ -92,12 +93,10 @@ use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
-use Statamic\Http\Controllers\CP\Taxonomies\RestoreTermRevisionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomiesController;
 use Statamic\Http\Controllers\CP\Taxonomies\TaxonomyBlueprintsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermActionController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermPreviewController;
-use Statamic\Http\Controllers\CP\Taxonomies\TermRevisionsController;
 use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
 use Statamic\Http\Controllers\CP\Themes\ShareThemeController;
 use Statamic\Http\Controllers\CP\Themes\ThemeController;
@@ -123,19 +122,21 @@ use Statamic\Statamic;
 Route::group(['prefix' => 'auth'], function () {
     if (config('statamic.cp.auth.enabled', true)) {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-        Route::post('login', [LoginController::class, 'login']);
+        Route::post('login', [LoginController::class, 'login'])->middleware('throttle:statamic.cp.auth');
 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.cp.auth')->name('password.email');
         Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.cp.auth')->name('password.reset.action');
 
-        Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
-        Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+        if (TwoFactor::enabled()) {
+            Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
+            Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
-        Route::get('two-factor-setup', TwoFactorSetupController::class)
-            ->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)
-            ->name('two-factor-setup');
+            Route::get('two-factor-setup', TwoFactorSetupController::class)
+                ->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)
+                ->name('two-factor-setup');
+        }
     }
 
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');
@@ -147,7 +148,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
-    Route::group(['prefix' => 'passkeys'], function () {
+    Route::group(['prefix' => 'passkeys', 'middleware' => 'throttle:statamic.cp.passkeys'], function () {
         Route::post('/', [PasskeyLoginController::class, 'login'])->name('passkeys.auth');
         Route::get('options', [PasskeyLoginController::class, 'options'])->name('passkeys.auth.options');
     });
@@ -226,12 +227,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::post('/', [PublishedTermsController::class, 'store'])->name('taxonomies.terms.published.store');
             Route::delete('/', [PublishedTermsController::class, 'destroy'])->name('taxonomies.terms.published.destroy');
 
-            Route::resource('revisions', TermRevisionsController::class, [
-                'as' => 'taxonomies.terms',
-                'only' => ['index', 'store', 'show'],
-            ]);
-
-            Route::post('restore-revision', RestoreTermRevisionController::class)->name('taxonomies.terms.restore-revision');
             Route::post('preview', [TermPreviewController::class, 'edit'])->name('taxonomies.terms.preview.edit');
             Route::get('preview', [TermPreviewController::class, 'show'])->name('taxonomies.terms.preview.popout');
             Route::patch('/', [TermsController::class, 'update'])->name('taxonomies.terms.update');
@@ -251,7 +246,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::resource('asset-containers', AssetContainersController::class)->except('index');
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
-    Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
     Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
     Route::get('assets/browse', [BrowserController::class, 'index'])->name('assets.browse.index');
@@ -354,14 +348,16 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
     Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
-    Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->middleware(RequireElevatedSession::class)->group(function () {
-        Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
-        Route::delete('two-factor', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
-        Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
-        Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
-        Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
-        Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
-    });
+    if (TwoFactor::enabled()) {
+        Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->middleware(RequireElevatedSession::class)->group(function () {
+            Route::post('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+            Route::delete('two-factor', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
+            Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
+            Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
+            Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
+            Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
+        });
+    }
     Route::get('account', AccountController::class)->name('account');
     Route::resource('user-groups', UserGroupsController::class);
     Route::resource('roles', RolesController::class);
@@ -447,11 +443,13 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
-    Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
-    Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
-    Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options');
-    Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
-    Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+    if (config('statamic.users.elevated_sessions_enabled')) {
+        Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
+        Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+        Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
+        Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
+        Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+    }
 
     Route::get('playground', PlaygroundController::class)->name('playground');
 

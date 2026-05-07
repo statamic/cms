@@ -37,11 +37,14 @@ const {
 } = Fieldtype.use(emit, props);
 
 const shouldFocus = computed(() => {
-    if (props.config.focus === false) {
-        return false;
+    if (props.config.focus === false || props.config.focus === true) {
+        return props.config.focus;
     }
+    
+    const isRootField = !props.fieldPathPrefix;
+    const isImplicitAutofocusField = name.value === 'title' || name.value === 'alt';
 
-    return props.config.focus || name.value === 'title' || name.value === 'alt';
+    return isRootField && isImplicitAutofocusField;
 });
 
 function inputUpdated(value) {

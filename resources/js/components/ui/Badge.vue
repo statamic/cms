@@ -1,9 +1,11 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from './Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** Appended text */
@@ -30,6 +32,7 @@ const props = defineProps({
     text: { type: [String, Number, Boolean, null], default: null },
 });
 
+const attrs = useAttrs();
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
@@ -45,7 +48,7 @@ const badgeClasses = computed(() => {
         variants: {
             size: {
                 sm: 'text-2xs leading-normal px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
-                default: 'text-xs leading-5.5 px-2 rounded-sm [&_svg]:size-3.5 gap-2',
+                default: 'text-xs leading-5.5 px-2.25 rounded-sm [&_svg]:size-3.5 gap-2',
                 lg: 'font-medium text-sm leading-7 px-2.5 rounded-lg [&_svg]:size-4 gap-2',
             },
             color: {
@@ -78,12 +81,17 @@ const badgeClasses = computed(() => {
         asButton: props.href ?? props.as == 'button' ? true : false,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, attrs.class);
+});
+
+const restAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
 });
 </script>
 
 <template>
-    <component :is="tag" :class="badgeClasses" :href="props.href" :target="target" data-ui-badge>
+    <component :is="tag" v-bind="restAttrs" :class="badgeClasses" :href="props.href" :target="target" data-ui-badge>
         <span v-if="props.prepend" class="font-medium border-e border-inherit ps-0.5 pe-1.5">{{ prepend }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />

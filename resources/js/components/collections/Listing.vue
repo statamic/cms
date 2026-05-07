@@ -24,28 +24,43 @@
                     <aside class="flex items-center gap-2">
                         <ItemActions
                             :url="collection.actions_url"
-                            :actions="collection.actions"
                             :item="collection.id"
                             @started="actionStarted"
                             @completed="actionCompleted"
-                            v-slot="{ actions }"
+                            v-slot="{ actions, loadActions, shouldShowSkeleton }"
                         >
-                            <Dropdown placement="left-start">
+                            <Dropdown
+                                placement="left-start"
+                                @mouseover="loadActions"
+                                @focus="loadActions"
+                                @click="loadActions"
+                            >
                                 <DropdownMenu>
                                     <DropdownItem v-if="collection.available_in_selected_site" :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.available_in_selected_site && collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
-                                    <DropdownSeparator v-if="actions.length" />
-                                    <DropdownItem
-                                        v-for="action in actions"
-                                        :key="action.handle"
-                                        :text="__(action.title)"
-                                        :icon="action.icon"
-                                        :variant="action.dangerous ? 'destructive' : 'default'"
-                                        @click="action.run"
-                                    />
+                                    <DropdownSeparator v-if="shouldShowSkeleton || actions.length" />
+                                    <template v-if="shouldShowSkeleton">
+                                        <div v-for="index in 3" :key="index" class="contents">
+                                            <ui-skeleton class="m-1 size-5" />
+                                            <ui-skeleton
+                                                class="mx-2 my-1.5 h-5"
+                                                :class="index === 1 ? 'w-28' : index === 2 ? 'w-36' : 'w-24'"
+                                            />
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <DropdownItem
+                                            v-for="action in actions"
+                                            :key="action.handle"
+                                            :text="__(action.title)"
+                                            :icon="action.icon"
+                                            :variant="action.dangerous ? 'destructive' : 'default'"
+                                            @click="action.run"
+                                        />
+                                    </template>
                                 </DropdownMenu>
                             </Dropdown>
                         </ItemActions>
@@ -90,7 +105,7 @@
                                         </div>
                                     </template>
                                     <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                        <div class="text-end font-mono text-xs text-gray-500 ps-6">
+                                        <div class="text-end font-mono text-xs text-gray-500 ps-6 whitespace-nowrap">
                                             <date-time :of="entry.date.date" date-only />
                                         </div>
                                     </template>
@@ -105,7 +120,7 @@
                     </div>
                 </ui-card>
 
-                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 gap-y-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <div class="flex items-center gap-1.5">
                         <ui-badge :text="String(collection.published_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
                         <span>{{ __('Published') }}</span>
@@ -209,12 +224,14 @@ export default {
     },
 
     data() {
+        const modePreference = this.$preferences.get('collections.listing_mode')
+
         return {
             initializedRequest: false,
             items: this.initialRows,
             columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
-            mode: this.$preferences.get('collections.listing_mode', 'list'),
+            mode: !modePreference || !['list', 'grid'].includes(modePreference) ? 'list' : modePreference,
             source: null,
         };
     },

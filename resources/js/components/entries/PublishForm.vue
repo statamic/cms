@@ -73,7 +73,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
@@ -86,6 +86,7 @@
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             :remember-tab="!isInline"
+            :provide="{ isWorkingCopy, revisionsEnabled }"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -123,7 +124,7 @@
                                 <Heading :text="__('Published')" />
                                 <Switch
                                     :model-value="published"
-                                    :read-only="!canManagePublishState"
+                                    :disabled="!canManagePublishState"
                                     @update:model-value="setFieldValue('published', $event)"
                                 />
                             </Panel>
@@ -144,15 +145,19 @@
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('Entry has a published version') }}
                                     </Subheading>
-                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Entry has not been published') }}
+                                    </Subheading>
+                                    <Subheading v-if="isWorkingCopy" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('This is the working copy') }}
                                     </Subheading>
                                     <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
                                         <Icon name="checkmark" class="text-green-600" />
                                         {{ __('This is the published version') }}
                                     </Subheading>
-                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                                         <Icon name="warning-diamond" />
                                         {{ __('Unsaved Changes') }}
                                     </Subheading>
@@ -365,6 +370,7 @@ export default {
             originValues: this.initialOriginValues,
             originMeta: this.initialOriginMeta,
             site: this.initialSite,
+            reference: this.initialReference,
             selectingOrigin: false,
             selectedOrigin: null,
             isWorkingCopy: this.initialIsWorkingCopy,
@@ -503,7 +509,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         originOptions() {
@@ -587,8 +593,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
@@ -678,9 +684,11 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
+				this.itemActions = data.itemActions;
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
@@ -755,8 +763,8 @@ export default {
                 this.redirectTo(this.createAnotherUrl);
             }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (!this.isInline && nextAction === null) {
+            // If the user has opted to go to listing, redirect them there.
+            else if (!this.isInline && nextAction === 'listing') {
                 this.redirectTo(this.listingUrl);
             }
 

@@ -1,9 +1,11 @@
 <template>
-    <div class="max-w-5xl mx-auto">
-        <ui-header :title="__('Updates')" icon="updates">
+    <div class="max-w-page mx-auto">
+        <ui-header :title="name" icon="updates">
             <template v-if="!gettingChangelog" #actions>
-                <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
-                <div v-if="onLatestVersion" v-text="__('Up to date')" />
+                {{ currentVersion }}
+                <ui-badge v-if="onLatestVersion" :text="__('Up to date')" color="green" size="lg" icon="checkmark" />
+                <ui-badge v-else-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <ui-badge v-else :text="__('Update available')" color="amber" size="lg" icon="alert-warning-exclamation-mark" />
             </template>
         </ui-header>
 
@@ -42,17 +44,27 @@
             :package="package"
             :show-actions="showActions"
         />
+
+        <Pagination
+            v-if="meta.last_page > 1"
+            class="mt-6"
+            :resource-meta="meta"
+            :per-page="perPage"
+            @page-selected="setPage"
+            @per-page-changed="setPerPage"
+        />
     </div>
 </template>
 
 <script>
 import Release from './Release.vue';
-import { Icon } from '@/components/ui';
+import { Icon, Pagination } from '@/components/ui';
 
 export default {
     components: {
         Release,
         Icon,
+        Pagination,
     },
 
     props: ['slug', 'package', 'name'],
@@ -64,6 +76,9 @@ export default {
             currentVersion: null,
             latestRelease: null,
             showingUnlicensedReleases: false,
+            page: 1,
+            perPage: 10,
+            meta: {},
         };
     },
 
@@ -78,6 +93,12 @@ export default {
 
         onLatestVersion() {
             return this.currentVersion && this.currentVersion == this.latestVersion;
+        },
+
+        securityUpdateAvailable() {
+            return this.currentVersion && this.changelog
+                .filter((release) => release.type === 'upgrade')
+                .some((release) => release.security);
         },
 
         licensedReleases() {
@@ -113,12 +134,34 @@ export default {
         getChangelog() {
             this.gettingChangelog = true;
 
-            this.$axios.get(cp_url(`/updater/${this.slug}/changelog`)).then((response) => {
-                this.gettingChangelog = false;
-                this.changelog = response.data.changelog;
-                this.currentVersion = response.data.currentVersion;
-                this.latestRelease = response.data.changelog[0];
-            });
+            this.$axios
+                .get(cp_url(`/updater/${this.slug}/changelog`), {
+                    params: {
+                        page: this.page,
+                        perPage: this.perPage,
+                    },
+                })
+                .then((response) => {
+                    this.gettingChangelog = false;
+                    this.changelog = response.data.changelog;
+                    this.currentVersion = response.data.currentVersion;
+                    this.meta = response.data.meta;
+
+                    if (this.page === 1 && response.data.changelog.length > 0) {
+                        this.latestRelease = response.data.changelog[0];
+                    }
+                });
+        },
+
+        setPage(page) {
+            this.page = page;
+            this.getChangelog();
+        },
+
+        setPerPage(perPage) {
+            this.perPage = perPage;
+            this.page = 1;
+            this.getChangelog();
         },
     },
 };

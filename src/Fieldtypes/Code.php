@@ -7,6 +7,8 @@ use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\CodeType;
 
+use function Statamic\trans as __;
+
 class Code extends Fieldtype
 {
     protected $categories = ['text'];
@@ -42,6 +44,13 @@ class Code extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                         'width' => '50',
+                    ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => 50,
                     ],
                 ],
             ],

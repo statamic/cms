@@ -51,10 +51,10 @@ const rootClasses = computed(() =>
                 true: 'opacity-50',
             },
             inline: {
-                true: 'grid grid-cols-2 items-start px-4.5 py-4 gap-x-5!',
+                true: 'grid md:grid-cols-2 items-start px-4.5 py-4 gap-y-3 md:gap-y-0 md:gap-x-5!',
             },
             fullWidthSetting: {
-                true: 'grid-cols-1',
+                true: 'md:grid-cols-1',
             },
         },
     })({
@@ -110,7 +110,11 @@ const hasErrors = computed(() => {
                 </slot>
                 <slot name="actions" />
             </div>
-            <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text :class="inline ? 'mb-0' : 'mb-1.5'">
+            <div
+                v-if="(!$slots.actions && (label || (instructions && !instructionsBelow) || $slots.label)) || ($slots.actions && instructions && !instructionsBelow)"
+                data-ui-field-text
+                :class="inline ? 'mb-0' : 'mb-2'"
+            >
                 <slot v-if="!$slots.actions" name="label">
                     <Label v-if="label" v-bind="labelProps" class="flex-1" />
                 </slot>

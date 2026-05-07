@@ -96,28 +96,6 @@
     --color-rose-850: oklch(0.433 0.174 11.985);
     --color-rose-925: oklch(0.3862 0.1498 10.413);
 
-    /* Temp */
-    --color-dark-100: #dfe1e5;
-    --color-dark-150: #bbbdc0;
-    --color-dark-175: #93979a;
-    --color-dark-200: #5f6163;
-    --color-dark-250: #555759;
-    --color-dark-275: #515356;
-    --color-dark-300: #4e5157;
-    --color-dark-350: #43454a;
-    --color-dark-400: #414245;
-    --color-dark-500: #404143;
-    --color-dark-550: #3b3f41;
-    --color-dark-575: #393b40;
-    --color-dark-600: #2b2d30;
-    --color-dark-650: #242628;
-    --color-dark-700: #212223;
-    --color-dark-750: #22242a;
-    --color-dark-800: #1e1f22;
-    --color-dark-900: #171717;
-    --color-dark-950: #161616;
-    --color-dark-975: #131314;
-
     --color-dark-blue-100: #2870F5;
     --color-dark-blue-125: #1e68f1;
     --color-dark-blue-150: #1f67ec;
@@ -156,6 +134,9 @@
 }
 
 @theme {
+    /* This is the outer width of the page content area. */
+    --max-width-page: 85rem;
+
     --text-4xs: 0.4rem;
     --text-3xs: 0.5rem;
     --text-2xs: 0.7rem;
@@ -166,6 +147,8 @@
     --breakpoint-xs: 30rem;
     --breakpoint-2xs: 20rem;
     --breakpoint-3xs: 15rem;
+    /* 1920px */
+    --breakpoint-3xl: 120rem;
 
     --shadow-ui-xs: 0px 1px 3px -1px rgba(0,0,0,0.10);
     --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);

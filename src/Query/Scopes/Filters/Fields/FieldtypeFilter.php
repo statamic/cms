@@ -6,6 +6,8 @@ use Statamic\Extend\HasFields;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FieldtypeFilter
 {
     use HasFields;
@@ -15,6 +17,16 @@ class FieldtypeFilter
     public function __construct($fieldtype)
     {
         $this->fieldtype = $fieldtype;
+    }
+
+    public function handle()
+    {
+        return $this->fieldtype->field()->handle();
+    }
+
+    public function display()
+    {
+        return $this->fieldtype->field()->display();
     }
 
     public function fieldItems()
@@ -74,6 +86,14 @@ class FieldtypeFilter
     {
         $values = array_filter($values);
 
-        return Arr::has($values, 'operator') && Arr::has($values, 'value');
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'value');
     }
 }

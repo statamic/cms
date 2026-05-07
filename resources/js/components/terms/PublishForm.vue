@@ -56,7 +56,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
             v-model="values"
             :meta="meta"
@@ -215,6 +215,7 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            reference: this.initialReference,
             isPreviewing: false,
             state: 'new',
             published: this.initialPublished,
@@ -301,7 +302,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save');
+            return this.getPreference('after_save') ?? 'listing';
         },
 
         direction() {
@@ -368,8 +369,8 @@ export default {
                         this.redirectTo(this.createAnotherUrl);
                     }
 
-                    // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (!this.isInline && nextAction === null) {
+                    // If the user has opted to go to listing, redirect them there.
+                    else if (!this.isInline && nextAction === 'listing') {
                         this.redirectTo(this.listingUrl);
                     }
 
@@ -440,6 +441,7 @@ export default {
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
             });

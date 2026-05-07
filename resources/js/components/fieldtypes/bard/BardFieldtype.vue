@@ -115,7 +115,7 @@
                             </set-picker>
                         </floating-menu>
 
-                        <div class="bard-error" v-if="initError" v-html="initError"></div>
+                        <div class="bard-error" v-if="initError" v-text="initError"></div>
                         <editor-content :editor="editor" :id="fieldId" />
                     </div>
                     <div
@@ -134,7 +134,7 @@
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
@@ -180,6 +180,7 @@ import { data_get } from "@/bootstrap/globals.js";
 
 const lowlight = createLowlight(common);
 let tiptap = null;
+let commandPaletteCallbackRegistered = false;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -220,6 +221,7 @@ export default {
             errorsById: {},
             debounceNextUpdate: true,
             setsCache: {},
+            assetsCache: {},
             loadingSet: null,
         };
     },
@@ -390,12 +392,20 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$nextTick(() => {
-            this.mounted = true;
-            if (this.config.collapse) this.collapseAll();
-        });
+		this.$nextTick(() => this.mounted = true);
 
         this.pageHeader = document.querySelector('.global-header');
+
+        if (!commandPaletteCallbackRegistered) {
+            commandPaletteCallbackRegistered = true;
+
+            Statamic.$commandPalette.preventIf(() => {
+                const selection = window.getSelection();
+                const node = selection?.anchorNode;
+                const isInBard = node?.parentElement?.closest('.bard-editor') !== null;
+                return isInBard && selection?.toString().length > 0;
+            });
+        }
 
         this.$nextTick(() => {
             let el = document.querySelector(`label[for="${this.fieldId}"]`);
@@ -418,14 +428,20 @@ export default {
 
             if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
 
-            this.debounceNextUpdate
-                ? this.updateDebounced(json)
-                : this.update(json);
-
+            const shouldDebounce = this.debounceNextUpdate;
             this.debounceNextUpdate = true;
+
+            if (shouldDebounce) {
+                this.updateDebounced(json);
+            } else {
+                this.updateDebounced.cancel();
+                this.update(json);
+            }
         },
 
         value(value, oldValue) {
+            if (!this.editor) return;
+
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -492,12 +508,12 @@ export default {
             this.loadingSet = handle;
 
             this.fetchSet(handle)
-                .then(data => this._addSet(handle, index, data))
+                .then(data => this._addSet(handle, data))
                 .catch(() => this.$toast.error(__('Something went wrong')))
                 .finally(() => this.loadingSet = null);
         },
 
-        _addSet(handle, index, data) {
+        _addSet(handle, data) {
             const id = uniqid();
             const deepCopy = JSON.parse(JSON.stringify(data.defaults));
             const values = Object.assign({}, { type: handle }, deepCopy);
@@ -524,14 +540,22 @@ export default {
                 const field = this.bardFieldPath();
                 const setCacheKey = `${field}.${set}`;
                 const reference = this.publishContainer.reference;
-                const blueprint = this.publishContainer.blueprint.fqh;
+                const token = this.publishContainer.blueprint.token;
+
+	            if (this.meta.new?.hasOwnProperty(set)) {
+		            let meta = this.meta.new[set];
+		            let defaults = this.meta.defaults[set];
+
+		            resolve({ new: meta, defaults });
+		            return;
+	            }
 
                 if (this.setsCache[setCacheKey]) {
                     resolve(this.setsCache[setCacheKey]);
                     return;
                 }
 
-                this.$axios.post(cp_url('fieldtypes/replicator/set'), { blueprint, reference, field, set })
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
                     .then(response => {
                         this.setsCache[setCacheKey] = response.data;
                         resolve(response.data);
@@ -550,8 +574,12 @@ export default {
 
             return this.fieldPathKeys
                 .map((key, index) => {
+	                if (['attrs', 'values'].includes(key)) return;
+
                     if (Number.isInteger(parseInt(key))) {
-                        return data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'))?.attrs?.values.type;
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+						return setValues.attrs?.values.type || setValues.type;
                     }
 
                     return key;
@@ -580,13 +608,18 @@ export default {
             });
         },
 
-        pasteSet(attrs) {
+        async pasteSet(attrs) {
             const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 
-            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+            if (this.meta.existing[old_id]) {
+                this.updateSetMeta(id, this.meta.existing[old_id]);
+            } else {
+                const data = await this.fetchSet(values.type);
+                this.updateSetMeta(id, data.new);
+            }
 
             return { id, enabled, values };
         },
@@ -828,7 +861,8 @@ export default {
                     setTimeout(() => {
                         const isInsideBard = this.$refs.container.contains(document.activeElement);
                         const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
-                        if (!isInsideBard && !isSetPickerSearch) {
+                        const isSetPickerOpen = !!this.$refs.setPicker?.isOpen;
+                        if (!isInsideBard && !isSetPickerSearch && !isSetPickerOpen) {
                             this.$emit('blur');
                             this.showAddSetButton = false;
                         }

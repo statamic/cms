@@ -3,7 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import Outside from '@/pages/layout/Outside.vue';
 import { AuthCard, Input, Field, Button, Separator, Checkbox, ErrorMessage } from '@ui';
 import { Link, router } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { usePasskey } from '@/composables/passkey';
 
 defineOptions({ layout: Outside });
@@ -15,7 +15,6 @@ const props = defineProps([
     'passkeyVerifyUrl',
     'oauthEnabled',
     'providers',
-    'referer',
     'submitUrl',
     'forgotPasswordUrl',
 ])
@@ -42,11 +41,11 @@ const submit = () => {
             errors.value = {};
         },
         onSuccess: (page) => {
-			if (page.component === 'auth/two-factor/Challenge') {
-				return;
-			}
+            if (page.component === 'auth/two-factor/Challenge') {
+                return;
+            }
 
-	        window.location.href = props.referer;
+            window.location.href = page.url;
         },
         onError: () => processing.value = false
     });
@@ -86,6 +85,8 @@ async function loginWithPasskey(useBrowserAutofill = false) {
 onMounted(() => {
     if (showPasskeyLogin.value) loginWithPasskey(true);
 });
+
+onUnmounted(() => passkey.cancel());
 </script>
 
 <template>
@@ -111,7 +112,7 @@ onMounted(() => {
                     <template #actions>
                         <Link
                             :href="forgotPasswordUrl"
-                            class="text-ui-accent-text text-sm hover:text-ui-accent-text/80"
+                            class="text-ui-accent-text mb-1.5 text-sm hover:text-ui-accent-text/80"
                             tabindex="6"
                             v-text="__('Forgot password?')"
                         />
@@ -133,7 +134,7 @@ onMounted(() => {
                             :icon="passkey.waiting.value ? null : 'key'"
                             :disabled="passkey.waiting.value"
                             :loading="passkey.waiting.value"
-                            @click="loginWithPasskey"
+                            @click="loginWithPasskey()"
                         />
                         <ErrorMessage v-if="passkey.error.value" :text="passkey.error.value" />
                     </template>

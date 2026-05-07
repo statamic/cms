@@ -11,12 +11,13 @@
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
                     <div :class="{
-                        'bg-white dark:bg-gray-800 dark:border-dark-900 rounded-lg border': config.border,
+                        'bg-white dark:bg-gray-800 dark:border-gray-900 rounded-lg border': config.border,
                         'hidden' : isCollapsed && !fullScreenMode
                     }">
                         <FieldsProvider
                             :fields="fields"
                             :as-config="false"
+                            :read-only="isReadOnly"
                             :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
                             :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
                         >

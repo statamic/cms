@@ -23,7 +23,7 @@ use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
-use Webauthn\CredentialRecord;
+use Webauthn\PublicKeyCredentialSource;
 
 #[Group('2fa')]
 class EloquentUserTest extends TestCase
@@ -336,17 +336,31 @@ class EloquentUserTest extends TestCase
     }
 
     #[Test]
+    public function merge_does_not_set_roles_and_groups_as_model_attributes()
+    {
+        $user = $this->user();
+
+        $user->merge(['name' => 'Updated Name']);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('roles', $attributes);
+        $this->assertArrayNotHasKey('groups', $attributes);
+        $this->assertEquals('Updated Name', $attributes['name']);
+    }
+
+    #[Test]
     #[Group('passkeys')]
     public function it_gets_passkeys()
     {
         $user = $this->user();
         $this->assertCount(0, $user->passkeys());
 
-        $mockCredentialA = \Mockery::mock(CredentialRecord::class);
+        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
         $mockCredentialA->publicKeyCredentialId = 'key-a';
-        $mockCredentialB = \Mockery::mock(CredentialRecord::class);
+        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
         $mockCredentialB->publicKeyCredentialId = 'key-b';
-        $mockCredentialC = \Mockery::mock(CredentialRecord::class);
+        $mockCredentialC = \Mockery::mock(PublicKeyCredentialSource::class);
         $mockCredentialC->publicKeyCredentialId = 'key-c';
 
         app()->instance(Serializer::class, new class($mockCredentialA, $mockCredentialB, $mockCredentialC)

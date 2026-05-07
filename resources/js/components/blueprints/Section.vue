@@ -18,6 +18,8 @@
                 :editing-field="editingField"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
+                :exclude-fieldset="excludeFieldset"
+                :with-command-palette="withCommandPalette"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-deleted="deleteField"
@@ -39,7 +41,7 @@
             :open="editingSection !== false"
             :title="editText"
             @closed="editCancelled"
-            @opened="() => $nextTick(() => $refs.displayInput.focus())"
+            @opened="() => $nextTick(() => $refs.displayInput.select())"
         >
             <div class="">
                 <div class="space-y-6">
@@ -57,10 +59,10 @@
                     <ui-field :label="__('Instructions')">
                         <ui-input type="text" v-model="editingSection.instructions" />
                     </ui-field>
-                    <ui-field :label="__('Collapsible')">
+                    <ui-field :label="__('Collapsible')" v-if="showCollapsibleField">
                         <ui-switch v-model="editingSection.collapsible" />
                     </ui-field>
-                    <ui-field :label="__('Collapsed by default')" v-if="editingSection.collapsible">
+                    <ui-field :label="__('Collapsed by default')" v-if="showCollapsibleField && editingSection.collapsible">
                         <ui-switch v-model="editingSection.collapsed" />
                     </ui-field>
                     <ui-field :label="__('Icon')" v-if="showHandleField">
@@ -143,8 +145,11 @@ export default {
         tabId: { type: String },
         section: { type: Object, required: true },
         showHandleField: { type: Boolean, default: false },
+	    showCollapsibleField: { type: Boolean, default: false },
         showHideField: { type: Boolean, default: false },
         editText: { type: String },
+        excludeFieldset: { type: String, default: null },
+        withCommandPalette: { type: Boolean, default: false },
     },
 
     data() {

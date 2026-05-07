@@ -72,6 +72,7 @@ export default {
             items: null,
             page: null,
             perPage: null,
+	        saveKeyBinding: null,
         };
     },
 
@@ -86,7 +87,20 @@ export default {
         },
     },
 
-    methods: {
+	created() {
+		this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+			if (this.reordering) {
+				e.preventDefault();
+				this.saveOrder();
+			}
+		});
+	},
+
+	beforeUnmount() {
+		this.saveKeyBinding.destroy();
+	},
+
+	methods: {
         requestComplete({ items, parameters, activeFilters }) {
             this.items = items;
             this.page = parameters.page;

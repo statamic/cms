@@ -2,7 +2,7 @@
 import type { Theme } from './types';
 import { computed } from 'vue';
 import { getDefaultTheme, getCssVariables } from '.';
-import uniqid from 'uniqid';
+import { nanoid as uniqid } from 'nanoid';
 
 const props = withDefaults(defineProps<{
     theme: Theme;

@@ -15,9 +15,9 @@ function send() {
 </script>
 
 <template>
-    <Head :title="[__('Email'), __('Utilities')]" />
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
+        <Head :title="[__('Email'), __('Utilities')]" />
 
-    <div class="max-w-5xl mx-auto">
         <Header :title="__('Email')" icon="mail-settings" />
 
         <CardPanel :heading="__('Send Test Email')">
@@ -35,7 +35,7 @@ function send() {
                         {{ __('Send') }}
                     </Button>
                 </div>
-                <p v-if="errors.email" class="mt-4 text-red-700 text-sm">{{ errors.email }}</p>
+                <p v-if="errors.email" class="mt-4 text-red-600 text-sm">{{ errors.email }}</p>
             </form>
         </CardPanel>
 

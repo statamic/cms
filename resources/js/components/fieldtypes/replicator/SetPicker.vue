@@ -1,6 +1,6 @@
 <template>
     <template v-if="!hasMultipleSets">
-        <Primitive @click="singleButtonClicked">
+        <Primitive as-child @click="singleButtonClicked">
             <slot name="trigger" />
         </Primitive>
     </template>
@@ -11,10 +11,12 @@
         :title="__('Add Set')"
         v-model:open="isOpen"
         v-else-if="shouldUseModal"
-        class="xl:max-w-3xl 2xl:max-w-5xl"
+        class="xl:max-w-3xl 2xl:max-w-page"
     >
         <template #trigger>
-            <slot name="trigger" />
+            <Primitive as-child @click.capture="onTriggerClick">
+                <slot name="trigger" />
+            </Primitive>
         </template>
 
         <template #default>
@@ -85,12 +87,14 @@
         :open="isOpen"
         @clicked-away="$emit('clicked-away', $event)"
         @update:open="isOpen = $event"
-        class="set-picker select-none w-72"
+        class="set-picker select-none w-72 rounded-b-lg"
         data-set-picker-popover
         inset
     >
         <template #trigger>
-            <slot name="trigger" />
+            <Primitive as-child @click.capture="onTriggerClick">
+                <slot name="trigger" />
+            </Primitive>
         </template>
 
         <template #default>
@@ -126,11 +130,11 @@
             </div>
 
             <!-- List Mode -->
-            <div class="max-h-[21rem] overflow-auto p-1.5">
+            <div class="max-h-[21rem] overflow-auto p-1.5 st-custom-scrollbar">
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded-lg"
+                    class="cursor-pointer rounded-md"
                     :class="{ 'bg-gray-100 dark:bg-gray-900': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
                     :title="__(item.instructions)"
@@ -150,7 +154,7 @@
                     <div 
                         v-if="item.type === 'set'" 
                         @click="!isLoading && addSet(item.handle)" 
-                        class="group flex items-center rounded-xl p-2.5 gap-2 sm:gap-3"
+                        class="group flex items-center rounded-lg p-2.5 gap-2 sm:gap-3"
                         :class="{ 'opacity-50 pointer-events-none': isLoading }"
                     >
                         <ui-icon v-if="isSetLoading(item.handle)" name="loading" class="size-4 text-gray-600 dark:text-gray-300" />
@@ -193,6 +197,7 @@ body:has(:is(.bard-fullscreen, .replicator-fullscreen)) [data-reka-popper-conten
 
 <script>
 import { Primitive } from 'reka-ui';
+import fuzzysort from 'fuzzysort';
 
 export default {
     emits: ['added', 'clicked-away'],
@@ -263,14 +268,7 @@ export default {
                   }, []);
 
             if (this.search) {
-                return sets
-                    .filter((set) => !set.hide)
-                    .filter((set) => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                sets = this.filterSetsBySearch(sets);
             }
 
             return sets.filter((set) => !set.hide);
@@ -317,12 +315,7 @@ export default {
 
                 // Apply search filter if there's a search term
                 if (this.search) {
-                    filteredSets = filteredSets.filter(set => {
-                        return (
-                            __(set.display).toLowerCase().includes(this.search.toLowerCase()) ||
-                            set.handle.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    });
+                    filteredSets = this.filterSetsBySearch(filteredSets);
                 }
 
                 groups[group.handle] = {
@@ -460,6 +453,13 @@ export default {
             this.isOpen = true;
         },
 
+        onTriggerClick(e) {
+            if (!this.enabled) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        },
+
         getStoredMode() {
             try {
                 return localStorage.getItem('statamic.replicator.setPicker.mode') || 'list';
@@ -479,6 +479,25 @@ export default {
         isSetLoading(handle) {
             return this.loadingSet === handle;
         },
+
+        filterSetsBySearch(sets) {
+            return fuzzysort
+                .go(this.search, sets, {
+                    all: true,
+                    keys: [(set) => __(set.display), 'handle', (set) => __(set.instructions)],
+                    scoreFn: (scores) => {
+                        const displayScore = scores[0]?.score ?? -Infinity;
+                        const handleScore = scores[1]?.score ?? -Infinity;
+                        const instructionsScore = (scores[2]?.score ?? -Infinity) * 0.5;
+                        return Math.max(displayScore, handleScore, instructionsScore);
+                    },
+                })
+                .map((result) => result.obj);
+        }
+    },
+
+    beforeUnmount() {
+        this.unbindKeys();
     },
 };
 </script>

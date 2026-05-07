@@ -743,6 +743,42 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_leak_stale_contents_state_across_calls_when_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Request::swap(new FakeArtisanRequest('queue:work'));
+
+        // First job populates the instance's $metaFiles cache. metaFilesIn() has no
+        // isWorker() guard, so if contents() reused the same instance across jobs
+        // the filtered result would stick around and bleed into the next job.
+        $this->assertEquals(
+            ['.meta/a.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->all()
+        );
+
+        // Simulate the next job seeing a different state on disk.
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+            'b.txt' => ['type' => 'file', 'path' => 'b.txt', 'dirname' => ''],
+            '.meta/b.txt.yaml' => ['type' => 'file', 'path' => '.meta/b.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        $this->assertEquals(
+            ['.meta/a.txt.yaml', '.meta/b.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->sort()->values()->all()
+        );
+    }
+
+    #[Test]
     public function it_gets_an_asset()
     {
         $asset = $this->containerWithDisk()->asset('a.txt');

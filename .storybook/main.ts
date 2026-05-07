@@ -8,7 +8,8 @@ const config: StorybookConfig = {
     ],
     addons: [
         '@storybook/addon-docs',
-        '@storybook/addon-a11y'
+        '@storybook/addon-a11y',
+        '@storybook/addon-vitest'
     ],
     staticDirs: ['./public'],
     framework: {
@@ -24,6 +25,10 @@ const config: StorybookConfig = {
                 '@api': resolve(process.cwd(), 'resources/js/api.js'),
             };
         }
+        config.build = {
+            ...config.build,
+            reportCompressedSize: false,
+        };
         return config;
     },
 };

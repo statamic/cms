@@ -1,4 +1,5 @@
 <script setup>
+import { config } from '@api';
 import { computed } from 'vue';
 import {
     DatePickerAnchor,
@@ -24,6 +25,7 @@ import Card from '../Card/Card.vue';
 import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
+import Text from '../Text.vue';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -31,11 +33,11 @@ const props = defineProps({
     /** Badge text to display. */
     badge: { type: String, default: null },
     required: { type: Boolean, default: false },
-    /** The controlled date value. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
+    /** The controlled date value. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) */
     modelValue: { type: [Object, String], default: null },
-    /** The minimum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
+    /** The minimum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) */
     min: { type: [String, Object], default: null },
-    /** The maximum selectable date. <br><br> Should be an ISO 8601 date and time string with a UTC offset (eg. `2021-11-07T07:45:00Z` or `2021-11-07T07:45:00-07:00`) */
+    /** The maximum selectable date. <br><br> Should be a [`DateValue` object](https://reka-ui.com/docs/guides/dates) */
     max: { type: [String, Object], default: null },
     /** The granularity of the date picker. <br><br> Options: `day`, `hour`, `minute`, `second` */
     granularity: { type: String, default: null },
@@ -94,6 +96,19 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event);
     },
 }));
+
+const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
+
+const formatTimeZone = (style) => {
+    const tz = timeZoneName.value;
+    if (!tz) return null;
+
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: style }).formatToParts(props.modelValue.toDate());
+    return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
+};
+
+const timeZoneLabel = computed(() => formatTimeZone('short'));
+const timeZoneTooltip = computed(() => formatTimeZone('long'));
 
 const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
@@ -187,6 +202,13 @@ const getInputLabel = (part) => {
                                 </div>
                             </template>
                         </div>
+                        <Text
+                            v-if="timeZoneLabel"
+                            class="text-gray-600 dark:text-gray-400 me-1"
+                            size="xs"
+                            v-tooltip="timeZoneTooltip"
+                            :text="timeZoneLabel"
+                        />
                         <Button
                             v-if="clearable && !readOnly"
                             @click="emit('update:modelValue', null)"

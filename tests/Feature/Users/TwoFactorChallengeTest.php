@@ -158,22 +158,6 @@ class TwoFactorChallengeTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_referer_url_after_successful_challenge()
-    {
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->session(['login.id' => $user->id()])
-            ->post(cp_route('two-factor-challenge'), [
-                'code' => $this->getOneTimeCode($user),
-                'referer' => 'http://localhost/cp/collections',
-            ])
-            ->assertRedirect('http://localhost/cp/collections');
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
     public function it_redirects_to_intended_url_after_successful_challenge()
     {
         $user = $this->userWithTwoFactorEnabled();
@@ -187,6 +171,23 @@ class TwoFactorChallengeTest extends TestCase
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertRedirect('http://localhost/cp/collections');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_does_not_redirect_to_external_url_on_frontend_route()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session(['login.id' => $user->id()])
+            ->post(route('statamic.two-factor-challenge', [
+                'redirect' => 'https://evil.com',
+            ]), [
+                'code' => $this->getOneTimeCode($user),
+            ])
+            ->assertRedirect(route('statamic.site'));
 
         $this->assertAuthenticatedAs($user);
     }

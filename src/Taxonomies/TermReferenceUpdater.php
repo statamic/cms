@@ -13,11 +13,6 @@ class TermReferenceUpdater extends DataReferenceUpdater
     protected $taxonomy;
 
     /**
-     * @var null|string
-     */
-    protected $scope;
-
-    /**
      * Filter by taxonomy.
      *
      * @return $this
@@ -37,79 +32,37 @@ class TermReferenceUpdater extends DataReferenceUpdater
      */
     protected function recursivelyUpdateFields($fields, $dottedPrefix = null)
     {
-        $this
-            ->updateTermsFieldValues($fields, $dottedPrefix)
-            ->updateScopedTermsFieldValues($fields, $dottedPrefix)
-            ->updateNestedFieldValues($fields, $dottedPrefix);
-    }
-
-    /**
-     * Update terms field values.
-     *
-     * @param  \Illuminate\Support\Collection  $fields
-     * @param  null|string  $dottedPrefix
-     * @return $this
-     */
-    protected function updateTermsFieldValues($fields, $dottedPrefix)
-    {
-        $this->scope = null;
-
-        $fields
-            ->filter(function ($field) {
-                return $field->type() === 'terms'
-                    && in_array($this->taxonomy, Arr::wrap($field->get('taxonomies')));
-            })
+        $this->fieldsWithReferenceUpdates($fields)
             ->each(function ($field) use ($dottedPrefix) {
-                $this->hasStringValue($field, $dottedPrefix)
-                    ? $this->updateStringValue($field, $dottedPrefix)
-                    : $this->updateArrayValue($field, $dottedPrefix);
+                $data = $this->item->data()->all();
+                $dottedKey = $dottedPrefix.$field->handle();
+                $oldData = Arr::get($data, $dottedKey);
+
+                if ($oldData === null) {
+                    return;
+                }
+
+                $newData = $field->fieldtype()->replaceTermReferences(
+                    $oldData,
+                    $this->newValue,
+                    $this->originalValue,
+                    $this->taxonomy
+                );
+
+                if ($oldData === $newData) {
+                    return;
+                }
+
+                if ($newData === null && $this->isRemovingValue()) {
+                    Arr::forget($data, $dottedKey);
+                } else {
+                    Arr::set($data, $dottedKey, $newData);
+                }
+
+                $this->item->data($data);
+                $this->updated = true;
             });
 
-        return $this;
-    }
-
-    /**
-     * Update scoped terms field values.
-     *
-     * @param  \Illuminate\Support\Collection  $fields
-     * @param  null|string  $dottedPrefix
-     * @return $this
-     */
-    protected function updateScopedTermsFieldValues($fields, $dottedPrefix)
-    {
-        $this->scope = "{$this->taxonomy}::";
-
-        $fields
-            ->filter(function ($field) {
-                return $field->type() === 'terms'
-                    && count(Arr::wrap($field->get('taxonomies'))) === 0;
-            })
-            ->each(function ($field) use ($dottedPrefix) {
-                $this->hasStringValue($field, $dottedPrefix)
-                    ? $this->updateStringValue($field, $dottedPrefix)
-                    : $this->updateArrayValue($field, $dottedPrefix);
-            });
-
-        return $this;
-    }
-
-    /**
-     * Get original value.
-     *
-     * @return mixed
-     */
-    protected function originalValue()
-    {
-        return $this->scope.$this->originalValue;
-    }
-
-    /**
-     * Get new value.
-     *
-     * @return mixed
-     */
-    protected function newValue()
-    {
-        return $this->scope.$this->newValue;
+        $this->updateNestedFieldValues($fields, $dottedPrefix);
     }
 }

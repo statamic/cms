@@ -37,17 +37,16 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldFakeVersion) {
-            \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
-            $this->addToAssertionCount(-1); // Dont want to assert this
+            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
-            \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls')->zeroOrMoreTimes();
-            $this->addToAssertionCount(-2); // Dont want to assert this
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+            \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
         }
 
         $this->addGqlMacros();
+        $this->addRateLimitMacros();
     }
 
     public function tearDown(): void
@@ -142,6 +141,11 @@ en:
     url: http://localhost/
     locale: en_US
 YAML);
+    }
+
+    protected function getPackage(): string
+    {
+        return 'statamic/cms';
     }
 
     protected function setSites($sites)
@@ -273,6 +277,21 @@ YAML);
                     "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
                 );
             }
+
+            return $this;
+        });
+    }
+
+    private function addRateLimitMacros()
+    {
+        TestResponse::macro('assertRateLimited', function () {
+            Assert::assertSame(429, $this->getStatusCode(), 'Expected request to be rate limited, but it was not.');
+
+            return $this;
+        });
+
+        TestResponse::macro('assertNotRateLimited', function () {
+            Assert::assertNotSame(429, $this->getStatusCode(), 'Expected request not to be rate limited, but it was.');
 
             return $this;
         });

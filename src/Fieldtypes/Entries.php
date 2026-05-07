@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -18,6 +19,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
+use Statamic\Query\OrderBy;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -149,12 +151,24 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
+        $configuredCollections = $this->getConfiguredCollections();
+        $this->authorizeCollectionAccess($configuredCollections);
+
         $query = $this->getIndexQuery($request);
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $query->whereIn('collection', $this->getConfiguredCollections());
+            $user = User::current();
+
+            $query->whereIn(
+                'collection',
+                collect($configuredCollections)
+                    ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
+                    ->filter(fn ($collection) => $collection && $user->can('view', $collection))
+                    ->map->handle()
+                    ->all()
+            );
         }
 
         if ($blueprints = $this->config('blueprints')) {
@@ -172,6 +186,17 @@ class Entries extends Relationship
         $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
 
         return $paginate ? $results->setCollection($items) : $items;
+    }
+
+    private function authorizeCollectionAccess(array $collections): void
+    {
+        $user = User::current();
+
+        $authorizedCollections = collect($collections)
+            ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection));
+
+        throw_if($authorizedCollections->isEmpty(), new AuthorizationException);
     }
 
     public function getResourceCollection($request, $items)
@@ -208,7 +233,7 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->sort ?? 'title';
+        $column = OrderBy::column($request->sort, 'title');
 
         if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();

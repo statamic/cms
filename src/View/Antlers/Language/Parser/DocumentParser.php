@@ -353,7 +353,7 @@ class DocumentParser
             $lastOffset = $thisIndex;
         }
 
-        preg_match_all('/(@?{{|@?(props|aware|cascade))/u', $this->content, $antlersStartCandidates, PREG_OFFSET_CAPTURE);
+        preg_match_all('/(@?{{|@(props|aware|cascade))/u', $this->content, $antlersStartCandidates, PREG_OFFSET_CAPTURE);
 
         $lastAntlersOffset = 0;
         $lastWasEscaped = false;
@@ -368,6 +368,31 @@ class DocumentParser
                         if (mb_substr($this->content, $antlersMatch[1] - 1, 1) === '@') {
                             $lastAntlersOffset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset);
                             $lastWasEscaped = true;
+
+                            continue;
+                        }
+                    }
+
+                    if (in_array($antlersRegion, ['@props', '@aware'])) {
+                        $hasArgs = false;
+
+                        for ($k = $offset + mb_strlen($antlersRegion); $k < $this->inputLen; $k++) {
+                            $ch = mb_substr($this->content, $k, 1);
+
+                            if (ctype_space($ch)) {
+                                continue;
+                            }
+
+                            if ($ch === '(') {
+                                $hasArgs = true;
+                            }
+
+                            break;
+                        }
+
+                        if (! $hasArgs) {
+                            $lastAntlersOffset = $offset + mb_strlen($antlersRegion);
+                            $lastWasEscaped = false;
 
                             continue;
                         }
@@ -419,6 +444,7 @@ class DocumentParser
             '@{{' => '{{',
             '@@props' => '@props',
             '@@aware' => '@aware',
+            '@@cascade' => '@cascade',
         ]);
     }
 
@@ -944,6 +970,7 @@ class DocumentParser
         $this->nodes[] = $node;
         $this->lastAntlersNode = $node;
         $this->startIndex = $this->currentIndex;
+        $this->currentIndex += 1;
     }
 
     private function advanceWhitespace()
@@ -1310,6 +1337,7 @@ class DocumentParser
     private function makeDirectiveNode($name, $args, $index)
     {
         $directive = new DirectiveNode();
+        $directive->withParser($this);
         $directive->directiveName = $name;
         $directive->args = $args;
 

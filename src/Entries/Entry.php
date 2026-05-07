@@ -52,6 +52,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\View\Cascade;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
@@ -445,7 +446,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->taxonomize();
 
-        if ($this->isDirty('slug')) {
+        if ($this->shouldUpdateUris()) {
             optional(Collection::findByMount($this))->updateEntryUris();
             $this->updateChildPageUris();
         }
@@ -477,6 +478,21 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return true;
     }
 
+    private function shouldUpdateUris(): bool
+    {
+        if (! $this->route()) {
+            return false;
+        }
+
+        $antlersRoute = preg_replace_callback('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $this->route());
+
+        return collect(Antlers::identifiers($antlersRoute))
+            ->filter(fn (string $identifier) => $this->isDirty($identifier))
+            ->isNotEmpty();
+    }
+
     private function updateChildPageUris()
     {
         $collection = $this->collection();
@@ -492,7 +508,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return;
         }
 
-        if (empty($ids = $page->flattenedPages()->pluck('id'))) {
+        $ids = $page->flattenedPages()->pluck('id');
+
+        if ($ids->isEmpty()) {
             return;
         }
 
@@ -524,7 +542,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 $format .= 's';
             }
 
-            $prefix = $this->date->format($format).'.';
+            $prefix = $this->date->copy()->setTimezone(config('app.timezone'))->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -953,7 +971,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
-            $date = $this->date()->setTimezone(Statamic::displayTimezone());
+            $date = $this->date()->copy()->setTimezone(Statamic::displayTimezone());
 
             $data = $data->merge([
                 'date' => $date,
@@ -1066,7 +1084,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = $this->withLocale($this->site()->lang(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
+        $title = $this->withLocale($this->site()->lang(), function () use ($format) {
+            $format = Facades\Parse::config($format);
+
+            return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        });
 
         return trim($title);
     }
@@ -1090,8 +1112,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             }, $format);
         }
 
+        $format = Facades\Parse::config($format);
+
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
-            'config' => config()->all(),
+            'config' => Cascade::config(),
             'site' => $this->site(),
             'uri' => $this->uri(),
             'url' => $this->url(),
@@ -1117,7 +1141,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('entry-uris')->forget($this->id());
         }
 
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1128,6 +1152,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'blueprint', 'collection', 'collectionHandle', 'date', 'editUrl', 'hasDate', 'hasExplicitDate', 'hasOrigin',
+            'hasSeconds', 'hasStructure', 'hasTime', 'id', 'isRedirect', 'isRoot', 'lastModified', 'lastModifiedBy',
+            'layout', 'locale', 'order', 'path', 'private', 'published', 'redirectUrl', 'reference', 'site', 'sites', 'slug',
+            'status', 'template', 'uri', 'url', 'urlWithoutRedirect',
+        ];
     }
 
     public function getSearchValue(string $field)

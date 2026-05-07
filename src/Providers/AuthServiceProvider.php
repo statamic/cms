@@ -31,6 +31,8 @@ use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\Denormalizer\WebauthnSerializerFactory;
 use Webauthn\PublicKeyCredentialRpEntity;
 
+use function Statamic\trans_choice;
+
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
@@ -169,6 +171,26 @@ class AuthServiceProvider extends ServiceProvider
             return ($app['auth']->getProvider() instanceof UserProvider)
                 ? new PasswordBrokerManager($app)
                 : $broker;
+        });
+
+        RateLimiter::for('statamic.auth', function (Request $request) {
+            return Limit::perMinute(4)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.cp.auth', function (Request $request) {
+            return RateLimiter::limiter('statamic.auth')($request);
+        });
+
+        RateLimiter::for('statamic.passkeys', function (Request $request) {
+            return Limit::perMinute(30)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.cp.passkeys', function (Request $request) {
+            return RateLimiter::limiter('statamic.passkeys')($request);
+        });
+
+        RateLimiter::for('statamic.forms', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
         });
 
         RateLimiter::for('two-factor', function (Request $request) {

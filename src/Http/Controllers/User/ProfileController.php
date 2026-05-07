@@ -2,8 +2,11 @@
 
 namespace Statamic\Http\Controllers\User;
 
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserProfileRequest;
+
+use function Statamic\trans as __;
 
 class ProfileController
 {
@@ -26,7 +29,8 @@ class ProfileController
 
     private function successfulResponse()
     {
-        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+        $redirect = request()->get('_redirect');
+        $response = $redirect && ! URL::isExternalToApplication($redirect) ? redirect($redirect) : back();
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([

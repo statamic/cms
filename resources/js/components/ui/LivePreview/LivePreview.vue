@@ -130,6 +130,10 @@ const update = debounce(() => {
         });
 }, 150);
 
+function componentUpdated(handle, value) {
+    extras.value[handle] = value;
+}
+
 function setIframeAttributes(iframe) {
     iframe.setAttribute('frameborder', '0');
     iframe.setAttribute('class', previewDevice.value ? 'device' : 'responsive');
@@ -267,6 +271,18 @@ function setEditorWidth(width) {
     localStorage.setItem(widthLocalStorageKey, width);
 }
 
+function onResizeEnd() {
+    editorResizing.value = false;
+
+    // Chromium doesn't recalculate iframe scroll state after the parent
+    // container is resized. Toggling a transform forces a reflow. #14540
+    const iframe = iframeContentContainer.value?.querySelector('iframe');
+    if (iframe) {
+        iframe.style.transform = 'translateZ(0)';
+        requestAnimationFrame(() => iframe.style.transform = '');
+    }
+}
+
 function close() {
     if (poppedOut.value) closePopout();
 
@@ -279,10 +295,14 @@ const keybinding = ref(
     }),
 );
 
-onUnmounted(() => keybinding.value.destroy());
+const refreshHandler = () => { if (props.enabled) update(); };
+const refreshEvent = `live-preview.${name.value}.refresh`;
 
-Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
-    if (props.enabled) update();
+Statamic.$events.$on(refreshEvent, refreshHandler);
+
+onUnmounted(() => {
+    keybinding.value.destroy();
+    Statamic.$events.$off(refreshEvent, refreshHandler);
 });
 </script>
 
@@ -295,7 +315,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
         <div class="live-preview fixed flex flex-col">
             <transition name="live-preview-header-slide">
                 <div v-show="headerVisible" class="live-preview-header">
-                    <div class="dark:text-dark-150 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
+                    <div class="dark:text-gray-300 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
                         {{ __('Live Preview') }}
                     </div>
                     <div class="flex items-center gap-x-2">
@@ -339,7 +359,7 @@ Statamic.$events.$on(`live-preview.${name.value}.refresh`, () => {
                             v-show="!poppedOut"
                             @resized="setEditorWidth"
                             @resize-start="editorResizing = true"
-                            @resize-end="editorResizing = false"
+                            @resize-end="onResizeEnd"
                             @collapsed="collapseEditor"
                         />
                     </div>

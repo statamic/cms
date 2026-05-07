@@ -122,7 +122,7 @@
 
                     <!-- Copy Pasta -->
                     <div v-else>
-                        <ui-description v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
+                        <ui-description v-html="__('messages.user_wizard_invitation_share_before', { email: escapedEmail })" />
                     </div>
                 </div>
             </ui-card-panel>
@@ -137,13 +137,13 @@
 
             <ui-card-panel :heading="__('User Details')">
                 <div class="space-y-4">
-                    <ui-description v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
+                    <ui-description v-html="__('messages.user_wizard_invitation_share', { email: escapedEmail })" />
                     <div>
                         <ui-label for="activation_url" :text="__('Activation URL')" />
                         <ui-input
                             readonly
                             copyable
-                            :value="activationUrl"
+                            :model-value="activationUrl"
                             id="activation_url"
                         />
                     </div>
@@ -152,7 +152,7 @@
                         <ui-input
                             readonly
                             copyable
-                            :value="values.email"
+                            :model-value="values.email"
                             id="email"
                         />
                     </div>
@@ -211,6 +211,7 @@
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
 import { router } from '@inertiajs/vue3';
+import { escapeHtml } from '@/bootstrap/globals.js';
 
 export default {
     mixins: [HasWizardSteps],
@@ -291,6 +292,9 @@ export default {
         },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
+        },
+        escapedEmail() {
+            return escapeHtml(String(this.values?.email ?? ''));
         },
         direction() {
             return this.$config.get('direction', 'ltr');

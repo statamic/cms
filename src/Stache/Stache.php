@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Concurrency;
 use Statamic\Events\StacheCleared;
@@ -17,6 +18,10 @@ use Symfony\Component\Lock\LockInterface;
 class Stache
 {
     protected $sites;
+
+    /**
+     * @var Collection<string,Store>
+     */
     protected $stores;
     protected $startTime;
     protected $updateIndexes = true;
@@ -69,6 +74,9 @@ class Stache
         return $this;
     }
 
+    /**
+     * @return Collection<string,Store>
+     */
     public function stores()
     {
         return $this->stores;

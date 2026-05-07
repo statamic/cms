@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Text extends Fieldtype
 {
     protected $categories = ['text'];
@@ -166,8 +168,10 @@ class Text extends Fieldtype
 
     public function preProcessIndex($value)
     {
-        if ($value) {
-            return $this->config('prepend').$value.$this->config('append');
+        if (is_null($value)) {
+            return null;
         }
+
+        return $this->config('prepend').$value.$this->config('append');
     }
 }

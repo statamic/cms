@@ -19,6 +19,8 @@ use Statamic\Query\Scopes\Filter;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class NavigationController extends CpController
 {
     public function index()
@@ -93,6 +95,30 @@ class NavigationController extends CpController
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
+        $collectionTree = null;
+
+        if ($nav->collections()->count() === 1 && $nav->collections()->first()->hasStructure()) {
+            $collection = $nav->collections()->first();
+
+            $collectionBlueprints = $collection
+                ->entryBlueprints()
+                ->reject->hidden()
+                ->map(function ($blueprint) {
+                    return [
+                        'handle' => $blueprint->handle(),
+                        'title' => $blueprint->title(),
+                    ];
+                })->values();
+
+            $collectionTree = [
+                'title' => $collection->title(),
+                'url' => cp_route('collections.tree.index', $collection),
+                'showSlugs' => $collection->structure()->showSlugs(),
+                'expectsRoot' => $collection->structure()->expectsRoot(),
+                'blueprints' => $collectionBlueprints,
+            ];
+        }
+
         return Inertia::render('navigation/Show', [
             'title' => $nav->title(),
             'handle' => $nav->handle(),
@@ -118,6 +144,7 @@ class NavigationController extends CpController
             'canEdit' => User::current()->can('edit', $nav),
             'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
             'canEditBlueprint' => User::current()->can('configure fields'),
+            'collectionTree' => $collectionTree,
         ]);
     }
 

@@ -15,10 +15,10 @@ use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorData;
 use Webauthn\CollectedClientData;
-use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
+use Webauthn\PublicKeyCredentialSource;
 
 #[Group('passkeys')]
 class WebAuthnTest extends TestCase
@@ -56,7 +56,7 @@ class WebAuthnTest extends TestCase
 
         $this->assertInstanceOf(PublicKeyCredentialRequestOptions::class, $options);
         $this->assertNotNull(session('webauthn.challenge'));
-        $this->assertEquals(32, strlen(session('webauthn.challenge')));
+        $this->assertEquals(32, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertEquals(PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED, $options->userVerification);
     }
 
@@ -84,11 +84,11 @@ class WebAuthnTest extends TestCase
         // Challenge should be stored in session for later verification
         $storedChallenge = session('webauthn.challenge');
         $this->assertNotNull($storedChallenge);
-        $this->assertEquals(32, strlen($storedChallenge));
+        $this->assertEquals(32, strlen(base64_decode($storedChallenge)));
 
         // The challenge in the options should be the same binary value
         // (base64url encoding happens during serialization, not in the object)
-        $this->assertEquals($storedChallenge, $options->challenge);
+        $this->assertEquals(base64_decode($storedChallenge), $options->challenge);
     }
 
     #[Test]
@@ -180,7 +180,7 @@ class WebAuthnTest extends TestCase
 
         $credentials = ['id' => 'credential-id', 'rawId' => 'raw-id', 'response' => [], 'type' => 'public-key'];
         $challenge = random_bytes(32);
-        session()->put('webauthn.challenge', $challenge);
+        session()->put('webauthn.challenge', base64_encode($challenge));
 
         // Create real objects
         $publicKeyCredential = new PublicKeyCredential(
@@ -195,7 +195,7 @@ class WebAuthnTest extends TestCase
         );
 
         // Mock the passkey
-        $mockPasskeyCredential = Mockery::mock(CredentialRecord::class);
+        $mockPasskeyCredential = Mockery::mock(PublicKeyCredentialSource::class);
         $mockPasskeyCredential->publicKeyCredentialId = 'test-raw-id';
 
         $mockPasskey = Mockery::mock(Passkey::class);
@@ -209,7 +209,7 @@ class WebAuthnTest extends TestCase
         $mockUser->shouldReceive('id')->andReturn('test-user');
         $mockUser->shouldReceive('passkeys->first')->andReturn($mockPasskey);
 
-        $updatedCredentialRecord = Mockery::mock(CredentialRecord::class);
+        $updatedCredentialSource = Mockery::mock(PublicKeyCredentialSource::class);
 
         $this->mockSerializer
             ->shouldReceive('deserialize')
@@ -219,7 +219,8 @@ class WebAuthnTest extends TestCase
         $this->mockAssertionValidator
             ->shouldReceive('check')
             ->once()
-            ->andReturn($updatedCredentialRecord);
+            ->withArgs(fn ($credential, $response, $options) => $options->challenge === $challenge)
+            ->andReturn($updatedCredentialSource);
 
         $result = $this->webauthn->validateAssertion($mockUser, $credentials);
 
@@ -234,7 +235,6 @@ class WebAuthnTest extends TestCase
         $user->save();
 
         $credentials = ['id' => 'credential-id', 'rawId' => 'raw-id', 'response' => [], 'type' => 'public-key'];
-        session()->put('webauthn.challenge', random_bytes(32));
 
         $publicKeyCredential = new PublicKeyCredential(
             'public-key',

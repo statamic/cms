@@ -16,6 +16,8 @@ use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialUserEntity;
 
+use function Statamic\trans as __;
+
 class WebAuthn
 {
     public function __construct(
@@ -31,7 +33,7 @@ class WebAuthn
     {
         $challenge = random_bytes(32);
 
-        session()->put('webauthn.challenge', $challenge);
+        session()->put('webauthn.challenge', base64_encode($challenge));
 
         return $this->getRequestOptions($challenge);
     }
@@ -42,9 +44,9 @@ class WebAuthn
 
         $passkey = $this->getPasskey($user, $publicKeyCredential);
 
-        $options = $this->getRequestOptions(session()->pull('webauthn.challenge'));
+        $options = $this->getRequestOptions(base64_decode(session()->pull('webauthn.challenge')));
 
-        $credentialRecord = $this->assertionResponseValidator->check(
+        $publicKeyCredentialSource = $this->assertionResponseValidator->check(
             $passkey->credential(),
             $publicKeyCredential->response,
             $options,
@@ -53,7 +55,7 @@ class WebAuthn
         );
 
         $passkey
-            ->setCredential($credentialRecord)
+            ->setCredential($publicKeyCredentialSource)
             ->setLastLogin(now())
             ->save();
 
@@ -79,7 +81,7 @@ class WebAuthn
     {
         $challenge = random_bytes(16);
 
-        session()->put('webauthn.challenge', $challenge);
+        session()->put('webauthn.challenge', base64_encode($challenge));
 
         return $this->getCreationOptions($user, $challenge);
     }
@@ -92,9 +94,9 @@ class WebAuthn
             throw new Exception(__('Invalid credentials.'));
         }
 
-        $options = $this->getCreationOptions($user, session()->pull('webauthn.challenge'));
+        $options = $this->getCreationOptions($user, base64_decode(session()->pull('webauthn.challenge')));
 
-        $credentialRecord = $this->attestationResponseValidator->check(
+        $publicKeyCredentialSource = $this->attestationResponseValidator->check(
             $publicKeyCredential->response,
             $options,
             request()->getHost()
@@ -103,7 +105,7 @@ class WebAuthn
         $passkey = app(Passkey::class)
             ->setUser($user)
             ->setName($name)
-            ->setCredential($credentialRecord);
+            ->setCredential($publicKeyCredentialSource);
 
         $passkey->save();
 
@@ -145,7 +147,7 @@ class WebAuthn
         $userEntity = PublicKeyCredentialUserEntity::create(
             $user->email(),
             $user->id(),
-            $user->name()
+            $user->name() ?? $user->email()
         );
 
         return PublicKeyCredentialCreationOptions::create(

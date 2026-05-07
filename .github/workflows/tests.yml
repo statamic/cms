@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         php: [8.3, 8.4, 8.5]
-        laravel: [12.*]
+        laravel: [12.*, 13.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
@@ -37,13 +37,13 @@ jobs:
         uses: tj-actions/changed-files@v46
         with:
           files: |
-            config
-            resources/lang
-            resources/users
-            resources/views
-            routes
-            src
-            tests
+            config/**
+            lang/**
+            resources/users/**
+            resources/views/**
+            routes/**
+            src/**
+            tests/**
             composer.json
             phpunit.xml.dist
             .github/workflows/tests.yml
@@ -136,6 +136,7 @@ jobs:
         env:
           CI: true
           LARAVEL_BYPASS_ENV_CHECK: 1
+          LANG: en_US.UTF-8
 
       - name: Verify build succeeds
         if: steps.should-run-tests.outputs.result == 'true'

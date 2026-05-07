@@ -135,10 +135,10 @@ export const Icons: Story = {
         docs: {
             source: {
                 code: `
-                    <Button size="lg" text="Large" />
-                    <Button size="base" text="Base" />
-                    <Button size="sm" text="Small" />
-                    <Button size="xs" text="Extra Small" />
+                    <Button icon="arrow-left" text="Prepend" />
+                    <Button icon-append="arrow-right" text="Append" />
+                    <Button icon="arrow-left" icon-append="arrow-right" text="Both" />
+                    <Button icon="cog" icon-only />
                 `,
             },
         },
@@ -298,6 +298,118 @@ export const ButtonGroups: Story = {
                 <Button text="Apply" />
                 <Button icon="save" text="Save All" />
             </ButtonGroup>
+        `,
+    }),
+};
+
+export const ButtonGroupOverflowStack: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <ButtonGroup overflow="stack">
+                        <Button text="Option A" />
+                        <Button text="Option B" />
+                        <Button text="Option C" />
+                        <Button text="Option D" />
+                        <Button text="Option E" />
+                    </ButtonGroup>
+                `,
+            },
+        },
+    },
+    render: () => ({
+        components: { ButtonGroup, Button },
+        template: `
+            <div class="w-72">
+                <ButtonGroup overflow="stack">
+                    <Button text="Option A" />
+                    <Button text="Option B" />
+                    <Button text="Option C" />
+                    <Button text="Option D" />
+                    <Button text="Option E" />
+                </ButtonGroup>
+            </div>
+        `,
+    }),
+};
+
+export const ButtonGroupOverflowGap: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+                    <ButtonGroup overflow="gap">
+                        <Button text="Option A" />
+                        <Button text="Option B" />
+                        <Button text="Option C" />
+                        <Button text="Option D" />
+                        <Button text="Option E" />
+                    </ButtonGroup>
+                `,
+            },
+        },
+    },
+    render: () => ({
+        components: { ButtonGroup, Button },
+        template: `
+            <div class="w-72">
+                <ButtonGroup overflow="gap">
+                    <Button text="Option A" />
+                    <Button text="Option B" />
+                    <Button text="Option C" />
+                    <Button text="Option D" />
+                    <Button text="Option E" />
+                </ButtonGroup>
+            </div>
+        `,
+    }),
+};
+
+export const ButtonGroupOverflowVariations: Story = {
+    render: () => ({
+        components: { ButtonGroup, Button },
+        template: `
+            <div class="space-y-8">
+                <div>
+                    <p class="text-xs font-mono text-gray-500 mb-2">overflow="stack" — fits</p>
+                    <ButtonGroup overflow="stack">
+                        <Button text="Option A" />
+                        <Button text="Option B" />
+                    </ButtonGroup>
+                </div>
+                <div>
+                    <p class="text-xs font-mono text-gray-500 mb-2">overflow="stack" — overflows</p>
+                    <div class="w-48">
+                        <ButtonGroup overflow="stack">
+                            <Button text="Option A" />
+                            <Button text="Option B" />
+                            <Button text="Option C" />
+                        </ButtonGroup>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-xs font-mono text-gray-500 mb-2">overflow="gap" — fits</p>
+                    <ButtonGroup overflow="gap">
+                        <Button text="Option A" />
+                        <Button text="Option B" />
+                    </ButtonGroup>
+                </div>
+                <div>
+                    <p class="text-xs font-mono text-gray-500 mb-2">overflow="gap" — overflows</p>
+                    <div class="w-72">
+                        <ButtonGroup overflow="gap">
+                            <Button text="Option A" />
+                            <Button text="Option B" />
+                            <Button text="Option C" />
+                            <Button text="Option D" />
+                            <Button text="Option E" />
+                            <Button text="Option F" />
+                            <Button text="Option G" />
+                        </ButtonGroup>
+                    </div>
+                </div>
+            </div>
         `,
     }),
 };
