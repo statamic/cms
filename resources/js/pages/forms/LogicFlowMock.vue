@@ -84,10 +84,10 @@ const logicDestination = ref(props.mockPreset.logicDestination || 'fan_length');
 const logicBranchingAction = ref(props.mockPreset.logicBranchingAction || 'go_to');
 const logicBranchingActionOptions = [
     { label: __('Go to'), value: 'go_to' },
-    { label: __('Add'), value: 'add' },
-    { label: __('Divide'), value: 'divide' },
-    { label: __('Subtract'), value: 'subtract' },
-    { label: __('Multiply'), value: 'multiply' },
+    { label: ['+', __('Add')].join('\u2007'), value: 'add' },
+    { label: ['÷', __('Divide')].join('\u2007'), value: 'divide' },
+    { label: ['−', __('Subtract')].join('\u2007'), value: 'subtract' },
+    { label: ['×', __('Multiply')].join('\u2007'), value: 'multiply' },
 ];
 const logicDestinationOptions = [
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
