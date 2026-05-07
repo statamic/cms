@@ -45,6 +45,9 @@ const introSeenLive = ref(null);
 const postPageSectionCollapsed = ref(false);
 const postPageEmail = ref('');
 const postPageFinalNote = ref('');
+const postPageContactMethod = ref(null);
+const postPageBestTime = ref(null);
+const postPageSmsUpdates = ref(false);
 const totalFieldCount = computed(() => 13);
 const introSeenLiveOptions = [
     { label: __('Yes'), value: 'yes' },
@@ -88,6 +91,16 @@ const notificationOptions = [
     { label: __('New Singles and Albums'), value: 'singles_and_albums' },
     { label: __('Merchandise'), value: 'merchandise' },
     { label: __('Friends of The Midnight'), value: 'friends_of_the_midnight' },
+];
+const postPageContactMethodOptions = [
+    { label: __('Email'), value: 'email' },
+    { label: __('SMS'), value: 'sms' },
+    { label: __('Either is fine'), value: 'either' },
+];
+const postPageBestTimeOptions = [
+    { label: __('Morning'), value: 'morning' },
+    { label: __('Afternoon'), value: 'afternoon' },
+    { label: __('Evening'), value: 'evening' },
 ];
 const isPageInspector = computed(() => inspectorTarget.value === 'page_1' || inspectorTarget.value === 'page_2');
 const activeSettingsTab = computed({
@@ -908,6 +921,15 @@ const selectedPageInternalName = computed({
                         </template>
                         <Switch v-model="wantsFreeDrinkVoucher" />
                         </Field>
+                        <div class="pt-2">
+                            <Button
+                                variant="primary"
+                                @click.prevent
+                                class="hover:cursor-not-allowed border-0! dark:border-0! ring-0! shadow-none!"
+                                style="--theme-color-primary: var(--theme-color-gray-950)"
+                                :text="__('Next Page')"
+                            />
+                        </div>
                     </div>
                 </Card>
             </div>
@@ -986,6 +1008,53 @@ const selectedPageInternalName = computed({
                                 </Label>
                             </template>
                             <Textarea id="post-page-note-field" v-model="postPageFinalNote" :rows="3" resize="vertical" />
+                        </Field>
+
+                        <Field id="post-page-contact-method-field" :label="__('Preferred confirmation method')">
+                            <template #label>
+                                <Label for="post-page-contact-method-field">
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="mail-sign-at" data-collapsed-field-icon class="size-3.5 me-1 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                                        {{ __('Preferred confirmation method') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <Select
+                                id="post-page-contact-method-field"
+                                v-model="postPageContactMethod"
+                                :options="postPageContactMethodOptions"
+                            />
+                        </Field>
+
+                        <Field :label="__('Best time to contact you')">
+                            <template #label>
+                                <Label>
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="time-clock-circle" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                                        {{ __('Best time to contact you') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <RadioGroup v-model="postPageBestTime">
+                                <Radio
+                                    v-for="timeOption in postPageBestTimeOptions"
+                                    :key="timeOption.value"
+                                    :label="timeOption.label"
+                                    :value="timeOption.value"
+                                />
+                            </RadioGroup>
+                        </Field>
+
+                        <Field :label="__('Send me text updates about schedule changes')">
+                            <template #label>
+                                <Label>
+                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <Icon name="mail-sign-hashtag" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+                                        {{ __('Send me text updates about schedule changes') }}
+                                    </span>
+                                </Label>
+                            </template>
+                            <Switch v-model="postPageSmsUpdates" />
                         </Field>
 
                         <Button
