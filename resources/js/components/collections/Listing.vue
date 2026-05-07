@@ -24,7 +24,6 @@
                     <aside class="flex items-center gap-2">
                         <ItemActions
                             :url="collection.actions_url"
-                            :actions="collection.actions"
                             :item="collection.id"
                             @started="actionStarted"
                             @completed="actionCompleted"
