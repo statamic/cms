@@ -4,6 +4,7 @@ namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -94,20 +95,26 @@ class LoginTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_referer_url()
+    #[DefineEnvironment('disableTwoFactor')]
+    public function it_skips_two_factor_challenge_when_two_factor_is_disabled()
     {
-        $user = $this->user();
+        Event::fake();
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this->withoutExceptionHandling();
 
         $this
             ->assertGuest()
             ->post(cp_route('login'), [
                 'email' => $user->email(),
                 'password' => 'secret',
-                'referer' => 'http://localhost/cp/cp/collections',
             ])
-            ->assertRedirect('http://localhost/cp/cp/collections');
+            ->assertRedirect(cp_route('index'));
 
         $this->assertAuthenticatedAs($user);
+
+        Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
     }
 
     #[Test]
@@ -125,6 +132,14 @@ class LoginTest extends TestCase
             ->assertRedirect('http://localhost/cp/cp/collections');
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function it_stores_the_intended_url_when_redirected_to_login()
+    {
+        $this
+            ->get(cp_route('collections.index'))
+            ->assertSessionHas('url.intended', 'http://localhost/cp/collections');
     }
 
     #[Test]
@@ -168,6 +183,11 @@ class LoginTest extends TestCase
             ->assertRedirect();
 
         $this->assertGuest();
+    }
+
+    protected function disableTwoFactor($app)
+    {
+        $app['config']->set('statamic.users.two_factor_enabled', false);
     }
 
     private function user()

@@ -19,6 +19,8 @@ use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FormController extends Controller
 {
     /**

@@ -703,6 +703,31 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function structured_entry_uri_updates_when_custom_field_in_route_changes()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
+        ]);
+
+        $collection = tap((new Collection)->handle('pages')->routes('{slug}/{test}'))->save();
+
+        $entry = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('page')->set('test', 'foo'))->save();
+
+        $collection->structureContents(['expects_root' => false])->save();
+        $collection->structure()->in('en')->tree([['entry' => '1']])->save();
+
+        // Warm the structure caches like they would be in production.
+        Blink::store('entry-uris')->flush();
+        $this->assertEquals('/page/foo', $entry->uri());
+
+        $entry->set('test', 'bar');
+        $entry->save();
+
+        Blink::store('entry-uris')->flush();
+        $this->assertEquals('/page/bar', $entry->uri());
+    }
+
+    #[Test]
     public function it_gets_and_sets_supplemental_data()
     {
         $entry = new Entry;
@@ -1430,7 +1455,6 @@ class EntryTest extends TestCase
         $cached = Cache::get('stache::items::entries::blog::1');
         $reflection = new ReflectionClass($cached);
         $property = $reflection->getProperty('withEvents');
-        $property->setAccessible(true);
         $withEvents = $property->getValue($cached);
         $this->assertTrue($withEvents);
     }

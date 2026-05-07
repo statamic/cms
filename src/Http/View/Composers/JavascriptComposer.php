@@ -64,6 +64,7 @@ class JavascriptComposer
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
+            'elevatedSessionsEnabled' => config('statamic.users.elevated_sessions_enabled'),
             'user' => $this->user($user),
             'defaultPreferences' => Preference::default()->all(),
             'paginationSize' => config('statamic.cp.pagination_size'),

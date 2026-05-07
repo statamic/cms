@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\AssetContainer;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class AssetFolder extends Relationship
 {
     protected $component = 'asset_folder';

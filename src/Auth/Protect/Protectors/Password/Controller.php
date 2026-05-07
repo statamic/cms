@@ -9,6 +9,8 @@ use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller as BaseController;
 use Statamic\View\View;
 
+use function Statamic\trans as __;
+
 class Controller extends BaseController
 {
     protected $tokenData;

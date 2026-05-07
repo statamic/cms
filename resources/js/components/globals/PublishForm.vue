@@ -72,7 +72,7 @@
             v-if="fieldset && !fieldset.empty"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
             v-model="values"
             :meta="meta"
@@ -82,6 +82,7 @@
             :site="site"
             v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
+            remember-tab
         />
 
         <confirmation-modal
@@ -163,6 +164,7 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            reference: this.initialReference,
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
@@ -300,6 +302,7 @@ export default {
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.afterActionSuccessfullyCompleted(data);
                 this.$nextTick(() => this.$refs.container.clearDirtyState());

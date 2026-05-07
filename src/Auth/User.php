@@ -19,6 +19,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -40,12 +41,15 @@ use Statamic\Events\UserDeleting;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;
+use Statamic\Facades\TwoFactor;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
@@ -365,6 +369,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function isTwoFactorAuthenticationRequired(): bool
     {
+        if (! TwoFactor::enabled()) {
+            return false;
+        }
+
         $enforcedRoles = config('statamic.users.two_factor_enforced_roles', []);
 
         if (in_array('*', $enforcedRoles)) {
@@ -410,7 +418,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $this->set('two_factor_recovery_codes', encrypt(str_replace(
             $code,
-            TwoFactor\RecoveryCode::generate(),
+            RecoveryCode::generate(),
             decrypt($this->two_factor_recovery_codes)
         )))->save();
 
@@ -424,7 +432,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $svg = (new Writer(
             new ImageRenderer(
-                new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
+                new RendererStyle(size: 192, fill: Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
                 new SvgImageBackEnd
             )
         ))->writeString($this->twoFactorQrCodeUrl());
@@ -470,7 +478,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -481,5 +489,14 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'avatar', 'blueprint', 'editUrl', 'email', 'gravatarUrl', 'groups', 'hasAvatarField',
+            'id', 'initials', 'isSuper', 'isTaxonomizable', 'lastLogin', 'name', 'path', 'preferredLocale',
+            'preferredTheme', 'reference', 'roles', 'title',
+        ];
     }
 }

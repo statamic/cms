@@ -64,7 +64,7 @@ class Composer extends Process
             return collect();
         }
 
-        return collect($this->runJsonComposerCommand('show', '--direct', '--no-plugins')->installed)
+        return collect($this->runJsonComposerCommand('show', '--direct', '--no-plugins')?->installed ?? [])
             ->keyBy('name')
             ->map(function ($package) use ($lock) {
                 $package->version = $this->normalizeVersion($package->version);
@@ -99,7 +99,7 @@ class Composer extends Process
      */
     public function installedPath(string $package)
     {
-        return collect($this->runJsonComposerCommand('show', '--direct', '--path', '--no-plugins')->installed)
+        return collect($this->runJsonComposerCommand('show', '--direct', '--path', '--no-plugins')?->installed ?? [])
             ->keyBy('name')
             ->get($package)
             ->path;

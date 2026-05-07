@@ -1,8 +1,10 @@
 <?php
 
-namespace Statamic\Http\Requests\CP\Auth;
+namespace Statamic\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+
+use function Statamic\trans as __;
 
 class ElevatedSessionConfirmationRequest extends FormRequest
 {

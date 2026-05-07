@@ -43,7 +43,7 @@
                                     :sortable-handle-class="sortableHandleClass"
                                     :collapsed="collapsed.includes(set._id)"
                                     :enabled="set.enabled"
-                                    :read-only
+                                    :read-only="isReadOnly"
                                     :can-add-set="canAddSet"
                                     :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"

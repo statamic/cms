@@ -13,9 +13,12 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\Slug;
 use Statamic\Rules\UniqueTermValue;
+
+use function Statamic\trans as __;
 
 class TermsController extends CpController
 {
@@ -33,7 +36,7 @@ class TermsController extends CpController
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
-        $sortField = request('sort');
+        $sortField = OrderBy::column(request('sort'));
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
@@ -130,7 +133,7 @@ class TermsController extends CpController
                     'url' => $localized->editUrl(),
                     'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
-            })->all(),
+            })->values()->all(),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),

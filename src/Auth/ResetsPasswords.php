@@ -14,6 +14,8 @@ use Illuminate\Validation\Rules\Password as PasswordRules;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\URL;
 
+use function Statamic\trans;
+
 /**
  * A copy of Illuminate\Auth\ResetsPasswords.
  * (but it doesn't import the RedirectsUsers trait).
@@ -130,8 +132,6 @@ trait ResetsPasswords
         $user->save();
 
         event(new PasswordReset($user));
-
-        $this->guard()->login($user);
     }
 
     /**

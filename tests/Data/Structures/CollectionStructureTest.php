@@ -175,6 +175,7 @@ class CollectionStructureTest extends StructureTestCase
 
         $page = $this->mock(Page::class);
         $page->shouldReceive('reference')->andReturn('the-entry-id');
+        $page->shouldReceive('setEntry')->once()->andReturnSelf();
         $page->shouldReceive('uri')->andReturn('/the-uri-from-the-page');
 
         $tree = $this->mock(Tree::class);

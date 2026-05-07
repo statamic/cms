@@ -7,6 +7,8 @@ use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\CodeType;
 
+use function Statamic\trans as __;
+
 class Code extends Fieldtype
 {
     protected $categories = ['text'];

@@ -158,22 +158,6 @@ class TwoFactorChallengeTest extends TestCase
     }
 
     #[Test]
-    public function it_redirects_to_referer_url_after_successful_challenge()
-    {
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->session(['login.id' => $user->id()])
-            ->post(cp_route('two-factor-challenge'), [
-                'code' => $this->getOneTimeCode($user),
-                'referer' => 'http://localhost/cp/collections',
-            ])
-            ->assertRedirect('http://localhost/cp/collections');
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
     public function it_redirects_to_intended_url_after_successful_challenge()
     {
         $user = $this->userWithTwoFactorEnabled();

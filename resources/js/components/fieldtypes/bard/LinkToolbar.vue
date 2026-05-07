@@ -80,6 +80,15 @@
         <ui-separator :text="__('Advanced Options')" />
 
         <section class="space-y-5">
+            <!-- Append attribute -->
+            <ui-input
+                v-if="linkType === 'entry'"
+                type="text"
+                v-model="appends"
+                :prepend="__('Append')"
+                :placeholder="__('?query=params#anchor')"
+            />
+
             <!-- Title attribute -->
             <ui-input
                 type="text"
@@ -196,6 +205,7 @@ export default {
             url: {},
             urlData: {},
             itemData: {},
+            appends: null,
             title: null,
             rel: null,
             targetBlank: false,
@@ -235,6 +245,13 @@ export default {
 
         href() {
             return this.sanitizeLink(this.url[this.linkType]);
+        },
+
+        normalizedAppends() {
+            const value = this.appends;
+            if (!value) return '';
+            if (value.startsWith('?') || value.startsWith('#')) return value;
+            return value.includes('=') ? `?${value}` : `#${value}`;
         },
 
         defaultRel() {
@@ -307,7 +324,11 @@ export default {
     },
 
     watch: {
-        linkType() {
+        linkType(type) {
+            if (type != 'entry') {
+                this.appends = null;
+            }
+
             this.autofocus();
         },
 
@@ -349,8 +370,8 @@ export default {
     methods: {
         applyAttrs(attrs) {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
-
-            this.url = { [this.linkType]: attrs.href };
+            this.appends = this.getAppendsForUrl(attrs.href);
+            this.url = { [this.linkType]: this.appends ? attrs.href?.replace(this.appends, '') : attrs.href };
             this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
@@ -393,7 +414,7 @@ export default {
             }
 
             this.$emit('updated', {
-                href: this.href,
+                href: this.href + this.normalizedAppends,
                 rel: this.rel,
                 target: this.canHaveTarget && this.targetBlank ? '_blank' : null,
                 title: this.title,
@@ -494,14 +515,24 @@ export default {
             return this.bard.meta.linkData[ref];
         },
 
+        getAppendsForUrl(urlString) {
+            // appends is only relevant to entry links
+            if (! urlString?.includes('statamic://entry::')) {
+                return null;
+            }
+
+            return urlString.replace(urlString.split(/[?#]/)[0], '') || null;
+        },
+
         parseDataUrl(url) {
             if (!url) {
                 return {};
             }
 
+            const appends = this.getAppendsForUrl(url);
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
-            const matches = url.match(regex);
+            const matches = (appends ? url.replace(appends, '') : url).match(regex);
             if (!matches) {
                 return {};
             }

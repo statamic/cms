@@ -15,6 +15,8 @@ use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\GraphQL\Types\LinkValueType;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Link extends Fieldtype
 {
     use UpdatesReferences;
@@ -62,6 +64,34 @@ class Link extends Fieldtype
                 : null,
             ['select_across_sites' => $this->canSelectAcrossSites()]
         );
+    }
+
+    public function preProcessIndex($data)
+    {
+        if (! $data) {
+            return null;
+        }
+
+        if ($data === '@child' && ! $this->field->parent() instanceof Entry) {
+            return null;
+        }
+
+        if (! $item = ResolveRedirect::item($data, $this->field->parent())) {
+            return null;
+        }
+
+        if (! ($url = is_object($item) ? $item->url() : $item)) {
+            return null;
+        }
+
+        $type = match (true) {
+            $data === '@child' => 'child',
+            Str::startsWith($data, 'asset::') => 'asset',
+            Str::startsWith($data, 'entry::') => 'entry',
+            default => 'url',
+        };
+
+        return ['type' => $type, 'url' => $url];
     }
 
     public function preload()

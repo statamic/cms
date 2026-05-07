@@ -1,3 +1,12 @@
+<script>
+import Outside from '@/pages/layout/Outside.vue';
+import Layout from '@/pages/layout/Layout.vue';
+
+export default {
+    layout: (h, page) => page.props.outside ? h(Outside, () => page) : h(Layout, () => page),
+};
+</script>
+
 <script setup>
 import Head from '@/pages/layout/Head.vue';
 import { AuthCard, Input, Field, Button, Description, ErrorMessage, Separator } from '@ui';
@@ -5,7 +14,7 @@ import { computed } from 'vue';
 import { Form, router } from '@inertiajs/vue3';
 import { usePasskey } from '@/composables/passkey';
 
-const props = defineProps(['method', 'allowPasskey', 'status', 'submitUrl', 'resendUrl', 'passkeyOptionsUrl']);
+const props = defineProps(['method', 'allowPasskey', 'status', 'submitUrl', 'resendUrl', 'passkeyOptionsUrl', 'outside']);
 const isConfirmingPassword = computed(() => props.method === 'password_confirmation');
 const isUsingVerificationCode = computed(() => props.method === 'verification_code');
 const isOnlyUsingPasskey = computed(() => props.method === 'passkey');
@@ -45,7 +54,7 @@ async function confirmWithPasskey() {
 
                 <Button
                     v-if="isUsingVerificationCode"
-                    as="href"
+                    as="a"
                     class="flex-1"
                     :href="resendUrl"
                     :text="__('Resend code')"

@@ -10,6 +10,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -27,9 +28,10 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Localization, ResolvesValuesContract
+class Variables implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, ResolvesValuesContract
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, HasOrigin, ResolvesValues, TracksQueriedRelations;
 
@@ -288,5 +290,27 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     public function fresh()
     {
         return Facades\GlobalSet::find($this->handle())->in($this->locale);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        $value = $this->value($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'editUrl', 'handle', 'id', 'locale', 'path', 'reference', 'site', 'sites', 'title',
+        ];
     }
 }
