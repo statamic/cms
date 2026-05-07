@@ -137,6 +137,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fields\Email::class,
         Forms\Fields\LongAnswer::class,
         Forms\Fields\MultiChoice::class,
+        Forms\Fields\Name::class,
         Forms\Fields\Number::class,
         Forms\Fields\ShortAnswer::class,
         Forms\Fields\Toggle::class,
