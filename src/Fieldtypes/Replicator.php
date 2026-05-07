@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
@@ -136,7 +137,7 @@ class Replicator extends Fieldtype
     {
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
         $parent = $this->field->parent();
-        $locale = $parent && method_exists($parent, 'locale') ? $parent->locale() : null;
+        $locale = $parent instanceof Localization ? $parent->locale() : null;
         $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
 
         return Blink::once($hash, function () use ($config, $index) {
