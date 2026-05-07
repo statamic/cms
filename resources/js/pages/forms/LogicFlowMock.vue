@@ -163,7 +163,7 @@ const primarySelection = computed({
 const calculationUsesNumberInput = computed(() => props.calculationMode && primarySelection.value === 'number');
 const branchingActionLabel = computed(() => {
     const selected = logicBranchingActionOptions.find((option) => option.value === logicBranchingAction.value);
-    return selected?.label || __('Branching');
+    return selected?.label || __('Logic');
 });
 const isBranchingCalculationAction = computed(() => logicBranchingAction.value !== 'go_to');
 const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalculationSource.value === 'number');
@@ -532,7 +532,7 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                                 </button>
                             </template>
                             <DropdownMenu>
-                                <DropdownLabel :text="__('Branching')" />
+                                <DropdownLabel :text="__('Logic')" />
                                 <DropdownItem :text="__('Go to')" @click="logicBranchingAction = 'go_to'" />
                                 <DropdownSeparator />
                                 <DropdownLabel :text="__('Calculation')" />
