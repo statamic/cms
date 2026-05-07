@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class MultiChoice extends FormFieldtype
 {
     protected static $fieldtype = 'select';
+    protected $icon = 'fieldtype-radio';
+    protected $categories = ['Choice'];
 
     public function configFieldItems(): array
     {

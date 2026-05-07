@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class Checkboxes extends FormFieldtype
 {
     protected static $fieldtype = 'checkboxes';
+    protected $icon = 'fieldtype-checkboxes';
+    protected $categories = ['Choice'];
 
     public function configFieldItems(): array
     {

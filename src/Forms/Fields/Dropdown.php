@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class Dropdown extends FormFieldtype
 {
     protected static $fieldtype = 'select';
+    protected $icon = 'fieldtype-select';
+    protected $categories = ['Choice'];
 
     public function configFieldItems(): array
     {

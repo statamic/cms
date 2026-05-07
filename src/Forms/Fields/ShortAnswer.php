@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class ShortAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'text';
+    protected $icon = 'text-short';
+    protected $categories = ['Text'];
 
     public function configFieldItems(): array
     {

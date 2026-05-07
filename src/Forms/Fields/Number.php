@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class Number extends FormFieldtype
 {
     protected static $fieldtype = 'integer';
+    protected $icon = 'number';
+    protected $categories = ['Number'];
 
     public function configFieldItems(): array
     {

@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class Toggle extends FormFieldtype
 {
     protected static $fieldtype = 'toggle';
+    protected $icon = 'fieldtype-toggle';
+    protected $categories = ['Choice'];
 
     public function configFieldItems(): array
     {

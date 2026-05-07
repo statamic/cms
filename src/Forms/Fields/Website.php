@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class Website extends FormFieldtype
 {
     protected static $fieldtype = 'text';
+    protected $icon = 'website';
+    protected $categories = ['Contact Info'];
 
     public function configFieldItems(): array
     {

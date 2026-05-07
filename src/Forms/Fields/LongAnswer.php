@@ -7,6 +7,8 @@ use Statamic\Support\Arr;
 class LongAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'textarea';
+    protected $icon = 'text-long';
+    protected $categories = ['Text'];
 
     public function configFieldItems(): array
     {
