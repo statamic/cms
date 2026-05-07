@@ -78,6 +78,12 @@ const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
+
+            // Avoid fatal error `Cannot set properties of undefined (setting 'hour')`
+            if (event.end == null) {
+              return
+            }
+
             event.start.hour = 0;
             event.start.minute = 0;
             event.start.second = 0;
