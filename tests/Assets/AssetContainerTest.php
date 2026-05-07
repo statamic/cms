@@ -743,21 +743,39 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_fresh_contents_instance_on_every_call_when_running_in_a_queue_worker()
+    public function it_does_not_leak_stale_contents_state_across_calls_when_running_in_a_queue_worker()
     {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
         $container = (new AssetContainer)->handle('test')->disk('test');
-
-        $nonWorkerInstance = $container->contents();
-        $sameNonWorkerInstance = $container->contents();
-
-        $this->assertSame($nonWorkerInstance, $sameNonWorkerInstance, 'Non-worker: Blink should return the same instance');
 
         Request::swap(new FakeArtisanRequest('queue:work'));
 
-        $workerInstance1 = $container->contents();
-        $workerInstance2 = $container->contents();
+        // First job populates the instance's $metaFiles cache. metaFilesIn() has no
+        // isWorker() guard, so if contents() reused the same instance across jobs
+        // the filtered result would stick around and bleed into the next job.
+        $this->assertEquals(
+            ['.meta/a.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->all()
+        );
 
-        $this->assertNotSame($workerInstance1, $workerInstance2, 'Worker: a fresh instance must be returned each call to prevent stale in-memory state leaking across jobs');
+        // Simulate the next job seeing a different state on disk.
+        Cache::put($cacheKey, collect([
+            'a.txt' => ['type' => 'file', 'path' => 'a.txt', 'dirname' => ''],
+            '.meta/a.txt.yaml' => ['type' => 'file', 'path' => '.meta/a.txt.yaml', 'dirname' => '.meta'],
+            'b.txt' => ['type' => 'file', 'path' => 'b.txt', 'dirname' => ''],
+            '.meta/b.txt.yaml' => ['type' => 'file', 'path' => '.meta/b.txt.yaml', 'dirname' => '.meta'],
+        ]));
+
+        $this->assertEquals(
+            ['.meta/a.txt.yaml', '.meta/b.txt.yaml'],
+            $container->contents()->metaFilesIn('/', true)->keys()->sort()->values()->all()
+        );
     }
 
     #[Test]
