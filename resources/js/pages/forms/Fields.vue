@@ -109,6 +109,27 @@ const selectedPageHeadingLabel = computed(() => {
     if (inspectorTarget.value === 'page_2') return __('Goodbye');
     return __('Page');
 });
+const selectedPageLogicMockPreset = computed(() => {
+    if (inspectorTarget.value === 'page_2') {
+        return {
+            logicBranchingConditionField: 'age',
+            logicOperator: 'contains',
+            logicValue: '21',
+            logicBranchingAction: 'divide',
+            logicBranchingCalculationSource: 'variable_score',
+            logicBranchingCalculationVariable: 'engagement_weight',
+            logicContainsOperator: 'contains',
+            logicContainsAnswer: 'google',
+        };
+    }
+
+    return {};
+});
+const selectedPageDestinationStepLabel = computed(() => (
+    inspectorTarget.value === 'page_2'
+        ? __('Then go to Page 1')
+        : __('Then go to Goodbye')
+));
 const selectedPageInternalName = computed({
     get() {
         return inspectorTarget.value === 'page_2' ? pageTwoInternalName.value : pageOneInternalName.value;
@@ -1075,9 +1096,11 @@ const selectedPageInternalName = computed({
                                     </a>
                                 </div>
                                 <LogicFlowMock
-                                    :destination-step-label="__('Then go to Goodbye')"
+                                    :key="`mobile-page-logic-${inspectorTarget}`"
+                                    :destination-step-label="selectedPageDestinationStepLabel"
                                     :show-destination-selector="true"
                                     :show-rule-controls="true"
+                                    :mock-preset="selectedPageLogicMockPreset"
                                 />
                                 <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
                                 <div class="mt-6 border-t border-gray-300 dark:border-gray-700">
@@ -1236,9 +1259,11 @@ const selectedPageInternalName = computed({
                             </div>
                         </div>
                         <LogicFlowMock
-                            :destination-step-label="__('Then go to Goodbye')"
+                            :key="`desktop-page-logic-${inspectorTarget}`"
+                            :destination-step-label="selectedPageDestinationStepLabel"
                             :show-destination-selector="true"
                             :show-rule-controls="true"
+                            :mock-preset="selectedPageLogicMockPreset"
                         />
                         <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
                         <div class="mt-3 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
