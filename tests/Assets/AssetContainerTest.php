@@ -743,6 +743,24 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_a_fresh_contents_instance_on_every_call_when_running_in_a_queue_worker()
+    {
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $nonWorkerInstance = $container->contents();
+        $sameNonWorkerInstance = $container->contents();
+
+        $this->assertSame($nonWorkerInstance, $sameNonWorkerInstance, 'Non-worker: Blink should return the same instance');
+
+        Request::swap(new FakeArtisanRequest('queue:work'));
+
+        $workerInstance1 = $container->contents();
+        $workerInstance2 = $container->contents();
+
+        $this->assertNotSame($workerInstance1, $workerInstance2, 'Worker: a fresh instance must be returned each call to prevent stale in-memory state leaking across jobs');
+    }
+
+    #[Test]
     public function it_gets_an_asset()
     {
         $asset = $this->containerWithDisk()->asset('a.txt');

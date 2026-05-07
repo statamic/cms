@@ -21,6 +21,7 @@ use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Statamic;
 use Statamic\Facades\File;
 use Statamic\Facades\Image;
 use Statamic\Facades\Pattern;
@@ -344,6 +345,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
     public function contents()
     {
+        if (Statamic::isWorker()) {
+            return app(AssetContainerContents::class)->container($this);
+        }
+
         return Blink::once('asset-listing-cache-'.$this->handle(), function () {
             return app(AssetContainerContents::class)->container($this);
         });
