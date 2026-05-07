@@ -132,6 +132,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $formFieldtypes = [
+        Forms\Fields\Checkboxes::class,
         Forms\Fields\Dropdown::class,
         Forms\Fields\Email::class,
         Forms\Fields\LongAnswer::class,
