@@ -26,7 +26,7 @@ const isValid = computed(() => {
     return true;
 });
 
-const appTimezone = computed(() => config.get('appTimezone') ?? 'UTC');
+const displayTimezone = computed(() => config.get('displayTimezone') ?? 'UTC');
 
 const formatTimeZone = (timeZone) => {
     const parts = new Intl.DateTimeFormat(config.get('translationLocale'), {
@@ -48,8 +48,8 @@ const formatDateTime = (timeZone) => {
 const rows = computed(() => {
     const all = [
         ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
-        { timeZone: getLocalTimeZone(), sublabel: __('Your computer') },
-        { timeZone: appTimezone.value, sublabel: __('Application') },
+        { timeZone: getLocalTimeZone(), sublabel: __('Your time') },
+        { timeZone: displayTimezone.value, sublabel: __('Site time') },
         { timeZone: 'UTC', sublabel: null },
     ];
 

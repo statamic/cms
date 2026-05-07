@@ -28,7 +28,7 @@ const storybookConfig = {
     selectedSite: 'default',
     lang: 'en',
     translationLocale: 'en',
-    appTimezone: 'UTC',
+    displayTimezone: 'UTC',
     asciiReplaceExtraSymbols: false,
     charmap: { currency: {}, currency_short: {} },
 };
