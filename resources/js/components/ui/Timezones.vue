@@ -50,7 +50,6 @@ const rows = computed(() => {
         ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
         { timeZone: getLocalTimeZone(), sublabel: __('Your time') },
         { timeZone: displayTimezone.value, sublabel: __('Site time') },
-        { timeZone: 'UTC', sublabel: null },
     ];
 
     const seen = new Set();
