@@ -47,9 +47,9 @@ const formatDateTime = (timeZone) => {
 
 const rows = computed(() => {
     const all = [
-        ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
-        { timeZone: getLocalTimeZone(), sublabel: __('Your time') },
         { timeZone: displayTimezone.value, sublabel: __('Site time') },
+        { timeZone: getLocalTimeZone(), sublabel: __('Your time') },
+        ...props.additionalTimezones.map((row) => ({ timeZone: row.timezone, sublabel: row.label })),
     ];
 
     const seen = new Set();
