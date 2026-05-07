@@ -24,6 +24,8 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class BrowserController extends CpController
 {
     use HasRequestedColumns, QueriesFilters, RedirectsToFirstAssetContainer;

@@ -14,6 +14,8 @@ use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
+use function Statamic\trans as __;
+
 class UserTags extends Tags
 {
     use Concerns\GetsFormSession,

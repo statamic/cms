@@ -19,6 +19,8 @@ use Statamic\Query\Scopes\Filter;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class NavigationController extends CpController
 {
     public function index()

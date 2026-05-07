@@ -9,6 +9,8 @@ use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
+use function Statamic\trans as __;
+
 abstract class ActionController extends CpController
 {
     public function run(Request $request)

@@ -10,6 +10,8 @@ use Statamic\Exceptions\ElevatedSessionAuthorizationException;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 /**
  * The base control panel controller.
  */

@@ -25,3 +25,6 @@ jobs:
           testMode: true
           verboseMode: true
           pintVersion: 1.16.0
+
+      - name: Check Statamic\trans imports
+        run: bash scripts/check-trans-import.sh

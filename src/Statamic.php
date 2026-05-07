@@ -424,6 +424,15 @@ class Statamic
         return $line;
     }
 
+    public static function transChoice($key, $number, $replace = [], $locale = null)
+    {
+        if (is_array(\__($key, $replace, $locale))) {
+            return $key;
+        }
+
+        return \trans_choice($key, $number, $replace, $locale);
+    }
+
     public static function isWorker()
     {
         if (! App::runningInConsole()) {

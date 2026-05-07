@@ -11,6 +11,8 @@ use Statamic\GraphQL\Types\GroupType;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Group extends Fieldtype
 {
     use UpdatesReferences;
