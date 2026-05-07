@@ -628,12 +628,20 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                             v-else
                             v-model="logicBranchingCalculationVariable"
                             size="sm"
+                            class="font-mono lowercase text-xs tracking-tight"
                             :options="logicCalculationVariableOptions"
                             option-label="label"
                             option-value="value"
                             :placeholder="__('Variable')"
                             :searchable="false"
-                        />
+                        >
+                            <template #option="{ label }">
+                                <span class="font-mono text-xs tracking-tight">{{ label }}</span>
+                            </template>
+                            <template #selected-option="{ option }">
+                                <span class="font-mono text-xs tracking-tight">{{ option.label }}</span>
+                            </template>
+                        </Combobox>
                     </li>
                 </ol>
             </li>
