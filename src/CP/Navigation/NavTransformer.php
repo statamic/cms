@@ -285,30 +285,24 @@ class NavTransformer
      */
     protected function calculateMinimumItemsForReorder($originalList, $newList): int
     {
-        // When the new list contains items not in the original (e.g., custom sections),
-        // we need to include enough items to establish where those new items are positioned,
-        // BUT only if they appear in the middle of the list. Items appended at the end
-        // don't need to be explicitly positioned.
-
+        // When the new list contains items not in the original (e.g. custom sections),
+        // we must include enough of newList to anchor the position of any custom items
+        // that appear before original items. Custom items at the end auto-append.
         $originalSet = collect($originalList);
         $lastCustomPositionInMiddle = 0;
 
         foreach ($newList as $index => $item) {
             if (! $originalSet->contains($item)) {
-                // Check if there are any original items after this custom item
                 $hasOriginalItemsAfter = collect($newList)
                     ->slice($index + 1)
                     ->contains(fn ($futureItem) => $originalSet->contains($futureItem));
 
-                // Only track this position if there are original items after it
-                // (meaning it's in the middle, not at the end)
                 if ($hasOriginalItemsAfter) {
                     $lastCustomPositionInMiddle = $index + 1;
                 }
             }
         }
 
-        // Use the original algorithm for reordering existing items
         $continueRejecting = true;
 
         $minimumItemsCount = collect($originalList)
@@ -325,8 +319,6 @@ class NavTransformer
 
         $minimumFromReordering = max(1, $minimumItemsCount - 1);
 
-        // If we have custom items in the middle of the list, we need to include
-        // enough items to establish their position. Return the maximum of the two.
         return max($minimumFromReordering, $lastCustomPositionInMiddle);
     }
 
