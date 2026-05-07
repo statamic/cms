@@ -27,7 +27,11 @@ use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Index;
 use Statamic\Search\Result;
+use Statamic\GraphQL\Types\EntriesSelectType;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\EntryType;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -452,9 +456,43 @@ class Entries extends Relationship
             : $collections;
     }
 
+    public function addGqlTypes()
+    {
+        $collections = $this->config('collections');
+
+        if (empty($collections)) {
+            return;
+        }
+
+        $typeNames = collect($collections)
+            ->flatMap(function ($handle) {
+                $collection = Collection::findByHandle($handle);
+
+                if (! $collection) {
+                    return [];
+                }
+
+                return $collection->entryBlueprints()
+                    ->map(fn ($blueprint) => EntryType::buildName($collection, $blueprint));
+            })
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($typeNames)) {
+            return;
+        }
+
+        GraphQL::addType(new EntriesSelectType(EntriesSelectType::buildName($collections), $typeNames));
+    }
+
     public function toGqlType()
     {
-        $type = GraphQL::type('EntryInterface');
+        $collections = $this->config('collections');
+
+        $type = empty($collections)
+            ? GraphQL::type(EntryInterface::NAME)
+            : GraphQL::type(EntriesSelectType::buildName($collections));
 
         if ($this->config('max_items') !== 1) {
             $type = GraphQL::listOf($type);

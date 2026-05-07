@@ -12,9 +12,12 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
+use Statamic\GraphQL\Types\EntriesSelectType;
+use Statamic\GraphQL\Types\EntryInterface;
 use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -374,6 +377,53 @@ class EntriesTest extends TestCase
         $this->assertInstanceOf(Builder::class, $augmented);
         $this->assertEveryItemIsInstanceOf(Entry::class, $augmented->get());
         $this->assertEquals(['one', 'two', 'three', 'four'], $augmented->get()->map->slug()->all());
+    }
+
+    #[Test]
+    public function it_uses_the_entry_interface_gql_type_when_no_collections_are_configured()
+    {
+        GraphQL::shouldReceive('type')->with(EntryInterface::NAME)->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+        GraphQL::shouldReceive('listOf')->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+
+        $this->fieldtype()->toGqlType();
+    }
+
+    #[Test]
+    public function it_uses_a_narrowed_gql_union_type_when_collections_are_configured()
+    {
+        GraphQL::shouldReceive('type')->with('Entries_Blog')->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+        GraphQL::shouldReceive('listOf')->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+
+        $this->fieldtype(['collections' => ['blog']])->toGqlType();
+    }
+
+    #[Test]
+    public function it_sorts_collection_handles_when_building_the_gql_union_type_name()
+    {
+        $this->assertEquals('Entries_Blog_Events', EntriesSelectType::buildName(['events', 'blog']));
+        $this->assertEquals('Entries_Blog_Events', EntriesSelectType::buildName(['blog', 'events']));
+    }
+
+    #[Test]
+    public function it_registers_a_narrowed_gql_union_type_containing_only_blueprints_from_configured_collections()
+    {
+        GraphQL::shouldReceive('addType')->once()->withArgs(function ($type) {
+            return $type instanceof EntriesSelectType
+                && $type->name === 'Entries_Blog'
+                && $type->typeNames === ['Entry_Blog_Blog'];
+        });
+
+        $this->fieldtype(['collections' => ['blog']])->addGqlTypes();
+    }
+
+    #[Test]
+    public function it_does_not_register_a_gql_union_type_when_no_collections_are_configured()
+    {
+        GraphQL::spy();
+
+        $this->fieldtype()->addGqlTypes();
+
+        GraphQL::shouldNotHaveReceived('addType');
     }
 
     public function fieldtype($config = [], $parent = null)
