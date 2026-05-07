@@ -9,6 +9,7 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Assets\Assets;
 use Statamic\Fieldtypes\Assets\DimensionsRule;
@@ -17,6 +18,7 @@ use Statamic\Fieldtypes\Assets\MaxRule;
 use Statamic\Fieldtypes\Assets\MimesRule;
 use Statamic\Fieldtypes\Assets\MimetypesRule;
 use Statamic\Fieldtypes\Assets\MinRule;
+use Statamic\GraphQL\Types\AssetInterface;
 use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -216,6 +218,35 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertEquals('file', $replaced[0]);
+    }
+
+    #[Test]
+    public function it_uses_the_asset_interface_gql_type_when_multiple_containers_exist_and_none_is_configured()
+    {
+        Storage::fake('other', ['url' => '/other']);
+        AssetContainer::make('other')->disk('other')->save();
+
+        GraphQL::shouldReceive('type')->with(AssetInterface::NAME)->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+        GraphQL::shouldReceive('listOf')->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+
+        $this->fieldtype()->toGqlType();
+    }
+
+    #[Test]
+    public function it_uses_the_concrete_asset_gql_type_when_a_container_is_configured()
+    {
+        GraphQL::shouldReceive('type')->with('Asset_Test')->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+
+        $this->fieldtype(['container' => 'test', 'max_files' => 1])->toGqlType();
+    }
+
+    #[Test]
+    public function it_uses_the_concrete_asset_gql_type_when_only_one_container_exists()
+    {
+        // configuredContainerHandle() resolves to the sole container even without explicit config.
+        GraphQL::shouldReceive('type')->with('Asset_Test')->once()->andReturn(\Mockery::mock(\GraphQL\Type\Definition\Type::class));
+
+        $this->fieldtype(['max_files' => 1])->toGqlType();
     }
 
     public function fieldtype($config = [])

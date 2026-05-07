@@ -18,6 +18,7 @@ use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\GraphQL\Types\AssetInterface;
+use Statamic\GraphQL\Types\AssetType;
 use Statamic\Http\Resources\CP\Assets\AssetsFieldtypeAsset as AssetResource;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
@@ -492,7 +493,12 @@ class Assets extends Fieldtype
 
     public function toGqlType()
     {
-        $type = GraphQL::type(AssetInterface::NAME);
+        $handle = $this->configuredContainerHandle();
+        $container = $handle ? AssetContainer::find($handle) : null;
+
+        $type = $container
+            ? GraphQL::type(AssetType::buildName($container))
+            : GraphQL::type(AssetInterface::NAME);
 
         if ($this->config('max_files') !== 1) {
             $type = GraphQL::listOf($type);
