@@ -96,6 +96,10 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'integer', 'display' => 'Age'],
                 ['type' => 'number', 'display' => 'Age'],
             ],
+            'time_picker' => [
+                ['type' => 'time', 'display' => 'Start Time'],
+                ['type' => 'time_picker', 'display' => 'Start Time'],
+            ],
             'dropdown' => [
                 ['type' => 'select', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
                 ['type' => 'dropdown', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
