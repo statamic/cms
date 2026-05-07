@@ -297,7 +297,7 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                         :searchable="false"
                     />
                 </div>
-                <div v-else class="flex items-center gap-2">
+                <div v-else class="flex items-center gap-1.75">
                     <div class="logic-text-badge logic-text__condition" aria-hidden="true">
                         {{ __('If') }}
                     </div>
