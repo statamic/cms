@@ -134,6 +134,7 @@ const logicJoinOptions = [
 const logicContainsOperator = ref(props.mockPreset.logicContainsOperator || 'contains');
 const logicContainsAnswer = ref(props.mockPreset.logicContainsAnswer || 'referral');
 const logicContainsAnswerPlaceholder = __('Answer');
+const secondaryConditionVisible = ref(props.showSecondaryCondition);
 
 const optionIconClasses = (option) => {
     if (option?.category === 'text') return 'size-4 shrink-0 text-purple-500 dark:text-purple-400';
@@ -297,7 +298,7 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                         :searchable="false"
                     />
                 </div>
-                <div v-else class="flex items-center gap-1.75">
+                <div v-else class="flex items-center">
                     <div class="logic-text-badge logic-text__condition" aria-hidden="true">
                         {{ __('If') }}
                     </div>
@@ -305,8 +306,8 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                         v-if="props.showRuleControls"
                         class="ms-1 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-100 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto"
                     >
-                        <Button size="sm" inset variant="subtle" icon="duplicate" v-tooltip="__('Duplicate')" />
-                        <Button size="sm" inset variant="subtle" icon="trash" v-tooltip="__('Delete')" />
+                        <Button size="sm" inset variant="subtle" class="size-7 [&_svg]:opacity-50 rounded-full ms-[0.025rem]" icon="trash" />
+                        <!-- class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px] opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-85 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto" -->
                     </div>
                 </div>
                 <ol>
@@ -450,17 +451,28 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                 </ol>
             </li>
 
-            <li v-if="props.showSecondaryCondition && !props.calculationMode">
-                <div class="logic-text__condition" aria-hidden="true">
-                    <Combobox
-                        v-model="logicJoin"
-                        class="max-w-24"
+            <li v-if="secondaryConditionVisible && !props.calculationMode">
+                <div class="flex items-center gap-0.75">
+                    <div class="logic-text__condition" aria-hidden="true">
+                        <Combobox
+                            v-model="logicJoin"
+                            class="max-w-24"
+                            size="sm"
+                            :options="logicJoinOptions"
+                            option-label="label"
+                            option-value="value"
+                            :placeholder="__('And')"
+                            :searchable="false"
+                        />
+                    </div>
+                    <Button
                         size="sm"
-                        :options="logicJoinOptions"
-                        option-label="label"
-                        option-value="value"
-                        :placeholder="__('And')"
-                        :searchable="false"
+                        inset
+                        variant="subtle"
+                        class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px] opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-85 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto"
+                        :text="'×'"
+                        :aria-label="__('Remove condition')"
+                        @click="secondaryConditionVisible = false"
                     />
                 </div>
                 <ol>
