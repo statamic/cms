@@ -91,7 +91,7 @@
 [data-fields-collapsed="true"] {
     [data-ui-input-group] {
         [data-ui-description],
-        > :not(:first-child, svg) {
+        > :not(:first-child, :has([data-logic-attached])) {
             display: none;
         }
 
