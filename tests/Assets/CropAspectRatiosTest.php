@@ -2,6 +2,7 @@
 
 namespace Tests\Assets;
 
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\CropAspectRatios;
 use Tests\TestCase;
@@ -47,6 +48,20 @@ class CropAspectRatiosTest extends TestCase
         $this->assertSame([
             ['label' => 'Portrait', 'value' => 9 / 16],
             ['label' => 'A4', 'value' => 210 / 297],
+        ], CropAspectRatios::all());
+    }
+
+    #[Test]
+    public function it_accepts_numeric_and_stringable_labels()
+    {
+        config()->set('statamic.assets.crop_aspect_ratios', [
+            ['label' => 123, 'ratio' => '16:9'],
+            ['label' => Str::of('Stringable'), 'ratio' => '4:3'],
+        ]);
+
+        $this->assertSame([
+            ['label' => '123', 'value' => 16 / 9],
+            ['label' => 'Stringable', 'value' => 4 / 3],
         ], CropAspectRatios::all());
     }
 

@@ -63,7 +63,9 @@ class CropAspectRatios
         $label = $entry['label'] ?? (is_string($key) ? $key : null);
         $ratio = $entry['ratio'] ?? null;
 
-        if (! is_string($label) || (! is_string($ratio) && ! is_numeric($ratio))) {
+        $labelIsStringable = is_string($label) || is_numeric($label) || $label instanceof \Stringable;
+
+        if (! $labelIsStringable || (! is_string($ratio) && ! is_numeric($ratio))) {
             self::warn($entry, $key);
 
             return null;
@@ -78,7 +80,7 @@ class CropAspectRatios
         }
 
         return [
-            'label' => $label,
+            'label' => (string) $label,
             'value' => $value,
         ];
     }
