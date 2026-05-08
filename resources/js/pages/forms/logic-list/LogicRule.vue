@@ -306,8 +306,9 @@ reveal.use(rootEl, () => emit('expanded'));
                                 <Badge
                                     v-else-if="isThenGoToPart(part)"
                                     size="sm"
+                                    pill
                                     color="white"
-                                    class="inline-block font-medium text-gray-800 dark:text-gray-200"
+                                    class="inline-block px-1.5 font-medium text-gray-800 dark:text-gray-200"
                                     style="text-box: trim-start text;"
                                 >
                                     {{ __('then go to') }}

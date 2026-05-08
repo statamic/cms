@@ -456,7 +456,7 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
             </li>
 
             <li v-if="secondaryConditionVisible && !props.calculationMode">
-                <div class="flex items-center gap-0.5">
+                <div class="flex items-center gap-0.25">
                     <div class="logic-text__condition" aria-hidden="true">
                         <Combobox
                             v-model="logicJoin"
