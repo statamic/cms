@@ -1,5 +1,5 @@
 <script setup>
-import { provide, ref, onMounted, onUnmounted, useTemplateRef } from 'vue';
+import { provide, ref, watch, onMounted, onUnmounted, useTemplateRef } from 'vue';
 import useResizable from '@/composables/use-resizable.js';
 
 const minWidth = 175;
@@ -57,6 +57,20 @@ function applyBreakpointDefaults() {
         }
     });
 }
+
+watch(
+    [left.active, right.active],
+    () => {
+        const el = document.getElementById('main-content');
+        if (!el) return;
+
+        if (left.active.value || right.active.value) {
+            el.setAttribute('data-panels-showing', '');
+        } else {
+            el.removeAttribute('data-panels-showing');
+        }
+    },
+);
 
 onMounted(() => {
     applyBreakpointDefaults();
