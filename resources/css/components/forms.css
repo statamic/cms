@@ -280,7 +280,7 @@
             content: '';
             position: absolute;
             z-index: var(--z-index-below);
-            inset-inline-start: 1.5rem;
+            inset-inline-start: 1.15rem;
             border-inline-start: var(--logic-line);
             height: 100%;
         }
@@ -309,10 +309,9 @@
 }
 .logic-text__condition {
     position: relative;
-    @apply mb-2.5;
-    &:only-child {
-        /* e.g. calcalations, variable > to > option */
-        @apply mb-0.25 ms-1.5;
+    /* e.g. not a "to" badge inside a calculation condition */
+    &:not(ol ol *) {
+        @apply mb-2.5;
     }
     &:not(:last-child)::after {
         content: '';
