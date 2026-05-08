@@ -449,7 +449,7 @@ function close() {
             </div>
 
             <!-- Footer -->
-            <div class="flex flex-wrap items-center justify-between gap-3 border-t dark:border-gray-700 px-4 py-3">
+            <div class="flex flex-wrap items-center gap-3 border-t dark:border-gray-700 px-4 py-3">
                 <div v-if="aspectRatios.length" class="flex gap-3">
                     <Select
                         clearable
@@ -474,7 +474,7 @@ function close() {
                         @click="toggleOrientation"
                     />
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3 ms-auto">
                     <Button variant="ghost" :text="__('Cancel')" :aria-label="__('Cancel cropping')" @click="close" />
                     <Button variant="ghost" :text="__('Reset')" :aria-label="__('Reset crop selection')" @click="reset" />
                     <Button variant="primary" :text="__('Finish')" :aria-label="__('Finish cropping')" :disabled="!cropper" @click="crop" />
