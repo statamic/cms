@@ -8,7 +8,7 @@ class Email extends FormFieldtype
 {
     protected static $fieldtype = 'text';
     protected $icon = 'mail-sign-at';
-    protected $categories = ['Contact Info'];
+    protected $categories = ['contact'];
 
     public function configFieldItems(): array
     {

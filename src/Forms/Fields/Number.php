@@ -8,7 +8,7 @@ class Number extends FormFieldtype
 {
     protected static $fieldtype = 'integer';
     protected $icon = 'number';
-    protected $categories = ['Number'];
+    protected $categories = ['number'];
 
     public function configFieldItems(): array
     {

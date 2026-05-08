@@ -8,6 +8,7 @@ import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, In
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
+import { mapValues } from 'lodash-es';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -16,6 +17,98 @@ const props = defineProps({
     fieldtypes: Array,
 });
 
+const categories = {
+    structure: {
+        title: __('Structure'),
+        color: 'bg-purple-500',
+    },
+    information: {
+        title: __('Information'),
+        color: 'bg-pink-500',
+    },
+    text: {
+        title: __('Text'),
+        color: 'bg-purple-500',
+    },
+    choice: {
+        title: __('Choice'),
+        color: 'bg-orange-500',
+    },
+    rate: {
+        title: __('Rate'),
+        color: 'bg-amber-500',
+    },
+    contact: {
+        title: __('Contact Info'),
+        color: 'bg-blue-500',
+    },
+    number: {
+        title: __('Number'),
+        color: 'bg-teal-500',
+    },
+    datetime: {
+        title: __('Date and Time'),
+        color: 'bg-fuchsia-500',
+    },
+    media: {
+        title: __('Media'),
+        color: 'bg-cyan-500',
+    },
+    payment: {
+        title: __('Payment'),
+        color: 'bg-green-500',
+    },
+};
+
+const allFieldtypes = computed(() => {
+    let options = props.fieldtypes;
+
+    options.push({
+        handle: 'section',
+        title: __('Section'),
+        categories: ['structure'],
+        keywords: [],
+        icon: 'add-section',
+        config: [],
+    });
+
+    // TODO: Only show this when Forms Pro is installed
+    options.push({
+        handle: 'page_break',
+        title: __('Page Break'),
+        categories: ['structure'],
+        keywords: [],
+        icon: 'page',
+        config: [],
+    });
+
+    return options;
+});
+
+const groupedFieldtypes = computed(() => {
+    return mapValues(categories, (category, handle) => {
+        category.handle = handle;
+        category.fieldtypes = [];
+
+        allFieldtypes.value.forEach((fieldtype) => {
+            let categories = fieldtype.categories;
+            if (categories.length === 0) categories = ['other'];
+            if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
+        });
+
+        return category;
+    });
+});
+
+// todo: searchFieldtypes
+
+const displayedFieldtypes = computed(() => {
+    return groupedFieldtypes.value;
+});
+
+
+
+// TODO: Refactor everything below this line
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const formPageTotal = 2;
 const activeFieldSettingsTab = ref('settings');
@@ -225,183 +318,36 @@ const selectedPageInternalName = computed({
     />
 
     <LayoutPanel side="left">
-        <div style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5">
-
-
+        <div
+            style="--graph-paper-y-offset: 4.5rem;"
+            class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5"
+        >
             <div class="left-panel-popover min-[1000px]:hidden">
                 <div id="popover-left-panel" class="left-panel-popover__menu" popover>
                     <button class="left-panel-popover__close-button" title="Close" popovertarget="popover-left-panel">
                         <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
                     </button>
                     <ul style="--graph-paper-y-offset: 4.5rem;" class="bg-graph-paper px-0.5 grid gap-8 @container py-10 pb-40">
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Information
+                        <li
+                            v-for="group in displayedFieldtypes"
+                            :key="group.handle"
+                            v-show="group.fieldtypes.length > 0"
+                        >
+                            <h2 v-if="group.title" class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                                <span
+                                    class="h-2 shrink-0 rounded-full"
+                                    :class="{
+                                        [group.color]: true,
+                                        'w-2 opacity-100': fieldView === 'collapsed',
+                                        'w-0 opacity-0': fieldView === 'expanded',
+                                    }"
+                                    aria-hidden="true"
+                                />
+                                {{ group.title }}
                             </h2>
                             <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Paragraph')" :title="__('Paragraph')" icon="text-short" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Banner')" :title="__('Banner')" icon="banner" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Legal')" :title="__('Legal')" icon="legal" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Text
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Long Answer')" :title="__('Long Answer')" icon="text-long" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-orange-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Choice
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Yes/No')" :title="__('Yes/No')" icon="like" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Multi Choice')" :title="__('Multi Choice')" icon="fieldtype-radio" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Checkboxes')" :title="__('Checkboxes')" icon="fieldtype-checkboxes" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Toggle')" :title="__('Toggle')" icon="fieldtype-toggle" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-amber-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Rate
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Ranking')" :title="__('Ranking')" icon="rank" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Opinion Scale')" :title="__('Opinion Scale')" icon="scale-up" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-blue-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Contact Info
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Email')" :title="__('Email')" icon="mail-sign-at" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Website')" :title="__('Website')" icon="website" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Phone')" :title="__('Phone')" icon="mail-sign-hashtag" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Address')" :title="__('Address')" icon="location-pin" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Signature')" :title="__('Signature')" icon="edit-pen-draw-scribble" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-teal-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Number
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Number')" :title="__('Number')" icon="number" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Currency')" :title="__('Currency')" icon="currency" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-fuchsia-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Date and Time
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Time Picker')" :title="__('Time Picker')" icon="time-clock" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Range')" :title="__('Range')" icon="calendar-range" />
-                                </li>
-                                <li>
-                                    <Button :text="__('SavvyCal')" :title="__('SavvyCal')" icon="calendar" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-cyan-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Media
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Video')" :title="__('Video')" icon="fieldtype-video" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Audio')" :title="__('Audio')" icon="media-music-sound-equalizer" />
-                                </li>
-                                <li>
-                                    <Button :text="__('Upload')" :title="__('Upload')" icon="upload-arrow-up" />
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                                <span class="h-2 shrink-0 rounded-full bg-green-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                                Payment
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li>
-                                    <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
-                                </li>
-                                <li>
-                                    <Button :text="__('PayPal')" :title="__('PayPal')" icon="credit-card" />
+                                <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                                    <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
                                 </li>
                             </ul>
                         </li>
@@ -410,193 +356,26 @@ const selectedPageInternalName = computed({
             </div>
             <!-- This is the desktop nav - the content is repeated from the left panel -->
             <ul class="px-0.5 grid gap-8 @container py-10 max-[1000px]:hidden">
-<!--                    <ul>-->
-<!--                        <li v-for="fieldtype in fieldtypes" :key="fieldtype.handle">-->
-<!--                            {{ fieldtype.title }}-->
-<!--                        </li>-->
-<!--                    </ul>-->
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Structure
+                <li
+                    v-for="group in displayedFieldtypes"
+                    :key="group.handle"
+                    v-show="group.fieldtypes.length > 0"
+                >
+                    <h2 v-if="group.title" class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                        <span
+                            class="h-2 shrink-0 rounded-full"
+                            :class="{
+                                [group.color]: true,
+                                'w-2 opacity-100': fieldView === 'collapsed',
+                                'w-0 opacity-0': fieldView === 'expanded',
+                            }"
+                            aria-hidden="true"
+                        />
+                        {{ group.title }}
                     </h2>
                     <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Section')" :title="__('Section')" icon="add-section" />
-                        </li>
-                        <li>
-                            <Button :text="__('Page Break')" :title="__('Page Break')" icon="page" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-pink-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Information
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Heading')" :title="__('Heading')" icon="heading" />
-                        </li>
-                        <li>
-                            <Button :text="__('Paragraph')" :title="__('Paragraph')" icon="text-short" />
-                        </li>
-                        <li>
-                            <Button :text="__('Banner')" :title="__('Banner')" icon="banner" />
-                        </li>
-                        <li>
-                            <Button :text="__('Legal')" :title="__('Legal')" icon="legal" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-purple-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Text
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Short Answer')" :title="__('Short Answer')" icon="text-short" />
-                        </li>
-                        <li>
-                            <Button :text="__('Long Answer')" :title="__('Long Answer')" icon="text-long" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-orange-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Choice
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Dropdown')" :title="__('Dropdown')" icon="fieldtype-select" />
-                        </li>
-                        <li>
-                            <Button :text="__('Yes/No')" :title="__('Yes/No')" icon="like" />
-                        </li>
-                        <li>
-                            <Button :text="__('Multi Choice')" :title="__('Multi Choice')" icon="fieldtype-radio" />
-                        </li>
-                        <li>
-                            <Button :text="__('Checkboxes')" :title="__('Checkboxes')" icon="fieldtype-checkboxes" />
-                        </li>
-                        <li>
-                            <Button :text="__('Toggle')" :title="__('Toggle')" icon="fieldtype-toggle" />
-                        </li>
-                        <li>
-                            <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-amber-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Rate
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Star Rating')" :title="__('Star Rating')" icon="star" />
-                        </li>
-                        <li>
-                            <Button :text="__('Ranking')" :title="__('Ranking')" icon="rank" />
-                        </li>
-                        <li>
-                            <Button :text="__('Opinion Scale')" :title="__('Opinion Scale')" icon="scale-up" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-blue-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Contact Info
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Name')" :title="__('Name')" icon="user-avatar-flush" />
-                        </li>
-                        <li>
-                            <Button :text="__('Email')" :title="__('Email')" icon="mail-sign-at" />
-                        </li>
-                        <li>
-                            <Button :text="__('Website')" :title="__('Website')" icon="website" />
-                        </li>
-                        <li>
-                            <Button :text="__('Phone')" :title="__('Phone')" icon="mail-sign-hashtag" />
-                        </li>
-                        <li>
-                            <Button :text="__('Address')" :title="__('Address')" icon="location-pin" />
-                        </li>
-                        <li>
-                            <Button :text="__('Signature')" :title="__('Signature')" icon="edit-pen-draw-scribble" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-teal-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Number
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Number')" :title="__('Number')" icon="number" />
-                        </li>
-                        <li>
-                            <Button :text="__('Currency')" :title="__('Currency')" icon="currency" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-fuchsia-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Date and Time
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Date Picker')" :title="__('Date Picker')" icon="calendar" />
-                        </li>
-                        <li>
-                            <Button :text="__('Time Picker')" :title="__('Time Picker')" icon="time-clock" />
-                        </li>
-                        <li>
-                            <Button :text="__('Range')" :title="__('Range')" icon="calendar-range" />
-                        </li>
-                        <li>
-                            <Button :text="__('SavvyCal')" :title="__('SavvyCal')" icon="calendar" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-cyan-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Media
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Image Choice')" :title="__('Image Choice')" icon="image-select" />
-                        </li>
-                        <li>
-                            <Button :text="__('Video')" :title="__('Video')" icon="fieldtype-video" />
-                        </li>
-                        <li>
-                            <Button :text="__('Audio')" :title="__('Audio')" icon="media-music-sound-equalizer" />
-                        </li>
-                        <li>
-                            <Button :text="__('Upload')" :title="__('Upload')" icon="upload-arrow-up" />
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h2 class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
-                        <span class="h-2 shrink-0 rounded-full bg-green-500" :class="fieldView === 'collapsed' ? 'w-2 opacity-100' : 'w-0 opacity-0'" aria-hidden="true"></span>
-                        Payment
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li>
-                            <Button :text="__('Stripe')" :title="__('Stripe')" icon="credit-card" />
-                        </li>
-                        <li>
-                            <Button :text="__('PayPal')" :title="__('PayPal')" icon="credit-card" />
+                        <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                            <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
                         </li>
                     </ul>
                 </li>
@@ -604,9 +383,7 @@ const selectedPageInternalName = computed({
         </div>
     </LayoutPanel>
 
-
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
-
         <Header class="mx-auto max-w-5xl">
             <template #title>
                 <StatusIndicator status="published" />

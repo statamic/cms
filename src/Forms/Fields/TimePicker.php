@@ -8,7 +8,7 @@ class TimePicker extends FormFieldtype
 {
     protected static $fieldtype = 'time';
     protected $icon = 'time-clock';
-    protected $categories = ['Date and Time'];
+    protected $categories = ['datetime'];
 
     public function toFieldArray(): array
     {

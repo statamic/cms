@@ -8,7 +8,7 @@ class ShortAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'text';
     protected $icon = 'text-short';
-    protected $categories = ['Text'];
+    protected $categories = ['text'];
 
     public function configFieldItems(): array
     {

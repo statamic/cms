@@ -8,7 +8,7 @@ class LongAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'textarea';
     protected $icon = 'text-long';
-    protected $categories = ['Text'];
+    protected $categories = ['text'];
 
     public function configFieldItems(): array
     {

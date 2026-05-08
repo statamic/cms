@@ -8,7 +8,7 @@ class Checkboxes extends FormFieldtype
 {
     protected static $fieldtype = 'checkboxes';
     protected $icon = 'fieldtype-checkboxes';
-    protected $categories = ['Choice'];
+    protected $categories = ['choice'];
 
     public function configFieldItems(): array
     {

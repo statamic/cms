@@ -8,7 +8,7 @@ class MultiChoice extends FormFieldtype
 {
     protected static $fieldtype = 'select';
     protected $icon = 'fieldtype-radio';
-    protected $categories = ['Choice'];
+    protected $categories = ['choice'];
 
     public function configFieldItems(): array
     {

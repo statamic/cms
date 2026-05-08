@@ -8,7 +8,7 @@ class Name extends FormFieldtype
 {
     protected static $fieldtype = 'text';
     protected $icon = 'user-avatar-flush';
-    protected $categories = ['Contact Info'];
+    protected $categories = ['contact'];
 
     public function configFieldItems(): array
     {

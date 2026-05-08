@@ -34,7 +34,7 @@ class Fallback extends FormFieldtype
         return [
             'handle' => $this->wrappedFieldtype->handle(),
             'title' => $this->wrappedFieldtype->title(),
-            'categories' => $this->wrappedFieldtype->categories(),
+            'categories' => [],
             'keywords' => $this->wrappedFieldtype->keywords(),
             'icon' => $this->wrappedFieldtype->icon(),
             'config' => $this->wrappedFieldtype->configFields()->toPublishArray(),
