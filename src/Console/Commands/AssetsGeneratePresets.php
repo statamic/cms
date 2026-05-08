@@ -79,7 +79,6 @@ class AssetsGeneratePresets extends Command
      * Generate presets for a container.
      *
      * @param  \Statamic\Contracts\Assets\AssetContainer  $container
-     * @param  string|null  $filterPreset
      * @return void
      */
     protected function generatePresets($container, ?string $filterPreset = null)
