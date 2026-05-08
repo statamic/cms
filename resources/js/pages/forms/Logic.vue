@@ -225,6 +225,56 @@ provide(publishContextKey, {
                 />
             </Card>
         </Panel>
+
+        <Panel class="mt-6">
+            <PanelHeader>
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
+                        <Heading :text="__('Field Logic')" />
+                    </div>
+                    <ToggleGroup :model-value="allRulesView" size="xs">
+                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules" />
+                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules" />
+                    </ToggleGroup>
+                </div>
+            </PanelHeader>
+            <Card>
+                <div class="relative space-y-6 mb-0" data-logic-list>
+                    <LogicRule
+                        v-for="(block, index) in logicBlocks"
+                        :id="`${block._id}-field`"
+                        :key="`${block._id}-field`"
+                        :index
+                        :field-path="fieldPath"
+                        :meta-path="metaPath"
+                        :values="block"
+                        :config="setConfigByHandle[block.type]"
+                        :sortable-item-class="sortableItemClass"
+                        :collapsed="collapsed.includes(block._id)"
+                        :enabled="block.enabled"
+                        :read-only="false"
+                        :can-add-rule="true"
+                        :has-error="false"
+                        :show-field-previews="true"
+                        @collapsed="collapseSet(block._id)"
+                        @expanded="expandSet(block._id)"
+                        @removed="removeSet(block._id)"
+                    />
+                </div>
+                <LogicAddRuleButton
+                    :groups="remainingGroupConfigs"
+                    :sets="remainingSetConfigs"
+                    :show-connector="logicBlocks.length > 0"
+                    :index="logicBlocks.length"
+                    :label="__('Add Rule')"
+                    :is-first="logicBlocks.length === 0"
+                    :loading-set="loadingSet"
+                    :search-placeholder="__('Search Fields')"
+                    @added="addSet"
+                />
+            </Card>
+        </Panel>
     </div>
 </template>
 
