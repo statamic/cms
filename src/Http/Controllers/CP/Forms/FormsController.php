@@ -80,7 +80,7 @@ class FormsController extends CpController
             ->map(fn ($fieldtype) => (new Fallback)->wrapping($fieldtype))
             ->values();
 
-        return Inertia::render('forms/Fields', [
+        return Inertia::render('forms/Builder', [
             'form' => $form,
             'fieldtypes' => $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values(),
         ]);
