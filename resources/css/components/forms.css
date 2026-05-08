@@ -312,19 +312,19 @@
     /* e.g. not a "to" badge inside a calculation condition */
     &:not(ol ol *) {
         @apply mb-2.5;
-    }
-    &:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        left: var(--outer-indent-connector);
-        border: var(--logic-line);
-        border-inline-end: 0;
-        border-block-start: 0;
-        border-end-start-radius: 100vw;
-        top: 100%;
-        width: calc(var(--spacing) * 4);
-        /* Don't overlap/clash with subsequent connectors */
-        height: 85%;
+        &::after {
+            content: '';
+            position: absolute;
+            left: var(--outer-indent-connector);
+            border: var(--logic-line);
+            border-inline-end: 0;
+            border-block-start: 0;
+            border-end-start-radius: 100vw;
+            top: 100%;
+            width: calc(var(--spacing) * 4);
+            /* Don't overlap/clash with subsequent connectors */
+            height: 85%;
+        }
     }
 }
 
