@@ -1,5 +1,5 @@
 <script setup>
-import { provide, ref, watch, onMounted, onUnmounted, useTemplateRef } from 'vue';
+import { computed, provide, ref, watch, onMounted, onUnmounted, useTemplateRef } from 'vue';
 import useResizable from '@/composables/use-resizable.js';
 
 const minWidth = 175;
@@ -44,6 +44,11 @@ const { makeResizable } = useResizable();
     panel.priorDefaults = new Set(panel.defaults.map((d) => `${d}px`));
 });
 
+const leftHasContent = computed(() => (left.ref.value?.childElementCount || 0) > 0);
+const rightHasContent = computed(() => (right.ref.value?.childElementCount || 0) > 0);
+const leftVisible = computed(() => left.active.value && leftHasContent.value);
+const rightVisible = computed(() => right.active.value && rightHasContent.value);
+
 function applyBreakpointDefaults() {
     [left, right].forEach((panel) => {
         if (!panel.active.value) return;
@@ -59,12 +64,12 @@ function applyBreakpointDefaults() {
 }
 
 watch(
-    [left.active, right.active],
+    [leftVisible, rightVisible],
     () => {
         const el = document.getElementById('main-content');
         if (!el) return;
 
-        if (left.active.value || right.active.value) {
+        if (leftVisible.value || rightVisible.value) {
             el.setAttribute('data-panels-showing', '');
         } else {
             el.removeAttribute('data-panels-showing');
@@ -85,8 +90,8 @@ onUnmounted(() => {
 <template>
     <Teleport defer to="#main-content">
         <div
-            v-show="left.active"
-            :data-left-panel="left.active ? '' : undefined"
+            v-show="leftVisible"
+            :data-left-panel="leftVisible ? '' : undefined"
             ref="leftPanel"
             id="left-panel"
             tabindex="-1"
@@ -97,8 +102,8 @@ onUnmounted(() => {
 
     <Teleport defer to="#main-content">
         <div
-            v-show="right.active"
-            :data-right-panel="right.active ? '' : undefined"
+            v-show="rightVisible"
+            :data-right-panel="rightVisible ? '' : undefined"
             ref="rightPanel"
             id="right-panel"
             tabindex="-1"
