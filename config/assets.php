@@ -184,7 +184,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Image Cropping
+    | Crop Aspect Ratios
     |--------------------------------------------------------------------------
     |
     | Configure the aspect ratio presets available in the Control Panel image
@@ -193,14 +193,12 @@ return [
     |
     */
 
-    'image_cropping' => [
-        'aspect_ratios' => [
-            '16:9',
-            '4:3',
-            '3:2',
-            '2:1',
-            '1:1',
-        ],
+    'crop_aspect_ratios' => [
+        '16:9',
+        '4:3',
+        '3:2',
+        '2:1',
+        '1:1',
     ],
 
     /*

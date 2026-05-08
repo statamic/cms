@@ -16,7 +16,7 @@ class JavascriptComposerTest extends TestCase
     #[Test]
     public function it_provides_crop_aspect_ratios_to_script_config()
     {
-        config()->set('statamic.assets.image_cropping.aspect_ratios', [
+        config()->set('statamic.assets.crop_aspect_ratios', [
             'Portrait' => '9:16',
             ['label' => 'US Letter', 'ratio' => '8.5:11'],
         ]);

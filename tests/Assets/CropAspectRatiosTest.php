@@ -11,7 +11,7 @@ class CropAspectRatiosTest extends TestCase
     #[Test]
     public function it_returns_default_ratios_from_config()
     {
-        config()->set('statamic.assets.image_cropping.aspect_ratios', [
+        config()->set('statamic.assets.crop_aspect_ratios', [
             '16:9',
             '4:3',
         ]);
@@ -25,7 +25,7 @@ class CropAspectRatiosTest extends TestCase
     #[Test]
     public function it_supports_custom_labels_and_fractional_ratio_strings()
     {
-        config()->set('statamic.assets.image_cropping.aspect_ratios', [
+        config()->set('statamic.assets.crop_aspect_ratios', [
             ['label' => 'US Letter', 'ratio' => '8.5:11'],
             ['label' => 'Golden', 'ratio' => 1.618],
         ]);
@@ -39,7 +39,7 @@ class CropAspectRatiosTest extends TestCase
     #[Test]
     public function it_supports_keyed_ratio_entries()
     {
-        config()->set('statamic.assets.image_cropping.aspect_ratios', [
+        config()->set('statamic.assets.crop_aspect_ratios', [
             'Portrait' => '9:16',
             'A4' => '210:297',
         ]);
@@ -53,7 +53,7 @@ class CropAspectRatiosTest extends TestCase
     #[Test]
     public function it_skips_invalid_entries()
     {
-        config()->set('statamic.assets.image_cropping.aspect_ratios', [
+        config()->set('statamic.assets.crop_aspect_ratios', [
             '16:9',
             'bad-value',
             ['label' => 'Zero height', 'ratio' => '4:0'],
@@ -71,7 +71,7 @@ class CropAspectRatiosTest extends TestCase
     #[Test]
     public function it_returns_an_empty_array_when_config_is_empty()
     {
-        config()->set('statamic.assets.image_cropping.aspect_ratios', []);
+        config()->set('statamic.assets.crop_aspect_ratios', []);
 
         $this->assertSame([], CropAspectRatios::all());
     }

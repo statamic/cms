@@ -11,7 +11,7 @@ class CropAspectRatios
      */
     public static function all(): array
     {
-        $ratios = config('statamic.assets.image_cropping.aspect_ratios', []);
+        $ratios = config('statamic.assets.crop_aspect_ratios', []);
 
         if (! is_array($ratios)) {
             return [];
