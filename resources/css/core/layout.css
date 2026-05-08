@@ -147,7 +147,7 @@ main.nav-closed {
 /* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
 =================================================== */
 /* Three panels exist */
-.main-content:has([data-left-panel], [data-right-panel]) {
+[data-panels-showing] {
     display: flex;
 
     #content-card {
