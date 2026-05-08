@@ -256,7 +256,14 @@ reveal.use(rootEl, () => emit('expanded'));
                 }"
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
-                    <Badge v-if="collapsed" pill size="sm" color="white" class="gap-1.5">
+                    <Badge
+                        v-if="collapsed"
+                        pill
+                        size="sm"
+                        color="white"
+                        class="gap-1.5"
+                        :class="collapsedPrefixIcon ? 'px-1.5 py-0 text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200' : ''"
+                    >
                         <Icon v-if="collapsedPrefixIcon" :name="collapsedPrefixIcon" class="size-3.5!" aria-hidden="true" />
                         <span>{{ collapsedPrefixLabel }}</span>
                     </Badge>
@@ -289,10 +296,11 @@ reveal.use(rootEl, () => emit('expanded'));
                                     size="sm"
                                     pill
                                     color="white"
-                                    class="inline-block px-1.5 py-0 text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
+                                    class="inline-block px-1.5 py-0 text-[12px] font-medium"
+                                    :class="collapsedPrefixIcon ? '' : 'bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200'"
                                     style="text-box: trim-start text;"
                                 >
-                                    {{ part.text }}
+                                    {{ collapsedPrefixIcon ? __('when') : part.text }}
                                 </Badge>
                                 <template v-else-if="part.type === 'destination'">&nbsp;{{ part.text }}</template>
                                 <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.725rem]">
