@@ -1,6 +1,6 @@
 <script setup>
 import { Button, Combobox, Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Icon, Input } from '@ui';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     initialConditionLabel: {
@@ -47,6 +47,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    usePageDestinationOptions: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const logicOperator = ref(props.mockPreset.logicOperator || (props.calculationMode ? 'add' : 'equals'));
@@ -88,7 +92,7 @@ const logicValueOptions = [
     { label: __('Kids'), value: 'kids' },
 ];
 
-const logicDestination = ref(props.mockPreset.logicDestination || 'fan_length');
+const logicDestination = ref(props.mockPreset.logicDestination || 'page_2');
 const logicBranchingAction = ref(props.mockPreset.logicBranchingAction || 'go_to');
 const logicBranchingActionOptions = [
     { label: __('Go to'), value: 'go_to' },
@@ -97,11 +101,15 @@ const logicBranchingActionOptions = [
     { label: ['−', __('Subtract')].join('\u2007'), value: 'subtract' },
     { label: ['×', __('Multiply')].join('\u2007'), value: 'multiply' },
 ];
-const logicDestinationOptions = [
+const fieldDestinationOptions = [
     { label: __('How long have you been…'), value: 'fan_length', icon: 'text-short', category: 'text' },
     { label: __('And second favorite album?'), value: 'second_favorite', icon: 'fieldtype-radio', category: 'choice' },
     { label: __('Sign up for email notifications'), value: 'email_notifications', icon: 'fieldtype-checkboxes', category: 'choice' },
     { label: __('I want a free drink voucher'), value: 'free_drink_voucher', icon: 'fieldtype-toggle', category: 'choice' },
+];
+const pageDestinationOptions = [
+    { label: __('Page 1 of 2'), value: 'page_1', icon: 'page', category: 'page' },
+    { label: __('Goodbye'), value: 'page_2', icon: 'page', category: 'page' },
 ];
 const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
 const logicPrimaryConditionField = ref(props.mockPreset.logicPrimaryConditionField || 'heard_about_us');
@@ -141,16 +149,19 @@ const logicContainsAnswerPlaceholder = __('Answer');
 const secondaryConditionVisible = ref(props.showSecondaryCondition);
 
 const optionIconClasses = (option) => {
+    if (option?.category === 'page') return 'size-4 shrink-0 text-gray-500 dark:text-gray-300';
     if (option?.category === 'text') return 'size-4 shrink-0 text-purple-500 dark:text-purple-400';
     return 'size-4 shrink-0 text-orange-500 dark:text-orange-400';
 };
 
 const optionChipClasses = (option) => {
+    if (option?.category === 'page') return 'flex shrink-0 items-center justify-center size-6 text-gray-500 dark:text-gray-300';
     if (option?.category === 'text') return 'flex shrink-0 items-center justify-center size-6 text-purple-600 dark:text-purple-400';
     return 'flex shrink-0 items-center justify-center size-6 text-orange-600 dark:text-orange-400';
 };
 
 const optionChipIconClasses = (option) => {
+    if (option?.category === 'page') return 'size-4 shrink-0 text-gray-500 dark:text-gray-300';
     if (option?.category === 'text') return 'size-4 shrink-0 text-purple-600 dark:text-purple-400';
     return 'size-4 shrink-0 text-orange-600 dark:text-orange-400';
 };
@@ -176,6 +187,30 @@ const branchingActionLabel = computed(() => {
 });
 const isBranchingCalculationAction = computed(() => logicBranchingAction.value !== 'go_to');
 const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalculationSource.value === 'number');
+const logicDestinationOptions = computed(() => (
+    props.usePageDestinationOptions ? pageDestinationOptions : fieldDestinationOptions
+));
+
+watch(
+    () => props.mockPreset.logicDestination,
+    (nextDestination) => {
+        if (!nextDestination) return;
+        logicDestination.value = nextDestination;
+    },
+    { immediate: true },
+);
+
+watch(
+    logicDestinationOptions,
+    (options) => {
+        if (!options.length) return;
+        const hasCurrent = options.some((option) => option.value === logicDestination.value);
+        if (!hasCurrent) {
+            logicDestination.value = options[0].value;
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>

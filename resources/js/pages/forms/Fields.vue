@@ -183,7 +183,7 @@ const goodbyeSecondRuleMockPreset = {
     logicContainsOperator: 'contains',
     logicContainsAnswer: 'friend',
     logicBranchingAction: 'go_to',
-    logicDestination: 'second_favorite',
+    logicDestination: 'page_1',
 };
 const selectedPageDestinationStepLabel = computed(() => (
     inspectorTarget.value === 'page_2'
@@ -1254,7 +1254,7 @@ const selectedPageInternalName = computed({
                                 <div v-if="inspectorTarget === 'page_2'" class="my-8 test border-t border-dashed border-gray-400 dark:border-gray-700"></div>
                                 <LogicFlowMock
                                     v-if="inspectorTarget === 'page_2'"
-                                    :key="`mobile-page-logic-secondary-${inspectorTarget}`"
+                                    :key="`mobile-page-logic-secondary-${inspectorTarget}-page-destination`"
                                     :destination-step-label="__('Then go to Page 1')"
                                     :show-destination-selector="true"
                                     :show-rule-controls="true"
@@ -1449,7 +1449,7 @@ const selectedPageInternalName = computed({
                         <div v-if="inspectorTarget === 'page_2'" class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
                         <LogicFlowMock
                             v-if="inspectorTarget === 'page_2'"
-                            :key="`desktop-page-logic-secondary-${inspectorTarget}`"
+                            :key="`desktop-page-logic-secondary-${inspectorTarget}-page-destination`"
                             :destination-step-label="__('Then go to Page 1')"
                             :show-destination-selector="true"
                             :show-rule-controls="true"
