@@ -218,7 +218,7 @@ const mockPresetByHandle = {
     heard_about_us: {
         logicOperator: 'equals',
         logicValue: 'referral',
-        logicDestination: 'fan_length',
+        logicDestination: 'page_2',
         logicJoin: 'and',
         logicContainsOperator: 'contains',
         logicContainsAnswer: 'referral',
@@ -226,7 +226,7 @@ const mockPresetByHandle = {
     fan_length: {
         logicOperator: 'contains',
         logicValue: 'referral',
-        logicDestination: 'email_notifications',
+        logicDestination: 'page_1',
         logicJoin: 'and',
         logicContainsOperator: 'contains',
         logicContainsAnswer: 'years',
@@ -234,7 +234,7 @@ const mockPresetByHandle = {
     favorite_album: {
         logicOperator: 'equals',
         logicValue: 'days_of_thunder',
-        logicDestination: 'second_favorite',
+        logicDestination: 'page_2',
         logicConditionField: 'heard_about_us',
         logicJoin: 'and',
         logicContainsOperator: 'contains',
@@ -243,7 +243,7 @@ const mockPresetByHandle = {
     second_favorite_album: {
         logicOperator: 'equals',
         logicValue: 'endless_summer',
-        logicDestination: 'email_notifications',
+        logicDestination: 'page_1',
         logicJoin: 'and',
         logicContainsOperator: 'contains',
         logicContainsAnswer: 'summer',
@@ -251,7 +251,7 @@ const mockPresetByHandle = {
     age: {
         logicOperator: 'equals',
         logicValue: '21',
-        logicDestination: 'free_drink_voucher',
+        logicDestination: 'page_2',
         logicConditionField: 'age',
         logicJoin: 'and',
         logicContainsOperator: 'contains',
@@ -404,6 +404,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             :initial-condition-icon="config.icon || 'fieldtype-radio'"
                             :initial-condition-icon-class="config.iconClass || 'text-orange-600 dark:text-orange-400'"
                             :show-secondary-condition="showSecondaryCondition"
+                            :use-page-destination-options="!collapsedPrefixIcon"
                             :mock-preset="mockPreset"
                         />
                         <Button
