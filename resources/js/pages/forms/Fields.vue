@@ -642,11 +642,13 @@ const selectedPageInternalName = computed({
             @keydown.enter.prevent="inspectorTarget = 'page_1'"
             @keydown.space.prevent="inspectorTarget = 'page_1'"
         >
-            <div class="flex items-center gap-4 cursor-pointer [&:has(svg[data-logic-attached])]:-translate-x-4 [&:has(svg[data-logic-attached])]:-me-4">
-                <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
-                <span v-tooltip="__('Logic attached')">
-                    <Icon data-logic-attached name="logic-tree" class="size-3.5! shrink-0 text-gray-400 dark:text-gray-600" aria-hidden="true" />
-                </span>
+            <div class="flex items-center gap-4 cursor-pointer">
+                <div class="flex items-center gap-2 flex-1">
+                    <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
+                    <span v-tooltip="__('Logic attached')">
+                        <Icon data-logic-attached name="logic-tree" class="size-3.5! shrink-0 text-gray-400 dark:text-gray-600" aria-hidden="true" />
+                    </span>
+                </div>
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200 scroll-mt-[7rem]"
                     :data-editing-item="inspectorTarget === 'page_1' ? '' : undefined"
