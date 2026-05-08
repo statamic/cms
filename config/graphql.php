@@ -98,6 +98,7 @@ return [
 
     'cache' => [
         'expiry' => 60,
+        'exclude' => [],
     ],
 
     /*

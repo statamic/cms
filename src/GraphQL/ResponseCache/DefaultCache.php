@@ -2,6 +2,8 @@
 
 namespace Statamic\GraphQL\ResponseCache;
 
+use GraphQL\Language\AST\FieldNode;
+use GraphQL\Language\Parser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,6 +15,10 @@ class DefaultCache implements ResponseCache
 {
     public function get(Request $request)
     {
+        if ($this->shouldBypassCache($request->input('query'))) {
+            return null;
+        }
+
         $cached = Cache::get($this->getCacheKey($request));
 
         if (! is_array($cached)) {
@@ -76,5 +82,50 @@ class DefaultCache implements ResponseCache
         });
 
         Cache::forget($this->getTrackingKey());
+    }
+
+    public function shouldBypassCache(string $query): bool
+    {
+        $excludedQueries = config('statamic.graphql.cache.exclude', []);
+        if (! $excludedQueries) {
+            return false;
+        }
+
+        $ast = Parser::parse($query);
+
+        foreach ($ast->definitions as $definition) {
+            if (! isset($definition->selectionSet)) {
+                continue;
+            }
+
+            foreach (array_keys($excludedQueries) as $excludedQuery) {
+                foreach ($definition->selectionSet->selections as $selection) {
+                    if ($this->containsFieldRecursive($selection, $excludedQuery)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function containsFieldRecursive($node, string $fieldName): bool
+    {
+        if ($node instanceof FieldNode) {
+            if ($node->name->value === $fieldName) {
+                return true;
+            }
+
+            if ($node->selectionSet) {
+                foreach ($node->selectionSet->selections as $selection) {
+                    if ($this->containsFieldRecursive($selection, $fieldName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
