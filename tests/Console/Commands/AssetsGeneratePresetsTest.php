@@ -21,6 +21,11 @@ class AssetsGeneratePresetsTest extends TestCase
 
         Storage::fake('test');
         Bus::fake();
+
+        config(['statamic.assets.image_manipulation.presets' => [
+            'preset_one' => ['w' => 100],
+            'preset_two' => ['w' => 200],
+        ]]);
     }
 
     private function makeContainer(string $handle = 'test', array $warmPresets = ['preset_one', 'preset_two'])
@@ -81,12 +86,14 @@ class AssetsGeneratePresetsTest extends TestCase
     }
 
     #[Test]
-    public function it_generates_nothing_when_the_preset_does_not_exist()
+    public function it_errors_when_the_preset_does_not_exist()
     {
         $this->makeContainer();
         $this->putLandscapeImage();
 
-        $this->artisan('statamic:assets:generate-presets --preset=nonexistent');
+        $this->artisan('statamic:assets:generate-presets --preset=nonexistent')
+            ->expectsOutputToContain('The preset "nonexistent" does not exist.')
+            ->assertExitCode(1);
 
         Bus::assertNotDispatchedSync(GeneratePresetImageManipulation::class);
     }

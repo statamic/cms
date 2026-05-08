@@ -7,6 +7,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Image;
 use Statamic\Jobs\GeneratePresetImageManipulation;
 use Statamic\Support\Arr;
 
@@ -65,6 +66,12 @@ class AssetsGeneratePresets extends Command
         }
 
         $filterPreset = $this->option('preset');
+
+        if ($filterPreset !== null && $filterPreset !== 'cp_thumbnail' && ! array_key_exists($filterPreset, Image::manipulationPresets())) {
+            error("The preset \"{$filterPreset}\" does not exist.");
+
+            return 1;
+        }
 
         AssetContainer::all()->filter(function ($container) use ($excludedContainers) {
             return ! in_array($container->handle(), $excludedContainers ?? []);
