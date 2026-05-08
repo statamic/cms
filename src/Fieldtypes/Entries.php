@@ -181,7 +181,7 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate($perPage = $request->integer('perPage', 15)) : $query->get();
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate($request->integer('perPage', 15)) : $query->get();
 
         $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
 
