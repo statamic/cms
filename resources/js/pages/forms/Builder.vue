@@ -9,6 +9,7 @@ import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
 import { mapValues } from 'lodash-es';
+import fuzzysort from 'fuzzysort';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -16,6 +17,9 @@ const props = defineProps({
     form: Object,
     fieldtypes: Array,
 });
+
+const search = ref('');
+const isSearching = computed(() => search.value.length > 0);
 
 const categories = {
     structure: {
@@ -61,7 +65,7 @@ const categories = {
 };
 
 const allFieldtypes = computed(() => {
-    let options = props.fieldtypes;
+    let options = [...props.fieldtypes];
 
     options.push({
         handle: 'section',
@@ -100,11 +104,28 @@ const groupedFieldtypes = computed(() => {
     });
 });
 
-// todo: searchFieldtypes
+const searchFieldtypes = computed(() => {
+    let options = allFieldtypes.value;
 
-const displayedFieldtypes = computed(() => {
-    return groupedFieldtypes.value;
+    if (search.value) {
+        return fuzzysort
+            .go(search.value, options, {
+                all: true,
+                keys: ['title', (obj) => obj.categories?.join(), (obj) => obj.keywords?.join()],
+                scoreFn: (scores) => {
+                    const textScore = scores[0]?.score * 1;
+                    const categoriesScore = scores[1]?.score * 0.1;
+                    const keywordsScore = scores[2]?.score * 0.4;
+                    return Math.max(textScore, categoriesScore, keywordsScore);
+                },
+            })
+            .map((result) => result.obj);
+    }
+
+    return options;
 });
+
+const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: searchFieldtypes.value }] : groupedFieldtypes.value);
 
 
 
@@ -333,7 +354,11 @@ const selectedPageInternalName = computed({
                             :key="group.handle"
                             v-show="group.fieldtypes.length > 0"
                         >
-                            <h2 v-if="group.title" class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+                            <h2
+                                v-if="group.title"
+                                class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium"
+                                :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'"
+                            >
                                 <span
                                     class="h-2 shrink-0 rounded-full"
                                     :class="{
@@ -355,13 +380,20 @@ const selectedPageInternalName = computed({
                 </div>
             </div>
             <!-- This is the desktop nav - the content is repeated from the left panel -->
-            <ul class="px-0.5 grid gap-8 @container py-10 max-[1000px]:hidden">
-                <li
-                    v-for="group in displayedFieldtypes"
-                    :key="group.handle"
-                    v-show="group.fieldtypes.length > 0"
-                >
-                    <h2 v-if="group.title" class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium" :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'">
+            <div class="px-0.5 pt-6 max-[1000px]:hidden">
+                <Input icon="magnifying-glass" :placeholder="__('Search Field Types...')" v-model="search" />
+
+                <ul class="py-10 grid gap-8 @container">
+                    <li
+                        v-for="group in displayedFieldtypes"
+                        :key="group.handle"
+                        v-show="group.fieldtypes.length > 0"
+                    >
+                        <h2
+                            v-if="group.title"
+                            class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium"
+                            :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'"
+                        >
                         <span
                             class="h-2 shrink-0 rounded-full"
                             :class="{
@@ -371,15 +403,16 @@ const selectedPageInternalName = computed({
                             }"
                             aria-hidden="true"
                         />
-                        {{ group.title }}
-                    </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                            <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                            {{ group.title }}
+                        </h2>
+                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
+                            <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                                <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </LayoutPanel>
 
