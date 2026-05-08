@@ -87,12 +87,14 @@ function handleClickOutside(event) {
     }
 }
 
-function toggle() {
+function toggle({ persist = true } = {}) {
     isOpen.value = !isOpen.value;
     // Reset viewport flag since user is explicitly toggling, so we should respect their preference
     // even when viewport size changes (don't auto-expand if user manually closed it)
     collapsedByViewport.value = false;
-    localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
+    if (persist) {
+        localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
+    }
 }
 
 function handleParentClick(event, item) {
@@ -143,14 +145,14 @@ Statamic.$keys.bind(['command+\\', ['[']], (e) => {
 
 Statamic.$events.$on('nav.toggle', toggle);
 
-Statamic.$events.$on('nav.open', () => {
+Statamic.$events.$on('nav.open', (options) => {
     if (isOpen.value) return;
-    toggle();
+    toggle(options);
 });
 
-Statamic.$events.$on('nav.close', () => {
+Statamic.$events.$on('nav.close', (options) => {
     if (!isOpen.value) return;
-    toggle();
+    toggle(options);
 });
 </script>
 
