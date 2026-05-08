@@ -43,6 +43,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    showAddConditionBeforeThen: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const logicOperator = ref(props.mockPreset.logicOperator || (props.calculationMode ? 'add' : 'equals'));
@@ -692,5 +696,12 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                 </ol>
             </li>
         </ol>
+        <Button
+            v-if="!props.useWhenSelector && props.showAddConditionBeforeThen"
+            size="sm"
+            variant="subtle"
+            class="ms-4 bg-transparent!"
+            :text="__('+ Add Condition')"
+        />
     </div>
 </template>
