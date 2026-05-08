@@ -71,5 +71,7 @@ const closeMobileNavPopover = () => {
         </div>
     </Teleport>
 
-    <slot />
+    <div class="starting-style-transition starting-style-transition-children">
+        <slot />
+    </div>
 </template>
