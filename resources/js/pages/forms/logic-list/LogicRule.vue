@@ -177,6 +177,38 @@ const isThenGoToPart = (part) => {
     return part.text.toLowerCase().includes(__('then go to').toLowerCase());
 };
 
+const stripThenGoTo = (text = '') => {
+    const marker = __('then go to');
+    return text.replace(new RegExp(marker, 'ig'), '').trim();
+};
+
+const fieldLogicAnotherQuestionPart = computed(() => {
+    const currentQuestion = (__(props.config?.display || props.config?.handle || '')).trim().toLowerCase();
+    const preferred = collapsedSummaryParts.value.find((part) => {
+        if (part.type !== 'text' && part.type !== 'destination') return false;
+        if (!part.text?.includes('?')) return false;
+        if (part.type === 'text' && isThenGoToPart(part)) return false;
+        return part.text.trim().toLowerCase() !== currentQuestion;
+    });
+
+    if (preferred) return preferred;
+
+    return collapsedSummaryParts.value.find((part) => {
+        if (part.type !== 'text' && part.type !== 'destination') return false;
+        if (!part.text?.trim()) return false;
+        if (part.type === 'text' && isThenGoToPart(part)) return false;
+        return part.text.trim().toLowerCase() !== currentQuestion;
+    });
+});
+
+const fieldLogicOperatorPart = computed(() => {
+    return collapsedSummaryParts.value.find((part) => part.type === 'operator');
+});
+
+const fieldLogicOperatorValuePart = computed(() => {
+    return collapsedSummaryParts.value.find((part) => part.type === 'operatorValue');
+});
+
 const showSecondaryCondition = computed(() => {
     const summary = props.values?.summary?.toLowerCase() || '';
     return summary.includes(', and ') || summary.includes(' and ');
@@ -278,7 +310,13 @@ reveal.use(rootEl, () => emit('expanded'));
                         />
                         {{ __(config.display) || config.handle }}
                     </Badge>
-                    <Badge v-if="collapsed && collapsedPrefixIcon" pill size="sm" color="white" class="gap-1.5">
+                    <Badge
+                        v-if="collapsed && collapsedPrefixIcon"
+                        pill
+                        size="sm"
+                        color="white"
+                        class="px-1.5 font-medium text-gray-800 dark:text-gray-200 gap-1.5"
+                    >
                         <Icon v-if="collapsedPrefixIcon" :name="collapsedPrefixIcon" class="size-3.5!" aria-hidden="true" />
                         <span>{{ collapsedPrefixLabel }}</span>
                     </Badge>
@@ -290,6 +328,24 @@ reveal.use(rootEl, () => emit('expanded'));
                     />
                     <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5! lowercase">
                         <span v-if="collapsedPreviewText" v-html="collapsedPreviewText" />
+                        <template v-else-if="collapsedPrefixIcon">
+                            <span v-if="fieldLogicAnotherQuestionPart">
+                                {{ stripThenGoTo(fieldLogicAnotherQuestionPart.text) }}
+                            </span>
+                            <Badge
+                                v-if="fieldLogicOperatorPart"
+                                size="sm"
+                                pill
+                                color="white"
+                                class="inline-block px-1.5 text-[0.75rem] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
+                                style="text-box: trim-start text;"
+                            >
+                                {{ fieldLogicOperatorPart.text }}
+                            </Badge>
+                            <span v-if="fieldLogicOperatorValuePart" class="font-mono text-[0.725rem]">
+                                {{ fieldLogicOperatorValuePart.text }}
+                            </span>
+                        </template>
                         <template v-else>
                             <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
                                 <Badge
@@ -307,7 +363,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                     {{ part.text }}
                                 </span>
                                 <Badge
-                                    v-else-if="isThenGoToPart(part)"
+                                    v-else-if="!collapsedPrefixIcon && isThenGoToPart(part)"
                                     size="sm"
                                     pill
                                     color="white"
