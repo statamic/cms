@@ -1,5 +1,40 @@
 # Release Notes
 
+## 6.17.0 (2026-05-08)
+
+### What's new
+- Add configurable timezone for date fields in the Control Panel [#14554](https://github.com/statamic/cms/issues/14554) by @duncanmcclean
+- Add `disabled` and `readOnly` props to `TimePicker` component [#14620](https://github.com/statamic/cms/issues/14620) by @duncanmcclean
+- Add Timezones components [#14612](https://github.com/statamic/cms/issues/14612) by @jasonvarga
+- Allow overriding date format preset options [#14600](https://github.com/statamic/cms/issues/14600) by @jasonvarga
+
+### What's fixed
+- Dirty state fixes [#14592](https://github.com/statamic/cms/issues/14592) by @jackmcdade
+- Localize timezone tooltip in DatePicker [#14596](https://github.com/statamic/cms/issues/14596) by @jasonvarga
+- Fix asset browser actions inside selector stack [#14565](https://github.com/statamic/cms/issues/14565) by @duncanmcclean
+- Fix date-only formats shifting days due to timezone conversion [#14552](https://github.com/statamic/cms/issues/14552) by @duncanmcclean
+- Avoid rendering time for dates in listings when appropriate [#14599](https://github.com/statamic/cms/issues/14599) by @jasonvarga
+- Display timezone in DateRangePicker [#14601](https://github.com/statamic/cms/issues/14601) by @jasonvarga
+- Fix date-only index fieldtype shifting across timezones [#14602](https://github.com/statamic/cms/issues/14602) by @jasonvarga
+- Memoize preprocessed fields in Validator [#14605](https://github.com/statamic/cms/issues/14605) by @jasonvarga
+- Show date fieldtype when searching for range [#14606](https://github.com/statamic/cms/issues/14606) by @jasonvarga
+- Fix error when typing in a required date range field [#14607](https://github.com/statamic/cms/issues/14607) by @jasonvarga
+- Fix HoverCard arrow not displaying [#14611](https://github.com/statamic/cms/issues/14611) by @jasonvarga
+- Adjust translation method usage [#14610](https://github.com/statamic/cms/issues/14610) by @jasonvarga
+- Fix stale asset listings across queued jobs [#14617](https://github.com/statamic/cms/issues/14617) by @ryanmitchell
+- Fix replicator fields using wrong site context [#14616](https://github.com/statamic/cms/issues/14616) by @ryanmitchell
+- Fix read-only/disabled states in `Radio` component [#14621](https://github.com/statamic/cms/issues/14621) by @duncanmcclean
+- Lazy-load actions for collections, submissions & terms [#14097](https://github.com/statamic/cms/issues/14097) by @duncanmcclean
+- Fix dated entries not syncing with origin revisions [#14216](https://github.com/statamic/cms/issues/14216) by @duncanmcclean
+- Fix DateRangePicker crash when selecting first date in a range [#13512](https://github.com/statamic/cms/issues/13512) by @andrii-trush
+- Fix moving custom section to 1st position in CP Nav [#12993](https://github.com/statamic/cms/issues/12993) by @duncanmcclean
+- Fix read-only state in publish forms [#14623](https://github.com/statamic/cms/issues/14623) by @duncanmcclean
+- Fix perPage limit in relationship stack listings [#14629](https://github.com/statamic/cms/issues/14629) by @wiktorm12
+- Bump postcss from 8.5.9 to 8.5.13 [#14595](https://github.com/statamic/cms/issues/14595) by @dependabot
+- Bump axios from 1.15.0 to 1.16.0 [#14613](https://github.com/statamic/cms/issues/14613) by @dependabot
+
+
+
 ## 6.16.0 (2026-05-01)
 
 ### What's new
