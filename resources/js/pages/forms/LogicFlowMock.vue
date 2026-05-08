@@ -63,9 +63,9 @@ const logicWhenOptions = props.calculationMode
         { label: `× ${__('Multiply')}`, value: 'multiply' },
     ]
     : [
-        { label: __('Always show'), value: 'always_show' },
-        { label: __('Show when'), value: 'show_when' },
-        { label: __('Hide when'), value: 'hide_when' },
+        { label: __('Always show'), value: 'always_show', icon: 'eye' },
+        { label: __('Show when'), value: 'show_when', icon: 'eye' },
+        { label: __('Hide when'), value: 'hide_when', icon: 'eye-closed' },
     ];
 const logicOperatorOptions = props.calculationMode
     ? [
@@ -335,7 +335,20 @@ watch(
                         option-label="label"
                         option-value="value"
                         :searchable="false"
-                    />
+                    >
+                        <template v-if="!props.calculationMode" #option="{ icon, label }">
+                            <span class="inline-flex items-center gap-2">
+                                <Icon v-if="icon" :name="icon" class="size-3.5 text-gray-700 dark:text-gray-200" />
+                                <span>{{ label }}</span>
+                            </span>
+                        </template>
+                        <template v-if="!props.calculationMode" #selected-option="{ option }">
+                            <span class="inline-flex items-center gap-2">
+                                <Icon v-if="option.icon" :name="option.icon" class="size-3.5 text-gray-700 dark:text-gray-200" />
+                                <span>{{ option.label }}</span>
+                            </span>
+                        </template>
+                    </Combobox>
                 </div>
                 <div v-else class="flex items-center">
                     <div class="logic-text-badge logic-text__condition" aria-hidden="true">
