@@ -78,6 +78,13 @@ const areAllFieldRulesCollapsed = computed(() => {
 const allFieldRulesView = computed(() => {
     return areAllFieldRulesCollapsed.value ? 'collapsed' : 'expanded';
 });
+const hideWhenFieldHandles = new Set(['age', 'second_favorite_album']);
+const fieldCollapsedPrefixLabel = (block) => (
+    hideWhenFieldHandles.has(block._id) ? __('Hide') : __('Show')
+);
+const fieldCollapsedPrefixIcon = (block) => (
+    hideWhenFieldHandles.has(block._id) ? 'eye-closed' : 'eye'
+);
 
 const remainingSetConfigs = computed(() => {
     const usedHandles = new Set(logicBlocks.value.map((block) => block.type));
@@ -238,6 +245,7 @@ provide(publishContextKey, {
                         :can-add-rule="true"
                         :has-error="false"
                         :show-field-previews="true"
+                        :collapsed-prefix-label="__('If')"
                         @collapsed="collapseSet(block._id, 'page')"
                         @expanded="expandSet(block._id, 'page')"
                         @removed="removeSet(block._id)"
@@ -285,6 +293,8 @@ provide(publishContextKey, {
                         :can-add-rule="true"
                         :has-error="false"
                         :show-field-previews="true"
+                        :collapsed-prefix-label="fieldCollapsedPrefixLabel(block)"
+                        :collapsed-prefix-icon="fieldCollapsedPrefixIcon(block)"
                         @collapsed="collapseSet(block._id, 'field')"
                         @expanded="expandSet(block._id, 'field')"
                         @removed="removeSet(block._id)"
