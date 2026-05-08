@@ -73,6 +73,19 @@ class AssetsGeneratePresetsTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_nothing_when_cp_thumbnail_filter_is_used_but_cp_is_disabled()
+    {
+        config(['statamic.cp.enabled' => false]);
+
+        $this->makeContainer();
+        $this->putLandscapeImage();
+
+        $this->artisan('statamic:assets:generate-presets --preset=cp_thumbnail');
+
+        Bus::assertNotDispatchedSync(GeneratePresetImageManipulation::class);
+    }
+
+    #[Test]
     public function it_generates_only_the_specified_preset()
     {
         $this->makeContainer();
