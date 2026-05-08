@@ -182,6 +182,8 @@ const stripThenGoTo = (text = '') => {
     return text.replace(new RegExp(marker, 'ig'), '').trim();
 };
 
+const compactDestinationLabel = (text = '') => text.replace(/^page\s+/i, '').trim();
+
 const fieldLogicAnotherQuestionPart = computed(() => {
     const currentQuestion = (__(props.config?.display || props.config?.handle || '')).trim().toLowerCase();
     const preferred = collapsedSummaryParts.value.find((part) => {
@@ -360,7 +362,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                 </Badge>
                                 <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-1">
                                     <Icon name="page" class="size-3! text-gray-500 dark:text-gray-300" aria-hidden="true" />
-                                    <span class="inline-block font-medium text-[0.75rem] text-gray-900 dark:text-gray-100" style="text-box: trim-start text; font-variant-numeric: lining-nums;">{{ part.text }}</span>
+                                    <span class="inline-block font-medium text-[0.75rem] text-gray-900 dark:text-gray-100" style="text-box: trim-start text; font-variant-numeric: lining-nums;">{{ compactDestinationLabel(part.text) }}</span>
                                 </span>
                                 <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.725rem]">
                                     {{ part.text }}
