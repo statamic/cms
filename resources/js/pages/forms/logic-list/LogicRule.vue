@@ -336,7 +336,6 @@ reveal.use(rootEl, () => emit('expanded'));
                     <Badge
                         v-if="collapsed && collapsedPrefixIcon"
                         pill
-                        size="sm"
                         color="white"
                         class="px-1.5 font-medium text-gray-800 dark:text-gray-200 gap-1.5"
                     >
@@ -349,19 +348,18 @@ reveal.use(rootEl, () => emit('expanded'));
                         class="size-3.5! text-gray-500"
                         v-tooltip="__(config.instructions)"
                     />
-                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5! lowercase">
+                    <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap lowercase text-xs">
                         <template v-if="collapsedPrefixIcon">
                             <span>{{ fieldLogicSecondQuestionText }}</span>
                             <Badge
-                                size="sm"
                                 pill
                                 color="white"
-                                class="inline-block px-1.5 text-[0.75rem] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
+                                class="inline-block px-1.5 font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
                                 style="text-box: trim-start text;"
                             >
                                 {{ fieldLogicOperatorText }}
                             </Badge>
-                            <span class="font-mono text-[0.725rem]">
+                            <span class="font-mono text-[0.75rem]">
                                 {{ fieldLogicOperatorValueText }}
                             </span>
                         </template>
@@ -370,30 +368,28 @@ reveal.use(rootEl, () => emit('expanded'));
                             <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
                                 <Badge
                                     v-if="part.type === 'operator'"
-                                    size="sm"
                                     pill
                                     color="white"
-                                    class="inline-block px-1.5 text-[0.75rem] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
+                                    class="inline-block px-1.5 font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
                                     style="text-box: trim-start text;"
                                 >
                                     {{ part.text }}
                                 </Badge>
                                 <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-1">
                                     <Icon name="page" class="size-3! text-gray-500 dark:text-gray-300" aria-hidden="true" />
-                                    <span class="inline-block font-medium text-[0.75rem] text-gray-900 dark:text-gray-100" style="text-box: trim-start text; font-variant-numeric: lining-nums;">{{ compactDestinationLabel(part.text) }}</span>
+                                    <span class="inline-block font-medium text-gray-900 dark:text-gray-100 text-xs" style="text-box: trim-start text; font-variant-numeric: lining-nums;">{{ compactDestinationLabel(part.text) }}</span>
                                 </span>
-                                <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.725rem]">
+                                <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.75rem]">
                                     {{ part.text }}
                                 </span>
                                 <Badge
                                     v-else-if="!collapsedPrefixIcon && isThenGoToPart(part)"
-                                    size="sm"
                                     pill
                                     color="white"
                                     class="inline-block px-1.5 font-medium text-gray-800 dark:text-gray-200"
                                     style="text-box: trim-start text;"
                                 >
-                                    {{ __('then go to') }}
+                                    {{ __('go to') }}
                                 </Badge>
                                 <template v-else>{{ part.text }}</template>
                             </template>
