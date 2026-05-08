@@ -495,13 +495,23 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     }
 
     /**
-     * The URL to view form submissions in the CP.
+     * The URL to view the form in the CP.
      *
      * @return string
      */
     public function showUrl()
     {
         return cp_route('forms.show', $this->handle());
+    }
+
+    /**
+     * The URL to view form submissions in the CP.
+     *
+     * @return string
+     */
+    public function submissionsUrl()
+    {
+        return cp_route('forms.submissions.index', $this->handle());
     }
 
     /**
@@ -527,7 +537,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     /** @deprecated */
     public function editBlueprintUrl()
     {
-        return cp_route('forms.fields.index', $this->handle());
+        return cp_route('forms.show', $this->handle());
     }
 
     public function hasFiles()

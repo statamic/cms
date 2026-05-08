@@ -9,6 +9,6 @@ class FormBlueprintController extends CpController
 {
     public function __invoke($form)
     {
-        return redirect(cp_route('forms.fields.index', $form->handle()));
+        return redirect(cp_route('forms.show', $form->handle()));
     }
 }

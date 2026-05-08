@@ -7,10 +7,10 @@ const page = usePage();
 const form = computed(() => page.props.form);
 
 const navItems = [
-    { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/fields`) },
+    { label: __('Edit'), href: cp_url(`forms/${form.value.handle}`) },
     { label: __('Logic'), href: cp_url(`forms/${form.value.handle}/logic`) },
     { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
-    { label: __('Results'), href: cp_url(`forms/${form.value.handle}`) },
+    { label: __('Results'), href: cp_url(`forms/${form.value.handle}/submissions`) },
     { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
 ];
 

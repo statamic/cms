@@ -2,14 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
-use Statamic\Facades\Scope;
 use Statamic\Facades\User;
+use Statamic\Forms\Fields\Fallback;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
@@ -37,8 +39,8 @@ class FormsController extends CpController
                     'title' => __($form->title()),
                     'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
+                    'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
-                    'fields_url' => cp_route('forms.fields.index', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
                 ];
@@ -57,39 +59,30 @@ class FormsController extends CpController
 
     public function show($form)
     {
-        $this->authorize('view', $form);
+        $this->authorize('edit', $form);
 
-        $columns = $form
-            ->blueprint()
-            ->columns()
-            ->prepend(Column::make('datestamp'), 'datestamp')
-            ->setPreferred("forms.{$form->handle()}.columns")
-            ->rejectUnlisted()
+        $formFieldtypes = app('statamic.form-fieldtypes')
+            ->unique()
+            ->map(fn ($class) => app($class))
+            ->filter->isSelectable()
             ->values();
 
-        return Inertia::render('forms/Show', [
-            'form' => [
-                'title' => __($form->title()),
-                'handle' => $form->handle(),
-                'editUrl' => $form->editUrl(),
-                'deleteUrl' => $form->deleteUrl(),
-                'canEdit' => User::current()->can('edit', $form),
-                'canDelete' => User::current()->can('delete', $form),
-                'canConfigureFields' => User::current()->can('configure form fields'),
-                'canGenerateFakeSubmissions' => (bool) $form->get('generate_fake_submissions', true),
-            ],
-            'columns' => $columns,
-            'filters' => Scope::filters('form-submissions', [
-                'form' => $form->handle(),
-            ]),
-            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
-            'generateFakeSubmissionUrl' => cp_route('forms.submissions.generate-fake', $form->handle()),
-            'exporters' => $form->exporters()->map(fn ($exporter) => [
-                'handle' => $exporter->handle(),
-                'title' => $exporter->title(),
-                'downloadUrl' => $exporter->downloadUrl(),
-            ])->values(),
-            'redirectUrl' => cp_route('forms.index'),
+        $fieldtypesPortedToFormFieldtypes = $formFieldtypes
+            ->map(fn (FormFieldtype $fieldtype) => $fieldtype::fieldtype())
+            ->filter()
+            ->unique()
+            ->values();
+
+        $legacySelectableFieldtypes = FieldtypeRepository::classes()
+            ->map(fn ($class) => app($class))
+            ->filter->selectableInForms()
+            ->reject(fn ($fieldtype) => $fieldtypesPortedToFormFieldtypes->contains($fieldtype->handle()))
+            ->map(fn ($fieldtype) => (new Fallback)->wrapping($fieldtype))
+            ->values();
+
+        return Inertia::render('forms/Fields', [
+            'form' => $form,
+            'fieldtypes' => $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values(),
         ]);
     }
 
@@ -155,7 +148,7 @@ class FormsController extends CpController
 
         session()->flash('success', __('Form created'));
 
-        return ['redirect' => $form->editUrl()];
+        return ['redirect' => $form->showUrl()];
     }
 
     public function edit($form)

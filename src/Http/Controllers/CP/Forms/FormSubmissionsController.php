@@ -4,8 +4,11 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Statamic\CP\Column;
 use Statamic\Events\FormSubmitted;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Forms\SendEmails;
 use Statamic\Http\Controllers\CP\CpController;
@@ -23,6 +26,46 @@ class FormSubmissionsController extends CpController
     {
         $this->authorize('view', $form);
 
+        if ($request->wantsJson()) {
+            return $this->json($request, $form);
+        }
+
+        $columns = $form
+            ->blueprint()
+            ->columns()
+            ->prepend(Column::make('datestamp'), 'datestamp')
+            ->setPreferred("forms.{$form->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
+        return Inertia::render('forms/Submissions', [
+            'form' => [
+                'title' => __($form->title()),
+                'handle' => $form->handle(),
+                'editUrl' => $form->editUrl(),
+                'deleteUrl' => $form->deleteUrl(),
+                'canEdit' => User::current()->can('edit', $form),
+                'canDelete' => User::current()->can('delete', $form),
+                'canConfigureFields' => User::current()->can('configure form fields'),
+                'canGenerateFakeSubmissions' => (bool) $form->get('generate_fake_submissions', true),
+            ],
+            'columns' => $columns,
+            'filters' => Scope::filters('form-submissions', [
+                'form' => $form->handle(),
+            ]),
+            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
+            'generateFakeSubmissionUrl' => cp_route('forms.submissions.generate-fake', $form->handle()),
+            'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'handle' => $exporter->handle(),
+                'title' => $exporter->title(),
+                'downloadUrl' => $exporter->downloadUrl(),
+            ])->values(),
+            'redirectUrl' => cp_route('forms.index'),
+        ]);
+    }
+
+    protected function json(FilteredRequest $request, $form)
+    {
         if (! $form->blueprint()) {
             return ['data' => [], 'meta' => ['columns' => []]];
         }
