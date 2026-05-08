@@ -42,7 +42,7 @@ class CropAspectRatios
         $label = is_string($key) ? $key : (string) $entry;
         $value = self::ratioToFloat($entry);
 
-        if (! $value) {
+        if ($value === null) {
             self::warn($entry, $key);
 
             return null;
@@ -73,7 +73,7 @@ class CropAspectRatios
 
         $value = self::ratioToFloat($ratio);
 
-        if (! $value) {
+        if ($value === null) {
             self::warn($entry, $key);
 
             return null;
