@@ -4,6 +4,8 @@ namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Log;
 
+use function Statamic\trans as __;
+
 class CropAspectRatios
 {
     /**
