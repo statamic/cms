@@ -135,6 +135,44 @@ class LoginTest extends TestCase
     }
 
     #[Test]
+    public function inertia_login_returns_a_full_page_redirect()
+    {
+        // Inertia would otherwise auto-follow a 302 with X-Inertia headers and swap to
+        // the dashboard component without the protected props it needs to render.
+        // Returning 409 + X-Inertia-Location forces a full browser navigation instead.
+        $user = $this->user();
+
+        $this
+            ->assertGuest()
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+            ], ['X-Inertia' => 'true'])
+            ->assertStatus(409)
+            ->assertHeader('X-Inertia-Location', cp_route('index'));
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function inertia_login_redirects_to_intended_url_via_full_page_redirect()
+    {
+        $user = $this->user();
+
+        $this
+            ->assertGuest()
+            ->session(['url.intended' => 'http://localhost/cp/cp/collections'])
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+            ], ['X-Inertia' => 'true'])
+            ->assertStatus(409)
+            ->assertHeader('X-Inertia-Location', 'http://localhost/cp/cp/collections');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
     public function it_stores_the_intended_url_when_redirected_to_login()
     {
         $this
