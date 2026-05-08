@@ -1441,7 +1441,7 @@ const selectedPageInternalName = computed({
                             :show-add-condition-before-then="true"
                             :mock-preset="selectedPageLogicMockPreset"
                         />
-                        <div v-if="inspectorTarget === 'page_2'" class="my-8 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
+                        <div v-if="inspectorTarget === 'page_2'" class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
                         <LogicFlowMock
                             v-if="inspectorTarget === 'page_2'"
                             :key="`desktop-page-logic-secondary-${inspectorTarget}`"
