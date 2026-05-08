@@ -167,6 +167,11 @@ main.nav-closed {
     }
 }
 
+[data-left-panel]:empty,
+[data-right-panel]:empty {
+    display: none;
+}
+
 [data-left-panel] {
     [data-resize-handle] {
         @apply dark:border-e dark:border-content-border;
