@@ -103,6 +103,20 @@ class AssetsGeneratePresetsTest extends TestCase
     }
 
     #[Test]
+    public function it_queues_jobs_when_queue_option_is_used()
+    {
+        config(['queue.default' => 'redis']);
+
+        $this->makeContainer('test', ['preset_one']);
+        $this->putLandscapeImage();
+
+        $this->artisan('statamic:assets:generate-presets --queue');
+
+        Bus::assertDispatched(GeneratePresetImageManipulation::class, fn ($job) => $job->preset === 'preset_one');
+        Bus::assertNotDispatchedSync(GeneratePresetImageManipulation::class);
+    }
+
+    #[Test]
     public function it_excludes_specified_containers()
     {
         Storage::fake('other');
