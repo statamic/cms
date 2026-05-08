@@ -427,6 +427,7 @@ reveal.use(rootEl, () => emit('expanded'));
                             :initial-condition-icon="config.icon || 'fieldtype-radio'"
                             :initial-condition-icon-class="config.iconClass || 'text-orange-600 dark:text-orange-400'"
                             :show-secondary-condition="showSecondaryCondition"
+                            :use-when-selector="Boolean(collapsedPrefixIcon)"
                             :use-page-destination-options="!collapsedPrefixIcon"
                             :mock-preset="mockPreset"
                         />
