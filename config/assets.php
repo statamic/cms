@@ -188,8 +188,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the aspect ratio presets available in the Control Panel image
-    | crop editor. Ratios may be provided as "W:H" strings, keyed values, or
-    | arrays with custom labels and ratio values.
+    | crop editor. Each entry may be a "W:H" string (e.g. "16:9") or an array
+    | with a custom label and ratio: ['label' => 'Wide', 'ratio' => '16:9'].
     |
     */
 

@@ -17,7 +17,7 @@ class JavascriptComposerTest extends TestCase
     public function it_provides_crop_aspect_ratios_to_script_config()
     {
         config()->set('statamic.assets.crop_aspect_ratios', [
-            'Portrait' => '9:16',
+            '9:16',
             ['label' => 'US Letter', 'ratio' => '8.5:11'],
         ]);
 
@@ -33,7 +33,7 @@ class JavascriptComposerTest extends TestCase
         $json = Statamic::jsonVariables(request());
 
         $this->assertSame([
-            ['label' => 'Portrait', 'value' => 9 / 16],
+            ['label' => '9:16', 'value' => 9 / 16],
             ['label' => 'US Letter', 'value' => 8.5 / 11],
         ], $json['cropAspectRatios']);
     }

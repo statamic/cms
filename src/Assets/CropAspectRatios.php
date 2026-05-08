@@ -4,6 +4,8 @@ namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Log;
 
+use function Statamic\trans as __;
+
 class CropAspectRatios
 {
     /**
@@ -39,7 +41,6 @@ class CropAspectRatios
             return null;
         }
 
-        $label = is_string($key) ? $key : (string) $entry;
         $value = self::ratioToFloat($entry);
 
         if ($value === null) {
@@ -49,7 +50,7 @@ class CropAspectRatios
         }
 
         return [
-            'label' => $label,
+            'label' => __((string) $entry),
             'value' => $value,
         ];
     }
@@ -60,7 +61,7 @@ class CropAspectRatios
      */
     private static function parseArrayEntry(array $entry, mixed $key): ?array
     {
-        $label = $entry['label'] ?? (is_string($key) ? $key : null);
+        $label = $entry['label'] ?? null;
         $ratio = $entry['ratio'] ?? null;
 
         $labelIsStringable = is_string($label) || is_numeric($label) || $label instanceof \Stringable;
@@ -80,7 +81,7 @@ class CropAspectRatios
         }
 
         return [
-            'label' => (string) $label,
+            'label' => __((string) $label),
             'value' => $value,
         ];
     }

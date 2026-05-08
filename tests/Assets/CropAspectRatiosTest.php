@@ -38,16 +38,20 @@ class CropAspectRatiosTest extends TestCase
     }
 
     #[Test]
-    public function it_supports_keyed_ratio_entries()
+    public function it_translates_labels()
     {
+        app('translator')->addLines([
+            'crop.wide' => 'Wide Screen',
+        ], 'en');
+
         config()->set('statamic.assets.crop_aspect_ratios', [
-            'Portrait' => '9:16',
-            'A4' => '210:297',
+            ['label' => 'crop.wide', 'ratio' => '16:9'],
+            ['label' => 'Square', 'ratio' => '1:1'],
         ]);
 
         $this->assertSame([
-            ['label' => 'Portrait', 'value' => 9 / 16],
-            ['label' => 'A4', 'value' => 210 / 297],
+            ['label' => 'Wide Screen', 'value' => 16 / 9],
+            ['label' => 'Square', 'value' => 1.0],
         ], CropAspectRatios::all());
     }
 
