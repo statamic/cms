@@ -308,7 +308,7 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
                     </div>
                     <div
                         v-if="props.showRuleControls"
-                        class="ms-1 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-100 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto"
+                        class="ms-0.5 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-100 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto"
                     >
                         <Button size="sm" inset variant="subtle" class="size-7 [&_svg]:opacity-50 rounded-full ms-[0.025rem]" icon="trash" />
                         <!-- class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px] opacity-0 pointer-events-none transition-opacity group-hover/logic-tab:opacity-85 group-hover/logic-tab:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto" -->
@@ -456,7 +456,7 @@ const branchingCalculationUsesNumberInput = computed(() => logicBranchingCalcula
             </li>
 
             <li v-if="secondaryConditionVisible && !props.calculationMode">
-                <div class="flex items-center gap-0.75">
+                <div class="flex items-center gap-0.5">
                     <div class="logic-text__condition" aria-hidden="true">
                         <Combobox
                             v-model="logicJoin"

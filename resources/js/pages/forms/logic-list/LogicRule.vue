@@ -172,6 +172,11 @@ const collapsedSummaryParts = computed(() => {
     return partsWithValueSegments;
 });
 
+const isThenGoToPart = (part) => {
+    if (part?.type !== 'text' || !part.text) return false;
+    return part.text.toLowerCase().includes(__('then go to').toLowerCase());
+};
+
 const showSecondaryCondition = computed(() => {
     const summary = props.values?.summary?.toLowerCase() || '';
     return summary.includes(', and ') || summary.includes(' and ');
@@ -289,15 +294,24 @@ reveal.use(rootEl, () => emit('expanded'));
                                     size="sm"
                                     pill
                                     color="white"
-                                    class="inline-block px-1.5 py-0 text-[12px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
+                                    class="inline-block px-1.5 text-[0.75rem] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
                                     style="text-box: trim-start text;"
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <template v-else-if="part.type === 'destination'">&nbsp;{{ part.text }}</template>
+                                <template v-else-if="part.type === 'destination'">{{ part.text }}</template>
                                 <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.725rem]">
                                     {{ part.text }}
                                 </span>
+                                <Badge
+                                    v-else-if="isThenGoToPart(part)"
+                                    size="sm"
+                                    color="white"
+                                    class="inline-block font-medium text-gray-800 dark:text-gray-200"
+                                    style="text-box: trim-start text;"
+                                >
+                                    {{ __('then go to') }}
+                                </Badge>
                                 <template v-else>{{ part.text }}</template>
                             </template>
                         </template>
