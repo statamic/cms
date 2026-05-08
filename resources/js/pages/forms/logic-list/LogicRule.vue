@@ -211,6 +211,27 @@ const fieldLogicOperatorValuePart = computed(() => {
     return collapsedSummaryParts.value.find((part) => part.type === 'operatorValue');
 });
 
+const fieldLogicRandomQuestionPool = [
+    __('How did you hear about us?'),
+    __('How long have you been a fan?'),
+    __('Which album was your favorite?'),
+    __('Which album was your second favorite?'),
+    __('How old are you?'),
+];
+
+const fieldLogicSecondQuestionText = computed(() => {
+    const currentQuestion = (__(props.config?.display || props.config?.handle || '')).trim().toLowerCase();
+    const options = fieldLogicRandomQuestionPool.filter((question) => question.trim().toLowerCase() !== currentQuestion);
+    if (!options.length) return fieldLogicRandomQuestionPool[0];
+
+    const key = `${props.id || ''}:${props.config?.handle || ''}`;
+    const hash = Array.from(key).reduce((acc, char) => ((acc * 33) + char.charCodeAt(0)) >>> 0, 5381);
+    return options[hash % options.length];
+});
+
+const fieldLogicOperatorText = computed(() => fieldLogicOperatorPart.value?.text || __('equals'));
+const fieldLogicOperatorValueText = computed(() => fieldLogicOperatorValuePart.value?.text || __('referral'));
+
 const showSecondaryCondition = computed(() => {
     const summary = props.values?.summary?.toLowerCase() || '';
     return summary.includes(', and ') || summary.includes(' and ');
@@ -329,25 +350,22 @@ reveal.use(rootEl, () => emit('expanded'));
                         v-tooltip="__(config.instructions)"
                     />
                     <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap gap-1.5! lowercase">
-                        <span v-if="collapsedPreviewText" v-html="collapsedPreviewText" />
-                        <template v-else-if="collapsedPrefixIcon">
-                            <span v-if="fieldLogicAnotherQuestionPart">
-                                {{ stripThenGoTo(fieldLogicAnotherQuestionPart.text) }}
-                            </span>
+                        <template v-if="collapsedPrefixIcon">
+                            <span>{{ fieldLogicSecondQuestionText }}</span>
                             <Badge
-                                v-if="fieldLogicOperatorPart"
                                 size="sm"
                                 pill
                                 color="white"
                                 class="inline-block px-1.5 text-[0.75rem] font-medium bg-gray-100 text-gray-800 dark:bg-gray-850 dark:text-gray-200"
                                 style="text-box: trim-start text;"
                             >
-                                {{ fieldLogicOperatorPart.text }}
+                                {{ fieldLogicOperatorText }}
                             </Badge>
-                            <span v-if="fieldLogicOperatorValuePart" class="font-mono text-[0.725rem]">
-                                {{ fieldLogicOperatorValuePart.text }}
+                            <span class="font-mono text-[0.725rem]">
+                                {{ fieldLogicOperatorValueText }}
                             </span>
                         </template>
+                        <span v-else-if="collapsedPreviewText" v-html="collapsedPreviewText" />
                         <template v-else>
                             <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
                                 <Badge
