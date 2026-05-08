@@ -1193,8 +1193,8 @@ const selectedPageInternalName = computed({
                                     <div class="size-4">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                     </div>
-                                    <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                        {{ __('Multi Choice') }}
+                                    <a href="#editing-field" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                        <span class="truncate">{{ settingsLabel }}</span>
                                         <div class="grid *:[grid-area:1/1]">
                                             <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                             <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -1269,8 +1269,8 @@ const selectedPageInternalName = computed({
                                     <div class="size-4">
                                         <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                                     </div>
-                                    <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                        {{ __('Multi Choice') }}
+                                    <a href="#editing-field" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                        <span class="truncate">{{ settingsLabel }}</span>
                                         <div class="grid *:[grid-area:1/1]">
                                             <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                             <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -1348,8 +1348,8 @@ const selectedPageInternalName = computed({
                             <div class="size-4">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
-                            <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ __('Multi Choice') }}
+                            <a href="#editing-field" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                <span class="truncate">{{ settingsLabel }}</span>
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -1462,8 +1462,8 @@ const selectedPageInternalName = computed({
                             <div class="size-4">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
-                            <a href="#editing-field" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ __('Multi Choice') }}
+                            <a href="#editing-field" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                <span class="truncate">{{ settingsLabel }}</span>
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
