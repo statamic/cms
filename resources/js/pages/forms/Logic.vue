@@ -30,7 +30,8 @@ const logicBlocks = ref([
     { _id: 'age', type: 'age', enabled: true, summary: __('is greater than 21, then go to I want a free drink voucher') },
 ]);
 
-const collapsed = ref(logicBlocks.value.map((block) => block._id));
+const pageCollapsed = ref(logicBlocks.value.map((block) => block._id));
+const fieldCollapsed = ref(logicBlocks.value.map((block) => block._id));
 const previews = ref({});
 const meta = ref({});
 
@@ -60,13 +61,22 @@ const setConfigByHandle = computed(() => {
     }, {});
 });
 
-const areAllRulesCollapsed = computed(() => {
+const areAllPageRulesCollapsed = computed(() => {
     if (logicBlocks.value.length === 0) return false;
-    return logicBlocks.value.every((block) => collapsed.value.includes(block._id));
+    return logicBlocks.value.every((block) => pageCollapsed.value.includes(block._id));
 });
 
-const allRulesView = computed(() => {
-    return areAllRulesCollapsed.value ? 'collapsed' : 'expanded';
+const allPageRulesView = computed(() => {
+    return areAllPageRulesCollapsed.value ? 'collapsed' : 'expanded';
+});
+
+const areAllFieldRulesCollapsed = computed(() => {
+    if (logicBlocks.value.length === 0) return false;
+    return logicBlocks.value.every((block) => fieldCollapsed.value.includes(block._id));
+});
+
+const allFieldRulesView = computed(() => {
+    return areAllFieldRulesCollapsed.value ? 'collapsed' : 'expanded';
 });
 
 const remainingSetConfigs = computed(() => {
@@ -118,32 +128,53 @@ function addSet(handle, index = logicBlocks.value.length) {
     };
 
     logicBlocks.value.splice(index, 0, newRule);
-    collapsed.value.push(newRule._id);
+    pageCollapsed.value.push(newRule._id);
+    fieldCollapsed.value.push(newRule._id);
 
     loadingSet.value = null;
 }
 
-function collapseSet(id) {
-    if (!collapsed.value.includes(id)) {
-        collapsed.value.push(id);
+function collapseSet(id, target = 'page') {
+    const collapsedTarget = target === 'field' ? fieldCollapsed : pageCollapsed;
+
+    if (!collapsedTarget.value.includes(id)) {
+        collapsedTarget.value.push(id);
     }
 }
 
-function expandSet(id) {
-    collapsed.value = collapsed.value.filter(setId => setId !== id);
+function expandSet(id, target = 'page') {
+    if (target === 'field') {
+        fieldCollapsed.value = fieldCollapsed.value.filter((setId) => setId !== id);
+        return;
+    }
+
+    pageCollapsed.value = pageCollapsed.value.filter((setId) => setId !== id);
 }
 
 function removeSet(id) {
     logicBlocks.value = logicBlocks.value.filter((block) => block._id !== id);
-    collapsed.value = collapsed.value.filter((setId) => setId !== id);
+    pageCollapsed.value = pageCollapsed.value.filter((setId) => setId !== id);
+    fieldCollapsed.value = fieldCollapsed.value.filter((setId) => setId !== id);
 }
 
-function expandAllRules() {
-    collapsed.value = [];
+function expandAllRules(target = 'page') {
+    if (target === 'field') {
+        fieldCollapsed.value = [];
+        return;
+    }
+
+    pageCollapsed.value = [];
 }
 
-function collapseAllRules() {
-    collapsed.value = logicBlocks.value.map((block) => block._id);
+function collapseAllRules(target = 'page') {
+    const ids = logicBlocks.value.map((block) => block._id);
+
+    if (target === 'field') {
+        fieldCollapsed.value = ids;
+        return;
+    }
+
+    pageCollapsed.value = ids;
 }
 
 provide('replicatorSets', groupConfigs);
@@ -183,9 +214,9 @@ provide(publishContextKey, {
                         <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                         <Heading :text="__('Page Logic')" />
                     </div>
-                    <ToggleGroup :model-value="allRulesView" size="xs">
-                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules" />
-                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules" />
+                    <ToggleGroup :model-value="allPageRulesView" size="xs">
+                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules('page')" />
+                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules('page')" />
                     </ToggleGroup>
                 </div>
             </PanelHeader>
@@ -201,14 +232,14 @@ provide(publishContextKey, {
                         :values="block"
                         :config="setConfigByHandle[block.type]"
                         :sortable-item-class="sortableItemClass"
-                        :collapsed="collapsed.includes(block._id)"
+                        :collapsed="pageCollapsed.includes(block._id)"
                         :enabled="block.enabled"
                         :read-only="false"
                         :can-add-rule="true"
                         :has-error="false"
                         :show-field-previews="true"
-                        @collapsed="collapseSet(block._id)"
-                        @expanded="expandSet(block._id)"
+                        @collapsed="collapseSet(block._id, 'page')"
+                        @expanded="expandSet(block._id, 'page')"
                         @removed="removeSet(block._id)"
                     />
                 </div>
@@ -229,13 +260,10 @@ provide(publishContextKey, {
         <Panel class="mt-6">
             <PanelHeader>
                 <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5">
-                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
-                        <Heading :text="__('Field Logic')" />
-                    </div>
-                    <ToggleGroup :model-value="allRulesView" size="xs">
-                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules" />
-                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules" />
+                    <Heading :text="__('Field Logic')" />
+                    <ToggleGroup :model-value="allFieldRulesView" size="xs">
+                        <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules('field')" />
+                        <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules('field')" />
                     </ToggleGroup>
                 </div>
             </PanelHeader>
@@ -251,14 +279,14 @@ provide(publishContextKey, {
                         :values="block"
                         :config="setConfigByHandle[block.type]"
                         :sortable-item-class="sortableItemClass"
-                        :collapsed="collapsed.includes(block._id)"
+                        :collapsed="fieldCollapsed.includes(block._id)"
                         :enabled="block.enabled"
                         :read-only="false"
                         :can-add-rule="true"
                         :has-error="false"
                         :show-field-previews="true"
-                        @collapsed="collapseSet(block._id)"
-                        @expanded="expandSet(block._id)"
+                        @collapsed="collapseSet(block._id, 'field')"
+                        @expanded="expandSet(block._id, 'field')"
                         @removed="removeSet(block._id)"
                     />
                 </div>
