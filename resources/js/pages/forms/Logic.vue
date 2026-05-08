@@ -1,5 +1,6 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
+import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Card, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
 import LogicAddRuleButton from './logic-list/LogicAddRuleButton.vue';
@@ -8,7 +9,7 @@ import { computed, provide, ref, watchEffect } from 'vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
 
-defineOptions({ layout: [Layout, FormsLayout] });
+defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps({
     form: Object,

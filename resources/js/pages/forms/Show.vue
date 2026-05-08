@@ -6,9 +6,10 @@ import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
+import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 
-defineOptions({ layout: [Layout, FormsLayout] });
+defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps([
     'form',

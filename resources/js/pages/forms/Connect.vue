@@ -1,5 +1,6 @@
 <script setup>
 import Layout from '@/pages/layout/Layout.vue';
+import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Badge, Button, Card, DocsCallout, Header, Heading, Icon, Panel, PanelHeader, StatusIndicator, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, ToggleGroup, ToggleItem, publishContextKey } from '@ui';
 import { computed, onMounted, provide, ref, watch, watchEffect } from 'vue';
@@ -11,7 +12,7 @@ import ConnectRule from './connect-list/ConnectRule.vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
 
-defineOptions({ layout: [Layout, FormsLayout] });
+defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps({
     form: Object,
