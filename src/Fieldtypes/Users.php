@@ -169,7 +169,7 @@ class Users extends Relationship
         };
 
         if ($request->boolean('paginate', true)) {
-            $users = $query->paginate();
+            $users = $query->paginate($request->integer('perPage', 15));
 
             $users->getCollection()->transform($userFields);
 
