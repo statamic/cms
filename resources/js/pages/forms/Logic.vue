@@ -24,9 +24,9 @@ const loadingSet = ref(null);
 
 const logicBlocks = ref([
     { _id: 'heard_about_us', type: 'heard_about_us', enabled: true, summary: __('equals Friend referral, then go to Goodbye') },
-    { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('contains years, then go to Page 1 of 2') },
+    { _id: 'fan_length', type: 'fan_length', enabled: true, summary: __('contains years, then go to Page 1') },
     { _id: 'favorite_album', type: 'favorite_album', enabled: true, summary: __('equals Days of Thunder, and :fieldname contains referral, then go to Goodbye', { fieldname: __('How did you hear about us?') }) },
-    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('equals Endless Summer, then go to Page 1 of 2') },
+    { _id: 'second_favorite_album', type: 'second_favorite_album', enabled: false, summary: __('equals Endless Summer, then go to Page 1') },
     { _id: 'age', type: 'age', enabled: true, summary: __('is greater than 21, then go to Goodbye') },
 ]);
 

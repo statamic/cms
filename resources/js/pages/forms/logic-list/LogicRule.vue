@@ -358,7 +358,10 @@ reveal.use(rootEl, () => emit('expanded'));
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <template v-else-if="part.type === 'destination'">{{ part.text }}</template>
+                                <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-1">
+                                    <Icon name="page" class="size-3! text-gray-500 dark:text-gray-300" aria-hidden="true" />
+                                    <span class="inline-block font-medium text-[0.75rem] text-gray-900 dark:text-gray-100" style="text-box: trim-start text; font-variant-numeric: lining-nums;">{{ part.text }}</span>
+                                </span>
                                 <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.725rem]">
                                     {{ part.text }}
                                 </span>
