@@ -131,7 +131,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
 
 // TODO: Refactor everything below this line
 const formTitle = computed(() => props.form?.title || __('Untitled Form'));
-const formPageTotal = 2;
+const formPageTotal = 1;
 const activeFieldSettingsTab = ref('settings');
 const activePageSettingsTab = ref('settings');
 const inspectorTarget = ref('field');
@@ -165,7 +165,7 @@ const postPageSmsUpdates = ref(false);
 const nextPageButtonLabel = ref(__('Next Page'));
 const previousPageButtonLabel = ref(__('Previous Page'));
 const submitButtonLabel = ref(__('Submit'));
-const totalFieldCount = computed(() => 13);
+const totalFieldCount = computed(() => 4);
 const introSeenLiveOptions = [
     { label: __('Yes'), value: 'yes' },
     { label: __('Not yet'), value: 'no' },
@@ -472,78 +472,6 @@ const selectedPageInternalName = computed({
         </div>
 
         <Panel
-            class="mx-auto max-w-5xl mb-6"
-            :class="{ 'pb-0': introSectionCollapsed }"
-            :data-panel-collapsed="introSectionCollapsed ? 'true' : 'false'"
-        >
-            <PanelHeader class="relative flex items-center justify-between">
-                <Heading :text="__('Getting started')" />
-                <Button
-                    @click="introSectionCollapsed = !introSectionCollapsed"
-                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
-                    :icon="introSectionCollapsed ? 'expand' : 'collapse'"
-                    size="sm"
-                    variant="ghost"
-                    :aria-label="__('Toggle section visibility')"
-                />
-            </PanelHeader>
-
-            <div
-                style="--tw-ease: ease;"
-                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! invisible! overflow-clip': introSectionCollapsed }"
-            >
-                <Card>
-                    <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-                        <Field id="intro-name-field" :label="__('What should we call you?')" required>
-                            <template #label>
-                                <Label for="intro-name-field">
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="user-avatar-flush" data-collapsed-field-icon class="size-3.5 me-1 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                                        {{ __('What should we call you?') }}
-                                        <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                    </span>
-                                </Label>
-                            </template>
-                            <Input id="intro-name-field" v-model="introFanName" :placeholder="__('Your name')" />
-                        </Field>
-
-                        <Field id="intro-city-field" :label="__('Where are you joining us from?')" :instructions="__('City or region is enough (we use this for tour and timezone hints)')">
-                            <template #label>
-                                <Label for="intro-city-field">
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
-                                        {{ __('Where are you joining us from?') }}
-                                    </span>
-                                </Label>
-                            </template>
-                            <Input id="intro-city-field" v-model="introCity" :placeholder="__('e.g. Nashville')" />
-                        </Field>
-
-                        <Field id="intro-seen-live-field" :label="__('Have you seen us live before?')">
-                            <template #label>
-                                <Label for="intro-seen-live-field">
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                        {{ __('Have you seen us live before?') }}
-                                    </span>
-                                </Label>
-                            </template>
-                            <Select
-                                id="intro-seen-live-field"
-                                v-model="introSeenLive"
-                                :options="introSeenLiveOptions"
-                                option-label="label"
-                                option-value="value"
-                                :placeholder="__('Choose one')"
-                            />
-                        </Field>
-                    </div>
-                </Card>
-            </div>
-        </Panel>
-
-        <Panel
             class="mx-auto max-w-5xl"
             :class="{ 'pb-0': panelCollapsed }"
             :data-panel-collapsed="panelCollapsed ? 'true' : 'false'"
@@ -567,155 +495,106 @@ const selectedPageInternalName = computed({
             >
                 <Card>
                     <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-                        <Field id="heard-about-field" :label="__('How did you hear about us?')" required>
-                        <template #label>
-                            <Label for="heard-about-field">
-                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <Icon name="fieldtype-select" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                    {{ __('How did you hear about us?') }}
-                                    <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                </span>
-                            </Label>
-                        </template>
-                        <Select
-                            id="heard-about-field"
-                            v-model="heardAboutValue"
-                            :options="heardAboutOptions"
-                            option-label="label"
-                            option-value="value"
-                            :placeholder="__('Choose one')"
-                        />
-                    </Field>
-
-                    <div data-fieldset-group class="space-y-7">
-                        <div id="fieldset-start">
-                            <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
-                                <span class="inline-flex" v-tooltip="__('Fieldset')">
-                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                </span>
-                                <span class="sr-only">{{ __('Fieldset') }}</span>
-                            </span>
-                            <Field :label="__('What do you like most about our band?')">
-                                <template #label>
-                                    <Label for="favorite-thing-field">
-                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
-                                            {{ __('What do you like most about our band?') }}
-                                            <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                        </span>
-                                    </Label>
-                                </template>
-                                <!-- TODO: Add logic tree icon for fields with logic -->
-                                <span class="absolute z-(--z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">
-                                    <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />
-                                </span>
-                                <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
-                            </Field>
-                        </div>
-
-                        <div id="fieldset-end">
-                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate')">
-                                <template #label>
-                                    <Label for="fan-length-field">
-                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
-                                            {{ __('How long have you been a fan?') }}
-                                        </span>
-                                    </Label>
-                                </template>
-                                <span class="absolute z-(--z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">
-                                    <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />
-                                </span>
-                                <Input id="fan-length-field" v-model="fanLength" />
-                            </Field>
-                        </div>
-                    </div>
-
-                    <div
-                        id="editing-field"
-                        :data-editing-field="isPageInspector || isActionInspector ? undefined : ''"
-                        :data-editing-item="isPageInspector || isActionInspector ? undefined : ''"
-                        @click="inspectorTarget = 'field'"
-                    >
-                        <div
-                            v-if="!isPageInspector && !isActionInspector"
-                            class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
-                        >
-                            <WidthSelector
-                                v-model="editingFieldWidth"
-                                size="base"
-                                variant="filled"
-                                class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
-                            />
-                            <Button
-                                size="sm"
-                                inset
-                                icon="duplicate"
-                                variant="subtle"
-                                :aria-label="__('Duplicate field')"
-                                :title="__('Duplicate field')"
-                                class="[&_svg]:opacity-45"
-                            />
-                            <Button
-                                size="sm"
-                                inset
-                                icon="eye"
-                                variant="subtle"
-                                :aria-label="__('Hide field')"
-                                :title="__('Hide field')"
-                                class="[&_svg]:opacity-45"
-                            />
-                            <Button
-                                size="sm"
-                                inset
-                                icon="trash"
-                                variant="subtle"
-                                :aria-label="__('Remove field')"
-                                :title="__('Remove field')"
-                                class="[&_svg]:opacity-45"
-                            />
-                        </div>
-                        <Field :label="__('Which album was your favorite?')">
-                            <template #label>
-                                <Label>
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                        {{ __('Which album was your favorite?') }}
+                        <div data-fieldset-group class="space-y-7">
+                            <div id="fieldset-start">
+                                <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
+                                    <span class="inline-flex" v-tooltip="__('Fieldset')">
+                                        <Icon name="link" class="size-3.5" aria-hidden="true" />
                                     </span>
-                                </Label>
-                            </template>
-                            <RadioGroup v-model="favoriteAlbum">
-                                <Radio
-                                v-for="album in visibleAlbumOptions"
-                                    :key="album.value"
-                                    :value="album.value"
-                                    :label="album.label"
-                                />
-                            </RadioGroup>
-                        </Field>
-                    </div>
-
-                    <div data-fieldset-group class="space-y-7">
-                        <div id="fieldset-start">
-                            <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
-                                <span class="inline-flex" v-tooltip="__('Fieldset')">
-                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
+                                    <span class="sr-only">{{ __('Fieldset') }}</span>
                                 </span>
-                                <span class="sr-only">{{ __('Fieldset') }}</span>
-                            </span>
-                            <Field :label="__('Which album was your second favorite?')">
+                                <Field :label="__('What do you like most about our band?')">
+                                    <template #label>
+                                        <Label for="favorite-thing-field">
+                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                                                {{ __('What do you like most about our band?') }}
+                                                <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
+                                            </span>
+                                        </Label>
+                                    </template>
+                                    <span class="absolute z-(--z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">
+                                        <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />
+                                    </span>
+                                    <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />
+                                </Field>
+                            </div>
+
+                            <div id="fieldset-end">
+                                <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate')">
+                                    <template #label>
+                                        <Label for="fan-length-field">
+                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                                                {{ __('How long have you been a fan?') }}
+                                            </span>
+                                        </Label>
+                                    </template>
+                                    <span class="absolute z-(--z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">
+                                        <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />
+                                    </span>
+                                    <Input id="fan-length-field" v-model="fanLength" />
+                                </Field>
+                            </div>
+                        </div>
+
+                        <div
+                            id="editing-field"
+                            :data-editing-field="isPageInspector || isActionInspector ? undefined : ''"
+                            :data-editing-item="isPageInspector || isActionInspector ? undefined : ''"
+                            @click="inspectorTarget = 'field'"
+                        >
+                            <div
+                                v-if="!isPageInspector && !isActionInspector"
+                                class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
+                            >
+                                <WidthSelector
+                                    v-model="editingFieldWidth"
+                                    size="base"
+                                    variant="filled"
+                                    class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
+                                />
+                                <Button
+                                    size="sm"
+                                    inset
+                                    icon="duplicate"
+                                    variant="subtle"
+                                    :aria-label="__('Duplicate field')"
+                                    :title="__('Duplicate field')"
+                                    class="[&_svg]:opacity-45"
+                                />
+                                <Button
+                                    size="sm"
+                                    inset
+                                    icon="eye"
+                                    variant="subtle"
+                                    :aria-label="__('Hide field')"
+                                    :title="__('Hide field')"
+                                    class="[&_svg]:opacity-45"
+                                />
+                                <Button
+                                    size="sm"
+                                    inset
+                                    icon="trash"
+                                    variant="subtle"
+                                    :aria-label="__('Remove field')"
+                                    :title="__('Remove field')"
+                                    class="[&_svg]:opacity-45"
+                                />
+                            </div>
+                            <Field :label="__('Which album was your favorite?')">
                                 <template #label>
                                     <Label>
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon name="fieldtype-radio" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                            {{ __('Which album was your second favorite?') }}
+                                            {{ __('Which album was your favorite?') }}
                                         </span>
                                     </Label>
                                 </template>
-                                <RadioGroup v-model="secondFavoriteAlbum">
+                                <RadioGroup v-model="favoriteAlbum">
                                     <Radio
                                         v-for="album in visibleAlbumOptions"
-                                        :key="`second-${album.value}`"
+                                        :key="album.value"
                                         :value="album.value"
                                         :label="album.label"
                                     />
@@ -723,52 +602,19 @@ const selectedPageInternalName = computed({
                             </Field>
                         </div>
 
-                        <Field :label="__('Sign up for email notifications from The Midnight')">
+                        <Field id="age-field" class="opacity-60" :label="__('How old are you?')">
                             <template #label>
-                                <Label>
+                                <Label for="age-field">
                                     <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="fieldtype-checkboxes" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                        {{ __('Sign up for email notifications from The Midnight') }}
+                                        <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                                        {{ __('How old are you?') }}
+                                        <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                                     </span>
                                 </Label>
                             </template>
-                            <CheckboxGroup v-model="emailNotifications">
-                                <Checkbox
-                                    v-for="notification in notificationOptions"
-                                    :key="notification.value"
-                                    :value="notification.value"
-                                    :label="notification.label"
-                                />
-                            </CheckboxGroup>
+                            <Input id="age-field" v-model="age" type="number" />
                         </Field>
 
-                        <div id="fieldset-end">
-                            <Field id="age-field" class="opacity-60" :label="__('How old are you?')">
-                                <template #label>
-                                    <Label for="age-field">
-                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                                            {{ __('How old are you?') }}
-                                            <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
-                                        </span>
-                                    </Label>
-                                </template>
-                                <Input id="age-field" v-model="age" type="number" />
-                            </Field>
-                        </div>
-                    </div>
-
-                        <Field :label="__('I want a free drink voucher')">
-                        <template #label>
-                            <Label>
-                                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <Icon name="fieldtype-toggle" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                    {{ __('I want a free drink voucher') }}
-                                </span>
-                            </Label>
-                        </template>
-                        <Switch v-model="wantsFreeDrinkVoucher" />
-                        </Field>
                         <div
                             id="action-next-button"
                             class="mt-8"
@@ -781,144 +627,6 @@ const selectedPageInternalName = computed({
                                 class="border-0! dark:border-0! ring-0! shadow-none!"
                                 style="--theme-color-primary: var(--theme-color-gray-950)"
                                 :text="nextPageButtonLabel"
-                            />
-                        </div>
-                    </div>
-                </Card>
-            </div>
-        </Panel>
-
-        <div
-            id="form-page-2"
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 mt-12"
-            role="button"
-            tabindex="0"
-            :aria-label="__('Goodbye')"
-            data-form-page-label
-            data-form-page="2"
-            @click="inspectorTarget = 'page_2'"
-            @keydown.enter.prevent="inspectorTarget = 'page_2'"
-            @keydown.space.prevent="inspectorTarget = 'page_2'"
-        >
-            <div class="flex items-center gap-4 cursor-pointer">
-                <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
-                <div
-                    class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200"
-                    :data-editing-item="inspectorTarget === 'page_2' ? '' : undefined"
-                    :class="inspectorTarget === 'page_2' ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
-                >
-                    <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                    {{ __('Goodbye') }}
-                </div>
-                <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
-            </div>
-        </div>
-
-        <Panel
-            class="mx-auto max-w-5xl mb-6"
-            :class="{ 'pb-0': postPageSectionCollapsed }"
-            :data-panel-collapsed="postPageSectionCollapsed ? 'true' : 'false'"
-        >
-            <PanelHeader class="relative flex items-center justify-between">
-                <Heading :text="__('Before you go')" />
-                <Button
-                    @click="postPageSectionCollapsed = !postPageSectionCollapsed"
-                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
-                    :icon="postPageSectionCollapsed ? 'expand' : 'collapse'"
-                    size="sm"
-                    variant="ghost"
-                    :aria-label="__('Toggle section visibility')"
-                />
-            </PanelHeader>
-
-            <div
-                style="--tw-ease: ease;"
-                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! invisible! overflow-clip': postPageSectionCollapsed }"
-            >
-                <Card>
-                    <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-                        <Field id="post-page-email-field" :label="__('Where should we send your confirmation?')" required>
-                            <template #label>
-                                <Label for="post-page-email-field">
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="mail-sign-at" data-collapsed-field-icon class="size-3.5 me-1 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                                        {{ __('Where should we send your confirmation?') }}
-                                        <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>
-                                    </span>
-                                </Label>
-                            </template>
-                            <Input id="post-page-email-field" v-model="postPageEmail" type="email" :placeholder="__('you@example.com')" />
-                        </Field>
-
-                        <Field id="post-page-note-field" :label="__('Anything else we should know?')" :instructions="__('Song requests, accessibility needs, or shout-outs for the crew (optional)')">
-                            <template #label>
-                                <Label for="post-page-note-field">
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
-                                        {{ __('Anything else we should know?') }}
-                                    </span>
-                                </Label>
-                            </template>
-                            <Textarea id="post-page-note-field" v-model="postPageFinalNote" :rows="3" resize="vertical" />
-                        </Field>
-
-                        <Field id="post-page-contact-method-field" :label="__('Preferred confirmation method')">
-                            <template #label>
-                                <Label for="post-page-contact-method-field">
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="mail-sign-at" data-collapsed-field-icon class="size-3.5 me-1 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                                        {{ __('Preferred confirmation method') }}
-                                    </span>
-                                </Label>
-                            </template>
-                            <Select
-                                id="post-page-contact-method-field"
-                                v-model="postPageContactMethod"
-                                :options="postPageContactMethodOptions"
-                            />
-                        </Field>
-
-                        <Field :label="__('Best time to contact you')">
-                            <template #label>
-                                <Label>
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="time-clock-circle" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                                        {{ __('Best time to contact you') }}
-                                    </span>
-                                </Label>
-                            </template>
-                            <RadioGroup v-model="postPageBestTime">
-                                <Radio
-                                    v-for="timeOption in postPageBestTimeOptions"
-                                    :key="timeOption.value"
-                                    :label="timeOption.label"
-                                    :value="timeOption.value"
-                                />
-                            </RadioGroup>
-                        </Field>
-
-                        <Field :label="__('Send me text updates about schedule changes')">
-                            <template #label>
-                                <Label>
-                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <Icon name="mail-sign-hashtag" data-collapsed-field-icon class="size-3.5 me-1 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-                                        {{ __('Send me text updates about schedule changes') }}
-                                    </span>
-                                </Label>
-                            </template>
-                            <Switch v-model="postPageSmsUpdates" />
-                        </Field>
-
-                        <div id="action-submit-button">
-                            <Button
-                                variant="primary"
-                                @click.prevent="inspectActionButton('action_submit')"
-                                :data-editing-field="inspectorTarget === 'action_submit' ? '' : undefined"
-                                :data-editing-item="inspectorTarget === 'action_submit' ? '' : undefined"
-                                class="border-0! dark:border-0! ring-0! shadow-none!"
-                                style="--theme-color-primary: var(--theme-color-gray-950)"
-                                :text="submitButtonLabel"
                             />
                         </div>
                     </div>
