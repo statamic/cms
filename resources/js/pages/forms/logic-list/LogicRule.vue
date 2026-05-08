@@ -260,9 +260,8 @@ reveal.use(rootEl, () => emit('expanded'));
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed,
                 }"
             >
-                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
-                    <Badge v-if="collapsed" pill size="sm" color="white" class="gap-1.5">
-                        <Icon v-if="collapsedPrefixIcon" :name="collapsedPrefixIcon" class="size-3.5!" aria-hidden="true" />
+                <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 ps-0 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
+                    <Badge v-if="collapsed && !collapsedPrefixIcon" pill size="sm" color="white" class="gap-1.5">
                         <span>{{ collapsedPrefixLabel }}</span>
                     </Badge>
                     <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
@@ -278,6 +277,10 @@ reveal.use(rootEl, () => emit('expanded'));
                             aria-hidden="true"
                         />
                         {{ __(config.display) || config.handle }}
+                    </Badge>
+                    <Badge v-if="collapsed && collapsedPrefixIcon" pill size="sm" color="white" class="gap-1.5">
+                        <Icon v-if="collapsedPrefixIcon" :name="collapsedPrefixIcon" class="size-3.5!" aria-hidden="true" />
+                        <span>{{ collapsedPrefixLabel }}</span>
                     </Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"

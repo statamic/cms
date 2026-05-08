@@ -80,7 +80,7 @@ const allFieldRulesView = computed(() => {
 });
 const hideWhenFieldHandles = new Set(['age', 'second_favorite_album']);
 const fieldCollapsedPrefixLabel = (block) => (
-    hideWhenFieldHandles.has(block._id) ? __('Hide') : __('Show')
+    hideWhenFieldHandles.has(block._id) ? __('Hide when') : __('Show when')
 );
 const fieldCollapsedPrefixIcon = (block) => (
     hideWhenFieldHandles.has(block._id) ? 'eye-closed' : 'eye'
