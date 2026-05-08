@@ -27,6 +27,7 @@ import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
 import { parseAbsoluteToLocal } from '@internationalized/date';
+import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -110,6 +111,8 @@ const timeZoneLabel = computed(() => {
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
 });
 
+const additionalTimezones = computed(() => getAdditionalTimezones(timeZoneName.value));
+
 const hoverCardDate = computed(() => {
     if (!props.modelValue?.start || !props.modelValue?.end) return null;
     return { start: props.modelValue.start.toDate(), end: props.modelValue.end.toDate() };
@@ -182,7 +185,7 @@ const hoverCardDate = computed(() => {
                     <TimezoneHoverCard
                         v-if="timeZoneLabel && hoverCardDate"
                         :date="hoverCardDate"
-                        :additional-timezones="[{ timezone: timeZoneName, label: __('This field') }]"
+                        :additional-timezones="additionalTimezones"
                         side="top"
                     >
                         <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
