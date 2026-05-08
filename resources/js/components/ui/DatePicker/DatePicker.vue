@@ -27,6 +27,7 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
+import { getAdditionalTimezones } from './util.js';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -107,6 +108,8 @@ const timeZoneLabel = computed(() => {
     const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
 });
+
+const additionalTimezones = computed(() => getAdditionalTimezones(timeZoneName.value));
 
 const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
@@ -203,7 +206,7 @@ const getInputLabel = (part) => {
                         <TimezoneHoverCard
                             v-if="timeZoneLabel"
                             :date="modelValue.toDate()"
-                            :additional-timezones="[{ timezone: timeZoneName, label: __('This field') }]"
+                            :additional-timezones="additionalTimezones"
                             side="top"
                         >
                             <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
