@@ -371,20 +371,33 @@ export default {
                 return;
             }
 
+            const allowedHashes = Object.values(this.setConfigHashes);
+            const compatible = data.items.filter((item) => allowedHashes.includes(item.configHash));
+            const skipped = data.items.length - compatible.length;
+
+            if (compatible.length === 0) {
+                return;
+            }
+
             const maxSets = this.config.max_sets;
-            if (maxSets && (this.value.length + data.items.length) > maxSets) {
+            if (maxSets && (this.value.length + compatible.length) > maxSets) {
                 this.$toast.error(__('Pasting would exceed the maximum number of sets'));
                 return;
             }
 
-            const newSets = data.items.map((item) => {
+            const newSets = compatible.map((item) => {
                 const newId = uniqid();
                 this.updateSetMeta(newId, item.meta);
                 return { ...item.values, _id: newId };
             });
 
             this.update([...this.value, ...newSets]);
-            this.$toast.success(__('Sets pasted'));
+
+            if (skipped > 0) {
+                this.$toast.success(__n(':count set pasted, :skipped skipped|:count sets pasted, :skipped skipped', compatible.length, { skipped }));
+            } else {
+                this.$toast.success(__('Sets pasted'));
+            }
         },
 
         duplicateSet(old_id) {

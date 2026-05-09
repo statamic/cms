@@ -65,7 +65,7 @@ export default function useClipboard() {
             return false;
         }
 
-        return state.data.items.every((item) => allowedHashes.includes(item.configHash));
+        return state.data.items.some((item) => allowedHashes.includes(item.configHash));
     };
 
     return { state, get, set, clear, canPaste };
