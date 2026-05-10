@@ -1,7 +1,7 @@
 @php
     $isMultiple = ! isset($max_items) || $max_items !== 1;
     $inline = isset($inline) && $inline === true;
-    $placeholderText = $placeholder ?? __('Please select...');
+    $placeholderText = $placeholder ?? trans('Please select...');
 
     $fieldName = $handle;
 
