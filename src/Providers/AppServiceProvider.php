@@ -85,7 +85,9 @@ class AppServiceProvider extends ServiceProvider
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
+            config('statamic.templates.language', 'antlers') === 'blade'
+                ? "{$this->root}/resources/views/extend/forms/blade"
+                : "{$this->root}/resources/views/extend/forms/antlers" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
         $this->publishes([
