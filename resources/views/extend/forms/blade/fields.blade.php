@@ -1,3 +1,6 @@
+@php
+    use function Statamic\trans as __;
+@endphp
 @foreach ($fields as $field)
     <div class="p-4">
         <label for="{{ $field['id'] }}">
