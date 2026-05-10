@@ -182,7 +182,15 @@ const stripThenGoTo = (text = '') => {
     return text.replace(new RegExp(marker, 'ig'), '').trim();
 };
 
-const compactDestinationLabel = (text = '') => text.replace(/^page\s+/i, '').trim();
+const formatPageReferenceChip = (text = '') => {
+    const trimmed = text.trim();
+    const normalized = trimmed.toLowerCase();
+    const pageOneLabel = __('Page 1').trim().toLowerCase();
+    if (normalized === pageOneLabel || normalized === '1' || /^page\s*1\b/i.test(trimmed)) {
+        return __('1 of 2');
+    }
+    return trimmed;
+};
 
 const pageLogicDestinationPart = computed(() => collapsedSummaryParts.value.find((part) => part.type === 'destination'));
 
@@ -394,7 +402,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                         v-if="pageLogicDestinationPart?.text"
                                         class="pe-0.5"
                                         style="text-box: trim-start text; font-variant-numeric: lining-nums;"
-                                    >{{ compactDestinationLabel(pageLogicDestinationPart.text) }}</span>
+                                    >{{ formatPageReferenceChip(pageLogicDestinationPart.text) }}</span>
                                 </Badge>
                                 <template v-else>{{ part.text }}</template>
                             </template>

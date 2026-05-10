@@ -108,7 +108,7 @@ const fieldDestinationOptions = [
     { label: __('I want a free drink voucher'), value: 'free_drink_voucher', icon: 'fieldtype-toggle', category: 'choice' },
 ];
 const pageDestinationOptions = [
-    { label: __('Page 1'), value: 'page_1', icon: 'page', category: 'page' },
+    { label: __('page 1/2'), value: 'page_1', icon: 'page', category: 'page' },
     { label: __('Goodbye'), value: 'page_2', icon: 'page', category: 'page' },
 ];
 const logicConditionField = ref(props.mockPreset.logicConditionField || 'long_answer');
