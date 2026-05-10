@@ -396,8 +396,8 @@ reveal.use(rootEl, () => emit('expanded'));
                                     color="white"
                                     class="inline-flex items-center gap-1 px-1.5 font-medium text-gray-800 dark:text-gray-200"
                                 >
-                                    <span style="text-box: trim-start text;">{{ __('go to') }}</span>
                                     <Icon name="page" class="size-3! shrink-0 me-0.5 text-gray-500 dark:text-gray-300" aria-hidden="true" />
+                                    <span style="text-box: trim-start text;">{{ __('go to') }}</span>
                                     <span
                                         v-if="pageLogicDestinationPart?.text"
                                         class="pe-0.5"
