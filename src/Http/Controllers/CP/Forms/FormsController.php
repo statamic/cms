@@ -10,7 +10,9 @@ use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
 use Statamic\Forms\Fields\Fallback;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
@@ -80,40 +82,34 @@ class FormsController extends CpController
             ->map(fn ($fieldtype) => (new Fallback)->wrapping($fieldtype))
             ->values();
 
+        $fieldtypes = $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values();
+
         return Inertia::render('forms/Builder', [
             'form' => $form,
-            'fieldtypes' => $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values(),
+            'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype) => [
+                ...$fieldtype->toArray(),
+                'preview' => $this->fieldtypePreview($fieldtype),
+            ]),
         ]);
     }
 
-    /**
-     * Get the metrics array ready to be injected into a Grid field.
-     *
-     * @param  Form  $form
-     * @return array
-     */
-    private function preProcessMetrics($form)
+    private function fieldtypePreview(FormFieldtype $fieldtype): array
     {
-        $metrics = [];
+        try {
+            $field = $fieldtype instanceof Fallback
+                ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle']])
+                : (clone $fieldtype)->setField(new FormField($fieldtype->handle(), ['type' => $fieldtype->handle()]))->toField();
 
-        foreach ($form->formset()->get('metrics', []) as $params) {
-            $metric = [
-                'type' => $params['type'],
-                'label' => $params['label'],
+            $field->setValue($field->defaultValue());
+
+            return [
+                'config' => $field->toPublishArray(),
+                'value' => $field->fieldtype()->preProcess($field->value()),
+                'meta' => $field->fieldtype()->preload(),
             ];
-            unset($params['type'], $params['label']);
-
-            foreach ($params as $key => $value) {
-                $metric['params'][] = [
-                    'value' => $key,
-                    'text' => $value,
-                ];
-            }
-
-            $metrics[] = $metric;
+        } catch (\Throwable) {
+            return [];
         }
-
-        return $metrics;
     }
 
     public function create()
@@ -357,10 +353,6 @@ class FormsController extends CpController
                     ],
                 ],
             ],
-
-            // metrics
-            // ...
-
         ];
 
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {

@@ -4,7 +4,7 @@ import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import LogicFlowMock from './LogicFlowMock.vue';
 import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
-import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
+import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, PublishContainer, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
@@ -22,21 +22,32 @@ const props = defineProps({
     fieldtypes: Array,
 });
 
-// todo: the original value should come from a prop
+// todo: the original value should come from a prop (initialFormFields)
 const formFields = ref({
     sections: [
         {
             _id: 'abc',
             collapsed: false,
             title: 'Section 1',
-            fields: [
-                //
-            ],
+            fields: [],
+            values: {},
+            meta: {},
         },
     ],
 });
 
 const sections = computed(() => formFields.value.sections);
+
+const sectionBlueprint = (section) => ({
+    tabs: [{
+        handle: 'main',
+        sections: [{
+            fields: section.fields
+                .filter((field) => field.publishConfig)
+                .map((field) => field.publishConfig),
+        }],
+    }],
+});
 
 const toggleSection = (section) => {
     formFields.value.sections.forEach((s) => {
@@ -52,6 +63,7 @@ const addField = (sectionId, fieldtypeHandle, index = null) => {
     const section = formFields.value.sections.find((section) => section._id === sectionId);
     if (!section) return;
 
+    const handle = uniqid();
     const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
 
     const field = {
@@ -59,12 +71,12 @@ const addField = (sectionId, fieldtypeHandle, index = null) => {
         config: {
             display: __(fieldtype.title),
             hidden: false,
-            // todo: fieldtype's default values?
         },
         fieldtype: fieldtypeHandle,
-        handle: uniqid(),
+        handle,
         icon: fieldtype?.icon || 'fieldtype-generic',
         type: 'inline',
+        publishConfig: { ...fieldtype.preview.config, handle },
     };
 
     if (index !== null) {
@@ -72,6 +84,9 @@ const addField = (sectionId, fieldtypeHandle, index = null) => {
     } else {
         section.fields.push(field);
     }
+
+    section.values[handle] = fieldtype.preview.value;
+    section.meta[handle] = fieldtype.preview.meta;
 };
 
 let draggableInstance = null;
@@ -283,26 +298,43 @@ const inspectActionButton = (target) => {
                         </div>
                     </div>
 
-                    <div v-else class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-                        <div v-for="field in section.fields" :key="field._id" data-field-item>
-                            <Field
-                                :id="field._id"
-                                :class="{ 'opacity-60': field.config.hidden }"
-                                :label="field.config.display"
-                            >
-                                <template #label>
-                                    <Label :for="field._id">
-                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon :name="field.icon" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                                            {{ field.config.display }}
-                                            <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
-                                        </span>
-                                    </Label>
-                                </template>
-                                <Input :id="field._id" />
-                            </Field>
+                    <PublishContainer
+                        v-else
+                        :name="'form-builder-' + section._id"
+                        :blueprint="sectionBlueprint(section)"
+                        v-model="section.values"
+                        :meta="section.meta"
+                        :track-dirty-state="false"
+                    >
+                        <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                            <div v-for="field in section.fields" :key="field._id" data-field-item>
+                                <Field
+                                    :id="field._id"
+                                    :class="{ 'opacity-60': field.config.hidden }"
+                                    :label="field.config.display"
+                                >
+                                    <template #label>
+                                        <Label :for="field._id">
+                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                <Icon :name="field.icon" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                                                {{ field.config.display }}
+                                                <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
+                                            </span>
+                                        </Label>
+                                    </template>
+                                    <div v-if="field.publishConfig" inert>
+                                        <component
+                                            :is="`${field.publishConfig.component || field.publishConfig.type}-fieldtype`"
+                                            :config="field.publishConfig"
+                                            :value="section.values[field.handle]"
+                                            :meta="section.meta[field.handle]"
+                                            :handle="field.handle"
+                                        />
+                                    </div>
+                                </Field>
+                            </div>
                         </div>
-                    </div>
+                    </PublishContainer>
                 </Card>
             </div>
         </Panel>
@@ -481,9 +513,7 @@ const inspectActionButton = (target) => {
     </div>
 
     <Button
-        class="
-        min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above)
-        sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
+        class="min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above) sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
         icon="cog"
