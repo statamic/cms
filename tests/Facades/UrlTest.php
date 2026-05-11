@@ -560,6 +560,26 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function making_urls_absolute_ignores_front_controller_in_request_root()
+    {
+        $this->setSiteValue('en', 'url', '/');
+
+        $request = \Illuminate\Http\Request::create(
+            'http://absolute-url-resolved-from-request.com/index.php',
+            'GET',
+            [],
+            [],
+            [],
+            ['SCRIPT_NAME' => '/index.php', 'SCRIPT_FILENAME' => 'index.php', 'PHP_SELF' => '/index.php']
+        );
+        $this->app->instance('request', $request);
+        \Illuminate\Support\Facades\URL::setRequest($request);
+
+        $this->assertSame('http://absolute-url-resolved-from-request.com', URL::makeAbsolute('/'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo', URL::makeAbsolute('/foo'));
+    }
+
+    #[Test]
     #[DataProvider('relativeProvider')]
     public function it_makes_urls_relative($url, $expected)
     {
