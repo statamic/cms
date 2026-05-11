@@ -337,11 +337,19 @@ abstract class Fieldtype implements Arrayable
 
     public function view()
     {
-        $default = 'statamic::forms.fields.'.$this->handle();
+        $language = config('statamic.templates.language', 'antlers');
+        $handle = $this->handle();
 
-        return view()->exists($default)
-            ? $default
-            : 'statamic::forms.fields.default';
+        $views = [
+            "statamic::forms.fields.{$handle}",
+            "statamic::forms.{$language}.fields.{$handle}",
+            "statamic::forms.{$language}.fields.default"
+        ];
+
+        $view = collect($views)->first(fn ($view) => view()->exists($view));
+
+        return $view
+            ?: 'statamic::forms.fields.default';
     }
 
     public function config(?string $key = null, $fallback = null)
