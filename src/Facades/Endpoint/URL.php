@@ -163,7 +163,10 @@ class URL
      */
     public function removeSiteUrl(?string $url): string
     {
-        return self::tidy(preg_replace('#^'.Config::getSiteUrl().'#', '/', $url));
+        $url = URL::makeAbsolute($url);
+        $url = Str::removeLeft($url, Site::current()->absoluteUrl());
+
+        return self::tidy($url);
     }
 
     /**
