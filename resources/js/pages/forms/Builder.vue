@@ -381,7 +381,7 @@ const selectedPageInternalName = computed({
             </div>
             <!-- This is the desktop nav - the content is repeated from the left panel -->
             <div class="px-0.5 pt-6 max-[1000px]:hidden">
-                <Input icon="magnifying-glass" :placeholder="__('Search Field Types...')" v-model="search" />
+                <Input icon="magnifying-glass" :legible-text="false" input-class="rounded-xl" :placeholder="__('Search Field Types...')" v-model="search" />
 
                 <ul class="py-10 grid gap-8 @container">
                     <li
