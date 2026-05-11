@@ -53,6 +53,10 @@ const categories = {
         title: __('Payment'),
         color: 'bg-green-500',
     },
+    other: {
+        title: __('Other'),
+        color: 'bg-gray-500',
+    },
 };
 
 const allFieldtypes = computed(() => {
