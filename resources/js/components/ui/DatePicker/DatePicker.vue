@@ -298,6 +298,7 @@ const getInputLabel = (part) => {
                             type="button"
                             variant="subtle"
                             size="xs"
+                            class="h-4"
                             :text="todayShortcutLabel"
                             :disabled="disabled || readOnly"
                             @click="onTodayShortcutClick"
