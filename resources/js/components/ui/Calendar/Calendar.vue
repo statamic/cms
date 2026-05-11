@@ -74,6 +74,20 @@ const gridStyle = computed(() => {
         'grid-template-rows': 'auto'
     };
 });
+
+/** Popover uses slight negative inset to align with card; inline skips that inside padded layouts. */
+const calendarHeaderClass = computed(() =>
+    props.inline
+        ? 'flex items-center justify-between pb-3.5 ms-1 -me-1.5 -mt-1'
+        : 'flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1',
+);
+
+/** Month grid wrapper: popover matches narrow card; inline allows shrink in tight form layouts. */
+const calendarGridClass = computed(() =>
+    props.inline
+        ? 'w-full border-collapse space-y-1 select-none -ms-2'
+        : 'w-full border-collapse space-y-1 select-none',
+);
 </script>
 
 <template>
@@ -88,7 +102,7 @@ const gridStyle = computed(() => {
         :number-of-months="numberOfMonths"
         @update:model-value="emit('update:modelValue', $event)"
     >
-        <Component :is="components.CalendarHeader" class="flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1">
+        <Component :is="components.CalendarHeader" :class="calendarHeaderClass">
             <Component :is="components.CalendarHeading" class="text-sm font-medium text-gray-925 dark:text-white" />
             <div>
                 <Component
@@ -111,7 +125,7 @@ const gridStyle = computed(() => {
                 :is="components.CalendarGrid"
                 v-for="month in grid"
                 :key="month.value.toString()"
-                class="w-full border-collapse space-y-1 select-none"
+                :class="calendarGridClass"
             >
                 <Component :is="components.CalendarGridHead">
                     <ui-badge class="mb-2" v-if="numberOfMonths > 1">
