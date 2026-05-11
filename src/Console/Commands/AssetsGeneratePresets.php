@@ -7,6 +7,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Image;
 use Statamic\Jobs\GeneratePresetImageManipulation;
 use Statamic\Support\Arr;
 
@@ -25,6 +26,7 @@ class AssetsGeneratePresets extends Command
      * @var string
      */
     protected $signature = 'statamic:assets:generate-presets
+        {--preset= : Only generate a specific preset. Use "cp_thumbnail" to generate all cp_thumbnail_small_* presets.}
         {--queue : Queue the image generation.}
         {--excluded-containers= : Comma separated list of container handles to exclude.}';
 
@@ -63,11 +65,19 @@ class AssetsGeneratePresets extends Command
             $excludedContainers = explode(',', $excludedContainers);
         }
 
+        $filterPreset = $this->option('preset');
+
+        if ($filterPreset !== null && $filterPreset !== 'cp_thumbnail' && ! array_key_exists($filterPreset, Image::manipulationPresets())) {
+            error("The preset \"{$filterPreset}\" does not exist.");
+
+            return 1;
+        }
+
         AssetContainer::all()->filter(function ($container) use ($excludedContainers) {
             return ! in_array($container->handle(), $excludedContainers ?? []);
-        })->sortBy('title')->each(function ($container) {
+        })->sortBy('title')->each(function ($container) use ($filterPreset) {
             note('Generating presets for <comment>'.$container->title().'</comment>...');
-            $this->generatePresets($container);
+            $this->generatePresets($container, $filterPreset);
             $this->newLine();
         });
     }
@@ -78,16 +88,17 @@ class AssetsGeneratePresets extends Command
      * @param  \Statamic\Contracts\Assets\AssetContainer  $container
      * @return void
      */
-    private function generatePresets($container)
+    protected function generatePresets($container, ?string $filterPreset = null)
     {
         $assets = $container->assets()->filter->isImage();
         $counts = [];
 
-        // The amount of extra cp presets for each asset. The amount will
-        // be consistent across assets, but just not the preset names.
-        $cpPresets = config('statamic.cp.enabled') ? 1 : 0;
-
-        $steps = (count($container->warmPresets()) + $cpPresets) * count($assets);
+        if ($filterPreset === null) {
+            $cpPresets = config('statamic.cp.enabled') ? 1 : 0;
+            $steps = (count($container->warmPresets()) + $cpPresets) * count($assets);
+        } else {
+            $steps = $assets->sum(fn ($asset) => count($this->filterPresets($asset->warmPresets(), $filterPreset)));
+        }
 
         if ($steps > 0) {
             $progress = progress(
@@ -98,7 +109,7 @@ class AssetsGeneratePresets extends Command
             $progress->start();
 
             foreach ($assets as $asset) {
-                foreach ($asset->warmPresets() as $preset) {
+                foreach ($this->filterPresets($asset->warmPresets(), $filterPreset) as $preset) {
                     $counts[$preset] = ($counts[$preset] ?? 0) + 1;
                     $progress->label("Generating $preset for {$asset->basename()}...");
 
@@ -134,5 +145,18 @@ class AssetsGeneratePresets extends Command
         }
 
         $this->output->newLine();
+    }
+
+    protected function filterPresets(array $presets, ?string $filterPreset): array
+    {
+        if ($filterPreset === null) {
+            return $presets;
+        }
+
+        if ($filterPreset === 'cp_thumbnail') {
+            return array_values(array_filter($presets, fn ($p) => str_starts_with($p, 'cp_thumbnail_small_')));
+        }
+
+        return in_array($filterPreset, $presets) ? [$filterPreset] : [];
     }
 }

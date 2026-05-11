@@ -7,6 +7,8 @@ use Facades\Statamic\Preferences\CorePreferences;
 use Illuminate\Support\Arr;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class Preferences
 {
     protected $dotted = [];
@@ -45,7 +47,7 @@ class Preferences
     {
         $this->resetState();
 
-        if (auth()->check()) {
+        if (User::current()) {
             $this
                 ->mergeDottedUserPreferences()
                 ->mergeDottedRolePreferences();

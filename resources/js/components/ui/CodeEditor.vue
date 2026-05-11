@@ -1,6 +1,6 @@
 <script setup>
 import CodeMirror from 'codemirror';
-import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import Select from './Select/Select.vue';
 import { colorMode as colorModeApi } from '@api';
 
@@ -99,6 +99,7 @@ const modes = ref([
 const codemirror = ref(null);
 const codemirrorElement = useTemplateRef('codemirrorElement');
 const fullScreenMode = ref(false);
+const visibilityObserver = ref(null);
 
 defineOptions({
     inheritAttrs: false,
@@ -110,7 +111,19 @@ defineExpose({
 });
 
 onMounted(() => {
-    nextTick(() => initCodeMirror());
+    nextTick(() => {
+        initCodeMirror();
+        initVisibilityObserver();
+    });
+});
+
+onBeforeUnmount(() => {
+    visibilityObserver.value?.disconnect();
+
+    if (codemirror.value) {
+        codemirror.value.getWrapperElement().remove();
+        codemirror.value = null;
+    }
 });
 
 function initCodeMirror() {
@@ -147,6 +160,21 @@ function initCodeMirror() {
             codemirror.value.getInputField().blur();
         }
     });
+}
+
+function initVisibilityObserver() {
+    visibilityObserver.value = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    codemirror.value?.refresh();
+                }
+            });
+        },
+        { threshold: 0.01 },
+    );
+
+    visibilityObserver.value.observe(codemirrorElement.value);
 }
 
 watch(
@@ -260,6 +288,7 @@ watch(
                     v-if="allowModeSelection"
                     :options="modes"
                     :disabled="disabled"
+                    :adaptive-width="true"
                     :model-value="mode"
                     @update:modelValue="$emit('update:mode', $event)"
                 />
@@ -277,6 +306,7 @@ watch(
                         v-if="allowModeSelection"
                         :options="modes"
                         :disabled="disabled"
+                        :adaptive-width="true"
                         :model-value="mode"
                         searchable
                         @update:modelValue="$emit('update:mode', $event)"

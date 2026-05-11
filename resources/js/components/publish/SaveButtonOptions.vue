@@ -65,9 +65,7 @@ export default {
         setPreference(value) {
             if (value === this.$preferences.get(this.preferencesKey)) return;
 
-            value === 'listing'
-                ? this.$preferences.remove(this.preferencesKey)
-                : this.$preferences.set(this.preferencesKey, value);
+            this.$preferences.set(this.preferencesKey, value);
         },
     },
 };

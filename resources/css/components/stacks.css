@@ -23,11 +23,8 @@
     }
     .stack-container {
         @apply absolute inset-0;
-        transition: left 200ms ease-out;
-
-        [dir='rtl'] & {
-            transition: right 200ms ease-out;
-        }
+        transition: transform 200ms ease-out;
+        -webkit-backface-visibility: hidden;
     }
 
     .stack-overlay {
@@ -40,17 +37,6 @@
 
     .stack-content {
         @apply relative h-[calc(100svh-1rem)];
-    }
-
-    .stack-overlay-fade-enter-active,
-    .stack-overlay-fade-leave-active {
-        transition: opacity 200ms ease-out;
-        will-change: opacity;
-    }
-
-    .stack-overlay-fade-enter-from,
-    .stack-overlay-fade-leave-to {
-        opacity: 0;
     }
 
     .stack-slide-enter-active,
@@ -81,10 +67,14 @@
 @media all and (max-width: 980px) {
     .stacks-on-stacks .stack-container {
         left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        transform: translateX(0) !important;
 
         [dir='rtl'] & {
-            left: unset !important;
+            left: 0 !important;
             right: 0 !important;
+            transform: translateX(0) !important;
         }
     }
 }

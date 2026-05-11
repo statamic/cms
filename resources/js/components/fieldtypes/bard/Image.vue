@@ -12,19 +12,19 @@
             </div>
 
             <div
-                class="flex flex-wrap items-center justify-center gap-2 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150"
+                class="flex flex-wrap items-center justify-center gap-2 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-gray-900 dark:text-gray-300"
             >
-                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @click="openSelector" />
+                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @mousedown.prevent @click="openSelector" />
 
-                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @click="edit" />
-                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @click="toggleAltEditor" />
-                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @click="openSelector" />
-                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @click="deleteNode" />
+                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @mousedown.prevent @click="edit" />
+                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @mousedown.prevent @click="toggleAltEditor" />
+                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @mousedown.prevent @click="openSelector" />
+                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @mousedown.prevent @click="deleteNode" />
             </div>
 
             <div
                 v-if="showingAltEdit"
-                class="flex items-center rounded-b border-t p-2 dark:border-dark-900"
+                class="flex items-center rounded-b border-t p-2 dark:border-gray-900"
                 @paste.stop
             >
                 <Input
@@ -212,12 +212,6 @@ export default {
             this.setAsset(asset);
             this.closeEditor();
         },
-    },
-
-    updated() {
-        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
-        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
-        this.$el.setAttribute('draggable', false);
     },
 };
 </script>

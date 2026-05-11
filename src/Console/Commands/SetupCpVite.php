@@ -53,24 +53,24 @@ class SetupCpVite extends Command
 
                 $installedDependencies = collect($contents['dependencies'] ?? [])->merge($contents['devDependencies'] ?? []);
 
-                if (! $installedDependencies->contains('vite')) {
-                    $contents['devDependencies']['vite'] = '^7.0.4';
+                if (! $installedDependencies->has('vite')) {
+                    $contents['devDependencies']['vite'] = '^8.0.0';
                 }
 
-                if (! $installedDependencies->contains('@statamic/cms')) {
+                if (! $installedDependencies->has('@statamic/cms')) {
                     $contents['dependencies']['@statamic/cms'] = 'file:./vendor/statamic/cms/resources/dist-package';
                 }
 
                 File::put($packageJsonPath, json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-                return Process::path(base_path())->run('npm install');
+                return Process::path(base_path())->run('npm install --ignore-scripts');
             },
             message: 'Installing dependencies...'
         );
 
         if ($result->failed()) {
             $this->line($result->errorOutput() ?: $result->output());
-            $this->components->error('Failed to install dependencies. You need to run "npm install" manually.');
+            $this->components->error('Failed to install dependencies. You need to run "npm install --ignore-scripts" manually.');
 
             return $this;
         }
@@ -87,7 +87,7 @@ class SetupCpVite extends Command
 
         $contents['scripts'] = [
             ...$contents['scripts'] ?? [],
-            'cp:dev' => 'vite build --config vite-cp.config.js --watch',
+            'cp:dev' => 'vite --config vite-cp.config.js',
             'cp:build' => 'vite build --config vite-cp.config.js',
         ];
 
@@ -163,6 +163,7 @@ class SetupCpVite extends Command
                 'resources/js/cp.js',
                 'resources/css/cp.css',
             ],
+            'hotFile' => public_path('cp-hot'),
             'buildDirectory' => 'vendor/app',
         ]);
 PHP);

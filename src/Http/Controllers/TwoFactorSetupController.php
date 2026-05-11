@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 
@@ -18,20 +19,25 @@ class TwoFactorSetupController extends Controller
     public function __invoke(Request $request)
     {
         $user = User::fromUser($request->user());
+        $redirect = $this->redirectPath();
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
-            return redirect($this->redirectPath());
+            return redirect($redirect);
         }
 
         return Inertia::render('auth/two-factor/Setup', [
             'routes' => $this->routes($user),
-            'redirect' => $this->redirectPath(),
+            'redirect' => $redirect,
         ]);
     }
 
     protected function redirectPath()
     {
-        return request('redirect') ?? route('statamic.site');
+        if (($redirect = request('redirect')) && ! URL::isExternalToApplication($redirect)) {
+            return $redirect;
+        }
+
+        return redirect()->getIntendedUrl() ?? route('statamic.site');
     }
 
     protected function routes($user): array

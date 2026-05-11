@@ -299,6 +299,24 @@ defineProps(['icons']);
                 </div>
             </section>
 
+            <section class="space-y-4">
+                <ui-heading size="lg">Button Sizes</ui-heading>
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
+                    <ui-button text="Large" size="lg" />
+                    <ui-button text="Base" size="base" />
+                    <ui-button text="Small" size="sm" />
+                    <ui-button text="Extra Small" size="xs" />
+                    <ui-button text="2XS" size="2xs" />
+                </div>
+                <div class="mb-4 flex flex-wrap gap-2 sm:gap-3 items-end">
+                    <ui-button icon="save" size="lg" />
+                    <ui-button icon="save" size="base" />
+                    <ui-button icon="save" size="sm" />
+                    <ui-button icon="save" size="xs" />
+                    <ui-button icon="save" size="2xs" />
+                </div>
+            </section>
+
             <section class="mb-10 space-y-3">
                 <ui-heading size="lg">Alerts</ui-heading>
 

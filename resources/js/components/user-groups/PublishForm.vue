@@ -39,7 +39,7 @@ function save() {
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-page mx-auto">
         <Header :title="__(title)" icon="groups">
             <Dropdown v-if="canEditBlueprint" class="me-2">
                 <template #trigger>

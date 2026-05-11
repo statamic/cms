@@ -6,12 +6,13 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
 use Statamic\Facades\WebAuthn;
-use Statamic\Http\Middleware\CP\RequireElevatedSession;
+use Statamic\Http\Middleware;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Tests\ElevatesSessions;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -42,7 +43,19 @@ class ElevatedSessionTest extends TestCase
         $app->booted(function () {
             Route::get('/requires-elevated-session', function () {
                 return 'ok';
-            })->middleware(RequireElevatedSession::class);
+            })->middleware(Middleware\RequireElevatedSession::class);
+
+            Route::post('/requires-elevated-session', function () {
+                return 'ok';
+            })->middleware(Middleware\RequireElevatedSession::class);
+
+            Route::get('/cp/requires-elevated-session', function () {
+                return 'ok';
+            })->middleware(Middleware\CP\RequireElevatedSession::class);
+
+            Route::post('/cp/requires-elevated-session', function () {
+                return 'ok';
+            })->middleware(Middleware\CP\RequireElevatedSession::class);
         });
     }
 
@@ -171,6 +184,23 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function starting_elevated_session_clears_stored_verification_code()
+    {
+        $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();
+
+        session()->put('statamic_elevated_session_verification_code', [
+            'code' => 'abc',
+            'generated_at' => now()->timestamp,
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->post('/cp/elevated-session', ['verification_code' => 'abc'])
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp)
+            ->assertSessionMissing('statamic_elevated_session_verification_code');
+    }
+
+    #[Test]
     public function it_cannot_start_elevated_session_with_incorrect_password()
     {
         $this
@@ -181,13 +211,97 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('invalidPasswordPayloads')]
+    public function it_rejects_invalid_password_payloads(array $payload): void
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('password')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidPasswordPayloads(): array
+    {
+        return [
+            'no fields' => [[]],
+            'string zero' => [['password' => '0']],
+            'integer zero' => [['password' => 0]],
+            'false' => [['password' => false]],
+            'empty string' => [['password' => '']],
+            'null' => [['password' => null]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidVerificationCodePayloads')]
+    public function it_rejects_invalid_verification_code_payloads(array $payload): void
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('verification_code')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidVerificationCodePayloads(): array
+    {
+        return [
+            'no fields' => [[]],
+            'string zero' => [['verification_code' => '0']],
+            'integer zero' => [['verification_code' => 0]],
+            'false' => [['verification_code' => false]],
+            'empty string' => [['verification_code' => '']],
+            'null' => [['verification_code' => null]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidPasskeyPayloads')]
+    public function it_handles_invalid_passkey_payloads(array $payload, bool $expectsValidationError): void
+    {
+        if ($expectsValidationError) {
+            $this
+                ->actingAs($this->user)
+                ->postJson('/cp/elevated-session', $payload)
+                ->assertStatus(422)
+                ->assertJsonValidationErrors('id')
+                ->assertSessionMissing('statamic_elevated_session');
+
+            return;
+        }
+
+        WebAuthn::shouldReceive('validateAssertion')->once()->andThrow(new \RuntimeException('Invalid assertion'));
+
+        $this
+            ->actingAs($this->user)
+            ->postJson('/cp/elevated-session', array_merge($payload, ['rawId' => 'raw-id', 'response' => [], 'type' => 'public-key']))
+            ->assertStatus(500)
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    public static function invalidPasskeyPayloads(): array
+    {
+        return [
+            'no fields' => [[], true],
+            'string zero' => [['id' => '0'], false],
+            'integer zero' => [['id' => 0], false],
+            'false' => [['id' => false], false],
+            'empty string' => [['id' => ''], true],
+            'null' => [['id' => null], true],
+        ];
+    }
+
+    #[Test]
     public function middleware_allows_request()
     {
         $this->actingAs($this->user);
 
         $this
             ->withElevatedSession()
-            ->get('/requires-elevated-session')
+            ->get('/cp/requires-elevated-session')
             ->assertOk()
             ->assertSee('ok');
     }
@@ -199,8 +313,56 @@ class ElevatedSessionTest extends TestCase
 
         $this
             ->withElevatedSession(now()->subMinutes(16))
-            ->get('/requires-elevated-session')
+            ->get('/cp/requires-elevated-session')
             ->assertRedirect('/cp/auth/confirm-password');
+    }
+
+    #[Test]
+    public function middleware_uses_referer_as_intended_url_for_post_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->post('/cp/requires-elevated-session', [], ['referer' => 'http://localhost/cp/some-form'])
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/some-form');
+    }
+
+    #[Test]
+    public function middleware_falls_back_to_full_url_when_referer_is_external_for_post_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->post('/cp/requires-elevated-session', [], ['referer' => 'https://evil.example.com/form'])
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/requires-elevated-session');
+    }
+
+    #[Test]
+    public function middleware_falls_back_to_full_url_when_referer_is_missing_for_post_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->post('/cp/requires-elevated-session')
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/requires-elevated-session');
+    }
+
+    #[Test]
+    public function middleware_uses_full_url_as_intended_url_for_get_requests()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/cp/requires-elevated-session', ['referer' => 'http://localhost/cp/some-form'])
+            ->assertRedirect('/cp/auth/confirm-password')
+            ->assertSessionHas('url.intended', 'http://localhost/cp/requires-elevated-session');
     }
 
     #[Test]
@@ -210,9 +372,50 @@ class ElevatedSessionTest extends TestCase
 
         $this
             ->withElevatedSession(now()->subMinutes(16))
-            ->getJson('/requires-elevated-session')
+            ->getJson('/cp/requires-elevated-session')
             ->assertStatus(403)
             ->assertJson(['message' => __('Requires an elevated session.')]);
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_even_if_session_expired()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function middleware_does_not_require_elevated_session_when_elevated_session_is_disabled_via_json()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->getJson('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
     }
 
     #[Test]
@@ -226,7 +429,7 @@ class ElevatedSessionTest extends TestCase
             ->assertRedirectToRoute('statamic.cp.index');
 
         $this
-            ->get('/requires-elevated-session')
+            ->get('/cp/requires-elevated-session')
             ->assertOk();
     }
 
@@ -289,7 +492,7 @@ class ElevatedSessionTest extends TestCase
             ->from('/original')
             ->get(cp_route('elevated-session.resend-code'))
             ->assertRedirect('/original')
-            ->assertSessionHas('success')
+            ->assertSessionHas('status')
             ->assertSessionHas('statamic_elevated_session_verification_code', [
                 'code' => 'abc',
                 'generated_at' => now()->timestamp,
@@ -313,12 +516,35 @@ class ElevatedSessionTest extends TestCase
                 ->get(cp_route('elevated-session.resend-code'));
         };
 
-        $request()->assertRedirect('/original')->assertSessionHas('success');
+        $request()->assertRedirect('/original')->assertSessionHas('status');
         $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
         $this->travel(30)->seconds();
         $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
         $this->travel(1)->minute();
-        $request()->assertRedirect('/original')->assertSessionHas('success');
+        $request()->assertRedirect('/original')->assertSessionHas('status');
+
+        Notification::assertCount(2);
+    }
+
+    #[Test]
+    public function frontend_resending_code_is_rate_limited()
+    {
+        Notification::fake();
+        $user = User::make()->email('foo@bar.com')->makeSuper();
+
+        $request = function () use ($user) {
+            return $this
+                ->actingAs($user)
+                ->from('/original')
+                ->get(route('statamic.elevated-session.resend-code'));
+        };
+
+        $request()->assertRedirect('/original')->assertSessionHas('status');
+        $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
+        $this->travel(30)->seconds();
+        $request()->assertRedirect('/original')->assertSessionHas('error', 'Try again in a minute.');
+        $this->travel(1)->minute();
+        $request()->assertRedirect('/original')->assertSessionHas('status');
 
         Notification::assertCount(2);
     }
@@ -333,7 +559,7 @@ class ElevatedSessionTest extends TestCase
             ->actingAs($this->user)
             ->from('/original')
             ->get(cp_route('elevated-session.resend-code'))
-            ->assertSessionHasErrors(['method' => 'Resend code is only available for verification code method'])
+            ->assertSessionHasErrors(['method' => 'Resend code is only available for verification code method.'])
             ->assertSessionMissing('statamic_elevated_session_verification_code');
 
         Notification::assertNothingSent();
@@ -352,7 +578,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $this->assertEquals('passkey', $user->getElevatedSessionMethod());
@@ -371,7 +596,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $this->assertEquals('password_confirmation', $user->getElevatedSessionMethod());
@@ -408,7 +632,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $response = $this
@@ -435,7 +658,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $credentials = [
@@ -471,7 +693,6 @@ class ElevatedSessionTest extends TestCase
         // Use reflection to set the passkeys property
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('passkeys');
-        $property->setAccessible(true);
         $property->setValue($user, $mockCollection);
 
         $this
@@ -483,5 +704,183 @@ class ElevatedSessionTest extends TestCase
                 'expiry' => null,
                 'method' => 'passkey',
             ]);
+    }
+
+    #[Test]
+    public function frontend_middleware_allows_request()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession()
+            ->get('/requires-elevated-session')
+            ->assertOk()
+            ->assertSee('ok');
+    }
+
+    #[Test]
+    public function frontend_middleware_denies_request_when_elevated_session_has_expired()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/requires-elevated-session')
+            ->assertRedirect('/!/auth/confirm-password');
+    }
+
+    #[Test]
+    public function frontend_middleware_denies_request_when_elevated_session_has_expired_via_json()
+    {
+        $this->actingAs($this->user);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->getJson('/requires-elevated-session')
+            ->assertStatus(403)
+            ->assertJson(['message' => __('Requires an elevated session.')]);
+    }
+
+    #[Test]
+    public function frontend_elevated_session_redirects_to_custom_url_when_configured()
+    {
+        config(['statamic.users.elevated_sessions_url' => '/custom-elevated-session']);
+
+        $this
+            ->actingAs($this->user)
+            ->get('/!/auth/confirm-password')
+            ->assertRedirect('/custom-elevated-session');
+    }
+
+    #[Test]
+    public function frontend_elevated_session_shows_inertia_page_when_no_custom_url()
+    {
+        config(['statamic.users.elevated_sessions_url' => null]);
+
+        $this
+            ->actingAs($this->user)
+            ->get('/!/auth/confirm-password')
+            ->assertInertia(fn ($page) => $page
+                ->component('auth/ConfirmPassword')
+                ->where('outside', true)
+                ->has('method')
+                ->has('allowPasskey')
+                ->has('submitUrl')
+                ->has('resendUrl')
+                ->has('passkeyOptionsUrl')
+            );
+    }
+
+    #[Test]
+    public function frontend_can_confirm_elevated_session_with_password()
+    {
+        redirect()->setIntendedUrl('/target-url');
+
+        $this
+            ->actingAs($this->user)
+            ->post('/!/auth/elevated-session', ['password' => 'secret'])
+            ->assertRedirect('/target-url')
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
+    public function frontend_can_confirm_elevated_session_via_json()
+    {
+        $this
+            ->actingAs($this->user)
+            ->postJson('/!/auth/elevated-session', ['password' => 'secret'])
+            ->assertOk()
+            ->assertJsonStructure(['elevated', 'expiry', 'redirect'])
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
+    public function frontend_can_confirm_elevated_session_via_inertia()
+    {
+        redirect()->setIntendedUrl('/target-url');
+
+        $this
+            ->actingAs($this->user)
+            ->post('/!/auth/elevated-session', ['password' => 'secret'], ['X-Inertia' => 'true'])
+            ->assertStatus(409)
+            ->assertHeader('X-Inertia-Location', 'http://localhost/target-url')
+            ->assertSessionHas('statamic_elevated_session', now()->timestamp);
+    }
+
+    #[Test]
+    public function frontend_cannot_confirm_elevated_session_with_incorrect_password()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/!/auth/elevated-session', ['password' => 'wrong'])
+            ->assertSessionHasErrors(['password'], null, 'user.elevated_session')
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function frontend_inertia_request_puts_errors_in_default_bag()
+    {
+        $this
+            ->actingAs($this->user)
+            ->post('/!/auth/elevated-session', ['password' => 'wrong'], ['X-Inertia' => 'true'])
+            ->assertSessionHasErrors(['password'])
+            ->assertSessionMissing('statamic_elevated_session');
+    }
+
+    #[Test]
+    public function frontend_verification_code_will_be_sent_for_passwordless_user_when_loading_the_form()
+    {
+        Notification::fake();
+        Str::createRandomStringsUsing(fn () => 'abc');
+        config(['statamic.users.elevated_sessions_url' => null]);
+
+        $this
+            ->actingAs($user = tap(User::make()->email('foo@bar.com')->makeSuper())->save())
+            ->get('/!/auth/confirm-password')
+            ->assertSessionHas('statamic_elevated_session_verification_code', [
+                'code' => 'abc',
+                'generated_at' => now()->timestamp,
+            ]);
+
+        Notification::assertSentTo($user, ElevatedSessionVerificationCode::class, function ($notification) {
+            return $notification->verificationCode === 'abc';
+        });
+    }
+
+    #[Test]
+    public function frontend_verification_code_can_be_resent()
+    {
+        Notification::fake();
+        Str::createRandomStringsUsing(fn () => 'abc');
+
+        $this
+            ->actingAs($user = User::make()->email('foo@bar.com')->makeSuper())
+            ->from('/original')
+            ->get('/!/auth/elevated-session/resend-code')
+            ->assertRedirect('/original')
+            ->assertSessionHas('status')
+            ->assertSessionHas('statamic_elevated_session_verification_code', [
+                'code' => 'abc',
+                'generated_at' => now()->timestamp,
+            ]);
+
+        Notification::assertSentTo($user, ElevatedSessionVerificationCode::class, function ($notification) {
+            return $notification->verificationCode === 'abc';
+        });
+    }
+
+    #[Test]
+    public function the_session_is_elevated_upon_frontend_login()
+    {
+        $this
+            ->post('/!/auth/login', [
+                'email' => 'foo@bar.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirect('/');
+
+        $this
+            ->get('/requires-elevated-session')
+            ->assertOk();
     }
 }

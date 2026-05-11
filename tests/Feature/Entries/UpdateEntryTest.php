@@ -469,6 +469,41 @@ class UpdateEntryTest extends TestCase
             ->assertOk();
     }
 
+    #[Test]
+    public function it_prevents_duplicate_uris_for_structured_entries_with_depth_conditional_routes()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test entries', 'access en site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('child-id')->slug('child')->collection('test')->create();
+
+        $entry = EntryFactory::id('other-child-id')
+            ->slug('other-child')
+            ->collection('test')
+            ->data(['title' => 'Other Child'])
+            ->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'root-id', 'children' => [
+                ['entry' => 'child-id'],
+                ['entry' => 'other-child-id'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Other Child', 'slug' => 'child'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
+    }
+
     private function seedUserAndCollection()
     {
         $this->setTestRoles(['test' => [

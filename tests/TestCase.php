@@ -46,6 +46,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->addGqlMacros();
+        $this->addRateLimitMacros();
     }
 
     public function tearDown(): void
@@ -140,6 +141,11 @@ en:
     url: http://localhost/
     locale: en_US
 YAML);
+    }
+
+    protected function getPackage(): string
+    {
+        return 'statamic/cms';
     }
 
     protected function setSites($sites)
@@ -271,6 +277,21 @@ YAML);
                     "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
                 );
             }
+
+            return $this;
+        });
+    }
+
+    private function addRateLimitMacros()
+    {
+        TestResponse::macro('assertRateLimited', function () {
+            Assert::assertSame(429, $this->getStatusCode(), 'Expected request to be rate limited, but it was not.');
+
+            return $this;
+        });
+
+        TestResponse::macro('assertNotRateLimited', function () {
+            Assert::assertNotSame(429, $this->getStatusCode(), 'Expected request not to be rate limited, but it was.');
 
             return $this;
         });

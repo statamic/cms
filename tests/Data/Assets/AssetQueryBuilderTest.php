@@ -715,6 +715,85 @@ class AssetQueryBuilderTest extends TestCase
             'f.jpg',
         ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
     }
+
+    #[Test]
+    public function can_get_min_value()
+    {
+        Asset::find('test::a.jpg')->data(['type' => 'b', 'quantity' => 1])->save();
+        Asset::find('test::b.txt')->data(['type' => 'b', 'quantity' => 2])->save();
+        Asset::find('test::c.txt')->data(['type' => 'a', 'quantity' => 3])->save();
+        Asset::find('test::d.jpg')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(1, $this->container->queryAssets()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, $this->container->queryAssets()->where('type', 'a')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull($this->container->queryAssets()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        Asset::find('test::a.jpg')->data(['type' => 'b', 'quantity' => 1])->save();
+        Asset::find('test::b.txt')->data(['type' => 'b', 'quantity' => 2])->save();
+        Asset::find('test::c.txt')->data(['type' => 'a', 'quantity' => 3])->save();
+        Asset::find('test::d.jpg')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(4, $this->container->queryAssets()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, $this->container->queryAssets()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull($this->container->queryAssets()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        Asset::find('test::a.jpg')->data(['type' => 'b', 'quantity' => 1])->save();
+        Asset::find('test::b.txt')->data(['type' => 'b', 'quantity' => 2])->save();
+        Asset::find('test::c.txt')->data(['type' => 'a', 'quantity' => 3])->save();
+        Asset::find('test::d.jpg')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(10, $this->container->queryAssets()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, $this->container->queryAssets()->where('type', 'a')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, $this->container->queryAssets()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        Asset::find('test::a.jpg')->data(['type' => 'b', 'quantity' => 1])->save();
+        Asset::find('test::b.txt')->data(['type' => 'b', 'quantity' => 2])->save();
+        Asset::find('test::c.txt')->data(['type' => 'a', 'quantity' => 3])->save();
+        Asset::find('test::d.jpg')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(2.5, $this->container->queryAssets()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, $this->container->queryAssets()->where('type', 'a')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull($this->container->queryAssets()->where('type', 'c')->average('quantity'));
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $count = $this->container->assets()->count();
+        $this->assertGreaterThan(0, $count);
+
+        $this->container->queryAssets()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, $this->container->assets());
+    }
 }
 
 class CustomScope extends Scope

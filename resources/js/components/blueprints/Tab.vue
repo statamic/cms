@@ -7,7 +7,7 @@
             class="h-4 w-4 me-1"
         />
 
-        {{ __(tab.display) }}
+        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
 
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
@@ -22,7 +22,7 @@
         <Stack
 	        size="narrow"
             :open="editing"
-            @opened="() => $nextTick(() => $refs.title.focus())"
+            @opened="() => $nextTick(() => $refs.title.select())"
             @update:open="editCancelled"
             :title="editText"
         >

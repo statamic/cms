@@ -2,6 +2,8 @@
 
 namespace Statamic\Dictionaries;
 
+use function Statamic\trans as __;
+
 class Languages extends BasicDictionary
 {
     protected string $valueKey = 'code';

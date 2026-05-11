@@ -17,6 +17,6 @@
             "@statamic/cms/*": ["packages/cms/src/*"]
         }
     },
-    "include": ["resources/js/**/*"],
+    "include": ["resources/js/**/*", ".storybook/**/*"],
     "exclude": ["node_modules", "resources/dist", "resources/dist-dev"]
 }

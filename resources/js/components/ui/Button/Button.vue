@@ -1,13 +1,16 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from '../Icon/Icon.vue';
 import { Link } from '@inertiajs/vue3';
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps({
     /** The element or component this component should render as */
     as: { type: String, default: null },
+	disabled: { type: Boolean, default: false },
     /** The URL to link to */
     href: { type: String, default: null },
     /** When `href` is provided, this prop controls the link's `target` attribute */
@@ -34,11 +37,12 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
 });
 
+const attrs = useAttrs();
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => {
     if (props.as) return props.as;
-    if (props.href) {
+    if (props.href && !props.disabled && !props.loading) {
         return props.target === '_blank' ? 'a' : Link;
     }
     return 'button';
@@ -57,8 +61,8 @@ const buttonClasses = computed(() => {
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white disabled:opacity-60 disabled:text-white dark:disabled:text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 disabled:inset-shadow-none dark:disabled:inset-shadow-none [&_svg]:text-white [&_svg]:opacity-60',
                 ],
-                danger: 'bg-linear-to-b from-red-700/90 to-red-700 hover:bg-red-700/90 text-white border border-red-700 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-white! disabled:opacity-60 disabled:inset-shadow-none',
-                filled: 'bg-black/5 hover:bg-black/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/15 dark:hover:bg-white/20 [&_svg]:opacity-70',
+                danger: 'bg-linear-to-b from-red-600/90 to-red-600 hover:bg-red-600/90 text-white border border-red-600 inset-shadow-xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-white! disabled:opacity-60 disabled:inset-shadow-none',
+                filled: 'bg-gray-950/5 hover:bg-gray-950/10 hover:text-gray-900 dark:hover:text-white dark:bg-white/4 dark:hover:bg-white/20 [&_svg]:opacity-70',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200',
                 'ghost-pressed': 'bg-transparent hover:bg-gray-400/10 text-gray-925 dark:text-white dark:hover:bg-white/7 dark:hover:text-white [&_svg]:opacity-100',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/7 dark:hover:text-gray-200 [&_svg]:opacity-35',
@@ -76,8 +80,8 @@ const buttonClasses = computed(() => {
             },
             groupBorder: {
                 danger: [
-                    'in-data-ui-button-group:text-red-500 in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-red-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm in-data-ui-button-group:inset-shadow-none',
-                    'dark:in-data-ui-button-group:text-red-500 dark:in-data-ui-button-group:from-gray-850 dark:in-data-ui-button-group:to-red-900/10 dark:in-data-ui-button-group:hover:to-gray-850 dark:in-data-ui-button-group:hover:bg-gray-900 dark:in-data-ui-button-group:border-gray-700/80 dark:in-data-ui-button-group:shadow-ui-md',
+                    'in-data-ui-button-group:text-red-600 in-data-ui-button-group:bg-linear-to-b in-data-ui-button-group:from-white in-data-ui-button-group:to-red-50 in-data-ui-button-group:hover:to-gray-100 in-data-ui-button-group:hover:bg-gray-50 in-data-ui-button-group:border in-data-ui-button-group:border-gray-300 in-data-ui-button-group:shadow-ui-sm in-data-ui-button-group:inset-shadow-none',
+                    'dark:in-data-ui-button-group:text-red-600 dark:in-data-ui-button-group:from-gray-850 dark:in-data-ui-button-group:to-red-900/10 dark:in-data-ui-button-group:hover:to-gray-850 dark:in-data-ui-button-group:hover:bg-gray-900 dark:in-data-ui-button-group:border-gray-700/80 dark:in-data-ui-button-group:shadow-ui-md',
                 ],
                 ghost: '',
                 pressed: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
@@ -108,15 +112,21 @@ const buttonClasses = computed(() => {
         iconOnly: iconOnly.value,
     });
 
-    return twMerge(classes);
+    return twMerge(classes, attrs.class);
+});
+
+const restAttrs = computed(() => {
+    const { class: _, ...rest } = attrs;
+    return rest;
 });
 </script>
 
 <template>
     <component
         :is="tag"
+        v-bind="restAttrs"
         :class="buttonClasses"
-        :disabled="loading"
+        :disabled="disabled || loading"
         :data-ui-group-target="['subtle', 'ghost'].includes(props.variant) ? null : true"
         :href
         :target
@@ -125,7 +135,7 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
+        <div :class="{ 'st-text-trim-start': size !== 'xs' && size !== 'sm' }" class="flex content-center items-center">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

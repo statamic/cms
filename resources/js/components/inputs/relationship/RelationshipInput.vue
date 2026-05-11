@@ -105,6 +105,22 @@ import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
 import { Button, Icon, Stack } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+
+const inFlightRequests = new Map();
+
+function detachFromInFlightRequest(component) {
+    const entry = component._activeRequest;
+    if (!entry) return;
+    component._activeRequest = null;
+    entry.subscribers--;
+    if (entry.subscribers > 0) return;
+    entry.controller.abort();
+    if (inFlightRequests.get(entry.cacheKey) === entry) {
+        inFlightRequests.delete(entry.cacheKey);
+    }
+}
 
 export default {
     props: {
@@ -159,6 +175,7 @@ export default {
             loading: true,
             inline: false,
             sortable: null,
+            removeNavigationListener: null,
         };
     },
 
@@ -240,6 +257,12 @@ export default {
         },
     },
 
+    created() {
+        this.removeNavigationListener = router.on('before', () => {
+            detachFromInFlightRequest(this);
+        });
+    },
+
     mounted() {
         this.initializeData().then(() => {
             this.initializing = false;
@@ -250,6 +273,8 @@ export default {
     },
 
     beforeUnmount() {
+        detachFromInFlightRequest(this);
+        if (this.removeNavigationListener) this.removeNavigationListener();
         if (this.sortable) {
             this.sortable.destroy();
             this.sortable = null;
@@ -273,6 +298,14 @@ export default {
         itemData(data, olddata) {
             if (this.initializing) return;
             this.$emit('item-data-updated', data);
+        },
+
+        items(items, oldItems) {
+            if (items.length > 0 && oldItems.length === 0) {
+                if (this.canReorder) {
+                    this.$nextTick(() => this.makeSortable());
+                }
+            }
         },
     },
 
@@ -308,12 +341,39 @@ export default {
         getDataForSelections(selections) {
             this.loading = true;
 
-            return this.$axios
-                .post(this.itemDataUrl, { site: this.site, selections })
+            detachFromInFlightRequest(this);
+
+            const cacheKey = JSON.stringify([this.itemDataUrl, this.site, selections?.slice().sort()]);
+            let entry = inFlightRequests.get(cacheKey);
+
+            if (!entry) {
+                const controller = new AbortController();
+                entry = { cacheKey, controller, subscribers: 0 };
+                entry.promise = this.$axios
+                    .post(this.itemDataUrl, { site: this.site, selections }, { signal: controller.signal })
+                    .finally(() => {
+                        if (inFlightRequests.get(cacheKey) === entry) {
+                            inFlightRequests.delete(cacheKey);
+                        }
+                    });
+                inFlightRequests.set(cacheKey, entry);
+            }
+
+            entry.subscribers++;
+            this._activeRequest = entry;
+
+            return entry.promise
                 .then((response) => {
+                    if (this._activeRequest !== entry) return;
                     this.$emit('item-data-updated', response.data.data);
                 })
+                .catch((e) => {
+                    if (axios.isCancel(e)) return;
+                    if (this._activeRequest !== entry) return;
+                    throw e;
+                })
                 .finally(() => {
+                    if (this._activeRequest !== entry) return;
                     this.loading = false;
                 });
         },

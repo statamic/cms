@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
@@ -27,12 +28,13 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
-class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
+class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;
 
@@ -453,6 +455,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
             'fqh' => $this->fullyQualifiedHandle(),
+            'token' => encrypt([
+                'fqh' => $this->fullyQualifiedHandle(),
+                'user_id' => User::current()->id(),
+            ]),
         ];
     }
 
@@ -815,5 +821,22 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return (new Link($text, Category::Fields))
             ->url($url)
             ->icon('blueprints');
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'columns', 'fields', 'handle', 'hidden', 'isEmpty', 'isDeletable', 'isResettable',
+            'namespace', 'order', 'path', 'tabs', 'title',
+        ];
     }
 }

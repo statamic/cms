@@ -1,6 +1,6 @@
 <template>
     <template v-if="!hasMultipleSets">
-        <Primitive @click="singleButtonClicked">
+        <Primitive as-child @click="singleButtonClicked">
             <slot name="trigger" />
         </Primitive>
     </template>
@@ -11,10 +11,12 @@
         :title="__('Add Set')"
         v-model:open="isOpen"
         v-else-if="shouldUseModal"
-        class="xl:max-w-3xl 2xl:max-w-5xl"
+        class="xl:max-w-3xl 2xl:max-w-page"
     >
         <template #trigger>
-            <slot name="trigger" />
+            <Primitive as-child @click.capture="onTriggerClick">
+                <slot name="trigger" />
+            </Primitive>
         </template>
 
         <template #default>
@@ -90,7 +92,9 @@
         inset
     >
         <template #trigger>
-            <slot name="trigger" />
+            <Primitive as-child @click.capture="onTriggerClick">
+                <slot name="trigger" />
+            </Primitive>
         </template>
 
         <template #default>
@@ -449,6 +453,13 @@ export default {
             this.isOpen = true;
         },
 
+        onTriggerClick(e) {
+            if (!this.enabled) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        },
+
         getStoredMode() {
             try {
                 return localStorage.getItem('statamic.replicator.setPicker.mode') || 'list';
@@ -483,6 +494,10 @@ export default {
                 })
                 .map((result) => result.obj);
         }
+    },
+
+    beforeUnmount() {
+        this.unbindKeys();
     },
 };
 </script>

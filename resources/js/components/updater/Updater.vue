@@ -1,9 +1,11 @@
 <template>
-    <div class="max-w-5xl mx-auto">
-        <ui-header :title="__('Updates')" icon="updates">
+    <div class="max-w-page mx-auto">
+        <ui-header :title="name" icon="updates">
             <template v-if="!gettingChangelog" #actions>
-                <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
-                <div v-if="onLatestVersion" v-text="__('Up to date')" />
+                {{ currentVersion }}
+                <ui-badge v-if="onLatestVersion" :text="__('Up to date')" color="green" size="lg" icon="checkmark" />
+                <ui-badge v-else-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <ui-badge v-else :text="__('Update available')" color="amber" size="lg" icon="alert-warning-exclamation-mark" />
             </template>
         </ui-header>
 
@@ -91,6 +93,12 @@ export default {
 
         onLatestVersion() {
             return this.currentVersion && this.currentVersion == this.latestVersion;
+        },
+
+        securityUpdateAvailable() {
+            return this.currentVersion && this.changelog
+                .filter((release) => release.type === 'upgrade')
+                .some((release) => release.security);
         },
 
         licensedReleases() {

@@ -10,7 +10,7 @@ import {
     provide,
     onMounted,
 } from 'vue';
-import { stacks, events, keys, config } from '@/api';
+import { stacks, events, keys, config, portals } from '@/api';
 import wait from '@/util/wait.js';
 import {hasComponent} from "@/composables/has-component.js";
 import { Button, Heading } from "@ui";
@@ -45,6 +45,7 @@ const stack = ref(null);
 const mounted = ref(false);
 const visible = ref(false);
 const isHovering = ref(false);
+const isStackEntering = ref(false);
 const escBinding = ref(null);
 const windowInnerWidth = ref(window.innerWidth);
 
@@ -59,6 +60,7 @@ const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('op
 const portal = computed(() => stack.value ? `#portal-target-${stack.value.id}` : null);
 const depth = computed(() => stacks.stacks().findIndex(s => s.id === stack.value?.id) + 1);
 const isTopStack = computed(() => stacks.count() === depth.value);
+const isTopPortal = computed(() => portals.all()[portals.all().length - 1]?.id === stack.value.id);
 
 const shouldAddHeader = computed(() => !!(props.title || props.icon) && !hasStackHeaderComponent.value);
 const shouldWrapSlot = computed(() => props.wrapSlot && !hasStackContentComponent.value);
@@ -90,6 +92,18 @@ const leftOffset = computed(() => {
 const hasChild = computed(() => stacks.count() > depth.value);
 const direction = computed(() => config.get('direction', 'ltr'));
 
+const containerStyle = computed(() => {
+    if (props.size === 'full') {
+        return direction.value === 'ltr' ? { left: 0, transform: 'translateZ(0)' } : { right: 0, transform: 'translateZ(0)' };
+    }
+    const x = leftOffset.value;
+    const width = `calc(100% - ${x}px)`;
+    if (direction.value === 'ltr') {
+        return { left: 0, width, transform: `translateX(${x}px) translateZ(0)` };
+    }
+    return { right: 0, width, transform: `translateX(-${x}px) translateZ(0)` };
+});
+
 const clickedHitArea = () => {
     if (!visible.value) return;
     if (!runCloseCallback()) return;
@@ -110,6 +124,13 @@ const mouseOutHitArea = () => {
 };
 
 const windowResized = () => windowInnerWidth.value = window.innerWidth;
+const stackEnteringChanged = (entering) => {
+    isStackEntering.value = entering;
+
+    if (entering) {
+        isHovering.value = false;
+    }
+};
 
 function open() {
     if (!stack.value) stack.value = stacks.add(instance.proxy);
@@ -117,7 +138,7 @@ function open() {
     events.$on(`stacks.${depth.value}.hit-area-mouseenter`, () => (isHovering.value = true));
     events.$on(`stacks.${depth.value}.hit-area-mouseout`, () => (isHovering.value = false));
 
-    escBinding.value = keys.bindGlobal('esc', close);
+    escBinding.value = keys.bindGlobal('esc', runCloseCallback);
 
     window.addEventListener('resize', windowResized);
 
@@ -127,7 +148,7 @@ function open() {
 
         nextTick(() => {
             visible.value = true;
-            emit('opened');
+            nextTick(() => emit('opened'));
         });
     });
 }
@@ -179,10 +200,13 @@ watch(
 );
 
 onMounted(() => {
+    events.$on('stacks.entering', stackEnteringChanged);
+
 	if (props.open) open();
 });
 
 onBeforeUnmount(() => {
+    events.$off('stacks.entering', stackEnteringChanged);
     cleanup();
 });
 
@@ -201,19 +225,18 @@ provide('closeStack', close);
     </Primitive>
     <teleport :to="portal" :order="depth" v-if="mounted">
         <div class="vue-portal-target stack">
-            <FocusScope trapped loop
-                class="stack-container"
-                :class="{ 'stack-is-current': isTopStack }"
-                :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
-            >
-                <transition name="stack-overlay-fade">
-                    <div
-                        v-if="visible"
-                        class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50"
-                        :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }"
-                    />
-                </transition>
+            <div
+                class="stack-overlay fixed inset-0 bg-gray-800/20 dark:bg-gray-800/50 transition-opacity duration-200 ease-out"
+                :class="visible ? 'opacity-100' : 'opacity-0'"
+            />
 
+            <FocusScope
+	            :trapped="isTopPortal"
+	            loop
+                class="stack-container outline-none"
+                :class="{ 'stack-is-current': isTopStack }"
+                :style="containerStyle"
+            >
                 <div
                     class="stack-hit-area"
                     :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }"
@@ -228,7 +251,7 @@ provide('closeStack', close);
                         class="stack-content fixed flex flex-col sm:end-1.5 bg-content-bg dark:bg-dark-content-bg overflow-hidden rounded-xl shadow-[0_8px_5px_-6px_rgba(0,0,0,0.1),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.15)] dark:shadow-[0_5px_20px_rgba(0,0,0,.5)] transition-transform duration-200 ease-out will-change-transform"
                         :class="[
                             size === 'full' ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
-                            { '-translate-x-4 rtl:translate-x-4': isHovering }
+                            { '-translate-x-4 rtl:translate-x-4': isHovering && !isStackEntering }
                         ]"
                     >
                         <template v-if="shouldAddHeader">

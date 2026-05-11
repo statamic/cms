@@ -3,6 +3,8 @@ import Logo from './Logo.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import SiteSelector from './SiteSelector.vue';
 import Search from './Search.vue';
+import SupportButton from "@/components/global-header/SupportButton.vue";
+import MaxWidthButton from "@/components/global-header/MaxWidthButton.vue";
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
 </script>
@@ -27,8 +29,18 @@ import UserDropdown from './UserDropdown.vue';
             <div class="flex items-center">
                 <Search />
             </div>
+	        <SupportButton />
+	        <MaxWidthButton />
             <ViewSiteButton />
             <UserDropdown />
         </div>
     </header>
 </template>
+
+<style>
+    /* Hide the expand layout control when the content is equal to or smaller than the max-width wrapper, since the button would have no visible effect. */
+    /* [class*="max-["] covers arbitrary max-width classes such as a blank dashboard page with a wizard. */
+    body:has([data-max-width-wrapper] > :is(.max-w-page, .max-w-5xl, .max-w-4xl, .max-w-3xl, [class*="max-["])) [data-expand-layout-control] {
+        display: none;
+    }
+</style>

@@ -707,6 +707,31 @@ abstract class Builder implements Contract
 
     abstract public function pluck($column, $key = null);
 
+    public function min($column)
+    {
+        return $this->pluck($column)->min();
+    }
+
+    public function max($column)
+    {
+        return $this->pluck($column)->max();
+    }
+
+    public function sum($column)
+    {
+        return $this->pluck($column)->sum();
+    }
+
+    public function avg($column)
+    {
+        return $this->pluck($column)->avg();
+    }
+
+    public function average($column)
+    {
+        return $this->avg($column);
+    }
+
     public function when($value, $callback, $default = null)
     {
         if ($value) {
@@ -780,7 +805,7 @@ abstract class Builder implements Contract
 
         $pattern = Pattern::sqlLikeToRegex($like);
 
-        return preg_match('/'.$pattern.'/im', (string) $item);
+        return preg_match('/'.$pattern.'/imu', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)
@@ -790,7 +815,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", (string) $item);
+        return preg_match("/{$pattern}/imu", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)

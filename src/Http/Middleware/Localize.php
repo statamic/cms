@@ -2,7 +2,8 @@
 
 namespace Statamic\Http\Middleware;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use ReflectionClass;
@@ -16,23 +17,29 @@ class Localize
     {
         $site = Site::current();
 
-        // Dates, Carbon, etc expect the full locale. (eg. "fr_FR" or whatever is
+        // PHP date-formatting functions expect the full locale. (eg. "fr_FR" or whatever is
         // installed on your actual server. You can check by running `locale -a`).
         // We'll save the original locale so we can reset it later. Of course,
         // you can get the locale by calling the setlocale method. Logical.
         $originalLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $site->locale());
 
-        // The sites lang is used for your translations. (eg. if you set your site's lang
-        // to "fr_FR", the translator will look for "fr_FR" files rather than "fr" files
-        // but if not set the translator will look for "fr" files rather than "fr_FR"
-        // files.) Again, we'll save the original locale so we can reset it later.
+        // The sites lang is used for your translations.
+        // e.g. If you set your lang to "fr" it'll look for "fr" translations.
+        // If not explicitly set, a site's lang will fall back to the "short locale"
+        // e.g. If your site's locale is "fr_FR", the lang would be "fr".
+        // Note that Carbon does also use this for some things.
+        // Again, we'll save the original locale so we can reset it later.
         $originalAppLocale = app()->getLocale();
         app()->setLocale($site->lang());
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
-        Date::setToStringFormat(function (Carbon $date) {
+        Date::setToStringFormat(function (CarbonInterface|CarbonInterval $date) {
+            if ($date instanceof CarbonInterval) {
+                return $date->forHumans();
+            }
+
             return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
         });
 
@@ -58,7 +65,6 @@ class Localize
         $reflection = new ReflectionClass($date = Date::now());
 
         $factory = $reflection->getMethod('getFactory');
-        $factory->setAccessible(true);
 
         return Arr::get($factory->invoke($date)->getSettings(), 'toStringFormat');
     }

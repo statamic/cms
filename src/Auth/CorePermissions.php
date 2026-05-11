@@ -227,7 +227,7 @@ class CorePermissions
         Addon::all()
             ->filter->hasSettingsBlueprint()
             ->each(function ($addon) {
-                Permission::register("edit {$addon->slug()} settings", function ($permission) use ($addon) {
+                Permission::register("edit {$addon->package()} settings", function ($permission) use ($addon) {
                     return $permission
                         ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]));
                 });

@@ -134,6 +134,17 @@ function handleChildClick(event, item, child) {
     }
 }
 
+const cpBaseUrl = Statamic.$config.get('cpUrl');
+
+function isUrlWithinControlPanel(url) {
+    return url && (url === cpBaseUrl || url.startsWith(cpBaseUrl + '/'));
+}
+
+function shouldRenderAsInertiaLink(item) {
+    if (item.attributes?.target === '_blank') return false;
+    return isUrlWithinControlPanel(item.url);
+}
+
 Statamic.$keys.bind(['command+\\', ['[']], (e) => {
     e.preventDefault();
     toggle();
@@ -155,7 +166,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                     <DynamicHtmlRenderer v-if="item.view" :html="item.view" />
                     <template v-else>
                         <component
-                            :is="item.attributes?.target === '_blank' ? 'a' : Link"
+                            :is="shouldRenderAsInertiaLink(item) ? Link : 'a'"
                             :href="item.url"
                             v-bind="item.attributes"
                             :class="{ 'active': item.active }"
@@ -167,7 +178,7 @@ Statamic.$events.$on('nav.toggle', toggle);
                         <ul v-if="item.children.length && item.active">
                             <li v-for="(child, i) in item.children" :key="i">
                                 <component
-                                    :is="child.attributes?.target === '_blank' ? 'a' : Link"
+                                    :is="shouldRenderAsInertiaLink(child) ? Link : 'a'"
                                     :href="child.url"
                                     v-bind="child.attributes"
                                     v-text="__(child.display)"

@@ -15,10 +15,12 @@ use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Rules\DateFieldtype as ValidationRule;
 use Statamic\Support\DateFormat;
 
+use function Statamic\trans as __;
+
 class Date extends Fieldtype
 {
     protected $categories = ['special'];
-    protected $keywords = ['datetime', 'time'];
+    protected $keywords = ['datetime', 'time', 'range'];
 
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
     const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
@@ -88,6 +90,16 @@ class Date extends Fieldtype
                         'default' => false,
                         'width' => 50,
                     ],
+                    'timezone' => [
+                        'display' => __('Timezone'),
+                        'instructions' => __('statamic::fieldtypes.date.config.timezone'),
+                        'type' => 'dictionary',
+                        'dictionary' => 'timezones',
+                        'placeholder' => $this->timezonePlaceholder(),
+                        'clearable' => true,
+                        'width' => 50,
+                        'max_items' => 1,
+                    ],
                 ],
             ],
             [
@@ -150,6 +162,10 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
+        if (! $this->formatHasTime()) {
+            return $this->parseSavedToCarbon($value)->format('Y-m-d');
+        }
+
         return $this->parseSaved($value)->toIso8601ZuluString('millisecond');
     }
 
@@ -164,6 +180,13 @@ class Date extends Fieldtype
         // In this case, we'll use the date for both the start and end of the range.
         if (! is_array($value)) {
             $carbon = $this->parseSavedToCarbon($value);
+
+            if (! $this->formatHasTime()) {
+                return [
+                    'start' => $carbon->copy()->format('Y-m-d'),
+                    'end' => $carbon->copy()->format('Y-m-d'),
+                ];
+            }
 
             return [
                 'start' => $carbon->copy()->startOfDay()->utc()->toIso8601ZuluString('millisecond'),
@@ -222,6 +245,12 @@ class Date extends Fieldtype
 
     private function processDateTime($value)
     {
+        if (! $this->formatHasTime()) {
+            $date = Carbon::parse($value, config('app.timezone'));
+
+            return $this->formatAndCast($date, $this->saveFormat());
+        }
+
         $date = Carbon::parse($value, 'UTC');
 
         return $this->formatAndCast($date, $this->saveFormat());
@@ -236,6 +265,8 @@ class Date extends Fieldtype
         $common = [
             'mode' => $this->config('mode', 'single'),
             'time_enabled' => $this->config('time_enabled'),
+            'timezone' => $this->resolvedTimezone(),
+            'format_has_time' => $this->formatHasTime(),
         ];
 
         if ($this->config('mode') === 'range') {
@@ -246,8 +277,8 @@ class Date extends Fieldtype
             }
 
             return [
-                'start' => $this->parseSaved($value['start'])->toIso8601ZuluString('millisecond'),
-                'end' => $this->parseSaved($value['end'])->toIso8601ZuluString('millisecond'),
+                'start' => $this->preProcessIndexDate($value['start']),
+                'end' => $this->preProcessIndexDate($value['end']),
                 ...$common,
             ];
         }
@@ -258,9 +289,18 @@ class Date extends Fieldtype
         }
 
         return [
-            'date' => $this->parseSaved($value)->toIso8601ZuluString('millisecond'),
+            'date' => $this->preProcessIndexDate($value),
             ...$common,
         ];
+    }
+
+    private function preProcessIndexDate($value)
+    {
+        if (! $this->formatHasTime()) {
+            return $this->parseSavedToCarbon($value)->format('Y-m-d');
+        }
+
+        return $this->parseSaved($value)->toIso8601ZuluString('millisecond');
     }
 
     private function saveFormat()
@@ -302,8 +342,8 @@ class Date extends Fieldtype
 
         if ($this->config('mode') === 'range') {
             return [
-                'start' => $this->parseSaved($value['start'])->startOfDay(),
-                'end' => $this->parseSaved($value['end'])->startOfDay(),
+                'start' => $this->parseSaved($value['start']),
+                'end' => $this->parseSaved($value['end']),
             ];
         }
 
@@ -360,6 +400,31 @@ class Date extends Fieldtype
         } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value, config('app.timezone'));
         }
+    }
+
+    public function formatHasTime(): bool
+    {
+        return DateFormat::containsTime($this->saveFormat());
+    }
+
+    public function preload()
+    {
+        return [
+            'formatHasTime' => $this->formatHasTime(),
+            'timezone' => $this->resolvedTimezone(),
+        ];
+    }
+
+    private function timezonePlaceholder(): string
+    {
+        $default = config('statamic.cp.default_timezone', 'auto');
+
+        return $default !== 'auto' ? $default : __('Auto');
+    }
+
+    private function resolvedTimezone(): string
+    {
+        return $this->config('timezone', config('statamic.cp.default_timezone', 'auto'));
     }
 
     public function timeEnabled()

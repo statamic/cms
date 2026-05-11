@@ -17,7 +17,7 @@
                 <uploader
                     ref="uploader"
                     :enabled="assetsEnabled"
-                    :container="container"
+                    :container="container?.id"
                     :path="folder"
                     @updated="uploadsUpdated"
                     @upload-complete="uploadComplete"
@@ -53,7 +53,7 @@
                             :is-fullscreen="false"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
-                            class="sticky z-(--z-index-above) -top-2 mb-2 [&~*]:-mt-2"
+                            class="sticky z-(--z-index-portal) top-0 sm:-top-2 mb-2 [&~*]:-mt-2"
                         />
 
                         <div class="drag-notification" v-show="dragging">
@@ -159,6 +159,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
+import DOMPurify from 'dompurify';
 import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@/util/throttle.js';
 import { Button, Stack } from '@/components/ui';
@@ -640,7 +641,7 @@ export default {
         updateMarkdownPreview() {
             this.$axios
                 .post(this.meta.previewUrl, { value: this.data, config: this.config })
-                .then((response) => (this.markdownPreviewText = response.data))
+                .then((response) => (this.markdownPreviewText = DOMPurify.sanitize(response.data)))
                 .catch((e) => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
         },
 
@@ -812,6 +813,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
                     quick: true,
+                    visible: this.config.fullscreen,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },

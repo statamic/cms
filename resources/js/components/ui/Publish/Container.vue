@@ -5,14 +5,14 @@ export const [injectContainerContext, provideContainerContext, containerContextK
 </script>
 
 <script setup>
-import uniqid from 'uniqid';
-import { watch, ref, computed, toRef, nextTick } from 'vue';
+import { nanoid as uniqid } from 'nanoid';
+import { onMounted, onUnmounted, watch, ref, computed, toRef, nextTick } from 'vue';
 import Component from '@/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@/components/publish/Values.js';
 import { data_get } from '@/bootstrap/globals.js';
 
-const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields', 'update:meta']);
 
 const props = defineProps({
     name: {
@@ -87,6 +87,11 @@ const props = defineProps({
     rememberTab: {
         type: Boolean,
         default: false,
+    },
+    /** Extra values to be provided through the context. */
+    provide: {
+        type: Object,
+        default: () => ({})
     },
 });
 
@@ -174,8 +179,15 @@ watch(
     { deep: true },
 );
 
+watch(
+    meta,
+    (meta) => emit('update:meta', meta),
+    { deep: true },
+);
+
 const avoidTrackingDirtyState = ref(false);
 const trackingDirtyState = computed(() => props.trackDirtyState && !avoidTrackingDirtyState.value)
+const isDirty = computed(() => Statamic.$dirty.has(props.name));
 
 function dirty() {
     if (trackingDirtyState.value) Statamic.$dirty.add(props.name);
@@ -204,6 +216,10 @@ function setFieldValue(path, value) {
     data_set(values.value, path, value);
 }
 
+function setMeta(newMeta) {
+    meta.value = newMeta;
+}
+
 function setFieldMeta(path, value) {
     data_set(meta.value, path, value);
 }
@@ -230,13 +246,45 @@ function removeLocalizedField(path) {
     if (index !== -1) localizedFields.value.splice(index, 1);
 }
 
+const fieldFocus = ref({});
+
+const fieldLocks = computed(() => {
+    const locks = {};
+    for (const { handle, user } of Object.values(fieldFocus.value)) {
+        if (!locks[handle]) {
+            locks[handle] = user;
+        }
+    }
+    return locks;
+});
+
+function focusField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('focusField only supports top-level fields.');
+    fieldFocus.value[user.id] = { handle, user };
+}
+
+function blurField(handle, user = Statamic.user) {
+    if (handle.includes('.')) throw new Error('blurField only supports top-level fields.');
+    if (fieldFocus.value[user.id]?.handle === handle) {
+        delete fieldFocus.value[user.id];
+    }
+}
+
 function pushComponent(name, { props }) {
     const component = new Component(uniqid(), name, props);
     components.value.push(component);
+    component.destroy = () => {
+        const index = components.value.indexOf(component);
+        if (index !== -1) components.value.splice(index, 1);
+    };
     return component;
 }
 
-const provided = {
+const additionalProvides = Object.fromEntries(
+    Object.entries(props.provide).map(([key]) => [key, toRef(() => props.provide[key])])
+);
+
+const builtInProvides = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
@@ -263,15 +311,54 @@ const provided = {
     isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
+    setMeta,
     setFieldMeta,
     setFieldPreviewValue,
     setRevealerField,
     unsetRevealerField,
     setHiddenField,
+    fieldFocus,
+    fieldLocks,
+    focusField,
+    blurField,
+    isDirty,
     withoutDirtying,
 };
 
+if (import.meta.env.DEV) {
+    for (const key of Object.keys(additionalProvides)) {
+        if (key in builtInProvides) {
+            console.warn(`PublishContainer: provide key "${key}" collides with a built-in context key, which takes precedence.`);
+        }
+    }
+}
+
+const provided = { ...additionalProvides, ...builtInProvides };
+
 provideContainerContext({ ...provided, container: provided });
+
+onMounted(() => {
+    Statamic.$events.$emit('publish-container-created', {
+        name: props.name,
+        reference: toRef(() => props.reference),
+        site: toRef(() => props.site),
+        values,
+        setFieldValue,
+        setValues,
+        meta,
+        setMeta,
+        setFieldMeta,
+        pushComponent,
+        fieldFocus,
+        focusField,
+        blurField,
+    });
+});
+
+onUnmounted(() => {
+    clearDirtyState();
+    Statamic.$events.$emit('publish-container-destroyed', { name: props.name });
+});
 
 defineExpose({
     name: props.name,
@@ -285,6 +372,7 @@ defineExpose({
     pushComponent,
     visibleValues,
     setValues,
+    setMeta,
     setExtraValues,
 });
 

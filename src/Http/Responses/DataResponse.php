@@ -42,12 +42,6 @@ class DataResponse implements Responsable
             ->make($this->contents())
             ->withHeaders($this->headers);
 
-        if ($content = $response->getContent()) {
-            $response
-                ->setEtag(md5($content))
-                ->isNotModified($request);
-        }
-
         ResponseCreated::dispatch($response, $this->data);
 
         return $response;
@@ -118,7 +112,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->isLivePreviewing(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Draft'] = true;
 
@@ -135,11 +129,16 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->isLivePreviewing(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Private'] = true;
 
         return $this;
+    }
+
+    private function isLivePreviewing()
+    {
+        return $this->request->isLivePreviewOf($this->data);
     }
 
     protected function view()

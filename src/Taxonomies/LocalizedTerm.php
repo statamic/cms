@@ -31,7 +31,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
-use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
@@ -39,7 +38,7 @@ use Statamic\Support\Str;
 
 class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
-    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $locale;
     protected $term;
@@ -235,41 +234,6 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         });
     }
 
-    protected function revisionKey()
-    {
-        return vsprintf('taxonomies/%s/%s/%s', [
-            $this->taxonomyHandle(),
-            $this->locale(),
-            $this->slug(),
-        ]);
-    }
-
-    protected function revisionAttributes()
-    {
-        return [
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'published' => $this->published(),
-            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
-        ];
-    }
-
-    public function makeFromRevision($revision)
-    {
-        $entry = clone $this;
-
-        if (! $revision) {
-            return $entry;
-        }
-
-        $attrs = $revision->attributes();
-
-        return $entry
-            ->published($attrs['published'])
-            ->data($attrs['data'])
-            ->slug($attrs['slug']);
-    }
-
     public function origin()
     {
         return $this->inDefaultLocale();
@@ -289,15 +253,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         return $this->locale;
     }
 
+    /** @deprecated */
     public function revisionsEnabled($enabled = null)
     {
-        if (func_num_args() === 0) {
-            return $this->term->revisionsEnabled();
-        }
-
-        $this->term->revisionsEnabled($enabled);
-
-        return $this;
+        return func_num_args() === 0 ? false : $this;
     }
 
     public function editUrl()
@@ -318,21 +277,6 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function unpublishUrl()
     {
         return $this->cpUrl('taxonomies.terms.published.destroy');
-    }
-
-    public function revisionsUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.revisions.index');
-    }
-
-    public function createRevisionUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.revisions.store');
-    }
-
-    public function restoreRevisionUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.restore-revision');
     }
 
     public function livePreviewUrl()
@@ -529,6 +473,8 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             }, $format);
         }
 
+        $format = Facades\Parse::config($format);
+
         return (string) Antlers::parse($format, $this->augmented()->all());
     }
 
@@ -539,7 +485,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -550,6 +496,16 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'apiUrl', 'blueprint', 'editUrl', 'entriesCount', 'hasOrigin', 'id', 'isRedirect',
+            'isRoot', 'lastModified', 'lastModifiedBy', 'layout', 'locale', 'path', 'private', 'published',
+            'redirectUrl', 'reference', 'site', 'slug', 'status', 'taxonomy', 'taxonomyHandle', 'template', 'title',
+            'uri', 'url', 'urlWithoutRedirect', 'values',
+        ];
     }
 
     public function getCpSearchResultBadge()

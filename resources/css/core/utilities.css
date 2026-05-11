@@ -2,8 +2,8 @@
 =================================================== */
 /* Here we extend Tailwind's classes to add additional functionality where we're sure it won't break anything. */
 
-/* If the next sibling is hidden (by a Vue conditional), remove the bottom border. For example, /cp/asset-containers/assets/edit, the Image Manipulation toggle. */
-.divide-y > *:has(+[style*="display: none"]:last-child) {
+/* If all the next siblings are hidden (by a Vue conditional), remove the bottom border. For example, /cp/seo-pro/site-defaults/edit#json-ld */
+.divide-y > *:not(:has(~ :not([style*="display: none"]))) {
     border-block-end: none;
 }
 
@@ -170,7 +170,7 @@
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
-        @apply bg-dark-600/90;
+        @apply bg-gray-700/90;
     }
 
     .inner {
@@ -307,17 +307,6 @@
             }
         }
         footer {
-            position: relative;
-            &::before {
-                content: '';
-                pointer-events: none;
-                position: absolute;
-                border-block-end: 1px solid black;
-                opacity: 0.06;
-                width: 100vw;
-                top: 50%;
-                transform: translateY(50%);
-            }
             button:only-child {
                 position: relative;
                 &::before, &::after {
@@ -344,38 +333,64 @@
 
 /* UTILITIES / DECORATION / CHECKERBOARD
 =================================================== */
-@utility bg-checkerboard {
-    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
-    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23000000'/%3E%3C/svg%3E");
 
+:root {
+    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%230a0a0a'/%3E%3C/svg%3E");
+    --checkerboard-dark-color: #1c1c1e;
+    --checkerboard-light-color: #fff;
+}
+
+@utility bg-checkerboard {
     position: relative;
-    background-color: #fff;
 
     &::before {
-        /* e.g. Asset field > Grid Mode */
         border-radius: inherit;
         content: '';
         position: absolute;
         inset: 0;
-        background-image: var(--checkerboard-light);
-        opacity: 0;
         transition: opacity 0.2s ease-in-out;
         pointer-events: none;
+        background-color: var(--checkerboard-light-color);
+        background-image: var(--checkerboard-light);
     }
 
-    &:hover::before {
-        opacity: 1;
+    .dark &::before {
+        background-color: var(--checkerboard-dark-color);
+        background-image: var(--checkerboard-dark);
     }
+}
 
-    .dark & {
-        background-color: var(--color-gray-850);
+@utility bg-checkerboard-light {
+    &::before {
+        background-color: var(--checkerboard-light-color) !important;
+        background-image: var(--checkerboard-light) !important;
+    }
+}
 
-        &::before {
-            background-image: var(--checkerboard-dark);
-        }
+@utility bg-checkerboard-dark {
+    &::before {
+        background-color: var(--checkerboard-dark-color) !important;
+        background-image: var(--checkerboard-dark) !important;
     }
 }
 
 @utility shape-squircle {
     corner-shape: squircle;
+}
+
+/* UTILITIES / ANIMATIONS
+=================================================== */
+@keyframes pulse-on-appearance {
+    50% {
+        opacity: 0.85;
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@utility animate-pulse-on-appearance {
+    animation: pulse-on-appearance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

@@ -11,6 +11,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Dictionary extends Fieldtype
 {
     protected $categories = ['controls', 'relationship'];

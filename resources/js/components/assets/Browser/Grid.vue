@@ -1,5 +1,5 @@
 <template>
-    <ui-card :class="{
+    <ui-card class="asset-browser-grid" :class="{
         'space-y-8': folders.length || assets.length || creatingFolder,
         '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
     }">
@@ -37,7 +37,7 @@
                             <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
                                 <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
-                                    class="overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
+                                    class="overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
                                     v-text="folder.basename"
                                     :title="folder.basename"
                                 />
@@ -67,7 +67,7 @@
                         submit-mode="enter"
                         :placeholder="__('Name')"
                         :class="[
-                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center font-mono text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
+                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
                             { 'st-has-error': creatingFolderError }
                         ]"
                         @submit="$emit('create-folder', newFolderName)"
@@ -102,10 +102,11 @@
                         <template #trigger>
                             <div
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
-                                :class="{
-                                    'bg-checkerboard!': asset.can_be_transparent,
-                                    'opacity-50!': draggingAsset === asset.id,
-                                }"
+                                :class="[
+                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
+                                    asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
+                                ]"
                             >
                                 <button
                                     class="size-full"
@@ -116,7 +117,7 @@
                                     @click.stop="selectionClicked(index, $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
-                                    <div class="relative flex aspect-square size-full items-center justify-center">
+                                    <div class="relative flex aspect-square size-full items-center justify-center" :class="{ 'cursor-pointer': maxFiles === 1 }">
                                         <div class="asset-thumb">
                                             <img
                                                 v-if="asset.thumbnail"
@@ -124,7 +125,7 @@
                                                 loading="lazy"
                                                 :draggable="false"
                                                 :class="{
-                                                    'size-full p-4': asset.extension === 'svg',
+                                                    'w-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
                                                 }"
                                             />
@@ -168,7 +169,9 @@
                         </ContextMenu>
                     </Context>
                 </ItemActions>
-                <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
+                <div class="asset-filename">
+                    <MiddleEllipsis :text="asset.basename" />
+                </div>
             </div>
         </section>
 
@@ -193,7 +196,8 @@ import {
     DropdownMenu,
     DropdownLabel,
     DropdownItem,
-    DropdownSeparator
+    DropdownSeparator,
+    MiddleEllipsis
 } from '@ui';
 import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -217,12 +221,16 @@ export default {
         DropdownSeparator,
         ItemActions,
         FolderSvg,
+        MiddleEllipsis,
     },
 
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
+        maxFiles: { type: Number },
+        showCheckerboard: { type: Boolean, default: false },
+        checkerboardMode: { type: String, default: 'transparent' },
     },
 
     data() {
@@ -245,17 +253,6 @@ export default {
     },
 
     methods: {
-        truncateFilename(filename) {
-            const maxLength = Math.floor(this.thumbnailSize / 7);
-            if (filename.length <= maxLength) return filename;
-
-            const extension = filename.split('.').pop();
-            const name = filename.slice(0, -(extension.length + 1));
-            const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
-
-            return `${name.slice(0, charsToKeep)}…${name.slice(-charsToKeep)}.${extension}`;
-        },
-
         isSelected(id) {
             return this.selectedAssets.includes(id);
         },
