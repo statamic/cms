@@ -864,7 +864,7 @@ const selectedPageInternalName = computed({
                         </Field>
                     </div>
                     <div v-else class="space-y-6 pt-8">
-                        <div data-field-settings class="flex items-center gap-2.5">
+                        <div data-field-settings class="flex items-center gap-2">
                             <div class="size-4">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
@@ -980,7 +980,7 @@ const selectedPageInternalName = computed({
                         </div>
                     </div>
                     <div v-else class="space-y-6 pt-8">
-                        <div data-field-settings class="flex items-center gap-2.5">
+                        <div data-field-settings class="flex items-center gap-2">
                             <div class="size-4">
                                 <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
