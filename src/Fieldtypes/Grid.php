@@ -13,6 +13,8 @@ use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Grid extends Fieldtype
 {
     use AddsEntryValidationReplacements;

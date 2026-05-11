@@ -12,6 +12,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Sets extends Fieldtype
 {
     protected $selectable = false;

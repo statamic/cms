@@ -25,7 +25,9 @@ import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
+import TimezoneHoverCard from '../TimezoneHoverCard.vue';
 import { parseAbsoluteToLocal } from '@internationalized/date';
+import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -78,6 +80,12 @@ const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
+
+            // Avoid fatal error `Cannot set properties of undefined (setting 'hour')`
+            if (event.end == null) {
+              return
+            }
+
             event.start.hour = 0;
             event.start.minute = 0;
             event.start.second = 0;
@@ -95,22 +103,26 @@ const calendarEvents = computed(() => ({
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
 
-const formatTimeZone = (style) => {
+const timeZoneLabel = computed(() => {
     const tz = timeZoneName.value;
     if (!tz) return null;
 
-    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: style }).formatToParts(props.modelValue.start.toDate());
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.start.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
-};
+});
 
-const timeZoneLabel = computed(() => formatTimeZone('short'));
-const timeZoneTooltip = computed(() => formatTimeZone('long'));
+const additionalTimezones = computed(() => getAdditionalTimezones(timeZoneName.value));
+
+const hoverCardDate = computed(() => {
+    if (!props.modelValue?.start || !props.modelValue?.end) return null;
+    return { start: props.modelValue.start.toDate(), end: props.modelValue.end.toDate() };
+});
 </script>
 
 <template>
     <div class="group/input relative block w-full" data-ui-input>
         <DateRangePickerRoot
-            :modelValue="modelValue"
+            :modelValue="modelValue ?? { start: undefined, end: undefined }"
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"
@@ -170,13 +182,14 @@ const timeZoneTooltip = computed(() => formatTimeZone('long'));
                         </DateRangePickerInput>
                     </template>
                     <div class="flex-1" />
-                    <Text
-                        v-if="timeZoneLabel"
-                        class="text-gray-600 dark:text-gray-400 me-1"
-                        size="xs"
-                        v-tooltip="timeZoneTooltip"
-                        :text="timeZoneLabel"
-                    />
+                    <TimezoneHoverCard
+                        v-if="timeZoneLabel && hoverCardDate"
+                        :date="hoverCardDate"
+                        :additional-timezones="additionalTimezones"
+                        side="top"
+                    >
+                        <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
+                    </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>

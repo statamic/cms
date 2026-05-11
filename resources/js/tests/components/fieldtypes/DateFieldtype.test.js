@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { test, expect } from 'vitest';
+import { test, expect, vi, afterEach } from 'vitest';
 import DateFieldtype from '@/components/fieldtypes/DateFieldtype.vue';
 import DateFormatter from '@/components/DateFormatter.js';
 import { containerContextKey } from '@ui/Publish/Container.vue';
@@ -83,6 +83,46 @@ test('datePickerValue returns null when value is "now"', () => {
     expect(dateField.vm.datePickerValue).toBe(null);
 });
 
+test('configured timezone overrides browser timezone', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField({
+        value: '2025-12-25T02:23:00Z',
+        meta: { timezone: 'Europe/London' },
+    });
+
+    expect(dateField.vm.datePickerValue.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
+});
+
+test('displayTimezone falls back to browser local when timezone is auto', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField({
+        value: '2025-12-25T02:23:00Z',
+        meta: { timezone: 'auto' },
+    });
+
+    expect(dateField.vm.displayTimezone).toBe('America/New_York');
+});
+
+test('range dates use configured timezone', () => {
+    process.env.TZ = 'America/New_York';
+
+    const dateField = makeDateField({
+        value: { start: '2025-12-25T02:23:00Z', end: '2025-12-26T02:23:00Z' },
+        meta: { timezone: 'Europe/London' },
+        config: {
+            mode: 'range',
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    const value = dateField.vm.datePickerValue;
+    expect(value.start.toString()).toBe('2025-12-25T02:23:00+00:00[Europe/London]');
+    expect(value.end.toString()).toBe('2025-12-26T02:23:00+00:00[Europe/London]');
+});
+
 test.each([
     ['UTC'],
     ['America/New_York'],
@@ -114,6 +154,79 @@ test('date-only format formats date correctly', async () => {
     const formatted = dateField.vm.formatDateOnly(new CalendarDate(2025, 6, 5));
 
     expect(formatted).toBe('2025-06-05');
+});
+
+test.each([
+    [{ start: { year: 2025, month: 12, day: 25 }, end: undefined }],
+    [{ start: undefined, end: { year: 2025, month: 12, day: 31 } }],
+])('partial range update is ignored', async (value) => {
+    const dateField = makeDateField({
+        meta: { formatHasTime: false },
+        config: {
+            mode: 'range',
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    expect(() => dateField.vm.datePickerUpdated(value)).not.toThrow();
+    expect(dateField.emitted('update:value')).toBeUndefined();
+});
+
+afterEach(() => vi.useRealTimers());
+
+test('addDate uses displayTimezone for date-only format', () => {
+    // 11pm Dec 24 in NY is already Dec 25 in London.
+    process.env.TZ = 'America/New_York';
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-12-25T04:00:00Z'));
+
+    const dateField = makeDateField({
+        meta: { formatHasTime: false, timezone: 'Europe/London' },
+    });
+
+    dateField.vm.addDate();
+
+    expect(dateField.emitted('update:value')[0][0]).toBe('2025-12-25');
+});
+
+test('addDate uses midnight in displayTimezone when time is disabled', () => {
+    // Without the displayTimezone anchor we'd get NY-midnight as UTC (Dec 24 05:00Z).
+    process.env.TZ = 'America/New_York';
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-12-25T04:00:00Z'));
+
+    const dateField = makeDateField({
+        meta: { formatHasTime: true, timezone: 'Europe/London' },
+        config: {
+            time_enabled: false,
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    dateField.vm.addDate();
+
+    expect(dateField.emitted('update:value')[0][0]).toBe('2025-12-25T00:00:00.000Z');
+});
+
+test('addDate preserves the current instant when time is enabled', () => {
+    process.env.TZ = 'America/New_York';
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-12-25T02:23:45.678Z'));
+
+    const dateField = makeDateField({
+        meta: { formatHasTime: true, timezone: 'Europe/London' },
+        config: {
+            time_enabled: true,
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+        },
+    });
+
+    dateField.vm.addDate();
+
+    expect(dateField.emitted('update:value')[0][0]).toBe('2025-12-25T02:23:45.000Z');
 });
 
 test('date-only range format is not affected by timezone', async () => {

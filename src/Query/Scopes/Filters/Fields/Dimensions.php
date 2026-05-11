@@ -4,6 +4,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Illuminate\Support\Arr;
 
+use function Statamic\trans as __;
+
 /**
  * Handle width, height, shortest side, longest side queries.
  */

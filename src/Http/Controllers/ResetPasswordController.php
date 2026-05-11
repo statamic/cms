@@ -13,6 +13,8 @@ use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
+use function Statamic\trans as __;
+
 class ResetPasswordController extends Controller
 {
     use ResetsPasswords;

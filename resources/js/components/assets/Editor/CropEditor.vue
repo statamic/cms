@@ -39,13 +39,7 @@ const uploading = ref(false);
 const pendingBlob = ref(null);
 const pendingMimeType = ref(null);
 
-const aspectRatios = ref([
-    { label: '16:9', value: 16 / 9 },
-    { label: '4:3', value: 4 / 3 },
-    { label: '3:2', value: 3 / 2 },
-    { label: '2:1', value: 2 / 1 },
-    { label: '1:1', value: 1 },
-]);
+const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
 
 watch(() => props.open, (newValue) => {
     if (newValue) {
@@ -455,8 +449,8 @@ function close() {
             </div>
 
             <!-- Footer -->
-            <div class="flex flex-wrap items-center justify-between gap-3 border-t dark:border-gray-700 px-4 py-3">
-                <div class="flex gap-3">
+            <div class="flex flex-wrap items-center gap-3 border-t dark:border-gray-700 px-4 py-3">
+                <div v-if="aspectRatios.length" class="flex gap-3">
                     <Select
                         clearable
                         v-model="selectedRatio"
@@ -480,7 +474,7 @@ function close() {
                         @click="toggleOrientation"
                     />
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3 ms-auto">
                     <Button variant="ghost" :text="__('Cancel')" :aria-label="__('Cancel cropping')" @click="close" />
                     <Button variant="ghost" :text="__('Reset')" :aria-label="__('Reset crop selection')" @click="reset" />
                     <Button variant="primary" :text="__('Finish')" :aria-label="__('Finish cropping')" :disabled="!cropper" @click="crop" />

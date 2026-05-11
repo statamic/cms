@@ -28,6 +28,8 @@ use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\Scaffolding\TemplateGenerator;
 
+use function Statamic\trans as __;
+
 class AppServiceProvider extends ServiceProvider
 {
     protected $root = __DIR__.'/../..';

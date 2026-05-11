@@ -31,6 +31,8 @@ use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\Denormalizer\WebauthnSerializerFactory;
 use Webauthn\PublicKeyCredentialRpEntity;
 
+use function Statamic\trans_choice;
+
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [

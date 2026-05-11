@@ -297,7 +297,7 @@ class Terms extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        return $request->boolean('paginate', true) ? $query->paginate($request->integer('perPage', 15)) : $query->get();
     }
 
     private function authorizeTaxonomyAccess(array $taxonomies): void

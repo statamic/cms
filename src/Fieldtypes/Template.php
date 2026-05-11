@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Template as TemplateFilter;
 
+use function Statamic\trans as __;
+
 class Template extends Fieldtype
 {
     protected $categories = ['special'];

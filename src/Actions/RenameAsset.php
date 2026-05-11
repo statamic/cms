@@ -5,6 +5,8 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Rules\AvailableAssetFilename;
 
+use function Statamic\trans as __;
+
 class RenameAsset extends Action
 {
     protected $icon = 'rename';

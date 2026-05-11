@@ -4,6 +4,8 @@ namespace Statamic\Licensing;
 
 use Statamic\Support\Arr;
 
+use function Statamic\trans;
+
 abstract class License
 {
     protected $response;

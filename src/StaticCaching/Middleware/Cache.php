@@ -23,6 +23,8 @@ use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
 
+use function Statamic\trans as __;
+
 class Cache
 {
     /**
