@@ -79,7 +79,7 @@ const gridStyle = computed(() => {
 const calendarHeaderClass = computed(() =>
     props.inline
         ? 'flex items-center justify-between pb-3.5 ms-1 -me-1.5 -mt-1'
-        : 'flex items-center justify-between ps-3 pe-1 pb-3.5 -mt-1',
+        : 'flex items-center justify-between ps-3.5 pe-1 pb-3.5 -mt-1.5',
 );
 
 /** Month grid wrapper: popover matches narrow card; inline allows shrink in tight form layouts. */
