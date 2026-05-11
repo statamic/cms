@@ -469,6 +469,13 @@ class URL
     {
         $rootUrl = url()->to('/');
 
+        // When the request hits the front controller directly (e.g. /index.php),
+        // Laravel's root URL ends with the script name. Strip it so the site's
+        // absolute URL stays invariant to whether the request came through it.
+        if ($script = pathinfo(request()->getScriptName())['basename'] ?? null) {
+            $rootUrl = Str::removeRight($rootUrl, '/'.$script);
+        }
+
         return self::tidy($rootUrl);
     }
 }
