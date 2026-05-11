@@ -7,8 +7,8 @@ import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
 import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, PublishContainer, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { Draggable } from '@shopify/draggable';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { Draggable, Sortable, Plugins } from '@shopify/draggable';
 import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
 import FieldSettings from '@/components/forms/Builder/FieldSettings.vue';
 import PageSettings from '@/components/forms/Builder/PageSettings.vue';
@@ -29,6 +29,14 @@ const formFields = ref({
             _id: 'abc',
             collapsed: false,
             title: 'Section 1',
+            fields: [],
+            values: {},
+            meta: {},
+        },
+        {
+            _id: 'zxc',
+            collapsed: false,
+            title: 'Section 2',
             fields: [],
             values: {},
             meta: {},
@@ -195,6 +203,67 @@ const makeFieldsDraggable = () => {
     });
 };
 
+const moveField = (sourceSectionId, targetSectionId, oldIndex, newIndex) => {
+    const sourceSection = formFields.value.sections.find((s) => s._id === sourceSectionId);
+    const targetSection = formFields.value.sections.find((s) => s._id === targetSectionId);
+    if (!sourceSection || !targetSection) return;
+
+    const [field] = sourceSection.fields.splice(oldIndex, 1);
+
+    if (sourceSectionId !== targetSectionId) {
+        targetSection.values[field.handle] = sourceSection.values[field.handle];
+        targetSection.meta[field.handle] = sourceSection.meta[field.handle];
+        delete sourceSection.values[field.handle];
+        delete sourceSection.meta[field.handle];
+    }
+
+    targetSection.fields.splice(newIndex, 0, field);
+};
+
+let sortableInstance = null;
+
+const makeFieldsSortable = () => {
+    sortableInstance?.destroy();
+
+    const containers = document.querySelectorAll('.field-sort-container');
+    if (containers.length === 0) return;
+
+    sortableInstance = new Sortable(containers, {
+        draggable: '[data-field-item]',
+        handle: '[data-field-item]',
+        distance: 5,
+        mirror: {
+            constrainDimensions: true,
+            appendTo: 'body',
+        },
+        swapAnimation: { vertical: true },
+        plugins: [Plugins.SwapAnimation],
+        exclude: {
+            plugins: [Draggable.Plugins.Focusable],
+        },
+    });
+
+    sortableInstance.on('drag:start', () => document.documentElement.classList.add('cursor-grabbing'));
+    sortableInstance.on('drag:stop', () => document.documentElement.classList.remove('cursor-grabbing'));
+
+    sortableInstance.on('sortable:stop', (event) => {
+        const { oldIndex, newIndex, oldContainer, newContainer } = event;
+
+        const sourceSectionId = oldContainer.dataset.sortSection;
+        const targetSectionId = newContainer.dataset.sortSection;
+
+        if (!sourceSectionId || !targetSectionId) return;
+        if (sourceSectionId === targetSectionId && oldIndex === newIndex) return;
+
+        moveField(sourceSectionId, targetSectionId, oldIndex, newIndex);
+    });
+};
+
+watch(
+    () => formFields.value.sections.map((s) => s.fields.length).join(','),
+    () => nextTick(makeFieldsSortable),
+);
+
 const onEscape = (event) => {
     if (event.key === 'Escape' && editingField.value) {
         deselectField();
@@ -202,12 +271,16 @@ const onEscape = (event) => {
 };
 
 onMounted(() => {
-    nextTick(makeFieldsDraggable);
+    nextTick(() => {
+        makeFieldsDraggable();
+        makeFieldsSortable();
+    });
     document.addEventListener('keydown', onEscape);
 });
 
 onUnmounted(() => {
     draggableInstance?.destroy();
+    sortableInstance?.destroy();
     document.removeEventListener('keydown', onEscape);
 });
 
@@ -372,14 +445,14 @@ const inspectActionButton = (target) => {
                         :meta="section.meta"
                         :track-dirty-state="false"
                     >
-                        <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                        <div class="field-sort-container space-y-7" :data-sort-section="section._id" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
                             <div
                                 v-for="field in section.fields"
                                 :key="field._id"
                                 data-field-item
                                 :data-editing-field="isEditingField(field) ? '' : undefined"
                                 :data-editing-item="isEditingField(field) ? '' : undefined"
-                                :class="{ 'cursor-pointer [&_label]:cursor-pointer': !isEditingField(field) }"
+                                :class="{ 'cursor-pointer': !isEditingField(field) }"
                                 @click.stop="isEditingField(field) || selectField(field)"
                             >
                                 <div
