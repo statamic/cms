@@ -1,7 +1,7 @@
 <script setup>
 import { config } from '@api';
-import { computed } from 'vue';
-import { getLocalTimeZone, now } from '@internationalized/date';
+import { computed, nextTick, ref } from 'vue';
+import { getLocalTimeZone, now, toCalendarDate } from '@internationalized/date';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -87,6 +87,9 @@ const inputEvents = computed(() => ({
     },
 }));
 
+/** Synced with DatePickerRoot so we can re-open after "Today" despite close-on-select. */
+const pickerOpen = ref(false);
+
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
@@ -100,17 +103,57 @@ const calendarEvents = computed(() => ({
     },
 }));
 
-const selectToday = () => {
-    if (props.disabled || props.readOnly) {
-        return;
+const isTodaySelected = computed(() => {
+    const mv = props.modelValue;
+    if (mv == null || typeof mv !== 'object') {
+        return false;
     }
+    try {
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const selectedCal = toCalendarDate(mv);
+        return (
+            selectedCal.year === todayCal.year &&
+            selectedCal.month === todayCal.month &&
+            selectedCal.day === todayCal.day
+        );
+    } catch {
+        return false;
+    }
+});
 
+const todayShortcutLabel = computed(() => {
+    if (props.inline) {
+        return __('Today');
+    }
+    return isTodaySelected.value ? __('Apply') : __('Today');
+});
+
+const emitTodayValue = () => {
     let value = now(getLocalTimeZone()).set({ millisecond: 0 });
     if (props.granularity === 'day') {
         value = value.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
     }
 
     emit('update:modelValue', value);
+
+    if (!props.inline) {
+        nextTick(() => {
+            pickerOpen.value = true;
+        });
+    }
+};
+
+const onTodayShortcutClick = () => {
+    if (props.disabled || props.readOnly) {
+        return;
+    }
+    if (isTodaySelected.value) {
+        if (!props.inline) {
+            pickerOpen.value = false;
+        }
+        return;
+    }
+    emitTodayValue();
 };
 
 const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
@@ -167,6 +210,7 @@ const getInputLabel = (part) => {
             :aria-label="__('Date picker')"
             :aria-required="required"
             close-on-select
+            v-model:open="pickerOpen"
         >
             <DatePickerField v-slot="{ segments }" class="w-full">
                 <DatePickerAnchor as-child>
@@ -254,9 +298,9 @@ const getInputLabel = (part) => {
                             type="button"
                             variant="subtle"
                             size="xs"
-                            :text="__('Today')"
+                            :text="todayShortcutLabel"
                             :disabled="disabled || readOnly"
-                            @click="selectToday"
+                            @click="onTodayShortcutClick"
                         />
                     </div>
                 </Card>
@@ -271,9 +315,9 @@ const getInputLabel = (part) => {
                         type="button"
                         variant="subtle"
                         size="xs"
-                        :text="__('Today')"
+                        :text="todayShortcutLabel"
                         :disabled="disabled || readOnly"
-                        @click="selectToday"
+                        @click="onTodayShortcutClick"
                     />
                 </div>
             </Card>

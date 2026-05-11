@@ -1,6 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import {
     DateRangePickerCalendar,
     DateRangePickerCell,
@@ -26,7 +26,7 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
-import { getLocalTimeZone, now, parseAbsoluteToLocal } from '@internationalized/date';
+import { getLocalTimeZone, now, parseAbsoluteToLocal, toCalendarDate } from '@internationalized/date';
 import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
@@ -77,6 +77,9 @@ const calendarBindings = computed(() => ({
 // rather than just a day).
 const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 
+/** Synced with DateRangePickerRoot so we can re-open after "Today" despite close-on-select. */
+const pickerOpen = ref(false);
+
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
@@ -115,6 +118,55 @@ const selectToday = () => {
     }
 
     emit('update:modelValue', { start, end });
+
+    if (!props.inline) {
+        nextTick(() => {
+            pickerOpen.value = true;
+        });
+    }
+};
+
+const isTodayRangeSelected = computed(() => {
+    const mv = props.modelValue;
+    if (!mv?.start || !mv?.end) {
+        return false;
+    }
+    try {
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const startCal = toCalendarDate(mv.start);
+        const endCal = toCalendarDate(mv.end);
+        const singleDay =
+            startCal.year === endCal.year &&
+            startCal.month === endCal.month &&
+            startCal.day === endCal.day;
+        const isToday =
+            startCal.year === todayCal.year &&
+            startCal.month === todayCal.month &&
+            startCal.day === todayCal.day;
+        return singleDay && isToday;
+    } catch {
+        return false;
+    }
+});
+
+const todayShortcutLabel = computed(() => {
+    if (props.inline) {
+        return __('Today');
+    }
+    return isTodayRangeSelected.value ? __('Apply') : __('Today');
+});
+
+const onTodayShortcutClick = () => {
+    if (props.disabled || props.readOnly) {
+        return;
+    }
+    if (isTodayRangeSelected.value) {
+        if (!props.inline) {
+            pickerOpen.value = false;
+        }
+        return;
+    }
+    selectToday();
 };
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
@@ -148,6 +200,7 @@ const hoverCardDate = computed(() => {
             hide-time-zone
             :placeholder="placeholder"
             close-on-select
+            v-model:open="pickerOpen"
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div
@@ -226,9 +279,9 @@ const hoverCardDate = computed(() => {
                             type="button"
                             variant="subtle"
                             size="sm"
-                            :text="__('Today')"
+                            :text="todayShortcutLabel"
                             :disabled="disabled || readOnly"
-                            @click="selectToday"
+                            @click="onTodayShortcutClick"
                         />
                     </div>
                 </Card>
@@ -243,9 +296,9 @@ const hoverCardDate = computed(() => {
                         type="button"
                         variant="subtle"
                         size="sm"
-                        :text="__('Today')"
+                        :text="todayShortcutLabel"
                         :disabled="disabled || readOnly"
-                        @click="selectToday"
+                        @click="onTodayShortcutClick"
                     />
                 </div>
             </Card>
