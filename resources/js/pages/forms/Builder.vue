@@ -127,6 +127,27 @@ const searchFieldtypes = computed(() => {
 
 const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: searchFieldtypes.value }] : groupedFieldtypes.value);
 
+// todo: the original value should come from a prop
+const formFields = ref({
+    sections: [
+        {
+            _id: 'abc',
+            collapsed: false,
+            title: 'Section 1',
+            fields: [
+                //
+            ],
+        },
+    ],
+});
+
+const sections = computed(() => formFields.value.sections);
+
+const toggleSection = (section) => {
+    formFields.value.sections.forEach((s) => {
+         return s._id === section._id ? (s.collapsed = !s.collapsed) : (s.collapsed = false);
+    });
+};
 
 
 // TODO: Refactor everything below this line
@@ -470,6 +491,58 @@ const selectedPageInternalName = computed({
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>
         </div>
+
+        <Panel
+            v-for="section in sections"
+            :key="section._id"
+            class="mx-auto max-w-5xl"
+            :class="{ 'pb-0': section.collapsed }"
+            :data-panel-collapsed="section.collapsed ? 'true' : 'false'"
+        >
+            <PanelHeader class="relative flex items-center justify-between">
+                <Heading :text="__(section.title)" />
+                <Button
+                    class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="section.collapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                    @click="toggleSection(section)"
+                />
+            </PanelHeader>
+
+            <div
+                style="--tw-ease: ease;"
+                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
+                :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
+            >
+                <Card>
+                    <div v-if="section.fields.length === 0" class="h-[670px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300">
+                        <div>
+                            <span class="text-zinc-500 mr-2">Drag fields here to build your form or</span>
+                            <Button size="xs" pill icon="link" :text="__('Link Existing')" />
+                        </div>
+                    </div>
+
+                    <div v-else class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+<!--                        <Field id="age-field" class="opacity-60" :label="__('How old are you?')">-->
+<!--                            <template #label>-->
+<!--                                <Label for="age-field">-->
+<!--                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">-->
+<!--                                        <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />-->
+<!--                                        {{ __('How old are you?') }}-->
+<!--                                        <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />-->
+<!--                                    </span>-->
+<!--                                </Label>-->
+<!--                            </template>-->
+<!--                            <Input id="age-field" v-model="age" type="number" />-->
+<!--                        </Field>-->
+                    </div>
+                </Card>
+            </div>
+        </Panel>
+
+
 
         <Panel
             class="mx-auto max-w-5xl"
