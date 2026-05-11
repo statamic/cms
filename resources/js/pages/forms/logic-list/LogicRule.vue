@@ -400,8 +400,7 @@ reveal.use(rootEl, () => emit('expanded'));
                                     <span style="text-box: trim-start text;">{{ __('go to') }}</span>
                                     <span
                                         v-if="pageLogicDestinationPart?.text"
-                                        class="pe-0.5"
-                                        style="text-box: trim-start text; font-variant-numeric: lining-nums;"
+                                        style="text-box: trim-start text; font-variant-numeric: proportional-nums;"
                                     >{{ formatPageReferenceChip(pageLogicDestinationPart.text) }}</span>
                                 </Badge>
                                 <template v-else>{{ part.text }}</template>
