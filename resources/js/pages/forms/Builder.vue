@@ -33,39 +33,41 @@ const formFields = ref({
             values: {},
             meta: {},
         },
-        {
-            _id: 'zxc',
-            collapsed: false,
-            title: 'Section 2',
-            fields: [],
-            values: {},
-            meta: {},
-        },
+        // {
+        //     _id: 'zxc',
+        //     collapsed: false,
+        //     title: 'Section 2',
+        //     fields: [],
+        //     values: {},
+        //     meta: {},
+        // },
     ],
 });
 
 const sections = computed(() => formFields.value.sections);
+
+const findSection = (sectionId) => sections.value.find((s) => s._id === sectionId);
 
 const sectionBlueprint = (section) => ({
     tabs: [{
         handle: 'main',
         sections: [{
             fields: section.fields
-                .filter((field) => field.publishConfig)
-                .map((field) => field.publishConfig),
+                .filter((f) => f.publishConfig)
+                .map((f) => f.publishConfig),
         }],
     }],
 });
 
 const toggleSection = (section) => {
-    formFields.value.sections.forEach((s) => {
-         return s._id === section._id ? (s.collapsed = !s.collapsed) : (s.collapsed = false);
+    sections.value.forEach((s) => {
+        s.collapsed = s._id === section._id ? !s.collapsed : false;
     });
 };
 
 const fieldView = ref('expanded');
 
-const shouldShowViewSelector = computed(() => formFields.value.sections.flatMap((section) => section.fields).length > 0);
+const shouldShowViewSelector = computed(() => sections.value.some((s) => s.fields.length > 0));
 
 const editingField = ref(null);
 
@@ -74,7 +76,7 @@ const deselectField = () => editingField.value = null;
 const isEditingField = (field) => editingField.value?._id === field._id;
 
 const addField = (sectionId, fieldtypeHandle, index = null) => {
-    const section = formFields.value.sections.find((section) => section._id === sectionId);
+    const section = findSection(sectionId);
     if (!section) return;
 
     const handle = uniqid();
@@ -93,11 +95,7 @@ const addField = (sectionId, fieldtypeHandle, index = null) => {
         publishConfig: { ...fieldtype.preview.config, handle },
     };
 
-    if (index !== null) {
-        section.fields.splice(index, 0, field);
-    } else {
-        section.fields.push(field);
-    }
+    section.fields.splice(index ?? section.fields.length, 0, field);
 
     section.values[handle] = fieldtype.preview.value;
     section.meta[handle] = fieldtype.preview.meta;
@@ -108,7 +106,7 @@ const addField = (sectionId, fieldtypeHandle, index = null) => {
 const toggleFieldVisibility = (field) => field.config.hidden = !field.config.hidden;
 
 const duplicateField = (sectionId, fieldId) => {
-    const section = formFields.value.sections.find((section) => section._id === sectionId);
+    const section = findSection(sectionId);
     if (!section) return;
 
     const field = section.fields.find((f) => f._id === fieldId);
@@ -133,15 +131,15 @@ const duplicateField = (sectionId, fieldId) => {
 };
 
 const removeField = (sectionId, fieldId) => {
-    const section = formFields.value.sections.find((section) => section._id === sectionId);
+    const section = findSection(sectionId);
     if (!section) return;
 
-    const index = section.fields.findIndex((field) => field._id === fieldId);
-    if (index === -1) return;
+    const field = section.fields.find((f) => f._id === fieldId);
+    if (!field) return;
 
-    section.fields.splice(index, 1);
-    delete section.values[fieldId];
-    delete section.meta[fieldId];
+    section.fields.splice(section.fields.indexOf(field), 1);
+    delete section.values[field.handle];
+    delete section.meta[field.handle];
 
     if (section.fields.length === 0) {
         toggleSection(section);
@@ -204,8 +202,8 @@ const makeFieldsDraggable = () => {
 };
 
 const moveField = (sourceSectionId, targetSectionId, oldIndex, newIndex) => {
-    const sourceSection = formFields.value.sections.find((s) => s._id === sourceSectionId);
-    const targetSection = formFields.value.sections.find((s) => s._id === targetSectionId);
+    const sourceSection = findSection(sourceSectionId);
+    const targetSection = findSection(targetSectionId);
     if (!sourceSection || !targetSection) return;
 
     const [field] = sourceSection.fields.splice(oldIndex, 1);
@@ -503,7 +501,7 @@ const inspectActionButton = (target) => {
                                     :label="field.config.display"
                                 >
                                     <template #label>
-                                        <Label :for="field._id">
+                                        <Label :for="field._id" :class="{ 'cursor-pointer': !isEditingField(field) }">
                                             <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                                 <Icon :name="field.icon" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
                                                 {{ field.config.display }}
