@@ -94,6 +94,13 @@ class RemoteUrlValidator
 
     protected function assertPublicIp($ip)
     {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $packed = inet_pton($ip);
+            if ($packed !== false && substr($packed, 0, 12) === "\0\0\0\0\0\0\0\0\0\0\xff\xff") {
+                $ip = inet_ntop(substr($packed, 12));
+            }
+        }
+
         $result = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
 
         if (! $result) {
