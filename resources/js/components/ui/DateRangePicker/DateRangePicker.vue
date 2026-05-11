@@ -1,6 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import {
     DateRangePickerCalendar,
     DateRangePickerCell,
@@ -81,13 +81,30 @@ const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 /** Synced with DateRangePickerRoot so we can re-open after "Today" despite close-on-select. */
 const pickerOpen = ref(false);
 
+/** After "Today" shortcut, label shows "Select" until the range changes or the popover closes. */
+const shortcutPrimedForSelect = ref(false);
+
+/**
+ * After "Select", keep start+end as the same calendar day (today) but set Reka `fixed-date="start"`.
+ * Reka's changeDate() only updates `end` on the next cell click when *both* endpoints exist; if `end`
+ * is cleared, a different code path runs that requires `highlightedRange` and often never completes.
+ */
+const fixRangeStartForNextPick = ref(false);
+
+const rangePickerFixedDate = computed(() => (fixRangeStartForNextPick.value ? 'start' : undefined));
+
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
 
             // Avoid fatal error `Cannot set properties of undefined (setting 'hour')`
             if (event.end == null) {
-              return
+                // Range mid-selection: parent v-model is not updated yet, so clear the
+                // "Select" primed state here or the label would stay wrong.
+                if (shortcutPrimedForSelect.value) {
+                    shortcutPrimedForSelect.value = false;
+                }
+                return;
             }
 
             event.start.hour = 0;
@@ -106,6 +123,8 @@ const calendarEvents = computed(() => ({
 }));
 
 const emitTodayValue = () => {
+    fixRangeStartForNextPick.value = false;
+
     const tz = getLocalTimeZone();
     let start = now(tz).set({ millisecond: 0 });
     let end = now(tz).set({ millisecond: 0 });
@@ -115,6 +134,7 @@ const emitTodayValue = () => {
     }
 
     emit('update:modelValue', { start, end });
+    shortcutPrimedForSelect.value = true;
 
     if (!props.inline) {
         nextTick(() => {
@@ -146,15 +166,43 @@ const isTodayRangeSelected = computed(() => {
     }
 });
 
-const todayShortcutLabel = computed(() => {
-    if (props.inline) {
-        return __('Today');
+const todayShortcutLabel = computed(() =>
+    shortcutPrimedForSelect.value && isTodayRangeSelected.value ? __('Select') : __('Today'),
+);
+
+watch(
+    () => props.modelValue,
+    () => {
+        if (shortcutPrimedForSelect.value && !isTodayRangeSelected.value) {
+            shortcutPrimedForSelect.value = false;
+        }
+        if (fixRangeStartForNextPick.value && !isTodayRangeSelected.value) {
+            fixRangeStartForNextPick.value = false;
+        }
+    },
+    { deep: true },
+);
+
+watch(pickerOpen, (open) => {
+    if (!props.inline && !open) {
+        shortcutPrimedForSelect.value = false;
+        fixRangeStartForNextPick.value = false;
     }
-    return isTodayRangeSelected.value ? __('Apply') : __('Today');
 });
 
 const onTodayShortcutClick = () => {
     if (props.disabled || props.readOnly) {
+        return;
+    }
+    /** Same calendar day for start+end, but `fixed-date="start"` so the next click only moves `end`. */
+    if (shortcutPrimedForSelect.value && isTodayRangeSelected.value) {
+        fixRangeStartForNextPick.value = true;
+        shortcutPrimedForSelect.value = false;
+        if (!props.inline) {
+            nextTick(() => {
+                pickerOpen.value = true;
+            });
+        }
         return;
     }
     if (isTodayRangeSelected.value) {
@@ -201,6 +249,7 @@ const hoverCardDate = computed(() => {
             :aria-label="__('Date range picker')"
             :aria-required="required"
             v-model:open="pickerOpen"
+            :fixed-date="rangePickerFixedDate"
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div
