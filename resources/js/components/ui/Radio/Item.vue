@@ -7,6 +7,7 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     /** Label text to display next to the radio button */
     label: { type: String, default: null },
+    readOnly: { type: Boolean, default: false },
     /** Value of the radio button */
     value: { type: [String, Number, Boolean], required: true },
 });
@@ -19,7 +20,7 @@ const id = useId();
         <RadioGroupItem
             :id
             :value="value"
-            :disabled
+            :disabled="readOnly || disabled"
             class="
                 shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
                 focus:focus-outline border border-gray-400/75 dark:border-none with-contrast:border-gray-100 bg-white outline-hidden

@@ -26,6 +26,8 @@ import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
+import TimezoneHoverCard from '../TimezoneHoverCard.vue';
+import { getAdditionalTimezones } from './util.js';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -99,16 +101,15 @@ const calendarEvents = computed(() => ({
 
 const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
 
-const formatTimeZone = (style) => {
+const timeZoneLabel = computed(() => {
     const tz = timeZoneName.value;
     if (!tz) return null;
 
-    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: style }).formatToParts(props.modelValue.toDate());
+    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
-};
+});
 
-const timeZoneLabel = computed(() => formatTimeZone('short'));
-const timeZoneTooltip = computed(() => formatTimeZone('long'));
+const additionalTimezones = computed(() => getAdditionalTimezones(timeZoneName.value));
 
 const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
@@ -202,13 +203,14 @@ const getInputLabel = (part) => {
                                 </div>
                             </template>
                         </div>
-                        <Text
+                        <TimezoneHoverCard
                             v-if="timeZoneLabel"
-                            class="text-gray-600 dark:text-gray-400 me-1"
-                            size="xs"
-                            v-tooltip="timeZoneTooltip"
-                            :text="timeZoneLabel"
-                        />
+                            :date="modelValue.toDate()"
+                            :additional-timezones="additionalTimezones"
+                            side="top"
+                        >
+                            <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
+                        </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
                             @click="emit('update:modelValue', null)"

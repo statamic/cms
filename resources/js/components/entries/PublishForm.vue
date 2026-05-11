@@ -82,6 +82,7 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
