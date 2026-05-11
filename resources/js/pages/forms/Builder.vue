@@ -7,9 +7,10 @@ import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
 import { Button, Card, Checkbox, CheckboxGroup, Field, Header, Heading, Icon, Input, Label, Panel, PanelHeader, Radio, RadioGroup, Select, StatusIndicator, Switch, Textarea, Tabs, TabList, TabTrigger, TabContent, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
-import { computed, ref } from 'vue';
-import { mapValues } from 'lodash-es';
-import fuzzysort from 'fuzzysort';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { Draggable } from '@shopify/draggable';
+import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
+import { uniqid } from '@/bootstrap/globals.js';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -17,115 +18,6 @@ const props = defineProps({
     form: Object,
     fieldtypes: Array,
 });
-
-const search = ref('');
-const isSearching = computed(() => search.value.length > 0);
-
-const categories = {
-    structure: {
-        title: __('Structure'),
-        color: 'bg-purple-500',
-    },
-    information: {
-        title: __('Information'),
-        color: 'bg-pink-500',
-    },
-    text: {
-        title: __('Text'),
-        color: 'bg-purple-500',
-    },
-    choice: {
-        title: __('Choice'),
-        color: 'bg-orange-500',
-    },
-    rate: {
-        title: __('Rate'),
-        color: 'bg-amber-500',
-    },
-    contact: {
-        title: __('Contact Info'),
-        color: 'bg-blue-500',
-    },
-    number: {
-        title: __('Number'),
-        color: 'bg-teal-500',
-    },
-    datetime: {
-        title: __('Date and Time'),
-        color: 'bg-fuchsia-500',
-    },
-    media: {
-        title: __('Media'),
-        color: 'bg-cyan-500',
-    },
-    payment: {
-        title: __('Payment'),
-        color: 'bg-green-500',
-    },
-};
-
-const allFieldtypes = computed(() => {
-    let options = [...props.fieldtypes];
-
-    options.push({
-        handle: 'section',
-        title: __('Section'),
-        categories: ['structure'],
-        keywords: [],
-        icon: 'add-section',
-        config: [],
-    });
-
-    // TODO: Only show this when Forms Pro is installed
-    options.push({
-        handle: 'page_break',
-        title: __('Page Break'),
-        categories: ['structure'],
-        keywords: [],
-        icon: 'page',
-        config: [],
-    });
-
-    return options;
-});
-
-const groupedFieldtypes = computed(() => {
-    return mapValues(categories, (category, handle) => {
-        category.handle = handle;
-        category.fieldtypes = [];
-
-        allFieldtypes.value.forEach((fieldtype) => {
-            let categories = fieldtype.categories;
-            if (categories.length === 0) categories = ['other'];
-            if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
-        });
-
-        return category;
-    });
-});
-
-const searchFieldtypes = computed(() => {
-    let options = allFieldtypes.value;
-
-    if (search.value) {
-        return fuzzysort
-            .go(search.value, options, {
-                all: true,
-                keys: ['title', (obj) => obj.categories?.join(), (obj) => obj.keywords?.join()],
-                scoreFn: (scores) => {
-                    const textScore = scores[0]?.score * 1;
-                    const categoriesScore = scores[1]?.score * 0.1;
-                    const keywordsScore = scores[2]?.score * 0.4;
-                    return Math.max(textScore, categoriesScore, keywordsScore);
-                },
-            })
-            .map((result) => result.obj);
-    }
-
-    return options;
-});
-
-const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: searchFieldtypes.value }] : groupedFieldtypes.value);
 
 // todo: the original value should come from a prop
 const formFields = ref({
@@ -153,9 +45,87 @@ const fieldView = ref('expanded');
 
 const shouldShowViewSelector = computed(() => formFields.value.sections.flatMap((section) => section.fields).length > 0);
 
+const addField = (sectionId, fieldtypeHandle, index = null) => {
+    const section = formFields.value.sections.find((section) => section._id === sectionId);
+    if (!section) return;
 
+    const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
 
+    const field = {
+        _id: `${sectionId}-${section.fields.length}`,
+        config: {
+            display: __(fieldtype.title),
+            hidden: false,
+            // todo: fieldtype's default values?
+        },
+        fieldtype: fieldtypeHandle,
+        handle: uniqid(),
+        icon: fieldtype?.icon || 'fieldtype-generic',
+        type: 'inline',
+    };
 
+    if (index !== null) {
+        section.fields.splice(index, 0, field);
+    } else {
+        section.fields.push(field);
+    }
+};
+
+let draggableInstance = null;
+let currentDropTarget = null;
+let lastClientY = 0;
+
+const makeFieldsDraggable = () => {
+    const containers = document.querySelectorAll('.fieldtype-source, .section-drop-zone');
+    if (containers.length === 0) return;
+
+    draggableInstance = new Draggable(containers, {
+        draggable: '.fieldtype-draggable',
+        mirror: {
+            constrainDimensions: true,
+            appendTo: 'body',
+        },
+    });
+
+    draggableInstance.on('drag:move', (event) => {
+        lastClientY = event.sensorEvent.clientY;
+    });
+
+    draggableInstance.on('drag:over:container', (event) => {
+        if (event.overContainer.classList.contains('section-drop-zone')) {
+            currentDropTarget = event.overContainer;
+        }
+    });
+
+    draggableInstance.on('drag:out:container', (event) => {
+        if (currentDropTarget === event.overContainer) {
+            currentDropTarget = null;
+        }
+    });
+
+    draggableInstance.on('drag:stop', (event) => {
+        if (!currentDropTarget) return;
+
+        const fieldtypeHandle = event.source.dataset.fieldtype;
+        const sectionId = currentDropTarget.dataset.sectionDropZone;
+        currentDropTarget = null;
+
+        if (!fieldtypeHandle || !sectionId) return;
+
+        const fieldElements = document.querySelectorAll(`[data-section-drop-zone="${sectionId}"] [data-field-item]`);
+
+        let index = 0;
+        for (const el of fieldElements) {
+            const rect = el.getBoundingClientRect();
+            if (lastClientY > rect.top + rect.height / 2) index++;
+        }
+
+        addField(sectionId, fieldtypeHandle, index);
+    });
+};
+
+onMounted(() => nextTick(makeFieldsDraggable));
+onUnmounted(() => draggableInstance?.destroy());
 
 
 
@@ -369,81 +339,7 @@ const selectedPageInternalName = computed({
     />
 
     <LayoutPanel side="left">
-        <div
-            style="--graph-paper-y-offset: 9rem;"
-            class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5"
-        >
-            <div class="left-panel-popover min-[1000px]:hidden">
-                <div id="popover-left-panel" class="left-panel-popover__menu" popover>
-                    <button class="left-panel-popover__close-button" title="Close" popovertarget="popover-left-panel">
-                        <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
-                    </button>
-                    <ul class="bg-graph-paper px-0.5 grid gap-8 @container py-10 pb-40">
-                        <li
-                            v-for="group in displayedFieldtypes"
-                            :key="group.handle"
-                            v-show="group.fieldtypes.length > 0"
-                        >
-                            <h2
-                                v-if="group.title"
-                                class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium"
-                                :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'"
-                            >
-                                <span
-                                    class="h-2 shrink-0 rounded-full"
-                                    :class="{
-                                        [group.color]: true,
-                                        'w-2 opacity-100': fieldView === 'collapsed',
-                                        'w-0 opacity-0': fieldView === 'expanded',
-                                    }"
-                                    aria-hidden="true"
-                                />
-                                {{ group.title }}
-                            </h2>
-                            <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                                <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                                    <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- This is the desktop nav - the content is repeated from the left panel -->
-            <div class="px-0.5 pt-6 max-[1000px]:hidden">
-                <Input icon="magnifying-glass" :legible-text="false" input-class="rounded-xl" :placeholder="__('Search Field Types...')" v-model="search" />
-
-                <ul class="py-10 grid gap-8 @container">
-                    <li
-                        v-for="group in displayedFieldtypes"
-                        :key="group.handle"
-                        v-show="group.fieldtypes.length > 0"
-                    >
-                        <h2
-                            v-if="group.title"
-                            class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium"
-                            :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'"
-                        >
-                        <span
-                            class="h-2 shrink-0 rounded-full"
-                            :class="{
-                                [group.color]: true,
-                                'w-2 opacity-100': fieldView === 'collapsed',
-                                'w-0 opacity-0': fieldView === 'expanded',
-                            }"
-                            aria-hidden="true"
-                        />
-                            {{ group.title }}
-                        </h2>
-                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                            <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                                <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <FieldtypeSelector :fieldtypes :field-view />
     </LayoutPanel>
 
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
@@ -525,7 +421,7 @@ const selectedPageInternalName = computed({
                 class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
                 :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
             >
-                <Card>
+                <Card class="section-drop-zone" :data-section-drop-zone="section._id">
                     <div v-if="section.fields.length === 0" class="h-[670px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300">
                         <div>
                             <span class="text-zinc-500 mr-2">Drag fields here to build your form or</span>
@@ -534,18 +430,24 @@ const selectedPageInternalName = computed({
                     </div>
 
                     <div v-else class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-<!--                        <Field id="age-field" class="opacity-60" :label="__('How old are you?')">-->
-<!--                            <template #label>-->
-<!--                                <Label for="age-field">-->
-<!--                                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">-->
-<!--                                        <Icon name="number" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />-->
-<!--                                        {{ __('How old are you?') }}-->
-<!--                                        <Icon name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />-->
-<!--                                    </span>-->
-<!--                                </Label>-->
-<!--                            </template>-->
-<!--                            <Input id="age-field" v-model="age" type="number" />-->
-<!--                        </Field>-->
+                        <div v-for="field in section.fields" :key="field._id" data-field-item>
+                            <Field
+                                :id="field._id"
+                                :class="{ 'opacity-60': field.config.hidden }"
+                                :label="field.config.display"
+                            >
+                                <template #label>
+                                    <Label :for="field._id">
+                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            <Icon :name="field.icon" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                                            {{ field.config.display }}
+                                            <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
+                                        </span>
+                                    </Label>
+                                </template>
+                                <Input :id="field._id" />
+                            </Field>
+                        </div>
                     </div>
                 </Card>
             </div>

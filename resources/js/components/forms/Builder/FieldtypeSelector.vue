@@ -151,8 +151,8 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                 />
                             {{ group.title }}
                         </h2>
-                        <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                            <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                        <ul class="fieldtype-source grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
+                            <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle" class="fieldtype-draggable" :data-fieldtype="fieldtype.handle">
                                 <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
                             </li>
                         </ul>
@@ -186,8 +186,8 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                         />
                         {{ group.title }}
                     </h2>
-                    <ul class="grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                    <ul class="fieldtype-source grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
+                        <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle" class="fieldtype-draggable" :data-fieldtype="fieldtype.handle">
                             <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
                         </li>
                     </ul>
