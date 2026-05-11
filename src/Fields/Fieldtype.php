@@ -343,13 +343,12 @@ abstract class Fieldtype implements Arrayable
         $views = [
             "statamic::forms.fields.{$handle}",
             "statamic::forms.{$language}.fields.{$handle}",
-            "statamic::forms.{$language}.fields.default",
         ];
 
         $view = collect($views)->first(fn ($view) => view()->exists($view));
 
         return $view
-            ?: 'statamic::forms.fields.default';
+            ?: "statamic::forms.{$language}.fields.default";
     }
 
     public function config(?string $key = null, $fallback = null)
