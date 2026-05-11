@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -29,6 +28,15 @@ abstract class Store
     protected $modified;
     protected $keys;
 
+    /**
+     * @return string
+     */
+    abstract public function key();
+
+    /**
+     * @param  string|null  $directory
+     * @return ($directory is null ? string : static)
+     */
     public function directory($directory = null)
     {
         if (func_num_args() === 0) {
@@ -208,7 +216,11 @@ abstract class Store
 
         // Get all the deleted files.
         // This would be any paths that exist in the cached array that aren't there anymore.
-        $deleted = $existing->keys()->diff($files->keys())->values();
+        $keys = $this->paths()->flip();
+        $deleted = $existing->keys()
+            ->map(fn ($path) => $keys->get($path))
+            ->diff($files->keys()->map(fn ($path) => $keys->get($path)))
+            ->values();
 
         // If there are no modified or deleted files, there's nothing to update.
         if ($modified->isEmpty() && $deleted->isEmpty()) {
@@ -315,6 +327,8 @@ abstract class Store
 
             return $isDuplicate ?? false;
         });
+
+        $items->each(fn ($item) => $this->cacheItem($item['item']));
 
         $paths = $items->pluck('path', 'key');
 

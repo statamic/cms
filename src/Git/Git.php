@@ -3,12 +3,16 @@
 namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Git
 {
@@ -240,7 +244,7 @@ class Git
         $context = $this->getCommandContext($paths, $message);
 
         return collect(config('statamic.git.commands'))->map(function ($command) use ($context) {
-            return Antlers::parse($command, $context);
+            return Antlers::parse(Parse::config($command), $context);
         });
     }
 
@@ -255,7 +259,7 @@ class Git
     {
         return [
             'git' => config('statamic.git.binary'),
-            'paths' => collect($paths)->implode(' '),
+            'paths' => $this->shellQuotePaths($paths),
             'message' => $this->shellEscape($message),
             'name' => $this->shellEscape($this->gitUserName()),
             'email' => $this->shellEscape($this->gitUserEmail()),
@@ -281,5 +285,15 @@ class Git
         $string = str_replace("'", '', $string);
 
         return escapeshellcmd($string);
+    }
+
+    /**
+     * Shell quote paths to a string for use in git commands.
+     */
+    protected function shellQuotePaths(Collection $paths): string
+    {
+        return collect($paths)
+            ->map(fn ($path) => '"'.$path.'"')
+            ->implode(' ');
     }
 }

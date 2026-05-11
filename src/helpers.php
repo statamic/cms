@@ -1,6 +1,5 @@
 <?php
 
-use Barryvdh\Debugbar\LaravelDebugbar;
 use Statamic\Facades\Path;
 use Statamic\Statamic;
 
@@ -17,6 +16,6 @@ function statamic_path($path = null)
 if (! function_exists('debugbar')) {
     function debugbar()
     {
-        return app()->bound(LaravelDebugbar::class) ? app(LaravelDebugbar::class) : optional();
+        return app()->bound('debugbar') ? app('debugbar') : optional();
     }
 }

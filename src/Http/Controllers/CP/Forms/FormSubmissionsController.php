@@ -2,15 +2,17 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Fields\Field;
+use Inertia\Inertia;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class FormSubmissionsController extends CpController
 {
-    use QueriesFilters;
+    use QueriesFilters, QueriesFormSubmissionSearch;
 
     public function index(FilteredRequest $request, $form)
     {
@@ -26,7 +28,7 @@ class FormSubmissionsController extends CpController
             'form' => $form->handle(),
         ]);
 
-        $sortField = request('sort', 'date');
+        $sortField = OrderBy::column(request('sort'), 'date');
         $sortDirection = request('order', $sortField === 'date' ? 'desc' : 'asc');
 
         if ($sortField) {
@@ -47,17 +49,7 @@ class FormSubmissionsController extends CpController
     {
         $query = $form->querySubmissions();
 
-        if ($search = request('search')) {
-            $query->where('date', 'like', '%'.$search.'%');
-
-            $form->blueprint()->fields()->all()
-                ->filter(function (Field $field): bool {
-                    return in_array($field->type(), ['text', 'textarea', 'integer']);
-                })
-                ->each(function (Field $field) use ($query, $search): void {
-                    $query->orWhere($field->handle(), 'like', '%'.$search.'%');
-                });
-        }
+        $this->applySubmissionSearch($query, $form, request('search'));
 
         return $query;
     }
@@ -84,13 +76,13 @@ class FormSubmissionsController extends CpController
         $blueprint = $submission->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
-        return view('statamic::forms.submission', [
-            'form' => $form,
-            'submission' => $submission,
+        return Inertia::render('forms/Submission', [
+            'id' => $submission->id(),
+            'formTitle' => $form->title(),
+            'date' => $submission->date()->toIso8601String(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-            'title' => $submission->formattedDate(),
         ]);
     }
 }

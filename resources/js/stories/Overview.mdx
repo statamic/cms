@@ -1,0 +1,48 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Overview" />
+
+# Statamic UI Components
+When building custom areas of the Control Panel, you should aim to use the UI components as much as possible.
+
+These will allow you to write UIs that match the design of Statamic without needing to worry about styles or Tailwind classes. It also allows you to keep your UIs in sync with our design system without having to do any additional work. In short, they're here to make your life easier.
+
+You can treat these components like an extension of HTML itself. They should *just work*.
+
+For example, if you need a card, don't use `<div class="bg-white p-4 rounded border shadow-sm">`, use the `<ui-card>` component!
+
+## Syntax
+
+All of the components are available with their kebab-cased name prefixed with `ui-`. For example:
+
+```html
+<ui-card>
+    <ui-heading text="A lovely card" />
+    <ui-button @click="doSomething" text="Click me" />
+</ui-card>
+```
+
+This syntax works in Blade _and_ Vue, which is especially handy for those times when you're bouncing back and forth between them.
+
+## Importing
+
+You can optionally import the UI components and namespace them, which gives your IDE the ability to autocomplete, link to the original components, and other useful dev-centric workflows. You import them from `@statamic/cms/ui`.
+
+```js
+<script setup>
+import { Card, Heading, Button } from '@statamic/cms/ui';
+</script>
+
+<template>
+    <Card>
+        <Heading text="A lovely card" />
+        <Button @click="doSomething" text="Click me" />
+    </Card>
+</template>
+```
+
+## Anatomy of a Component
+
+Most of our components use [Reka](https://reka-ui.com/) under the hood, and are built with Vue.js's [composition API](https://vuejs.org/api/composition-api-setup).
+
+We utilize [Class Variariance Authority](https://cva.style/docs) to dynamically assemble our classes and styles based on variants and props.

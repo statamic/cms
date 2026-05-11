@@ -11,12 +11,14 @@ class IncrementTest extends TestCase
     protected $data = [
         'data' => [
             [
+                'category' => 'A',
                 'articles' => [
                     ['title' => 'One'],
                     ['title' => 'Two'],
                 ],
             ],
             [
+                'category' => 'B',
                 'articles' => [
                     ['title' => 'Three'],
                     ['title' => 'Four'],
@@ -27,7 +29,7 @@ class IncrementTest extends TestCase
 
     private function tag($tag, $context = [])
     {
-        return (string) Parse::template($tag, $context);
+        return (string) Parse::template($tag, $context, trusted: true);
     }
 
     #[Test]
@@ -39,6 +41,19 @@ EOT;
 
         $this->assertSame(
             '0-10-20-30-',
+            $this->tag($template, $this->data)
+        );
+    }
+
+    #[Test]
+    public function increment_with_dynamic_name_works()
+    {
+        $template = <<<'EOT'
+{{ data }}{{ category }}-{{ articles }}{{ increment :counter="category" by="10" }}-{{ /articles }}{{ /data }}
+EOT;
+
+        $this->assertSame(
+            'A-0-10-B-0-10-',
             $this->tag($template, $this->data)
         );
     }

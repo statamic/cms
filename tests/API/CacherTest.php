@@ -57,7 +57,11 @@ class CacherTest extends TestCase
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
 
         // manually manipulate whats in the cache so we can be sure it uses it.
-        Cache::put($cacheKey, response()->json(['foo' => 'bar']), 10);
+        Cache::put($cacheKey, [
+            'content' => json_encode(['foo' => 'bar']),
+            'status' => 200,
+            'headers' => ['content-type' => ['application/json']],
+        ], 10);
 
         $this->get($endpoint)
             ->assertOk()

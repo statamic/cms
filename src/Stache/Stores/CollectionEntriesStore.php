@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Carbon;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -96,7 +97,7 @@ class CollectionEntriesStore extends ChildStore
         // }
 
         if ($collection->dated()) {
-            $entry->date((new GetDateFromPath)($path));
+            $entry->date($this->getDateFromPath($path));
         }
 
         // Blink the entry so that it can be used when building the URI. If it's not
@@ -160,7 +161,7 @@ class CollectionEntriesStore extends ChildStore
         $indexes = collect([
             'slug',
             'uri',
-            'collection',
+            'collectionHandle',
             'published',
             'title',
             'site' => Indexes\Site::class,
@@ -214,9 +215,11 @@ class CollectionEntriesStore extends ChildStore
                 break;
             }
 
-            $itemFromDisk = $this->makeItemFromFile($path, $contents);
+            // Only parse the ID from the file rather than using makeItemFromFile,
+            // which would put a stale entry into the structure-entries blink store.
+            $id = Arr::get(YAML::file($path)->parse($contents), 'id');
 
-            if ($item->id() == $itemFromDisk->id()) {
+            if ($item->id() == $id) {
                 break;
             }
 
@@ -234,9 +237,7 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
-
-        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+        if (! Index::isLoading() && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
@@ -270,7 +271,7 @@ class CollectionEntriesStore extends ChildStore
 
     private function updateEntriesWithinIndex($index, $ids)
     {
-        if (empty($ids)) {
+        if (collect($ids)->isEmpty()) {
             return $index->update();
         }
 
@@ -282,12 +283,33 @@ class CollectionEntriesStore extends ChildStore
 
     private function updateEntriesWithinStore($ids)
     {
-        if (empty($ids)) {
+        if (collect($ids)->isEmpty()) {
             $ids = $this->paths()->keys();
         }
 
         $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
 
         $entries->each(fn ($entry) => $this->cacheItem($entry));
+    }
+
+    private function getDateFromPath($path)
+    {
+        if (! $date = (new GetDateFromPath)($path)) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $carbon = Carbon::createFromFormat($format, $date, config('app.timezone'));
+
+        if (strlen($date) === 10) {
+            $carbon->startOfDay();
+        }
+
+        return $carbon->utc();
     }
 }

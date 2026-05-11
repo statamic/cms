@@ -2,6 +2,7 @@
 
 namespace Statamic\Taxonomies;
 
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasDirtyState;
@@ -20,7 +21,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Term implements TermContract
+class Term implements ContainsQueryableValues, TermContract
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState;
 
@@ -35,6 +36,14 @@ class Term implements TermContract
     public function __construct()
     {
         $this->data = collect();
+    }
+
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->data->transform(function ($data) {
+            return clone $data;
+        });
     }
 
     public function id()
@@ -270,9 +279,10 @@ class Term implements TermContract
         return "term::{$this->id()}";
     }
 
+    /** @deprecated */
     public function revisionsEnabled()
     {
-        return $this->taxonomy()->revisionsEnabled();
+        return false;
     }
 
     public function dataForLocale($locale, $data = null)
@@ -291,6 +301,23 @@ class Term implements TermContract
         $this->inDefaultLocale()->set($key, $value);
 
         return $this;
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return $this->inDefaultLocale()->getQueryableValue($field);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'blueprint', 'collection', 'entriesCount', 'id', 'path', 'reference',
+            'slug', 'taxonomy', 'taxonomyHandle', 'title',
+        ];
     }
 
     public function getCurrentDirtyStateAttributes(): array

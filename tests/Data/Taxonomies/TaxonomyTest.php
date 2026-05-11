@@ -18,7 +18,6 @@ use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Taxonomies\Taxonomy;
@@ -289,6 +288,24 @@ class TaxonomyTest extends TestCase
         $taxonomy->truncate();
 
         $this->assertCount(0, $taxonomy->queryTerms()->get());
+    }
+
+    #[Test]
+    public function it_get_terms_count_from_multi_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+            'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
+        ]);
+
+        $taxonomy = tap(Facades\Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
+        Facades\Term::make()->taxonomy('tags')->slug('one')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('two')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('three')->data([])->save();
+
+        $this->assertCount(9, $taxonomy->queryTerms()->get());
+        $this->assertEquals(3, $taxonomy->queryTerms()->pluck('slug')->unique()->count());
     }
 
     #[Test]

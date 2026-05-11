@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Lists extends Fieldtype
 {
     protected $categories = ['structured'];
@@ -38,6 +40,10 @@ class Lists extends Fieldtype
 
         return collect($data)->reject(function ($item) {
             return in_array($item, [null, ''], true);
+        })->map(function ($item) {
+            return is_numeric($item)
+                ? (str_contains($item, '.') ? (float) $item : (int) $item)
+                : $item;
         })->values()->all();
     }
 

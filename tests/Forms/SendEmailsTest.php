@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Illuminate\Support\Facades\Bus;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Forms\SubmissionRepository;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Forms\DeleteTemporaryAttachments;
@@ -113,6 +114,29 @@ class SendEmailsTest extends TestCase
             ]),
             new DeleteTemporaryAttachments($submission),
         ]);
+    }
+
+    #[Test]
+    public function delete_attachments_job_only_saves_submission_when_enabled()
+    {
+        $form = tap(FacadesForm::make('attachments_test')->email([
+            'from' => 'first@sender.com',
+            'to' => 'first@recipient.com',
+            'foo' => 'bar',
+        ]))->save();
+
+        $form
+            ->store(false)
+            ->blueprint()
+            ->ensureField('attachments', ['type' => 'files'])->save();
+
+        $submission = $form->makeSubmission();
+
+        (new DeleteTemporaryAttachments($submission))->handle();
+
+        $submissions = app(SubmissionRepository::class)->all();
+
+        $this->assertEmpty($submissions);
     }
 
     #[Test]

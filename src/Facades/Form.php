@@ -20,7 +20,7 @@ use Statamic\Forms\Exporters\ExporterRepository;
  * @method static ExporterRepository exporters()
  *
  * @see \Statamic\Contracts\Forms\FormRepository
- * @see \Statamic\Forms\Form
+ * @link \Statamic\Forms\Form
  */
 class Form extends Facade
 {

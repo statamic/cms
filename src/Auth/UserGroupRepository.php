@@ -7,6 +7,8 @@ use Statamic\Contracts\Auth\UserGroupRepository as RepositoryContract;
 use Statamic\Events\UserGroupBlueprintFound;
 use Statamic\Facades\Blueprint;
 
+use function Statamic\trans as __;
+
 abstract class UserGroupRepository implements RepositoryContract
 {
     public function find($id): ?UserGroupContract
@@ -25,5 +27,13 @@ abstract class UserGroupRepository implements RepositoryContract
         UserGroupBlueprintFound::dispatch($blueprint);
 
         return $blueprint;
+    }
+
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Users',
+            url: cp_route('blueprints.user-groups.edit'),
+        );
     }
 }

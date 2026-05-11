@@ -121,6 +121,60 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
+    public function invalidating_a_url_with_explicit_domain_updates_correct_url_index()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        // Different domain than base_url
+        $domainHash = md5('http://differentexample.com');
+        $cache->forever("static-cache:{$domainHash}.urls", [
+            'one' => '/one',
+            'two' => '/two',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:two', 'two html content');
+
+        // Invalidate explicit domain
+        $cacher->invalidateUrl('/one', 'http://differentexample.com');
+
+        // URL index under http://differentexample.com should be updated and not http://example.com
+        $this->assertEquals(
+            ['two' => '/two'],
+            $cacher->getUrls('http://differentexample.com')->all()
+        );
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    #[Test]
+    public function invalidating_a_full_url_without_domain_extracts_domain_correctly()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        // Different domain than base_url
+        $domainHash = md5('http://differentexample.com');
+        $cache->forever("static-cache:{$domainHash}.urls", [
+            'one' => '/one',
+            'two' => '/two',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:two', 'two html content');
+
+        // Invalidate full URL with no explicit domain to simulate CLI
+        $cacher->invalidateUrl('http://differentexample.com/one');
+
+        // Should extract domain from URL and update correct URL index
+        $this->assertEquals(
+            ['two' => '/two'],
+            $cacher->getUrls('http://differentexample.com')->all()
+        );
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    #[Test]
     #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {

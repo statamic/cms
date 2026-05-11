@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as HeaderStories from '../Header.stories';
+
+<Meta of={HeaderStories} />
+
+# Header
+Displays a page header with an optional icon, title, and action buttons. The Header component provides consistent styling and layout for page headers throughout the Control Panel.
+<Canvas of={HeaderStories._DocsIntro} sourceState={'shown'} />
+
+## With Actions
+Add action buttons to the right side of the header using the default slot.
+<Canvas of={HeaderStories._WithActions} sourceState={'shown'} />
+
+## With Title Slot
+Use the `title` slot for custom title content with custom formatting.
+<Canvas of={HeaderStories._WithTitleSlot} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={HeaderStories} />

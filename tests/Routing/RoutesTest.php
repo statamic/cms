@@ -151,6 +151,8 @@ class RoutesTest extends TestCase
                 });
 
             });
+
+            Route::statamic('/callables-test', 'auth');
         });
     }
 
@@ -471,7 +473,7 @@ class RoutesTest extends TestCase
 
         $this->get('/route-with-custom-content-type')
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/json')
+            ->assertContentType('application/json')
             ->assertExactJson(['hello' => 'world']);
     }
 
@@ -484,7 +486,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertContentType('text/xml; charset=utf-8');
 
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
@@ -498,7 +500,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertContentType('text/xml; charset=utf-8');
 
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
@@ -512,7 +514,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+            ->assertContentType('text/xml; charset=utf-8');
 
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
@@ -528,7 +530,7 @@ class RoutesTest extends TestCase
 
         $response = $this
             ->get('/xml')
-            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+            ->assertContentType('text/html; charset=utf-8');
 
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
@@ -542,7 +544,7 @@ class RoutesTest extends TestCase
 
         $this
             ->get('/xml-with-custom-type')
-            ->assertHeader('Content-Type', 'application/json');
+            ->assertContentType('application/json');
     }
 
     #[Test]
@@ -595,6 +597,17 @@ class RoutesTest extends TestCase
         $this->get('/basic-route-with-data')
             ->assertOk()
             ->assertSee('Custom layout');
+    }
+
+    #[Test]
+    public function it_checks_for_closure_instances_instead_of_callables()
+    {
+        $this->viewShouldReturnRaw('auth', 'Hello, world.');
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $this->get('/callables-test')
+            ->assertOk()
+            ->assertSee('Hello, world.');
     }
 }
 

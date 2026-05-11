@@ -6,17 +6,25 @@ use Locale;
 use Statamic\Facades\Preference;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class CorePreferences
 {
     public function boot()
     {
         Preference::register('locale', [
             'type' => 'select',
-            'display' => __('Locale'),
+            'display' => __('Language'),
             'instructions' => __('statamic::messages.preference_locale_instructions'),
             'clearable' => true,
             'label_html' => true,
             'options' => $this->localeOptions(),
+        ]);
+
+        Preference::register('formatting_locale', [
+            'type' => 'formatting_locales',
+            'display' => __('Formatting Locale'),
+            'instructions' => __('statamic::messages.preference_formatting_locale_instructions'),
         ]);
 
         Preference::register('start_page', [
@@ -25,26 +33,24 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
 
-        Preference::register('favorites', [
-            'type' => 'grid',
-            'display' => __('Favorites'),
-            'instructions' => __('statamic::messages.preference_favorites_instructions'),
-            'fields' => [
-                [
-                    'handle' => 'name',
-                    'field' => [
-                        'type' => 'text',
-                        'width' => 33,
-                    ],
-                ],
-                [
-                    'handle' => 'url',
-                    'field' => [
-                        'display' => __('URL'),
-                        'type' => 'text',
-                    ],
-                ],
-            ],
+        Preference::register('strict_accessibility', [
+            'type' => 'toggle',
+            'display' => __('Stricter WCAG 2.2 Mode'),
+            'instructions' => __('statamic::messages.preference_strict_accessibility_instructions'),
+        ]);
+
+        Preference::register('confirm_dirty_navigation', [
+            'type' => 'toggle',
+            'default' => true,
+            'display' => __('Confirm Dirty Navigation'),
+            'instructions' => __('statamic::messages.preference_confirm_dirty_navigation_instructions'),
+        ]);
+
+        Preference::register('theme', [
+            'type' => 'theme',
+            'display' => __('Theme'),
+            'instructions' => __('statamic::messages.preference_theme_instructions'),
+            'full_width_setting' => true,
         ]);
     }
 
@@ -61,6 +67,7 @@ class CorePreferences
             'de_CH' => 'German (Switzerland)',
             'en' => 'English',
             'es' => 'Spanish',
+            'et' => 'Estonian',
             'fa' => 'Persian',
             'fr' => 'French',
             'hu' => 'Hungarian',
@@ -91,7 +98,7 @@ class CorePreferences
                 ['label' => $label, 'native' => $native] = $item;
 
                 if ($locale !== $current && $label !== $native) {
-                    $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
+                    $label .= '<span class="ms-4 text-gray-500 dark:text-gray-400">'.$native.'</span>';
                 }
 
                 return $label;

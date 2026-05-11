@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -948,5 +949,104 @@ GQL;
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => 'a'],
             ]]]]);
+    }
+
+    #[Test]
+    public function it_cannot_use_query_scopes_by_default()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(query_scope: { test_scope: { operator: "is", value: 1 }}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'query_scope' => ['Forbidden: test_scope'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function it_can_use_a_query_scope_when_configuration_allows_for_it()
+    {
+        $this->createEntries();
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(Collection::handles()->all());
+        ResourceAuthorizer::makePartial();
+
+        app('statamic.scopes')['test_scope'] = TestScope::class;
+
+        config()->set('statamic.graphql.resources.collections.pages', [
+            'allowed_query_scopes' => ['test_scope'],
+        ]);
+
+        $query = <<<'GQL'
+{
+    entries(query_scope: { test_scope: { operator: "is", value: 1 }}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+            ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(query_scope: { test_scope: { operator: "isnt", value: 1 }}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '4', 'title' => 'Event Two'],
+                ['id' => '5', 'title' => 'Hamburger'],
+            ]]]]);
+    }
+}
+
+class TestScope extends Scope
+{
+    public function apply($query, $values)
+    {
+        $query->where('id', $values['operator'] == 'is' ? '=' : '!=', $values['value']);
     }
 }

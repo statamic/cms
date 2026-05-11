@@ -25,12 +25,12 @@ trait ExtractsFromEntryFields
         }
 
         if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 19);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $datetime = substr($entry->date()->setTimezone(config('app.timezone'))->toDateTimeString(), 0, 19);
             $values['date'] = $datetime;
         }
 
         $fields = $blueprint
+            ->setParent($entry)
             ->fields()
             ->addValues($values)
             ->preProcess();

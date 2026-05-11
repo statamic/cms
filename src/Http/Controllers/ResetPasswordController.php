@@ -5,10 +5,15 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Inertia\Inertia;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\ResetsPasswords;
 use Statamic\Contracts\Auth\User;
+use Statamic\Facades\URL;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
+
+use function Statamic\trans as __;
 
 class ResetPasswordController extends Controller
 {
@@ -16,15 +21,18 @@ class ResetPasswordController extends Controller
 
     public function __construct()
     {
+        $this->middleware(HandleInertiaRequests::class);
         $this->middleware(RedirectIfAuthorized::class);
     }
 
     public function showResetForm(Request $request, $token = null)
     {
-        return view('statamic::auth.passwords.reset')->with([
+        return Inertia::render('auth/passwords/Reset', [
+            'loginUrl' => cp_route('login'),
             'token' => $token,
             'email' => $request->email,
             'action' => $this->resetFormAction(),
+            'redirect' => $request->redirect,
             'title' => $this->resetFormTitle(),
         ]);
     }
@@ -41,7 +49,11 @@ class ResetPasswordController extends Controller
 
     public function redirectPath()
     {
-        return request('redirect') ?? route('statamic.site');
+        $redirect = request('redirect');
+
+        return $redirect && ! URL::isExternalToApplication($redirect)
+            ? $redirect
+            : route('statamic.site');
     }
 
     protected function setUserPassword($user, $password)

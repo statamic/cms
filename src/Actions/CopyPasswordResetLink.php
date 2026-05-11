@@ -6,6 +6,8 @@ use Exception;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 
+use function Statamic\trans as __;
+
 class CopyPasswordResetLink extends Action
 {
     protected $confirm = false;
@@ -28,6 +30,11 @@ class CopyPasswordResetLink extends Action
     public function authorize($authed, $user)
     {
         return $authed->can('sendPasswordReset', $user);
+    }
+
+    public function requiresElevatedSession(): bool
+    {
+        return true;
     }
 
     public function confirmationText()

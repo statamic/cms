@@ -69,11 +69,15 @@ class EntryQuery extends Query
             $query->where('site', $site);
         }
 
-        $filters = $args['filter'] ?? null;
+        $filters = $args['filter'] ?? [];
 
         $this->filterQuery($query, $filters);
 
         $entry = $query->limit(1)->get()->first();
+
+        if ($entry && $entry->status() !== 'published' && request()->isLivePreview() && ! request()->isLivePreviewOf($entry)) {
+            return null;
+        }
 
         // The `AuthorizeSubResources` middleware will authorize when using `collection` arg,
         // but this is still required when the user queries entry using other args.
@@ -107,7 +111,7 @@ class EntryQuery extends Query
 
     private function filterQuery($query, $filters)
     {
-        if (! isset($filters['status']) && ! isset($filters['published'])) {
+        if (! request()->isLivePreview() && (! isset($filters['status']) && ! isset($filters['published']))) {
             $filters['status'] = 'published';
         }
 

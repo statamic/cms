@@ -89,7 +89,7 @@ class TreeBuilder
     {
         return collect($tree)->map(function ($item) {
             $page = $item['page'];
-            $collection = $page->collection();
+            $collection = $page->mountedCollection();
             $referenceExists = $page->referenceExists();
 
             return [
@@ -101,7 +101,7 @@ class TreeBuilder
                     'handle' => $page->entry()->blueprint()->handle(),
                     'title' => $page->entry()->blueprint()->title(),
                 ] : null,
-                'url' => $referenceExists ? $page->url() : null,
+                'url' => $page->url(),
                 'edit_url' => $page->editUrl(),
                 'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,
                 'slug' => $page->slug(),

@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
+use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -754,5 +755,82 @@ GQL;
                 'id' => '7',
                 'title' => 'That will be so rad!',
             ]]]);
+    }
+
+    #[Test]
+    public function it_only_shows_unpublished_entries_with_token()
+    {
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
+        $entry = EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(false)
+            ->create();
+
+        LivePreview::tokenize('test-token', $entry);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6") {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql?token=test-token', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => [
+                'id' => '6',
+                'title' => 'That was so rad!',
+            ]]]);
+    }
+
+    #[Test]
+    public function it_does_not_show_unpublished_entries_with_token_for_different_entry()
+    {
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(false)
+            ->create();
+
+        $other = EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('other')
+            ->data(['title' => 'Other'])
+            ->create();
+
+        LivePreview::tokenize('test-token', $other);
+
+        $query = <<<'GQL'
+{
+    entry(id: "6") {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql?token=test-token', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => null]]);
     }
 }

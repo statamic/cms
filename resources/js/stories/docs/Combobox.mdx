@@ -1,0 +1,58 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ComboboxStories from '../Combobox.stories';
+
+<Meta of={ComboboxStories} />
+
+# Combobox
+A flexible selection component that combines a text input with a dropdown list. Supports single and multiple selection, search/filtering, tagging, and keyboard navigation.
+
+<Canvas of={ComboboxStories._DocsIntro} sourceState={'shown'} />
+
+You should provide an array of option objects via the `options` prop. The objects must contain `value` and `label` keys by default, but you can customize the keys using the `optionValue` and `optionLabel` props.
+
+## Sizes
+Use the `size` prop to control the input's height and type scale. Available sizes: `xs`, `sm`, `base`, `lg`, `xl`.
+<Canvas of={ComboboxStories._Sizes} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to change the appearance of the combobox. Available variants: `default`, `filled`, `ghost`, `subtle`.
+<Canvas of={ComboboxStories._Variants} sourceState={'shown'} />
+
+## Clearable
+Add a clear button to your combobox by setting the `clearable` prop.
+<Canvas of={ComboboxStories._Clearable} sourceState={'shown'} />
+
+## Multiple Selections
+Enable multiple selection mode with the `multiple` prop. Selected items appear as badges below the input and can be reordered via drag and drop.
+<Canvas of={ComboboxStories._Multiple} sourceState={'shown'} />
+
+## Max Selections
+Limit the number of selections with the `maxSelections` prop. A counter is displayed showing the current selection count.
+<Canvas of={ComboboxStories._MaxSelections} sourceState={'shown'} />
+
+## Taggable
+Allow users to add new options by typing and pressing enter. Set `taggable` to `true` to enable this feature. Users can also paste comma-separated values to add multiple tags at once.
+<Canvas of={ComboboxStories._Taggable} sourceState={'shown'} />
+
+## Disable Search
+By default, the combobox is searchable. You may disable search by setting the `searchable` prop to `false`.
+<Canvas of={ComboboxStories._SearchDisabled} sourceState={'shown'} />
+
+## Server-side Searching
+When `ignoreFilter` is `true`, the combobox won't filter options locally. Use this with the `search` event to implement server-side searching.
+<Canvas of={ComboboxStories._IgnoreFilter} sourceState={'shown'} />
+
+## Customize Options
+You may customize how options are rendered using the `selected-option` and `option` slots.
+
+- The `selected-option` slot is used to display the currently selected option in the "trigger"
+- The `option` slot is used to display individual options in the dropdown
+
+<Canvas of={ComboboxStories._OptionSlots} sourceState={'shown'} />
+
+## Adaptive Width
+By default, the dropdown matches the trigger width. Set `adaptiveWidth` to `true` to allow the dropdown to expand to fit longer option labels.
+<Canvas of={ComboboxStories._AdaptiveWidth} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ComboboxStories} />

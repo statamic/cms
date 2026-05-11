@@ -36,6 +36,13 @@ class ComposerTest extends TestCase
 
     public function tearDown(): void
     {
+        // If the test was skipped, avoid trying to clean up. The setUp would've never happened.
+        if (! $this->files) {
+            parent::tearDown();
+
+            return;
+        }
+
         $this->files->deleteDirectory($this->basePath('tmp'));
         $this->files->deleteDirectory($this->basePath('vendor'));
         $this->files->delete($this->basePath('composer.json'));
@@ -85,11 +92,6 @@ class ComposerTest extends TestCase
         $this->assertEquals(
             __DIR__.'/__fixtures__/vendor/statamic/composer-test-example-dependency',
             Composer::installedPath('statamic/composer-test-example-dependency')
-        );
-
-        $this->assertEquals(
-            __DIR__.'/__fixtures__/vendor/composer/composer',
-            Composer::installedPath('composer/composer')
         );
     }
 
@@ -217,9 +219,6 @@ class ComposerTest extends TestCase
         PackToTheFuture::generateComposerJson('test/two', '2.0.0', [], $this->basePath('tmp/two/composer.json'));
 
         $repositories = [
-            'require' => [
-                'composer/composer' => '^2.0.0',
-            ],
             'repositories' => [
                 ['type' => 'path', 'url' => $this->basePath('tmp/one'), 'options' => ['symlink' => false]],
                 ['type' => 'path', 'url' => $this->basePath('tmp/two'), 'options' => ['symlink' => false]],

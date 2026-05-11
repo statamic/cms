@@ -4,6 +4,8 @@ namespace Statamic\Http\Controllers\CP;
 
 use Statamic\Facades\Site;
 
+use function Statamic\trans as __;
+
 class SelectSiteController extends CpController
 {
     public function select($handle)
