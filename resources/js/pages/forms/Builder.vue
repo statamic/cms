@@ -155,11 +155,12 @@ const onEscape = (event) => {
     }
 };
 
-onMounted(() => {
-    nextTick(() => {
-        makeFieldsDraggable();
-        makeFieldsSortable();
-    });
+onMounted(async () => {
+    await nextTick();
+    await nextTick();
+
+    makeFieldsDraggable();
+    makeFieldsSortable();
 
     document.addEventListener('keydown', onEscape);
 });
