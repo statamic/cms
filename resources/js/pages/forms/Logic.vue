@@ -200,7 +200,7 @@ provide(publishContextKey, {
         </Button>
     </Teleport>
 
-    <div class="py-4 mx-auto max-w-5xl">
+    <div class="py-1 mx-auto max-w-5xl">
         <Header class="mb-2">
             <template #title>
                 <StatusIndicator status="published" />
