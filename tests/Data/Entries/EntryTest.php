@@ -2049,23 +2049,32 @@ class EntryTest extends TestCase
     }
 
     #[Test]
-    public function it_respects_custom_blueprint_template_base_path()
+    public function it_respects_custom_blueprint_template_path_per_collection()
     {
-        // Set custom base path for test
-        config(['statamic.system.blueprint_template_base_path' => 'custom.path']);
+        config(['statamic.system.blueprint_templates' => [
+            'articles' => 'custom.path',
+        ]]);
 
-        $collection = tap(Collection::make('articles')->template('@blueprint'))->save();
+        $articles = tap(Collection::make('articles')->template('@blueprint'))->save();
+        $pages = tap(Collection::make('pages')->template('@blueprint'))->save();
         $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
-        $entry = Entry::make('test')->collection($collection)->blueprint($blueprint->handle());
 
-        // entry uses the custom path instead of collection handle
-        $this->assertEquals('custom.path.standard_article', $entry->template());
+        $articleEntry = Entry::make('test')->collection($articles)->blueprint($blueprint->handle());
+        $pageEntry = Entry::make('test')->collection($pages)->blueprint($blueprint->handle());
 
-        // entry uses slugified custom path when that template exists
+        // mapped collection uses the mapped prefix instead of the collection handle
+        $this->assertEquals('custom.path.standard_article', $articleEntry->template());
+
+        // unmapped collection still uses its handle as the prefix
+        $this->assertEquals('pages.standard_article', $pageEntry->template());
+
+        // mapped collection uses slugified prefix when that template exists
         View::shouldReceive('exists')->with('custom.path.standard-article')->andReturn(true);
-        $this->assertEquals('custom.path.standard-article', $entry->template());
+        $this->assertEquals('custom.path.standard-article', $articleEntry->template());
 
-        config(['statamic.system.blueprint_template_base_path' => null]);
+        // entry level template still overrides @blueprint
+        $articleEntry->template('articles.custom');
+        $this->assertEquals('articles.custom', $articleEntry->template());
     }
 
     #[Test]

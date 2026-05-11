@@ -271,16 +271,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Blueprint Template Base Path
+    | Blueprint Templates
     |--------------------------------------------------------------------------
     |
-    | When using @blueprint in a collection's template setting, Statamic looks for
-    | templates in /resources/views/{collection}/{blueprint}.antlers.html. Set this
-    | value to use a different base path
-    | (e.g. 'templates' for /resources/views/templates/).
+    | When an entry's template is set to `@blueprint`, Statamic will look for 
+    | a view named `{collection}.{blueprint}`. You may override this logic
+    | on a per-collection basis here.
+    |
+    | https://statamic.dev/content-modeling/collections#templates
     |
     */
 
-    'blueprint_template_base_path' => env('STATAMIC_BLUEPRINT_TEMPLATE_PATH', null),
+    'blueprint_templates' => [
+        //
+    ],
 
 ];
