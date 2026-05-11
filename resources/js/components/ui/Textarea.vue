@@ -68,7 +68,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="group/input relative block w-full" data-ui-input>
+    <div class="group/input relative block w-full st-text-legibility" data-ui-input>
         <textarea
             ref="textarea"
             :class="classes"
