@@ -13,7 +13,7 @@ import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue'
 import FieldSettings from '@/components/forms/Builder/FieldSettings.vue';
 import PageSettings from '@/components/forms/Builder/PageSettings.vue';
 import ActionSettings from '@/components/forms/Builder/ActionSettings.vue';
-import { uniqid } from '@/bootstrap/globals.js';
+import { field_width_class, uniqid } from '@/bootstrap/globals.js';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -59,6 +59,12 @@ const fieldView = ref('expanded');
 
 const shouldShowViewSelector = computed(() => formFields.value.sections.flatMap((section) => section.fields).length > 0);
 
+const editingField = ref(null);
+
+const selectField = (field) => editingField.value = field;
+const deselectField = () => editingField.value = null;
+const isEditingField = (field) => editingField.value?._id === field._id;
+
 const addField = (sectionId, fieldtypeHandle, index = null) => {
     const section = formFields.value.sections.find((section) => section._id === sectionId);
     if (!section) return;
@@ -87,6 +93,53 @@ const addField = (sectionId, fieldtypeHandle, index = null) => {
 
     section.values[handle] = fieldtype.preview.value;
     section.meta[handle] = fieldtype.preview.meta;
+
+    editingField.value = field;
+};
+
+const toggleFieldVisibility = (field) => field.config.hidden = !field.config.hidden;
+
+const duplicateField = (sectionId, fieldId) => {
+    const section = formFields.value.sections.find((section) => section._id === sectionId);
+    if (!section) return;
+
+    const field = section.fields.find((f) => f._id === fieldId);
+    if (!field) return;
+
+    const index = section.fields.indexOf(field);
+    const handle = uniqid();
+
+    const newField = {
+        ...field,
+        _id: `${sectionId}-${section.fields.length}`,
+        handle,
+        config: { ...field.config, display: `${field.config.display} (${__('Duplicate')})` },
+        publishConfig: { ...field.publishConfig, handle },
+    };
+
+    section.fields.splice(index + 1, 0, newField);
+    section.values[handle] = section.values[field.handle];
+    section.meta[handle] = section.meta[field.handle];
+
+    editingField.value = newField;
+};
+
+const removeField = (sectionId, fieldId) => {
+    const section = formFields.value.sections.find((section) => section._id === sectionId);
+    if (!section) return;
+
+    const index = section.fields.findIndex((field) => field._id === fieldId);
+    if (index === -1) return;
+
+    section.fields.splice(index, 1);
+    delete section.values[fieldId];
+    delete section.meta[fieldId];
+
+    if (section.fields.length === 0) {
+        toggleSection(section);
+    }
+
+    deselectField();
 };
 
 let draggableInstance = null;
@@ -142,8 +195,21 @@ const makeFieldsDraggable = () => {
     });
 };
 
-onMounted(() => nextTick(makeFieldsDraggable));
-onUnmounted(() => draggableInstance?.destroy());
+const onEscape = (event) => {
+    if (event.key === 'Escape' && editingField.value) {
+        deselectField();
+    }
+};
+
+onMounted(() => {
+    nextTick(makeFieldsDraggable);
+    document.addEventListener('keydown', onEscape);
+});
+
+onUnmounted(() => {
+    draggableInstance?.destroy();
+    document.removeEventListener('keydown', onEscape);
+});
 
 
 
@@ -307,7 +373,57 @@ const inspectActionButton = (target) => {
                         :track-dirty-state="false"
                     >
                         <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
-                            <div v-for="field in section.fields" :key="field._id" data-field-item>
+                            <div
+                                v-for="field in section.fields"
+                                :key="field._id"
+                                data-field-item
+                                :data-editing-field="isEditingField(field) ? '' : undefined"
+                                :data-editing-item="isEditingField(field) ? '' : undefined"
+                                :class="{ 'cursor-pointer [&_label]:cursor-pointer': !isEditingField(field) }"
+                                @click.stop="isEditingField(field) || selectField(field)"
+                            >
+                                <div
+                                    v-if="isEditingField(field)"
+                                    class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
+                                >
+                                    <WidthSelector
+                                        size="base"
+                                        variant="filled"
+                                        class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
+                                        :model-value="field.config.width || 100"
+                                        @update:model-value="field.config.width = $event"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        inset
+                                        icon="duplicate"
+                                        variant="subtle"
+                                        :aria-label="__('Duplicate field')"
+                                        :title="__('Duplicate field')"
+                                        class="[&_svg]:opacity-45"
+                                        @click.stop="duplicateField(section._id, field._id)"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        inset
+                                        :icon="field.config.hidden ? 'eye-closed' : 'eye'"
+                                        variant="subtle"
+                                        :aria-label="field.config.hidden ? __('Show field') : __('Hide field')"
+                                        :title="field.config.hidden ? __('Show field') : __('Hide field')"
+                                        class="[&_svg]:opacity-45"
+                                        @click.stop="toggleFieldVisibility(field)"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        inset
+                                        icon="trash"
+                                        variant="subtle"
+                                        :aria-label="__('Remove field')"
+                                        :title="__('Remove field')"
+                                        class="[&_svg]:opacity-45"
+                                        @click.stop="removeField(section._id, field._id)"
+                                    />
+                                </div>
                                 <Field
                                     :id="field._id"
                                     :class="{ 'opacity-60': field.config.hidden }"
@@ -520,8 +636,8 @@ const inspectActionButton = (target) => {
     />
 
     <LayoutPanel side="right">
-        <PageSettings v-if="isPageInspector" />
-        <ActionSettings v-else-if="isActionInspector" />
-        <FieldSettings v-else />
+        <!-- TODO: Wire up field/page/action settings -->
+
+        <p v-if="editingField">{{ editingField.config.display }}</p>
     </LayoutPanel>
 </template>
