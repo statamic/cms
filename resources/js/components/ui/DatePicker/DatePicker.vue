@@ -1,6 +1,7 @@
 <script setup>
 import { config } from '@api';
 import { computed } from 'vue';
+import { getLocalTimeZone, now } from '@internationalized/date';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -98,6 +99,19 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event);
     },
 }));
+
+const selectToday = () => {
+    if (props.disabled || props.readOnly) {
+        return;
+    }
+
+    let value = now(getLocalTimeZone()).set({ millisecond: 0 });
+    if (props.granularity === 'day') {
+        value = value.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    }
+
+    emit('update:modelValue', value);
+};
 
 const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
 
@@ -233,11 +247,35 @@ const getInputLabel = (part) => {
             >
                 <Card class="w-[20rem]">
                     <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                    <div
+                        class="flex justify-end"
+                    >
+                        <Button
+                            type="button"
+                            variant="subtle"
+                            size="xs"
+                            :text="__('Today')"
+                            :disabled="disabled || readOnly"
+                            @click="selectToday"
+                        />
+                    </div>
                 </Card>
             </DatePickerContent>
 
             <Card v-if="inline" class="mt-2">
                 <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                <div
+                    class="flex justify-end border-t border-gray-200 px-3 py-2 dark:border-gray-700"
+                >
+                    <Button
+                        type="button"
+                        variant="subtle"
+                        size="sm"
+                        :text="__('Today')"
+                        :disabled="disabled || readOnly"
+                        @click="selectToday"
+                    />
+                </div>
             </Card>
         </DatePickerRoot>
     </div>

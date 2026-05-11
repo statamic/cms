@@ -26,7 +26,7 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
-import { parseAbsoluteToLocal } from '@internationalized/date';
+import { getLocalTimeZone, now, parseAbsoluteToLocal } from '@internationalized/date';
 import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
@@ -100,6 +100,22 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event)
     },
 }));
+
+const selectToday = () => {
+    if (props.disabled || props.readOnly) {
+        return;
+    }
+
+    const tz = getLocalTimeZone();
+    let start = now(tz).set({ millisecond: 0 });
+    let end = now(tz).set({ millisecond: 0 });
+    if (props.granularity === 'day') {
+        start = start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+        end = end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    }
+
+    emit('update:modelValue', { start, end });
+};
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
 
@@ -203,11 +219,35 @@ const hoverCardDate = computed(() => {
             >
                 <Card class="w-[20rem]">
                     <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                    <div
+                        class="flex justify-end border-t border-gray-200 px-3 py-2 dark:border-gray-700"
+                    >
+                        <Button
+                            type="button"
+                            variant="subtle"
+                            size="sm"
+                            :text="__('Today')"
+                            :disabled="disabled || readOnly"
+                            @click="selectToday"
+                        />
+                    </div>
                 </Card>
             </DateRangePickerContent>
 
             <Card v-if="inline" class="mt-2">
                 <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                <div
+                    class="flex justify-end border-t border-gray-200 px-3 py-2 dark:border-gray-700"
+                >
+                    <Button
+                        type="button"
+                        variant="subtle"
+                        size="sm"
+                        :text="__('Today')"
+                        :disabled="disabled || readOnly"
+                        @click="selectToday"
+                    />
+                </div>
             </Card>
         </DateRangePickerRoot>
     </div>
