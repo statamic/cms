@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.73.22 (2026-05-11)
+
+### What's fixed
+- Harden remote URL validation [#14645](https://github.com/statamic/cms/issues/14645) by @jasonvarga
+
+
+
 ## 5.73.21 (2026-04-27)
 
 ### What's fixed
