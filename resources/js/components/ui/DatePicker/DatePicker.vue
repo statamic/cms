@@ -265,12 +265,12 @@ const getInputLabel = (part) => {
             <Card v-if="inline" class="mt-2">
                 <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
                 <div
-                    class="flex justify-end border-t border-gray-200 px-3 py-2 dark:border-gray-700"
+                    class="flex justify-end"
                 >
                     <Button
                         type="button"
                         variant="subtle"
-                        size="sm"
+                        size="xs"
                         :text="__('Today')"
                         :disabled="disabled || readOnly"
                         @click="selectToday"
