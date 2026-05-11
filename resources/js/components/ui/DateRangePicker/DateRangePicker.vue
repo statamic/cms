@@ -55,6 +55,7 @@ const calendarBindings = computed(() => ({
     modelValue: props.modelValue ?? [],
     min: props.min,
     max: props.max,
+    inline: props.inline,
     components: {
         Root: DateRangePickerCalendar,
         Header: DateRangePickerHeader,
@@ -104,11 +105,7 @@ const calendarEvents = computed(() => ({
     },
 }));
 
-const selectToday = () => {
-    if (props.disabled || props.readOnly) {
-        return;
-    }
-
+const emitTodayValue = () => {
     const tz = getLocalTimeZone();
     let start = now(tz).set({ millisecond: 0 });
     let end = now(tz).set({ millisecond: 0 });
@@ -166,7 +163,7 @@ const onTodayShortcutClick = () => {
         }
         return;
     }
-    selectToday();
+    emitTodayValue();
 };
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
@@ -200,6 +197,9 @@ const hoverCardDate = computed(() => {
             hide-time-zone
             :placeholder="placeholder"
             close-on-select
+            role="group"
+            :aria-label="__('Date range picker')"
+            :aria-required="required"
             v-model:open="pickerOpen"
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
@@ -259,7 +259,16 @@ const hoverCardDate = computed(() => {
                     >
                         <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
                     </TimezoneHoverCard>
-                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
+                    <Button
+                        v-if="clearable && !readOnly"
+                        @click="emit('update:modelValue', null)"
+                        variant="subtle"
+                        size="sm"
+                        icon="x"
+                        class="-my-1.25 -me-2"
+                        :disabled="disabled"
+                        v-tooltip="__('Clear date')"
+                    />
                 </div>
             </DateRangePickerField>
 
@@ -273,12 +282,13 @@ const hoverCardDate = computed(() => {
                 <Card class="w-[20rem]">
                     <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
                     <div
-                        class="flex justify-end border-t border-gray-200 px-3 py-2 dark:border-gray-700"
+                        class="flex justify-end"
                     >
                         <Button
                             type="button"
                             variant="subtle"
-                            size="sm"
+                            size="2xs"
+                            class="me-1"
                             :text="todayShortcutLabel"
                             :disabled="disabled || readOnly"
                             @click="onTodayShortcutClick"
@@ -290,12 +300,13 @@ const hoverCardDate = computed(() => {
             <Card v-if="inline" class="mt-2">
                 <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
                 <div
-                    class="flex justify-end border-t border-gray-200 px-3 py-2 dark:border-gray-700"
+                    class="flex justify-end"
                 >
                     <Button
                         type="button"
                         variant="subtle"
-                        size="sm"
+                        size="2xs"
+                        class="-me-1"
                         :text="todayShortcutLabel"
                         :disabled="disabled || readOnly"
                         @click="onTodayShortcutClick"
