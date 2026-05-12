@@ -95,37 +95,62 @@ const fixRangeStartForNextPick = ref(false);
 
 const rangePickerFixedDate = computed(() => (fixRangeStartForNextPick.value ? 'start' : undefined));
 
-const calendarEvents = computed(() => ({
-    'update:model-value': (event) => {
-        if (props.granularity === 'day') {
+/** Same calendar day for start/end, and that day is today (footer "Select" / today-shortcut state). */
+function isTodaySingleDayRange(start, end) {
+    if (!start || !end) {
+        return false;
+    }
+    try {
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const startCal = toCalendarDate(start);
+        const endCal = toCalendarDate(end);
+        const singleDay =
+            startCal.year === endCal.year &&
+            startCal.month === endCal.month &&
+            startCal.day === endCal.day;
+        const isToday =
+            startCal.year === todayCal.year &&
+            startCal.month === todayCal.month &&
+            startCal.day === todayCal.day;
+        return singleDay && isToday;
+    } catch {
+        return false;
+    }
+}
 
-            // Avoid fatal error `Cannot set properties of undefined (setting 'hour')`
-            if (event.end == null) {
-                // Range mid-selection: parent v-model is not updated yet, so clear the
-                // "Select" primed state here or the label would stay wrong.
-                if (shortcutPrimedForSelect.value) {
-                    shortcutPrimedForSelect.value = false;
-                }
-                if (fixRangeStartForNextPick.value) {
-                    fixRangeStartForNextPick.value = false;
-                }
-                return;
-            }
-
-            event.start.hour = 0;
-            event.start.minute = 0;
-            event.start.second = 0;
-            event.start.millisecond = 0;
-
-            event.end.hour = 0;
-            event.end.minute = 0;
-            event.end.second = 0;
-            event.end.millisecond = 0;
+/**
+ * Range updates come from DateRangePickerRoot — not from Calendar's emit (DateRangePickerCalendar
+ * handles RangeCalendar internally). Footer priming + day normalization must run here.
+ */
+function onPickerModelUpdate(event) {
+    // Partial range (any granularity): reset footer — inline pickers often omit `granularity="day"`.
+    if (event.end == null) {
+        if (shortcutPrimedForSelect.value && !fixRangeStartForNextPick.value) {
+            shortcutPrimedForSelect.value = false;
         }
+        emit('update:modelValue', event);
+        return;
+    }
 
-        emit('update:modelValue', event)
-    },
-}));
+    if (props.granularity === 'day') {
+        event.start.hour = 0;
+        event.start.minute = 0;
+        event.start.second = 0;
+        event.start.millisecond = 0;
+
+        event.end.hour = 0;
+        event.end.minute = 0;
+        event.end.second = 0;
+        event.end.millisecond = 0;
+    }
+
+    if (event.start && !isTodaySingleDayRange(event.start, event.end)) {
+        shortcutPrimedForSelect.value = false;
+        fixRangeStartForNextPick.value = false;
+    }
+
+    emit('update:modelValue', event);
+}
 
 const emitTodayValue = () => {
     fixRangeStartForNextPick.value = false;
@@ -160,22 +185,7 @@ const isTodayRangeSelected = computed(() => {
     if (!mv?.start || !mv?.end) {
         return false;
     }
-    try {
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const startCal = toCalendarDate(mv.start);
-        const endCal = toCalendarDate(mv.end);
-        const singleDay =
-            startCal.year === endCal.year &&
-            startCal.month === endCal.month &&
-            startCal.day === endCal.day;
-        const isToday =
-            startCal.year === todayCal.year &&
-            startCal.month === todayCal.month &&
-            startCal.day === todayCal.day;
-        return singleDay && isToday;
-    } catch {
-        return false;
-    }
+    return isTodaySingleDayRange(mv.start, mv.end);
 });
 
 const todayShortcutLabel = computed(() =>
@@ -255,11 +265,11 @@ const hoverCardDate = computed(() => {
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"
-            @update:model-value="emit('update:modelValue', $event)"
+            @update:model-value="onPickerModelUpdate"
             v-bind="$attrs"
             prevent-deselect
             hide-time-zone
-            close-on-select
+            :close-on-select="!inline"
             role="group"
             :aria-label="__('Date range picker')"
             :aria-required="required"
@@ -344,7 +354,7 @@ const hoverCardDate = computed(() => {
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">
-                    <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                    <Calendar v-bind="calendarBindings" />
                     <div
                         class="flex justify-end"
                     >
@@ -362,7 +372,7 @@ const hoverCardDate = computed(() => {
             </DateRangePickerContent>
 
             <Card v-if="inline" class="mt-2">
-                <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                <Calendar v-bind="calendarBindings" />
                 <div
                     class="flex justify-end"
                 >
