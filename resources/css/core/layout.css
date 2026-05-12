@@ -116,7 +116,8 @@
 @media (width < theme(--breakpoint-lg)) {
     .nav-main {
         /* Always visible but off-screen by default */
-        @apply flex z-6;
+        z-index: var(--z-index-max);
+        @apply flex;
         @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 
