@@ -1,6 +1,7 @@
 <script setup>
 import { config } from '@api';
 import { computed } from 'vue';
+import { normalizeLocale } from '../../FormattingLocale.js';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -105,7 +106,7 @@ const timeZoneLabel = computed(() => {
     const tz = timeZoneName.value;
     if (!tz) return null;
 
-    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
+    const parts = new Intl.DateTimeFormat(normalizeLocale(config.get('translationLocale')), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
 });
 
