@@ -138,7 +138,7 @@ class Field implements Arrayable
 
     public function reserveSpaceWhenHidden()
     {
-        return (bool) Arr::get($this->config, 'reserve_space_when_hidden', false);
+        return Arr::get($this->config, 'reserve_space_when_hidden', false);
     }
 
     public function rules()

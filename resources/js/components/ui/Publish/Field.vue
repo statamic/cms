@@ -149,10 +149,13 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
-const reserveSpaceWhenHidden = computed(() => props.config.reserve_space_when_hidden === true);
+// Only applies when hidden by conditions; blueprint "hidden" visibility still removes the field from layout.
+const reserveSpaceWhenHiddenEnabled = computed(
+    () => props.config.reserve_space_when_hidden === true && props.config.visibility !== 'hidden',
+);
 
 const shouldHideFieldVisually = computed(
-    () => reserveSpaceWhenHidden.value && !shouldShowField.value,
+    () => reserveSpaceWhenHiddenEnabled.value && !shouldShowField.value,
 );
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
@@ -235,7 +238,7 @@ const fieldtypeComponentEvents = computed(() => ({
         :shouldShowField="shouldShowField"
     >
         <Field
-            v-show="shouldShowField || reserveSpaceWhenHidden"
+            v-show="shouldShowField || reserveSpaceWhenHiddenEnabled"
             :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
             :inert="shouldHideFieldVisually"
             :id="fieldId"
