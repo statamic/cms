@@ -136,14 +136,14 @@ defineExpose({ addField });
                     :meta="section.meta"
                     :track-dirty-state="false"
                 >
-                    <div class="field-sort-container space-y-7" :data-sort-section="section._id" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                    <div class="field-sort-container field-grid" :data-sort-section="section._id" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
                         <div
                             v-for="field in section.fields"
                             :key="field._id"
                             data-field-item
                             :data-editing-field="isEditingField(field) ? '' : undefined"
                             :data-editing-item="isEditingField(field) ? '' : undefined"
-                            :class="{ 'cursor-pointer': !isEditingField(field) }"
+                            :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isEditingField(field) }]"
                             @click.stop="isEditingField(field) || selectField(field)"
                         >
                             <div
