@@ -26,7 +26,7 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
-import { getLocalTimeZone, now, parseAbsoluteToLocal, toCalendarDate } from '@internationalized/date';
+import { getLocalTimeZone, now, toCalendarDate } from '@internationalized/date';
 import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
@@ -71,12 +71,6 @@ const calendarBindings = computed(() => ({
         CellTrigger: DateRangePickerCellTrigger,
     },
 }));
-
-// The placeholder defines the month to show when there's no value. Additionally,
-// by setting it to an absolute value, it ensures that the emitted event value
-// will be the appropriate format (e.g. a full date with time with timezone,
-// rather than just a day).
-const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 
 /** Synced with DateRangePickerRoot so we can re-open after "Today" despite close-on-select. */
 const pickerOpen = ref(false);
@@ -265,7 +259,6 @@ const hoverCardDate = computed(() => {
             v-bind="$attrs"
             prevent-deselect
             hide-time-zone
-            :placeholder="placeholder"
             close-on-select
             role="group"
             :aria-label="__('Date range picker')"
