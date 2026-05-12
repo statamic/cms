@@ -189,7 +189,7 @@ const hoverCardDate = computed(() => {
                         :additional-timezones="additionalTimezones"
                         side="top"
                     >
-                        <Text class="text-gray-600! dark:text-gray-400! me-1" size="xs" :text="timeZoneLabel" />
+                        <Text class="text-gray-600! dark:text-gray-400! ms-3 me-1" size="xs" :text="timeZoneLabel" />
                     </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
