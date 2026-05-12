@@ -175,6 +175,7 @@ const inspectActionButton = (target) => {
                         <div
                             v-for="field in section.fields"
                             :key="field._id"
+                            :id="isEditingField ? 'editing-field' : null"
                             data-field-item
                             :data-editing-field="isEditingField(field) ? '' : undefined"
                             :data-editing-item="isEditingField(field) ? '' : undefined"
