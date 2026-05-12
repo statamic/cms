@@ -1,7 +1,7 @@
 <script setup>
 import { Button, Card, Field, Heading, Icon, Label, Panel, PanelHeader, PublishContainer } from '@ui';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { uniqid } from '@/bootstrap/globals.js';
 
 const props = defineProps({
@@ -95,6 +95,17 @@ const removeField = (fieldId) => {
 };
 
 defineExpose({ addField });
+
+// TODO: Refactor everything below this line
+const inspectorTarget = ref('field');
+const fanLength = ref('');
+const favoriteThing = ref('');
+const panelCollapsed = ref(false);
+const nextPageButtonLabel = ref(__('Next Page'));
+
+const inspectActionButton = (target) => {
+    inspectorTarget.value = target;
+};
 </script>
 
 <template>
@@ -197,7 +208,7 @@ defineExpose({ addField });
                                     <Label :for="field._id" :class="{ 'cursor-pointer': !isEditingField(field) }">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon :name="field.icon" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
-                                            {{ field.config.display }}
+                                            {{ __(field.config.display) }}
                                             <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                                         </span>
                                     </Label>
@@ -218,4 +229,90 @@ defineExpose({ addField });
             </Card>
         </div>
     </Panel>
+
+<!--    <Panel-->
+<!--        class="mx-auto max-w-5xl"-->
+<!--        :class="{ 'pb-0': panelCollapsed }"-->
+<!--        :data-panel-collapsed="panelCollapsed ? 'true' : 'false'"-->
+<!--    >-->
+<!--        <PanelHeader class="relative flex items-center justify-between">-->
+<!--            <Heading :text="__('Main Section')" />-->
+<!--            <Button-->
+<!--                @click="panelCollapsed = !panelCollapsed"-->
+<!--                class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"-->
+<!--                :icon="panelCollapsed ? 'expand' : 'collapse'"-->
+<!--                size="sm"-->
+<!--                variant="ghost"-->
+<!--                :aria-label="__('Toggle section visibility')"-->
+<!--            />-->
+<!--        </PanelHeader>-->
+
+<!--        <div-->
+<!--            style="&#45;&#45;tw-ease: ease;"-->
+<!--            class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"-->
+<!--            :class="{ 'h-0! invisible! overflow-clip': panelCollapsed }"-->
+<!--        >-->
+<!--            <Card>-->
+<!--                <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">-->
+<!--                    <div data-fieldset-group class="space-y-7">-->
+<!--                        <div id="fieldset-start">-->
+<!--                                <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">-->
+<!--                                    <span class="inline-flex" v-tooltip="__('Fieldset')">-->
+<!--                                        <Icon name="link" class="size-3.5" aria-hidden="true" />-->
+<!--                                    </span>-->
+<!--                                    <span class="sr-only">{{ __('Fieldset') }}</span>-->
+<!--                                </span>-->
+<!--                            <Field :label="__('What do you like most about our band?')">-->
+<!--                                <template #label>-->
+<!--                                    <Label for="favorite-thing-field">-->
+<!--                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">-->
+<!--                                                <Icon name="text-long" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />-->
+<!--                                                {{ __('What do you like most about our band?') }}-->
+<!--                                                <span class="relative -top-px -ms-0.5 text-red-600" :aria-label="__('Required')">*</span>-->
+<!--                                            </span>-->
+<!--                                    </Label>-->
+<!--                                </template>-->
+<!--                                <span class="absolute z-(&#45;&#45;z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">-->
+<!--                                        <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />-->
+<!--                                    </span>-->
+<!--                                <Textarea id="favorite-thing-field" v-model="favoriteThing" :rows="4" resize="vertical" required />-->
+<!--                            </Field>-->
+<!--                        </div>-->
+
+<!--                        <div id="fieldset-end">-->
+<!--                            <Field :label="__('How long have you been a fan?')" :instructions="__('If you don\'t remember, just give your best estimate')">-->
+<!--                                <template #label>-->
+<!--                                    <Label for="fan-length-field">-->
+<!--                                            <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">-->
+<!--                                                <Icon name="text-short" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />-->
+<!--                                                {{ __('How long have you been a fan?') }}-->
+<!--                                            </span>-->
+<!--                                    </Label>-->
+<!--                                </template>-->
+<!--                                <span class="absolute z-(&#45;&#45;z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">-->
+<!--                                        <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />-->
+<!--                                    </span>-->
+<!--                                <Input id="fan-length-field" v-model="fanLength" />-->
+<!--                            </Field>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div-->
+<!--                        id="action-next-button"-->
+<!--                        class="mt-8"-->
+<!--                    >-->
+<!--                        <Button-->
+<!--                            variant="primary"-->
+<!--                            @click.prevent="inspectActionButton('action_next')"-->
+<!--                            :data-editing-field="inspectorTarget === 'action_next' ? '' : undefined"-->
+<!--                            :data-editing-item="inspectorTarget === 'action_next' ? '' : undefined"-->
+<!--                            class="border-0! dark:border-0! ring-0! shadow-none!"-->
+<!--                            style="&#45;&#45;theme-color-primary: var(&#45;&#45;theme-color-gray-950)"-->
+<!--                            :text="nextPageButtonLabel"-->
+<!--                        />-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </Card>-->
+<!--        </div>-->
+<!--    </Panel>-->
 </template>
