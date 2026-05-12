@@ -137,7 +137,7 @@ const hoverCardDate = computed(() => {
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div
                     :class="[
-                        'flex items-center w-full bg-white dark:bg-gray-900',
+                        'flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-gray-700',
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                         'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-2.5 disabled:shadow-none',
@@ -189,7 +189,7 @@ const hoverCardDate = computed(() => {
                         :additional-timezones="additionalTimezones"
                         side="top"
                     >
-                        <Text class="text-gray-600! dark:text-gray-400! ms-3 me-1" size="xs" :text="timeZoneLabel" />
+                        <Text class="text-gray-600! dark:text-gray-400! ms-2.5 me-1" size="xs" :text="timeZoneLabel" />
                     </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>

@@ -159,7 +159,7 @@ const getInputLabel = (part) => {
                 <DatePickerAnchor as-child>
                     <div
                         :class="[
-                            'flex w-full items-center bg-white uppercase dark:bg-gray-900',
+                            'flex w-full items-center overflow-x-auto overflow-y-hidden bg-white uppercase dark:bg-gray-900',
                             'border border-gray-300 dark:border-gray-700',
                             'text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
@@ -210,7 +210,7 @@ const getInputLabel = (part) => {
                             :additional-timezones="additionalTimezones"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-3 me-1" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2.5 me-1" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
