@@ -1,8 +1,8 @@
 <label>
-    <input type="hidden" name="{{ $handle }}" value="0">
+    <input type="hidden" name="{{ $name }}" value="0">
     <input
         type="checkbox"
-        name="{{ $handle }}"
+        name="{{ $name }}"
         value="1"
         @if (isset($js_driver)) {!! $js_attributes !!} @endif
         @checked($value && $value !== '0')

@@ -5,7 +5,7 @@
     $inline = isset($inline) && $inline === true;
     $placeholderText = $placeholder ?? __('Please select...');
 
-    $fieldName = $handle;
+    $fieldName = $name;
 
     if ($isMultiple) {
         $fieldName .= '[]';

@@ -1,7 +1,7 @@
 @php
     $isMultiple = ! isset($max_files) || $max_files !== 1;
 
-    $fieldName = $handle;
+    $fieldName = $name;
 
     if ($isMultiple) {
         $fieldName .= '[]';

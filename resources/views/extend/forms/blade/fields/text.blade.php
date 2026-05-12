@@ -1,7 +1,7 @@
 <input
     id="{{ $id }}"
     type="{{ $input_type ?? 'text' }}"
-    name="{{ $handle }}"
+    name="{{ $name }}"
     value="{{ $value ?? '' }}"
     @if (isset($placeholder)) placeholder="{{ $placeholder }}" @endif
     @if (isset($character_limit)) maxlength="{{ $character_limit }}" @endif

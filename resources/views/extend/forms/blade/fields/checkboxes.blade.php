@@ -2,13 +2,13 @@
     $inline = isset($inline) && $inline === true;
 @endphp
 
-<input type="hidden" name="{{ $handle }}[]">
+<input type="hidden" name="{{ $name }}[]">
 @foreach ($options as $option => $label)
     <label>
         <input
             id="{{ $id }}-{{ \Illuminate\Support\Str::slug($option) }}-option"
             type="checkbox"
-            name="{{ $handle }}[]"
+            name="{{ $name }}[]"
             value="{{ $option }}"
             @if (isset($js_driver)) {!! $js_attributes !!} @endif
             @checked(in_array($option, $value ?? []))

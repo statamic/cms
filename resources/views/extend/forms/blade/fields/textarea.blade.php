@@ -1,6 +1,6 @@
 <textarea
     id="{{ $id }}"
-    name="{{ $handle }}"
+    name="{{ $name }}"
     rows="5"
     @if (isset($placeholder)) placeholder="{{ $placeholder }}" @endif
     @if (isset($character_limit)) maxlength="{{ $character_limit }}" @endif

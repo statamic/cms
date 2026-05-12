@@ -7,7 +7,7 @@
         <input
             id="{{ $id }}-{{ \Illuminate\Support\Str::slug($option) }}-option"
             type="radio"
-            name="{{ $handle }}"
+            name="{{ $name }}"
             value="{{ $option }}"
             @if (isset($js_driver)) {!! $js_attributes !!} @endif
             @checked($value == $option)
