@@ -459,9 +459,9 @@ function close() {
                 <div
                     v-if="cropDimensions"
                     class="absolute top-5 end-5 z-10 rounded-md bg-gray-900/75 px-2 py-1 text-xs font-medium text-white tabular-nums pointer-events-none"
-                    :aria-label="__('Crop dimensions')"
+                    :aria-label="__('Dimensions')"
                 >
-                    {{ cropDimensions.width }} &times; {{ cropDimensions.height }} px
+                    {{ __('messages.width_x_height', { width: cropDimensions.width, height: cropDimensions.height }) }}
                 </div>
             </div>
 
