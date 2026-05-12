@@ -8,6 +8,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Draggable, Sortable, Plugins } from '@shopify/draggable';
 import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
 import Section from '@/components/forms/Builder/Section.vue';
+import { uniqid } from '@/bootstrap/globals.js';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -38,14 +39,20 @@ const shouldShowViewSelector = computed(() => sections.value.some((s) => s.field
 
 let draggableInstance = null;
 let currentDropTarget = null;
+let lastValidDropTarget = null;
 let lastClientY = 0;
 
 const dropIndicator = document.createElement('div');
-dropIndicator.className = 'h-1 -my-1 rounded-full bg-zinc-300 col-span-full';
+dropIndicator.className = 'h-1 -my-1 w-full rounded-full bg-zinc-300 col-span-full';
 dropIndicator.dataset.dropIndicator = '';
 
-const showDropIndicator = (sectionId, clientY) => {
-    const sortContainer = document.querySelector(`.field-sort-container[data-sort-section="${sectionId}"]`);
+const showDropIndicator = (targetEl, clientY) => {
+    if (targetEl.classList.contains('section-gap-drop-zone')) {
+        targetEl.appendChild(dropIndicator);
+        return;
+    }
+
+    const sortContainer = targetEl.querySelector('.field-sort-container');
     if (!sortContainer) return hideDropIndicator();
 
     const fieldElements = sortContainer.querySelectorAll('[data-field-item]');
@@ -71,8 +78,10 @@ const dropIndex = (sectionId) => {
     return index;
 };
 
+const isDropZone = (el) => el.classList.contains('section-drop-zone') || el.classList.contains('section-gap-drop-zone');
+
 const makeFieldsDraggable = () => {
-    const containers = document.querySelectorAll('.fieldtype-source-container, .section-drop-zone');
+    const containers = document.querySelectorAll('.fieldtype-source-container, .section-drop-zone, .section-gap-drop-zone');
     if (containers.length === 0) return;
 
     draggableInstance = new Draggable(containers, {
@@ -83,41 +92,102 @@ const makeFieldsDraggable = () => {
         },
     });
 
+    draggableInstance.on('drag:start', () => {
+        lastValidDropTarget = null;
+    });
+
     draggableInstance.on('drag:move', (event) => {
         lastClientY = event.sensorEvent.clientY;
 
-        if (!currentDropTarget) return hideDropIndicator();
+        const target = currentDropTarget ?? lastValidDropTarget;
+        if (!target) return hideDropIndicator();
 
-        showDropIndicator(currentDropTarget.dataset.sectionDropZone, lastClientY);
+        const isGap = target.classList.contains('section-gap-drop-zone');
+        const isSectionDrag = event.source.dataset.fieldtype === 'section';
+        if (isGap && !isSectionDrag) return hideDropIndicator();
+
+        showDropIndicator(target, lastClientY);
     });
 
     draggableInstance.on('drag:over:container', (event) => {
-        if (event.overContainer.classList.contains('section-drop-zone')) {
+        if (isDropZone(event.overContainer)) {
             currentDropTarget = event.overContainer;
+            lastValidDropTarget = event.overContainer;
         }
     });
 
     draggableInstance.on('drag:out:container', (event) => {
         if (currentDropTarget === event.overContainer) {
             currentDropTarget = null;
-            hideDropIndicator();
         }
     });
 
     draggableInstance.on('drag:stop', (event) => {
-        const target = currentDropTarget;
+        const target = currentDropTarget ?? lastValidDropTarget;
         currentDropTarget = null;
+        lastValidDropTarget = null;
         hideDropIndicator();
 
         if (!target) return;
 
         const fieldtypeHandle = event.source.dataset.fieldtype;
+        if (!fieldtypeHandle) return;
+
+        if (target.classList.contains('section-gap-drop-zone')) {
+            if (fieldtypeHandle !== 'section') return;
+            insertSection(parseInt(target.dataset.sectionGapIndex, 10));
+            return;
+        }
+
         const sectionId = target.dataset.sectionDropZone;
+        if (!sectionId) return;
 
-        if (!fieldtypeHandle || !sectionId) return;
+        const index = dropIndex(sectionId);
 
-        sectionRefs.value[sectionId]?.addField(fieldtypeHandle, dropIndex(sectionId));
+        if (fieldtypeHandle === 'section') {
+            splitSection(sectionId, index);
+        } else {
+            sectionRefs.value[sectionId]?.addField(fieldtypeHandle, index);
+        }
     });
+};
+
+const makeSection = (fields = []) => ({
+    _id: uniqid(),
+    collapsed: false,
+    title: __('Section'),
+    fields,
+    values: {},
+    meta: {},
+});
+
+const insertSection = (atIndex) => {
+    formFields.value.sections.splice(atIndex, 0, makeSection());
+    nextTick(refreshDraggable);
+};
+
+const splitSection = (sourceSectionId, splitAtIndex) => {
+    const sourceSection = sections.value.find((s) => s._id === sourceSectionId);
+    if (!sourceSection) return;
+
+    const sourceSectionIndex = sections.value.indexOf(sourceSection);
+    const movedFields = sourceSection.fields.splice(splitAtIndex);
+    const newSection = makeSection(movedFields);
+
+    movedFields.forEach((field) => {
+        newSection.values[field.handle] = sourceSection.values[field.handle];
+        newSection.meta[field.handle] = sourceSection.meta[field.handle];
+        delete sourceSection.values[field.handle];
+        delete sourceSection.meta[field.handle];
+    });
+
+    formFields.value.sections.splice(sourceSectionIndex + 1, 0, newSection);
+    nextTick(refreshDraggable);
+};
+
+const refreshDraggable = () => {
+    draggableInstance?.destroy();
+    makeFieldsDraggable();
 };
 
 let sortableInstance = null;
@@ -321,15 +391,19 @@ const inspectActionButton = (target) => {
 <!--            </div>-->
 <!--        </div>-->
 
-        <Section
-            v-for="section in sections"
-            :key="section._id"
-            :ref="(el) => sectionRefs[section._id] = el"
-            :section
-            :fieldtypes
-            :field-view
-            v-model:editing-field="editingField"
-        />
+        <div class="section-gap-drop-zone mx-auto max-w-5xl h-6 flex items-center" data-section-gap-index="0" />
+
+        <template v-for="(section, sectionIndex) in sections" :key="section._id">
+            <Section
+                :ref="(el) => sectionRefs[section._id] = el"
+                :section
+                :fieldtypes
+                :field-view
+                v-model:editing-field="editingField"
+            />
+
+            <div class="section-gap-drop-zone mx-auto max-w-5xl h-6 flex items-center" :data-section-gap-index="sectionIndex + 1" />
+        </template>
 
 <!--        <Panel-->
 <!--            class="mx-auto max-w-5xl"-->
