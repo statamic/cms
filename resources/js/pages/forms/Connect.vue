@@ -11,6 +11,7 @@ import ConnectAddRuleButton from './connect-list/ConnectAddRuleButton.vue';
 import ConnectRule from './connect-list/ConnectRule.vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
+import Head from '@/pages/layout/Head.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -233,6 +234,8 @@ watch(selectedIntegrationName, (integrationName) => {
 </script>
 
 <template>
+    <Head :title="[__('Connect'), form.title, __('Forms')]" />
+
     <div class="mx-auto max-w-5xl">
         <Header class="mb-2">
             <template #title>

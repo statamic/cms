@@ -7,6 +7,7 @@ import { PublishContainer as Container, PublishTabs as Tabs } from '@/components
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
+import Head from '@/pages/layout/Head.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -65,6 +66,8 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
+    <Head :title="[__('Configure'), initialValues.title, __('Forms')]" />
+
     <Teleport to="#form-layout-actions">
         <Button variant="primary" @click="save" :disabled="saving" :aria-label="__('Save')">
             <Icon name="save" class="sm:hidden" />

@@ -9,6 +9,7 @@ import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue'
 import Section from '@/components/forms/Builder/Section.vue';
 import { useDragAndDrop } from '@/components/forms/Builder/use-drag-and-drop';
 import { uniqid } from '@/bootstrap/globals.js';
+import Head from '@/pages/layout/Head.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -35,7 +36,8 @@ const editingField = ref(null);
 const fieldView = ref('expanded');
 const sectionRefs = ref({});
 const sections = computed(() => formFields.value.sections);
-const shouldShowViewSelector = computed(() => sections.value.some((s) => s.fields.length > 0));
+const shouldShowViewSelector = computed(() => sections.value.some(section => section.fields.length > 0));
+const fieldsCount = computed(() => sections.value.flatMap(section => section.fields).length);
 
 const addSection = (atIndex, fields = []) => {
     const section = {
@@ -110,7 +112,6 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
 
 
 // TODO: Refactor everything below this line
-const formTitle = computed(() => props.form?.title || __('Untitled Form'));
 const formPageTotal = 1;
 const inspectorTarget = ref('field');
 const age = ref(null);
@@ -120,7 +121,6 @@ const favoriteAlbum = ref(null);
 const editingFieldWidth = ref(100);
 const panelCollapsed = ref(false);
 const nextPageButtonLabel = ref(__('Next Page'));
-const totalFieldCount = computed(() => 4);
 const albumOptions = [
     { label: __('Days of Thunder'), value: 'days_of_thunder' },
     { label: __('Endless Summer'), value: 'endless_summer' },
@@ -150,6 +150,8 @@ const inspectActionButton = (target) => {
 </script>
 
 <template>
+    <Head :title="[form.title, __('Forms')]" />
+
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')">
             <Icon name="save" class="sm:hidden" />
@@ -172,7 +174,7 @@ const inspectActionButton = (target) => {
         <Header class="mx-auto max-w-5xl">
             <template #title>
                 <StatusIndicator status="published" />
-                {{ formTitle }}
+                {{ form.title }}
             </template>
             <template #actions>
                 <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
@@ -404,7 +406,7 @@ const inspectActionButton = (target) => {
             v-if="fieldView === 'collapsed'"
             class="mx-auto text-center max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300"
         >
-            <strong>{{ totalFieldCount }}</strong> {{ __n('field on this form|fields on this form', totalFieldCount) }}
+            <strong>{{ fieldsCount }}</strong> {{ __n('field on this form|fields on this form', fieldsCount) }}
         </p>
     </div>
 

@@ -117,7 +117,7 @@ function exportSubmissions() {
 </script>
 
 <template>
-    <Head :title="[form.title, __('Forms')]" />
+    <Head :title="[__('Results'), form.title, __('Forms')]" />
 
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
         <Header :title="form.title" icon="forms">
