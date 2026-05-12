@@ -210,7 +210,7 @@ const getInputLabel = (part) => {
                             :additional-timezones="additionalTimezones"
                             side="top"
                         >
-                            <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! me-1" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
