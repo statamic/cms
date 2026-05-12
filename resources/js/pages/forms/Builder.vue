@@ -40,6 +40,37 @@ let draggableInstance = null;
 let currentDropTarget = null;
 let lastClientY = 0;
 
+const dropIndicator = document.createElement('div');
+dropIndicator.className = 'h-1 -my-1 rounded-full bg-zinc-300 col-span-full';
+dropIndicator.dataset.dropIndicator = '';
+
+const showDropIndicator = (sectionId, clientY) => {
+    const sortContainer = document.querySelector(`.field-sort-container[data-sort-section="${sectionId}"]`);
+    if (!sortContainer) return hideDropIndicator();
+
+    const fieldElements = sortContainer.querySelectorAll('[data-field-item]');
+    let index = 0;
+    for (const el of fieldElements) {
+        const rect = el.getBoundingClientRect();
+        if (clientY > rect.top + rect.height / 2) index++;
+    }
+
+    const referenceNode = fieldElements[index] ?? null;
+    sortContainer.insertBefore(dropIndicator, referenceNode);
+};
+
+const hideDropIndicator = () => dropIndicator.remove();
+
+const dropIndex = (sectionId) => {
+    const fieldElements = document.querySelectorAll(`[data-section-drop-zone="${sectionId}"] [data-field-item]`);
+    let index = 0;
+    for (const el of fieldElements) {
+        const rect = el.getBoundingClientRect();
+        if (lastClientY > rect.top + rect.height / 2) index++;
+    }
+    return index;
+};
+
 const makeFieldsDraggable = () => {
     const containers = document.querySelectorAll('.fieldtype-source-container, .section-drop-zone');
     if (containers.length === 0) return;
@@ -52,7 +83,13 @@ const makeFieldsDraggable = () => {
         },
     });
 
-    draggableInstance.on('drag:move', (event) => lastClientY = event.sensorEvent.clientY);
+    draggableInstance.on('drag:move', (event) => {
+        lastClientY = event.sensorEvent.clientY;
+
+        if (!currentDropTarget) return hideDropIndicator();
+
+        showDropIndicator(currentDropTarget.dataset.sectionDropZone, lastClientY);
+    });
 
     draggableInstance.on('drag:over:container', (event) => {
         if (event.overContainer.classList.contains('section-drop-zone')) {
@@ -63,28 +100,23 @@ const makeFieldsDraggable = () => {
     draggableInstance.on('drag:out:container', (event) => {
         if (currentDropTarget === event.overContainer) {
             currentDropTarget = null;
+            hideDropIndicator();
         }
     });
 
     draggableInstance.on('drag:stop', (event) => {
-        if (!currentDropTarget) return;
+        const target = currentDropTarget;
+        currentDropTarget = null;
+        hideDropIndicator();
+
+        if (!target) return;
 
         const fieldtypeHandle = event.source.dataset.fieldtype;
-        const sectionId = currentDropTarget.dataset.sectionDropZone;
-        currentDropTarget = null;
+        const sectionId = target.dataset.sectionDropZone;
 
         if (!fieldtypeHandle || !sectionId) return;
 
-        const fieldElements = document.querySelectorAll(`[data-section-drop-zone="${sectionId}"] [data-field-item]`);
-
-        let index = 0;
-
-        for (const el of fieldElements) {
-            const rect = el.getBoundingClientRect();
-            if (lastClientY > rect.top + rect.height / 2) index++;
-        }
-
-        sectionRefs.value[sectionId]?.addField(fieldtypeHandle, index);
+        sectionRefs.value[sectionId]?.addField(fieldtypeHandle, dropIndex(sectionId));
     });
 };
 
