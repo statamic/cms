@@ -274,7 +274,7 @@ return [
     | Blueprint Templates
     |--------------------------------------------------------------------------
     |
-    | When an entry's template is set to `@blueprint`, Statamic will look for 
+    | When an entry's template is set to `@blueprint`, Statamic will look for
     | a view named `{collection}.{blueprint}`. You may override this logic
     | on a per-collection basis here.
     |
