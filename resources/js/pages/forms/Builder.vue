@@ -4,10 +4,10 @@ import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import { Draggable, Sortable, Plugins } from '@shopify/draggable';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
 import Section from '@/components/forms/Builder/Section.vue';
+import { useDragAndDrop } from '@/components/forms/Builder/use-drag-and-drop';
 import { uniqid } from '@/bootstrap/globals.js';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
@@ -37,142 +37,28 @@ const sectionRefs = ref({});
 const sections = computed(() => formFields.value.sections);
 const shouldShowViewSelector = computed(() => sections.value.some((s) => s.fields.length > 0));
 
-let draggableInstance = null;
-let currentDropTarget = null;
-let lastValidDropTarget = null;
-let lastClientY = 0;
+const addSection = (atIndex, fields = []) => {
+    const section = {
+        _id: uniqid(),
+        collapsed: false,
+        title: __('Section'),
+        fields,
+        values: {},
+        meta: {},
+    };
 
-const dropIndicator = document.createElement('div');
-dropIndicator.className = 'h-1 -my-1 w-full rounded-full bg-zinc-300 col-span-full';
-dropIndicator.dataset.dropIndicator = '';
+    formFields.value.sections.splice(atIndex, 0, section);
 
-const showDropIndicator = (targetEl, clientY) => {
-    if (targetEl.classList.contains('section-gap-drop-zone')) {
-        targetEl.appendChild(dropIndicator);
-        return;
-    }
-
-    const sortContainer = targetEl.querySelector('.field-sort-container');
-    if (!sortContainer) return hideDropIndicator();
-
-    const fieldElements = sortContainer.querySelectorAll('[data-field-item]');
-    let index = 0;
-    for (const el of fieldElements) {
-        const rect = el.getBoundingClientRect();
-        if (clientY > rect.top + rect.height / 2) index++;
-    }
-
-    const referenceNode = fieldElements[index] ?? null;
-    sortContainer.insertBefore(dropIndicator, referenceNode);
+    return section;
 };
 
-const hideDropIndicator = () => dropIndicator.remove();
-
-const dropIndex = (sectionId) => {
-    const fieldElements = document.querySelectorAll(`[data-section-drop-zone="${sectionId}"] [data-field-item]`);
-    let index = 0;
-    for (const el of fieldElements) {
-        const rect = el.getBoundingClientRect();
-        if (lastClientY > rect.top + rect.height / 2) index++;
-    }
-    return index;
-};
-
-const isDropZone = (el) => el.classList.contains('section-drop-zone') || el.classList.contains('section-gap-drop-zone');
-
-const makeFieldsDraggable = () => {
-    const containers = document.querySelectorAll('.fieldtype-source-container, .section-drop-zone, .section-gap-drop-zone');
-    if (containers.length === 0) return;
-
-    draggableInstance = new Draggable(containers, {
-        draggable: '.fieldtype-draggable',
-        mirror: {
-            constrainDimensions: true,
-            appendTo: 'body',
-        },
-    });
-
-    draggableInstance.on('drag:start', () => {
-        lastValidDropTarget = null;
-    });
-
-    draggableInstance.on('drag:move', (event) => {
-        lastClientY = event.sensorEvent.clientY;
-
-        const target = currentDropTarget ?? lastValidDropTarget;
-        if (!target) return hideDropIndicator();
-
-        const isGap = target.classList.contains('section-gap-drop-zone');
-        const isSectionDrag = event.source.dataset.fieldtype === 'section';
-        if (isGap && !isSectionDrag) return hideDropIndicator();
-
-        showDropIndicator(target, lastClientY);
-    });
-
-    draggableInstance.on('drag:over:container', (event) => {
-        if (isDropZone(event.overContainer)) {
-            currentDropTarget = event.overContainer;
-            lastValidDropTarget = event.overContainer;
-        }
-    });
-
-    draggableInstance.on('drag:out:container', (event) => {
-        if (currentDropTarget === event.overContainer) {
-            currentDropTarget = null;
-        }
-    });
-
-    draggableInstance.on('drag:stop', (event) => {
-        const target = currentDropTarget ?? lastValidDropTarget;
-        currentDropTarget = null;
-        lastValidDropTarget = null;
-        hideDropIndicator();
-
-        if (!target) return;
-
-        const fieldtypeHandle = event.source.dataset.fieldtype;
-        if (!fieldtypeHandle) return;
-
-        if (target.classList.contains('section-gap-drop-zone')) {
-            if (fieldtypeHandle !== 'section') return;
-            insertSection(parseInt(target.dataset.sectionGapIndex, 10));
-            return;
-        }
-
-        const sectionId = target.dataset.sectionDropZone;
-        if (!sectionId) return;
-
-        const index = dropIndex(sectionId);
-
-        if (fieldtypeHandle === 'section') {
-            splitSection(sectionId, index);
-        } else {
-            sectionRefs.value[sectionId]?.addField(fieldtypeHandle, index);
-        }
-    });
-};
-
-const makeSection = (fields = []) => ({
-    _id: uniqid(),
-    collapsed: false,
-    title: __('Section'),
-    fields,
-    values: {},
-    meta: {},
-});
-
-const insertSection = (atIndex) => {
-    formFields.value.sections.splice(atIndex, 0, makeSection());
-    nextTick(refreshDraggable);
-};
-
-const splitSection = (sourceSectionId, splitAtIndex) => {
+const addSectionAt = (sourceSectionId, fieldIndex) => {
     const sourceSection = sections.value.find((s) => s._id === sourceSectionId);
     if (!sourceSection) return;
 
     const sourceSectionIndex = sections.value.indexOf(sourceSection);
-    const movedFields = sourceSection.fields.splice(splitAtIndex);
-    const newSection = makeSection(movedFields);
+    const movedFields = sourceSection.fields.splice(fieldIndex);
+    const newSection = addSection(sourceSectionIndex + 1, movedFields);
 
     movedFields.forEach((field) => {
         newSection.values[field.handle] = sourceSection.values[field.handle];
@@ -180,76 +66,36 @@ const splitSection = (sourceSectionId, splitAtIndex) => {
         delete sourceSection.values[field.handle];
         delete sourceSection.meta[field.handle];
     });
-
-    formFields.value.sections.splice(sourceSectionIndex + 1, 0, newSection);
-    nextTick(refreshDraggable);
 };
 
-const refreshDraggable = () => {
-    draggableInstance?.destroy();
-    makeFieldsDraggable();
+const addField = (sectionId, fieldtypeHandle, atIndex) => {
+    sectionRefs.value[sectionId]?.addField(fieldtypeHandle, atIndex);
 };
 
-let sortableInstance = null;
+const moveField = (fromSectionId, toSectionId, oldIndex, newIndex) => {
+    const fromSection = sections.value.find((s) => s._id === fromSectionId);
+    const toSection = sections.value.find((s) => s._id === toSectionId);
+    if (!fromSection || !toSection) return;
 
-const makeFieldsSortable = () => {
-    sortableInstance?.destroy();
+    const [field] = fromSection.fields.splice(oldIndex, 1);
 
-    const containers = document.querySelectorAll('.field-sort-container');
-    if (containers.length === 0) return;
-
-    sortableInstance = new Sortable(containers, {
-        draggable: '[data-field-item]',
-        handle: '[data-field-item]',
-        distance: 5,
-        mirror: {
-            constrainDimensions: true,
-            appendTo: 'body',
-        },
-        swapAnimation: { vertical: true },
-        plugins: [Plugins.SwapAnimation],
-        exclude: {
-            plugins: [Draggable.Plugins.Focusable],
-        },
-    });
-
-    sortableInstance.on('drag:start', () => document.documentElement.classList.add('cursor-grabbing'));
-    sortableInstance.on('drag:stop', () => document.documentElement.classList.remove('cursor-grabbing'));
-
-    sortableInstance.on('sortable:stop', (event) => {
-        const { oldIndex, newIndex, oldContainer, newContainer } = event;
-
-        const originalSectionId = oldContainer.dataset.sortSection;
-        const targetSectionId = newContainer.dataset.sortSection;
-
-        if (!originalSectionId || !targetSectionId) return;
-        if (originalSectionId === targetSectionId && oldIndex === newIndex) return;
-
-        moveField(originalSectionId, targetSectionId, oldIndex, newIndex);
-    });
-};
-
-const moveField = (originalSectionId, targetSectionId, oldIndex, newIndex) => {
-    const originalSection = sections.value.find((s) => s._id === originalSectionId);
-    const targetSection = sections.value.find((s) => s._id === targetSectionId);
-    if (!originalSection || !targetSection) return;
-
-    const [field] = originalSection.fields.splice(oldIndex, 1);
-
-    if (originalSectionId !== targetSectionId) {
-        targetSection.values[field.handle] = originalSection.values[field.handle];
-        targetSection.meta[field.handle] = originalSection.meta[field.handle];
-        delete originalSection.values[field.handle];
-        delete originalSection.meta[field.handle];
+    if (fromSectionId !== toSectionId) {
+        toSection.values[field.handle] = fromSection.values[field.handle];
+        toSection.meta[field.handle] = fromSection.meta[field.handle];
+        delete fromSection.values[field.handle];
+        delete fromSection.meta[field.handle];
     }
 
-    targetSection.fields.splice(newIndex, 0, field);
+    toSection.fields.splice(newIndex, 0, field);
 };
 
-watch(
-    () => formFields.value.sections.map((s) => s.fields.length).join(','),
-    () => nextTick(makeFieldsSortable),
-);
+useDragAndDrop({
+    sections,
+    onSectionAdded: addSection,
+    onSectionAddedWithinSection: addSectionAt,
+    onFieldAdded: addField,
+    onFieldMoved: moveField,
+});
 
 const onEscape = (event) => {
     if (event.key === 'Escape' && editingField.value) {
@@ -257,22 +103,8 @@ const onEscape = (event) => {
     }
 };
 
-onMounted(async () => {
-    await nextTick();
-    await nextTick();
-
-    makeFieldsDraggable();
-    makeFieldsSortable();
-
-    document.addEventListener('keydown', onEscape);
-});
-
-onUnmounted(() => {
-    draggableInstance?.destroy();
-    sortableInstance?.destroy();
-
-    document.removeEventListener('keydown', onEscape);
-});
+onMounted(() => document.addEventListener('keydown', onEscape));
+onUnmounted(() => document.removeEventListener('keydown', onEscape));
 
 
 
@@ -402,7 +234,7 @@ const inspectActionButton = (target) => {
                 v-model:editing-field="editingField"
             />
 
-            <div class="section-gap-drop-zone mx-auto max-w-5xl h-6 flex items-center" :data-section-gap-index="sectionIndex + 1" />
+            <div class="section-gap-drop-zone mx-auto max-w-5xl h-14 -mt-8 flex items-center" :data-section-gap-index="sectionIndex + 1" />
         </template>
 
 <!--        <Panel-->
