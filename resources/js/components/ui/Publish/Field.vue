@@ -149,6 +149,12 @@ const shouldShowField = computed(() => {
     ).showField(props.config, fullPath.value);
 });
 
+const reserveSpaceWhenHidden = computed(() => props.config.reserve_space_when_hidden === true);
+
+const shouldHideFieldVisually = computed(
+    () => reserveSpaceWhenHidden.value && !shouldShowField.value,
+);
+
 const shouldShowLabelText = computed(() => !props.config.hide_display);
 
 const shouldShowLabel = computed(
@@ -229,8 +235,9 @@ const fieldtypeComponentEvents = computed(() => ({
         :shouldShowField="shouldShowField"
     >
         <Field
-            v-show="shouldShowField"
-            :class="`${config.type}-fieldtype`"
+            v-show="shouldShowField || reserveSpaceWhenHidden"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
+            :inert="shouldHideFieldVisually"
             :id="fieldId"
             :instructions="config.instructions"
             :instructions-below="config.instructions_position === 'below'"
