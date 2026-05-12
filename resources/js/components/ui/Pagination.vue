@@ -79,6 +79,11 @@ const showPerPageSelector = computed(() => props.showPerPageSelector && isPerPag
 const totalItems = computed(() => props.resourceMeta.total);
 const fromItem = computed(() => props.resourceMeta.from || 0);
 const toItem = computed(() => Math.min(props.resourceMeta.to, totalItems.value));
+const formattedRange = computed(() => {
+    return fromItem.value === toItem.value
+        ? Statamic.$number.format(fromItem.value)
+        : Statamic.$number.formatRange(fromItem.value, toItem.value);
+});
 
 function selectPage(page) {
     if (page === currentPage.value) {
@@ -156,7 +161,7 @@ function getRange(start, end) {
         <div class="flex flex-1 items-center">
             <div class="text-sm text-gray-600 dark:text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':range of :total', {
-                    range: $number.formatRange(fromItem, toItem),
+                    range: formattedRange,
                     total: $number.format(totalItems)
                 }) }}
             </div>
