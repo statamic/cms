@@ -38,6 +38,7 @@ const showConfirmation = ref(false);
 const uploading = ref(false);
 const pendingBlob = ref(null);
 const pendingMimeType = ref(null);
+const cropDimensions = ref(null);
 
 const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
 
@@ -67,6 +68,7 @@ function resetState() {
     uploading.value = false;
     pendingBlob.value = null;
     pendingMimeType.value = null;
+    cropDimensions.value = null;
 }
 
 function destroyCropper() {
@@ -118,7 +120,15 @@ function createCropper(imageElement) {
         cropstart: onCropStart,
         cropmove: onCropMove,
         cropend: onCropEnd,
+        crop: onCrop,
     });
+}
+
+function onCrop(event) {
+    cropDimensions.value = {
+        width: Math.round(event.detail.width),
+        height: Math.round(event.detail.height),
+    };
 }
 
 function onCropStart() {
@@ -445,6 +455,13 @@ function close() {
             <div class="bg-gray-300 p-3 inset-shadow-xs dark:bg-gray-850 flex flex-1 flex-col overflow-auto relative min-h-0 w-full items-center justify-center" role="img" :aria-label="__('Image crop area')">
                 <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
+                </div>
+                <div
+                    v-if="cropDimensions"
+                    class="absolute top-5 end-5 z-10 rounded-md bg-gray-900/75 px-2 py-1 text-xs font-medium text-white tabular-nums pointer-events-none"
+                    :aria-label="__('Crop dimensions')"
+                >
+                    {{ cropDimensions.width }} &times; {{ cropDimensions.height }} px
                 </div>
             </div>
 
