@@ -1,7 +1,7 @@
 <script setup>
 import { config } from '@api';
 import { computed, nextTick, ref } from 'vue';
-import { getLocalTimeZone, now, toCalendarDate } from '@internationalized/date';
+import { getLocalTimeZone, now, parseAbsolute, toCalendarDate } from '@internationalized/date';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -103,6 +103,40 @@ const calendarEvents = computed(() => ({
     },
 }));
 
+/** When `min` is later than today, "today" is outside the allowed range. */
+const isTodayBeforeMin = computed(() => {
+    if (props.min == null) {
+        return false;
+    }
+    try {
+        const minValue = typeof props.min === 'string' ? parseAbsolute(props.min) : props.min;
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const minCal = toCalendarDate(minValue);
+        return todayCal.compare(minCal) < 0;
+    } catch {
+        return false;
+    }
+});
+
+/** When `max` is earlier than today, "today" is outside the allowed range. */
+const isTodayAfterMax = computed(() => {
+    if (props.max == null) {
+        return false;
+    }
+    try {
+        const maxValue = typeof props.max === 'string' ? parseAbsolute(props.max) : props.max;
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const maxCal = toCalendarDate(maxValue);
+        return todayCal.compare(maxCal) > 0;
+    } catch {
+        return false;
+    }
+});
+
+const todayShortcutDisabled = computed(
+    () => props.disabled || props.readOnly || isTodayBeforeMin.value || isTodayAfterMax.value,
+);
+
 const isTodaySelected = computed(() => {
     const mv = props.modelValue;
     if (mv == null || typeof mv !== 'object') {
@@ -129,6 +163,9 @@ const todayShortcutLabel = computed(() => {
 });
 
 const emitTodayValue = () => {
+    if (todayShortcutDisabled.value) {
+        return;
+    }
     let value = now(getLocalTimeZone()).set({ millisecond: 0 });
     if (props.granularity === 'day') {
         value = value.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
@@ -144,7 +181,7 @@ const emitTodayValue = () => {
 };
 
 const onTodayShortcutClick = () => {
-    if (props.disabled || props.readOnly) {
+    if (todayShortcutDisabled.value) {
         return;
     }
     if (isTodaySelected.value) {
@@ -303,7 +340,7 @@ const getInputLabel = (part) => {
                             size="2xs"
                             class="me-1"
                             :text="todayShortcutLabel"
-                            :disabled="disabled || readOnly"
+                            :disabled="todayShortcutDisabled"
                             @click="onTodayShortcutClick"
                         />
                     </div>
@@ -321,7 +358,7 @@ const getInputLabel = (part) => {
                         size="2xs"
                         class="-me-1"
                         :text="todayShortcutLabel"
-                        :disabled="disabled || readOnly"
+                        :disabled="todayShortcutDisabled"
                         @click="onTodayShortcutClick"
                     />
                 </div>

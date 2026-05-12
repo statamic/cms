@@ -26,7 +26,7 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
-import { getLocalTimeZone, now, toCalendarDate } from '@internationalized/date';
+import { getLocalTimeZone, now, parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
@@ -95,6 +95,40 @@ const fixRangeStartForNextPick = ref(false);
 
 const rangePickerFixedDate = computed(() => (fixRangeStartForNextPick.value ? 'start' : undefined));
 
+/** When `min` is later than today, "today" is outside the allowed range. */
+const isTodayBeforeMin = computed(() => {
+    if (props.min == null) {
+        return false;
+    }
+    try {
+        const minValue = typeof props.min === 'string' ? parseAbsolute(props.min) : props.min;
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const minCal = toCalendarDate(minValue);
+        return todayCal.compare(minCal) < 0;
+    } catch {
+        return false;
+    }
+});
+
+/** When `max` is earlier than today, "today" is outside the allowed range. */
+const isTodayAfterMax = computed(() => {
+    if (props.max == null) {
+        return false;
+    }
+    try {
+        const maxValue = typeof props.max === 'string' ? parseAbsolute(props.max) : props.max;
+        const todayCal = toCalendarDate(now(getLocalTimeZone()));
+        const maxCal = toCalendarDate(maxValue);
+        return todayCal.compare(maxCal) > 0;
+    } catch {
+        return false;
+    }
+});
+
+const todayShortcutDisabled = computed(
+    () => props.disabled || props.readOnly || isTodayBeforeMin.value || isTodayAfterMax.value,
+);
+
 /** Same calendar day for start/end, and that day is today (footer "Select" / today-shortcut state). */
 function isTodaySingleDayRange(start, end) {
     if (!start || !end) {
@@ -153,6 +187,10 @@ function onPickerModelUpdate(event) {
 }
 
 const emitTodayValue = () => {
+    if (todayShortcutDisabled.value) {
+        return;
+    }
+
     fixRangeStartForNextPick.value = false;
 
     const tz = getLocalTimeZone();
@@ -205,6 +243,13 @@ watch(
     { deep: true },
 );
 
+watch([isTodayBeforeMin, isTodayAfterMax], ([beforeMin, afterMax]) => {
+    if (beforeMin || afterMax) {
+        shortcutPrimedForSelect.value = false;
+        fixRangeStartForNextPick.value = false;
+    }
+});
+
 watch(pickerOpen, (open) => {
     if (!props.inline && !open) {
         if (ignoreNextPickerCloseForShortcut.value) {
@@ -222,7 +267,7 @@ onUnmounted(() => {
 });
 
 const onTodayShortcutClick = () => {
-    if (props.disabled || props.readOnly) {
+    if (todayShortcutDisabled.value) {
         return;
     }
     /** Same calendar day for start+end, but `fixed-date="start"` so the next click only moves `end`. */
@@ -364,7 +409,7 @@ const hoverCardDate = computed(() => {
                             size="2xs"
                             class="me-1"
                             :text="todayShortcutLabel"
-                            :disabled="disabled || readOnly"
+                            :disabled="todayShortcutDisabled"
                             @click="onTodayShortcutClick"
                         />
                     </div>
@@ -382,7 +427,7 @@ const hoverCardDate = computed(() => {
                         size="2xs"
                         class="-me-1"
                         :text="todayShortcutLabel"
-                        :disabled="disabled || readOnly"
+                        :disabled="todayShortcutDisabled"
                         @click="onTodayShortcutClick"
                     />
                 </div>
