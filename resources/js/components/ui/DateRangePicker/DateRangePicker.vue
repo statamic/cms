@@ -1,6 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import {
     DateRangePickerCalendar,
     DateRangePickerCell,
@@ -85,9 +85,17 @@ const pickerOpen = ref(false);
 const shortcutPrimedForSelect = ref(false);
 
 /**
+ * Reka closes the popover when start+end are both set (`close-on-select`). Our "Today" emit does that,
+ * so the popover blips closed and `watch(pickerOpen)` would clear `shortcutPrimedForSelect` before
+ * we re-open in `nextTick`. Skip clearing for that one automatic close.
+ */
+const ignoreNextPickerCloseForShortcut = ref(false);
+
+/**
  * After "Select", keep start+end as the same calendar day (today) but set Reka `fixed-date="start"`.
  * Reka's changeDate() only updates `end` on the next cell click when *both* endpoints exist; if `end`
  * is cleared, a different code path runs that requires `highlightedRange` and often never completes.
+ * (reka-ui: `RangeCalendarCellTrigger.vue` → `changeDate`.)
  */
 const fixRangeStartForNextPick = ref(false);
 
@@ -103,6 +111,9 @@ const calendarEvents = computed(() => ({
                 // "Select" primed state here or the label would stay wrong.
                 if (shortcutPrimedForSelect.value) {
                     shortcutPrimedForSelect.value = false;
+                }
+                if (fixRangeStartForNextPick.value) {
+                    fixRangeStartForNextPick.value = false;
                 }
                 return;
             }
@@ -133,12 +144,19 @@ const emitTodayValue = () => {
         end = end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
     }
 
+    if (!props.inline) {
+        ignoreNextPickerCloseForShortcut.value = true;
+    }
+
     emit('update:modelValue', { start, end });
     shortcutPrimedForSelect.value = true;
 
     if (!props.inline) {
         nextTick(() => {
             pickerOpen.value = true;
+            nextTick(() => {
+                ignoreNextPickerCloseForShortcut.value = false;
+            });
         });
     }
 };
@@ -185,9 +203,18 @@ watch(
 
 watch(pickerOpen, (open) => {
     if (!props.inline && !open) {
+        if (ignoreNextPickerCloseForShortcut.value) {
+            return;
+        }
         shortcutPrimedForSelect.value = false;
         fixRangeStartForNextPick.value = false;
     }
+});
+
+onUnmounted(() => {
+    shortcutPrimedForSelect.value = false;
+    fixRangeStartForNextPick.value = false;
+    ignoreNextPickerCloseForShortcut.value = false;
 });
 
 const onTodayShortcutClick = () => {
@@ -205,12 +232,7 @@ const onTodayShortcutClick = () => {
         }
         return;
     }
-    if (isTodayRangeSelected.value) {
-        if (!props.inline) {
-            pickerOpen.value = false;
-        }
-        return;
-    }
+    /** Always apply today (clears fixed-date / in-progress calendar state). Same as first "Today". */
     emitTodayValue();
 };
 

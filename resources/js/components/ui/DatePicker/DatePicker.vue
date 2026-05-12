@@ -121,12 +121,9 @@ const isTodaySelected = computed(() => {
     }
 });
 
-const todayShortcutLabel = computed(() => {
-    if (props.inline) {
-        return __('Today');
-    }
-    return isTodaySelected.value ? __('Apply') : __('Today');
-});
+const todayShortcutLabel = computed(() =>
+    isTodaySelected.value ? __('Apply') : __('Today'),
+);
 
 const emitTodayValue = () => {
     let value = now(getLocalTimeZone()).set({ millisecond: 0 });
@@ -150,6 +147,9 @@ const onTodayShortcutClick = () => {
     if (isTodaySelected.value) {
         if (!props.inline) {
             pickerOpen.value = false;
+        } else {
+            // Inline has no popover to dismiss; re-apply today's value so "Apply" does something useful.
+            emitTodayValue();
         }
         return;
     }
