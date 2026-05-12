@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { mapValues } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
 import { Button, Input } from '@ui';
+import { categories, categoryColorClasses } from './categories';
 
 const props = defineProps({
     fieldtypes: Array,
@@ -11,53 +12,6 @@ const props = defineProps({
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);
-
-const categories = {
-    structure: {
-        title: __('Structure'),
-        color: 'bg-purple-500',
-    },
-    information: {
-        title: __('Information'),
-        color: 'bg-pink-500',
-    },
-    text: {
-        title: __('Text'),
-        color: 'bg-purple-500',
-    },
-    choice: {
-        title: __('Choice'),
-        color: 'bg-orange-500',
-    },
-    rate: {
-        title: __('Rate'),
-        color: 'bg-amber-500',
-    },
-    contact: {
-        title: __('Contact Info'),
-        color: 'bg-blue-500',
-    },
-    number: {
-        title: __('Number'),
-        color: 'bg-teal-500',
-    },
-    datetime: {
-        title: __('Date and Time'),
-        color: 'bg-fuchsia-500',
-    },
-    media: {
-        title: __('Media'),
-        color: 'bg-cyan-500',
-    },
-    payment: {
-        title: __('Payment'),
-        color: 'bg-green-500',
-    },
-    other: {
-        title: __('Other'),
-        color: 'bg-gray-500',
-    },
-};
 
 const allFieldtypes = computed(() => {
     let options = [...props.fieldtypes];
@@ -147,7 +101,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                 <span
                                     class="h-2 shrink-0 rounded-full"
                                     :class="{
-                                        [group.color]: true,
+                                        [categoryColorClasses[group.color].dot]: true,
                                         'w-2 opacity-100': fieldView === 'collapsed',
                                         'w-0 opacity-0': fieldView === 'expanded',
                                     }"
@@ -182,7 +136,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                         <span
                             class="h-2 shrink-0 rounded-full"
                             :class="{
-                                [group.color]: true,
+                                [categoryColorClasses[group.color].dot]: true,
                                 'w-2 opacity-100': fieldView === 'collapsed',
                                 'w-0 opacity-0': fieldView === 'expanded',
                             }"

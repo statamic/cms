@@ -3,6 +3,7 @@ import { Button, Card, Field, Heading, Icon, Label, Panel, PanelHeader, PublishC
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
 import { uniqid } from '@/bootstrap/globals.js';
+import { categories, categoryColorClasses } from './categories';
 
 const props = defineProps({
     section: Object,
@@ -27,6 +28,14 @@ const blueprint = computed(() => ({
 
 const selectField = (field) => editingField.value = field;
 const isEditingField = (field) => editingField.value?._id === field._id;
+
+const fieldtypeCategory = (field) => {
+    const fieldtype = props.fieldtypes.find((f) => f.handle === field.fieldtype);
+    const hue = fieldtype?.categories?.[0] || 'other';
+    return categories[hue] ?? categories.other;
+};
+
+const fieldtypeIconColorClass = (field) => categoryColorClasses[fieldtypeCategory(field).color].icon;
 
 const addField = (fieldtypeHandle, index = null) => {
     const { section } = props;
@@ -207,7 +216,7 @@ const inspectActionButton = (target) => {
                                 <template #label>
                                     <Label :for="field._id" :class="{ 'cursor-pointer': !isEditingField(field) }">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon :name="field.icon" data-collapsed-field-icon class="size-3.5 me-1 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                                            <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', fieldtypeIconColorClass(field)]" aria-hidden="true" />
                                             {{ __(field.config.display) }}
                                             <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                                         </span>
