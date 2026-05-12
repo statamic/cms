@@ -75,6 +75,15 @@ jobs:
           ini-values: short_open_tag=on
           coverage: none
 
+      # Workaround for new GitHub token format breaking Composer 2.9.7's token
+      # regex (composer/composer#12849). shivammathur/setup-php writes the
+      # GITHUB_TOKEN into Composer's global auth.json; remove it so Composer
+      # never tries to validate it.
+      - name: Remove Composer github-oauth credentials
+        if: steps.should-run-tests.outputs.result == 'true'
+        shell: bash
+        run: rm -f ~/.composer/auth.json ~/.config/composer/auth.json "$APPDATA/Composer/auth.json"
+
       - name: Install dependencies
         uses: nick-invision/retry@v3
         if: steps.should-run-tests.outputs.result == 'true'
