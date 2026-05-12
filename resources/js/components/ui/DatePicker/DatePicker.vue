@@ -121,9 +121,12 @@ const isTodaySelected = computed(() => {
     }
 });
 
-const todayShortcutLabel = computed(() =>
-    isTodaySelected.value ? __('Apply') : __('Today'),
-);
+const todayShortcutLabel = computed(() => {
+    if (props.inline) {
+        return __('Today');
+    }
+    return isTodaySelected.value ? __('Apply') : __('Today');
+});
 
 const emitTodayValue = () => {
     let value = now(getLocalTimeZone()).set({ millisecond: 0 });
