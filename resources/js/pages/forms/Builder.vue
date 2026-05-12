@@ -41,7 +41,7 @@ let currentDropTarget = null;
 let lastClientY = 0;
 
 const makeFieldsDraggable = () => {
-    const containers = document.querySelectorAll('.fieldtype-source, .section-drop-zone');
+    const containers = document.querySelectorAll('.fieldtype-source-container, .section-drop-zone');
     if (containers.length === 0) return;
 
     draggableInstance = new Draggable(containers, {
