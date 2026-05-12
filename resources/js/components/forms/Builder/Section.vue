@@ -5,10 +5,13 @@ import { computed, ref } from 'vue';
 import { uniqid } from '@/bootstrap/globals.js';
 import { categories, categoryColorClasses } from './categories';
 
+const emit = defineEmits(['deleted']);
+
 const props = defineProps({
     section: Object,
     fieldtypes: Array,
     fieldView: String,
+    canDeleteSection: Boolean,
 });
 
 const editingField = defineModel('editingField');
@@ -103,6 +106,8 @@ const removeField = (fieldId) => {
     editingField.value = null;
 };
 
+const remove = () => emit('deleted', props.section._id);
+
 defineExpose({ addField });
 
 // TODO: Refactor everything below this line
@@ -123,16 +128,26 @@ const inspectActionButton = (target) => {
         :class="{ 'pb-0': section.collapsed }"
         :data-panel-collapsed="section.collapsed ? 'true' : 'false'"
     >
-        <PanelHeader class="relative flex items-center justify-between">
-            <Heading :text="__(section.title)" />
-            <Button
-                class="static! [&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
-                :icon="section.collapsed ? 'expand' : 'collapse'"
-                size="sm"
-                variant="ghost"
-                :aria-label="__('Toggle section visibility')"
-                @click="toggleCollapsed"
-            />
+        <PanelHeader class="flex items-center justify-between">
+            <Heading class="cursor-pointer flex-1" :text="__(section.title)" />
+            <div>
+                <Button
+                    v-if="canDeleteSection"
+                    class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    icon="trash"
+                    size="sm"
+                    variant="ghost"
+                    @click="remove"
+                />
+                <Button
+                    class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    :icon="section.collapsed ? 'expand' : 'collapse'"
+                    size="sm"
+                    variant="ghost"
+                    :aria-label="__('Toggle section visibility')"
+                    @click="toggleCollapsed"
+                />
+            </div>
         </PanelHeader>
 
         <div

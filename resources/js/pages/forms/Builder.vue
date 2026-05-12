@@ -38,6 +38,7 @@ const sectionRefs = ref({});
 const sections = computed(() => formFields.value.sections);
 const shouldShowViewSelector = computed(() => sections.value.some(section => section.fields.length > 0));
 const fieldsCount = computed(() => sections.value.flatMap(section => section.fields).length);
+const canDeleteSection = computed(() => sections.value.length > 1);
 
 const addSection = (atIndex, fields = []) => {
     const section = {
@@ -69,6 +70,8 @@ const addSectionAt = (sourceSectionId, fieldIndex) => {
         delete sourceSection.meta[field.handle];
     });
 };
+
+const sectionDeleted = (sectionId) => formFields.value['sections'] = formFields.value['sections'].filter(section => section._id !== sectionId);
 
 const addField = (sectionId, fieldtypeHandle, atIndex) => {
     sectionRefs.value[sectionId]?.addField(fieldtypeHandle, atIndex);
@@ -197,7 +200,9 @@ const inspectorTarget = ref('field');
                 :section
                 :fieldtypes
                 :field-view
+                :can-delete-section
                 v-model:editing-field="editingField"
+                @deleted="sectionDeleted"
             />
 
             <div class="section-gap-drop-zone mx-auto max-w-5xl h-14 -mt-8 flex items-center" :data-section-gap-index="sectionIndex + 1" />
