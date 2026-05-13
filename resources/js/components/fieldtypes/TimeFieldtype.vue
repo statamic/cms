@@ -1,34 +1,44 @@
 <template>
-	<Button :text="__('Set Time')" icon="fieldtype-time" v-if="!isReadOnly && !config.disabled && !hasTime" @click="addTime" />
+    <div class="min-w-[145px]">
+        <div
+            v-if="isReadOnly && !hasTime"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900/50 dark:text-gray-400"
+            data-time-readonly-empty
+        >
+            {{ __('None') }}
+        </div>
 
-    <TimePicker
-	    v-if="hasTime"
-        ref="time"
-        :model-value="timePickerValue"
-        :granularity="useSeconds ? 'second' : 'minute'"
-        :disabled="config.disabled"
-        :read-only="isReadOnly"
-        @update:model-value="timePickerUpdated"
-    />
+        <Button :text="__('Set Time')" icon="fieldtype-time" v-if="!isReadOnly && !config.disabled && !hasTime" @click="addTime" />
+
+        <TimePicker
+            v-if="hasTime"
+            ref="time"
+            :model-value="timePickerValue"
+            :granularity="useSeconds ? 'second' : 'minute'"
+            :disabled="config.disabled"
+            :read-only="isReadOnly"
+            @update:model-value="timePickerUpdated"
+        />
+    </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import {Button, TimePicker} from '@/components/ui';
+import { Button, TimePicker } from '@/components/ui';
 import { parseTime } from '@internationalized/date';
 
 export default {
     mixins: [Fieldtype],
 
     components: {
-	    Button,
+        Button,
         TimePicker,
     },
 
     computed: {
-	    hasTime() {
-		    return !!(this.config.required || this.value);
-	    },
+        hasTime() {
+            return !!(this.config.required || this.value);
+        },
 
         useSeconds() {
             return this.config.seconds_enabled;
@@ -56,14 +66,14 @@ export default {
             this.update(value);
         },
 
-	    addTime() {
-		    const date = new Date();
-		    const hours = String(date.getHours()).padStart(2, '0');
-		    const minutes = String(date.getMinutes()).padStart(2, '0');
-		    const seconds = String(date.getSeconds()).padStart(2, '0');
+        addTime() {
+            const date = new Date();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
 
-		    this.update(this.useSeconds ? `${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`);
-	    },
+            this.update(this.useSeconds ? `${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`);
+        },
     },
 };
 </script>

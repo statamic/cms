@@ -1,5 +1,12 @@
 <template>
     <div>
+        <div
+            v-if="isReadOnly && data.length === 0"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900/50 dark:text-gray-400"
+            data-list-readonly-empty
+        >
+            {{ __('None') }}
+        </div>
         <table class="table-contained" v-if="data.length > 0">
             <sortable-list
                 v-model="data"
