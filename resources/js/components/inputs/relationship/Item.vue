@@ -1,7 +1,12 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-(--z-index-above) flex w-full h-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 [&:has(.cursor-grab)]:px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-gray-700 dark:with-contrast:border-gray-500 dark:bg-gray-900"
-        :class="{ invalid: item.invalid, 'border-dashed': readOnlyEntriesRow }"
+        class="shadow-ui-sm relative z-(--z-index-above) flex w-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 [&:has(.cursor-grab)]:px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-gray-700 dark:with-contrast:border-gray-500 dark:bg-gray-900"
+        :class="{
+            'h-full': !readOnlyFormRow,
+            'h-10 min-h-10 shrink-0 py-0': readOnlyFormRow,
+            invalid: item.invalid,
+            'border-dashed': readOnlyEntriesRow,
+        }"
     >
         <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300 dark:text-gray-700" v-if="sortable" />
         <div class="flex flex-1 items-center line-clamp-1 text-sm text-gray-600 dark:text-gray-300">
@@ -105,8 +110,16 @@ export default {
     },
 
     computed: {
+        /** Entries + Form relationship fieldtypes: dashed row when read-only (row = item selected). */
         readOnlyEntriesRow() {
-            return this.readOnly && this.config?.type === 'entries';
+            return (
+                this.readOnly &&
+                ['entries', 'form'].includes(this.config?.type)
+            );
+        },
+
+        readOnlyFormRow() {
+            return this.readOnly && this.config?.type === 'form';
         },
     },
 
