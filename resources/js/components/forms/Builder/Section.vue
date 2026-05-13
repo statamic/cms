@@ -194,7 +194,7 @@ const inspectActionButton = (target) => {
                         <div
                             v-for="field in section.fields"
                             :key="field._id"
-                            :id="isEditingField ? 'editing-field' : null"
+                            :id="`field-${field._id}`"
                             data-field-item
                             :data-editing-field="isEditingField(field) ? '' : undefined"
                             :data-editing-item="isEditingField(field) ? '' : undefined"
@@ -244,12 +244,11 @@ const inspectActionButton = (target) => {
                                 />
                             </div>
                             <Field
-                                :id="field._id"
                                 :class="{ 'opacity-60': field.config.hidden }"
                                 :label="field.config.display"
                             >
                                 <template #label>
-                                    <Label :for="field._id" :class="{ 'cursor-pointer': !isEditingField(field) }">
+                                    <Label :class="{ 'cursor-pointer': !isEditingField(field) }">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', fieldtypeIconColorClass(field)]" aria-hidden="true" />
                                             {{ __(field.config.display) }}

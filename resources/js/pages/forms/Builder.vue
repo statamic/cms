@@ -31,6 +31,7 @@ import { uniqid } from '@/bootstrap/globals.js';
 import Head from '@/pages/layout/Head.vue';
 import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
 import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
+import FieldInspector from '@/components/forms/Builder/FieldInspector.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -261,6 +262,7 @@ const inspectorTarget = ref('field');
 
     <LayoutPanel side="right">
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
+        <FieldInspector v-if="inspectorType === InspectorType.Field" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
     </LayoutPanel>
 </template>
