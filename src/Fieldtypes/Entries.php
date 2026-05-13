@@ -27,6 +27,7 @@ use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Index;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -181,7 +182,7 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate($request->integer('perPage', 15)) : $query->get();
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
 
         $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
 
