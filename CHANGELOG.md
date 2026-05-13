@@ -1,5 +1,26 @@
 # Release Notes
 
+## 6.19.0 (2026-05-13)
+
+### What's new
+- Show crop dimensions in the crop editor [#14654](https://github.com/statamic/cms/issues/14654) by @jasonvarga
+- Add configurable `@blueprint` template base path [#11632](https://github.com/statamic/cms/issues/11632) by @o1y
+- Add Blade field templates for `statamic-forms` publish command [#14639](https://github.com/statamic/cms/issues/14639) by @martyf
+
+### What's fixed
+- Fix layout shift in Entries Fieldtype mode switcher [#14646](https://github.com/statamic/cms/issues/14646) by @jackmcdade
+- Fix `/index.php` request poisoning `Site::absoluteUrl` [#14647](https://github.com/statamic/cms/issues/14647) by @jasonvarga
+- Remove `overscroll-behavior-x: contain` on panels [#14642](https://github.com/statamic/cms/issues/14642) by @jaygeorge
+- Fix `nav:breadcrumbs` for multi-site [#13789](https://github.com/statamic/cms/issues/13789) by @nopticon
+- Fix date time overflow [#14652](https://github.com/statamic/cms/issues/14652) by @jaygeorge
+- Fix scrollbars showing all the time on the calendar view [#14653](https://github.com/statamic/cms/issues/14653) by @jaygeorge
+- Fix grid header overlapping nav [#14640](https://github.com/statamic/cms/issues/14640) by @wiktorm12
+- Collapse equal range endpoints in NumberFormatter [#14657](https://github.com/statamic/cms/issues/14657) by @jasonvarga
+- Don't show Visit URL for terms that aren't routable [#14658](https://github.com/statamic/cms/issues/14658) by @edalzell
+- Cap CP `perPage` query parameter to configured ceiling [#14668](https://github.com/statamic/cms/issues/14668) by @jasonvarga
+
+
+
 ## 6.18.1 (2026-05-11)
 
 ### What's fixed
