@@ -69,6 +69,7 @@ const buttonClasses = computed(() => {
                 pressed: [
                     'bg-linear-to-b from-gray-200 to-gray-150 text-gray-900 border border-gray-300 inset-shadow-sm/10',
                     'dark:from-black dark:to-black dark:text-white dark:border-gray-700/80',
+                    'dark:disabled:from-gray-950/50 dark:disabled:to-gray-950/50'
                 ],
             },
             size: {
