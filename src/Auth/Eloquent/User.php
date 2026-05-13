@@ -225,7 +225,7 @@ class User extends BaseUser
         if ($cached = $cache->get($this->id)) {
             return $cached;
         }
-        
+
         $permissions = $this->groups()->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions();
