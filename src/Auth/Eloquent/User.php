@@ -222,7 +222,7 @@ class User extends BaseUser
     {
         $cache = app(PermissionCache::class);
 
-        if ($cached = $cache->get($this->id)) {
+        if ($cached = $cache->get($this->id())) {
             return $cached;
         }
 
@@ -233,6 +233,10 @@ class User extends BaseUser
         if ($this->get('super', false)) {
             $permissions[] = 'super';
         }
+
+        $permissions = $permissions->unique()->values();
+
+        $cache->put($this->id(), $permissions);
 
         return $permissions;
     }
