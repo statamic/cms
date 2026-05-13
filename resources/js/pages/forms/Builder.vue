@@ -10,6 +10,7 @@ import Section from '@/components/forms/Builder/Section.vue';
 import { useDragAndDrop } from '@/components/forms/Builder/use-drag-and-drop';
 import { uniqid } from '@/bootstrap/globals.js';
 import Head from '@/pages/layout/Head.vue';
+import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -32,6 +33,8 @@ const formFields = ref({
     ],
 });
 
+const inspecting = ref(null);
+const inspectorType = ref(null);
 const editingField = ref(null);
 const fieldView = ref('expanded');
 const sectionRefs = ref({});
@@ -102,6 +105,14 @@ useDragAndDrop({
     onFieldMoved: moveField,
 });
 
+const inspect = (type, data) => {
+    inspecting.value = data;
+    inspectorType.value = type;
+
+    // todo: remove this when we do away with the editingField state
+    editingField.value = null;
+};
+
 const onEscape = (event) => {
     if (event.key === 'Escape' && editingField.value) {
         editingField.value = null;
@@ -134,7 +145,11 @@ const inspectorTarget = ref('field');
     />
 
     <LayoutPanel side="left">
-        <FieldtypeSelector :fieldtypes :field-view />
+        <FieldtypeSelector
+            :fieldtypes
+            :field-view
+            @inspect="inspect('fieldtype_hint', $event)"
+        />
     </LayoutPanel>
 
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
@@ -224,7 +239,11 @@ const inspectorTarget = ref('field');
     />
 
     <LayoutPanel side="right">
+        <FieldtypeHint
+            v-if="inspectorType === 'fieldtype_hint'"
+            :fieldtype="inspecting"
+        />
+
         <!-- TODO: Wire up field/page/action settings -->
-        <p v-if="editingField">{{ editingField.config.display }}</p>
     </LayoutPanel>
 </template>

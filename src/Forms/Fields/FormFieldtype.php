@@ -25,6 +25,7 @@ abstract class FormFieldtype implements Arrayable
 
     protected $field;
     protected $selectable = true;
+    protected $description;
     protected $categories = [];
     protected $keywords = [];
     protected $configFields = [];
@@ -65,6 +66,11 @@ abstract class FormFieldtype implements Arrayable
     public static function fieldtype(): ?string
     {
         return static::$fieldtype;
+    }
+
+    public function description(): ?string
+    {
+        return $this->description;
     }
 
     public function categories(): array
@@ -129,6 +135,11 @@ abstract class FormFieldtype implements Arrayable
 
     abstract public function toFieldArray(): array;
 
+    public function example(): ?array
+    {
+        return null;
+    }
+
     public function view(): string
     {
         $default = "statamic::forms.fields.{$this->handle()}";
@@ -165,6 +176,7 @@ abstract class FormFieldtype implements Arrayable
         return [
             'handle' => $this->handle(),
             'title' => $this->title(),
+            'description' => $this->description(),
             'categories' => $this->categories(),
             'keywords' => $this->keywords(),
             'icon' => $this->icon(),

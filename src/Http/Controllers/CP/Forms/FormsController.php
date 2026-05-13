@@ -16,6 +16,7 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -86,15 +87,15 @@ class FormsController extends CpController
 
         return Inertia::render('forms/Builder', [
             'form' => $form,
-            'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype) => [
-                ...$fieldtype->toArray(),
-                'preview' => $this->fieldtypePreview($fieldtype),
-            ]),
+            'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype) => $this->transformFieldtype($fieldtype)),
         ]);
     }
 
-    private function fieldtypePreview(FormFieldtype $fieldtype): array
+    private function transformFieldtype(FormFieldtype $fieldtype): array
     {
+        $preview = null;
+        $example = null;
+
         try {
             $field = $fieldtype instanceof Fallback
                 ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle']])
@@ -102,14 +103,39 @@ class FormsController extends CpController
 
             $field->setValue($field->defaultValue());
 
-            return [
+            $preview = [
                 'config' => $field->toPublishArray(),
                 'value' => $field->fieldtype()->preProcess($field->value()),
                 'meta' => $field->fieldtype()->preload(),
             ];
-        } catch (\Throwable) {
-            return [];
+        } catch (\Throwable $e) {
+            //
         }
+
+        if ($exampleData = $fieldtype->example()) {
+            $exampleConfig = [
+                'type' => $fieldtype->handle(),
+                ...Arr::get($exampleData, 'config', []),
+            ];
+
+            $exampleField = $fieldtype instanceof Fallback
+                ? new Field($fieldtype->toArray()['handle'], $exampleConfig)
+                : (clone $fieldtype)->setField(new FormField($fieldtype->handle(), $exampleConfig))->toField();
+
+            $exampleField->setValue(Arr::get($exampleData, 'value'));
+
+            $example = [
+                'config' => $exampleField->toPublishArray(),
+                'value' => $exampleField->fieldtype()->preProcess($exampleField->value()),
+                'meta' => $exampleField->fieldtype()->preload(),
+            ];
+        }
+
+        return [
+            ...$fieldtype->toArray(),
+            'preview' => $preview,
+            'example' => $example,
+        ];
     }
 
     public function create()

@@ -5,6 +5,8 @@ import fuzzysort from 'fuzzysort';
 import { Button, Input } from '@ui';
 import { categories, categoryColorClasses } from './categories';
 
+const emit = defineEmits(['inspect']);
+
 const props = defineProps({
     fieldtypes: Array,
     fieldView: { type: String, default: 'expanded' },
@@ -110,8 +112,18 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                             {{ group.title }}
                         </h2>
                         <ul class="fieldtype-source grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                            <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle" class="fieldtype-draggable" :data-fieldtype="fieldtype.handle">
-                                <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
+                            <li
+                                v-for="fieldtype in group.fieldtypes"
+                                :key="fieldtype.handle"
+                                class="fieldtype-draggable list-none"
+                                :data-fieldtype="fieldtype.handle"
+                            >
+                                <Button
+                                    :text="__(fieldtype.title)"
+                                    :title="__(fieldtype.title)"
+                                    :icon="fieldtype.icon"
+                                    @click="emit('inspect', fieldtype)"
+                                />
                             </li>
                         </ul>
                     </li>
@@ -145,8 +157,18 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                         {{ group.title }}
                     </h2>
                     <ul class="fieldtype-source grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
-                        <li v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle" class="fieldtype-draggable" :data-fieldtype="fieldtype.handle">
-                            <Button :text="__(fieldtype.title)" :title="__(fieldtype.title)" :icon="fieldtype.icon" />
+                        <li
+                            v-for="fieldtype in group.fieldtypes"
+                            :key="fieldtype.handle"
+                            class="fieldtype-draggable list-none"
+                            :data-fieldtype="fieldtype.handle"
+                        >
+                            <Button
+                                :text="__(fieldtype.title)"
+                                :title="__(fieldtype.title)"
+                                :icon="fieldtype.icon"
+                                @click="emit('inspect', fieldtype)"
+                            />
                         </li>
                     </ul>
                 </li>
