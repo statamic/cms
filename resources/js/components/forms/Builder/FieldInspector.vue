@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
 import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
-import { Button, Field, Icon, Input, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
-import { computed, ref } from 'vue';
+import { Button, Field, Icon, Input, Textarea, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishField } from '@ui';
+import { computed, ref, onMounted, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
+import axios from 'axios';
 
-const { inspecting: field } = injectBuilderContext();
+const { form, inspecting: field } = injectBuilderContext();
 
 enum FieldTabs {
     Settings = 'settings',
@@ -13,37 +14,52 @@ enum FieldTabs {
     Validation = 'validation',
 }
 
+const loading = ref(true);
+const error = ref(null);
+const errors = ref({});
+const values = ref(null);
+const meta = ref(null);
+const originValues = ref(null);
+const originMeta = ref(null);
+const fieldtype = ref(null);
+const blueprint = ref(null);
 const activeTab = ref<FieldTabs>(FieldTabs.Settings);
 
-const settingsLabel = ref(__('Which album was your favorite?'));
-const settingsHelpText = ref('');
-const settingsPlaceholder = ref('');
-const settingsCharacterLimit = ref(null);
+watch(values, (newValues) => {
+    field.value.config = newValues;
+});
 
-const albumOptions = [
-    { label: __('Days of Thunder'), value: 'days_of_thunder' },
-    { label: __('Endless Summer'), value: 'endless_summer' },
-    { label: __('Nocturnal'), value: 'nocturnal' },
-    { label: __('Kids'), value: 'kids' },
-    { label: __('Monsters'), value: 'monsters' },
-    { label: __('Heroes'), value: 'heroes' },
-    { label: __('Red, White, and Bruised: The Midnight Live'), value: 'red_white_and_bruised' },
-];
+const load = () => {
+    axios
+        .post(cp_url(`forms/${form.handle}/builder/fields/edit`), {
+            type: field.value.fieldtype,
+            reference: field.value.type === 'reference' ? field.value.field_reference : false,
+            values: field.value.config,
+        })
+        .then((response) => {
+            loading.value = false;
+            fieldtype.value = response.data.fieldtype;
+            blueprint.value = response.data.blueprint;
+            values.value = response.data.values;
+            meta.value = response.data.meta;
+            originValues.value = response.data.originValues;
+            originMeta.value = response.data.originMeta;
+        })
+        .catch((e) => {
+            loading.value = false;
 
-const optionRows = ref(albumOptions.map((option) => ({
-    option_value: option.value,
-    cells: [option.label],
-    hidden: false,
-})));
-
-const optionRowsConfig = {
-    max_columns: 1,
-    max_rows: 20,
-    show_header: false,
-    show_add_column: false,
-    add_row_text: __('Add Option'),
-    show_hide_toggle: true,
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                error.value = message;
+                errors.value = errors;
+                Statamic.$toast.error(message);
+            } else {
+                Statamic.$toast.error(e.response?.data?.message || __('Something went wrong'));
+            }
+        });
 };
+
+onMounted(() => load());
 </script>
 
 <template>
@@ -134,7 +150,11 @@ const optionRowsConfig = {
 
         <!-- Desktop -->
         <div class="@container relative pt-6 pb-12 px-2.5 pe-4.5 max-[1000px]:hidden">
-            <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">
+            <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+                <Icon name="loading" />
+            </div>
+
+            <Tabs v-else v-model:modelValue="activeTab" :unmount-on-hide="false">
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                     <TabTrigger :name="FieldTabs.Settings" :text="__('Settings')" />
                     <TabTrigger :name="FieldTabs.Conditions" :text="__('Logic')" />
@@ -156,29 +176,37 @@ const optionRowsConfig = {
                             </a>
                         </div>
 
-                        <Field :label="__('Label')">
-                            <Input v-model="field.config.display" />
-                        </Field>
+                        <PublishContainer
+                            ref="container"
+                            :blueprint
+                            :meta
+                            :errors
+                            v-model="values"
+                            :origin-values
+                            :origin-meta
+                        >
+                            <PublishFieldsProvider>
+                                <div class="publish-fields">
+                                    <PublishField
+                                        v-for="field in blueprint.tabs[0].sections[0].fields"
+                                        :key="field.handle"
+                                        :config="field"
+                                        :class="[
+                                            'form-group',
+                                            `field-w-${field.width}`
+                                        ]"
+                                    />
+                                </div>
+                            </PublishFieldsProvider>
+                        </PublishContainer>
 
-                        <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
-                            <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />
-                        </Field>
-
-                        <Field :label="__('Placeholder')">
-                            <Input v-model="settingsPlaceholder" />
-                        </Field>
-
-                        <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">
-                            <Input v-model="settingsCharacterLimit" type="number" />
-                        </Field>
-
-                        <Field :label="__('Options')">
-                            <TableFieldtype
-                                handle="options"
-                                v-model:value="optionRows"
-                                :config="optionRowsConfig"
-                            />
-                        </Field>
+<!--                        <Field :label="__('Options')">-->
+<!--                            <TableFieldtype-->
+<!--                                handle="options"-->
+<!--                                v-model:value="optionRows"-->
+<!--                                :config="optionRowsConfig"-->
+<!--                            />-->
+<!--                        </Field>-->
                     </div>
                 </TabContent>
 

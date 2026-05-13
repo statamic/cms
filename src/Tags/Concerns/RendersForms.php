@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\MessageBag;
 use Statamic\Fields\Field;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\RenderableField;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -139,7 +140,7 @@ trait RendersForms
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;
 
-        $configDefaults = Field::commonFieldOptions()->all()
+        $configDefaults = FormField::commonFieldOptions()->all()
             ->merge($field->fieldtype()->configFields()->all())
             ->map->get('default')
             ->filter()->all();

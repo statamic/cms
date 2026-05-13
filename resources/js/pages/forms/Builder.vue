@@ -133,6 +133,7 @@ const inspect = (type: string | null, data: any = null) => {
 const clearInspector = () => inspect(null);
 
 provideBuilderContext({
+    form: props.form,
     fieldView,
     inspecting,
     inspectorType,
@@ -262,7 +263,7 @@ const inspectorTarget = ref('field');
 
     <LayoutPanel side="right">
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
-        <FieldInspector v-if="inspectorType === InspectorType.Field" />
+        <FieldInspector v-if="inspectorType === InspectorType.Field" :key="inspecting?._id" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
     </LayoutPanel>
 </template>

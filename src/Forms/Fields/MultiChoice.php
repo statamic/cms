@@ -21,6 +21,7 @@ class MultiChoice extends FormFieldtype
                 'instructions' => __('statamic::fieldtypes.radio.config.options'),
                 'type' => 'array',
                 'expand' => true,
+                'show_hide_toggle' => true,
                 'field' => [
                     'type' => 'text',
                 ],

@@ -32,6 +32,7 @@ class Dropdown extends FormFieldtype
                 'value_header' => __('Label').' ('.__('Optional').')',
                 'add_button' => __('Add Option'),
                 'width' => '50',
+                'show_hide_toggle' => true,
             ],
             'multiple' => [
                 'display' => __('Multiple'),

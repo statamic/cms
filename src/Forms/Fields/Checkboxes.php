@@ -19,6 +19,7 @@ class Checkboxes extends FormFieldtype
                 'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
                 'type' => 'array',
                 'expand' => true,
+                'show_hide_toggle' => true,
                 'key_header' => __('Key'),
                 'value_header' => __('Label').' ('.__('Optional').')',
                 'add_button' => __('Add Option'),

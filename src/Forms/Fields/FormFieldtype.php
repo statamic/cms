@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -126,6 +127,23 @@ abstract class FormFieldtype implements Arrayable
     protected function configFieldItems(): array
     {
         return $this->configFields;
+    }
+
+    public function configBlueprint(): Blueprint
+    {
+        return (new Blueprint)->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => collect($this->configFieldItems())
+                                ->map(fn ($field, $handle) => compact('handle', 'field'))
+                                ->values()->all(),
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function toField(): Field
