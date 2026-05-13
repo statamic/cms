@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -219,6 +220,12 @@ class User extends BaseUser
 
     public function permissions()
     {
+        $cache = app(PermissionCache::class);
+
+        if ($cached = $cache->get($this->id)) {
+            return $cached;
+        }
+        
         $permissions = $this->groups()->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions();
