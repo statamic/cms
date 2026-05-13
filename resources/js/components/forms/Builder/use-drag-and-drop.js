@@ -28,6 +28,7 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
 
         draggable = new Draggable(containers, {
             draggable: '.fieldtype-draggable',
+            distance: 5,
             mirror: { constrainDimensions: true, appendTo: 'body' },
         });
 

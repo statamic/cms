@@ -59,7 +59,7 @@ abstract class FormFieldtype implements Arrayable
 
     public static function handle(): string
     {
-        return Str::removeRight(static::traitHandle(), '_form_field');
+        return Str::removeRight(static::traitHandle(), '_form_fieldtype');
     }
 
     public static function fieldtype(): ?string
