@@ -1,7 +1,7 @@
 @php
     use function Statamic\trans as __;
 
-    $isMultiple = ! isset($max_items) || $max_items !== 1;
+    $isMultiple = isset($multiple) && $multiple == true;
     $inline = isset($inline) && $inline === true;
     $placeholderText = $placeholder ?? __('Please select...');
 
