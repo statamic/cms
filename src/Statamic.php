@@ -477,6 +477,20 @@ class Statamic
         return TextDirection::of(static::cpLocale());
     }
 
+    public static function cpPerPage($perPage)
+    {
+        if ($perPage === null || $perPage === '') {
+            return null;
+        }
+
+        $perPage = (int) $perPage;
+
+        $options = config('statamic.cp.pagination_size_options') ?: [config('statamic.cp.pagination_size')];
+        $ceiling = max($options);
+
+        return max(1, min($perPage, $ceiling));
+    }
+
     public static function nonInertiaPageData()
     {
         $props = Inertia::getShared();
