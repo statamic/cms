@@ -1,16 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import { mapValues } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
 import { Button, Input } from '@ui';
 import { categories, categoryColorClasses } from './categories';
 
-const emit = defineEmits(['inspect']);
+const emit = defineEmits<{
+    (e: 'inspect', value: object): void;
+}>();
 
-const props = defineProps({
+const props = defineProps<{
     fieldtypes: Array,
-    fieldView: { type: String, default: 'expanded' },
-});
+    fieldView: string,
+}>();
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);

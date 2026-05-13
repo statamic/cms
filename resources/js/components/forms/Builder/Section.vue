@@ -1,18 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { Button, Card, Field, Heading, Icon, Label, Panel, PanelHeader, PublishContainer } from '@ui';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
 import { uniqid } from '@/bootstrap/globals.js';
 import { categories, categoryColorClasses } from './categories';
 
-const emit = defineEmits(['deleted']);
+const emit = defineEmits<{
+    (e: 'deleted', value: null): void;
+}>();
 
-const props = defineProps({
+const props = defineProps<{
     section: Object,
     fieldtypes: Array,
     fieldView: String,
     canDeleteSection: Boolean,
-});
+}>();
 
 const editingField = defineModel('editingField');
 

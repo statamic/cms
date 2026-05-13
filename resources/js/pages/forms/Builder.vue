@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
@@ -14,10 +14,15 @@ import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
-const props = defineProps({
+const props = defineProps<{
     form: Object,
     fieldtypes: Array,
-});
+}>();
+
+enum FieldView {
+    Expanded = 'expanded',
+    Collapsed = 'collapsed',
+}
 
 // todo: the original value should come from a prop (initialFormFields)
 const formFields = ref({
@@ -36,7 +41,7 @@ const formFields = ref({
 const inspecting = ref(null);
 const inspectorType = ref(null);
 const editingField = ref(null);
-const fieldView = ref('expanded');
+const fieldView = ref<FieldView>(FieldView.Expanded);
 const sectionRefs = ref({});
 const sections = computed(() => formFields.value.sections);
 const shouldShowViewSelector = computed(() => sections.value.some(section => section.fields.length > 0));
@@ -161,13 +166,13 @@ const inspectorTarget = ref('field');
             <template #actions>
                 <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
                     <ToggleItem
-                        value="expanded"
+                        :value="FieldView.Expanded"
                         icon="expand"
                         :aria-label="__('Expanded view')"
                         v-tooltip="__('Expanded view')"
                     />
                     <ToggleItem
-                        value="collapsed"
+                        :value="FieldView.Collapsed"
                         icon="collapse"
                         :aria-label="__('Collapsed view')"
                         v-tooltip="__('Collapsed view')"
@@ -224,7 +229,7 @@ const inspectorTarget = ref('field');
         </template>
 
         <p
-            v-if="fieldView === 'collapsed'"
+            v-if="fieldView === FieldView.Collapsed"
             class="mx-auto text-center max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300"
         >
             <strong>{{ fieldsCount }}</strong> {{ __n('field on this form|fields on this form', fieldsCount) }}
