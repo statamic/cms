@@ -30,11 +30,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
         with:
           files: |
             config/**
@@ -67,7 +67,7 @@ jobs:
         run: sudo apt-get install language-pack-fr
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
@@ -80,7 +80,7 @@ jobs:
           github-token: ''
 
       - name: Install dependencies
-        uses: nick-invision/retry@v3
+        uses: nick-invision/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           timeout_minutes: 5
@@ -105,11 +105,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
         with:
           files: |
             **/*.{js,vue,ts}
@@ -124,7 +124,7 @@ jobs:
           echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
 
       - name: Install dependencies
         if: steps.should-run-tests.outputs.result == 'true'
@@ -152,9 +152,9 @@ jobs:
     needs: [php-tests, js-tests]
     if: always()
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
+      - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v3
+        uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3
         if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
           status: failure
