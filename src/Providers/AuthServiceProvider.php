@@ -20,6 +20,7 @@ use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Permission;
 use Statamic\Facades\User;
 use Statamic\Policies;
@@ -148,7 +149,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::after(function ($user, $ability) {
             // If the ability isn't a Statamic permission, we don't want to get involved. 🙈
-            if (! Permission::boot()->flattened()->map->value()->contains($ability)) {
+            if (! Blink::once('flattened-permissions', fn() => Permission::boot()->flattened()->map->value())->contains($ability)) {
                 return null;
             }
 
