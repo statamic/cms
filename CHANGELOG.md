@@ -1,5 +1,14 @@
 # Release Notes
 
+## 6.18.1 (2026-05-11)
+
+### What's fixed
+- Tone down scheduled status badge in dark mode [#14641](https://github.com/statamic/cms/issues/14641) by @jasonvarga
+- Fix date fieldtype input disappearing with underscore locales [#14643](https://github.com/statamic/cms/issues/14643) by @jasonvarga
+- Harden remote URL validation [#14645](https://github.com/statamic/cms/issues/14645) by @jasonvarga
+
+
+
 ## 6.18.0 (2026-05-08)
 
 ### What's new

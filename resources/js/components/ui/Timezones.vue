@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { dateFormatter, config } from '@api';
 import { getLocalTimeZone } from '@internationalized/date';
+import { normalizeLocale } from '../FormattingLocale.js';
 import Text from './Text.vue';
 
 const props = defineProps({
@@ -29,7 +30,7 @@ const isValid = computed(() => {
 const displayTimezone = computed(() => config.get('displayTimezone') ?? 'UTC');
 
 const formatTimeZone = (timeZone) => {
-    const parts = new Intl.DateTimeFormat(config.get('translationLocale'), {
+    const parts = new Intl.DateTimeFormat(normalizeLocale(config.get('translationLocale')), {
         timeZone,
         timeZoneName: 'short',
     }).formatToParts(start.value);
