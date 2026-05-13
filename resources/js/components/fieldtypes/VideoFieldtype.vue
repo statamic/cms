@@ -1,16 +1,23 @@
 <template>
-    <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
+    <div
+        class="
+            flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900
+            data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100
+            data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!
+        "
+        :data-readonly="isReadOnly ? true : undefined"
+    >
         <ui-input-group>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input
                 :model-value="value"
-                :isReadOnly="isReadOnly"
+                :read-only="isReadOnly"
                 :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                 :aria-label="__('Video URL')"
-                @update:model-value="update"
+                @update:model-value="onInputUpdate"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
-                input-class="border-s-0"
+                input-class="border-s-0 read-only:border-solid"
             />
         </ui-input-group>
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
@@ -31,6 +38,13 @@ import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype],
+
+    methods: {
+        onInputUpdate(value) {
+            if (this.isReadOnly) return;
+            this.update(value);
+        },
+    },
 
     data() {
         return {
