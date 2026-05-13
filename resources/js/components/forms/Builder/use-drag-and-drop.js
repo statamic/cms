@@ -40,6 +40,11 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
         });
 
         draggable.on('drag:over:container', (event) => {
+            if (event.overContainer.classList.contains('fieldtype-source-container')) {
+                dropTarget.reset();
+                hideIndicator();
+                return;
+            }
             if (isDropZone(event.overContainer)) dropTarget.enter(event.overContainer);
         });
 
@@ -145,6 +150,7 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
     });
 
     watch(() => sections.value.length, () => nextTick(refreshDraggable));
+
     watch(
         () => sections.value.map((s) => s.fields.length).join(','),
         () => nextTick(refreshSortable),
@@ -186,10 +192,12 @@ function isDropZone(el) {
 
 function indexFromClientY(elements, clientY) {
     let index = 0;
+
     for (const el of elements) {
         const rect = el.getBoundingClientRect();
         if (clientY > rect.top + rect.height / 2) index++;
     }
+
     return index;
 }
 
