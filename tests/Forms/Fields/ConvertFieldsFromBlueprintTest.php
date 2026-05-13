@@ -104,17 +104,21 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'select', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
                 ['type' => 'dropdown', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
             ],
-            'dropdown, removes multiple and max_items' => [
+            'dropdown, removes multiple and max_items when single' => [
                 ['type' => 'select', 'display' => 'Color', 'multiple' => false, 'max_items' => 1, 'options' => ['red' => 'Red']],
                 ['type' => 'dropdown', 'display' => 'Color', 'options' => ['red' => 'Red']],
             ],
-            'multi_choice' => [
+            'dropdown, with multiple' => [
                 ['type' => 'select', 'display' => 'Colors', 'multiple' => true, 'options' => ['red' => 'Red']],
-                ['type' => 'multi_choice', 'display' => 'Colors', 'options' => ['red' => 'Red']],
+                ['type' => 'dropdown', 'display' => 'Colors', 'multiple' => true, 'options' => ['red' => 'Red']],
             ],
-            'multi_choice, converts max_items to max_selections' => [
+            'dropdown, with multiple converts max_items to max_selections' => [
                 ['type' => 'select', 'display' => 'Colors', 'multiple' => true, 'max_items' => 3, 'options' => ['red' => 'Red']],
-                ['type' => 'multi_choice', 'display' => 'Colors', 'max_selections' => 3, 'options' => ['red' => 'Red']],
+                ['type' => 'dropdown', 'display' => 'Colors', 'multiple' => true, 'max_selections' => 3, 'options' => ['red' => 'Red']],
+            ],
+            'multi_choice' => [
+                ['type' => 'radio', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
+                ['type' => 'multi_choice', 'display' => 'Color', 'options' => ['red' => 'Red', 'blue' => 'Blue']],
             ],
             'non-form field should be preserved' => [
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],

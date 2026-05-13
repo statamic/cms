@@ -14,7 +14,6 @@ class MultiChoiceTest extends TestCase
     {
         $fieldtype = (new MultiChoice)->setField(new FormField('colors', [
             'type' => 'multi_choice',
-            'placeholder' => 'Choose colors',
             'options' => [
                 'red' => 'Red',
                 'blue' => 'Blue',
@@ -23,42 +22,12 @@ class MultiChoiceTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'type' => 'select',
-            'multiple' => true,
-            'max_items' => null,
+            'type' => 'radio',
             'options' => [
                 'red' => 'Red',
                 'blue' => 'Blue',
                 'green' => 'Green',
             ],
-            'placeholder' => 'Choose colors',
-        ], $fieldtype->toFieldArray());
-    }
-
-    #[Test]
-    public function it_maps_max_selections_to_max_items()
-    {
-        $fieldtype = (new MultiChoice)->setField(new FormField('colors', [
-            'type' => 'multi_choice',
-            'placeholder' => 'Choose colors',
-            'max_selections' => 3,
-            'options' => [
-                'red' => 'Red',
-                'blue' => 'Blue',
-                'green' => 'Green',
-            ],
-        ]));
-
-        $this->assertEquals([
-            'type' => 'select',
-            'multiple' => true,
-            'max_items' => 3,
-            'options' => [
-                'red' => 'Red',
-                'blue' => 'Blue',
-                'green' => 'Green',
-            ],
-            'placeholder' => 'Choose colors',
         ], $fieldtype->toFieldArray());
     }
 
@@ -67,7 +36,6 @@ class MultiChoiceTest extends TestCase
     {
         $fieldtype = (new MultiChoice)->setField(new FormField('colors', [
             'type' => 'multi_choice',
-            'placeholder' => 'Choose colors',
             'options' => [
                 'red' => 'Red',
                 'blue' => 'Blue',
@@ -76,14 +44,11 @@ class MultiChoiceTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'type' => 'select',
-            'multiple' => true,
-            'max_items' => null,
+            'type' => 'radio',
             'options' => [
                 'red' => 'Red',
                 'blue' => 'Blue',
             ],
-            'placeholder' => 'Choose colors',
             'default' => 'red',
         ], $fieldtype->toFieldArray());
     }
