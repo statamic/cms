@@ -2,7 +2,7 @@
     <div class="flex gap-2 sm:gap-3">
         <!-- Link type selector -->
         <div class="w-fit">
-            <Select :options v-model="option" />
+            <Select :options v-model="option" :read-only="isReadOnly" />
         </div>
 
         <div class="flex-1 flex">
@@ -14,6 +14,7 @@
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
                 :value="selectedEntries"
+                :read-only="isReadOnly"
                 @update:meta="meta.entry.meta = $event"
                 @update:value="entriesSelected"
                 button-size="base"
@@ -28,6 +29,7 @@
                 ref="assets"
                 handle="asset"
                 :value="selectedAssets"
+                :read-only="isReadOnly"
                 :config="meta.asset.config"
                 :meta="meta.asset.meta"
                 @update:value="assetsSelected"
@@ -102,22 +104,22 @@ export default {
             if (this.metaChanging) return;
 
             if (option === null) {
-                this.update(null);
+                if (!this.isReadOnly) this.update(null);
             } else if (option === 'url') {
-                this.updateDebounced(this.urlValue);
+                if (!this.isReadOnly) this.updateDebounced(this.urlValue);
             } else if (option === 'first-child') {
-                this.update('@child');
+                if (!this.isReadOnly) this.update('@child');
             } else if (option === 'entry') {
                 if (this.entryValue) {
-                    this.update(this.entryValue);
-                } else {
-                    setTimeout(() => this.$refs.entries.linkExistingItem(), 0);
+                    if (!this.isReadOnly) this.update(this.entryValue);
+                } else if (!this.isReadOnly) {
+                    setTimeout(() => this.$refs.entries?.linkExistingItem(), 0);
                 }
             } else if (option === 'asset') {
                 if (this.assetValue) {
-                    this.update(this.assetValue);
-                } else {
-                    setTimeout(() => this.$refs.assets.openSelector(), 0);
+                    if (!this.isReadOnly) this.update(this.assetValue);
+                } else if (!this.isReadOnly) {
+                    setTimeout(() => this.$refs.assets?.openSelector(), 0);
                 }
             }
 
@@ -126,6 +128,7 @@ export default {
 
         urlValue(url) {
             if (this.metaChanging) return;
+            if (this.isReadOnly) return;
             this.syncUrlDebounced(url);
         },
 
@@ -158,12 +161,14 @@ export default {
         },
 
         entriesSelected(entries) {
+            if (this.isReadOnly) return;
             this.selectedEntries = entries;
             this.update(this.entryValue);
             this.updateMeta({ ...this.meta, initialSelectedEntries: entries });
         },
 
         assetsSelected(assets) {
+            if (this.isReadOnly) return;
             this.selectedAssets = assets;
             this.update(this.assetValue);
             this.updateMeta({ ...this.meta, initialSelectedAssets: assets });

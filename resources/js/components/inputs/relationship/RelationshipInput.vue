@@ -1,7 +1,7 @@
 <template>
     <div class="relationship-input @container w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
-            v-if="!initializing && usesSelectField"
+            v-if="showSelectDropdown"
             :config="config"
             :items="items"
             :multiple="maxItems > 1"
@@ -29,7 +29,8 @@
             <div
                 v-if="items.length"
                 ref="items"
-                :class="{ 'mt-2': usesSelectField && items.length }"
+                class="relationship-input-items h-full"
+                :class="{ 'mt-2': showSelectDropdown && items.length }"
             >
                 <component
                     :is="itemComponent"
@@ -38,7 +39,7 @@
                     :item="item"
                     :config="config"
                     :status-icon="statusIcons"
-                    :editable="canEdit && (item.editable || item.editable === undefined)"
+                    :editable="!readOnly && canEdit && (item.editable || item.editable === undefined)"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
                     :form-component="formComponent"
@@ -187,6 +188,14 @@ export default {
     },
 
     computed: {
+        /** Select combobox: hidden in read-only single-select when items render below (avoids double height). */
+        showSelectDropdown() {
+            if (this.initializing || !this.usesSelectField) return false;
+            if (this.readOnly && this.maxItems === 1 && this.items.length > 0) return false;
+
+            return true;
+        },
+
         icon() {
             if (this.config.type === 'taxonomies') {
                 return 'add-tag';
@@ -258,7 +267,9 @@ export default {
         shouldShowSelectedItems() {
             if (this.initializing) return false;
 
-            if (this.usesSelectField && this.maxItems === 1) return false;
+            // Hide duplicate stack under single-select combobox while editing; keep it in read-only
+            // so the selected item(s) stay visible when the combobox is disabled.
+            if (this.usesSelectField && this.maxItems === 1 && !this.readOnly) return false;
 
             return true;
         },
@@ -326,9 +337,10 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
-	    openSelector() {
-			this.isSelecting = true;
-	    },
+        openSelector() {
+            if (this.readOnly) return;
+            this.isSelecting = true;
+        },
 
         selectionsUpdated(selections) {
             this.getDataForSelections(selections).then(() => {
@@ -409,11 +421,13 @@ export default {
         },
 
         itemCreated(item) {
+            if (this.readOnly) return;
             this.$emit('item-data-updated', [...this.data, item]);
             this.update([...this.value, item.id]);
         },
 
         selectFieldSelected(selectedItemData) {
+            if (this.readOnly) return;
             this.$emit('item-data-updated', selectedItemData);
             this.update(selectedItemData.map((item) => item.id));
         },
