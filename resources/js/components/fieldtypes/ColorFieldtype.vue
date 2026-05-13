@@ -77,7 +77,7 @@
 
             <div
                 v-else
-                class="pointer-events-none flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-4 text-sm text-gray-400 dark:text-gray-500"
+                class="pointer-events-none flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full bg-gray-50 px-4 text-sm text-gray-400 dark:bg-gray-900 dark:text-gray-400"
                 role="status"
                 data-color-readonly-empty
             >

@@ -2,7 +2,7 @@
     <div class="datetime min-w-[145px]">
         <div
             v-if="isReadOnly && !hasDate && !isInline"
-            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900/50 dark:text-gray-400"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400"
             data-date-readonly-empty
         >
             {{ __('None') }}
