@@ -149,7 +149,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::after(function ($user, $ability) {
             // If the ability isn't a Statamic permission, we don't want to get involved. 🙈
-            if (! Blink::once('flattened-permissions', fn() => Permission::boot()->flattened()->map->value())->contains($ability)) {
+            if (! Blink::once('flattened-permissions', fn () => Permission::boot()->flattened()->map->value())->contains($ability)) {
                 return null;
             }
 
