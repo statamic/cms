@@ -36,11 +36,13 @@ export default class NumberFormatter {
 
     toString() {
         try {
-            if (this.#rangeEnd !== undefined) {
-                return Intl.NumberFormat(this.locale, this.#options).formatRange(this.#number, this.#rangeEnd);
+            const formatter = Intl.NumberFormat(this.locale, this.#options);
+
+            if (this.#rangeEnd !== undefined && this.#rangeEnd !== this.#number) {
+                return formatter.formatRange(this.#number, this.#rangeEnd);
             }
 
-            return Intl.NumberFormat(this.locale, this.#options).format(this.#number);
+            return formatter.format(this.#number);
         } catch (e) {
             return 'Invalid Number';
         }

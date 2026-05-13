@@ -4,7 +4,6 @@ const normalizeInputOptions = HasInputOptions.methods.normalizeInputOptions;
 import { flatten, sortBy, range } from 'lodash-es';
 import Select from './Select/Select.vue';
 import Button from './Button/Button.vue';
-import { numberFormatter as $number } from '@api';
 import { computed } from 'vue';
 
 const emit = defineEmits(['page-selected', 'per-page-changed']);
@@ -80,11 +79,6 @@ const showPerPageSelector = computed(() => props.showPerPageSelector && isPerPag
 const totalItems = computed(() => props.resourceMeta.total);
 const fromItem = computed(() => props.resourceMeta.from || 0);
 const toItem = computed(() => Math.min(props.resourceMeta.to, totalItems.value));
-const formattedRange = computed(() => {
-    return fromItem.value === toItem.value
-        ? $number.format(fromItem.value)
-        : $number.formatRange(fromItem.value, toItem.value);
-});
 
 function selectPage(page) {
     if (page === currentPage.value) {
@@ -162,7 +156,7 @@ function getRange(start, end) {
         <div class="flex flex-1 items-center">
             <div class="text-sm text-gray-600 dark:text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':range of :total', {
-                    range: formattedRange,
+                    range: $number.formatRange(fromItem, toItem),
                     total: $number.format(totalItems)
                 }) }}
             </div>
