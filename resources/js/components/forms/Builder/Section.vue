@@ -109,7 +109,8 @@ const removeField = (fieldId) => {
     clearInspector();
 };
 
-const remove = () => emit('deleted', props.section._id);
+const editSection = () => inspect(InspectorType.Section, props.section);
+const deleteSection = () => emit('deleted', props.section._id);
 
 defineExpose({ addField });
 
@@ -132,16 +133,23 @@ const inspectActionButton = (target) => {
         :class="{ 'pb-0': section.collapsed }"
         :data-panel-collapsed="section.collapsed ? 'true' : 'false'"
     >
-        <PanelHeader class="flex items-center justify-between">
-            <Heading class="cursor-pointer flex-1" :text="__(section.title)" @click="inspect(InspectorType.Section, section)" />
+        <PanelHeader class="flex items-center justify-between" @click="toggleCollapsed">
+            <Heading class="cursor-pointer flex-1" :text="__(section.title)" />
             <div>
+                <Button
+                    class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
+                    icon="pencil-line"
+                    size="sm"
+                    variant="ghost"
+                    @click.stop="editSection"
+                />
                 <Button
                     v-if="canDeleteSection"
                     class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
                     icon="trash"
                     size="sm"
                     variant="ghost"
-                    @click="remove"
+                    @click.stop="deleteSection"
                 />
                 <Button
                     class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
@@ -149,7 +157,7 @@ const inspectActionButton = (target) => {
                     size="sm"
                     variant="ghost"
                     :aria-label="__('Toggle section visibility')"
-                    @click="toggleCollapsed"
+                    @click.stop="toggleCollapsed"
                 />
             </div>
         </PanelHeader>

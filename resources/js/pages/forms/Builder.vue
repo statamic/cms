@@ -45,7 +45,7 @@ const formFields = ref({
         {
             _id: 'abc',
             collapsed: false,
-            title: 'Section 1',
+            title: 'Section',
             fields: [],
             values: {},
             meta: {},
