@@ -53,6 +53,16 @@ defineProps<{
 
                 <p v-if="fieldtype.description" class="text-zinc-600">{{ __(fieldtype.description) }}</p>
 
+                <div v-if="fieldtype.handle === 'section'" class="text-zinc-600">
+                    <p class="mb-2">Page Breaks split a form into multiple steps, turning a long form into a more manageable, step-by-step experience.</p>
+                    <p>They don’t affect how the form behaves. For conditional flows—like showing different pages based on answers—use Page Breaks, or apply conditional logic at the field level to control when individual fields are shown or hidden.</p>
+                </div>
+
+                <div v-if="fieldtype.handle === 'page_break'" class="text-zinc-600">
+                    <p class="mb-2">Sections group fields into clearly defined areas, helping you structure and navigate your form.</p>
+                    <p>They can also control the form flow with conditional logic, directing users to different pages based on their answers. This allows you to create more dynamic, personalized journeys instead of a one-size-fits-all flow.</p>
+                </div>
+
                 <div v-if="fieldtype.example">
                     <Badge class="mb-2" size="sm" :text="__('Example')" />
                     <div class="bg-white rounded-md p-4 border" inert>
