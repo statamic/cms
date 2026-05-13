@@ -63,6 +63,7 @@ use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\ReplicatorSetController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
+use Statamic\Http\Controllers\CP\Forms\FormBuilderController;
 use Statamic\Http\Controllers\CP\Forms\FormConnectController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
 use Statamic\Http\Controllers\CP\Forms\FormLogicController;
@@ -346,6 +347,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('forms/{form}/submissions', [FormSubmissionsController::class, 'index'])->name('forms.submissions.index');
     Route::get('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'show'])->name('forms.submissions.show');
     Route::delete('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'destroy'])->name('forms.submissions.destroy');
+    Route::get('forms/{form}/builder', FormBuilderController::class)->name('forms.builder');
     Route::get('forms/{form}/logic', FormLogicController::class)->name('forms.logic.index');
     Route::get('forms/{form}/connect', FormConnectController::class)->name('forms.connect.index');
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');

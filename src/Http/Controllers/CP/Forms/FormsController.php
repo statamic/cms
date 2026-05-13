@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -10,13 +9,8 @@ use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\Fields\Field;
-use Statamic\Forms\Fields\Fallback;
-use Statamic\Forms\Fields\FormField;
-use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -62,80 +56,7 @@ class FormsController extends CpController
 
     public function show($form)
     {
-        $this->authorize('edit', $form);
-
-        $formFieldtypes = app('statamic.form-fieldtypes')
-            ->unique()
-            ->map(fn ($class) => app($class))
-            ->filter->isSelectable()
-            ->values();
-
-        $fieldtypesPortedToFormFieldtypes = $formFieldtypes
-            ->map(fn (FormFieldtype $fieldtype) => $fieldtype::fieldtype())
-            ->filter()
-            ->unique()
-            ->values();
-
-        $legacySelectableFieldtypes = FieldtypeRepository::classes()
-            ->map(fn ($class) => app($class))
-            ->filter->selectableInForms()
-            ->reject(fn ($fieldtype) => $fieldtypesPortedToFormFieldtypes->contains($fieldtype->handle()))
-            ->map(fn ($fieldtype) => (new Fallback)->wrapping($fieldtype))
-            ->values();
-
-        $fieldtypes = $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values();
-
-        return Inertia::render('forms/Builder', [
-            'form' => $form,
-            'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype) => $this->transformFieldtype($fieldtype)),
-        ]);
-    }
-
-    private function transformFieldtype(FormFieldtype $fieldtype): array
-    {
-        $preview = null;
-        $example = null;
-
-        try {
-            $field = $fieldtype instanceof Fallback
-                ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle']])
-                : (clone $fieldtype)->setField(new FormField($fieldtype->handle(), ['type' => $fieldtype->handle()]))->toField();
-
-            $field->setValue($field->defaultValue());
-
-            $preview = [
-                'config' => $field->toPublishArray(),
-                'value' => $field->fieldtype()->preProcess($field->value()),
-                'meta' => $field->fieldtype()->preload(),
-            ];
-        } catch (\Throwable $e) {
-            //
-        }
-
-        if ($exampleData = $fieldtype->example()) {
-            $exampleConfig = [
-                'type' => $fieldtype->handle(),
-                ...Arr::get($exampleData, 'config', []),
-            ];
-
-            $exampleField = $fieldtype instanceof Fallback
-                ? new Field($fieldtype->toArray()['handle'], $exampleConfig)
-                : (clone $fieldtype)->setField(new FormField($fieldtype->handle(), $exampleConfig))->toField();
-
-            $exampleField->setValue(Arr::get($exampleData, 'value'));
-
-            $example = [
-                'config' => $exampleField->toPublishArray(),
-                'value' => $exampleField->fieldtype()->preProcess($exampleField->value()),
-                'meta' => $exampleField->fieldtype()->preload(),
-            ];
-        }
-
-        return [
-            ...$fieldtype->toArray(),
-            'preview' => $preview,
-            'example' => $example,
-        ];
+        return redirect()->route('statamic.cp.forms.builder', $form->handle());
     }
 
     public function create()
