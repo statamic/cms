@@ -30,6 +30,7 @@ import { useDragAndDrop } from '@/components/forms/Builder/use-drag-and-drop';
 import { uniqid } from '@/bootstrap/globals.js';
 import Head from '@/pages/layout/Head.vue';
 import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
+import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -259,9 +260,7 @@ const inspectorTarget = ref('field');
     />
 
     <LayoutPanel side="right">
-        <FieldtypeHint
-            v-if="inspectorType === InspectorType.FieldtypeHint"
-            :fieldtype="inspecting"
-        />
+        <SectionInspector v-if="inspectorType == InspectorType.Section" />
+        <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
     </LayoutPanel>
 </template>

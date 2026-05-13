@@ -127,12 +127,13 @@ const inspectActionButton = (target) => {
 
 <template>
     <Panel
+        :id="`section-${section._id}`"
         class="mx-auto max-w-5xl"
         :class="{ 'pb-0': section.collapsed }"
         :data-panel-collapsed="section.collapsed ? 'true' : 'false'"
     >
         <PanelHeader class="flex items-center justify-between">
-            <Heading class="cursor-pointer flex-1" :text="__(section.title)" />
+            <Heading class="cursor-pointer flex-1" :text="__(section.title)" @click="inspect(InspectorType.Section, section)" />
             <div>
                 <Button
                     v-if="canDeleteSection"

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Badge, Icon, PublishContainer, PublishFieldsProvider, PublishFields } from '@ui';
+import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-defineProps<{
-    fieldtype: Object,
-}>();
+const { inspecting: fieldtype } = injectBuilderContext();
 </script>
 
 <template>
