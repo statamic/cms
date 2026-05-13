@@ -54,12 +54,19 @@ const checkboxClasses = computed(() => {
             'dark:border-none',
             'dark:data-[disabled]:bg-ui-accent-bg/60 dark:data-[disabled]:border-ui-accent-bg/70',
             'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
-            'shrink-0'
+            'shrink-0',
         ],
         variants: {
             size: {
                 sm: 'size-3.75',
                 base: 'size-4',
+            },
+            readOnly: {
+                true: [
+                    '!border-dashed border-gray-300 with-contrast:border-gray-500',
+                    'dark:!border dark:!border-dashed dark:!border-gray-600',
+                ],
+                false: '',
             },
         },
     })({ ...props });
@@ -107,6 +114,7 @@ const conditionalProps = computed(() => {
     <div :class="containerClasses">
         <CheckboxRoot
             :disabled="readOnly || disabled"
+            :data-readonly="readOnly ? true : undefined"
             :id
             :name="name"
             :value="value"
