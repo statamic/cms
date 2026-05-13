@@ -173,7 +173,12 @@ const isReadOnly = computed(() => {
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
-    return isLocked.value || props.config.visibility === 'read_only' || false;
+    return (
+        isLocked.value ||
+        props.config.visibility === 'read_only' ||
+        props.config.read_only === true ||
+        false
+    );
 });
 
 const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
