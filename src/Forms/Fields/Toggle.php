@@ -7,6 +7,7 @@ use Statamic\Support\Arr;
 class Toggle extends FormFieldtype
 {
     protected static $fieldtype = 'toggle';
+    protected $description = 'A simple yes or no switch.';
     protected $icon = 'fieldtype-toggle';
     protected $categories = ['choice'];
 
@@ -28,6 +29,17 @@ class Toggle extends FormFieldtype
             'type' => 'toggle',
             'inline_label' => $this->config('inline_label'),
             ...Arr::except($this->config(), ['type', 'inline_label']),
+        ];
+    }
+
+    public function example(): ?array
+    {
+        return [
+            'config' => [
+                'display' => 'Agreement',
+                'inline_label' => 'I promise not to spoil the ending',
+            ],
+            'value' => true,
         ];
     }
 }

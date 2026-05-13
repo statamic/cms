@@ -7,6 +7,7 @@ use Statamic\Support\Arr;
 class ShortAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'text';
+    protected $description = 'A simple field for short, one-line answers.';
     protected $icon = 'text-short';
     protected $categories = ['text'];
 
@@ -33,6 +34,16 @@ class ShortAnswer extends FormFieldtype
             'placeholder' => $this->config('placeholder'),
             'character_limit' => $this->config('character_limit'),
             ...Arr::except($this->config(), ['type', 'placeholder', 'character_limit']),
+        ];
+    }
+
+    public function example(): ?array
+    {
+        return [
+            'config' => [
+                'display' => "What's your secret talent?",
+            ],
+            'value' => 'I can whistle with crackers in my mouth',
         ];
     }
 }

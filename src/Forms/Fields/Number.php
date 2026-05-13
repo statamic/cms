@@ -7,6 +7,7 @@ use Statamic\Support\Arr;
 class Number extends FormFieldtype
 {
     protected static $fieldtype = 'integer';
+    protected $description = 'Collects a number. You can set minimum and maximum values.';
     protected $icon = 'number';
     protected $categories = ['number'];
 
@@ -35,6 +36,16 @@ class Number extends FormFieldtype
             'min' => $this->config('min'),
             'max' => $this->config('max'),
             ...Arr::except($this->config(), ['type', 'min', 'max']),
+        ];
+    }
+
+    public function example(): ?array
+    {
+        return [
+            'config' => [
+                'display' => 'How many cups of coffee do you drink per day?',
+            ],
+            'value' => 4,
         ];
     }
 }

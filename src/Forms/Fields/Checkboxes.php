@@ -7,6 +7,7 @@ use Statamic\Support\Arr;
 class Checkboxes extends FormFieldtype
 {
     protected static $fieldtype = 'checkboxes';
+    protected $description = 'Respondents can select multiple options from a list.';
     protected $icon = 'fieldtype-checkboxes';
     protected $categories = ['choice'];
 
@@ -31,6 +32,22 @@ class Checkboxes extends FormFieldtype
             'type' => 'checkboxes',
             'options' => $this->config('options'),
             ...Arr::except($this->config(), ['type', 'options']),
+        ];
+    }
+
+    public function example(): ?array
+    {
+        return [
+            'config' => [
+                'display' => 'What toppings do you want?',
+                'options' => [
+                    'pepperoni' => 'Pepperoni',
+                    'mushrooms' => 'Mushrooms',
+                    'pineapple' => 'Pineapple (controversial)',
+                    'anchovies' => 'Anchovies (brave choice)',
+                ],
+            ],
+            'value' => ['pepperoni', 'pineapple'],
         ];
     }
 }
