@@ -28,7 +28,7 @@ const id = useId();
                 data-[state=checked]:border-ui-accent-bg data-[disabled]:opacity-50
                 dark:bg-gray-500 dark:data-[state=checked]:border-none dark:data-[state=checked]:bg-gray-300
                 data-readonly:border-dashed! data-readonly:border-gray-500/90 data-readonly:with-contrast:border-gray-100
-                data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!
+                data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:bg-gray-900
             "
         >
             <RadioGroupIndicator

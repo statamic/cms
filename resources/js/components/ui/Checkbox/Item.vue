@@ -47,13 +47,13 @@ const handleKeydown = (event) => {
 const checkboxClasses = computed(() => {
     return cva({
         base: [
-            'shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 with-contrast:border-gray-500 bg-white',
-            'dark:bg-gray-500 dark:border-gray-900',
+            'group shadow-ui-xs mt-0.5 cursor-default rounded-sm border border-gray-400/75 with-contrast:border-gray-100 bg-white outline-hidden focus:focus-outline',
+            'dark:bg-gray-500 dark:border-none',
             'data-[state=checked]:border-ui-accent-bg data-[state=checked]:bg-ui-accent-bg',
             'data-[state=indeterminate]:border-ui-accent-bg data-[state=indeterminate]:bg-ui-accent-bg',
-            'dark:border-none',
-            'dark:data-[disabled]:bg-ui-accent-bg/60 dark:data-[disabled]:border-ui-accent-bg/70',
-            'dark:data-[disabled]:text-gray-400 dark:data-[disabled]:cursor-not-allowed',
+            'dark:disabled:data-[state=checked]:border-none dark:disabled:data-[state=checked]:bg-gray-300',
+            'dark:disabled:data-[state=indeterminate]:border-none dark:disabled:data-[state=indeterminate]:bg-gray-300',
+            'data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed',
             'shrink-0',
         ],
         variants: {
@@ -63,8 +63,8 @@ const checkboxClasses = computed(() => {
             },
             readOnly: {
                 true: [
-                    '!border-dashed border-gray-300 with-contrast:border-gray-500',
-                    'dark:!border dark:!border-dashed dark:!border-gray-600',
+                    'data-readonly:border-dashed! data-readonly:border-gray-500/90 data-readonly:with-contrast:border-gray-100',
+                    'data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:bg-gray-900',
                 ],
                 false: '',
             },
@@ -74,7 +74,7 @@ const checkboxClasses = computed(() => {
 
 const containerClasses = computed(() => {
     const classes = cva({
-        base: 'flex gap-2',
+        base: 'flex gap-1.5',
         variants: {
             align: {
                 start: 'items-start',
@@ -124,7 +124,9 @@ const conditionalProps = computed(() => {
             :class="checkboxClasses"
             :tabindex="attrs.tabindex"
         >
-            <CheckboxIndicator class="relative flex h-full w-full items-center justify-center text-white">
+            <CheckboxIndicator
+                class="relative flex h-full w-full items-center justify-center text-white group-disabled:dark:group-data-[state=checked]:text-gray-900 group-disabled:dark:group-data-[state=indeterminate]:text-gray-900"
+            >
                 <!-- Checkmark icon for checked state -->
                 <svg v-if="!indeterminate" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5 shrink-0" aria-hidden="true"><path d="M9 1L3.5 6.5L1 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 <!-- Dash icon for indeterminate state -->
@@ -135,10 +137,16 @@ const conditionalProps = computed(() => {
             </span>
         </CheckboxRoot>
         <div class="flex flex-col" v-if="!solo">
-            <label class="text-sm font-normal antialiased dark:text-gray-200" :for="id">
+            <label
+                class="text-sm font-normal antialiased dark:text-gray-200"
+                :class="{ 'opacity-50': disabled }"
+                :for="id"
+            >
                 <slot>{{ label || value }}</slot>
             </label>
-            <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-200">{{ description }}</p>
+            <p v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500">
+                {{ description }}
+            </p>
         </div>
     </div>
 </template>
