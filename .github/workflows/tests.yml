@@ -74,10 +74,6 @@ jobs:
           extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
           ini-values: short_open_tag=on
           coverage: none
-          # Pass an empty token so setup-php doesn't write GITHUB_TOKEN into
-          # Composer's auth config. Composer 2.9.7's regex rejects the new
-          # GITHUB_TOKEN format (composer/composer#12849).
-          github-token: ''
 
       - name: Install dependencies
         uses: nick-invision/retry@v3
