@@ -25,7 +25,7 @@
     @endif
 >
     @unless ($isMultiple)
-        <option value>{{ $placeholderText  }}</option>
+        <option value>{{ $placeholderText }}</option>
     @endunless
     @foreach ($options as $option => $label)
         @php
