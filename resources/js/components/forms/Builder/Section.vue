@@ -156,10 +156,17 @@ const inspectActionButton = (target) => {
             :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
         >
             <Card class="section-drop-zone" :data-section-drop-zone="section._id">
-                <div v-if="section.fields.length === 0" class="h-[670px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300">
-                    <div>
-                        <span class="text-zinc-500 mr-2">{{ __('Drag fields here to build your form or') }}</span>
-                        <Button size="xs" pill icon="link" :text="__('Link Existing')" />
+                <!-- Empty state - sort container always present for drag indicators -->
+                <div
+                    v-if="section.fields.length === 0"
+                    class="field-sort-container"
+                    :data-sort-section="section._id"
+                >
+                    <div data-empty-section class="h-[670px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300">
+                        <div>
+                            <span class="text-zinc-500 mr-2">{{ __('Drag fields here to build your form or') }}</span>
+                            <Button size="xs" pill icon="link" :text="__('Link Existing')" />
+                        </div>
                     </div>
                 </div>
 
@@ -341,3 +348,9 @@ const inspectActionButton = (target) => {
 <!--        </div>-->
 <!--    </Panel>-->
 </template>
+
+<style>
+[data-drop-indicator]:has(~ [data-empty-section]) {
+    margin-bottom: 1rem;
+}
+</style>

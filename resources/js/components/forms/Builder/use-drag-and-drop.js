@@ -98,7 +98,10 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
         if (!sortContainer) return hideIndicator();
 
         const fields = sortContainer.querySelectorAll('[data-field-item]');
-        if (fields.length === 0) return hideIndicator();
+        if (fields.length === 0) {
+            sortContainer.prepend(dropIndicator);
+            return;
+        }
 
         const index = indexFromClientY(fields, lastClientY);
         const reference = fields[index] ?? null;
