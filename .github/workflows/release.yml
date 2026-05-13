@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Use Node.js 20.19.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20.19.0
 
@@ -25,13 +25,13 @@ jobs:
 
       - name: Get Changelog
         id: changelog
-        uses: statamic/changelog-action@v1
+        uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1
         with:
           version: ${{ github.ref }}
 
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -41,7 +41,7 @@ jobs:
           prerelease: false
 
       - name: Upload dist zip to release
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@64e5e85fc528f162d7ba7ce2d15a3bb67efb3d80 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -51,7 +51,7 @@ jobs:
           asset_content_type: application/tar+gz
 
       - name: Upload dist-dev zip to release
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@64e5e85fc528f162d7ba7ce2d15a3bb67efb3d80 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -61,7 +61,7 @@ jobs:
           asset_content_type: application/tar+gz
 
       - name: Upload dist-frontend zip to release
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@64e5e85fc528f162d7ba7ce2d15a3bb67efb3d80 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -71,7 +71,7 @@ jobs:
           asset_content_type: application/tar+gz
 
       - name: Upload dist-package zip to release
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@64e5e85fc528f162d7ba7ce2d15a3bb67efb3d80 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
