@@ -5,6 +5,7 @@
             with-contrast:border with-contrast:border-gray-500
             data-readonly:border data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100
             data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!
+            data-readonly:dark:bg-gray-900
         "
         :data-readonly="isReadOnly ? true : undefined"
     >
