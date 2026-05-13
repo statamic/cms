@@ -4,15 +4,13 @@ import { mapValues } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
 import { Button, Input } from '@ui';
 import { categories, categoryColorClasses } from './categories';
-
-const emit = defineEmits<{
-    (e: 'inspect', value: object): void;
-}>();
+import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 
 const props = defineProps<{
     fieldtypes: Array,
-    fieldView: string,
 }>();
+
+const { fieldView, inspect } = injectBuilderContext();
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);
@@ -100,14 +98,14 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                         <h2
                             v-if="group.title"
                             class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium"
-                            :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'"
+                            :class="fieldView === FieldView.Collapsed ? 'gap-1.5' : 'gap-0'"
                         >
                                 <span
                                     class="h-2 shrink-0 rounded-full"
                                     :class="{
                                         [categoryColorClasses[group.color].dot]: true,
-                                        'w-2 opacity-100': fieldView === 'collapsed',
-                                        'w-0 opacity-0': fieldView === 'expanded',
+                                        'w-2 opacity-100': fieldView === FieldView.Collapsed,
+                                        'w-0 opacity-0': fieldView === FieldView.Expanded,
                                     }"
                                     aria-hidden="true"
                                 />
@@ -124,7 +122,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                     :text="__(fieldtype.title)"
                                     :title="__(fieldtype.title)"
                                     :icon="fieldtype.icon"
-                                    @click="emit('inspect', fieldtype)"
+                                    @click="inspect(InspectorType.FieldtypeHint, fieldtype)"
                                 />
                             </li>
                         </ul>
@@ -145,7 +143,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                     <h2
                         v-if="group.title"
                         class="inline-flex items-center px-1.5 pb-1 text-sm text-gray-950 dark:text-gray-200 font-medium"
-                        :class="fieldView === 'collapsed' ? 'gap-1.5' : 'gap-0'"
+                        :class="fieldView === FieldView.Collapsed ? 'gap-1.5' : 'gap-0'"
                     >
                         <span
                             class="h-2 shrink-0 rounded-full"
@@ -169,7 +167,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                 :text="__(fieldtype.title)"
                                 :title="__(fieldtype.title)"
                                 :icon="fieldtype.icon"
-                                @click="emit('inspect', fieldtype)"
+                                @click="inspect(InspectorType.FieldtypeHint, fieldtype)"
                             />
                         </li>
                     </ul>

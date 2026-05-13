@@ -1,3 +1,22 @@
+<script lang="ts">
+import createContext from '@/util/createContext.js';
+
+export enum InspectorType {
+    Page = 'page',
+    Section = 'section',
+    Field = 'field',
+    Action = 'action',
+    FieldtypeHint = 'fieldtype_hint',
+}
+
+export enum FieldView {
+    Expanded = 'expanded',
+    Collapsed = 'collapsed',
+}
+
+export const [injectBuilderContext, provideBuilderContext] = createContext('FormBuilder');
+</script>
+
 <script setup lang="ts">
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
@@ -19,11 +38,6 @@ const props = defineProps<{
     fieldtypes: Array,
 }>();
 
-enum FieldView {
-    Expanded = 'expanded',
-    Collapsed = 'collapsed',
-}
-
 // todo: the original value should come from a prop (initialFormFields)
 const formFields = ref({
     sections: [
@@ -38,14 +52,13 @@ const formFields = ref({
     ],
 });
 
-const inspecting = ref(null);
-const inspectorType = ref(null);
-const editingField = ref(null);
+const inspecting = ref<object | null>(null);
+const inspectorType = ref<InspectorType | null>(null);
 const fieldView = ref<FieldView>(FieldView.Expanded);
 const sectionRefs = ref({});
 const sections = computed(() => formFields.value.sections);
 const shouldShowViewSelector = computed(() => sections.value.some(section => section.fields.length > 0));
-const fieldsCount = computed(() => sections.value.flatMap(section => section.fields).length);
+const fieldCount = computed(() => sections.value.flatMap(section => section.fields).length);
 const canDeleteSection = computed(() => sections.value.length > 1);
 
 const addSection = (atIndex, fields = []) => {
@@ -110,17 +123,24 @@ useDragAndDrop({
     onFieldMoved: moveField,
 });
 
-const inspect = (type, data) => {
+const inspect = (type: string | null, data: any = null) => {
     inspecting.value = data;
     inspectorType.value = type;
-
-    // todo: remove this when we do away with the editingField state
-    editingField.value = null;
 };
 
-const onEscape = (event) => {
-    if (event.key === 'Escape' && editingField.value) {
-        editingField.value = null;
+const clearInspector = () => inspect(null);
+
+provideBuilderContext({
+    fieldView,
+    inspecting,
+    inspectorType,
+    inspect,
+    clearInspector,
+});
+
+const onEscape = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && inspecting.value) {
+        clearInspector();
     }
 };
 
@@ -150,11 +170,7 @@ const inspectorTarget = ref('field');
     />
 
     <LayoutPanel side="left">
-        <FieldtypeSelector
-            :fieldtypes
-            :field-view
-            @inspect="inspect('fieldtype_hint', $event)"
-        />
+        <FieldtypeSelector :fieldtypes />
     </LayoutPanel>
 
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
@@ -219,9 +235,7 @@ const inspectorTarget = ref('field');
                 :ref="(el) => sectionRefs[section._id] = el"
                 :section
                 :fieldtypes
-                :field-view
                 :can-delete-section
-                v-model:editing-field="editingField"
                 @deleted="sectionDeleted"
             />
 
@@ -232,11 +246,12 @@ const inspectorTarget = ref('field');
             v-if="fieldView === FieldView.Collapsed"
             class="mx-auto text-center max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300"
         >
-            <strong>{{ fieldsCount }}</strong> {{ __n('field on this form|fields on this form', fieldsCount) }}
+            <strong>{{ fieldCount }}</strong> {{ __n('field on this form|fields on this form', fieldCount) }}
         </p>
     </div>
 
     <Button
+        v-if="inspectorType"
         class="min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above) sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
         popovertarget="popover-right-panel"
         :text="__('Settings')"
@@ -245,10 +260,8 @@ const inspectorTarget = ref('field');
 
     <LayoutPanel side="right">
         <FieldtypeHint
-            v-if="inspectorType === 'fieldtype_hint'"
+            v-if="inspectorType === InspectorType.FieldtypeHint"
             :fieldtype="inspecting"
         />
-
-        <!-- TODO: Wire up field/page/action settings -->
     </LayoutPanel>
 </template>

@@ -4,6 +4,7 @@ import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed, ref } from 'vue';
 import { uniqid } from '@/bootstrap/globals.js';
 import { categories, categoryColorClasses } from './categories';
+import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 
 const emit = defineEmits<{
     (e: 'deleted', value: null): void;
@@ -12,11 +13,14 @@ const emit = defineEmits<{
 const props = defineProps<{
     section: Object,
     fieldtypes: Array,
-    fieldView: String,
     canDeleteSection: Boolean,
 }>();
 
-const editingField = defineModel('editingField');
+const { fieldView, inspecting, inspectorType, inspect, clearInspector } = injectBuilderContext();
+
+const editingField = computed(() => inspectorType.value === InspectorType.Field ? inspecting.value : null);
+const isEditingField = (field) => editingField.value?._id === field._id;
+const inspectField = (field: any) => inspect(InspectorType.Field, field);
 
 const toggleCollapsed = () => props.section.collapsed = !props.section.collapsed;
 
@@ -30,9 +34,6 @@ const blueprint = computed(() => ({
         }],
     }],
 }));
-
-const selectField = (field) => editingField.value = field;
-const isEditingField = (field) => editingField.value?._id === field._id;
 
 const fieldtypeCategory = (field) => {
     const fieldtype = props.fieldtypes.find((f) => f.handle === field.fieldtype);
@@ -64,7 +65,7 @@ const addField = (fieldtypeHandle, index = null) => {
     section.values[handle] = fieldtype.preview.value;
     section.meta[handle] = fieldtype.preview.meta;
 
-    editingField.value = field;
+    inspectField(field);
 };
 
 const toggleFieldVisibility = (field) => field.config.hidden = !field.config.hidden;
@@ -89,7 +90,7 @@ const duplicateField = (fieldId) => {
     section.values[handle] = section.values[field.handle];
     section.meta[handle] = section.meta[field.handle];
 
-    editingField.value = newField;
+    inspectField(newField);
 };
 
 const removeField = (fieldId) => {
@@ -105,7 +106,7 @@ const removeField = (fieldId) => {
         toggleCollapsed();
     }
 
-    editingField.value = null;
+    clearInspector();
 };
 
 const remove = () => emit('deleted', props.section._id);
@@ -180,7 +181,7 @@ const inspectActionButton = (target) => {
                     :meta="section.meta"
                     :track-dirty-state="false"
                 >
-                    <div class="field-sort-container field-grid" :data-sort-section="section._id" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">
+                    <div class="field-sort-container field-grid" :data-sort-section="section._id" :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null">
                         <div
                             v-for="field in section.fields"
                             :key="field._id"
@@ -189,7 +190,7 @@ const inspectActionButton = (target) => {
                             :data-editing-field="isEditingField(field) ? '' : undefined"
                             :data-editing-item="isEditingField(field) ? '' : undefined"
                             :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isEditingField(field) }]"
-                            @click.stop="isEditingField(field) || selectField(field)"
+                            @click.stop="isEditingField(field) || inspectField(field)"
                         >
                             <div
                                 v-if="isEditingField(field)"
@@ -287,7 +288,7 @@ const inspectActionButton = (target) => {
 <!--            :class="{ 'h-0! invisible! overflow-clip': panelCollapsed }"-->
 <!--        >-->
 <!--            <Card>-->
-<!--                <div class="space-y-7" :data-fields-collapsed="fieldView === 'collapsed' ? 'true' : null">-->
+<!--                <div class="space-y-7" :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null">-->
 <!--                    <div data-fieldset-group class="space-y-7">-->
 <!--                        <div id="fieldset-start">-->
 <!--                                <span data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">-->
