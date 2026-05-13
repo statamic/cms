@@ -4,7 +4,7 @@ const normalizeInputOptions = HasInputOptions.methods.normalizeInputOptions;
 import { flatten, sortBy, range } from 'lodash-es';
 import Select from './Select/Select.vue';
 import Button from './Button/Button.vue';
-import { numberFormatter } from '@api';
+import { numberFormatter as $number } from '@api';
 import { computed } from 'vue';
 
 const emit = defineEmits(['page-selected', 'per-page-changed']);
@@ -82,8 +82,8 @@ const fromItem = computed(() => props.resourceMeta.from || 0);
 const toItem = computed(() => Math.min(props.resourceMeta.to, totalItems.value));
 const formattedRange = computed(() => {
     return fromItem.value === toItem.value
-        ? numberFormatter.format(fromItem.value)
-        : numberFormatter.formatRange(fromItem.value, toItem.value);
+        ? $number.format(fromItem.value)
+        : $number.formatRange(fromItem.value, toItem.value);
 });
 
 function selectPage(page) {
