@@ -152,14 +152,14 @@ const calendarGridClass = computed(() =>
             <div class="inline-flex items-center">
                 <Component
                     :is="components.CalendarPrev"
-                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
+                    class="inline-flex size-7.5 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
                 >
                     <Icon name="chevron-left" class="size-4" />
                 </Component>
                 <button
                     v-if="showThisMonthShortcut"
                     type="button"
-                    class="inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-925 hover:bg-gray-50 active:scale-90 disabled:pointer-events-none disabled:opacity-40 dark:text-white dark:hover:bg-gray-925 dark:disabled:opacity-40"
+                    class="inline-flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-925 hover:bg-gray-50 active:scale-90 disabled:pointer-events-none disabled:opacity-40 dark:text-white dark:hover:bg-gray-925 dark:disabled:opacity-40"
                     :disabled="thisMonthShortcutDisabled"
                     :aria-label="__('This month')"
                     v-tooltip="__('This month')"
@@ -169,7 +169,7 @@ const calendarGridClass = computed(() =>
                 </button>
                 <Component
                     :is="components.CalendarNext"
-                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
+                    class="inline-flex size-7.5 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
                 >
                     <Icon name="chevron-right" class="size-4" />
                 </Component>
