@@ -1,6 +1,5 @@
 <script setup>
-import { computed } from 'vue';
-import { parseAbsolute } from '@internationalized/date';
+import { ref, computed } from 'vue';
 import {
     CalendarCell,
     CalendarCellTrigger,
@@ -15,6 +14,7 @@ import {
     CalendarPrev,
     CalendarNext,
 } from 'reka-ui';
+import { parseAbsolute } from '@internationalized/date';
 import Icon from '../Icon/Icon.vue';
 import CalendarToday from './CalendarToday.vue';
 
