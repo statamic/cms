@@ -1,6 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
+import { computed } from 'vue';
 import {
     DateRangePickerCalendar,
     DateRangePickerCell,
@@ -26,7 +26,7 @@ import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
 import TimezoneHoverCard from '../TimezoneHoverCard.vue';
-import { getLocalTimeZone, now, parseAbsolute, toCalendarDate } from '@internationalized/date';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 import { getAdditionalTimezones } from '../DatePicker/util.js';
 
 const emit = defineEmits(['update:modelValue']);
@@ -55,7 +55,6 @@ const calendarBindings = computed(() => ({
     modelValue: props.modelValue ?? [],
     min: props.min,
     max: props.max,
-    inline: props.inline,
     components: {
         Root: DateRangePickerCalendar,
         Header: DateRangePickerHeader,
@@ -72,218 +71,35 @@ const calendarBindings = computed(() => ({
     },
 }));
 
-/** Synced with DateRangePickerRoot so we can re-open after "Today" despite close-on-select. */
-const pickerOpen = ref(false);
+// The placeholder defines the month to show when there's no value. Additionally,
+// by setting it to an absolute value, it ensures that the emitted event value
+// will be the appropriate format (e.g. a full date with time with timezone,
+// rather than just a day).
+const placeholder = parseAbsoluteToLocal(new Date().toISOString());
 
-/** After "Today" shortcut, label shows "Select" until the range changes or the popover closes. */
-const shortcutPrimedForSelect = ref(false);
+const calendarEvents = computed(() => ({
+    'update:model-value': (event) => {
+        if (props.granularity === 'day') {
 
-/**
- * Reka closes the popover when start+end are both set (`close-on-select`). Our "Today" emit does that,
- * so the popover blips closed and `watch(pickerOpen)` would clear `shortcutPrimedForSelect` before
- * we re-open in `nextTick`. Skip clearing for that one automatic close.
- */
-const ignoreNextPickerCloseForShortcut = ref(false);
+            // Avoid fatal error `Cannot set properties of undefined (setting 'hour')`
+            if (event.end == null) {
+              return
+            }
 
-/**
- * After "Select", keep start+end as the same calendar day (today) but set Reka `fixed-date="start"`.
- * Reka's changeDate() only updates `end` on the next cell click when *both* endpoints exist; if `end`
- * is cleared, a different code path runs that requires `highlightedRange` and often never completes.
- * (reka-ui: `RangeCalendarCellTrigger.vue` → `changeDate`.)
- */
-const fixRangeStartForNextPick = ref(false);
+            event.start.hour = 0;
+            event.start.minute = 0;
+            event.start.second = 0;
+            event.start.millisecond = 0;
 
-const rangePickerFixedDate = computed(() => (fixRangeStartForNextPick.value ? 'start' : undefined));
-
-/** When `min` is later than today, "today" is outside the allowed range. */
-const isTodayBeforeMin = computed(() => {
-    if (props.min == null) {
-        return false;
-    }
-    try {
-        const minValue = typeof props.min === 'string' ? parseAbsolute(props.min) : props.min;
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const minCal = toCalendarDate(minValue);
-        return todayCal.compare(minCal) < 0;
-    } catch {
-        return false;
-    }
-});
-
-/** When `max` is earlier than today, "today" is outside the allowed range. */
-const isTodayAfterMax = computed(() => {
-    if (props.max == null) {
-        return false;
-    }
-    try {
-        const maxValue = typeof props.max === 'string' ? parseAbsolute(props.max) : props.max;
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const maxCal = toCalendarDate(maxValue);
-        return todayCal.compare(maxCal) > 0;
-    } catch {
-        return false;
-    }
-});
-
-const todayShortcutDisabled = computed(
-    () => props.disabled || props.readOnly || isTodayBeforeMin.value || isTodayAfterMax.value,
-);
-
-/** Same calendar day for start/end, and that day is today (footer "Select" / today-shortcut state). */
-function isTodaySingleDayRange(start, end) {
-    if (!start || !end) {
-        return false;
-    }
-    try {
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const startCal = toCalendarDate(start);
-        const endCal = toCalendarDate(end);
-        const singleDay =
-            startCal.year === endCal.year &&
-            startCal.month === endCal.month &&
-            startCal.day === endCal.day;
-        const isToday =
-            startCal.year === todayCal.year &&
-            startCal.month === todayCal.month &&
-            startCal.day === todayCal.day;
-        return singleDay && isToday;
-    } catch {
-        return false;
-    }
-}
-
-/**
- * Range updates come from DateRangePickerRoot — not from Calendar's emit (DateRangePickerCalendar
- * handles RangeCalendar internally). Footer priming + day normalization must run here.
- */
-function onPickerModelUpdate(event) {
-    // Partial range (any granularity): reset footer — inline pickers often omit `granularity="day"`.
-    if (event.end == null) {
-        if (shortcutPrimedForSelect.value && !fixRangeStartForNextPick.value) {
-            shortcutPrimedForSelect.value = false;
+            event.end.hour = 0;
+            event.end.minute = 0;
+            event.end.second = 0;
+            event.end.millisecond = 0;
         }
-        emit('update:modelValue', event);
-        return;
-    }
 
-    if (props.granularity === 'day') {
-        event.start.hour = 0;
-        event.start.minute = 0;
-        event.start.second = 0;
-        event.start.millisecond = 0;
-
-        event.end.hour = 0;
-        event.end.minute = 0;
-        event.end.second = 0;
-        event.end.millisecond = 0;
-    }
-
-    if (event.start && !isTodaySingleDayRange(event.start, event.end)) {
-        shortcutPrimedForSelect.value = false;
-        fixRangeStartForNextPick.value = false;
-    }
-
-    emit('update:modelValue', event);
-}
-
-const emitTodayValue = () => {
-    if (todayShortcutDisabled.value) {
-        return;
-    }
-
-    fixRangeStartForNextPick.value = false;
-
-    const tz = getLocalTimeZone();
-    let start = now(tz).set({ millisecond: 0 });
-    let end = now(tz).set({ millisecond: 0 });
-    if (props.granularity === 'day') {
-        start = start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-        end = end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-    }
-
-    if (!props.inline) {
-        ignoreNextPickerCloseForShortcut.value = true;
-    }
-
-    emit('update:modelValue', { start, end });
-    shortcutPrimedForSelect.value = true;
-
-    if (!props.inline) {
-        nextTick(() => {
-            pickerOpen.value = true;
-            nextTick(() => {
-                ignoreNextPickerCloseForShortcut.value = false;
-            });
-        });
-    }
-};
-
-const isTodayRangeSelected = computed(() => {
-    const mv = props.modelValue;
-    if (!mv?.start || !mv?.end) {
-        return false;
-    }
-    return isTodaySingleDayRange(mv.start, mv.end);
-});
-
-const todayShortcutLabel = computed(() =>
-    shortcutPrimedForSelect.value && isTodayRangeSelected.value ? __('Select') : __('Today'),
-);
-
-watch(
-    () => props.modelValue,
-    () => {
-        if (shortcutPrimedForSelect.value && !isTodayRangeSelected.value) {
-            shortcutPrimedForSelect.value = false;
-        }
-        if (fixRangeStartForNextPick.value && !isTodayRangeSelected.value) {
-            fixRangeStartForNextPick.value = false;
-        }
+        emit('update:modelValue', event)
     },
-    { deep: true },
-);
-
-watch([isTodayBeforeMin, isTodayAfterMax], ([beforeMin, afterMax]) => {
-    if (beforeMin || afterMax) {
-        shortcutPrimedForSelect.value = false;
-        fixRangeStartForNextPick.value = false;
-    }
-});
-
-watch(pickerOpen, (open) => {
-    if (!props.inline && !open) {
-        if (ignoreNextPickerCloseForShortcut.value) {
-            return;
-        }
-        shortcutPrimedForSelect.value = false;
-        fixRangeStartForNextPick.value = false;
-    }
-});
-
-onUnmounted(() => {
-    shortcutPrimedForSelect.value = false;
-    fixRangeStartForNextPick.value = false;
-    ignoreNextPickerCloseForShortcut.value = false;
-});
-
-const onTodayShortcutClick = () => {
-    if (todayShortcutDisabled.value) {
-        return;
-    }
-    /** Same calendar day for start+end, but `fixed-date="start"` so the next click only moves `end`. */
-    if (shortcutPrimedForSelect.value && isTodayRangeSelected.value) {
-        fixRangeStartForNextPick.value = true;
-        shortcutPrimedForSelect.value = false;
-        if (!props.inline) {
-            nextTick(() => {
-                pickerOpen.value = true;
-            });
-        }
-        return;
-    }
-    /** Always apply today (clears fixed-date / in-progress calendar state). Same as first "Today". */
-    emitTodayValue();
-};
+}));
 
 const timeZoneName = computed(() => props.modelValue?.start?.timeZone ?? null);
 
@@ -310,16 +126,12 @@ const hoverCardDate = computed(() => {
             :granularity="granularity"
             :locale="$date.locale"
             :disabled="disabled || readOnly"
-            @update:model-value="onPickerModelUpdate"
+            @update:model-value="emit('update:modelValue', $event)"
             v-bind="$attrs"
             prevent-deselect
             hide-time-zone
-            :close-on-select="!inline"
-            role="group"
-            :aria-label="__('Date range picker')"
-            :aria-required="required"
-            v-model:open="pickerOpen"
-            :fixed-date="rangePickerFixedDate"
+            :placeholder="placeholder"
+            close-on-select
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div
@@ -378,16 +190,7 @@ const hoverCardDate = computed(() => {
                     >
                         <Text class="text-gray-600 dark:text-gray-400 me-1" size="xs" :text="timeZoneLabel" />
                     </TimezoneHoverCard>
-                    <Button
-                        v-if="clearable && !readOnly"
-                        @click="emit('update:modelValue', null)"
-                        variant="subtle"
-                        size="sm"
-                        icon="x"
-                        class="-my-1.25 -me-2"
-                        :disabled="disabled"
-                        v-tooltip="__('Clear date')"
-                    />
+                    <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
             </DateRangePickerField>
 
@@ -399,38 +202,12 @@ const hoverCardDate = computed(() => {
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">
-                    <Calendar v-bind="calendarBindings" />
-                    <div
-                        class="flex justify-end"
-                    >
-                        <Button
-                            type="button"
-                            variant="subtle"
-                            size="2xs"
-                            class="me-1"
-                            :text="todayShortcutLabel"
-                            :disabled="todayShortcutDisabled"
-                            @click="onTodayShortcutClick"
-                        />
-                    </div>
+                    <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
                 </Card>
             </DateRangePickerContent>
 
             <Card v-if="inline" class="mt-2">
-                <Calendar v-bind="calendarBindings" />
-                <div
-                    class="flex justify-end"
-                >
-                    <Button
-                        type="button"
-                        variant="subtle"
-                        size="2xs"
-                        class="-me-1"
-                        :text="todayShortcutLabel"
-                        :disabled="todayShortcutDisabled"
-                        @click="onTodayShortcutClick"
-                    />
-                </div>
+                <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
             </Card>
         </DateRangePickerRoot>
     </div>

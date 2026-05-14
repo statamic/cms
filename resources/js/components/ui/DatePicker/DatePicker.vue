@@ -1,7 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed, nextTick, ref } from 'vue';
-import { getLocalTimeZone, now, parseAbsolute, toCalendarDate } from '@internationalized/date';
+import { computed } from 'vue';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -87,9 +86,6 @@ const inputEvents = computed(() => ({
     },
 }));
 
-/** Synced with DatePickerRoot so we can re-open after "Today" despite close-on-select. */
-const pickerOpen = ref(false);
-
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
         if (props.granularity === 'day') {
@@ -102,99 +98,6 @@ const calendarEvents = computed(() => ({
         emit('update:modelValue', event);
     },
 }));
-
-/** When `min` is later than today, "today" is outside the allowed range. */
-const isTodayBeforeMin = computed(() => {
-    if (props.min == null) {
-        return false;
-    }
-    try {
-        const minValue = typeof props.min === 'string' ? parseAbsolute(props.min) : props.min;
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const minCal = toCalendarDate(minValue);
-        return todayCal.compare(minCal) < 0;
-    } catch {
-        return false;
-    }
-});
-
-/** When `max` is earlier than today, "today" is outside the allowed range. */
-const isTodayAfterMax = computed(() => {
-    if (props.max == null) {
-        return false;
-    }
-    try {
-        const maxValue = typeof props.max === 'string' ? parseAbsolute(props.max) : props.max;
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const maxCal = toCalendarDate(maxValue);
-        return todayCal.compare(maxCal) > 0;
-    } catch {
-        return false;
-    }
-});
-
-const todayShortcutDisabled = computed(
-    () => props.disabled || props.readOnly || isTodayBeforeMin.value || isTodayAfterMax.value,
-);
-
-const isTodaySelected = computed(() => {
-    const mv = props.modelValue;
-    if (mv == null || typeof mv !== 'object') {
-        return false;
-    }
-    try {
-        const todayCal = toCalendarDate(now(getLocalTimeZone()));
-        const selectedCal = toCalendarDate(mv);
-        return (
-            selectedCal.year === todayCal.year &&
-            selectedCal.month === todayCal.month &&
-            selectedCal.day === todayCal.day
-        );
-    } catch {
-        return false;
-    }
-});
-
-const todayShortcutLabel = computed(() => {
-    if (props.inline) {
-        return __('Today');
-    }
-    return isTodaySelected.value ? __('Apply') : __('Today');
-});
-
-const emitTodayValue = () => {
-    if (todayShortcutDisabled.value) {
-        return;
-    }
-    let value = now(getLocalTimeZone()).set({ millisecond: 0 });
-    if (props.granularity === 'day') {
-        value = value.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-    }
-
-    emit('update:modelValue', value);
-
-    if (!props.inline) {
-        nextTick(() => {
-            pickerOpen.value = true;
-        });
-    }
-};
-
-const onTodayShortcutClick = () => {
-    if (todayShortcutDisabled.value) {
-        return;
-    }
-    if (isTodaySelected.value) {
-        if (!props.inline) {
-            pickerOpen.value = false;
-        } else {
-            // Inline has no popover to dismiss; re-apply today's value so "Apply" does something useful.
-            emitTodayValue();
-        }
-        return;
-    }
-    emitTodayValue();
-};
 
 const timeZoneName = computed(() => props.modelValue?.timeZone ?? null);
 
@@ -250,7 +153,6 @@ const getInputLabel = (part) => {
             :aria-label="__('Date picker')"
             :aria-required="required"
             close-on-select
-            v-model:open="pickerOpen"
         >
             <DatePickerField v-slot="{ segments }" class="w-full">
                 <DatePickerAnchor as-child>
@@ -331,37 +233,11 @@ const getInputLabel = (part) => {
             >
                 <Card class="w-[20rem]">
                     <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
-                    <div
-                        class="flex justify-end"
-                    >
-                        <Button
-                            type="button"
-                            variant="subtle"
-                            size="2xs"
-                            class="me-1"
-                            :text="todayShortcutLabel"
-                            :disabled="todayShortcutDisabled"
-                            @click="onTodayShortcutClick"
-                        />
-                    </div>
                 </Card>
             </DatePickerContent>
 
             <Card v-if="inline" class="mt-2">
                 <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
-                <div
-                    class="flex justify-end"
-                >
-                    <Button
-                        type="button"
-                        variant="subtle"
-                        size="2xs"
-                        class="-me-1"
-                        :text="todayShortcutLabel"
-                        :disabled="todayShortcutDisabled"
-                        @click="onTodayShortcutClick"
-                    />
-                </div>
             </Card>
         </DatePickerRoot>
     </div>
