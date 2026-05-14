@@ -4,7 +4,9 @@ namespace Statamic\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Rebing\GraphQL\Support\Contracts\ConfigConvertible;
+use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Taxonomy;
 use Statamic\GraphQL\Middleware\CacheResponse;
 use Statamic\GraphQL\Middleware\HandleAuthentication;
 use Statamic\GraphQL\Queries\AssetContainerQuery;
@@ -23,6 +25,8 @@ use Statamic\GraphQL\Queries\NavQuery;
 use Statamic\GraphQL\Queries\NavsQuery;
 use Statamic\GraphQL\Queries\PingQuery;
 use Statamic\GraphQL\Queries\SitesQuery;
+use Statamic\GraphQL\Queries\SpecificEntriesQuery;
+use Statamic\GraphQL\Queries\SpecificTermsQuery;
 use Statamic\GraphQL\Queries\TaxonomiesQuery;
 use Statamic\GraphQL\Queries\TaxonomyQuery;
 use Statamic\GraphQL\Queries\TermQuery;
@@ -69,9 +73,77 @@ class DefaultSchema implements ConfigConvertible
             $queries = $queries->merge(ResourceAuthorizer::isAllowed('graphql', $resource) ? $qs : []);
         });
 
+        $queries = $queries
+            ->merge($this->getSpecificEntriesQueries())
+            ->merge($this->getSpecificTermsQueries());
+
         return $queries
             ->merge(config('statamic.graphql.queries', []))
             ->merge(GraphQL::getExtraQueries())
+            ->all();
+    }
+
+    private function getSpecificEntriesQueries(): array
+    {
+        // rebing/graphql-laravel calls toConfig() eagerly during boot
+        // at which point the Stache is not yet ready.
+        // The schema is rebuilt when an actual request hits the controller,
+        // where the Stache is fully booted, so wildcards still expand correctly there.
+        if (! app()->isBooted()) {
+            return [];
+        }
+
+        if (! ResourceAuthorizer::isAllowed('graphql', 'collections')) {
+            return [];
+        }
+
+        $configured = config('statamic.graphql.improved_types.collections', []);
+
+        if (empty($configured)) {
+            return [];
+        }
+
+        if (in_array('*', $configured)) {
+            $handles = Collection::handles()->all();
+        } else {
+            $handles = $configured;
+        }
+
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'collections');
+
+        return collect($handles)
+            ->filter(fn ($handle) => in_array($handle, $allowed))
+            ->map(fn ($handle) => new SpecificEntriesQuery($handle))
+            ->all();
+    }
+
+    private function getSpecificTermsQueries(): array
+    {
+        if (! app()->isBooted()) {
+            return [];
+        }
+
+        if (! ResourceAuthorizer::isAllowed('graphql', 'taxonomies')) {
+            return [];
+        }
+
+        $configured = config('statamic.graphql.improved_types.terms', []);
+
+        if (empty($configured)) {
+            return [];
+        }
+
+        if (in_array('*', $configured)) {
+            $handles = Taxonomy::handles()->all();
+        } else {
+            $handles = $configured;
+        }
+
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'taxonomies');
+
+        return collect($handles)
+            ->filter(fn ($handle) => in_array($handle, $allowed))
+            ->map(fn ($handle) => new SpecificTermsQuery($handle))
             ->all();
     }
 
