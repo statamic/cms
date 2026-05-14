@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, unref, watchEffect } from 'vue';
-import { getLocalTimeZone, isSameMonth, now, parseAbsolute, startOfMonth, toCalendarDate } from '@internationalized/date';
+import { computed } from 'vue';
+import { parseAbsolute } from '@internationalized/date';
 import {
     CalendarCell,
     CalendarCellTrigger,
@@ -14,10 +14,9 @@ import {
     CalendarRoot,
     CalendarPrev,
     CalendarNext,
-    injectDatePickerRootContext,
-    injectDateRangePickerRootContext,
 } from 'reka-ui';
 import Icon from '../Icon/Icon.vue';
+import CalendarToday from './CalendarToday.vue';
 
 defineOptions({ name: 'Calendar' });
 
@@ -33,52 +32,7 @@ const props = defineProps({
     /** The number of months to display at once. */
     numberOfMonths: { type: Number, default: 1 },
     inline: { type: Boolean, default: false },
-    /** When `false`, hides the "This month" view shortcut (used outside CP date pickers). */
-    showTodayShortcut: { type: Boolean, default: true },
 });
-
-const pickerRoot = injectDatePickerRootContext(null);
-const rangeRoot = injectDateRangePickerRootContext(null);
-const dateFieldRoot = pickerRoot ?? rangeRoot;
-
-const showThisMonthShortcut = computed(() => props.showTodayShortcut && !!dateFieldRoot);
-
-function currentMonth() {
-    return startOfMonth(toCalendarDate(now(getLocalTimeZone())));
-}
-
-/** Reka inject context is a plain object of refs; read placeholder here so navigation updates reliably. */
-const fieldPlaceholder = ref(undefined);
-
-watchEffect(() => {
-    const root = dateFieldRoot;
-    if (!root?.placeholder) {
-        fieldPlaceholder.value = undefined;
-        return;
-    }
-    fieldPlaceholder.value = unref(root.placeholder);
-});
-
-const thisMonthShortcutDisabled = computed(() => {
-    if (!dateFieldRoot) {
-        return true;
-    }
-    if (unref(dateFieldRoot.disabled) || unref(dateFieldRoot.readonly)) {
-        return true;
-    }
-    const ph = fieldPlaceholder.value;
-    if (!ph) {
-        return false;
-    }
-    return isSameMonth(toCalendarDate(ph), currentMonth());
-});
-
-function goToThisMonth() {
-    if (!dateFieldRoot || thisMonthShortcutDisabled.value) {
-        return;
-    }
-    dateFieldRoot.onPlaceholderChange(currentMonth());
-}
 
 const components = computed(() => ({
     CalendarRoot: props.components.Root || CalendarRoot,
@@ -86,6 +40,7 @@ const components = computed(() => ({
     CalendarHeading: props.components.Heading || CalendarHeading,
     CalendarPrev: props.components.Prev || CalendarPrev,
     CalendarNext: props.components.Next || CalendarNext,
+    CalendarToday: props.components.Today || CalendarToday,
     CalendarGrid: props.components.Grid || CalendarGrid,
     CalendarGridHead: props.components.GridHead || CalendarGridHead,
     CalendarGridBody: props.components.GridBody || CalendarGridBody,
@@ -158,17 +113,7 @@ const calendarGridClass = computed(() =>
                 >
                     <Icon name="chevron-left" class="size-4" />
                 </Component>
-                <button
-                    v-if="showThisMonthShortcut"
-                    type="button"
-                    class="inline-flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-925 hover:bg-gray-50 active:scale-90 disabled:pointer-events-none disabled:opacity-40 dark:text-white dark:hover:bg-gray-925"
-                    :disabled="thisMonthShortcutDisabled"
-                    :aria-label="__('This month')"
-                    v-tooltip="__('This month')"
-                    @click="goToThisMonth"
-                >
-                    <Icon name="calendar" class="size-3.5!" />
-                </button>
+                <Component :is="components.CalendarToday" />
                 <Component
                     :is="components.CalendarNext"
                     class="inline-flex size-7.5 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-925"
