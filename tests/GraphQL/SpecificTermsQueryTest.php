@@ -75,6 +75,8 @@ class SpecificTermsQueryTest extends TestCase
 
     private function getQueryName($query): string
     {
+        // The Query class does not have a getName() method,
+        // so we need to use reflection to get the name.
         $reflection = new \ReflectionProperty($query, 'attributes');
 
         return $reflection->getValue($query)['name'];

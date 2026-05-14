@@ -6,8 +6,6 @@ namespace Statamic\GraphQL\Types;
 
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\UnionType;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Fields\Blueprint;
 
 class DynamicTermUnionType extends UnionType
 {
@@ -20,11 +18,6 @@ class DynamicTermUnionType extends UnionType
         $this->attributes['name'] = self::getTypeName($types);
     }
 
-    /**
-     * Get the name of the dynamic union type
-     *
-     * @param  array{taxonomy: Taxonomy, blueprint: Blueprint}  $types
-     */
     public static function getTypeName(array $types): string
     {
         $typeNames = array_map(function ($type) {
