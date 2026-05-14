@@ -3,14 +3,15 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
+use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Facades\Blueprint;
-use Statamic\Fields\Field;
+use Statamic\Forms\Fields\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
-use function Statamic\trans as __;
 
 class FormFieldsController extends CpController
 {
@@ -21,7 +22,11 @@ class FormFieldsController extends CpController
             'values' => 'array',
         ]);
 
-        $fieldtype = FormFieldtypeRepository::find($request->type);
+        try {
+            $fieldtype = FormFieldtypeRepository::find($request->type);
+        } catch (FormFieldtypeNotFoundException $e) {
+            $fieldtype = (new Fallback)->wrapping(FieldtypeRepository::find($request->type));
+        }
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -30,15 +35,15 @@ class FormFieldsController extends CpController
             ->addValues($request->values)
             ->preProcess();
 
-//        if ($request->reference) {
-//            $originFields = $blueprint
-//                ->fields()
-//                ->addValues(FieldRepository::find($request->reference)->config())
-//                ->preProcess();
-//
-//            $originValues = Arr::except($originFields->values()->all(), 'handle');
-//            $originMeta = $originFields->meta()->all();
-//        }
+        //        if ($request->reference) {
+        //            $originFields = $blueprint
+        //                ->fields()
+        //                ->addValues(FieldRepository::find($request->reference)->config())
+        //                ->preProcess();
+        //
+        //            $originValues = Arr::except($originFields->values()->all(), 'handle');
+        //            $originMeta = $originFields->meta()->all();
+        //        }
 
         return [
             'fieldtype' => $fieldtype->toArray(),

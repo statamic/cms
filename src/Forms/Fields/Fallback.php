@@ -15,6 +15,17 @@ class Fallback extends FormFieldtype
         return $this;
     }
 
+    public function configFieldItems(): array
+    {
+        if (! $this->wrappedFieldtype) {
+            return parent::configFieldItems();
+        }
+
+        return collect($this->wrappedFieldtype->configFields()->toPublishArray())
+            ->keyBy('handle')
+            ->all();
+    }
+
     public function toFieldArray(): array
     {
         return $this->config();
