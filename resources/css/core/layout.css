@@ -115,8 +115,9 @@
 /* Mobile nav behavior */
 @media (width < theme(--breakpoint-lg)) {
     .nav-main {
-        /* Always visible but off-screen by default */
+        /* Always visible but off-screen until opened (do not rely on JS adding .nav-closed before first paint). */
         @apply flex;
+        @apply -start-50;
         @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 
