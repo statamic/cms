@@ -124,6 +124,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                     :title="__(fieldtype.title)"
                                     :icon="fieldtype.icon"
                                     @click="inspect(InspectorType.FieldtypeHint, fieldtype)"
+                                    class="show-focus"
                                 />
                             </li>
                         </ul>
@@ -170,6 +171,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                 :title="__(fieldtype.title)"
                                 :icon="fieldtype.icon"
                                 @click="inspect(InspectorType.FieldtypeHint, fieldtype)"
+                                class="show-focus"
                             />
                         </li>
                     </ul>
