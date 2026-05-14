@@ -11,6 +11,7 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
+use Statamic\Fieldtypes\Sets;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
@@ -114,27 +115,31 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
                 }
             });
 
-        Blueprint::all()
-            ->each(function ($blueprint) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
-                $updated = AssetReferenceUpdater::item($blueprint)
-                    ->filterByContainer($container)
-                    ->updateReferences($originalPath, $newPath);
+        // Only enumerate blueprints/fieldsets when set preview images are configured
+        // and the asset is in the configured container to avoid unnecessary disk I/O.
+        if (($config = Sets::previewImageConfig()) && $container === $config['container']) {
+            Blueprint::all()
+                ->each(function ($blueprint) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
+                    $updated = AssetReferenceUpdater::item($blueprint)
+                        ->filterByContainer($container)
+                        ->updateReferences($originalPath, $newPath);
 
-                if ($updated) {
-                    $hasUpdatedItems = true;
-                }
-            });
+                    if ($updated) {
+                        $hasUpdatedItems = true;
+                    }
+                });
 
-        Fieldset::all()
-            ->each(function ($fieldset) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
-                $updated = AssetReferenceUpdater::item($fieldset)
-                    ->filterByContainer($container)
-                    ->updateReferences($originalPath, $newPath);
+            Fieldset::all()
+                ->each(function ($fieldset) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
+                    $updated = AssetReferenceUpdater::item($fieldset)
+                        ->filterByContainer($container)
+                        ->updateReferences($originalPath, $newPath);
 
-                if ($updated) {
-                    $hasUpdatedItems = true;
-                }
-            });
+                    if ($updated) {
+                        $hasUpdatedItems = true;
+                    }
+                });
+        }
 
         if ($hasUpdatedItems) {
             AssetReferencesUpdated::dispatch($asset);
