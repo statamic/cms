@@ -88,6 +88,7 @@ watch(
     (newValues) => {
         field.value.config = newValues;
 
+        // todo: get rid of this, and regenerate publishconfig & meta on server when we do validation
         field.value.publishConfig = {
             ...field.value.publishConfig,
             ...newValues,

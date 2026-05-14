@@ -42,16 +42,7 @@ const props = defineProps<{
 
 // todo: the original value should come from a prop (initialFormFields)
 const formFields = ref({
-    sections: [
-        {
-            _id: 'abc',
-            collapsed: false,
-            title: 'Section',
-            fields: [],
-            values: {},
-            meta: {},
-        },
-    ],
+    sections: [],
 });
 
 const inspecting = ref<object | null>(null);
@@ -147,7 +138,14 @@ const onEscape = (event: KeyboardEvent) => {
     }
 };
 
-onMounted(() => document.addEventListener('keydown', onEscape));
+onMounted(() => {
+    if (formFields.value.sections.length === 0) {
+        addSection(0);
+    }
+
+    document.addEventListener('keydown', onEscape);
+});
+
 onUnmounted(() => document.removeEventListener('keydown', onEscape));
 
 // TODO: Refactor everything below this line
