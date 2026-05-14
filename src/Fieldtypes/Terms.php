@@ -25,6 +25,7 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -297,7 +298,7 @@ class Terms extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate($request->integer('perPage', 15)) : $query->get();
+        return $request->boolean('paginate', true) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
     }
 
     private function authorizeTaxonomyAccess(array $taxonomies): void
