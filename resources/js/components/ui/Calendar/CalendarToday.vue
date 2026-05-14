@@ -1,6 +1,6 @@
 <script setup>
-import { computed, unref } from 'vue';
-import { getLocalTimeZone, isSameMonth, now, startOfMonth, toCalendarDate } from '@internationalized/date';
+import { computed, onMounted, onUnmounted, ref, unref } from 'vue';
+import { fromDate, getLocalTimeZone, isSameMonth, startOfMonth, toCalendarDate } from '@internationalized/date';
 import { injectCalendarRootContext, injectRangeCalendarRootContext } from 'reka-ui';
 import Icon from '../Icon/Icon.vue';
 
@@ -8,8 +8,21 @@ defineOptions({ name: 'CalendarToday' });
 
 const calendarRoot = injectCalendarRootContext(null) ?? injectRangeCalendarRootContext(null);
 
+const today = ref(new Date());
+let timer;
+
+// Re-evaluates "today" at midnight so the disabled state doesn't go stale if the calendar stays open overnight.
+function scheduleUpdate() {
+    const now = new Date();
+    const msUntilMidnight = +new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - +now;
+    timer = setTimeout(() => { today.value = new Date(); scheduleUpdate(); }, msUntilMidnight);
+}
+
+onMounted(scheduleUpdate);
+onUnmounted(() => clearTimeout(timer));
+
 function currentMonth() {
-    return startOfMonth(toCalendarDate(now(getLocalTimeZone())));
+    return startOfMonth(toCalendarDate(fromDate(today.value, getLocalTimeZone())));
 }
 
 const disabled = computed(() => {
