@@ -161,7 +161,7 @@ const calendarGridClass = computed(() =>
                 <button
                     v-if="showThisMonthShortcut"
                     type="button"
-                    class="inline-flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-925 hover:bg-gray-50 active:scale-90 disabled:pointer-events-none disabled:opacity-40 dark:text-white dark:hover:bg-gray-925 dark:disabled:opacity-40"
+                    class="inline-flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-925 hover:bg-gray-50 active:scale-90 disabled:pointer-events-none disabled:opacity-40 dark:text-white dark:hover:bg-gray-925"
                     :disabled="thisMonthShortcutDisabled"
                     :aria-label="__('This month')"
                     v-tooltip="__('This month')"
