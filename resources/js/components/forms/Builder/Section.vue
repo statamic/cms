@@ -58,12 +58,12 @@ const addField = (fieldtypeHandle, index = null) => {
         handle,
         icon: fieldtype?.icon || 'fieldtype-generic',
         type: 'inline',
-        publishConfig: { ...fieldtype.preview.config, handle },
+        publishConfig: { ...fieldtype.preview?.config, handle },
     };
 
     section.fields.splice(index ?? section.fields.length, 0, field);
-    section.values[handle] = fieldtype.preview.value;
-    section.meta[handle] = fieldtype.preview.meta;
+    section.values[handle] = fieldtype.preview?.value;
+    section.meta[handle] = fieldtype.preview?.meta;
 
     inspectField(field);
 };
