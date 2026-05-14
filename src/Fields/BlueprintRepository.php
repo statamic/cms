@@ -353,6 +353,9 @@ class BlueprintRepository
                 ->setInitialPath($path)
                 ->setNamespace($namespace ?? null)
                 ->setContents($contents);
+        // Clear any parent that may have been set on the blueprint during a previous
+        // find() call. The blink cache returns the same instance, so without this,
+        // iterating blueprints via all() could produce instances with stale parents.
         })->setParent(null);
     }
 
