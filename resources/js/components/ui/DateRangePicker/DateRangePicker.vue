@@ -56,6 +56,7 @@ const calendarBindings = computed(() => ({
     modelValue: props.modelValue ?? [],
     min: props.min,
     max: props.max,
+    inline: props.inline,
     components: {
         Root: DateRangePickerCalendar,
         Header: DateRangePickerHeader,
@@ -72,11 +73,11 @@ const calendarBindings = computed(() => ({
     },
 }));
 
-// The placeholder defines the month to show when there's no value. Additionally,
-// by setting it to an absolute value, it ensures that the emitted event value
-// will be the appropriate format (e.g. a full date with time with timezone,
-// rather than just a day).
-const placeholder = parseAbsoluteToLocal(new Date().toISOString());
+// Initial month when there is no value. Use defaultPlaceholder (not placeholder) so
+// the range root stays uncontrolled: month navigation can update the visible month,
+// and shared calendar UI (e.g. Today) can read that state from inject context.
+// Still an absolute local ZonedDateTime so defaults match full date/time shape.
+const defaultPlaceholder = parseAbsoluteToLocal(new Date().toISOString());
 
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => {
@@ -131,7 +132,7 @@ const hoverCardDate = computed(() => {
             v-bind="$attrs"
             prevent-deselect
             hide-time-zone
-            :placeholder="placeholder"
+            :default-placeholder="defaultPlaceholder"
             close-on-select
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
