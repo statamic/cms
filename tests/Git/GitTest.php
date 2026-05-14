@@ -3,6 +3,7 @@
 namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Processes\Git as GitProcess;
@@ -410,6 +411,32 @@ EOT;
         Git::dispatchCommit();
 
         Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
+    }
+
+    #[Test]
+    public function it_attributes_coalesced_commits_to_the_configured_user()
+    {
+        Cache::put('statamic-git-pending-saves', 3);
+
+        $user = User::make()->email('alice@example.com');
+
+        Git::shouldReceive('as')->with(null)->andReturnSelf()->once();
+        Git::shouldReceive('commit')->with('Entry saved')->once();
+
+        (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
+    }
+
+    #[Test]
+    public function it_attributes_non_coalesced_commits_to_the_authenticated_user()
+    {
+        Cache::put('statamic-git-pending-saves', 1);
+
+        $user = User::make()->email('alice@example.com');
+
+        Git::shouldReceive('as')->with($user)->andReturnSelf()->once();
+        Git::shouldReceive('commit')->with('Entry saved')->once();
+
+        (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
     }
 
     #[Test]

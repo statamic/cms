@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Git;
 
 class CommitJob implements ShouldBeUnique, ShouldQueue
@@ -30,6 +31,8 @@ class CommitJob implements ShouldBeUnique, ShouldQueue
      */
     public function handle()
     {
-        Git::as($this->committer)->commit($this->message);
+        $committer = Cache::pull('statamic-git-pending-saves', 0) > 1 ? null : $this->committer;
+
+        Git::as($committer)->commit($this->message);
     }
 }
