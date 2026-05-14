@@ -90,13 +90,19 @@ class Modify implements \IteratorAggregate
      */
     public function __toString()
     {
-        if (! is_string($this->value) && ! method_exists($this->value, '__toString')) {
-            throw new ModifierException(
-                'Attempted to access modified value as a string, but encountered ['.get_class($this->value).']'
-            );
+        $value = $this->value;
+
+        if ($value === null || is_scalar($value)) {
+            return (string) $value;
         }
 
-        return (string) $this->value;
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return (string) $value;
+        }
+
+        throw new ModifierException(
+            'Attempted to access modified value as a string, but encountered ['.get_debug_type($value).']'
+        );
     }
 
     /**
