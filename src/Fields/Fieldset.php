@@ -25,6 +25,8 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Fieldset implements ContainsQueryableValues
 {
     protected $handle;

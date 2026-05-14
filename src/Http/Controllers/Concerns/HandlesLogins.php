@@ -11,6 +11,8 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\URL;
 
+use function Statamic\trans;
+
 trait HandlesLogins
 {
     use ThrottlesLogins;
@@ -60,20 +62,14 @@ trait HandlesLogins
 
     protected function twoFactorChallengeResponse(Request $request, User $user)
     {
-        $request->session()->forget('login.redirect');
-
-        $session = [
+        $request->session()->put([
             'login.id' => $user->getKey(),
             'login.remember' => $request->boolean('remember'),
-        ];
+        ]);
 
-        if ($redirect = $request->input('_redirect')) {
-            if (! URL::isExternalToApplication($redirect)) {
-                $session['login.redirect'] = $redirect;
-            }
+        if (($redirect = $request->input('_redirect')) && ! URL::isExternalToApplication($redirect)) {
+            redirect()->setIntendedUrl($redirect);
         }
-
-        $request->session()->put($session);
 
         TwoFactorAuthenticationChallenged::dispatch($user);
 

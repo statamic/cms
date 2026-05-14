@@ -424,6 +424,15 @@ class Statamic
         return $line;
     }
 
+    public static function transChoice($key, $number, $replace = [], $locale = null)
+    {
+        if (is_array(\__($key, $replace, $locale))) {
+            return $key;
+        }
+
+        return \trans_choice($key, $number, $replace, $locale);
+    }
+
     public static function isWorker()
     {
         if (! App::runningInConsole()) {
@@ -466,6 +475,20 @@ class Statamic
     public static function cpDirection()
     {
         return TextDirection::of(static::cpLocale());
+    }
+
+    public static function cpPerPage($perPage)
+    {
+        if ($perPage === null || $perPage === '') {
+            return null;
+        }
+
+        $perPage = (int) $perPage;
+
+        $options = config('statamic.cp.pagination_size_options') ?: [config('statamic.cp.pagination_size')];
+        $ceiling = max($options);
+
+        return max(1, min($perPage, $ceiling));
     }
 
     public static function nonInertiaPageData()

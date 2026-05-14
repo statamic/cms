@@ -16,6 +16,8 @@ use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialUserEntity;
 
+use function Statamic\trans as __;
+
 class WebAuthn
 {
     public function __construct(

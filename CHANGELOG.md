@@ -1,5 +1,121 @@
 # Release Notes
 
+## 6.19.0 (2026-05-13)
+
+### What's new
+- Show crop dimensions in the crop editor [#14654](https://github.com/statamic/cms/issues/14654) by @jasonvarga
+- Add configurable `@blueprint` template base path [#11632](https://github.com/statamic/cms/issues/11632) by @o1y
+- Add Blade field templates for `statamic-forms` publish command [#14639](https://github.com/statamic/cms/issues/14639) by @martyf
+
+### What's fixed
+- Fix layout shift in Entries Fieldtype mode switcher [#14646](https://github.com/statamic/cms/issues/14646) by @jackmcdade
+- Fix `/index.php` request poisoning `Site::absoluteUrl` [#14647](https://github.com/statamic/cms/issues/14647) by @jasonvarga
+- Remove `overscroll-behavior-x: contain` on panels [#14642](https://github.com/statamic/cms/issues/14642) by @jaygeorge
+- Fix `nav:breadcrumbs` for multi-site [#13789](https://github.com/statamic/cms/issues/13789) by @nopticon
+- Fix date time overflow [#14652](https://github.com/statamic/cms/issues/14652) by @jaygeorge
+- Fix scrollbars showing all the time on the calendar view [#14653](https://github.com/statamic/cms/issues/14653) by @jaygeorge
+- Fix grid header overlapping nav [#14640](https://github.com/statamic/cms/issues/14640) by @wiktorm12
+- Collapse equal range endpoints in NumberFormatter [#14657](https://github.com/statamic/cms/issues/14657) by @jasonvarga
+- Don't show Visit URL for terms that aren't routable [#14658](https://github.com/statamic/cms/issues/14658) by @edalzell
+- Cap CP `perPage` query parameter to configured ceiling [#14668](https://github.com/statamic/cms/issues/14668) by @jasonvarga
+
+
+
+## 6.18.1 (2026-05-11)
+
+### What's fixed
+- Tone down scheduled status badge in dark mode [#14641](https://github.com/statamic/cms/issues/14641) by @jasonvarga
+- Fix date fieldtype input disappearing with underscore locales [#14643](https://github.com/statamic/cms/issues/14643) by @jasonvarga
+- Harden remote URL validation [#14645](https://github.com/statamic/cms/issues/14645) by @jasonvarga
+
+
+
+## 6.18.0 (2026-05-08)
+
+### What's new
+- Customizable crop ratios [#14630](https://github.com/statamic/cms/issues/14630) by @jackmcdade
+- Add --preset option to `assets:generate-presets` [#14626](https://github.com/statamic/cms/issues/14626) by @ryanmitchell
+
+### What's fixed
+- Fix CP login bouncing after Inertia auto-follow [#14632](https://github.com/statamic/cms/issues/14632) by @jasonvarga
+- Fix flaky TracksLastModified file timestamp test [#14634](https://github.com/statamic/cms/issues/14634) by @jasonvarga
+- Hide redundant 'This field' timezone row in date pickers [#14635](https://github.com/statamic/cms/issues/14635) by @jasonvarga
+- Simplify crop aspect ratio config formats [#14633](https://github.com/statamic/cms/issues/14633) by @jasonvarga
+
+
+
+## 6.17.0 (2026-05-08)
+
+### What's new
+- Add configurable timezone for date fields in the Control Panel [#14554](https://github.com/statamic/cms/issues/14554) by @duncanmcclean
+- Add `disabled` and `readOnly` props to `TimePicker` component [#14620](https://github.com/statamic/cms/issues/14620) by @duncanmcclean
+- Add Timezones components [#14612](https://github.com/statamic/cms/issues/14612) by @jasonvarga
+- Allow overriding date format preset options [#14600](https://github.com/statamic/cms/issues/14600) by @jasonvarga
+
+### What's fixed
+- Dirty state fixes [#14592](https://github.com/statamic/cms/issues/14592) by @jackmcdade
+- Localize timezone tooltip in DatePicker [#14596](https://github.com/statamic/cms/issues/14596) by @jasonvarga
+- Fix asset browser actions inside selector stack [#14565](https://github.com/statamic/cms/issues/14565) by @duncanmcclean
+- Fix date-only formats shifting days due to timezone conversion [#14552](https://github.com/statamic/cms/issues/14552) by @duncanmcclean
+- Avoid rendering time for dates in listings when appropriate [#14599](https://github.com/statamic/cms/issues/14599) by @jasonvarga
+- Display timezone in DateRangePicker [#14601](https://github.com/statamic/cms/issues/14601) by @jasonvarga
+- Fix date-only index fieldtype shifting across timezones [#14602](https://github.com/statamic/cms/issues/14602) by @jasonvarga
+- Memoize preprocessed fields in Validator [#14605](https://github.com/statamic/cms/issues/14605) by @jasonvarga
+- Show date fieldtype when searching for range [#14606](https://github.com/statamic/cms/issues/14606) by @jasonvarga
+- Fix error when typing in a required date range field [#14607](https://github.com/statamic/cms/issues/14607) by @jasonvarga
+- Fix HoverCard arrow not displaying [#14611](https://github.com/statamic/cms/issues/14611) by @jasonvarga
+- Adjust translation method usage [#14610](https://github.com/statamic/cms/issues/14610) by @jasonvarga
+- Fix stale asset listings across queued jobs [#14617](https://github.com/statamic/cms/issues/14617) by @ryanmitchell
+- Fix replicator fields using wrong site context [#14616](https://github.com/statamic/cms/issues/14616) by @ryanmitchell
+- Fix read-only/disabled states in `Radio` component [#14621](https://github.com/statamic/cms/issues/14621) by @duncanmcclean
+- Lazy-load actions for collections, submissions & terms [#14097](https://github.com/statamic/cms/issues/14097) by @duncanmcclean
+- Fix dated entries not syncing with origin revisions [#14216](https://github.com/statamic/cms/issues/14216) by @duncanmcclean
+- Fix DateRangePicker crash when selecting first date in a range [#13512](https://github.com/statamic/cms/issues/13512) by @andrii-trush
+- Fix moving custom section to 1st position in CP Nav [#12993](https://github.com/statamic/cms/issues/12993) by @duncanmcclean
+- Fix read-only state in publish forms [#14623](https://github.com/statamic/cms/issues/14623) by @duncanmcclean
+- Fix perPage limit in relationship stack listings [#14629](https://github.com/statamic/cms/issues/14629) by @wiktorm12
+- Bump postcss from 8.5.9 to 8.5.13 [#14595](https://github.com/statamic/cms/issues/14595) by @dependabot
+- Bump axios from 1.15.0 to 1.16.0 [#14613](https://github.com/statamic/cms/issues/14613) by @dependabot
+
+
+
+## 6.16.0 (2026-05-01)
+
+### What's new
+- Add support for strict null coalescence (`???`) in Antlers parsing [#14545](https://github.com/statamic/cms/issues/14545) by @marcorieser
+- Add hooks to asset listings [#14566](https://github.com/statamic/cms/issues/14566) by @edalzell
+- Show license key status in about and support:details commands [#14574](https://github.com/statamic/cms/issues/14574) by @jasonvarga
+- Support icon sets in names [#14579](https://github.com/statamic/cms/issues/14579) by @jasonvarga
+
+### What's fixed
+- Fix Comb search index delete() rewriting JSON when ref absent [#14550](https://github.com/statamic/cms/issues/14550) by @SUXUMI
+- Include missing time chars in `DateFormat::containsTime` [#14555](https://github.com/statamic/cms/issues/14555) by @jasonvarga
+- Update setup-cp-vite to install Vite 8 [#14559](https://github.com/statamic/cms/issues/14559) by @jasonvarga
+- Fix cache invalidation when using custom fields in URI route [#14564](https://github.com/statamic/cms/issues/14564) by @duncanmcclean
+- Fix validation bypass via spoofed Precognition-Validate-Only header [#14557](https://github.com/statamic/cms/issues/14557) by @duncanmcclean
+- Restore selected site when resuming session [#14562](https://github.com/statamic/cms/issues/14562) by @duncanmcclean
+- Fix relationship selector footer not sticking to bottom of stack [#14569](https://github.com/statamic/cms/issues/14569) by @duncanmcclean
+- Fix asset selector drag-to-upload covering footer but not handling drops [#14551](https://github.com/statamic/cms/issues/14551) by @duncanmcclean
+- Field margin balance [#14567](https://github.com/statamic/cms/issues/14567) by @jaygeorge
+- Harden OrderBys [#14572](https://github.com/statamic/cms/issues/14572) by @jasonvarga
+- Fix Asset field set to "Read-only" clipping filename [#14575](https://github.com/statamic/cms/issues/14575) by @jackmcdade
+- Fix login redirects [#14560](https://github.com/statamic/cms/issues/14560) by @jasonvarga
+- Design a better empty, read-only state for asset fields [#14578](https://github.com/statamic/cms/issues/14578) by @jackmcdade
+- Avoid per-icon requests in the Icon storybook [#14580](https://github.com/statamic/cms/issues/14580) by @jasonvarga
+- Fix updater crash when addon has no license [#14573](https://github.com/statamic/cms/issues/14573) by @duncanmcclean
+- Lazy load Inertia page components [#14582](https://github.com/statamic/cms/issues/14582) by @jasonvarga
+- Fix LivePreview listener leak and simplify Grid row updates [#14583](https://github.com/statamic/cms/issues/14583) by @jasonvarga
+- Fix SavePipeline initial debounce delay [#14586](https://github.com/statamic/cms/issues/14586) by @jasonvarga
+- Debounce LinkFieldtype URL writes [#14584](https://github.com/statamic/cms/issues/14584) by @jasonvarga
+- Extract fieldtype update debounce to shared constant [#14587](https://github.com/statamic/cms/issues/14587) by @jasonvarga
+- Wrap FieldAction instances with markRaw [#14589](https://github.com/statamic/cms/issues/14589) by @jasonvarga
+- Color swatches get borders for contrast [#14591](https://github.com/statamic/cms/issues/14591) by @jackmcdade
+- Deduplicate RelationshipInput in-flight item-data requests [#14590](https://github.com/statamic/cms/issues/14590) by @jasonvarga
+- German translations [#14561](https://github.com/statamic/cms/issues/14561) by @helloDanuk
+- French translations [#14585](https://github.com/statamic/cms/issues/14585) by @ebeauchamps
+
+
+
 ## 6.15.0 (2026-04-27)
 
 ### What's new

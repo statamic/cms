@@ -12,6 +12,8 @@ use Statamic\Facades\Path;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Git
 {
     private ?UserContract $authenticatedUser;

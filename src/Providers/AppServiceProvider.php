@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
@@ -26,6 +27,8 @@ use Statamic\Stache\Query\RevisionQueryBuilder;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\Scaffolding\TemplateGenerator;
+
+use function Statamic\trans as __;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -81,8 +84,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
+        $formsSource = config('statamic.templates.language', 'antlers') === 'blade'
+            ? "{$this->root}/resources/views/extend/forms/blade"
+            : "{$this->root}/resources/views/extend/forms/antlers";
+
         $this->publishes([
-            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
+            $formsSource => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
         $this->publishes([
@@ -301,6 +308,7 @@ class AppServiceProvider extends ServiceProvider
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
             'Addons' => $addons->count(),
+            'License Key' => fn () => Config::getLicenseKey() ? 'Set' : 'Not set',
             'Stache Watcher' => fn () => $this->stacheWatcher(),
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
             'Sites' => fn () => $this->sitesAboutCommandInfo(),

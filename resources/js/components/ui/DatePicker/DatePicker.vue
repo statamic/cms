@@ -1,5 +1,7 @@
 <script setup>
+import { config } from '@api';
 import { computed } from 'vue';
+import { normalizeLocale } from '../../FormattingLocale.js';
 import {
     DatePickerAnchor,
     DatePickerContent,
@@ -25,6 +27,8 @@ import Button from '../Button/Button.vue';
 import Calendar from '../Calendar/Calendar.vue';
 import Icon from '../Icon/Icon.vue';
 import Text from '../Text.vue';
+import TimezoneHoverCard from '../TimezoneHoverCard.vue';
+import { getAdditionalTimezones } from './util.js';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -102,9 +106,11 @@ const timeZoneLabel = computed(() => {
     const tz = timeZoneName.value;
     if (!tz) return null;
 
-    const parts = new Intl.DateTimeFormat(undefined, { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
+    const parts = new Intl.DateTimeFormat(normalizeLocale(config.get('translationLocale')), { timeZone: tz, timeZoneName: 'short' }).formatToParts(props.modelValue.toDate());
     return parts.find((p) => p.type === 'timeZoneName')?.value ?? tz;
 });
+
+const additionalTimezones = computed(() => getAdditionalTimezones(timeZoneName.value));
 
 const isInvalid = computed(() => {
     // Check if the component has invalid state from form validation
@@ -153,7 +159,7 @@ const getInputLabel = (part) => {
                 <DatePickerAnchor as-child>
                     <div
                         :class="[
-                            'flex w-full items-center bg-white uppercase dark:bg-gray-900',
+                            'flex w-full items-center overflow-x-auto overflow-y-hidden bg-white uppercase dark:bg-gray-900',
                             'border border-gray-300 dark:border-gray-700',
                             'text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
@@ -198,12 +204,14 @@ const getInputLabel = (part) => {
                                 </div>
                             </template>
                         </div>
-                        <Text
-                            class="text-gray-600 dark:text-gray-400 me-1"
-                            size="xs"
-                            v-tooltip="timeZoneName"
-                            :text="timeZoneLabel"
-                        />
+                        <TimezoneHoverCard
+                            v-if="timeZoneLabel"
+                            :date="modelValue.toDate()"
+                            :additional-timezones="additionalTimezones"
+                            side="top"
+                        >
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2.5 me-1" size="xs" :text="timeZoneLabel" />
+                        </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
                             @click="emit('update:modelValue', null)"

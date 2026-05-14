@@ -5,6 +5,8 @@ namespace Statamic\Http\Middleware;
 use Closure;
 use Statamic\Facades\Stache;
 
+use function Statamic\trans as __;
+
 class StacheLock
 {
     public function handle($request, Closure $next)

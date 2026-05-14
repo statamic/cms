@@ -356,6 +356,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    clearDirtyState();
     Statamic.$events.$emit('publish-container-destroyed', { name: props.name });
 });
 

@@ -42,8 +42,15 @@ class PasskeyLoginController extends Controller
 
     protected function successRedirectUrl(Request $request): string
     {
-        $redirect = $request->input('redirect', '/');
+        if (($redirect = $request->input('redirect')) && ! URL::isExternalToApplication($redirect)) {
+            return $redirect;
+        }
 
-        return URL::isExternalToApplication($redirect) ? '/' : $redirect;
+        return $request->session()->pull('url.intended', $this->defaultRedirectUrl());
+    }
+
+    protected function defaultRedirectUrl(): string
+    {
+        return '/';
     }
 }

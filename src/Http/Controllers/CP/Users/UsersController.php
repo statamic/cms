@@ -22,7 +22,10 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Symfony\Component\Mailer\Exception\TransportException;
+
+use function Statamic\trans as __;
 
 class UsersController extends CpController
 {
@@ -93,7 +96,7 @@ class UsersController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $users = $query->paginate(request('perPage'));
+        $users = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());

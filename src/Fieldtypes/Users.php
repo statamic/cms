@@ -14,7 +14,10 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class Users extends Relationship
 {
@@ -167,7 +170,7 @@ class Users extends Relationship
         };
 
         if ($request->boolean('paginate', true)) {
-            $users = $query->paginate();
+            $users = $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15);
 
             $users->getCollection()->transform($userFields);
 

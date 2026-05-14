@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class ElevatedSessionAuthorizationException extends \Exception
 {
     public function __construct()

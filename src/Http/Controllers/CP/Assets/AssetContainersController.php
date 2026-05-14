@@ -10,6 +10,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 
+use function Statamic\trans as __;
+
 class AssetContainersController extends CpController
 {
     public function show($container)
