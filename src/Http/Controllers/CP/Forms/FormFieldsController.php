@@ -10,6 +10,7 @@ use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Forms\Fields\Fallback;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
@@ -22,11 +23,7 @@ class FormFieldsController extends CpController
             'values' => 'array',
         ]);
 
-        try {
-            $fieldtype = FormFieldtypeRepository::find($request->type);
-        } catch (FormFieldtypeNotFoundException $e) {
-            $fieldtype = (new Fallback)->wrapping(FieldtypeRepository::find($request->type));
-        }
+        $fieldtype = $this->resolveFormFieldtype($request->type);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -58,6 +55,14 @@ class FormFieldsController extends CpController
     public function update(Request $request)
     {
         // todo
+
+    private function resolveFormFieldtype(string $type): ?FormFieldtype
+    {
+        try {
+            return FormFieldtypeRepository::find($type);
+        } catch (FormFieldtypeNotFoundException $e) {
+            return (new Fallback)->wrapping(FieldtypeRepository::find($type));
+        }
     }
 
     private function blueprint($blueprint)
