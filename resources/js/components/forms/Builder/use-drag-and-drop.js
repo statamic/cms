@@ -23,6 +23,8 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
     };
 
     const initDraggable = () => {
+        draggable?.destroy();
+
         const containers = document.querySelectorAll(DROP_ZONE_SELECTOR);
         if (containers.length === 0) return;
 
@@ -61,6 +63,8 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
     };
 
     const initSortable = () => {
+        sortable?.destroy();
+
         const containers = document.querySelectorAll(SORT_CONTAINER_SELECTOR);
         if (containers.length === 0) return;
 
