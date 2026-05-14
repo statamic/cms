@@ -27,10 +27,6 @@ const fieldtype = ref(null);
 const blueprint = ref(null);
 const activeTab = ref<FieldTabs>(FieldTabs.Settings);
 
-watch(values, (newValues) => {
-    field.value.config = newValues;
-});
-
 const load = () => {
     const cached = cache.get(field.value._id);
 
@@ -86,6 +82,19 @@ const load = () => {
 };
 
 watch(field, () => load());
+
+watch(
+    values,
+    (newValues) => {
+        field.value.config = newValues;
+
+        field.value.publishConfig = {
+            ...field.value.publishConfig,
+            ...newValues,
+        }
+    },
+    { deep: true }
+);
 
 onMounted(() => load());
 </script>
@@ -227,14 +236,6 @@ onMounted(() => load());
                                 </div>
                             </PublishFieldsProvider>
                         </PublishContainer>
-
-<!--                        <Field :label="__('Options')">-->
-<!--                            <TableFieldtype-->
-<!--                                handle="options"-->
-<!--                                v-model:value="optionRows"-->
-<!--                                :config="optionRowsConfig"-->
-<!--                            />-->
-<!--                        </Field>-->
                     </div>
                 </TabContent>
 

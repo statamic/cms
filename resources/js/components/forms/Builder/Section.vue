@@ -246,6 +246,7 @@ const inspectActionButton = (target) => {
                             <Field
                                 :class="{ 'opacity-60': field.config.hidden }"
                                 :label="field.config.display"
+                                :instructions="field.config.instructions"
                             >
                                 <template #label>
                                     <Label :class="{ 'cursor-pointer': !isEditingField(field) }">
