@@ -43,7 +43,9 @@ const dateFieldRoot = pickerRoot ?? rangeRoot;
 
 const showThisMonthShortcut = computed(() => props.showTodayShortcut && !!dateFieldRoot);
 
-const todayMonth = computed(() => startOfMonth(toCalendarDate(now(getLocalTimeZone()))));
+function currentMonth() {
+    return startOfMonth(toCalendarDate(now(getLocalTimeZone())));
+}
 
 /** Reka inject context is a plain object of refs; read placeholder here so navigation updates reliably. */
 const fieldPlaceholder = ref(undefined);
@@ -68,14 +70,14 @@ const thisMonthShortcutDisabled = computed(() => {
     if (!ph) {
         return false;
     }
-    return isSameMonth(toCalendarDate(ph), todayMonth.value);
+    return isSameMonth(toCalendarDate(ph), currentMonth());
 });
 
 function goToThisMonth() {
     if (!dateFieldRoot || thisMonthShortcutDisabled.value) {
         return;
     }
-    dateFieldRoot.onPlaceholderChange(todayMonth.value);
+    dateFieldRoot.onPlaceholderChange(currentMonth());
 }
 
 const components = computed(() => ({
