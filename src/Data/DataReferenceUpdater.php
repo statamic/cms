@@ -93,6 +93,13 @@ abstract class DataReferenceUpdater
      * Finds fields of a given type in the contents of a blueprint.
      * Returns dot-notation paths to the fields.
      *
+     * Note: This uses a simple heuristic that matches any nested array with
+     * a 'type' key whose value is in the given fieldtypes list. While this
+     * could theoretically match non-field structures, in practice blueprint
+     * contents don't contain these strings in other contexts (like validation
+     * rules), and downstream code guards against false matches by checking
+     * for the presence of required keys like 'sets'.
+     *
      * @param  array  $array
      * @param  array  $fieldtypes
      * @param  string|null  $dottedPrefix
