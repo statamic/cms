@@ -66,6 +66,22 @@ class BlueprintRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function it_includes_user_and_user_group_blueprints_in_all()
+    {
+        $this->repo->setDirectories($this->fakeStacheDirectory.'/dev-null/blueprints');
+
+        // Create user and user_group blueprints
+        $this->repo->make('user')->save();
+        $this->repo->make('user_group')->save();
+
+        $all = $this->repo->all();
+
+        $this->assertEveryItemIsInstanceOf(Blueprint::class, $all);
+        $this->assertContains('user', $all->map->fullyQualifiedHandle()->all());
+        $this->assertContains('user_group', $all->map->fullyQualifiedHandle()->all());
+    }
+
+    #[Test]
     public function it_gets_a_blueprint()
     {
         $contents = <<<'EOT'

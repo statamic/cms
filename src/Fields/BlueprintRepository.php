@@ -33,7 +33,13 @@ class BlueprintRepository
             ...$this->getAdditionalNamespaces()->keys()->all(),
         ];
 
-        return collect($namespaces)->flatMap(fn ($namespace) => $this->in($namespace)->values());
+        $rootLevelBlueprints = collect(['user', 'user_group'])
+            ->map(fn ($handle) => $this->find($handle))
+            ->filter();
+
+        return $rootLevelBlueprints->merge(
+            collect($namespaces)->flatMap(fn ($namespace) => $this->in($namespace)->values())
+        );
     }
 
     public function setDirectories(string|array $directories)

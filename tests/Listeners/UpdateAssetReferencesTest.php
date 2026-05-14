@@ -2268,6 +2268,48 @@ EOT;
         $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
     }
 
+    #[Test]
+    public function it_updates_references_in_set_configs_in_user_blueprints()
+    {
+        $this->assetHoff->path('set-previews/hoff.jpg')->save();
+
+        config()->set('statamic.assets.set_preview_images', [
+            'container' => 'test_container',
+            'folder' => 'set-previews',
+        ]);
+
+        $blueprint = Facades\Blueprint::make('user');
+
+        $blueprint->setContents([
+            'fields' => [
+                [
+                    'handle' => 'bio',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => 'hoff.jpg',
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $blueprint = Facades\Blueprint::find('user');
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.0.field.sets.set_group.sets.first_set.image'));
+
+        $this->assetHoff->path('set-previews/renamed-hoff.jpg')->save();
+
+        $blueprint = Facades\Blueprint::find('user');
+        $this->assertEquals('renamed-hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.0.field.sets.set_group.sets.first_set.image'));
+    }
+
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();
