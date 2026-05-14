@@ -117,6 +117,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                                 :key="fieldtype.handle"
                                 class="fieldtype-draggable list-none"
                                 :data-fieldtype="fieldtype.handle"
+                                tabindex="-1"
                             >
                                 <Button
                                     :text="__(fieldtype.title)"
@@ -162,6 +163,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                             :key="fieldtype.handle"
                             class="fieldtype-draggable list-none"
                             :data-fieldtype="fieldtype.handle"
+                            tabindex="-1"
                         >
                             <Button
                                 :text="__(fieldtype.title)"
