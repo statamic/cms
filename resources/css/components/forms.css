@@ -22,6 +22,13 @@
             border-radius: 10px;
             @apply bg-blue-50;
         }
+        /* Adjust for the first and last field in a section because of the surrounding block padding */
+        &:first-child::before {
+            inset-block-start: calc(-1.25rem - 1px);
+        }
+        &:last-child::before {
+            inset-block-end: calc(-1.25rem - 1px);
+        }
     }
     /* Editing a button like "Next page" and "Submit" */
     :has(> button&) {
