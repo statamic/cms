@@ -401,6 +401,18 @@ EOT;
     }
 
     #[Test]
+    public function it_only_dispatches_one_commit_job_at_a_time()
+    {
+        Queue::fake();
+
+        Git::dispatchCommit();
+        Git::dispatchCommit();
+        Git::dispatchCommit();
+
+        Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
+    }
+
+    #[Test]
     public function it_doesnt_push_by_default()
     {
         Git::shouldReceive('push')->never();
