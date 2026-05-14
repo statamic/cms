@@ -38,7 +38,9 @@ return [
     |
     */
 
-    'improved_types' => env('STATAMIC_GRAPHQL_IMPROVED_TYPES', true),
+    'improved_types' => [
+        'enabled' => env('STATAMIC_GRAPHQL_IMPROVED_TYPES', true),
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -459,7 +459,7 @@ class Entries extends Relationship
     public function toGqlType()
     {
         // Fallback to old behaviour if improved types are disabled.
-        if (! config('statamic.graphql.improved_types', false)) {
+        if (! config('statamic.graphql.improved_types.enabled', false)) {
             $type = GraphQL::type('EntryInterface');
 
             if ($this->config('max_items') !== 1) {

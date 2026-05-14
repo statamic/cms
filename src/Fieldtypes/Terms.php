@@ -531,7 +531,7 @@ class Terms extends Relationship
 
     public function toGqlType()
     {
-        if (! config('statamic.graphql.improved_types', false)) {
+        if (! config('statamic.graphql.improved_types.enabled', false)) {
             $type = GraphQL::type(TermInterface::NAME);
 
             if ($this->config('max_items') !== 1) {

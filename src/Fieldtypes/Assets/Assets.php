@@ -494,7 +494,7 @@ class Assets extends Fieldtype
     public function toGqlType()
     {
         // Fallback to old behaviour if improved types are disabled.
-        if (! config('statamic.graphql.improved_types', false)) {
+        if (! config('statamic.graphql.improved_types.enabled', false)) {
             $type = GraphQL::type(AssetInterface::NAME);
 
             if ($this->config('max_files') !== 1) {

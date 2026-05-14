@@ -22,7 +22,7 @@ class AssetsFieldtypeGqlTypeTest extends TestCase
     #[Test]
     public function it_uses_asset_interface_when_improved_types_are_disabled()
     {
-        config()->set('statamic.graphql.improved_types', false);
+        config()->set('statamic.graphql.improved_types.enabled', false);
 
         GraphQL::shouldReceive('type')
             ->once()
@@ -41,7 +41,7 @@ class AssetsFieldtypeGqlTypeTest extends TestCase
     #[Test]
     public function it_uses_a_concrete_asset_type_when_a_container_is_configured()
     {
-        config()->set('statamic.graphql.improved_types', true);
+        config()->set('statamic.graphql.improved_types.enabled', true);
 
         Storage::fake('test', ['url' => '/assets']);
         AssetContainer::make('photos')->disk('test')->save();
@@ -66,7 +66,7 @@ class AssetsFieldtypeGqlTypeTest extends TestCase
     #[Test]
     public function it_wraps_in_non_null_list_when_max_files_is_not_one()
     {
-        config()->set('statamic.graphql.improved_types', true);
+        config()->set('statamic.graphql.improved_types.enabled', true);
 
         Storage::fake('test', ['url' => '/assets']);
         AssetContainer::make('documents')->disk('test')->save();
