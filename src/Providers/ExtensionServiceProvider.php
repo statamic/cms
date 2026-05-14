@@ -140,6 +140,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fields\MultiChoice::class,
         Forms\Fields\Name::class,
         Forms\Fields\Number::class,
+        Forms\Fields\Phone::class,
         Forms\Fields\ShortAnswer::class,
         Forms\Fields\TimePicker::class,
         Forms\Fields\Toggle::class,
