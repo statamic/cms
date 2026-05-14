@@ -144,6 +144,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fields\TimePicker::class,
         Forms\Fields\Toggle::class,
         Forms\Fields\Website::class,
+        Forms\Fields\YesNo::class,
     ];
 
     protected $modifierAliases = [
