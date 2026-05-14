@@ -6,6 +6,8 @@ import { computed, ref, onMounted, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import axios from 'axios';
 
+const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
+
 const { form, inspecting: field } = injectBuilderContext();
 
 enum FieldTabs {
@@ -14,7 +16,7 @@ enum FieldTabs {
     Validation = 'validation',
 }
 
-const loading = ref(true);
+const loading = ref(!cache.has(field.value._id));
 const error = ref(null);
 const errors = ref({});
 const values = ref(null);
@@ -30,6 +32,21 @@ watch(values, (newValues) => {
 });
 
 const load = () => {
+    const cached = cache.get(field.value._id);
+
+    if (cached) {
+        loading.value = false;
+        fieldtype.value = cached.fieldtype;
+        blueprint.value = cached.blueprint;
+        values.value = cached.values;
+        meta.value = cached.meta;
+        originValues.value = cached.originValues;
+        originMeta.value = cached.originMeta;
+        return;
+    }
+
+    loading.value = true;
+
     axios
         .post(cp_url(`forms/${form.handle}/builder/fields/edit`), {
             type: field.value.fieldtype,
@@ -44,6 +61,15 @@ const load = () => {
             meta.value = response.data.meta;
             originValues.value = response.data.originValues;
             originMeta.value = response.data.originMeta;
+
+            cache.set(field.value._id, {
+                fieldtype: response.data.fieldtype,
+                blueprint: response.data.blueprint,
+                values: response.data.values,
+                meta: response.data.meta,
+                originValues: response.data.originValues,
+                originMeta: response.data.originMeta,
+            });
         })
         .catch((e) => {
             loading.value = false;
@@ -58,6 +84,8 @@ const load = () => {
             }
         });
 };
+
+watch(field, () => load());
 
 onMounted(() => load());
 </script>

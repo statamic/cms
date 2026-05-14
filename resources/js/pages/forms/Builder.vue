@@ -263,7 +263,7 @@ const inspectorTarget = ref('field');
 
     <LayoutPanel side="right">
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
-        <FieldInspector v-if="inspectorType === InspectorType.Field" :key="inspecting?._id" />
+        <FieldInspector v-if="inspectorType === InspectorType.Field" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
     </LayoutPanel>
 </template>
