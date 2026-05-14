@@ -20,7 +20,7 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
+                    class="absolute inset-0 z-(--z-index-above) flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
                 >
                     <ui-icon name="upload-cloud" class="size-5" />
                     <span class="text-sm">{{ __('Drop to Upload') }}</span>
@@ -88,6 +88,10 @@
                     />
                 </div>
 
+                <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
+                    <ui-icon name="assets" class="size-5 text-gray-300 dark:text-gray-700 mx-auto" />
+                </div>
+
                 <template v-if="expanded">
                     <sortable-list
                         v-if="expanded && displayMode === 'grid'"
@@ -97,15 +101,14 @@
                         v-model="assets"
                         :animate="false"
                         :constrain-dimensions="true"
-                        :disabled="config.disabled"
+                        :disabled="config.disabled || isReadOnly"
                         :distance="5"
-                        :read-only="isReadOnly"
                         @dragend="$emit('blur')"
                         @dragstart="$emit('focus')"
                     >
                         <div
-                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 border-t-0 rounded-t-none dark:bg-gray-850 dark:border-gray-700"
-                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
                             ref="assets"
                             style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
                         >
@@ -125,7 +128,11 @@
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none" v-if="displayMode === 'list'">
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
+                        v-if="displayMode === 'list'"
+                    >
                         <table class="table-fixed w-full">
                             <thead class="sr-only">
                                 <tr>
@@ -137,10 +144,9 @@
                                 v-model="assets"
                                 item-class="asset-row"
                                 handle-class="asset-row"
-                                :disabled="config.disabled"
+                                :disabled="config.disabled || isReadOnly"
                                 :distance="5"
                                 :mirror="false"
-                                :read-only="isReadOnly"
                                 :vertical="true"
                             >
                                 <tbody ref="assets">

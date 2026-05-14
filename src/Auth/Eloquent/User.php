@@ -303,7 +303,11 @@ class User extends BaseUser
 
     public function merge($data)
     {
-        $this->data($this->data()->merge(collect($data)->filter(fn ($v) => $v !== null)->all()));
+        $merged = $this->data()
+            ->except(['roles', 'groups'])
+            ->merge(collect($data)->filter(fn ($v) => $v !== null)->all());
+
+        $this->data($merged->all());
 
         return $this;
     }

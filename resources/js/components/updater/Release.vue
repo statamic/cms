@@ -4,7 +4,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <ui-heading :text="release.version" />
-                    <ui-badge v-if="release.critical" :text="__('Critical')" color="red" size="sm" />
+                    <ui-badge v-if="release.security" :text="__('Security')" color="red" size="sm" />
                 </div>
                 <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>

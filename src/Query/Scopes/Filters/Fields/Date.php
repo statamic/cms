@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Carbon;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Date extends FieldtypeFilter
 {
     public function fieldItems()

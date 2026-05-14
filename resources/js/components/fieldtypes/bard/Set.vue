@@ -18,12 +18,12 @@
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md border-b-1 border-b-transparent"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
-                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none border-b-gray-300! dark:border-b-white/10!': !collapsed
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
-                <span v-if="!isReadOnly" draggable="true" data-drag-handle class="flex cursor-grab">
+                <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
                     <Icon name="handles" class="size-4 text-gray-400" />
                 </span>
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-4 p-2 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
@@ -51,7 +51,7 @@
 
                     <Dropdown>
                         <template #trigger>
-                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -77,10 +77,16 @@
                 </div>
             </header>
 
-            <div v-if="index !== undefined" v-show="!collapsed" :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }">
+            <div
+                v-if="index !== undefined && hasFields"
+                v-show="!collapsed"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
+            >
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
+                    :read-only="isReadOnly"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >
@@ -141,6 +147,12 @@ export default {
     computed: {
         fields() {
             return this.config.fields;
+        },
+
+        hasFields() {
+            return Array.isArray(this.fields)
+                ? this.fields.length > 0
+                : Object.keys(this.fields || {}).length > 0;
         },
 
         display() {
@@ -318,6 +330,19 @@ export default {
                 this.getPos,
             );
         },
+
+        enableDragging() {
+            this._draggableObserver?.disconnect();
+            this.$el.setAttribute('draggable', true);
+
+            document.addEventListener('mouseup', this.disableDragging, { once: true });
+            document.addEventListener('dragend', this.disableDragging, { once: true });
+        },
+
+        disableDragging() {
+            this.$el.setAttribute('draggable', false);
+            this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
     },
 
     mounted() {
@@ -325,6 +350,7 @@ export default {
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
 				if (! values) return;
+                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
 
                 this.updateAttributes({ values });
             },

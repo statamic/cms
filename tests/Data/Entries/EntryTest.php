@@ -703,6 +703,31 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function structured_entry_uri_updates_when_custom_field_in_route_changes()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
+        ]);
+
+        $collection = tap((new Collection)->handle('pages')->routes('{slug}/{test}'))->save();
+
+        $entry = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('page')->set('test', 'foo'))->save();
+
+        $collection->structureContents(['expects_root' => false])->save();
+        $collection->structure()->in('en')->tree([['entry' => '1']])->save();
+
+        // Warm the structure caches like they would be in production.
+        Blink::store('entry-uris')->flush();
+        $this->assertEquals('/page/foo', $entry->uri());
+
+        $entry->set('test', 'bar');
+        $entry->save();
+
+        Blink::store('entry-uris')->flush();
+        $this->assertEquals('/page/bar', $entry->uri());
+    }
+
+    #[Test]
     public function it_gets_and_sets_supplemental_data()
     {
         $entry = new Entry;
@@ -1430,7 +1455,6 @@ class EntryTest extends TestCase
         $cached = Cache::get('stache::items::entries::blog::1');
         $reflection = new ReflectionClass($cached);
         $property = $reflection->getProperty('withEvents');
-        $property->setAccessible(true);
         $withEvents = $property->getValue($cached);
         $this->assertTrue($withEvents);
     }
@@ -2022,6 +2046,35 @@ class EntryTest extends TestCase
         // entry level template overrides `@blueprint` on the collection
         $entry->template('articles.custom');
         $this->assertEquals('articles.custom', $entry->template());
+    }
+
+    #[Test]
+    public function it_respects_custom_blueprint_template_path_per_collection()
+    {
+        config(['statamic.system.blueprint_templates' => [
+            'articles' => 'custom.path',
+        ]]);
+
+        $articles = tap(Collection::make('articles')->template('@blueprint'))->save();
+        $pages = tap(Collection::make('pages')->template('@blueprint'))->save();
+        $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
+
+        $articleEntry = Entry::make('test')->collection($articles)->blueprint($blueprint->handle());
+        $pageEntry = Entry::make('test')->collection($pages)->blueprint($blueprint->handle());
+
+        // mapped collection uses the mapped prefix instead of the collection handle
+        $this->assertEquals('custom.path.standard_article', $articleEntry->template());
+
+        // unmapped collection still uses its handle as the prefix
+        $this->assertEquals('pages.standard_article', $pageEntry->template());
+
+        // mapped collection uses slugified prefix when that template exists
+        View::shouldReceive('exists')->with('custom.path.standard-article')->andReturn(true);
+        $this->assertEquals('custom.path.standard-article', $articleEntry->template());
+
+        // entry level template still overrides @blueprint
+        $articleEntry->template('articles.custom');
+        $this->assertEquals('articles.custom', $articleEntry->template());
     }
 
     #[Test]

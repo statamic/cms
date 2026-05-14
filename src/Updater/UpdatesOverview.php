@@ -15,7 +15,7 @@ class UpdatesOverview
 
     protected $count;
     protected $statamic;
-    protected $critical;
+    protected $security;
     protected $addons;
 
     /**
@@ -49,25 +49,25 @@ class UpdatesOverview
     }
 
     /**
-     * Check if a critical update is available (Statamic or any addon).
+     * Check if a security update is available (Statamic or any addon).
      *
      * @return bool
      */
-    public function hasCriticalUpdate()
+    public function hasSecurityUpdate()
     {
-        return $this->getCached('updates-overview.critical');
+        return $this->getCached('updates-overview.security');
     }
 
     /**
-     * Get badge data (count and whether there is a critical update).
+     * Get badge data (count and whether there is a security update).
      *
-     * @return array{count: int, critical: bool}
+     * @return array{count: int, security: bool}
      */
     public function badge()
     {
         return [
             'count' => $this->count(),
-            'critical' => $this->hasCriticalUpdate(),
+            'security' => $this->hasSecurityUpdate(),
         ];
     }
 
@@ -107,7 +107,7 @@ class UpdatesOverview
     {
         $this->count = 0;
         $this->statamic = false;
-        $this->critical = false;
+        $this->security = false;
         $this->addons = [];
 
         return $this;
@@ -131,8 +131,8 @@ class UpdatesOverview
             $this->count++;
         }
 
-        if ($this->statamic && Marketplace::statamic()->changelog()->hasCriticalUpdate()) {
-            $this->critical = true;
+        if ($this->statamic && Marketplace::statamic()->changelog()->hasSecurityUpdate()) {
+            $this->security = true;
         }
 
         return $this;
@@ -148,8 +148,8 @@ class UpdatesOverview
         $updatableAddons = Addon::all()->reject->isLatestVersion();
 
         foreach ($updatableAddons as $addon) {
-            if ($addon->changelog()->hasCriticalUpdate()) {
-                $this->critical = true;
+            if ($addon->changelog()->hasSecurityUpdate()) {
+                $this->security = true;
                 break;
             }
         }
@@ -171,7 +171,7 @@ class UpdatesOverview
 
         Cache::put('updates-overview.count', $this->count, $expiry);
         Cache::put('updates-overview.statamic', $this->statamic, $expiry);
-        Cache::put('updates-overview.critical', $this->critical, $expiry);
+        Cache::put('updates-overview.security', $this->security, $expiry);
         Cache::put('updates-overview.addons', $this->addons, $expiry);
 
         return $this;

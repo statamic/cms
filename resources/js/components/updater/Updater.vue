@@ -4,7 +4,7 @@
             <template v-if="!gettingChangelog" #actions>
                 {{ currentVersion }}
                 <ui-badge v-if="onLatestVersion" :text="__('Up to date')" color="green" size="lg" icon="checkmark" />
-                <ui-badge v-else-if="criticalUpdateAvailable" :text="__('Critical update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
+                <ui-badge v-else-if="securityUpdateAvailable" :text="__('Security update available')" color="red" size="lg" icon="alert-warning-exclamation-mark" />
                 <ui-badge v-else :text="__('Update available')" color="amber" size="lg" icon="alert-warning-exclamation-mark" />
             </template>
         </ui-header>
@@ -95,10 +95,10 @@ export default {
             return this.currentVersion && this.currentVersion == this.latestVersion;
         },
 
-        criticalUpdateAvailable() {
+        securityUpdateAvailable() {
             return this.currentVersion && this.changelog
                 .filter((release) => release.type === 'upgrade')
-                .some((release) => release.critical);
+                .some((release) => release.security);
         },
 
         licensedReleases() {

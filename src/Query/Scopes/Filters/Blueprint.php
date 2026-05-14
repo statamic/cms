@@ -7,6 +7,8 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Blueprint extends Filter
 {
     protected $pinned = true;

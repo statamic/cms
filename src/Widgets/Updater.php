@@ -23,7 +23,7 @@ class Updater extends Widget
             return [
                 'name' => $addon->name(),
                 'count' => $changelog->availableUpdatesCount(),
-                'critical' => $changelog->hasCriticalUpdate(),
+                'security' => $changelog->hasSecurityUpdate(),
                 'url' => cp_route('updater.product', $addon->slug()),
             ];
         });
@@ -33,7 +33,7 @@ class Updater extends Widget
             $items->push([
                 'name' => 'Statamic Core',
                 'count' => $changelog->availableUpdatesCount(),
-                'critical' => $changelog->hasCriticalUpdate(),
+                'security' => $changelog->hasSecurityUpdate(),
                 'url' => cp_route('updater.product', 'statamic'),
             ]);
         }

@@ -184,6 +184,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Crop Aspect Ratios
+    |--------------------------------------------------------------------------
+    |
+    | Configure the aspect ratio presets available in the Control Panel image
+    | crop editor. Each entry may be a "W:H" string (e.g. "16:9") or an array
+    | with a custom label and ratio: ['label' => 'Wide', 'ratio' => '16:9'].
+    |
+    */
+
+    'crop_aspect_ratios' => [
+        '16:9',
+        '4:3',
+        '3:2',
+        '2:1',
+        '1:1',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Enforce Lowercase Filenames
     |--------------------------------------------------------------------------
     |
@@ -206,6 +225,19 @@ return [
     */
 
     'additional_uploadable_extensions' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Additional Filename Character Replacements
+    |--------------------------------------------------------------------------
+    |
+    | When uploading files, certain characters in filenames will be replaced
+    | to ensure a safe filename. You may configure additional replacements.
+    | These are in addition to the native ones. They are not overridable.
+    |
+    */
+
+    'additional_filename_replacements' => [],
 
     /*
     |--------------------------------------------------------------------------

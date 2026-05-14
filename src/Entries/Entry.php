@@ -508,7 +508,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return;
         }
 
-        if (empty($ids = $page->flattenedPages()->pluck('id'))) {
+        $ids = $page->flattenedPages()->pluck('id');
+
+        if ($ids->isEmpty()) {
             return;
         }
 
@@ -540,7 +542,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 $format .= 's';
             }
 
-            $prefix = $this->date->format($format).'.';
+            $prefix = $this->date->copy()->setTimezone(config('app.timezone'))->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -581,7 +583,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle().'.'.$this->blueprint();
+        $handle = $this->collection()->handle();
+        $prefix = config('statamic.system.blueprint_templates.'.$handle, $handle);
+
+        $template = $prefix.'.'.$this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
@@ -773,7 +778,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            if ($this->isRoot() || $this->blueprint()->field('date')->isLocalizable()) {
+                $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
+            }
         }
 
         return $entry;
@@ -1139,7 +1146,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('entry-uris')->forget($this->id());
         }
 
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -1150,6 +1157,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'blueprint', 'collection', 'collectionHandle', 'date', 'editUrl', 'hasDate', 'hasExplicitDate', 'hasOrigin',
+            'hasSeconds', 'hasStructure', 'hasTime', 'id', 'isRedirect', 'isRoot', 'lastModified', 'lastModifiedBy',
+            'layout', 'locale', 'order', 'path', 'private', 'published', 'redirectUrl', 'reference', 'site', 'sites', 'slug',
+            'status', 'template', 'uri', 'url', 'urlWithoutRedirect',
+        ];
     }
 
     public function getSearchValue(string $field)

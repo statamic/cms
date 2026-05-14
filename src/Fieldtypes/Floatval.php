@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 
+use function Statamic\trans as __;
+
 class Floatval extends Fieldtype
 {
     protected $categories = ['number'];

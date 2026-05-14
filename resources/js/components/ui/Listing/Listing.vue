@@ -237,6 +237,17 @@ watch(
     }
 );
 
+const removeFromSelections = (ids) => selections.value = selections.value.filter(selection => !ids.includes(selection));
+Statamic.$events.$on('removeFromSelections', removeFromSelections);
+
+const replaceInSelections = (replacements) => selections.value = selections.value.map(selection => replacements[selection] ?? selection);
+Statamic.$events.$on('replaceInSelections', replaceInSelections);
+
+onBeforeUnmount(() => {
+    Statamic.$events.$off('removeFromSelections', removeFromSelections);
+    Statamic.$events.$off('replaceInSelections', replaceInSelections);
+});
+
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
@@ -666,6 +677,7 @@ provideListingContext({
 defineExpose({
     refresh,
     setFilter,
+    parameters,
 });
 
 watch(parameters, (newParams, oldParams) => {
@@ -731,7 +743,7 @@ autoApplyState();
                 v-text="__('No results')"
             />
 
-            <Panel v-else class="relative overflow-x-auto overscroll-x-contain" style="container-type: scroll-state;">
+            <Panel v-else class="relative overflow-x-auto" style="container-type: scroll-state;">
                 <Table>
                     <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                         <component :is="slot" v-bind="slotProps" />
