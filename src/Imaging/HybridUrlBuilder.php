@@ -53,7 +53,7 @@ class HybridUrlBuilder extends ImageUrlBuilder
         $mapping = match ($this->itemType()) {
             'asset' => ['type' => 'asset', 'id' => $this->item->id(), 'params' => $params],
             'url' => ['type' => 'url', 'url' => $this->item, 'params' => $params],
-            'id' => ['type' => 'asset', 'id' => str_replace('/', '::', $this->item), 'params' => $params],
+            'id' => ['type' => 'asset', 'id' => $this->item, 'params' => $params],
             'path' => ['type' => 'path', 'path' => $this->item, 'params' => $params],
             default => throw new Exception('Cannot build a hybrid Glide URL without a URL, path, or asset.'),
         };

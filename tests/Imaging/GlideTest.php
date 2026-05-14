@@ -245,6 +245,32 @@ class GlideTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('hybridCaching')]
+    public function hybrid_caching_generates_image_on_first_request_by_asset_id_string()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        $assetId = 'test_container::foo/hoff.jpg';
+        $url = $this->app->make(UrlBuilder::class)->build($assetId, ['w' => 100]);
+
+        $asset = Asset::find($assetId);
+        $resolver = new GlideCachePathResolver($this->app->make(Server::class));
+        $expectedPath = $resolver->resolveForAsset($asset, ['w' => 100]);
+
+        $this->assertFalse(Glide::cacheDisk()->exists($expectedPath));
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+        $this->assertTrue(Glide::cacheDisk()->exists($expectedPath));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
     public function hybrid_caching_generates_image_on_first_request_by_path()
     {
         $fakeImage = UploadedFile::fake()->image('test-path.jpg', 30, 60);
