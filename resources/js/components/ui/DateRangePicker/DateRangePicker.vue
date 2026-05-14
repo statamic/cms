@@ -56,6 +56,7 @@ const calendarBindings = computed(() => ({
     modelValue: props.modelValue ?? [],
     min: props.min,
     max: props.max,
+    inline: props.inline,
     components: {
         Root: DateRangePickerCalendar,
         Header: DateRangePickerHeader,
