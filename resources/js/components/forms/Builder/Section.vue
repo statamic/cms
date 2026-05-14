@@ -102,10 +102,6 @@ const removeField = (fieldId) => {
     delete section.values[field.handle];
     delete section.meta[field.handle];
 
-    if (section.fields.length === 0) {
-        toggleCollapsed();
-    }
-
     clearInspector();
 };
 
