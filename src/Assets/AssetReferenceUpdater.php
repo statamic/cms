@@ -76,8 +76,9 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     protected function updateBlueprintFields()
     {
         if (
-            ! Sets::previewImageConfig()
-            || ! Str::startsWith($this->originalValue, Sets::previewImageConfig()['folder'].'/')
+            ! ($config = Sets::previewImageConfig())
+            || $this->container !== $config['container']
+            || ! Str::startsWith($this->originalValue, $config['folder'].'/')
         ) {
             return;
         }

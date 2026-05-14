@@ -2217,6 +2217,57 @@ EOT;
         $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
     }
 
+    #[Test]
+    public function it_doesnt_update_set_configs_when_asset_is_in_different_container_with_same_folder()
+    {
+        config(['filesystems.disks.other_disk' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/tmp/other',
+        ]]);
+
+        $otherContainer = tap(Facades\AssetContainer::make()->handle('other_container')->disk('other_disk'))->save();
+        $otherAsset = tap(Facades\Asset::make()->container('other_container')->path('set-previews/hoff.jpg'))->save();
+
+        config()->set('statamic.assets.set_preview_images', [
+            'container' => 'test_container',
+            'folder' => 'set-previews',
+        ]);
+
+        $collection = tap(Facades\Collection::make('articles'))->save();
+        $blueprint = $collection->entryBlueprint();
+
+        $blueprint->setContents([
+            'fields' => [
+                [
+                    'handle' => 'content',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'set_group' => [
+                                'sets' => [
+                                    'first_set' => [
+                                        'image' => 'hoff.jpg',
+                                        'fields' => [['handle' => 'foo', 'field' => ['type' => 'text']]],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+
+        // Rename asset in the other container (not the configured preview images container)
+        $otherAsset->path('set-previews/renamed-hoff.jpg')->save();
+
+        // Blueprint should NOT be updated since the asset is in a different container
+        $blueprint = Facades\Blueprint::find($blueprint->fullyQualifiedHandle());
+        $this->assertEquals('hoff.jpg', Arr::get($blueprint->contents(), 'tabs.main.sections.0.fields.1.field.sets.set_group.sets.first_set.image'));
+    }
+
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();

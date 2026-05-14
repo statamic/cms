@@ -115,8 +115,9 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
             });
 
         Blueprint::all()
-            ->each(function ($blueprint) use ($originalPath, $newPath, &$hasUpdatedItems) {
+            ->each(function ($blueprint) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
                 $updated = AssetReferenceUpdater::item($blueprint)
+                    ->filterByContainer($container)
                     ->updateReferences($originalPath, $newPath);
 
                 if ($updated) {
@@ -125,8 +126,9 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
             });
 
         Fieldset::all()
-            ->each(function ($fieldset) use ($originalPath, $newPath, &$hasUpdatedItems) {
+            ->each(function ($fieldset) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
                 $updated = AssetReferenceUpdater::item($fieldset)
+                    ->filterByContainer($container)
                     ->updateReferences($originalPath, $newPath);
 
                 if ($updated) {
