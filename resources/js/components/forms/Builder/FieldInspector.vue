@@ -68,8 +68,6 @@ const load = () => {
             });
         })
         .catch((e) => {
-            loading.value = false;
-
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 error.value = message;
