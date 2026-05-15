@@ -125,6 +125,7 @@ const clearInspector = () => inspect(null);
 
 provideBuilderContext({
     form: props.form,
+    sections,
     fieldView,
     inspecting,
     inspectorType,

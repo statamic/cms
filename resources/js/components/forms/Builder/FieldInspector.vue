@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
-import TableFieldtype from '@/components/fieldtypes/TableFieldtype.vue';
-import { Button, Field, Icon, Input, Textarea, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishField } from '@ui';
-import { computed, ref, onMounted, watch } from 'vue';
+import { Button, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishField, Icon } from '@ui';
+import { ref, onMounted, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
+import debounce from '@/util/debounce.js';
 import axios from 'axios';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { form, inspecting: field } = injectBuilderContext();
+const { form, sections, inspecting: field } = injectBuilderContext();
 
 enum FieldTabs {
     Settings = 'settings',
@@ -79,21 +79,35 @@ const load = () => {
         });
 };
 
+const updatePreview = debounce(() => {
+    axios
+        .post(cp_url(`forms/${form.handle}/builder/fields/update`), {
+            type: field.value.fieldtype,
+            values: values.value,
+        })
+        .then((response) => {
+            field.value.config = response.data.values;
+
+            if (response.data.preview) {
+                field.value.publishConfig = {
+                    ...response.data.preview.config,
+                    handle: field.value.handle,
+                };
+
+                const section = sections.value.find((section) => section.fields.some((f) => f._id === field.value._id));
+
+                if (section) {
+                    section.values[field.value.handle] = response.data.preview.value;
+                    section.meta[field.value.handle] = response.data.preview.meta;
+                }
+            }
+
+            cache.delete(field.value._id);
+        });
+}, 500);
+
 watch(field, () => load());
-
-watch(
-    values,
-    (newValues) => {
-        field.value.config = newValues;
-
-        // todo: get rid of this, and regenerate publishconfig & meta on server when we do validation
-        field.value.publishConfig = {
-            ...field.value.publishConfig,
-            ...newValues,
-        }
-    },
-    { deep: true }
-);
+watch(values, () => updatePreview(), { deep: true });
 
 onMounted(() => load());
 </script>
