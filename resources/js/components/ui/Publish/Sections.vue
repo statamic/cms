@@ -115,9 +115,7 @@ function toggleSection(section) {
 }
 
 .publish-section-collapsible--expanded .publish-section-collapsible__inner {
-    animation:
-        make-visible 0ms 0ms forwards,
-        unset-overflow 0ms var(--speed) forwards;
+    animation: calc(var(--speed) * 2) var(--timing) section-fade-in both;
     overflow: clip;
 }
 
@@ -128,10 +126,9 @@ function toggleSection(section) {
     overflow: clip;
 }
 
-@keyframes make-visible   { from { visibility: hidden; } to { visibility: visible; } }
+@keyframes section-fade-in { from { opacity: 0%; } to { opacity: 100%; } }
 @keyframes make-invisible { from { visibility: visible; } to { visibility: hidden; } }
 @keyframes collapse-rows  { from { grid-template-rows: 1fr; } to { grid-template-rows: 0fr; } }
 @keyframes expand-rows    { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
 @keyframes clip-overflow  { to { overflow: clip; } }
-@keyframes unset-overflow { to { overflow: visible; } }
 </style>
