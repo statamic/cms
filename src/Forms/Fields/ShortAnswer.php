@@ -19,11 +19,6 @@ class ShortAnswer extends FormFieldtype
                 'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                 'type' => 'text',
             ],
-            'character_limit' => [
-                'display' => __('Character Limit'),
-                'instructions' => __('statamic::fieldtypes.text.config.character_limit_instructions'),
-                'type' => 'integer',
-            ],
         ];
     }
 
@@ -32,8 +27,7 @@ class ShortAnswer extends FormFieldtype
         return [
             'type' => 'text',
             'placeholder' => $this->config('placeholder'),
-            'character_limit' => $this->config('character_limit'),
-            ...Arr::except($this->config(), ['type', 'placeholder', 'character_limit']),
+            ...Arr::except($this->config(), ['type', 'placeholder']),
         ];
     }
 

@@ -15,13 +15,11 @@ class ShortAnswerTest extends TestCase
         $fieldtype = (new ShortAnswer)->setField(new FormField('name', [
             'type' => 'short_answer',
             'placeholder' => 'Your name',
-            'character_limit' => 30,
         ]));
 
         $this->assertEquals([
             'type' => 'text',
             'placeholder' => 'Your name',
-            'character_limit' => 30,
         ], $fieldtype->toFieldArray());
     }
 
@@ -31,14 +29,12 @@ class ShortAnswerTest extends TestCase
         $fieldtype = (new ShortAnswer)->setField(new FormField('name', [
             'type' => 'short_answer',
             'placeholder' => 'Your name',
-            'character_limit' => 30,
             'default' => 'David Hasselhoff',
         ]));
 
         $this->assertEquals([
             'type' => 'text',
             'placeholder' => 'Your name',
-            'character_limit' => 30,
             'default' => 'David Hasselhoff',
         ], $fieldtype->toFieldArray());
     }

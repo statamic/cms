@@ -15,13 +15,11 @@ class LongAnswerTest extends TestCase
         $fieldtype = (new LongAnswer)->setField(new FormField('message', [
             'type' => 'long_answer',
             'placeholder' => 'Your message',
-            'character_limit' => 30,
         ]));
 
         $this->assertEquals([
             'type' => 'textarea',
             'placeholder' => 'Your message',
-            'character_limit' => 30,
         ], $fieldtype->toFieldArray());
     }
 
@@ -31,14 +29,12 @@ class LongAnswerTest extends TestCase
         $fieldtype = (new LongAnswer)->setField(new FormField('message', [
             'type' => 'long_answer',
             'placeholder' => 'Your message',
-            'character_limit' => 30,
             'default' => 'David Hasselhoff',
         ]));
 
         $this->assertEquals([
             'type' => 'textarea',
             'placeholder' => 'Your message',
-            'character_limit' => 30,
             'default' => 'David Hasselhoff',
         ], $fieldtype->toFieldArray());
     }
