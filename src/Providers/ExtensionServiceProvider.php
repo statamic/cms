@@ -133,6 +133,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $formFieldtypes = [
         Forms\Fields\Checkboxes::class,
+        Forms\Fields\Currency::class,
         Forms\Fields\Dictionary::class,
         Forms\Fields\Dropdown::class,
         Forms\Fields\Email::class,
