@@ -16,7 +16,7 @@ enum FieldTabs {
     Validation = 'validation',
 }
 
-const loading = ref(!cache.has(field.value._id));
+const loading = ref(true);
 const error = ref(null);
 const errors = ref({});
 const values = ref(null);
@@ -80,12 +80,16 @@ const load = () => {
 };
 
 const updatePreview = debounce(() => {
+    const fieldId = field.value._id;
+
     axios
         .post(cp_url(`forms/${form.handle}/builder/fields/update`), {
             type: field.value.fieldtype,
             values: values.value,
         })
         .then((response) => {
+            if (field.value._id !== fieldId) return;
+
             field.value.config = response.data.values;
 
             if (response.data.preview) {
@@ -100,7 +104,12 @@ const updatePreview = debounce(() => {
         });
 }, 500);
 
-watch(field, () => load());
+watch(field, () => {
+    updatePreview.cancel();
+    loading.value = !cache.has(field.value._id);
+    load();
+});
+
 watch(values, () => updatePreview(), { deep: true });
 
 onMounted(() => load());
