@@ -92,54 +92,55 @@ function toggleSection(section) {
 </template>
 
 <style scoped>
+[class*="publish-section-collapsible"] {
+    --speed: 250ms;
+    --timing: ease;
+}
+
 .publish-section-collapsible--expanded {
-    animation: publish-section-expand 250ms ease forwards;
-    grid-template-rows: 1fr;
+    /* We can animate collapse/expand using grid rows */
+    animation: expand-rows var(--speed) var(--timing) forwards;
 }
 
 .publish-section-collapsible--collapsed {
-    animation: publish-section-collapse 250ms ease forwards;
-    grid-template-rows: 0fr;
+    animation: collapse-rows var(--speed) var(--timing) forwards;
 }
 
 .publish-section-collapsible--expanded .publish-section-collapsible__inner {
     animation:
-        publish-section-expand-visibility 0ms 0ms forwards,
-        publish-section-expand-overflow 0ms 250ms forwards;
+        make-visible 0ms 0ms forwards,
+        unset-overflow 0ms var(--speed) forwards;
     overflow: clip;
 }
 
 .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
-    /* border: 3px solid blue!important; */
     animation:
-        publish-section-collapse-overflow 0ms 250ms forwards,
-        publish-section-collapse-visibility 0ms 250ms forwards;
+        clip-overflow 0ms var(--speed) forwards,
+        make-invisible 0ms var(--speed) forwards;
     overflow: clip;
 }
 
-@keyframes publish-section-expand {
+@keyframes make-visible {
     from {
-        grid-template-rows: 0fr;
+        visibility: hidden;
     }
 
-    to {
-        grid-template-rows: 1fr;
-    }
-}
-
-@keyframes publish-section-expand-visibility {
     to {
         visibility: visible;
     }
 }
 
-@keyframes publish-section-expand-overflow {
+@keyframes make-invisible {
+    from {
+        visibility: visible;
+    }
+
     to {
-        overflow: visible;
+        visibility: hidden;
     }
 }
 
-@keyframes publish-section-collapse {
+@keyframes collapse-rows {
     from {
         grid-template-rows: 1fr;
     }
@@ -149,21 +150,33 @@ function toggleSection(section) {
     }
 }
 
-@keyframes publish-section-collapse-overflow {
+@keyframes expand-rows {
+    from {
+        grid-template-rows: 0fr;
+    }
+
+    to {
+        grid-template-rows: 1fr;
+    }
+}
+
+@keyframes clip-overflow {
     to {
         overflow: clip;
     }
 }
 
-@keyframes publish-section-collapse-visibility {
+@keyframes unset-overflow {
     to {
-        visibility: hidden;
+        overflow: visible;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .publish-section-collapsible--expanded,
-    .publish-section-collapsible--collapsed {
+    .publish-section-collapsible--collapsed,
+    .publish-section-collapsible--expanded .publish-section-collapsible__inner,
+    .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
         animation: none;
     }
 
@@ -181,7 +194,6 @@ function toggleSection(section) {
     }
 
     .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
-        animation: none;
         visibility: hidden;
         overflow: clip;
     }
