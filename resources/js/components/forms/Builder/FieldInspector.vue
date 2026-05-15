@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { form, sections, inspecting: field } = injectBuilderContext();
+const { form, inspecting: field } = injectBuilderContext();
 
 enum FieldTabs {
     Settings = 'settings',
@@ -89,17 +89,11 @@ const updatePreview = debounce(() => {
             field.value.config = response.data.values;
 
             if (response.data.preview) {
-                field.value.publishConfig = {
-                    ...response.data.preview.config,
-                    handle: field.value.handle,
+                field.value.preview = {
+                    config: { ...response.data.preview.config, handle: field.value.handle },
+                    value: response.data.preview.value,
+                    meta: response.data.preview.meta,
                 };
-
-                const section = sections.value.find((section) => section.fields.some((f) => f._id === field.value._id));
-
-                if (section) {
-                    section.values[field.value.handle] = response.data.preview.value;
-                    section.meta[field.value.handle] = response.data.preview.meta;
-                }
             }
 
             cache.delete(field.value._id);

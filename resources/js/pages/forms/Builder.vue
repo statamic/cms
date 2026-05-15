@@ -60,8 +60,6 @@ const addSection = (atIndex, fields = []) => {
         collapsed: false,
         title: __('Section'),
         fields,
-        values: {},
-        meta: {},
     };
 
     formFields.value.sections.splice(atIndex, 0, section);
@@ -75,14 +73,8 @@ const addSectionAt = (sourceSectionId, fieldIndex) => {
 
     const sourceSectionIndex = sections.value.indexOf(sourceSection);
     const movedFields = sourceSection.fields.splice(fieldIndex);
-    const newSection = addSection(sourceSectionIndex + 1, movedFields);
 
-    movedFields.forEach((field) => {
-        newSection.values[field.handle] = sourceSection.values[field.handle];
-        newSection.meta[field.handle] = sourceSection.meta[field.handle];
-        delete sourceSection.values[field.handle];
-        delete sourceSection.meta[field.handle];
-    });
+    addSection(sourceSectionIndex + 1, movedFields);
 };
 
 const sectionDeleted = (sectionId) => formFields.value['sections'] = formFields.value['sections'].filter(section => section._id !== sectionId);
@@ -97,13 +89,6 @@ const moveField = (fromSectionId, toSectionId, oldIndex, newIndex) => {
     if (!fromSection || !toSection) return;
 
     const [field] = fromSection.fields.splice(oldIndex, 1);
-
-    if (fromSectionId !== toSectionId) {
-        toSection.values[field.handle] = fromSection.values[field.handle];
-        toSection.meta[field.handle] = fromSection.meta[field.handle];
-        delete fromSection.values[field.handle];
-        delete fromSection.meta[field.handle];
-    }
 
     toSection.fields.splice(newIndex, 0, field);
 };
@@ -125,7 +110,6 @@ const clearInspector = () => inspect(null);
 
 provideBuilderContext({
     form: props.form,
-    sections,
     fieldView,
     inspecting,
     inspectorType,

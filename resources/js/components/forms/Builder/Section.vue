@@ -29,8 +29,8 @@ const blueprint = computed(() => ({
         handle: 'main',
         sections: [{
             fields: props.section.fields
-                .filter((field) => field.publishConfig)
-                .map((field) => field.publishConfig),
+                .filter((field) => field.preview?.config)
+                .map((field) => field.preview.config),
         }],
     }],
 }));
@@ -58,12 +58,14 @@ const addField = (fieldtypeHandle, index = null) => {
         handle,
         icon: fieldtype?.icon || 'fieldtype-generic',
         type: 'inline',
-        publishConfig: { ...fieldtype.preview?.config, handle },
+        preview: {
+            config: { ...fieldtype.preview?.config, handle },
+            value: fieldtype.preview?.value,
+            meta: fieldtype.preview?.meta,
+        },
     };
 
     section.fields.splice(index ?? section.fields.length, 0, field);
-    section.values[handle] = fieldtype.preview?.value;
-    section.meta[handle] = fieldtype.preview?.meta;
 
     inspectField(field);
 };
@@ -83,12 +85,14 @@ const duplicateField = (fieldId) => {
         _id: `${section._id}-${section.fields.length}`,
         handle,
         config: { ...field.config, display: `${field.config.display} (${__('Duplicate')})` },
-        publishConfig: { ...field.publishConfig, handle },
+        preview: {
+            config: { ...field.preview.config, handle },
+            value: field.preview.value,
+            meta: field.preview.meta,
+        },
     };
 
     section.fields.splice(index + 1, 0, newField);
-    section.values[handle] = section.values[field.handle];
-    section.meta[handle] = section.meta[field.handle];
 
     inspectField(newField);
 };
@@ -99,8 +103,6 @@ const removeField = (fieldId) => {
     if (!field) return;
 
     section.fields.splice(section.fields.indexOf(field), 1);
-    delete section.values[field.handle];
-    delete section.meta[field.handle];
 
     clearInspector();
 };
@@ -182,8 +184,6 @@ const inspectActionButton = (target) => {
                     v-else
                     :name="'form-builder-' + section._id"
                     :blueprint="blueprint"
-                    v-model="section.values"
-                    :meta="section.meta"
                     :track-dirty-state="false"
                 >
                     <div class="field-sort-container field-grid" :data-sort-section="section._id" :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null">
@@ -253,12 +253,12 @@ const inspectActionButton = (target) => {
                                         </span>
                                     </Label>
                                 </template>
-                                <div v-if="field.publishConfig" inert>
+                                <div v-if="field.preview" inert>
                                     <component
-                                        :is="`${field.publishConfig.component || field.publishConfig.type}-fieldtype`"
-                                        :config="field.publishConfig"
-                                        :value="section.values[field.handle]"
-                                        :meta="section.meta[field.handle]"
+                                        :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
+                                        :config="field.preview.config"
+                                        :value="field.preview.value"
+                                        :meta="field.preview.meta"
                                         :handle="field.handle"
                                     />
                                 </div>
