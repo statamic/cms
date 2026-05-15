@@ -10,6 +10,7 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesFields;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 class FormBuilderController extends CpController
@@ -43,6 +44,7 @@ class FormBuilderController extends CpController
 
         return Inertia::render('forms/Builder', [
             'form' => $form,
+            'formsProInstalled' => Statamic::formsProInstalled(),
             'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype): array => [
                 ...$fieldtype->toArray(),
                 'preview' => $this->fieldtypePreview($fieldtype),

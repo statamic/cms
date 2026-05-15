@@ -37,6 +37,7 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps<{
     form: Object,
+    formsProInstalled: Boolean,
     fieldtypes: Array,
 }>();
 
@@ -110,6 +111,7 @@ const clearInspector = () => inspect(null);
 
 provideBuilderContext({
     form: props.form,
+    formsProInstalled: props.formsProInstalled,
     fieldView,
     inspecting,
     inspectorType,

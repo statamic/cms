@@ -10,7 +10,7 @@ const props = defineProps<{
     fieldtypes: Array,
 }>();
 
-const { fieldView, inspect } = injectBuilderContext();
+const { formsProInstalled, fieldView, inspect } = injectBuilderContext();
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);
@@ -28,16 +28,17 @@ const allFieldtypes = computed(() => {
         config: [],
     });
 
-    // TODO: Only show this when Forms Pro is installed
-    options.push({
-        handle: 'page_break',
-        title: __('Page Break'),
-        description: __('Page Breaks split a form into multiple steps, turning a long form into a more manageable, step-by-step experience.'),
-        categories: ['structure'],
-        keywords: [],
-        icon: 'page',
-        config: [],
-    });
+    if (formsProInstalled) {
+        options.push({
+            handle: 'page_break',
+            title: __('Page Break'),
+            description: __('Page Breaks split a form into multiple steps, turning a long form into a more manageable, step-by-step experience.'),
+            categories: ['structure'],
+            keywords: [],
+            icon: 'page',
+            config: [],
+        });
+    }
 
     return options;
 });

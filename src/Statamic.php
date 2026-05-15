@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Inertia\Inertia;
 use Laravel\Nova\Nova;
+use Facades\Statamic\Console\Processes\Composer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
@@ -52,6 +53,11 @@ class Statamic
     public static function enablePro()
     {
         Artisan::call('statamic:pro:enable', ['--update-config' => true]);
+    }
+
+    public static function formsProInstalled(): bool
+    {
+        return Composer::isInstalled('statamic/forms-pro');
     }
 
     public static function availableScripts(Request $request)
