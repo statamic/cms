@@ -248,7 +248,10 @@ const inspectActionButton = (target) => {
                                     <Label :class="{ 'cursor-pointer': !isEditingField(field) }">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', fieldtypeIconColorClass(field)]" aria-hidden="true" />
-                                            {{ __(field.config.display) }}
+                                            <span>
+                                                {{ __(field.config.display) }}
+                                                <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
+                                            </span>
                                             <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                                         </span>
                                     </Label>

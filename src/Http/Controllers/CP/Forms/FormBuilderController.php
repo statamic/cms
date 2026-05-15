@@ -9,10 +9,13 @@ use Statamic\Forms\Fields\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Fields\ManagesFields;
 use Statamic\Support\Arr;
 
 class FormBuilderController extends CpController
 {
+    use ManagesFields;
+
     public function __invoke($form)
     {
         $this->authorize('edit', $form);
@@ -45,6 +48,7 @@ class FormBuilderController extends CpController
                 'preview' => $this->fieldtypePreview($fieldtype),
                 'example' => $this->fieldtypeExample($fieldtype),
             ]),
+            ...$this->fieldProps(),
         ]);
     }
 

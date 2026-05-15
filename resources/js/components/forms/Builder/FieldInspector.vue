@@ -5,6 +5,7 @@ import { ref, onMounted, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import debounce from '@/util/debounce.js';
 import axios from 'axios';
+import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
@@ -291,6 +292,8 @@ onMounted(() => load());
                                 </div>
                             </a>
                         </div>
+
+                        <FieldValidationBuilder :config="values" @updated="values.validate = $event" />
                     </div>
                 </TabContent>
             </Tabs>
