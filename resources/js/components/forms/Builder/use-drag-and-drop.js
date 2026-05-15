@@ -36,6 +36,16 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
 
         draggable.on('drag:start', () => dropTarget.reset());
 
+        draggable.on('mirror:created', (event) => {
+            const width = `${event.source.offsetWidth}px`;
+            event.mirror.style.width = width;
+            const button = event.mirror.querySelector('button');
+            if (button) {
+                button.style.width = width;
+                button.style.justifyContent = 'flex-start';
+            }
+        });
+
         draggable.on('drag:move', (event) => {
             lastClientY = event.sensorEvent.clientY;
             renderIndicator(event);
