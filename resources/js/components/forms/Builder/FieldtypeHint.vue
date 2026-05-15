@@ -52,14 +52,6 @@ const { inspecting: fieldtype } = injectBuilderContext();
 
                 <p v-if="fieldtype.description" class="text-zinc-600">{{ __(fieldtype.description) }}</p>
 
-                <div v-if="fieldtype.handle === 'section'" class="text-zinc-600">
-                    <p>Sections group fields into clearly defined areas, helping you structure, organize, and navigate your form.</p>
-                </div>
-
-                <div v-if="fieldtype.handle === 'page_break'" class="text-zinc-600">
-                    <p>Page Breaks split a form into multiple steps, turning a long form into a more manageable, step-by-step experience.</p>
-                </div>
-
                 <div v-if="fieldtype.example">
                     <Badge class="mb-2" size="sm" :text="__('Example')" />
                     <div class="bg-white rounded-md p-4 border" inert>

@@ -21,6 +21,7 @@ const allFieldtypes = computed(() => {
     options.push({
         handle: 'section',
         title: __('Section'),
+        description: __('Sections group fields into clearly defined areas, helping you structure, organize, and navigate your form.'),
         categories: ['structure'],
         keywords: [],
         icon: 'add-section',
@@ -31,6 +32,7 @@ const allFieldtypes = computed(() => {
     options.push({
         handle: 'page_break',
         title: __('Page Break'),
+        description: __('Page Breaks split a form into multiple steps, turning a long form into a more manageable, step-by-step experience.'),
         categories: ['structure'],
         keywords: [],
         icon: 'page',
