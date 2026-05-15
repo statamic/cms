@@ -7,7 +7,6 @@ import {
     Heading,
     Subheading,
     Card,
-    Icon,
 } from '@ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
@@ -15,8 +14,6 @@ import ShowField from '@/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
 import markdown from '@/util/markdown.js';
 import { computed } from 'vue';
-import { Primitive } from 'reka-ui';
-import { Motion } from 'motion-v';
 
 const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
@@ -43,6 +40,7 @@ function renderInstructions(instructions) {
 
 function toggleSection(section) {
     if (section.collapsible) {
+        section.collapsibleAnimated = true;
         section.collapsed = !section.collapsed;
     }
 }
@@ -75,7 +73,10 @@ function toggleSection(section) {
             </PanelHeader>
             <div
                 class="publish-section-collapsible grid"
-                :class="section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded'"
+                :class="[
+                    section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded',
+                    { 'publish-section-collapsible--animate': section.collapsibleAnimated },
+                ]"
             >
                 <div class="publish-section-collapsible__inner min-h-0">
                     <Card :class="{ 'p-0!': asConfig }">
@@ -92,7 +93,7 @@ function toggleSection(section) {
 </template>
 
 <style scoped>
-[class*="publish-section-collapsible"] {
+[class*='publish-section-collapsible'] {
     --speed: 250ms;
     --timing: ease;
 
@@ -101,23 +102,40 @@ function toggleSection(section) {
     }
 }
 
-.publish-section-collapsible--expanded {
-    /* We can animate collapse/expand using grid rows */
+.publish-section-collapsible--expanded:not(.publish-section-collapsible--animate) {
+    grid-template-rows: 1fr;
+}
+
+.publish-section-collapsible--collapsed:not(.publish-section-collapsible--animate) {
+    grid-template-rows: 0fr;
+}
+
+.publish-section-collapsible--expanded:not(.publish-section-collapsible--animate) .publish-section-collapsible__inner {
+    visibility: visible;
+    overflow: visible;
+}
+
+.publish-section-collapsible--collapsed:not(.publish-section-collapsible--animate) .publish-section-collapsible__inner {
+    visibility: hidden;
+    overflow: clip;
+}
+
+.publish-section-collapsible--animate.publish-section-collapsible--expanded {
     animation: expand-rows var(--speed) var(--timing) forwards;
 }
 
-.publish-section-collapsible--collapsed {
+.publish-section-collapsible--animate.publish-section-collapsible--collapsed {
     animation: collapse-rows var(--speed) var(--timing) forwards;
 }
 
-.publish-section-collapsible--expanded .publish-section-collapsible__inner {
+.publish-section-collapsible--animate.publish-section-collapsible--expanded .publish-section-collapsible__inner {
     animation:
         make-visible 0ms 0ms forwards,
         unset-overflow 0ms var(--speed) forwards;
     overflow: clip;
 }
 
-.publish-section-collapsible--collapsed .publish-section-collapsible__inner {
+.publish-section-collapsible--animate.publish-section-collapsible--collapsed .publish-section-collapsible__inner {
     animation:
         clip-overflow 0ms var(--speed) forwards,
         make-invisible 0ms var(--speed) forwards;
