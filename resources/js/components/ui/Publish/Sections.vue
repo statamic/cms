@@ -93,7 +93,11 @@ function toggleSection(section) {
 
 <style scoped>
 [class*="publish-section-collapsible"] {
-    --speed: 250ms;
+    --speed: 0ms;
+    /* Only setting the animation speed when the panel is hovered prevents the animation triggering on page load. */
+    [data-ui-panel]:hover & {
+        --speed: 250ms;
+    }
     --timing: ease;
 
     @media (prefers-reduced-motion: reduce) {
