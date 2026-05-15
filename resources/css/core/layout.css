@@ -29,11 +29,11 @@
     }
 
     ul li ul {
-        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1.5 border-s border-gray-300 dark:border-gray-700;
+        @apply ml-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1.5 border-s border-gray-300 dark:border-gray-700;
     }
 
     ul li ul li a {
-        @apply py-0 hover:bg-transparent;
+        @apply py-0 ps-5 hover:bg-transparent;
     }
 
     ul li ul li a.active {
@@ -80,12 +80,11 @@
             &::before {
                 content: '';
                 position: absolute;
-                width: anchor-size(height);
                 height: calc(anchor-size(height) + 0.5px);
                 @apply border-s border-s-black;
                 translate: -100% 0;
                 position-anchor: --active;
-                left: calc(anchor(left) + 0.25rem - 0.5px);
+                left: anchor(left);
                 top: anchor(top);
                 transition-property: top, left;
                 transition-duration: 0.2s;
