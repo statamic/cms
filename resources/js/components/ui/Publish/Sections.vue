@@ -74,18 +74,116 @@ function toggleSection(section) {
                 />
             </PanelHeader>
             <div
-                style="--tw-ease: ease;"
-                class="h-auto visible transition-[height,visibility] duration-[250ms,2s]"
-                :class="{ 'h-0! invisible! overflow-clip': section.collapsed }"
+                class="publish-section-collapsible grid"
+                :class="section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded'"
             >
-                <Card :class="{ 'p-0!': asConfig }">
-                    <FieldsProvider :fields="section.fields">
-                        <slot :section="section">
-                            <Fields />
-                        </slot>
-                    </FieldsProvider>
-                </Card>
+                <div class="publish-section-collapsible__inner min-h-0">
+                    <Card :class="{ 'p-0!': asConfig }">
+                        <FieldsProvider :fields="section.fields">
+                            <slot :section="section">
+                                <Fields />
+                            </slot>
+                        </FieldsProvider>
+                    </Card>
+                </div>
             </div>
         </Panel>
     </div>
 </template>
+
+<style scoped>
+.publish-section-collapsible--expanded {
+    animation: publish-section-expand 250ms ease forwards;
+    grid-template-rows: 1fr;
+}
+
+.publish-section-collapsible--collapsed {
+    animation: publish-section-collapse 250ms ease forwards;
+    grid-template-rows: 0fr;
+}
+
+.publish-section-collapsible--expanded .publish-section-collapsible__inner {
+    animation:
+        publish-section-expand-visibility 0ms 0ms forwards,
+        publish-section-expand-overflow 0ms 250ms forwards;
+    overflow: clip;
+}
+
+.publish-section-collapsible--collapsed .publish-section-collapsible__inner {
+    /* border: 3px solid blue!important; */
+    animation:
+        publish-section-collapse-overflow 0ms 250ms forwards,
+        publish-section-collapse-visibility 0ms 250ms forwards;
+    overflow: clip;
+}
+
+@keyframes publish-section-expand {
+    from {
+        grid-template-rows: 0fr;
+    }
+
+    to {
+        grid-template-rows: 1fr;
+    }
+}
+
+@keyframes publish-section-expand-visibility {
+    to {
+        visibility: visible;
+    }
+}
+
+@keyframes publish-section-expand-overflow {
+    to {
+        overflow: visible;
+    }
+}
+
+@keyframes publish-section-collapse {
+    from {
+        grid-template-rows: 1fr;
+    }
+
+    to {
+        grid-template-rows: 0fr;
+    }
+}
+
+@keyframes publish-section-collapse-overflow {
+    to {
+        overflow: clip;
+    }
+}
+
+@keyframes publish-section-collapse-visibility {
+    to {
+        visibility: hidden;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .publish-section-collapsible--expanded,
+    .publish-section-collapsible--collapsed {
+        animation: none;
+    }
+
+    .publish-section-collapsible--expanded {
+        grid-template-rows: 1fr;
+    }
+
+    .publish-section-collapsible--collapsed {
+        grid-template-rows: 0fr;
+    }
+
+    .publish-section-collapsible--expanded .publish-section-collapsible__inner {
+        visibility: visible;
+        overflow: visible;
+    }
+
+    .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
+        animation: none;
+        visibility: hidden;
+        overflow: clip;
+    }
+}
+</style>
