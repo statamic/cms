@@ -95,6 +95,10 @@ function toggleSection(section) {
 [class*="publish-section-collapsible"] {
     --speed: 250ms;
     --timing: ease;
+
+    @media (prefers-reduced-motion: reduce) {
+        --speed: 0ms;
+    }
 }
 
 .publish-section-collapsible--expanded {
@@ -120,82 +124,10 @@ function toggleSection(section) {
     overflow: clip;
 }
 
-@keyframes make-visible {
-    from {
-        visibility: hidden;
-    }
-
-    to {
-        visibility: visible;
-    }
-}
-
-@keyframes make-invisible {
-    from {
-        visibility: visible;
-    }
-
-    to {
-        visibility: hidden;
-    }
-}
-
-@keyframes collapse-rows {
-    from {
-        grid-template-rows: 1fr;
-    }
-
-    to {
-        grid-template-rows: 0fr;
-    }
-}
-
-@keyframes expand-rows {
-    from {
-        grid-template-rows: 0fr;
-    }
-
-    to {
-        grid-template-rows: 1fr;
-    }
-}
-
-@keyframes clip-overflow {
-    to {
-        overflow: clip;
-    }
-}
-
-@keyframes unset-overflow {
-    to {
-        overflow: visible;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .publish-section-collapsible--expanded,
-    .publish-section-collapsible--collapsed,
-    .publish-section-collapsible--expanded .publish-section-collapsible__inner,
-    .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
-        animation: none;
-    }
-
-    .publish-section-collapsible--expanded {
-        grid-template-rows: 1fr;
-    }
-
-    .publish-section-collapsible--collapsed {
-        grid-template-rows: 0fr;
-    }
-
-    .publish-section-collapsible--expanded .publish-section-collapsible__inner {
-        visibility: visible;
-        overflow: visible;
-    }
-
-    .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
-        visibility: hidden;
-        overflow: clip;
-    }
-}
+@keyframes make-visible   { from { visibility: hidden; } to { visibility: visible; } }
+@keyframes make-invisible { from { visibility: visible; } to { visibility: hidden; } }
+@keyframes collapse-rows  { from { grid-template-rows: 1fr; } to { grid-template-rows: 0fr; } }
+@keyframes expand-rows    { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
+@keyframes clip-overflow  { to { overflow: clip; } }
+@keyframes unset-overflow { to { overflow: visible; } }
 </style>
