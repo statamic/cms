@@ -55,6 +55,7 @@ class FormFieldsController extends CpController
     public function update(Request $request)
     {
         // todo
+    }
 
     private function resolveFormFieldtype(string $type): ?FormFieldtype
     {
