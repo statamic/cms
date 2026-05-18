@@ -24,7 +24,7 @@ jobs:
 
       - name: Check PHP code style issues
         if: steps.changed-files.outputs.any_modified == 'true'
-        uses: aglipanci/laravel-pint-action@36de00d5f5a8a4e12d443e01671daa12a18f4c79 # v2.6
+        uses: aglipanci/laravel-pint-action@36de00d5f5a8a4e12d443e01671daa12a18f4c79 # 2.6
         with:
           testMode: true
           verboseMode: true
