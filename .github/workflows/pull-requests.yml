@@ -4,7 +4,7 @@ name: Pull Requests
 #         https://github.com/laravel/.github/blob/main/.github/workflows/pull-requests.yml
 
 on:
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
     types:
       - opened
 
