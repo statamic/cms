@@ -58,7 +58,7 @@ class SpecificEntriesQuery extends Query
             $type = GraphQL::type($unionType->name);
         }
 
-        return GraphQL::paginate($type);
+        return GraphQL::nonNull(GraphQL::paginate($type));
     }
 
     public function args(): array
