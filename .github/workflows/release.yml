@@ -9,6 +9,7 @@ permissions: {}
 
 jobs:
   build:
+    name: Build and release
     runs-on: ubuntu-latest
     permissions:
       contents: write # create GitHub release and upload assets
