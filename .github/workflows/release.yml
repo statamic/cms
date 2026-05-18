@@ -35,55 +35,18 @@ jobs:
           version: ${{ github.ref }}
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.changelog.outputs.version }}
-          release_name: ${{ steps.changelog.outputs.version }}
+          name: ${{ steps.changelog.outputs.version }}
           body: ${{ steps.changelog.outputs.text }}
-          prerelease: false
-
-      - name: Upload dist zip to release
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist.tar.gz
-          asset_name: dist.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-dev zip to release
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-dev.tar.gz
-          asset_name: dist-dev.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-frontend zip to release
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-frontend.tar.gz
-          asset_name: dist-frontend.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-package zip to release
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-package.tar.gz
-          asset_name: dist-package.tar.gz
-          asset_content_type: application/tar+gz
+          files: |
+            ./resources/dist.tar.gz
+            ./resources/dist-dev.tar.gz
+            ./resources/dist-frontend.tar.gz
+            ./resources/dist-package.tar.gz
 
       - name: Deploy Storybook to Forge
         continue-on-error: true
