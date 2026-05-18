@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Fields;
 
 use Statamic\Support\Arr;
+
 use function Statamic\trans as __;
 
 class Dictionary extends FormFieldtype

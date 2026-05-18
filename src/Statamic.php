@@ -3,6 +3,7 @@
 namespace Statamic;
 
 use Closure;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
@@ -10,7 +11,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Inertia\Inertia;
 use Laravel\Nova\Nova;
-use Facades\Statamic\Console\Processes\Composer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;

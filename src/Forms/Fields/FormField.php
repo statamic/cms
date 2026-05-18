@@ -5,8 +5,6 @@ namespace Statamic\Forms\Fields;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Fields\ConfigFields;
-use Statamic\Fields\Fields;
-use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 

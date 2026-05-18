@@ -72,7 +72,7 @@ class Dropdown extends FormFieldtype
                 'placeholder' => 'Select a song...',
                 'options' => [
                     'bohemian' => 'Bohemian Rhapsody',
-                    'wrecking' => "I Will Survive",
+                    'wrecking' => 'I Will Survive',
                     'sweet' => 'Sweet Caroline',
                     'never' => 'Never Gonna Give You Up',
                 ],
