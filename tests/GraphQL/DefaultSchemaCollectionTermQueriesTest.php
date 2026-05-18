@@ -9,6 +9,8 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\GraphQL\DefaultSchema;
 use Statamic\GraphQL\Queries\SpecificEntriesQuery;
+use Statamic\GraphQL\Queries\SpecificEntryQuery;
+use Statamic\GraphQL\Queries\SpecificTermQuery;
 use Statamic\GraphQL\Queries\SpecificTermsQuery;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -45,7 +47,7 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
         $queries = $this->getQueryInstances();
 
         $this->assertEmpty(
-            collect($queries)->filter(fn ($q) => $q instanceof SpecificEntriesQuery)->all()
+            collect($queries)->filter(fn ($q) => $q instanceof SpecificEntriesQuery || $q instanceof SpecificEntryQuery)->all()
         );
     }
 
@@ -62,11 +64,11 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
 
         $queries = $this->getQueryInstances();
         $collectionQueries = collect($queries)
-            ->filter(fn ($q) => $q instanceof SpecificEntriesQuery)
+            ->filter(fn ($q) => $q instanceof SpecificEntriesQuery || $q instanceof SpecificEntryQuery)
             ->values();
 
-        $this->assertCount(1, $collectionQueries);
-        $this->assertEquals('blog', $this->getQueryName($collectionQueries[0]));
+        $this->assertCount(2, $collectionQueries);
+        $this->assertEquals(['blog', 'blogEntry'], $collectionQueries->map(fn ($q) => $this->getQueryName($q))->sort()->values()->all());
     }
 
     #[Test]
@@ -82,13 +84,13 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
 
         $queries = $this->getQueryInstances();
         $collectionQueries = collect($queries)
-            ->filter(fn ($q) => $q instanceof SpecificEntriesQuery)
+            ->filter(fn ($q) => $q instanceof SpecificEntriesQuery || $q instanceof SpecificEntryQuery)
             ->values();
 
         $names = $collectionQueries->map(fn ($q) => $this->getQueryName($q))->sort()->values()->all();
 
-        $this->assertCount(2, $collectionQueries);
-        $this->assertEquals(['blog', 'pages'], $names);
+        $this->assertCount(4, $collectionQueries);
+        $this->assertEquals(['blog', 'blogEntry', 'page', 'pages'], $names);
     }
 
     #[Test]
@@ -103,7 +105,7 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
         $queries = $this->getQueryInstances();
 
         $this->assertEmpty(
-            collect($queries)->filter(fn ($q) => $q instanceof SpecificEntriesQuery)->all()
+            collect($queries)->filter(fn ($q) => $q instanceof SpecificEntriesQuery || $q instanceof SpecificEntryQuery)->all()
         );
     }
 
@@ -116,7 +118,7 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
         $queries = $this->getQueryInstances();
 
         $this->assertEmpty(
-            collect($queries)->filter(fn ($q) => $q instanceof SpecificTermsQuery)->all()
+            collect($queries)->filter(fn ($q) => $q instanceof SpecificTermsQuery || $q instanceof SpecificTermQuery)->all()
         );
     }
 
@@ -133,11 +135,11 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
 
         $queries = $this->getQueryInstances();
         $termQueries = collect($queries)
-            ->filter(fn ($q) => $q instanceof SpecificTermsQuery)
+            ->filter(fn ($q) => $q instanceof SpecificTermsQuery || $q instanceof SpecificTermQuery)
             ->values();
 
-        $this->assertCount(1, $termQueries);
-        $this->assertEquals('tags', $this->getQueryName($termQueries[0]));
+        $this->assertCount(2, $termQueries);
+        $this->assertEquals(['tag', 'tags'], $termQueries->map(fn ($q) => $this->getQueryName($q))->sort()->values()->all());
     }
 
     #[Test]
@@ -153,13 +155,13 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
 
         $queries = $this->getQueryInstances();
         $termQueries = collect($queries)
-            ->filter(fn ($q) => $q instanceof SpecificTermsQuery)
+            ->filter(fn ($q) => $q instanceof SpecificTermsQuery || $q instanceof SpecificTermQuery)
             ->values();
 
         $names = $termQueries->map(fn ($q) => $this->getQueryName($q))->sort()->values()->all();
 
-        $this->assertCount(2, $termQueries);
-        $this->assertEquals(['categories', 'tags'], $names);
+        $this->assertCount(4, $termQueries);
+        $this->assertEquals(['categories', 'category', 'tag', 'tags'], $names);
     }
 
     #[Test]
@@ -174,7 +176,7 @@ class DefaultSchemaCollectionTermQueriesTest extends TestCase
         $queries = $this->getQueryInstances();
 
         $this->assertEmpty(
-            collect($queries)->filter(fn ($q) => $q instanceof SpecificTermsQuery)->all()
+            collect($queries)->filter(fn ($q) => $q instanceof SpecificTermsQuery || $q instanceof SpecificTermQuery)->all()
         );
     }
 

@@ -26,6 +26,8 @@ use Statamic\GraphQL\Queries\NavsQuery;
 use Statamic\GraphQL\Queries\PingQuery;
 use Statamic\GraphQL\Queries\SitesQuery;
 use Statamic\GraphQL\Queries\SpecificEntriesQuery;
+use Statamic\GraphQL\Queries\SpecificEntryQuery;
+use Statamic\GraphQL\Queries\SpecificTermQuery;
 use Statamic\GraphQL\Queries\SpecificTermsQuery;
 use Statamic\GraphQL\Queries\TaxonomiesQuery;
 use Statamic\GraphQL\Queries\TaxonomyQuery;
@@ -113,7 +115,10 @@ class DefaultSchema implements ConfigConvertible
 
         return collect($handles)
             ->filter(fn ($handle) => in_array($handle, $allowed))
-            ->map(fn ($handle) => new SpecificEntriesQuery($handle))
+            ->flatMap(fn ($handle) => [
+                new SpecificEntriesQuery($handle),
+                new SpecificEntryQuery($handle),
+            ])
             ->all();
     }
 
@@ -143,7 +148,10 @@ class DefaultSchema implements ConfigConvertible
 
         return collect($handles)
             ->filter(fn ($handle) => in_array($handle, $allowed))
-            ->map(fn ($handle) => new SpecificTermsQuery($handle))
+            ->flatMap(fn ($handle) => [
+                new SpecificTermsQuery($handle),
+                new SpecificTermQuery($handle),
+            ])
             ->all();
     }
 
