@@ -52,5 +52,7 @@ jobs:
 
       - name: Deploy Storybook to Forge
         continue-on-error: true
+        env:
+          FORGE_STORYBOOK_WEBHOOK: ${{ secrets.FORGE_STORYBOOK_WEBHOOK }}
         run: |
-          curl -X POST "${{ secrets.FORGE_STORYBOOK_WEBHOOK }}"
+          curl -X POST "$FORGE_STORYBOOK_WEBHOOK"
