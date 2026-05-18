@@ -172,16 +172,3 @@ jobs:
                 text:
                   type: mrkdwn
                   text: ":x: *${{ github.repository }}* tests failed\n*Ref:* ${{ github.ref }}\n*Author:* ${{ github.actor }}\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"
-      - name: Send test Slack notification (temporary)
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
-        if: github.event_name == 'pull_request'
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK }}
-          webhook-type: incoming-webhook
-          payload: |
-            text: ":white_check_mark: *statamic/cms* test notification"
-            blocks:
-              - type: section
-                text:
-                  type: mrkdwn
-                  text: ":white_check_mark: *statamic/cms* test notification\n*Ref:* refs/heads/zizmor\n*Author:* jasonvarga\n*Workflow:* <https://github.com/statamic/cms/actions/runs/123456789|Run Tests>"
