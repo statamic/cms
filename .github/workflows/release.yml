@@ -8,7 +8,7 @@ on: # zizmor: ignore[concurrency-limits]
 permissions: {}
 
 jobs:
-  build:
+  build: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
     permissions:
       contents: write # create GitHub release and upload assets

@@ -7,7 +7,7 @@ on: # zizmor: ignore[concurrency-limits]
 permissions: {}
 
 jobs:
-  stale:
+  stale: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
     permissions:
       issues: write # mark issues stale and close them

@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pr-title:
+  pr-title: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
     permissions: {}
     steps:

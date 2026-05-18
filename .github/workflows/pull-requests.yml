@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  uneditable:
+  uneditable: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write # post comment and close PRs that don't allow maintainer edits

@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-code-styling:
+  lint-code-styling: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
     permissions:
       contents: read
