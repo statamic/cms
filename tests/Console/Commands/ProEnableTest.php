@@ -296,4 +296,16 @@ ENV, $this->files->get($this->envPath));
             ->expectsQuestion('If you have a Statamic license key, paste it now (leave blank to add later)', '')
             ->expectsOutput('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
     }
+
+    #[Test]
+    public function it_skips_license_key_prompt_in_non_interactive_mode()
+    {
+        $this->artisan('statamic:pro:enable', ['--no-interaction' => true]);
+
+        $this->assertEquals(<<<'ENV'
+APP_NAME=Statamic
+STATAMIC_PRO_ENABLED=true
+STATAMIC_LICENSE_KEY=
+ENV, $this->files->get($this->envPath));
+    }
 }
