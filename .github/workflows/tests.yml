@@ -9,6 +9,8 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -159,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [php-tests, js-tests]
     permissions:
-      actions: read
+      actions: read # required by workflow-conclusion-action to determine overall workflow status
     if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3
