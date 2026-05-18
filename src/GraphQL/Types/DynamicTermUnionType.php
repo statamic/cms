@@ -36,6 +36,10 @@ class DynamicTermUnionType extends UnionType
             ? static::combinationsForHandles($taxonomies)
             : static::combinationsFor($taxonomies);
 
+        if (count($combinations) === 0) {
+            return GraphQL::type(TermInterface::NAME);
+        }
+
         if (count($combinations) === 1) {
             return GraphQL::type(TermType::buildName($combinations[0]['taxonomy'], $combinations[0]['blueprint']));
         }

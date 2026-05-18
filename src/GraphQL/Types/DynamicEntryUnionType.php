@@ -37,6 +37,10 @@ class DynamicEntryUnionType extends UnionType
             ? static::combinationsForHandles($collections)
             : static::combinationsFor($collections);
 
+        if (count($combinations) === 0) {
+            return GraphQL::type(EntryInterface::NAME);
+        }
+
         if (count($combinations) === 1) {
             return GraphQL::type(EntryType::buildName($combinations[0]['collection'], $combinations[0]['blueprint']));
         }
