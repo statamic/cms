@@ -16,7 +16,6 @@ concurrency:
 
 jobs:
   uneditable:
-    name: Check maintainer edit access
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write # post comment and close PRs that don't allow maintainer edits

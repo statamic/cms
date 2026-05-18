@@ -8,7 +8,6 @@ permissions: {}
 
 jobs:
   stale:
-    name: Close stale issues
     runs-on: ubuntu-latest
     permissions:
       issues: write # mark issues stale and close them

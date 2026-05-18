@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   pr-title:
-    name: Validate PR title
     runs-on: ubuntu-latest
     permissions: {}
     steps:

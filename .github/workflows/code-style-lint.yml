@@ -11,7 +11,6 @@ concurrency:
 
 jobs:
   lint-code-styling:
-    name: Lint code style
     runs-on: ubuntu-latest
     permissions:
       contents: read
