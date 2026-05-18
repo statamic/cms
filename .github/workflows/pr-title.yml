@@ -7,6 +7,7 @@ on:
 jobs:
   pr-title:
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Validate PR title matches target branch
         env:
