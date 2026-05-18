@@ -78,7 +78,7 @@ return [
     'date.config.number_of_months' => 'Contrôlez le nombre de mois affichés simultanément.',
     'date.config.time_enabled' => 'Activez l’horodateur.',
     'date.config.time_seconds_enabled' => 'Affichez les secondes dans l’horodateur.',
-    'date.config.timezone' => 'Les dates liées au fuseau horaire seront affichées et saisis. Par défaut, le fuseau horaire utilisé est celui du navigateur.',
+    'date.config.timezone' => 'Le fuseau horaire dans lequel les dates seront affichées et saisies. Le fuseau horaire par défaut (Auto) est celui du navigateur.',
     'date.title' => 'Date',
     'dictionary.config.dictionary' => 'Le dictionnaire à partir duquel vous souhaitez extraire des options.',
     'dictionary.file.config.filename' => 'Le nom du fichier contenant vos options, relatif au répertoire `resources/dictionaries`.',
