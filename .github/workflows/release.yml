@@ -1,6 +1,6 @@
 name: Create Release
 
-on:
+on: # zizmor: ignore[concurrency-limits]
   push:
     tags:
       - 'v*'

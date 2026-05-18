@@ -1,5 +1,5 @@
 name: "Close stale issues"
-on:
+on: # zizmor: ignore[concurrency-limits]
   workflow_dispatch:
   schedule:
   - cron: "30 1 * * *"

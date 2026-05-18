@@ -3,6 +3,10 @@ name: Lint code style issues
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-code-styling:
     runs-on: ubuntu-latest
