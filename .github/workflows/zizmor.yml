@@ -5,9 +5,11 @@ on:
     branches:
       - master
       - '*.x'
+    paths:
+      - '.github/**.yml'
   pull_request:
-    branches:
-      - '**'
+    paths:
+      - '.github/**.yml'
 
 permissions: {}
 
@@ -15,8 +17,7 @@ jobs:
   zizmor:
     name: zizmor
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
+    permissions: {}
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -25,3 +26,6 @@ jobs:
 
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+        with:
+          advanced-security: false
+          annotations: true
