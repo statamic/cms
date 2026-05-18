@@ -192,14 +192,14 @@ class AttributesTest extends TestCase
         imagedestroy($img);
 
         $tiff = pack('A2', 'II')
-            . pack('v', 42)
-            . pack('V', 8)
-            . pack('v', 1)
-            . pack('v', 0x0112)
-            . pack('v', 3)
-            . pack('V', 1)
-            . pack('v', $orientation)."\x00\x00"
-            . pack('V', 0);
+            .pack('v', 42)
+            .pack('V', 8)
+            .pack('v', 1)
+            .pack('v', 0x0112)
+            .pack('v', 3)
+            .pack('V', 1)
+            .pack('v', $orientation)."\x00\x00"
+            .pack('V', 0);
 
         $app1 = "Exif\x00\x00".$tiff;
         $app1Segment = "\xFF\xE1".pack('n', strlen($app1) + 2).$app1;
