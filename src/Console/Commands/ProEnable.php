@@ -174,9 +174,9 @@ class ProEnable extends Command
      */
     protected function replaceLicenseKeyInEnv($licenseKey)
     {
-        file_put_contents($this->envPath(), preg_replace(
+        file_put_contents($this->envPath(), preg_replace_callback(
             '/^#?\s*STATAMIC_LICENSE_KEY=.*$/m',
-            'STATAMIC_LICENSE_KEY='.$licenseKey,
+            fn() => 'STATAMIC_LICENSE_KEY='.$licenseKey,
             $this->envContents()
         ));
     }
