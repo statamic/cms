@@ -160,12 +160,15 @@ jobs:
     steps:
       - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3
       - name: Send Slack notification
-        uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
-          status: failure
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-          author_name: ${{ github.actor }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: ":x: *${{ github.repository }}* tests failed"
+            blocks:
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ":x: *${{ github.repository }}* tests failed\n*Ref:* ${{ github.ref }}\n*Author:* ${{ github.actor }}\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"
