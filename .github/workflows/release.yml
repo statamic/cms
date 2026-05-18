@@ -35,17 +35,17 @@ jobs:
           version: ${{ github.ref }}
 
       - name: Create release
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.changelog.outputs.version }}
-          name: ${{ steps.changelog.outputs.version }}
-          body: ${{ steps.changelog.outputs.text }}
-          files: |
-            ./resources/dist.tar.gz
-            ./resources/dist-dev.tar.gz
-            ./resources/dist-frontend.tar.gz
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.changelog.outputs.version }}
+          RELEASE_NOTES: ${{ steps.changelog.outputs.text }}
+        run: |
+          gh release create "$RELEASE_VERSION" \
+            --title "$RELEASE_VERSION" \
+            --notes "$RELEASE_NOTES" \
+            ./resources/dist.tar.gz \
+            ./resources/dist-dev.tar.gz \
+            ./resources/dist-frontend.tar.gz \
             ./resources/dist-package.tar.gz
 
       - name: Deploy Storybook to Forge
