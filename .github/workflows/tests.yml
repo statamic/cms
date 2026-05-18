@@ -67,7 +67,7 @@ jobs:
         run: sudo apt-get install language-pack-fr
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
