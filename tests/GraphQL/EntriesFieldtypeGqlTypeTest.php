@@ -49,19 +49,16 @@ class EntriesFieldtypeGqlTypeTest extends TestCase
             ->with('collections/blog_posts')
             ->andReturn(collect(['article' => $article]));
 
+        EntryInterface::addTypes();
+
         $expected = EntryType::buildName(Collection::findByHandle('blog_posts'), $article);
 
-        GraphQL::shouldReceive('type')
-            ->once()
-            ->with($expected)
-            ->andReturn((object) ['name' => $expected]);
-
-        GraphQL::shouldReceive('addType')->never();
-
-        $this->fieldtype([
+        $type = $this->fieldtype([
             'collections' => ['blog_posts'],
             'max_items' => 1,
         ])->toGqlType();
+
+        $this->assertEquals($expected, $type->name);
     }
 
     #[Test]

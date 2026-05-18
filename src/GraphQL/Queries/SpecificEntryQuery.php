@@ -10,7 +10,6 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\DynamicEntryUnionType;
-use Statamic\GraphQL\Types\EntryType;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Support\Str;
 
@@ -35,22 +34,7 @@ class SpecificEntryQuery extends Query
 
     public function type(): Type
     {
-        $collection = Collection::findByHandle($this->collectionHandle);
-        $blueprints = $collection->entryBlueprints();
-
-        $combinations = $blueprints->map(fn ($blueprint) => [
-            'collection' => $collection,
-            'blueprint' => $blueprint,
-        ])->values()->all();
-
-        if (count($combinations) === 1) {
-            return GraphQL::type(EntryType::buildName($combinations[0]['collection'], $combinations[0]['blueprint']));
-        }
-
-        $unionType = new DynamicEntryUnionType($combinations);
-        GraphQL::addType($unionType);
-
-        return GraphQL::type($unionType->name);
+        return DynamicEntryUnionType::createTypeFor(Collection::findByHandle($this->collectionHandle));
     }
 
     public function args(): array
@@ -67,8 +51,6 @@ class SpecificEntryQuery extends Query
     public function resolve($root, $args)
     {
         $query = Entry::query();
-
-        $query->where('collection', $this->collectionHandle);
 
         if ($id = $args['id'] ?? null) {
             $query->where('id', $id);

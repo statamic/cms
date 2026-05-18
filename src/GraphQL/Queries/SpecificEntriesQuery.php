@@ -14,7 +14,6 @@ use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Queries\Concerns\ScopesQuery;
 use Statamic\GraphQL\Types\DynamicEntryUnionType;
-use Statamic\GraphQL\Types\EntryType;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
@@ -43,22 +42,8 @@ class SpecificEntriesQuery extends Query
     public function type(): Type
     {
         $collection = Collection::findByHandle($this->collectionHandle);
-        $blueprints = $collection->entryBlueprints();
 
-        $combinations = $blueprints->map(fn ($blueprint) => [
-            'collection' => $collection,
-            'blueprint' => $blueprint,
-        ])->values()->all();
-
-        if (count($combinations) === 1) {
-            $type = GraphQL::type(EntryType::buildName($combinations[0]['collection'], $combinations[0]['blueprint']));
-        } else {
-            $unionType = new DynamicEntryUnionType($combinations);
-            GraphQL::addType($unionType);
-            $type = GraphQL::type($unionType->name);
-        }
-
-        return GraphQL::nonNull(GraphQL::paginate($type));
+        return GraphQL::nonNull(GraphQL::paginate(DynamicEntryUnionType::createTypeFor($collection)));
     }
 
     public function args(): array

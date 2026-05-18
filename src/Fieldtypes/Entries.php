@@ -19,7 +19,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\DynamicEntryUnionType;
 use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\GraphQL\Types\EntryType;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderBy;
@@ -480,30 +479,7 @@ class Entries extends Relationship
             return $type;
         }
 
-        $configuredCollections = $this->getConfiguredCollections();
-
-        $combinations = collect($configuredCollections)->flatMap(function ($collectionHandle) {
-            $collection = Collection::find($collectionHandle);
-
-            if (! $collection) {
-                return [];
-            }
-
-            return $collection->entryBlueprints()->map(fn ($blueprint) => [
-                'collection' => $collection,
-                'blueprint' => $blueprint,
-            ]);
-        })->values()->all();
-
-        if (count($combinations) === 1) {
-            $collection = $combinations[0]['collection'];
-            $blueprint = $combinations[0]['blueprint'];
-            $type = GraphQL::type(EntryType::buildName($collection, $blueprint));
-        } else {
-            $newType = new DynamicEntryUnionType($combinations);
-            GraphQL::addType($newType);
-            $type = GraphQL::type($newType->name);
-        }
+        $type = DynamicEntryUnionType::createTypeFor($this->getConfiguredCollections());
 
         if ($this->config('max_items') !== 1) {
             $type = GraphQL::listOf(GraphQL::nonNull($type));

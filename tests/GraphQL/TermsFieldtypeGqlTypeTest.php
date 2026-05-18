@@ -52,20 +52,16 @@ class TermsFieldtypeGqlTypeTest extends TestCase
             ->with('taxonomies/tags')
             ->andReturn(collect(['tag' => $tag]));
 
+        TermInterface::addTypes();
+
         $expected = TermType::buildName($taxonomy, $tag);
 
-        GraphQL::shouldReceive('type')
-            ->once()
-            ->with($expected)
-            ->andReturn((object) ['name' => $expected]);
-
-        GraphQL::shouldReceive('addType')->never();
-        GraphQL::shouldReceive('listOf')->never();
-
-        $this->fieldtype([
+        $type = $this->fieldtype([
             'taxonomies' => ['tags'],
             'max_items' => 1,
         ])->toGqlType();
+
+        $this->assertEquals($expected, $type->name);
     }
 
     #[Test]
@@ -111,4 +107,3 @@ class TermsFieldtypeGqlTypeTest extends TestCase
         return (new Terms)->setField($field);
     }
 }
-

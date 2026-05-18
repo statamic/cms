@@ -9,7 +9,6 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\GraphQL\Types\DynamicTermUnionType;
-use Statamic\GraphQL\Types\TermType;
 use Statamic\Support\Str;
 
 class SpecificTermQuery extends Query
@@ -29,22 +28,7 @@ class SpecificTermQuery extends Query
 
     public function type(): Type
     {
-        $taxonomy = Taxonomy::findByHandle($this->taxonomyHandle);
-        $blueprints = $taxonomy->termBlueprints();
-
-        $combinations = $blueprints->map(fn ($blueprint) => [
-            'taxonomy' => $taxonomy,
-            'blueprint' => $blueprint,
-        ])->values()->all();
-
-        if (count($combinations) === 1) {
-            return GraphQL::type(TermType::buildName($combinations[0]['taxonomy'], $combinations[0]['blueprint']));
-        }
-
-        $unionType = new DynamicTermUnionType($combinations);
-        GraphQL::addType($unionType);
-
-        return GraphQL::type($unionType->name);
+        return DynamicTermUnionType::createTypeFor(Taxonomy::findByHandle($this->taxonomyHandle));
     }
 
     public function args(): array

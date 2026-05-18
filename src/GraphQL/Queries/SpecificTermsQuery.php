@@ -12,7 +12,6 @@ use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\DynamicTermUnionType;
 use Statamic\GraphQL\Types\JsonArgument;
-use Statamic\GraphQL\Types\TermType;
 use Statamic\Query\OrderBy;
 use Statamic\Support\Str;
 
@@ -34,23 +33,7 @@ class SpecificTermsQuery extends Query
 
     public function type(): Type
     {
-        $taxonomy = Taxonomy::findByHandle($this->taxonomyHandle);
-        $blueprints = $taxonomy->termBlueprints();
-
-        $combinations = $blueprints->map(fn ($blueprint) => [
-            'taxonomy' => $taxonomy,
-            'blueprint' => $blueprint,
-        ])->values()->all();
-
-        if (count($combinations) === 1) {
-            $type = GraphQL::type(TermType::buildName($combinations[0]['taxonomy'], $combinations[0]['blueprint']));
-        } else {
-            $unionType = new DynamicTermUnionType($combinations);
-            GraphQL::addType($unionType);
-            $type = GraphQL::type($unionType->name);
-        }
-
-        return GraphQL::nonNull(GraphQL::paginate($type));
+        return GraphQL::nonNull(GraphQL::paginate(DynamicTermUnionType::createTypeFor(Taxonomy::findByHandle($this->taxonomyHandle))));
     }
 
     public function args(): array

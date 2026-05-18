@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Statamic\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Rebing\GraphQL\Support\UnionType;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\GraphQL;
 
 class DynamicEntryUnionType extends UnionType
 {
@@ -27,6 +31,22 @@ class DynamicEntryUnionType extends UnionType
         return 'DynamicEntryUnionType_'.implode('_', $typeNames);
     }
 
+    public static function createTypeFor(Collection|array $collections): Type
+    {
+        $combinations = is_array($collections)
+            ? static::combinationsForHandles($collections)
+            : static::combinationsFor($collections);
+
+        if (count($combinations) === 1) {
+            return GraphQL::type(EntryType::buildName($combinations[0]['collection'], $combinations[0]['blueprint']));
+        }
+
+        $unionType = new static($combinations);
+        GraphQL::addType($unionType);
+
+        return GraphQL::type($unionType->name);
+    }
+
     public function types(): array
     {
         return array_map(function ($type) {
@@ -37,5 +57,56 @@ class DynamicEntryUnionType extends UnionType
     public function resolveType($value)
     {
         return GraphQL::type(EntryType::buildName($value->collection(), $value->blueprint()));
+    }
+
+    protected static function combinationsFor(Collection $collection): array
+    {
+        return static::uniqueCombinations(
+            static::collectionsFor($collection)
+                ->flatMap(fn (Collection $collection) => $collection->entryBlueprints()->map(fn ($blueprint) => [
+                    'collection' => $collection,
+                    'blueprint' => $blueprint,
+                ]))
+                ->all()
+        );
+    }
+
+    protected static function combinationsForHandles(array $handles): array
+    {
+        return static::uniqueCombinations(
+            collect($handles)
+                ->flatMap(function ($handle) {
+                    $collection = CollectionFacade::find($handle);
+
+                    if (! $collection) {
+                        return [];
+                    }
+
+                    return static::combinationsFor($collection);
+                })
+                ->all()
+        );
+    }
+
+    protected static function uniqueCombinations(array $combinations): array
+    {
+        return collect($combinations)
+            ->unique(fn (array $combination) => EntryType::buildName($combination['collection'], $combination['blueprint']))
+            ->values()
+            ->all();
+    }
+
+    protected static function collectionsFor(Collection $collection): IlluminateCollection
+    {
+        return collect([$collection])->merge(static::mountedCollections($collection));
+    }
+
+    protected static function mountedCollections(Collection $collection): IlluminateCollection
+    {
+        return CollectionFacade::all()->filter(function (Collection $mounted) use ($collection) {
+            $mount = $mounted->mount();
+
+            return $mount && $mount->collectionHandle() === $collection->handle();
+        });
     }
 }
