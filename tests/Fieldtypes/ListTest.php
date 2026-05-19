@@ -23,9 +23,8 @@ class ListTest extends TestCase
     {
         $configFields = (new \ReflectionMethod(Lists::class, 'configFieldItems'))->invoke(new Lists);
 
-        $appearanceSection = collect($configFields)->firstWhere('display', __('Appearance'));
-
-        $this->assertArrayHasKey('add_row', $appearanceSection['fields']);
+        $this->assertArrayHasKey('add_row', $configFields);
+        $this->assertSame('text', $configFields['add_row']['type']);
     }
 
     private function field($config = [])
