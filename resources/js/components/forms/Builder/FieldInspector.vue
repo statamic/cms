@@ -11,7 +11,7 @@ const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; met
 
 const { form, inspecting: field } = injectBuilderContext();
 
-enum FieldTabs {
+enum FieldInspectorTabs {
     Settings = 'settings',
     Conditions = 'conditions',
     Validation = 'validation',
@@ -26,7 +26,7 @@ const originValues = ref(null);
 const originMeta = ref(null);
 const fieldtype = ref(null);
 const blueprint = ref(null);
-const activeTab = ref<FieldTabs>(FieldTabs.Settings);
+const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
 
 const load = () => {
     const cached = cache.get(field.value._id);
@@ -210,12 +210,12 @@ onMounted(() => load());
 
             <Tabs v-else v-model:modelValue="activeTab" :unmount-on-hide="false">
                 <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
-                    <TabTrigger :name="FieldTabs.Settings" :text="__('Settings')" />
-                    <TabTrigger :name="FieldTabs.Conditions" :text="__('Logic')" />
-                    <TabTrigger :name="FieldTabs.Validation" :text="__('Validation')" />
+                    <TabTrigger :name="FieldInspectorTabs.Settings" :text="__('Settings')" />
+                    <TabTrigger :name="FieldInspectorTabs.Conditions" :text="__('Logic')" />
+                    <TabTrigger :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
                 </TabList>
 
-                <TabContent :name="FieldTabs.Settings">
+                <TabContent :name="FieldInspectorTabs.Settings">
                     <div class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2">
                             <div class="size-4">
@@ -256,7 +256,7 @@ onMounted(() => load());
                     </div>
                 </TabContent>
 
-                <TabContent :name="FieldTabs.Conditions">
+                <TabContent :name="FieldInspectorTabs.Conditions">
                     <div class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2">
                             <div class="size-4">
@@ -278,7 +278,7 @@ onMounted(() => load());
                     </div>
                 </TabContent>
 
-                <TabContent :name="FieldTabs.Validation">
+                <TabContent :name="FieldInspectorTabs.Validation">
                     <div class="space-y-6 pt-8">
                         <div data-field-settings class="flex items-center gap-2">
                             <div class="size-4">

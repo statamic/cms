@@ -6,12 +6,11 @@ import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { useDragAndDrop } from './use-drag-and-drop';
 import { uniqid } from '@/bootstrap/globals.js';
 
-const { inspecting, inspectorType, inspect } = injectBuilderContext();
+const { inspecting, inspectorType, inspect, pages } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
     pageIndex: number;
-    totalPages: number;
 }>();
 
 const inspectPage = () => inspect(InspectorType.Page, props.page);
@@ -79,11 +78,11 @@ onMounted(() => {
 <template>
     <div :data-form-page="page._id">
         <div
-            :id="`form-page-${page._id}`"
+            :id="`page-${page._id}`"
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
             role="button"
             tabindex="0"
-            :aria-label="page.title ? __(page.title) : __('Page :current of :total', { current: pageIndex + 1, total: totalPages })"
+            :aria-label="page.title ? __(page.title) : __('Page :current of :total', { current: pageIndex + 1, total: pages.length })"
             data-form-page-label
             @click="inspectPage"
             @keydown.enter.prevent="inspectPage"
@@ -102,7 +101,7 @@ onMounted(() => {
                     :class="isEditing ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                    {{ page.title ? __(page.title) : __('Page :current of :total', { current: pageIndex + 1, total: totalPages }) }}
+                    {{ page.title ? __(page.title) : __('Page :current of :total', { current: pageIndex + 1, total: pages.length }) }}
                 </div>
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>

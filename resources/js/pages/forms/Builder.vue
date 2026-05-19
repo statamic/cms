@@ -30,6 +30,7 @@ import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
 import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
 import FieldInspector from '@/components/forms/Builder/FieldInspector.vue';
 import Page from '@/components/forms/Builder/Page.vue';
+import PageInspector from '@/components/forms/Builder/PageInspector.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -44,6 +45,8 @@ const formFields = ref({
     pages: [
         {
             _id: 'page-1',
+            title: null,
+            instructions: null,
             sections: [],
         },
     ],
@@ -69,6 +72,7 @@ provideBuilderContext({
     formsProInstalled: props.formsProInstalled,
     fieldtypes: props.fieldtypes,
     fieldView,
+    pages,
     inspecting,
     inspectorType,
     inspect,
@@ -135,7 +139,6 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
             :key="page._id"
             :page="page"
             :page-index="index"
-            :total-pages="pages.length"
         />
 
         <p
@@ -155,9 +158,9 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
     />
 
     <LayoutPanel side="right">
+        <PageInspector v-if="inspectorType === InspectorType.Page" />
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
         <FieldInspector v-if="inspectorType === InspectorType.Field" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
-        <p v-if="inspectorType === InspectorType.Page">page</p>
     </LayoutPanel>
 </template>
