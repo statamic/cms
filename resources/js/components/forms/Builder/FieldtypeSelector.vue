@@ -6,17 +6,13 @@ import { Button, Input } from '@ui';
 import { categories, categoryColorClasses } from './categories';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 
-const props = defineProps<{
-    fieldtypes: Array,
-}>();
-
-const { formsProInstalled, fieldView, inspect } = injectBuilderContext();
+const { fieldtypes, formsProInstalled, fieldView, inspect } = injectBuilderContext();
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);
 
 const allFieldtypes = computed(() => {
-    let options = [...props.fieldtypes];
+    let options = [...fieldtypes];
 
     options.push({
         handle: 'section',

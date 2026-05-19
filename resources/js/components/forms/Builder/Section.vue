@@ -12,11 +12,10 @@ const emit = defineEmits<{
 
 const props = defineProps<{
     section: Object,
-    fieldtypes: Array,
     canDeleteSection: Boolean,
 }>();
 
-const { fieldView, inspecting, inspectorType, inspect, clearInspector } = injectBuilderContext();
+const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector } = injectBuilderContext();
 
 const editingField = computed(() => inspectorType.value === InspectorType.Field ? inspecting.value : null);
 const isEditingField = (field) => editingField.value?._id === field._id;
@@ -36,7 +35,7 @@ const blueprint = computed(() => ({
 }));
 
 const fieldtypeCategory = (field) => {
-    const fieldtype = props.fieldtypes.find((f) => f.handle === field.fieldtype);
+    const fieldtype = fieldtypes.find((f) => f.handle === field.fieldtype);
     const hue = fieldtype?.categories?.[0] || 'other';
     return categories[hue] ?? categories.other;
 };
@@ -46,7 +45,7 @@ const fieldtypeIconColorClass = (field) => categoryColorClasses[fieldtypeCategor
 const addField = (fieldtypeHandle, index = null) => {
     const { section } = props;
     const handle = uniqid();
-    const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
+    const fieldtype = fieldtypes.find((f) => f.handle === fieldtypeHandle);
 
     const field = {
         _id: `${section._id}-${section.fields.length}`,
