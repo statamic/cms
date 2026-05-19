@@ -18,6 +18,16 @@ class ListTest extends TestCase
         );
     }
 
+    #[Test]
+    public function it_has_add_row_config()
+    {
+        $configFields = (new \ReflectionMethod(Lists::class, 'configFieldItems'))->invoke(new Lists);
+
+        $appearanceSection = collect($configFields)->firstWhere('display', __('Appearance'));
+
+        $this->assertArrayHasKey('add_row', $appearanceSection['fields']);
+    }
+
     private function field($config = [])
     {
         $ft = new Lists;
