@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Icon } from '@ui';
+import { Button, Icon } from '@ui';
 import Section from './Section.vue';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { useSortable } from './use-drag-and-drop';
+import { __ } from '@/bootstrap/globals';
 
 const { inspecting, inspectorType, inspect, pages, addSection } = injectBuilderContext();
 
@@ -12,10 +13,14 @@ const props = defineProps<{
 }>();
 
 const inspectPage = () => inspect(InspectorType.Page, props.page);
-const isEditing = computed(() => inspectorType.value === InspectorType.Page && inspecting.value?._id === props.page._id);
+const isInspectingPage = computed(() => inspectorType.value === InspectorType.Page && inspecting.value?._id === props.page._id);
+const inspectAction = () => inspect(InspectorType.Action, props.page);
+const isInspectingAction = computed(() => inspectorType.value === InspectorType.Action && inspecting.value?._id === props.page._id);
 const container = useTemplateRef('container');
 const sections = computed(() => props.page.sections);
 const canDeleteSection = computed(() => sections.value.length > 1);
+const isFirstPage = computed(() => pages.value.findIndex((p) => p._id === props.page._id) === 0);
+const isLastPage = computed(() => pages.value.findIndex((p) => p._id === props.page._id) === pages.value.length - 1);
 
 const placeholderTitle = computed(() => {
     let pageIndex = pages.value.findIndex((p) => p._id === props.page._id);
@@ -70,8 +75,8 @@ onMounted(() => {
                 </div>
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200 scroll-mt-[7rem]"
-                    :data-editing-item="isEditing ? '' : undefined"
-                    :class="isEditing ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
+                    :data-editing-item="isInspectingPage ? '' : undefined"
+                    :class="isInspectingPage ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                     {{ page.title ? __(page.title) : placeholderTitle }}
@@ -87,7 +92,22 @@ onMounted(() => {
                 :section
                 :can-delete-section
                 @deleted="sectionDeleted"
-            />
+            >
+                <template v-if="section.fields.length && sectionIndex === (sections.length - 1)" #footer>
+                    <div :id="`actions-${page._id}`" class="mt-8">
+                        <div class="cursor-pointer" @click.prevent="inspectAction">
+                            <Button
+                                variant="primary"
+                                :data-editing-field="isInspectingAction ? '' : undefined"
+                                :data-editing-item="isInspectingAction ? '' : undefined"
+                                class="border-0! dark:border-0! ring-0! shadow-none!"
+                                style="--theme-color-primary: var(--theme-color-gray-950)"
+                                :text="page.button_label ?? (isLastPage ? __('Submit') : __('Next Page'))"
+                            />
+                        </div>
+                    </div>
+                </template>
+            </Section>
 
             <div class="section-gap-drop-zone mx-auto max-w-5xl h-14 -mt-8 flex items-center" :data-section-gap-index="sectionIndex + 1" />
         </template>

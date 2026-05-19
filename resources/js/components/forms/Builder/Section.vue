@@ -11,15 +11,14 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<{
-    section: Object,
-    canDeleteSection: Boolean,
+    section: object,
+    canDeleteSection: boolean,
 }>();
 
 const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector } = injectBuilderContext();
 
-const editingField = computed(() => inspectorType.value === InspectorType.Field ? inspecting.value : null);
-const isEditingField = (field) => editingField.value?._id === field._id;
 const inspectField = (field: any) => inspect(InspectorType.Field, field);
+const isInspectingField = (field) => inspectorType.value === InspectorType.Field && inspecting.value?._id === field._id;
 
 const toggleCollapsed = () => props.section.collapsed = !props.section.collapsed;
 
@@ -110,17 +109,6 @@ const editSection = () => inspect(InspectorType.Section, props.section);
 const deleteSection = () => emit('deleted', props.section._id);
 
 defineExpose({ addField });
-
-// TODO: Refactor everything below this line
-const inspectorTarget = ref('field');
-const fanLength = ref('');
-const favoriteThing = ref('');
-const panelCollapsed = ref(false);
-const nextPageButtonLabel = ref(__('Next Page'));
-
-const inspectActionButton = (target) => {
-    inspectorTarget.value = target;
-};
 </script>
 
 <template>
@@ -185,19 +173,23 @@ const inspectActionButton = (target) => {
                     :blueprint="blueprint"
                     :track-dirty-state="false"
                 >
-                    <div class="field-sort-container field-grid" :data-sort-section="section._id" :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null">
+                    <div
+                        class="field-sort-container field-grid"
+                        :data-sort-section="section._id"
+                        :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null"
+                    >
                         <div
                             v-for="field in section.fields"
                             :key="field._id"
                             :id="`field-${field._id}`"
                             data-field-item
-                            :data-editing-field="isEditingField(field) ? '' : undefined"
-                            :data-editing-item="isEditingField(field) ? '' : undefined"
-                            :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isEditingField(field) }]"
-                            @click.stop="isEditingField(field) || inspectField(field)"
+                            :data-editing-field="isInspectingField(field) ? '' : undefined"
+                            :data-editing-item="isInspectingField(field) ? '' : undefined"
+                            :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspectingField(field) }]"
+                            @click.stop="isInspectingField(field) || inspectField(field)"
                         >
                             <div
-                                v-if="isEditingField(field)"
+                                v-if="isInspectingField(field)"
                                 class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
                             >
                                 <WidthSelector
@@ -244,7 +236,7 @@ const inspectActionButton = (target) => {
                                 :instructions="field.config.instructions"
                             >
                                 <template #label>
-                                    <Label :class="{ 'cursor-pointer': !isEditingField(field) }">
+                                    <Label :class="{ 'cursor-pointer': !isInspectingField(field) }">
                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                                             <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', fieldtypeIconColorClass(field)]" aria-hidden="true" />
                                             <span>
@@ -268,6 +260,8 @@ const inspectActionButton = (target) => {
                         </div>
                     </div>
                 </PublishContainer>
+
+                <slot name="footer" />
             </Card>
         </div>
     </Panel>

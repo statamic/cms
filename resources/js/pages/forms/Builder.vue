@@ -33,6 +33,7 @@ import Page from '@/components/forms/Builder/Page.vue';
 import PageInspector from '@/components/forms/Builder/PageInspector.vue';
 import { uniqid } from '@/bootstrap/globals.js';
 import { useFieldtypeDraggable } from '@/components/forms/Builder/use-drag-and-drop';
+import ActionInspector from '@/components/forms/Builder/ActionInspector.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -49,6 +50,8 @@ const formFields = ref({
             _id: 'page-1',
             title: null,
             instructions: null,
+            button_label: null,
+            previous_page_label: null,
             sections: [],
         },
     ],
@@ -109,6 +112,8 @@ const addPage = (pageId: string, sectionIndex: number, fieldIndex: number | null
         _id: uniqid(),
         title: null,
         instructions: null,
+        button_label: null,
+        previous_page_label: null,
         sections: sectionsForNewPage,
     };
 
@@ -159,7 +164,7 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     const handle = uniqid();
 
     const field = {
-        _id: `${section._id}-${section.fields.length}`,
+        _id: handle,
         config: {
             display: __(fieldtype.title),
             hidden: false,
@@ -293,6 +298,7 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
     />
 
     <LayoutPanel side="right">
+        <ActionInspector v-if="inspectorType === InspectorType.Action" />
         <PageInspector v-if="inspectorType === InspectorType.Page" />
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
         <FieldInspector v-if="inspectorType === InspectorType.Field" />
