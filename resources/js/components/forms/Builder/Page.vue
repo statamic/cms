@@ -9,7 +9,6 @@ const { inspecting, inspectorType, inspect, pages, addSection } = injectBuilderC
 
 const props = defineProps<{
     page: object;
-    pageIndex: number;
 }>();
 
 const inspectPage = () => inspect(InspectorType.Page, props.page);
@@ -17,6 +16,12 @@ const isEditing = computed(() => inspectorType.value === InspectorType.Page && i
 const container = useTemplateRef('container');
 const sections = computed(() => props.page.sections);
 const canDeleteSection = computed(() => sections.value.length > 1);
+
+const placeholderTitle = computed(() => {
+    let pageIndex = pages.value.findIndex((p) => p._id === props.page._id);
+
+    return __('Page :current of :total', { current: pageIndex + 1, total: pages.value.length });
+});
 
 const sectionDeleted = (sectionId) => props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
 
@@ -50,7 +55,7 @@ onMounted(() => {
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
             role="button"
             tabindex="0"
-            :aria-label="page.title ? __(page.title) : __('Page :current of :total', { current: pageIndex + 1, total: pages.length })"
+            :aria-label="page.title ? __(page.title) : placeholderTitle"
             data-form-page-label
             @click="inspectPage"
             @keydown.enter.prevent="inspectPage"
@@ -69,7 +74,7 @@ onMounted(() => {
                     :class="isEditing ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                    {{ page.title ? __(page.title) : __('Page :current of :total', { current: pageIndex + 1, total: pages.length }) }}
+                    {{ page.title ? __(page.title) : placeholderTitle }}
                 </div>
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>

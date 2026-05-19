@@ -274,7 +274,6 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
             v-for="(page, index) in pages"
             :key="page._id"
             :page="page"
-            :page-index="index"
         />
 
         <p

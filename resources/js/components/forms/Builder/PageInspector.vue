@@ -13,36 +13,14 @@ enum PageInspectorTabs {
 
 const activeTab = ref<PageInspectorTabs>(PageInspectorTabs.Settings);
 
+const placeholderTitle = computed(() => {
+    let pageIndex = pages.value.findIndex((p) => p._id === page.value._id);
 
+    return __('Page :current of :total', { current: pageIndex + 1, total: pages.value.length });
+});
 
 // todo: refactor everything under this line
-const formPageTotal = 1;
 const inspectorTarget = ref('page_1');
-const pageOneInternalName = ref('');
-const pageTwoInternalName = ref('Goodbye');
-const settingsHelpText = ref('');
-
-const selectedPageAnchor = computed(() => (inspectorTarget.value === 'page_2' ? '#form-page-2' : '#form-page-1'));
-
-const selectedPageHeadingLabel = computed(() => {
-    if (inspectorTarget.value === 'page_1') return __('Page :current of :total', { current: 1, total: formPageTotal });
-    if (inspectorTarget.value === 'page_2') return __('Goodbye');
-    return __('Page');
-});
-
-const selectedPageInternalName = computed({
-    get() {
-        return inspectorTarget.value === 'page_2' ? pageTwoInternalName.value : pageOneInternalName.value;
-    },
-    set(value) {
-        if (inspectorTarget.value === 'page_2') {
-            pageTwoInternalName.value = value;
-            return;
-        }
-
-        pageOneInternalName.value = value;
-    },
-});
 
 const selectedPageLogicMockPreset = computed(() => {
     if (inspectorTarget.value === 'page_2') {
@@ -177,7 +155,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.title ? __(page.title) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
+                                {{ page.title ? __(page.title) : placeholderTitle }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -186,7 +164,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                         </div>
 
                         <Field :label="__('Label')">
-                            <Input v-model="page.title" :placeholder="__('Page :current of :total', { current: 'FOO', total: pages.length })" />
+                            <Input v-model="page.title" :placeholder="placeholderTitle" />
                         </Field>
 
                         <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
@@ -198,19 +176,18 @@ const selectedPageDestinationStepLabel = computed(() => (
                 <TabContent :name="PageInspectorTabs.Conditions">
                     <div class="group/logic-tab space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
-                            <div class="flex items-center gap-2.5">
-                                <div class="size-4">
-                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
-                                </div>
-                                <a :href="selectedPageAnchor" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                    {{ selectedPageHeadingLabel }}
-                                    <div class="grid *:[grid-area:1/1]">
-                                        <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
-                                        <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
-                                    </div>
-                                </a>
+                            <div class="size-4">
+                                <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
+                            <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                {{ page.title ? __(page.title) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
                         </div>
+
                         <LogicFlowMock
                             :key="`desktop-page-logic-${inspectorTarget}`"
                             :destination-step-label="selectedPageDestinationStepLabel"
@@ -220,7 +197,9 @@ const selectedPageDestinationStepLabel = computed(() => (
                             :use-page-destination-options="true"
                             :mock-preset="selectedPageLogicMockPreset"
                         />
+
                         <div v-if="inspectorTarget === 'page_2'" class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
+
                         <LogicFlowMock
                             v-if="inspectorTarget === 'page_2'"
                             :key="`desktop-page-logic-secondary-${inspectorTarget}`"
@@ -231,6 +210,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                             :use-page-destination-options="true"
                             :mock-preset="goodbyeSecondRuleMockPreset"
                         />
+
                         <div class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
                             <Button size="sm" :text="__('+ Add Rule')" />
                         </div>
