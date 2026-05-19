@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Icon } from '@ui';
 import Section from './Section.vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, useTemplateRef } from 'vue';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
-import { useDragAndDrop } from './use-drag-and-drop';
-import { uniqid } from '@/bootstrap/globals.js';
+import { useSortable } from './use-drag-and-drop';
 
-const { inspecting, inspectorType, inspect, pages } = injectBuilderContext();
+const { inspecting, inspectorType, inspect, pages, addSection } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
@@ -15,40 +14,11 @@ const props = defineProps<{
 
 const inspectPage = () => inspect(InspectorType.Page, props.page);
 const isEditing = computed(() => inspectorType.value === InspectorType.Page && inspecting.value?._id === props.page._id);
-const sectionRefs = ref({});
+const container = useTemplateRef('container');
 const sections = computed(() => props.page.sections);
 const canDeleteSection = computed(() => sections.value.length > 1);
 
-const addSection = (atIndex, fields = []) => {
-    const section = {
-        _id: uniqid(),
-        collapsed: false,
-        title: __('Section'),
-        fields,
-    };
-
-    props.page.sections.splice(atIndex, 0, section);
-
-    return section;
-};
-
-const addSectionAt = (sourceSectionId, fieldIndex) => {
-    const sourceSection = sections.value.find((s) => s._id === sourceSectionId);
-    if (!sourceSection) return;
-
-    const sourceSectionIndex = sections.value.indexOf(sourceSection);
-    const movedFields = sourceSection.fields.splice(fieldIndex);
-
-    addSection(sourceSectionIndex + 1, movedFields);
-};
-
-const sectionDeleted = (sectionId) => {
-    props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
-};
-
-const addField = (sectionId, fieldtypeHandle, atIndex) => {
-    sectionRefs.value[sectionId]?.addField(fieldtypeHandle, atIndex);
-};
+const sectionDeleted = (sectionId) => props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
 
 const moveField = (fromSectionId, toSectionId, oldIndex, newIndex) => {
     const fromSection = sections.value.find((s) => s._id === fromSectionId);
@@ -60,23 +30,21 @@ const moveField = (fromSectionId, toSectionId, oldIndex, newIndex) => {
     toSection.fields.splice(newIndex, 0, field);
 };
 
-useDragAndDrop({
+useSortable({
+    container,
     sections,
-    onSectionAdded: addSection,
-    onSectionAddedWithinSection: addSectionAt,
-    onFieldAdded: addField,
     onFieldMoved: moveField,
 });
 
 onMounted(() => {
     if (sections.value.length === 0) {
-        addSection(0);
+        addSection(props.page._id, 0);
     }
 });
 </script>
 
 <template>
-    <div :data-form-page="page._id">
+    <div ref="container" :data-form-page="page._id">
         <div
             :id="`page-${page._id}`"
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
@@ -111,7 +79,6 @@ onMounted(() => {
 
         <template v-for="(section, sectionIndex) in sections" :key="section._id">
             <Section
-                :ref="(el) => sectionRefs[section._id] = el"
                 :section
                 :can-delete-section
                 @deleted="sectionDeleted"

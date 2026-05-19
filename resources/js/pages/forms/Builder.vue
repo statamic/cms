@@ -31,6 +31,8 @@ import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
 import FieldInspector from '@/components/forms/Builder/FieldInspector.vue';
 import Page from '@/components/forms/Builder/Page.vue';
 import PageInspector from '@/components/forms/Builder/PageInspector.vue';
+import { uniqid } from '@/bootstrap/globals.js';
+import { useFieldtypeDraggable } from '@/components/forms/Builder/use-drag-and-drop';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -67,6 +69,139 @@ const inspect = (type: string | null, data: any = null) => {
 
 const clearInspector = () => inspect(null);
 
+const addPage = (pageId: string, sectionIndex: number, fieldIndex: number | null = null) => {
+    const pageIndex = pages.value.findIndex(p => p._id === pageId);
+    if (pageIndex === -1) return;
+
+    const page = pages.value[pageIndex];
+    const sections = page.sections;
+
+    let sectionsForNewPage = [];
+
+    if (fieldIndex !== null && sectionIndex < sections.length) {
+        const section = sections[sectionIndex];
+        const remainingFields = section.fields.splice(fieldIndex);
+
+        if (remainingFields.length > 0) {
+            sectionsForNewPage.push({
+                _id: uniqid(),
+                collapsed: false,
+                title: __('Section'),
+                fields: remainingFields,
+            });
+        }
+
+        sectionsForNewPage.push(...sections.splice(sectionIndex + 1));
+    } else {
+        sectionsForNewPage = sections.splice(sectionIndex);
+    }
+
+    if (sectionsForNewPage.length === 0) {
+        sectionsForNewPage.push({
+            _id: uniqid(),
+            collapsed: false,
+            title: __('Section'),
+            fields: [],
+        });
+    }
+
+    const newPage = {
+        _id: uniqid(),
+        title: null,
+        instructions: null,
+        sections: sectionsForNewPage,
+    };
+
+    formFields.value.pages.splice(pageIndex + 1, 0, newPage);
+
+    inspect(InspectorType.Page, newPage);
+};
+
+const addSection = (pageId: string, atIndex: number, fields = []) => {
+    const page = pages.value.find((p) => p._id === pageId);
+    if (!page) return;
+
+    const section = {
+        _id: uniqid(),
+        collapsed: false,
+        title: __('Section'),
+        fields,
+    };
+
+    page.sections.splice(atIndex, 0, section);
+
+    return section;
+};
+
+const addSectionAt = (pageId: string, sourceSectionId: string, fieldIndex: number) => {
+    const page = pages.value.find((p) => p._id === pageId);
+    if (!page) return;
+
+    const sourceSection = page.sections.find((s) => s._id === sourceSectionId);
+    if (!sourceSection) return;
+
+    const sourceSectionIndex = page.sections.indexOf(sourceSection);
+    const movedFields = sourceSection.fields.splice(fieldIndex);
+
+    addSection(pageId, sourceSectionIndex + 1, movedFields);
+};
+
+const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, atIndex: number) => {
+    const page = pages.value.find((p) => p._id === pageId);
+    if (!page) return;
+
+    const section = page.sections.find((s) => s._id === sectionId);
+    if (!section) return;
+
+    const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
+    if (!fieldtype) return;
+
+    const handle = uniqid();
+
+    const field = {
+        _id: `${section._id}-${section.fields.length}`,
+        config: {
+            display: __(fieldtype.title),
+            hidden: false,
+        },
+        fieldtype: fieldtypeHandle,
+        handle,
+        icon: fieldtype?.icon || 'fieldtype-generic',
+        type: 'inline',
+        preview: {
+            config: { ...fieldtype.preview?.config, handle },
+            value: fieldtype.preview?.value,
+            meta: fieldtype.preview?.meta,
+        },
+    };
+
+    section.fields.splice(atIndex, 0, field);
+
+    inspect(InspectorType.Field, field);
+};
+
+const handleFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
+    if (fieldtypeHandle === 'page_break') {
+        addPage(pageId, sectionIndex, fieldIndex);
+        return;
+    }
+
+    if (fieldtypeHandle === 'section') {
+        fieldIndex !== null && sectionId
+            ? addSectionAt(pageId, sectionId, fieldIndex)
+            : addSection(pageId, sectionIndex);
+
+        return;
+    }
+
+    addField(pageId, sectionId, fieldtypeHandle, fieldIndex);
+};
+
+useFieldtypeDraggable({
+    pages,
+    onDrop: handleFieldtypeDrop,
+});
+
 provideBuilderContext({
     form: props.form,
     formsProInstalled: props.formsProInstalled,
@@ -77,6 +212,7 @@ provideBuilderContext({
     inspectorType,
     inspect,
     clearInspector,
+    addSection,
 });
 
 const onEscape = (event: KeyboardEvent) => {

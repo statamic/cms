@@ -1,31 +1,31 @@
 import { nextTick, onMounted, onUnmounted, watch } from 'vue';
-import { Draggable, Sortable, Plugins } from '@shopify/draggable';
+import { Draggable, Sortable } from '@shopify/draggable';
 
-const DROP_ZONE_SELECTOR = '.fieldtype-source-container, .section-drop-zone, .section-gap-drop-zone';
 const SORT_CONTAINER_SELECTOR = '.field-sort-container';
 
-export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinSection, onFieldAdded, onFieldMoved }) {
+/**
+ * Handles dragging fieldtypes from the source panel onto drop zones.
+ * Should be used once at the Builder level.
+ */
+export function useFieldtypeDraggable({ pages, onDrop }) {
     let draggable = null;
-    let sortable = null;
     let lastClientY = 0;
 
     const dropTarget = createDropTarget();
     const dropIndicator = createDropIndicator();
 
-    const refreshDraggable = () => {
+    const refresh = () => {
         draggable?.destroy();
-        initDraggable();
+        init();
     };
 
-    const refreshSortable = () => {
-        sortable?.destroy();
-        initSortable();
-    };
-
-    const initDraggable = () => {
+    const init = () => {
         draggable?.destroy();
 
-        const containers = document.querySelectorAll(DROP_ZONE_SELECTOR);
+        const fieldtypeSource = document.querySelectorAll('.fieldtype-source-container');
+        const dropZones = document.querySelectorAll('.section-drop-zone, .section-gap-drop-zone');
+        const containers = [...fieldtypeSource, ...dropZones];
+
         if (containers.length === 0) return;
 
         draggable = new Draggable(containers, {
@@ -57,6 +57,7 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
                 hideIndicator();
                 return;
             }
+
             if (isDropZone(event.overContainer)) dropTarget.enter(event.overContainer);
         });
 
@@ -66,40 +67,11 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
             const target = dropTarget.effective;
             dropTarget.reset();
             hideIndicator();
+            event.mirror?.remove();
 
             if (!target) return;
+
             handleDrop(target, event.source.dataset.fieldtype);
-        });
-    };
-
-    const initSortable = () => {
-        sortable?.destroy();
-
-        const containers = document.querySelectorAll(SORT_CONTAINER_SELECTOR);
-        if (containers.length === 0) return;
-
-        sortable = new Sortable(containers, {
-            draggable: '[data-field-item]',
-            handle: '[data-field-item]',
-            distance: 5,
-            mirror: { constrainDimensions: true, appendTo: 'body' },
-            swapAnimation: { vertical: true },
-            plugins: [Plugins.SwapAnimation],
-            exclude: { plugins: [Draggable.Plugins.Focusable] },
-        });
-
-        sortable.on('drag:start', () => document.documentElement.classList.add('cursor-grabbing'));
-        sortable.on('drag:stop', () => document.documentElement.classList.remove('cursor-grabbing'));
-
-        sortable.on('sortable:stop', (event) => {
-            const { oldIndex, newIndex, oldContainer, newContainer } = event;
-            const from = oldContainer.dataset.sortSection;
-            const to = newContainer.dataset.sortSection;
-
-            if (!from || !to) return;
-            if (from === to && oldIndex === newIndex) return;
-
-            onFieldMoved(from, to, oldIndex, newIndex);
         });
     };
 
@@ -108,8 +80,9 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
         if (!target) return hideIndicator();
 
         const isGap = target.classList.contains('section-gap-drop-zone');
-        const isSectionDrag = event.source.dataset.fieldtype === 'section';
-        if (isGap && !isSectionDrag) return hideIndicator();
+        const fieldtype = event.source.dataset.fieldtype;
+        const isStructuralDrag = fieldtype === 'section' || fieldtype === 'page_break';
+        if (isGap && !isStructuralDrag) return hideIndicator();
 
         if (isGap) return target.appendChild(dropIndicator);
 
@@ -132,42 +105,143 @@ export function useDragAndDrop({ sections, onSectionAdded, onSectionAddedWithinS
     const handleDrop = (target, fieldtypeHandle) => {
         if (!fieldtypeHandle) return;
 
+        const pageEl = target.closest('[data-form-page]');
+        if (!pageEl) return;
+
+        const pageId = pageEl.dataset.formPage;
+        const page = pages.value.find((p) => p._id === pageId);
+        if (!page) return;
+
         if (target.classList.contains('section-gap-drop-zone')) {
-            if (fieldtypeHandle !== 'section') return;
-            onSectionAdded(parseInt(target.dataset.sectionGapIndex, 10));
+            const sectionIndex = parseInt(target.dataset.sectionGapIndex, 10);
+            onDrop({ pageId, fieldtypeHandle, sectionIndex, fieldIndex: null });
             return;
         }
 
         const sectionId = target.dataset.sectionDropZone;
         if (!sectionId) return;
 
-        const fields = document.querySelectorAll(`[data-section-drop-zone="${sectionId}"] [data-field-item]`);
-        const index = indexFromClientY(fields, lastClientY);
+        const sectionIndex = page.sections.findIndex((s) => s._id === sectionId);
+        if (sectionIndex === -1) return;
 
-        if (fieldtypeHandle === 'section') {
-            onSectionAddedWithinSection(sectionId, index);
-        } else {
-            onFieldAdded(sectionId, fieldtypeHandle, index);
-        }
+        const fields = document.querySelectorAll(`[data-section-drop-zone="${sectionId}"] [data-field-item]`);
+        const fieldIndex = indexFromClientY(fields, lastClientY);
+
+        onDrop({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex });
     };
 
     onMounted(async () => {
         await nextTick();
         await nextTick();
-        initDraggable();
-        initSortable();
+        init();
     });
 
     onUnmounted(() => {
         draggable?.destroy();
+    });
+
+    // Refresh when pages or sections change
+    watch(
+        () => pages.value.flatMap((p) => p.sections).length,
+        () => nextTick(refresh),
+    );
+
+    watch(
+        () => pages.value.flatMap((p) => p.sections.flatMap((s) => s.fields)).length,
+        () => nextTick(refresh),
+    );
+}
+
+/**
+ * Handles sorting/reordering fields within sections.
+ * Should be used per-page.
+ */
+export function useSortable({ container, sections, onFieldMoved }) {
+    let sortable = null;
+
+    const refresh = () => {
+        sortable?.destroy();
+        init();
+    };
+
+    const init = () => {
+        sortable?.destroy();
+
+        const el = container.value;
+        if (!el) return;
+
+        const containers = el.querySelectorAll(SORT_CONTAINER_SELECTOR);
+        if (containers.length === 0) return;
+
+        sortable = new Sortable(containers, {
+            draggable: '[data-field-item]',
+            handle: '[data-field-item]',
+            distance: 5,
+            mirror: { constrainDimensions: true, appendTo: 'body' },
+            exclude: { plugins: [Draggable.Plugins.Focusable] },
+        });
+
+        sortable.on('drag:start', () => document.documentElement.classList.add('cursor-grabbing'));
+        sortable.on('drag:stop', () => document.documentElement.classList.remove('cursor-grabbing'));
+
+        let dragStartState = null;
+
+        sortable.on('sortable:start', (event) => {
+            // Capture original DOM state before any manipulation
+            const container = event.dragEvent.sourceContainer;
+            const children = [...container.querySelectorAll('[data-field-item]')];
+            const sourceIndex = children.indexOf(event.dragEvent.source);
+            dragStartState = {
+                container,
+                index: sourceIndex,
+                element: event.dragEvent.source,
+            };
+        });
+
+        sortable.on('sortable:stop', (event) => {
+            const { oldIndex, newIndex, oldContainer, newContainer } = event;
+            const from = oldContainer.dataset.sortSection;
+            const to = newContainer.dataset.sortSection;
+
+            if (!from || !to) {
+                dragStartState = null;
+                return;
+            }
+            if (from === to && oldIndex === newIndex) {
+                dragStartState = null;
+                return;
+            }
+
+            // Revert DOM to original state - Vue will handle the update via reactivity
+            if (dragStartState) {
+                const { container, index, element } = dragStartState;
+                element.remove();
+                const children = [...container.querySelectorAll('[data-field-item]')];
+                if (index < children.length) {
+                    container.insertBefore(element, children[index]);
+                } else {
+                    container.appendChild(element);
+                }
+            }
+            dragStartState = null;
+
+            onFieldMoved(from, to, oldIndex, newIndex);
+        });
+    };
+
+    onMounted(async () => {
+        await nextTick();
+        await nextTick();
+        init();
+    });
+
+    onUnmounted(() => {
         sortable?.destroy();
     });
 
-    watch(() => sections.value.length, () => nextTick(refreshDraggable));
-
     watch(
         () => sections.value.map((s) => s.fields.length).join(','),
-        () => nextTick(refreshSortable),
+        () => nextTick(refresh),
     );
 }
 
@@ -214,4 +288,3 @@ function indexFromClientY(elements, clientY) {
 
     return index;
 }
-
