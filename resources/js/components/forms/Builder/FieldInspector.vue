@@ -160,7 +160,7 @@ onMounted(() => load());
                             :origin-values
                             :origin-meta
                         >
-                            <PublishFieldsProvider>
+                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
                                 <div class="publish-fields">
                                     <PublishField
                                         v-for="field in blueprint.tabs[0].sections[0].fields"
@@ -259,7 +259,7 @@ onMounted(() => load());
                             :origin-values
                             :origin-meta
                         >
-                            <PublishFieldsProvider>
+                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
                                 <div class="publish-fields">
                                     <PublishField
                                         v-for="field in blueprint.tabs[0].sections[0].fields"
