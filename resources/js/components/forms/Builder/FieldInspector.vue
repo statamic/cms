@@ -118,89 +118,109 @@ onMounted(() => load());
 
 <template>
     <div>
-<!--        <div class="right-panel-popover min-[1000px]:hidden">-->
-<!--            <div id="popover-right-panel" class="right-panel-popover__menu" popover>-->
-<!--                <button class="right-panel-popover__close-button" title="Close" popovertarget="popover-right-panel">-->
-<!--                    <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>-->
-<!--                </button>-->
-<!--                <div class="@container pt-6 pb-40 px-2.5">-->
-<!--                    <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">-->
-<!--                        <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">-->
-<!--                            <TabTrigger name="settings" :text="__('Settings')" />-->
-<!--                            <TabTrigger name="conditions" :text="__('Logic')" />-->
-<!--                            <TabTrigger name="validation" :text="__('Validation')" />-->
-<!--                        </TabList>-->
+        <!-- Mobile -->
+        <div class="right-panel-popover min-[1000px]:hidden">
+            <div id="popover-right-panel" class="right-panel-popover__menu" popover>
+                <button class="right-panel-popover__close-button" :title="__('Close')" popovertarget="popover-right-panel">
+                    <svg height="100pt" aria-hidden="true" viewBox="0 0 100 100" width="100pt" xmlns="http://www.w3.org/2000/svg"><path d="m91.668 13.676-5.3398-5.3398-36.328 36.324-36.328-36.324-5.3398 5.3398 36.328 36.324-36.328 36.324 5.3398 5.3398 36.328-36.324 36.328 36.324 5.3398-5.3398-36.328-36.324z"/></svg>
+                </button>
+                <div class="@container pt-6 pb-40 px-2.5">
+                    <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+                        <Icon name="loading" />
+                    </div>
 
-<!--                        <TabContent name="settings">-->
-<!--                            <div class="space-y-6 pt-8">-->
-<!--                                <div class="flex items-center gap-2.5">-->
-<!--                                    <div class="size-4">-->
-<!--                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />-->
-<!--                                    </div>-->
-<!--                                    <a href="#editing-field" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">-->
-<!--                                        <span class="truncate">{{ settingsLabel }}</span>-->
-<!--                                        <div class="grid *:[grid-area:1/1]">-->
-<!--                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />-->
-<!--                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />-->
-<!--                                        </div>-->
-<!--                                    </a>-->
-<!--                                </div>-->
+                    <Tabs v-else v-model:modelValue="activeTab" :unmount-on-hide="false">
+                <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
+                    <TabTrigger :name="FieldInspectorTabs.Settings" :text="__('Settings')" />
+                    <TabTrigger :name="FieldInspectorTabs.Conditions" :text="__('Logic')" />
+                    <TabTrigger :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
+                </TabList>
 
-<!--                                <Field :label="__('Label')">-->
-<!--                                    <Input v-model="settingsLabel" />-->
-<!--                                </Field>-->
+                <TabContent :name="FieldInspectorTabs.Settings">
+                    <div class="space-y-6 pt-8">
+                        <div data-field-settings class="flex items-center gap-2">
+                            <div class="size-4">
+                                <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
+                            <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                <span class="truncate">{{ field.config.display }}</span>
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
+                        </div>
 
-<!--                                <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">-->
-<!--                                    <Textarea v-model="settingsHelpText" :rows="2" resize="vertical" />-->
-<!--                                </Field>-->
+                        <PublishContainer
+                            ref="container"
+                            :blueprint
+                            :meta
+                            :errors
+                            v-model="values"
+                            :origin-values
+                            :origin-meta
+                        >
+                            <PublishFieldsProvider>
+                                <div class="publish-fields">
+                                    <PublishField
+                                        v-for="field in blueprint.tabs[0].sections[0].fields"
+                                        :key="field.handle"
+                                        :config="field"
+                                        :class="[
+                                            'form-group',
+                                            `field-w-${field.width}`
+                                        ]"
+                                    />
+                                </div>
+                            </PublishFieldsProvider>
+                        </PublishContainer>
+                    </div>
+                </TabContent>
 
-<!--                                <Field :label="__('Placeholder')">-->
-<!--                                    <Input v-model="settingsPlaceholder" />-->
-<!--                                </Field>-->
+                <TabContent :name="FieldInspectorTabs.Conditions">
+                    <div class="space-y-6 pt-8">
+                        <div data-field-settings class="flex items-center gap-2">
+                            <div class="size-4">
+                                <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
+                            <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                <span class="truncate">{{ field.config.display }}</span>
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
+                        </div>
 
-<!--                                <Field :label="__('Character Limit')" :instructions="__('Set the recommended maximum number of enterable characters.')">-->
-<!--                                    <Input v-model="settingsCharacterLimit" type="number" />-->
-<!--                                </Field>-->
+                        <div class="space-y-4">
+                            <LogicFlowMock :use-when-selector="true" />
+                            <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
+                        </div>
+                    </div>
+                </TabContent>
 
-<!--                                <Field :label="__('Options')">-->
-<!--                                    <TableFieldtype-->
-<!--                                        handle="options"-->
-<!--                                        v-model:value="optionRows"-->
-<!--                                        :config="optionRowsConfig"-->
-<!--                                    />-->
-<!--                                </Field>-->
-<!--                            </div>-->
-<!--                        </TabContent>-->
+                <TabContent :name="FieldInspectorTabs.Validation">
+                    <div class="space-y-6 pt-8">
+                        <div data-field-settings class="flex items-center gap-2">
+                            <div class="size-4">
+                                <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
+                            </div>
+                            <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
+                                <span class="truncate">{{ field.config.display }}</span>
+                                <div class="grid *:[grid-area:1/1]">
+                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                </div>
+                            </a>
+                        </div>
 
-<!--                        <TabContent name="conditions">-->
-<!--                            <div class="space-y-6 pt-8">-->
-<!--                                <div class="flex items-center gap-2.5">-->
-<!--                                    <div class="size-4">-->
-<!--                                        <Icon name="fieldtype-radio" class="size-4 text-gray-500 dark:text-gray-300" />-->
-<!--                                    </div>-->
-<!--                                    <a href="#editing-field" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">-->
-<!--                                        <span class="truncate">{{ settingsLabel }}</span>-->
-<!--                                        <div class="grid *:[grid-area:1/1]">-->
-<!--                                            <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />-->
-<!--                                            <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />-->
-<!--                                        </div>-->
-<!--                                    </a>-->
-<!--                                </div>-->
-
-<!--                                <div class="space-y-4">-->
-<!--                                    <LogicFlowMock :use-when-selector="true" />-->
-<!--                                    <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </TabContent>-->
-
-<!--                        <TabContent name="validation">-->
-<!--                            <p class="text-sm text-gray-700 dark:text-gray-200">{{ __('Validation') }}</p>-->
-<!--                        </TabContent>-->
-<!--                    </Tabs>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+                        <FieldValidationBuilder :config="values" @updated="values.validate = $event" />
+                    </div>
+                </TabContent>
+                    </Tabs>
+                </div>
+            </div>
+        </div>
 
         <!-- Desktop -->
         <div class="@container relative pt-6 pb-12 px-2.5 pe-4.5 max-[1000px]:hidden">
