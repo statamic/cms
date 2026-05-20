@@ -70,7 +70,6 @@ class FormBuilderController extends CpController
             'pages' => ['required', 'array'],
         ]);
 
-        // todo: rename titles to displays?
         $pages = collect($request->pages)->map(function (array $page) {
             return Arr::removeNullValues([
                 'display' => $page['display'] ?? null,
@@ -94,8 +93,8 @@ class FormBuilderController extends CpController
     private function toVueObject(FormFields $formFields): array
     {
         return [
-            'pages' => $formFields->pages()->map(function (array $page, $i): array {
-                return array_merge($this->pageToVue($page), ['_id' => $i]);
+            'pages' => $formFields->pages()->map(function (array $page): array {
+                return array_merge($this->pageToVue($page), ['_id' => Str::random()]);
             })->values()->all(),
         ];
     }
@@ -107,23 +106,19 @@ class FormBuilderController extends CpController
             'instructions' => $page['instructions'] ?? null,
             'button_label' => $page['button_label'] ?? null,
             'previous_page_label' => $page['previous_page_label'] ?? null,
-            'sections' => collect($page['sections'])->map(function (array $section, int $i) use ($page): array {
-                $handle = Str::slug($page['display'] ?? 'page').'-'.$i;
-
-                return array_merge($this->sectionToVue($section, $i, $page), ['_id' => $handle.'-'.$i]);
+            'sections' => collect($page['sections'])->map(function (array $section): array {
+                return array_merge($this->sectionToVue($section), ['_id' => Str::random()]);
             })->values()->all(),
         ];
     }
 
-    private function sectionToVue(array $section, int $sectionIndex, array $page): array
+    private function sectionToVue(array $section): array
     {
         return Arr::removeNullValues([
             'display' => $section['display'] ?? __('Section'),
         ]) + [
-            'fields' => collect($section['fields'] ?? [])->map(function (array $field, int $i) use ($page, $sectionIndex) {
-                $id = Str::slug($page['display'] ?? 'page').'-'.$sectionIndex.'-'.$i;
-
-                return array_merge(FormFieldTransformer::toVue($field), ['_id' => $id]);
+            'fields' => collect($section['fields'] ?? [])->map(function (array $field) {
+                return array_merge(FormFieldTransformer::toVue($field), ['_id' => Str::random()]);
             })->all(),
         ];
     }
