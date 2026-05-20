@@ -3,7 +3,9 @@
 namespace Tests\Data;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Search\Searchable;
 use Statamic\Data\DataCollection;
+use Statamic\Search\Result;
 use Tests\TestCase;
 
 class DataCollectionTest extends TestCase
@@ -45,9 +47,26 @@ class DataCollectionTest extends TestCase
         $this->assertFalse($a->deleted);
         $this->assertFalse($b->deleted);
     }
+
+    #[Test]
+    public function sorting_search_results_by_unsafe_method_does_not_invoke_it()
+    {
+        $a = new DataCollectionTestObject('alfa');
+        $b = new DataCollectionTestObject('bravo');
+
+        $collection = new DataCollection([
+            new Result($a, 'test'),
+            new Result($b, 'test'),
+        ]);
+
+        $collection->multisort('delete');
+
+        $this->assertFalse($a->deleted);
+        $this->assertFalse($b->deleted);
+    }
 }
 
-class DataCollectionTestObject
+class DataCollectionTestObject implements Searchable
 {
     public bool $deleted = false;
 
@@ -63,5 +82,20 @@ class DataCollectionTestObject
     public function get($key)
     {
         return $this->{$key} ?? null;
+    }
+
+    public function getSearchValue(string $field)
+    {
+        return $this->{$field} ?? null;
+    }
+
+    public function getSearchReference(): string
+    {
+        return 'test::'.$this->title;
+    }
+
+    public function toSearchResult(): Result
+    {
+        return new Result($this, 'test');
     }
 }
