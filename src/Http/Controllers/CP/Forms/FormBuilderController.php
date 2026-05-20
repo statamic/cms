@@ -34,6 +34,7 @@ class FormBuilderController extends CpController
             ->unique()
             ->map(fn ($class) => app($class))
             ->filter->isSelectable()
+            ->reject(fn (FormFieldtype $fieldtype) => $this->wrappedFieldtypeIsUnselectable($fieldtype))
             ->values();
 
         $fieldtypesPortedToFormFieldtypes = $formFieldtypes
@@ -79,6 +80,19 @@ class FormBuilderController extends CpController
         $this->setFormFields($request, $form);
 
         $form->save();
+    }
+
+    private function wrappedFieldtypeIsUnselectable(FormFieldtype $fieldtype): bool
+    {
+        if (! $handle = $fieldtype::fieldtype()) {
+            return false;
+        }
+
+        if (! FieldtypeRepository::selectableInFormIsOverriden($handle)) {
+            return false;
+        }
+
+        return ! FieldtypeRepository::hasBeenMadeSelectableInForms($handle);
     }
 
     private function toVueObject(FormFields $formFields): array
