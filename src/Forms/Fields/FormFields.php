@@ -10,7 +10,10 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldsetRecursionStack;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class FormFields
 {
@@ -20,12 +23,36 @@ class FormFields
 
     public function contents(): array
     {
+        if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
+            return [
+                'sections' => collect($this->contents['pages'])
+                    ->flatMap(fn (array $page): array => $page['sections'] ?? [])
+                    ->all(),
+            ];
+        }
+
         return $this->contents;
+    }
+
+    public function pages(): Collection
+    {
+        if (! isset($this->contents['pages'])) {
+            return collect([
+                ['sections' => $this->contents['sections'] ?? []],
+            ]);
+        }
+
+        return collect($this->contents['pages']);
+    }
+
+    public function sections(): Collection
+    {
+        return $this->pages()->flatMap(fn (array $page): array => $page['sections'] ?? []);
     }
 
     public function items(): Collection
     {
-        return collect($this->contents['sections'] ?? [])->flatMap(fn (array $section): array => $section['fields'] ?? []);
+        return $this->sections()->flatMap(fn (array $section): array => $section['fields'] ?? []);
     }
 
     public function fields(): Collection
@@ -50,35 +77,43 @@ class FormFields
 
     public function toBlueprint(): Blueprint
     {
-        $contents = collect($this->contents['sections'] ?? [])
-            ->map(function (array $section): array {
+        $tabs = $this->pages()
+            ->mapWithKeys(function (array $page, int $index): array {
+                $handle = $this->pages()->count() > 1 ? 'page_'.($index + 1) : 'main';
+
+                $sections = collect($page['sections'] ?? [])
+                    ->map(function (array $section): array {
+                        return [
+                            ...$section,
+                            'fields' => collect($section['fields'] ?? [])
+                                ->map(function (array $config): array {
+                                    if (isset($config['import']) || is_string($config['field'])) {
+                                        return $config;
+                                    }
+
+                                    $formField = $this->field($config['handle']);
+
+                                    return [
+                                        'handle' => $config['handle'],
+                                        'field' => Arr::removeNullValues($formField->toFieldArray()),
+                                    ];
+                                })
+                                ->all(),
+                        ];
+                    })
+                    ->all();
+
                 return [
-                    ...$section,
-                    'fields' => collect($section['fields'] ?? [])
-                        ->map(function (array $config): array {
-                            if (isset($config['import']) || is_string($config['field'])) {
-                                return $config;
-                            }
-
-                            $formField = $this->field($config['handle']);
-
-                            return [
-                                'handle' => $config['handle'],
-                                'field' => Arr::removeNullValues($formField->toFieldArray()),
-                            ];
-                        })
-                        ->all(),
+                    $handle => [
+                        ...$page,
+                        'display' => $page['display'] ?? __('Page :current of :total', ['current' => $index + 1, 'total' => $this->pages()->count()]),
+                        'sections' => $sections,
+                    ],
                 ];
             })
             ->all();
 
-        return Facades\Blueprint::make()->setContents([
-            'tabs' => [
-                'main' => [
-                    'sections' => $contents,
-                ],
-            ],
-        ]);
+        return Facades\Blueprint::make()->setContents(['tabs' => $tabs]);
     }
 
     /**
