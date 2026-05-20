@@ -122,7 +122,7 @@ class FormSubmissionsController extends CpController
 
         $this->authorize('view', $submission);
 
-        $blueprint = $submission->blueprint();
+        $blueprint = $form->blueprint();
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
         return Inertia::render('forms/Submission', [
