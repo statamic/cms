@@ -15,7 +15,7 @@ const props = defineProps<{
     canDeleteSection: boolean,
 }>();
 
-const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector } = injectBuilderContext();
+const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector, errors } = injectBuilderContext();
 
 const inspectField = (field: any) => inspect(InspectorType.Field, field);
 const isInspectingField = (field) => inspectorType.value === InspectorType.Field && inspecting.value?._id === field._id;
@@ -103,6 +103,11 @@ const removeField = (fieldId) => {
     section.fields.splice(section.fields.indexOf(field), 1);
 
     clearInspector();
+};
+
+const fieldHasErrors = (fieldId: string) => {
+    const allErrors = errors?.value ?? {};
+    return Object.keys(allErrors).some(key => key.startsWith(`${fieldId}.`));
 };
 
 const editSection = () => inspect(InspectorType.Section, props.section);
@@ -234,6 +239,7 @@ defineExpose({ addField });
                                 :class="{ 'opacity-60': field.config.hidden }"
                                 :label="field.config.display"
                                 :instructions="field.config.instructions"
+                                :error="fieldHasErrors(field._id) ? __('This field has errors. Please fix them before saving.') : null"
                             >
                                 <template #label>
                                     <Label :class="{ 'cursor-pointer': !isInspectingField(field) }">

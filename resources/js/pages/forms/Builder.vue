@@ -55,6 +55,7 @@ const pages = computed(() => formFields.value.pages);
 const allSections = computed(() => pages.value.flatMap(page => page.sections));
 const shouldShowViewSelector = computed(() => allSections.value.some(section => section.fields.length > 0));
 const fieldCount = computed(() => allSections.value.flatMap(section => section.fields).length);
+const errors = ref<Record<string, Record<string, string[]>>>({});
 
 const inspect = (type: InspectorType, data: object): void => {
     inspecting.value = data;
@@ -217,13 +218,18 @@ useFieldtypeDraggable({
 });
 
 const save = () => {
+    errors.value = {};
     saving.value = true;
 
     axios.patch(props.action, formFields.value)
-        .then((response) => {
-            Statamic.$toast.success(__('Saved'));
-            saving.value = false;
-        });
+        .then((response) => Statamic.$toast.success(__('Saved')))
+        .catch((e) => {
+            if (e.response?.status === 422) {
+                errors.value = e.response.data.errors;
+                Statamic.$toast.error(e.response.data.message);
+            }
+        })
+        .finally(() => saving.value = false);
 };
 
 provideBuilderContext({
@@ -237,6 +243,7 @@ provideBuilderContext({
     inspect,
     clearInspector,
     addSection,
+    errors,
 });
 
 const onEscape = (event: KeyboardEvent) => {

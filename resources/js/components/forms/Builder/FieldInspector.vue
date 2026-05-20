@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
 import { Button, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishField, Icon } from '@ui';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import debounce from '@/util/debounce.js';
 import axios from 'axios';
@@ -9,7 +9,22 @@ import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { form, inspecting: field } = injectBuilderContext();
+const { form, inspecting: field, errors: contextErrors } = injectBuilderContext();
+
+const errors = computed(() => {
+    const result = {};
+    const prefix = `${field.value._id}.`;
+    const allErrors = contextErrors.value ?? {};
+
+    for (const [key, messages] of Object.entries(allErrors)) {
+        if (key.startsWith(prefix)) {
+            const configField = key.slice(prefix.length);
+            result[configField] = messages;
+        }
+    }
+
+    return result;
+});
 
 enum FieldInspectorTabs {
     Settings = 'settings',
@@ -18,8 +33,6 @@ enum FieldInspectorTabs {
 }
 
 const loading = ref(true);
-const error = ref(null);
-const errors = ref({});
 const values = ref(null);
 const meta = ref(null);
 const originValues = ref(null);
@@ -70,9 +83,7 @@ const load = () => {
         })
         .catch((e) => {
             if (e.response && e.response.status === 422) {
-                const { message, errors } = e.response.data;
-                error.value = message;
-                errors.value = errors;
+                const { message } = e.response.data;
                 Statamic.$toast.error(message);
             } else {
                 Statamic.$toast.error(e.response?.data?.message || __('Something went wrong'));
@@ -155,7 +166,7 @@ onMounted(() => load());
                             ref="container"
                             :blueprint
                             :meta
-                            :errors
+                            :errors="errors"
                             v-model="values"
                             :origin-values
                             :origin-meta
@@ -254,7 +265,7 @@ onMounted(() => load());
                             ref="container"
                             :blueprint
                             :meta
-                            :errors
+                            :errors="errors"
                             v-model="values"
                             :origin-values
                             :origin-meta

@@ -3,8 +3,12 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Statamic\Contracts\Forms\Form;
+use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Forms\Fields\FormField;
@@ -65,29 +69,16 @@ class FormBuilderController extends CpController
     {
         $this->authorize('edit', $form);
 
-        // todo: validate fields
         $request->validate([
-            'pages' => ['required', 'array'],
+            'pages' => ['required', 'array', 'min:1'],
+            'pages.*.sections' => ['required', 'array', 'min:1'],
         ]);
 
-        $pages = collect($request->pages)->map(function (array $page) {
-            return Arr::removeNullValues([
-                'display' => $page['display'] ?? null,
-                'instructions' => $page['instructions'] ?? null,
-                'button_label' => $page['button_label'] ?? null,
-                'previous_page_label' => $page['previous_page_label'] ?? null,
-                'sections' => collect($page['sections'])->map(function (array $section) {
-                    return Arr::removeNullValues([
-                        'display' => $section['display'] ?? null,
-                        'fields' => collect($section['fields'])
-                            ->map(fn (array $field) => FormFieldTransformer::fromVue($field))
-                            ->all(),
-                    ]);
-                })->all(),
-            ]);
-        })->all();
+        $this->validateFields($request);
 
-        $form->formFields(['pages' => $pages])->save();
+        $this->setFormFields($request, $form);
+
+        $form->save();
     }
 
     private function toVueObject(FormFields $formFields): array
@@ -164,5 +155,77 @@ class FormBuilderController extends CpController
             'value' => $field->fieldtype()->preProcess($field->value()),
             'meta' => $field->fieldtype()->preload(),
         ];
+    }
+
+    private function validateFields(Request $request): void
+    {
+        $errors = [];
+
+        foreach ($request->pages as $page) {
+            foreach ($page['sections'] ?? [] as $section) {
+                foreach ($section['fields'] ?? [] as $field) {
+                    $fieldtype = FormFieldtypeRepository::find($field['fieldtype']);
+                    $blueprint = $this->configBlueprint($fieldtype->configBlueprint());
+
+                    $fields = $blueprint
+                        ->fields()
+                        ->addValues($field['config'] ?? []);
+
+                    try {
+                        $fields->validate();
+                    } catch (ValidationException $e) {
+                        foreach ($e->errors() as $handle => $messages) {
+                            $errors["{$field['_id']}.{$handle}"] = $messages;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (! empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
+    }
+
+    private function configBlueprint($blueprint)
+    {
+        return Blueprint::make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ...FormField::commonFieldOptions()->items(),
+                                ...$blueprint->contents()['tabs']['main']['sections'][0]['fields'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    private function setFormFields(Request $request, Form $form): Form
+    {
+        $pages = collect($request->pages)->map(function (array $page) {
+            return Arr::removeNullValues([
+                'display' => $page['display'] ?? null,
+                'instructions' => $page['instructions'] ?? null,
+                'button_label' => $page['button_label'] ?? null,
+                'previous_page_label' => $page['previous_page_label'] ?? null,
+                'sections' => collect($page['sections'])->map(function (array $section) {
+                    return Arr::removeNullValues([
+                        'display' => $section['display'] ?? null,
+                        'fields' => collect($section['fields'])
+                            ->map(fn (array $field) => FormFieldTransformer::fromVue($field))
+                            ->all(),
+                    ]);
+                })->all(),
+            ]);
+        })->all();
+
+        $form->formFields(['pages' => $pages]);
+
+        return $form;
     }
 }
