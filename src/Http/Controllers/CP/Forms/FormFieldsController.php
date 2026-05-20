@@ -17,6 +17,8 @@ class FormFieldsController extends CpController
 {
     public function edit(Request $request)
     {
+        // todo: add authorization
+
         $request->validate([
             'type' => 'required',
             'values' => 'array',
@@ -53,6 +55,8 @@ class FormFieldsController extends CpController
 
     public function update(Request $request)
     {
+        // todo: add authorization
+
         $request->validate([
             'type' => 'required',
             'values' => 'required|array',
