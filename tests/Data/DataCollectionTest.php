@@ -51,7 +51,9 @@ class DataCollectionTestObject
 {
     public bool $deleted = false;
 
-    public function __construct(public string $title) {}
+    public function __construct(public string $title)
+    {
+    }
 
     public function delete()
     {
