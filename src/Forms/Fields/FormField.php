@@ -4,6 +4,7 @@ namespace Statamic\Forms\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
+use Statamic\Fields\Field;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Fields\ConfigFields;
 use Statamic\Support\Arr;
@@ -45,6 +46,11 @@ class FormField
     public function instructions()
     {
         return Arr::get($this->config, 'instructions');
+    }
+
+    public function toField(): Field
+    {
+        return $this->fieldtype()->toField();
     }
 
     public function toFieldArray(): array

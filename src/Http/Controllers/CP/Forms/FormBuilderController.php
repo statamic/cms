@@ -6,14 +6,17 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Fields\Field;
-use Statamic\Forms\Fieldtypes\Fallback;
+use Statamic\Fields\FieldTransformer;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormFields;
 use Statamic\Forms\Fields\FormFieldTransformer;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesFields;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FormBuilderController extends CpController
 {
@@ -44,9 +47,9 @@ class FormBuilderController extends CpController
 
         $fieldtypes = $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values();
 
-        // todo: pass initialFormFields to view
         return Inertia::render('forms/Builder', [
             'form' => $form,
+            'initialFormFields' => $this->toVueObject($form->formFields()),
             'formsProInstalled' => Statamic::formsProInstalled(),
             'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype): array => [
                 ...$fieldtype->toArray(),
@@ -70,13 +73,13 @@ class FormBuilderController extends CpController
         // todo: rename titles to displays?
         $pages = collect($request->pages)->map(function (array $page) {
             return Arr::removeNullValues([
-                'title' => $page['title'] ?? null,
+                'display' => $page['display'] ?? null,
                 'instructions' => $page['instructions'] ?? null,
                 'button_label' => $page['button_label'] ?? null,
                 'previous_page_label' => $page['previous_page_label'] ?? null,
                 'sections' => collect($page['sections'])->map(function (array $section) {
                     return Arr::removeNullValues([
-                        'title' => $section['title'] ?? null,
+                        'display' => $section['display'] ?? null,
                         'fields' => collect($section['fields'])
                             ->map(fn (array $field) => FormFieldTransformer::fromVue($field))
                             ->all(),
@@ -86,6 +89,43 @@ class FormBuilderController extends CpController
         })->all();
 
         $form->formFields(['pages' => $pages])->save();
+    }
+
+    private function toVueObject(FormFields $formFields): array
+    {
+        return [
+            'pages' => $formFields->pages()->map(function (array $page, $i): array {
+                return array_merge($this->pageToVue($page), ['_id' => $i]);
+            })->values()->all(),
+        ];
+    }
+
+    private function pageToVue(array $page): array
+    {
+        return [
+            'display' => $page['display'] ?? null,
+            'instructions' => $page['instructions'] ?? null,
+            'button_label' => $page['button_label'] ?? null,
+            'previous_page_label' => $page['previous_page_label'] ?? null,
+            'sections' => collect($page['sections'])->map(function (array $section, int $i) use ($page): array {
+                $handle = Str::slug($page['display'] ?? 'page').'-'.$i;
+
+                return array_merge($this->sectionToVue($section, $i, $page), ['_id' => $handle.'-'.$i]);
+            })->values()->all(),
+        ];
+    }
+
+    private function sectionToVue(array $section, int $sectionIndex, array $page): array
+    {
+        return Arr::removeNullValues([
+            'display' => $section['display'] ?? __('Section'),
+        ]) + [
+            'fields' => collect($section['fields'] ?? [])->map(function (array $field, int $i) use ($page, $sectionIndex) {
+                $id = Str::slug($page['display'] ?? 'page').'-'.$sectionIndex.'-'.$i;
+
+                return array_merge(FormFieldTransformer::toVue($field), ['_id' => $id]);
+            })->all(),
+        ];
     }
 
     private function fieldtypePreview(FormFieldtype $fieldtype): ?array

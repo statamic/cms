@@ -40,25 +40,13 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps<{
     form: object,
+    initialFormFields: object,
     formsProInstalled: boolean,
     fieldtypes: array,
     action: string,
 }>();
 
-// todo: the original value should come from a prop (initialFormFields)
-const formFields = ref({
-    pages: [
-        {
-            _id: 'page-1',
-            title: null,
-            instructions: null,
-            button_label: null,
-            previous_page_label: null,
-            sections: [],
-        },
-    ],
-});
-
+const formFields = ref<object>(props.initialFormFields);
 const saving = ref<boolean>(false);
 const inspecting = ref<object | null>(null);
 const inspectorType = ref<InspectorType | null>(null);
@@ -68,14 +56,32 @@ const allSections = computed(() => pages.value.flatMap(page => page.sections));
 const shouldShowViewSelector = computed(() => allSections.value.some(section => section.fields.length > 0));
 const fieldCount = computed(() => allSections.value.flatMap(section => section.fields).length);
 
-const inspect = (type: string | null, data: any = null) => {
+const inspect = (type: InspectorType, data: object): void => {
     inspecting.value = data;
     inspectorType.value = type;
 };
 
-const clearInspector = () => inspect(null);
+const clearInspector = (): void => {
+    inspecting.value = null;
+    inspectorType.value = null;
+};
 
-const addPage = (pageId: string, sectionIndex: number, fieldIndex: number | null = null) => {
+const addPage = (atIndex: number | null = null) => {
+    const page = {
+        _id: uniqid(),
+        display: null,
+        instructions: null,
+        button_label: null,
+        previous_page_label: null,
+        sections: [],
+    };
+
+    formFields.value.pages.splice(atIndex ?? formFields.value.pages.length, 0, page);
+
+    return page;
+};
+
+const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | null = null) => {
     const pageIndex = pages.value.findIndex(p => p._id === pageId);
     if (pageIndex === -1) return;
 
@@ -92,7 +98,7 @@ const addPage = (pageId: string, sectionIndex: number, fieldIndex: number | null
             sectionsForNewPage.push({
                 _id: uniqid(),
                 collapsed: false,
-                title: __('Section'),
+                display: __('Section'),
                 fields: remainingFields,
             });
         }
@@ -106,14 +112,14 @@ const addPage = (pageId: string, sectionIndex: number, fieldIndex: number | null
         sectionsForNewPage.push({
             _id: uniqid(),
             collapsed: false,
-            title: __('Section'),
+            display: __('Section'),
             fields: [],
         });
     }
 
     const newPage = {
         _id: uniqid(),
-        title: null,
+        display: null,
         instructions: null,
         button_label: null,
         previous_page_label: null,
@@ -132,7 +138,7 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     const section = {
         _id: uniqid(),
         collapsed: false,
-        title: __('Section'),
+        display: __('Section'),
         fields,
     };
 
@@ -190,7 +196,7 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
 
 const handleFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
     if (fieldtypeHandle === 'page_break') {
-        addPage(pageId, sectionIndex, fieldIndex);
+        addPageAt(pageId, sectionIndex, fieldIndex);
         return;
     }
 
@@ -241,7 +247,12 @@ const onEscape = (event: KeyboardEvent) => {
 
 watch(saving, (saving) => Statamic.$progress.loading('form-builder', saving));
 
-onMounted(() => document.addEventListener('keydown', onEscape));
+onMounted(() => {
+    if (formFields.value.pages.length === 0) addPage();
+
+    document.addEventListener('keydown', onEscape);
+});
+
 onUnmounted(() => document.removeEventListener('keydown', onEscape));
 </script>
 
