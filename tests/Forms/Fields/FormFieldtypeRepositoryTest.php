@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormFieldtypeRepository;
+use Statamic\Forms\Fieldtypes\Fallback;
 use Tests\TestCase;
 
 class FormFieldtypeRepositoryTest extends TestCase
@@ -56,7 +57,16 @@ class FormFieldtypeRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function it_throw_exception_when_finding_invalid_form_fieldtype()
+    public function it_returns_fallback_fieldtype_when_no_form_fieldtype_exists()
+    {
+        // "video" is a regular fieldtype, but not a form fieldtype.
+        $found = $this->repo->find('video');
+
+        $this->assertInstanceOf(Fallback::class, $found);
+    }
+
+    #[Test]
+    public function it_throws_exception_when_form_fieldtype_cant_be_found()
     {
         $this->expectException(FormFieldtypeNotFoundException::class);
         $this->expectExceptionMessage('Form Fieldtype [test] not found');

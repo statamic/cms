@@ -2,8 +2,10 @@
 
 namespace Statamic\Forms\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
+use Statamic\Forms\Fieldtypes\Fallback;
 
 class FormFieldtypeRepository
 {
@@ -17,6 +19,10 @@ class FormFieldtypeRepository
         }
 
         if (! ($formFields = $this->classes())->has($handle)) {
+            if ($fieldtype = FieldtypeRepository::classes()->get($handle)) {
+                return $this->formFieldtypes[$handle] = (new Fallback())->wrapping(app($fieldtype));
+            }
+
             throw new FormFieldtypeNotFoundException($handle);
         }
 

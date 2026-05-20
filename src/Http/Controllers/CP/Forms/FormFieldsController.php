@@ -22,7 +22,7 @@ class FormFieldsController extends CpController
             'values' => 'array',
         ]);
 
-        $fieldtype = $this->resolveFormFieldtype($request->type);
+        $fieldtype = FormFieldtypeRepository::find($request->type);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -58,7 +58,7 @@ class FormFieldsController extends CpController
             'values' => 'required|array',
         ]);
 
-        $fieldtype = $this->resolveFormFieldtype($request->type);
+        $fieldtype = FormFieldtypeRepository::find($request->type);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -95,15 +95,6 @@ class FormFieldsController extends CpController
             ];
         } catch (\Throwable $e) {
             return null;
-        }
-    }
-
-    private function resolveFormFieldtype(string $type): ?FormFieldtype
-    {
-        try {
-            return FormFieldtypeRepository::find($type);
-        } catch (FormFieldtypeNotFoundException $e) {
-            return (new Fallback)->wrapping(FieldtypeRepository::find($type));
         }
     }
 

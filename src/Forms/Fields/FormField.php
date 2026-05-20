@@ -34,11 +34,7 @@ class FormField
 
     public function fieldtype()
     {
-        try {
-            return FormFieldtypeRepository::find($this->type())->setField($this);
-        } catch (FormFieldtypeNotFoundException $e) {
-            return (new Fallback)->setField($this);
-        }
+        return FormFieldtypeRepository::find($this->type())->setField($this);
     }
 
     public function display()

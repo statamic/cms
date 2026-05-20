@@ -33,11 +33,7 @@ class FormFieldTransformer
 
     private static function inlineTabField(array $submitted)
     {
-        try {
-            $fieldtype = FormFieldtypeRepository::find($submitted['fieldtype']);
-        } catch (FormFieldtypeNotFoundException $e) {
-            // todo
-        }
+        $fieldtype = FormFieldtypeRepository::find($submitted['fieldtype']);
 
         $fields = FormField::commonFieldOptions()->all()
             ->merge($fieldtype->configFields()->all());
