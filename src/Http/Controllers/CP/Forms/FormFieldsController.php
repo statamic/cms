@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
-use Statamic\Forms\Fields\Fallback;
+use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;

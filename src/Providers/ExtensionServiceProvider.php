@@ -132,21 +132,21 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $formFieldtypes = [
-        Forms\Fields\Checkboxes::class,
-        Forms\Fields\Currency::class,
-        Forms\Fields\Dictionary::class,
-        Forms\Fields\Dropdown::class,
-        Forms\Fields\Email::class,
-        Forms\Fields\LongAnswer::class,
-        Forms\Fields\MultiChoice::class,
-        Forms\Fields\Name::class,
-        Forms\Fields\Number::class,
-        Forms\Fields\Phone::class,
-        Forms\Fields\ShortAnswer::class,
-        Forms\Fields\TimePicker::class,
-        Forms\Fields\Toggle::class,
-        Forms\Fields\Website::class,
-        Forms\Fields\YesNo::class,
+        Forms\Fieldtypes\Checkboxes::class,
+        Forms\Fieldtypes\Currency::class,
+        Forms\Fieldtypes\Dictionary::class,
+        Forms\Fieldtypes\Dropdown::class,
+        Forms\Fieldtypes\Email::class,
+        Forms\Fieldtypes\LongAnswer::class,
+        Forms\Fieldtypes\MultiChoice::class,
+        Forms\Fieldtypes\Name::class,
+        Forms\Fieldtypes\Number::class,
+        Forms\Fieldtypes\Phone::class,
+        Forms\Fieldtypes\ShortAnswer::class,
+        Forms\Fieldtypes\TimePicker::class,
+        Forms\Fieldtypes\Toggle::class,
+        Forms\Fieldtypes\Website::class,
+        Forms\Fieldtypes\YesNo::class,
     ];
 
     protected $modifierAliases = [

@@ -6,7 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Fields\Field;
-use Statamic\Forms\Fields\Fallback;
+use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldTransformer;
 use Statamic\Forms\Fields\FormFieldtype;
