@@ -5,7 +5,7 @@
             :handle="handle"
             :value="value"
             :meta="relationshipMeta"
-            :config="{ type: 'asset_folder', max_items: this.config.max_items }"
+            :config="relationshipConfig"
             @input="update"
         />
     </div>
@@ -16,12 +16,40 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: {
+        storeName: {
+            default: null
+        }
+    },
 
     computed: {
 
         container() {
-            return data_get(this.$store.state.publish[this.storeName].values.container, '0', this.config.container);
+            let container = this.config.container;
+
+            if (container) {
+                return Array.isArray(container) ? container[0] : container;
+            }
+
+            if (! this.storeName) return null;
+
+            const state = this.$store?.state?.publish?.[this.storeName];
+            if (! state) return null;
+
+            container = state.values.container;
+
+            if (Array.isArray(container)) {
+                return container[0] || null;
+            }
+
+            return container || null;
+        },
+
+        relationshipConfig() {
+            return {
+                ...this.config,
+                type: 'asset_folder',
+            };
         },
 
         relationshipMeta() {

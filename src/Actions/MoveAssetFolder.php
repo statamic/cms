@@ -3,8 +3,6 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\AssetFolder;
-use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Blink;
 
 class MoveAssetFolder extends Action
 {
@@ -42,21 +40,13 @@ class MoveAssetFolder extends Action
 
     protected function fieldItems()
     {
-        $options = Blink::once('action-move-asset-folders', function () {
-            return AssetContainer::find($this->context['container'])
-                ->assetFolders()
-                ->mapWithKeys(function ($folder) {
-                    return [$folder->path() => $folder->path()];
-                })
-                ->prepend('/', '/')
-                ->all();
-        });
-
         return [
             'folder' => [
                 'display' => __('Folder'),
-                'type' => 'select',
-                'options' => $options,
+                'type' => 'asset_folder',
+                'container' => $this->context['container'],
+                'mode' => 'select',
+                'max_items' => 1,
                 'validate' => 'required',
             ],
         ];
