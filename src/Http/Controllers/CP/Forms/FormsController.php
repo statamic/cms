@@ -56,7 +56,7 @@ class FormsController extends CpController
 
     public function show($form)
     {
-        return redirect()->route('statamic.cp.forms.builder', $form->handle());
+        return redirect()->route('statamic.cp.forms.builder.edit', $form->handle());
     }
 
     public function create()

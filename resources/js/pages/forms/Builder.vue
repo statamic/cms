@@ -23,7 +23,7 @@ import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
 import Head from '@/pages/layout/Head.vue';
 import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
@@ -31,9 +31,10 @@ import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
 import FieldInspector from '@/components/forms/Builder/FieldInspector.vue';
 import Page from '@/components/forms/Builder/Page.vue';
 import PageInspector from '@/components/forms/Builder/PageInspector.vue';
-import { uniqid } from '@/bootstrap/globals.js';
+import { __, uniqid } from '@/bootstrap/globals.js';
 import { useFieldtypeDraggable } from '@/components/forms/Builder/use-drag-and-drop';
 import ActionInspector from '@/components/forms/Builder/ActionInspector.vue';
+import axios from 'axios';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -41,6 +42,7 @@ const props = defineProps<{
     form: object,
     formsProInstalled: boolean,
     fieldtypes: array,
+    action: string,
 }>();
 
 // todo: the original value should come from a prop (initialFormFields)
@@ -57,6 +59,7 @@ const formFields = ref({
     ],
 });
 
+const saving = ref<boolean>(false);
 const inspecting = ref<object | null>(null);
 const inspectorType = ref<InspectorType | null>(null);
 const fieldView = ref<FieldView>(FieldView.Expanded);
@@ -207,6 +210,16 @@ useFieldtypeDraggable({
     onDrop: handleFieldtypeDrop,
 });
 
+const save = () => {
+    saving.value = true;
+
+    axios.patch(props.action, formFields.value)
+        .then((response) => {
+            Statamic.$toast.success(__('Saved'));
+            saving.value = false;
+        });
+};
+
 provideBuilderContext({
     form: props.form,
     formsProInstalled: props.formsProInstalled,
@@ -226,6 +239,8 @@ const onEscape = (event: KeyboardEvent) => {
     }
 };
 
+watch(saving, (saving) => Statamic.$progress.loading('form-builder', saving));
+
 onMounted(() => document.addEventListener('keydown', onEscape));
 onUnmounted(() => document.removeEventListener('keydown', onEscape));
 </script>
@@ -234,7 +249,7 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
     <Head :title="[form.title, __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
-        <Button variant="primary" :aria-label="__('Save')">
+        <Button variant="primary" :aria-label="__('Save')" @click="save">
             <Icon name="save" class="sm:hidden" />
             <span class="hidden sm:inline">{{ __('Save') }}</span>
         </Button>
@@ -275,11 +290,7 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
             </template>
         </Header>
 
-        <Page
-            v-for="(page, index) in pages"
-            :key="page._id"
-            :page="page"
-        />
+        <Page v-for="page in pages" :key="page._id" :page />
 
         <p
             v-if="fieldView === FieldView.Collapsed"

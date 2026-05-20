@@ -3,10 +3,12 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Fields\Field;
 use Statamic\Forms\Fields\Fallback;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormFieldTransformer;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesFields;
@@ -17,7 +19,7 @@ class FormBuilderController extends CpController
 {
     use ManagesFields;
 
-    public function __invoke($form)
+    public function edit($form)
     {
         $this->authorize('edit', $form);
 
@@ -42,6 +44,7 @@ class FormBuilderController extends CpController
 
         $fieldtypes = $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values();
 
+        // todo: pass initialFormFields to view
         return Inertia::render('forms/Builder', [
             'form' => $form,
             'formsProInstalled' => Statamic::formsProInstalled(),
@@ -50,8 +53,39 @@ class FormBuilderController extends CpController
                 'preview' => $this->fieldtypePreview($fieldtype),
                 'example' => $this->fieldtypeExample($fieldtype),
             ]),
+            'action' => cp_route('forms.builder.update', $form->handle()),
             ...$this->fieldProps(),
         ]);
+    }
+
+    public function update(Request $request, $form)
+    {
+        $this->authorize('edit', $form);
+
+        // todo: validate fields
+        $request->validate([
+            'pages' => ['required', 'array'],
+        ]);
+
+        // todo: rename titles to displays?
+        $pages = collect($request->pages)->map(function (array $page) {
+            return Arr::removeNullValues([
+                'title' => $page['title'] ?? null,
+                'instructions' => $page['instructions'] ?? null,
+                'button_label' => $page['button_label'] ?? null,
+                'previous_page_label' => $page['previous_page_label'] ?? null,
+                'sections' => collect($page['sections'])->map(function (array $section) {
+                    return Arr::removeNullValues([
+                        'title' => $section['title'] ?? null,
+                        'fields' => collect($section['fields'])
+                            ->map(fn (array $field) => FormFieldTransformer::fromVue($field))
+                            ->all(),
+                    ]);
+                })->all(),
+            ]);
+        })->all();
+
+        $form->formFields(['pages' => $pages])->save();
     }
 
     private function fieldtypePreview(FormFieldtype $fieldtype): ?array

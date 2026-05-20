@@ -348,7 +348,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('forms/{form}/submissions', [FormSubmissionsController::class, 'index'])->name('forms.submissions.index');
     Route::get('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'show'])->name('forms.submissions.show');
     Route::delete('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'destroy'])->name('forms.submissions.destroy');
-    Route::get('forms/{form}/builder', FormBuilderController::class)->name('forms.builder');
+    Route::get('forms/{form}/builder', [FormBuilderController::class, 'edit'])->name('forms.builder.edit');
+    Route::patch('forms/{form}/builder', [FormBuilderController::class, 'update'])->name('forms.builder.update');
     Route::post('forms/{form}/builder/fields/edit', [FormFieldsController::class, 'edit'])->name('forms.builder.fields.edit');
     Route::post('forms/{form}/builder/fields/update', [FormFieldsController::class, 'update'])->name('forms.builder.fields.update');
     Route::get('forms/{form}/logic', FormLogicController::class)->name('forms.logic.index');
