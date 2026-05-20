@@ -31,4 +31,35 @@ class DataCollectionTest extends TestCase
 
         $this->assertEquals([1, 3, 2], $collection->multisort('foos')->pluck('id')->all());
     }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $a = new DataCollectionTestObject('alfa');
+        $b = new DataCollectionTestObject('bravo');
+
+        $collection = new DataCollection([$a, $b]);
+
+        $collection->multisort('delete');
+
+        $this->assertFalse($a->deleted);
+        $this->assertFalse($b->deleted);
+    }
+}
+
+class DataCollectionTestObject
+{
+    public bool $deleted = false;
+
+    public function __construct(public string $title) {}
+
+    public function delete()
+    {
+        $this->deleted = true;
+    }
+
+    public function get($key)
+    {
+        return $this->{$key} ?? null;
+    }
 }
