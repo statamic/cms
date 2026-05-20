@@ -60,7 +60,7 @@ onMounted(() => {
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
             role="button"
             tabindex="0"
-            :aria-label="page.title ? __(page.title) : placeholderTitle"
+            :aria-label="page.display ? __(page.display) : placeholderTitle"
             data-form-page-label
             @click="inspectPage"
             @keydown.enter.prevent="inspectPage"
@@ -79,7 +79,7 @@ onMounted(() => {
                     :class="isInspectingPage ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                    {{ page.title ? __(page.title) : placeholderTitle }}
+                    {{ page.display ? __(page.display) : placeholderTitle }}
                 </div>
                 <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
             </div>

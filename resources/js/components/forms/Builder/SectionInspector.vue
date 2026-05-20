@@ -20,7 +20,7 @@ const { inspecting: section } = injectBuilderContext();
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#section-${section._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ __(section.title) }}
+                                {{ __(section.display) }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -29,7 +29,7 @@ const { inspecting: section } = injectBuilderContext();
                         </div>
 
                         <Field :label="__('Label')">
-                            <Input v-model="section.title" />
+                            <Input v-model="section.display" />
                         </Field>
                     </div>
                 </div>
@@ -44,7 +44,7 @@ const { inspecting: section } = injectBuilderContext();
                         <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                     </div>
                     <a :href="`#section-${section._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                        {{ __(section.title) }}
+                        {{ __(section.display) }}
                         <div class="grid *:[grid-area:1/1]">
                             <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                             <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -53,7 +53,7 @@ const { inspecting: section } = injectBuilderContext();
                 </div>
 
                 <Field :label="__('Label')">
-                    <Input v-model="section.title" />
+                    <Input v-model="section.display" />
                 </Field>
             </div>
         </div>

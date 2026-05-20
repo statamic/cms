@@ -80,7 +80,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.title ? __(page.title) : placeholderTitle }}
+                                {{ page.display ? __(page.display) : placeholderTitle }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -89,7 +89,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                         </div>
 
                         <Field :label="__('Label')">
-                            <Input v-model="page.title" :placeholder="placeholderTitle" />
+                            <Input v-model="page.display" :placeholder="placeholderTitle" />
                         </Field>
 
                         <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
@@ -105,7 +105,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.title ? __(page.title) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
+                                {{ page.display ? __(page.display) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -161,7 +161,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.title ? __(page.title) : placeholderTitle }}
+                                {{ page.display ? __(page.display) : placeholderTitle }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -170,7 +170,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                         </div>
 
                         <Field :label="__('Label')">
-                            <Input v-model="page.title" :placeholder="placeholderTitle" />
+                            <Input v-model="page.display" :placeholder="placeholderTitle" />
                         </Field>
 
                         <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
@@ -186,7 +186,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.title ? __(page.title) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
+                                {{ page.display ? __(page.display) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />

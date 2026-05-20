@@ -119,7 +119,7 @@ defineExpose({ addField });
         :data-panel-collapsed="section.collapsed ? 'true' : 'false'"
     >
         <PanelHeader class="flex items-center justify-between" @click="toggleCollapsed">
-            <Heading class="cursor-pointer flex-1" :text="__(section.title)" />
+            <Heading class="cursor-pointer flex-1" :text="__(section.display)" />
             <div>
                 <Button
                     class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
