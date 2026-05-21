@@ -130,6 +130,25 @@ YAML;
     }
 
     #[Test]
+    public function it_prevents_path_traversal_in_find()
+    {
+        File::put(storage_path('statamic/evil.yaml'), "handler: 'Handler'\nexpires_at: 9999999999\ndata: []");
+
+        $this->assertNull($this->tokens->find('../evil'));
+    }
+
+    #[Test]
+    public function it_generates_token_when_path_traversal_attempted_in_make()
+    {
+        Generator::shouldReceive('generate')->times(4)->andReturn('generated-token');
+
+        $this->assertEquals('generated-token', $this->tokens->make('../../../etc/passwd', 'Handler')->token());
+        $this->assertEquals('generated-token', $this->tokens->make('..\\..\\..\\windows', 'Handler')->token());
+        $this->assertEquals('generated-token', $this->tokens->make('foo/bar', 'Handler')->token());
+        $this->assertEquals('generated-token', $this->tokens->make('foo\\bar', 'Handler')->token());
+    }
+
+    #[Test]
     public function it_deletes_expired_tokens()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
