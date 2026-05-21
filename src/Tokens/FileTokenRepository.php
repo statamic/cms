@@ -11,11 +11,19 @@ class FileTokenRepository extends TokenRepository
 {
     public function make(?string $token, string $handler, array $data = []): TokenContract
     {
+        if ($token && (str_contains($token, '/') || str_contains($token, '\\'))) {
+            $token = null;
+        }
+
         return app()->makeWith(TokenContract::class, compact('token', 'handler', 'data'));
     }
 
     public function find(string $token): ?TokenContract
     {
+        if (str_contains($token, '/') || str_contains($token, '\\')) {
+            return null;
+        }
+
         $path = storage_path('statamic/tokens/'.$token.'.yaml');
 
         if (! File::exists($path)) {
