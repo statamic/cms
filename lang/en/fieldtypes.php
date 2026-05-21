@@ -121,6 +121,7 @@ return [
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
     'link.config.container' => 'Choose which asset container to use for this field.',
+    'link.config.default_option' => 'The default Link type option, if available for the fieldtype\'s configuration.',
     'link.title' => 'Link',
     'list.config.add_row' => 'Customize the label of the "Add Item" button.',
     'list.title' => 'List',

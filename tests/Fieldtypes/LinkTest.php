@@ -10,10 +10,13 @@ use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LinkTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_augments_string_to_string()
     {
@@ -260,5 +263,107 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField($field);
 
         $this->assertNull($fieldtype->preProcessIndex('@child'));
+    }
+
+    #[Test]
+    public function it_preloads_the_configured_initial_option()
+    {
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+            'default_option' => 'entry',
+        ]);
+
+        $field->setValue(null);
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertEquals('entry', $fieldtype->preload()['initialOption']);
+    }
+
+    #[Test]
+    public function it_preloads_the_url_initial_option_when_required()
+    {
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+            'required' => true,
+        ]);
+
+        $field->setValue(null);
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
+    }
+
+    #[Test]
+    public function it_preloads_the_expected_initial_option_when_default_option_not_set()
+    {
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+        ]);
+
+        $field->setValue(null);
+
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertNull($fieldtype->preload()['initialOption']);
+    }
+
+    #[Test]
+    public function it_preloads_initial_option_of_first_child_only_when_available()
+    {
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+            'default_option' => 'first-child',
+            'required' => true,
+        ]);
+
+        $field->setValue(null);
+        $field->setParent(Mockery::mock());
+
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
+    }
+
+    #[Test]
+    public function it_preloads_initial_option_of_asset_only_when_available()
+    {
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+            'default_option' => 'asset',
+            'required' => true,
+        ]);
+
+        $field->setValue(null);
+
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
+    }
+
+    #[Test]
+    public function it_preloads_the_values_initial_option_when_set()
+    {
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+            'default_option' => 'entry',
+        ]);
+
+        $field->setValue('https://example.com');
+
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
     }
 }
