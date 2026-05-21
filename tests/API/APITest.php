@@ -494,9 +494,9 @@ class APITest extends TestCase
             'message' => 'Not found.',
         ]);
 
-        Token::make('test-token', FakeTokenHandler::class)->save();
+        Token::make('fake-token', FakeTokenHandler::class)->save();
 
-        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+        $this->get('/api/collections/pages/entries/dance?token=fake-token')->assertJson([
             'message' => 'Not found.',
         ]);
     }
