@@ -9,7 +9,7 @@ import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { form, inspecting: field, errors: contextErrors } = injectBuilderContext();
+const { form, inspecting: field, errors: contextErrors, dirty, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};
@@ -67,7 +67,7 @@ const load = () => {
             loading.value = false;
             fieldtype.value = response.data.fieldtype;
             blueprint.value = response.data.blueprint;
-            values.value = response.data.values;
+            withoutDirtying(() => (values.value = response.data.values));
             meta.value = response.data.meta;
             originValues.value = response.data.originValues;
             originMeta.value = response.data.originMeta;
@@ -122,7 +122,14 @@ watch(field, () => {
     load();
 });
 
-watch(values, () => updatePreview(), { deep: true });
+watch(
+    values,
+    () => {
+        dirty();
+        updatePreview();
+    },
+    { deep: true }
+);
 
 onMounted(() => load());
 </script>
@@ -170,6 +177,7 @@ onMounted(() => load());
                             v-model="values"
                             :origin-values
                             :origin-meta
+                            :track-dirty-state="false"
                         >
                             <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
                                 <div class="publish-fields">
@@ -269,6 +277,7 @@ onMounted(() => load());
                             v-model="values"
                             :origin-values
                             :origin-meta
+                            :track-dirty-state="false"
                         >
                             <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
                                 <div class="publish-fields">

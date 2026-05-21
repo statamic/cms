@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Field, Icon, Input, Tabs, TabList, TabTrigger, TabContent } from '@ui';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
 
-const { inspecting: page, pages } = injectBuilderContext();
+const { inspecting: page, pages, dirty } = injectBuilderContext();
 
 enum ActionInspectorTabs {
     Settings = 'settings',
@@ -18,6 +18,9 @@ const isLastPage = computed(() => pages.value.findIndex((p) => p._id === page.va
 const title = computed(() => isLastPage.value ? __('Submit button') : __('Next Page button'));
 const submitButtonLabel = computed(() => isLastPage.value ? __('Submit Button Label') : __('Next Button Label'));
 const submitButtonPlaceholder = computed(() => isLastPage.value ? __('Submit') : __('Next Page'));
+
+watch(() => page.value.button_label, dirty);
+watch(() => page.value.previous_page_label, dirty);
 </script>
 
 <template>

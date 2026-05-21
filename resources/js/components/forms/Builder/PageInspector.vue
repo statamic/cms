@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
 import { Button, Field, Icon, Input, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-const { inspecting: page, pages } = injectBuilderContext();
+const { inspecting: page, pages, dirty } = injectBuilderContext();
 
 enum PageInspectorTabs {
     Settings = 'settings',
@@ -18,6 +18,9 @@ const placeholderTitle = computed(() => {
 
     return __('Page :current of :total', { current: pageIndex + 1, total: pages.value.length });
 });
+
+watch(() => page.value.display, dirty);
+watch(() => page.value.instructions, dirty);
 
 // todo: refactor everything under this line
 const inspectorTarget = ref('page_1');

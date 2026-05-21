@@ -6,7 +6,7 @@ import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { useSortable } from './use-drag-and-drop';
 import { __ } from '@/bootstrap/globals';
 
-const { inspecting, inspectorType, inspect, pages, addSection } = injectBuilderContext();
+const { inspecting, inspectorType, inspect, pages, addSection, dirty } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
@@ -28,7 +28,10 @@ const placeholderTitle = computed(() => {
     return __('Page :current of :total', { current: pageIndex + 1, total: pages.value.length });
 });
 
-const sectionDeleted = (sectionId) => props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
+const sectionDeleted = (sectionId) => {
+    dirty();
+    props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
+};
 
 const moveField = (fromSectionId, toSectionId, oldIndex, newIndex) => {
     const fromSection = sections.value.find((s) => s._id === fromSectionId);

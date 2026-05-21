@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Field, Icon, Input } from '@ui';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
+import { watch } from 'vue';
 
-const { inspecting: section } = injectBuilderContext();
+const { inspecting: section, dirty } = injectBuilderContext();
+
+watch(() => section.value.display, dirty);
 </script>
 
 <template>

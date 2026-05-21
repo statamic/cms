@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button, Card, Field, Heading, Icon, Label, Panel, PanelHeader, PublishContainer } from '@ui';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { uniqid } from '@/bootstrap/globals.js';
 import { categories, categoryColorClasses } from './categories';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
@@ -15,12 +15,21 @@ const props = defineProps<{
     canDeleteSection: boolean,
 }>();
 
-const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector, errors } = injectBuilderContext();
+const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector, errors, dirty } = injectBuilderContext();
 
 const inspectField = (field: any) => inspect(InspectorType.Field, field);
 const isInspectingField = (field) => inspectorType.value === InspectorType.Field && inspecting.value?._id === field._id;
 
 const toggleCollapsed = () => props.section.collapsed = !props.section.collapsed;
+const toggleFieldVisibility = (field) => field.config.hidden = !field.config.hidden;
+
+const fieldtypeCategory = (field) => {
+    const fieldtype = fieldtypes.find((f) => f.handle === field.fieldtype);
+    const hue = fieldtype?.categories?.[0] || 'other';
+    return categories[hue] ?? categories.other;
+};
+
+const fieldtypeIconColorClass = (field) => categoryColorClasses[fieldtypeCategory(field).color].icon;
 
 const blueprint = computed(() => ({
     tabs: [{
@@ -32,43 +41,6 @@ const blueprint = computed(() => ({
         }],
     }],
 }));
-
-const fieldtypeCategory = (field) => {
-    const fieldtype = fieldtypes.find((f) => f.handle === field.fieldtype);
-    const hue = fieldtype?.categories?.[0] || 'other';
-    return categories[hue] ?? categories.other;
-};
-
-const fieldtypeIconColorClass = (field) => categoryColorClasses[fieldtypeCategory(field).color].icon;
-
-const addField = (fieldtypeHandle, index = null) => {
-    const { section } = props;
-    const handle = uniqid();
-    const fieldtype = fieldtypes.find((f) => f.handle === fieldtypeHandle);
-
-    const field = {
-        _id: `${section._id}-${section.fields.length}`,
-        config: {
-            display: __(fieldtype.title),
-            hidden: false,
-        },
-        fieldtype: fieldtypeHandle,
-        handle,
-        icon: fieldtype?.icon || 'fieldtype-generic',
-        type: 'inline',
-        preview: {
-            config: { ...fieldtype.preview?.config, handle },
-            value: fieldtype.preview?.value,
-            meta: fieldtype.preview?.meta,
-        },
-    };
-
-    section.fields.splice(index ?? section.fields.length, 0, field);
-
-    inspectField(field);
-};
-
-const toggleFieldVisibility = (field) => field.config.hidden = !field.config.hidden;
 
 const duplicateField = (fieldId) => {
     const { section } = props;
@@ -92,6 +64,7 @@ const duplicateField = (fieldId) => {
 
     section.fields.splice(index + 1, 0, newField);
 
+    dirty();
     inspectField(newField);
 };
 
@@ -102,6 +75,7 @@ const removeField = (fieldId) => {
 
     section.fields.splice(section.fields.indexOf(field), 1);
 
+    dirty();
     clearInspector();
 };
 
@@ -112,8 +86,6 @@ const fieldHasErrors = (fieldId: string) => {
 
 const editSection = () => inspect(InspectorType.Section, props.section);
 const deleteSection = () => emit('deleted', props.section._id);
-
-defineExpose({ addField });
 </script>
 
 <template>

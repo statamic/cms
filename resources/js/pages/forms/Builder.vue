@@ -23,7 +23,7 @@ import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
 import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
 import Head from '@/pages/layout/Head.vue';
 import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
@@ -79,6 +79,8 @@ const addPage = (atIndex: number | null = null) => {
 
     formFields.value.pages.splice(atIndex ?? formFields.value.pages.length, 0, page);
 
+    dirty();
+
     return page;
 };
 
@@ -130,6 +132,8 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
     formFields.value.pages.splice(pageIndex + 1, 0, newPage);
 
     inspect(InspectorType.Page, newPage);
+
+    dirty();
 };
 
 const addSection = (pageId: string, atIndex: number, fields = []) => {
@@ -144,6 +148,8 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     };
 
     page.sections.splice(atIndex, 0, section);
+
+    dirty();
 
     return section;
 };
@@ -193,6 +199,8 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     section.fields.splice(atIndex, 0, field);
 
     inspect(InspectorType.Field, field);
+
+    dirty();
 };
 
 const handleFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
@@ -217,12 +225,34 @@ useFieldtypeDraggable({
     onDrop: handleFieldtypeDrop,
 });
 
+const avoidTrackingDirtyState = ref(false);
+const trackingDirtyState = computed(() => !avoidTrackingDirtyState.value);
+const isDirty = computed(() => Statamic.$dirty.has('form-builder'));
+
+function dirty() {
+    if (trackingDirtyState.value) Statamic.$dirty.add('form-builder');
+}
+
+function clearDirtyState() {
+    Statamic.$dirty.remove('form-builder');
+}
+
+function withoutDirtying(callback: () => void) {
+    const previous = avoidTrackingDirtyState.value;
+    avoidTrackingDirtyState.value = true;
+    callback();
+    nextTick(() => avoidTrackingDirtyState.value = previous);
+}
+
 const save = () => {
     errors.value = {};
     saving.value = true;
 
     axios.patch(props.action, formFields.value)
-        .then((response) => Statamic.$toast.success(__('Saved')))
+        .then((response) => {
+            clearDirtyState();
+            Statamic.$toast.success(__('Saved'));
+        })
         .catch((e) => {
             if (e.response?.status === 422) {
                 errors.value = e.response.data.errors;
@@ -244,6 +274,9 @@ provideBuilderContext({
     clearInspector,
     addSection,
     errors,
+    dirty,
+    isDirty,
+    withoutDirtying,
 });
 
 const onEscape = (event: KeyboardEvent) => {
@@ -256,11 +289,13 @@ watch(saving, (saving) => Statamic.$progress.loading('form-builder', saving));
 
 onMounted(() => {
     if (formFields.value.pages.length === 0) addPage();
-
     document.addEventListener('keydown', onEscape);
 });
 
-onUnmounted(() => document.removeEventListener('keydown', onEscape));
+onUnmounted(() => {
+    clearDirtyState();
+    document.removeEventListener('keydown', onEscape);
+});
 </script>
 
 <template>
