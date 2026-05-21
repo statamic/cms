@@ -11,8 +11,7 @@ class LivePreview
 {
     public function tokenize($token, $item): TokenContract
     {
-        $token = ($token ? Token::find($token) : null)
-            ?? tap(Token::make($token, Handler::class))->save();
+        $token = tap(Token::make($token, Handler::class))->save();
 
         Cache::put('statamic.live-preview.'.$token->token(), $item, now()->addHour());
 
