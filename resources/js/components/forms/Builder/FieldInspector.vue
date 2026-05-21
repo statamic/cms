@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
-import { Button, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishField, Icon } from '@ui';
+import { Button, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishFields, Icon } from '@ui';
 import { ref, onMounted, watch, computed } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import debounce from '@/util/debounce.js';
@@ -198,17 +198,7 @@ onMounted(() => load());
                             :track-dirty-state="false"
                         >
                             <PublishFieldsProvider :fields="adjustedBlueprint.tabs[0].sections[0].fields">
-                                <div class="publish-fields">
-                                    <PublishField
-                                        v-for="field in adjustedBlueprint.tabs[0].sections[0].fields"
-                                        :key="field.handle"
-                                        :config="field"
-                                        :class="[
-                                            'form-group',
-                                            `field-w-${field.width}`
-                                        ]"
-                                    />
-                                </div>
+                                <PublishFields />
                             </PublishFieldsProvider>
                         </PublishContainer>
                     </div>
@@ -299,17 +289,7 @@ onMounted(() => load());
                             :track-dirty-state="false"
                         >
                             <PublishFieldsProvider :fields="adjustedBlueprint.tabs[0].sections[0].fields">
-                                <div class="publish-fields">
-                                    <PublishField
-                                        v-for="field in adjustedBlueprint.tabs[0].sections[0].fields"
-                                        :key="field.handle"
-                                        :config="field"
-                                        :class="[
-                                            'form-group',
-                                            `field-w-${field.width}`
-                                        ]"
-                                    />
-                                </div>
+                                <PublishFields />
                             </PublishFieldsProvider>
                         </PublishContainer>
                     </div>

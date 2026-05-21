@@ -175,6 +175,7 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     const field = {
         _id: handle,
         config: {
+            type: fieldtypeHandle,
             display: __(fieldtype.title),
             hidden: false,
         },

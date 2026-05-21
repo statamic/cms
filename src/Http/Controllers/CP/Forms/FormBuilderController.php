@@ -127,7 +127,7 @@ class FormBuilderController extends CpController
         ]) + [
             'fields' => collect($section['fields'] ?? [])->map(function (array $field) {
                 return array_merge(FormFieldTransformer::toVue($field), ['_id' => Str::random()]);
-            })->all(),
+            })->values()->all(),
         ];
     }
 
