@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Field, Icon, Label } from '@ui';
+import { Button, Description, Field, Icon, Label } from '@ui';
 import { computed } from 'vue';
 import { __ } from '@/bootstrap/globals.js';
 import { categoryColorClasses } from './categories';
@@ -14,7 +14,7 @@ defineEmits<{
     (e: 'remove'): void;
 }>();
 
-const { inspecting, inspectorType, inspect } = injectBuilderContext();
+const { inspecting, inspectorType, inspect, errors } = injectBuilderContext();
 
 const fieldsets = Object.values(usePage().props.fieldsets);
 
@@ -27,6 +27,12 @@ const fieldsetFields = computed(() => {
 });
 
 const inspectFieldsetImport = () => inspect(InspectorType.FieldsetImport, props.field);
+
+const errorMessage = computed(() => {
+    const allErrors = errors?.value ?? {};
+    const key = Object.keys(allErrors).find(k => k.startsWith(`${props.field._id}.`));
+    return key ? allErrors[key]?.[0] : null;
+});
 </script>
 
 <template>
@@ -82,6 +88,11 @@ const inspectFieldsetImport = () => inspect(InspectorType.FieldsetImport, props.
                             />
                         </div>
                     </Field>
+                    <Description
+                        v-if="errorMessage && fieldsetFieldIndex === fieldsetFields.length - 1"
+                        :text="errorMessage"
+                        class="!text-red-600 mt-4"
+                    />
                 </div>
             </template>
         </div>

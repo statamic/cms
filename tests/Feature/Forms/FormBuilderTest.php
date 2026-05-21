@@ -5,6 +5,7 @@ namespace Tests\Feature\Forms;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Fieldtypes\Link;
@@ -561,6 +562,148 @@ class FormBuilderTest extends TestCase
 
         $form = Form::find('test');
         $this->assertEmpty($form->formFields()->pages()[0]['sections'][0]['fields'] ?? []);
+    }
+
+    #[Test]
+    public function it_validates_duplicate_handles_from_inline_fields()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'name',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                                [
+                                    '_id' => 'field2',
+                                    'handle' => 'name',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name Again'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle', 'field2.handle']);
+    }
+
+    #[Test]
+    public function it_validates_duplicate_handles_from_fieldset_import()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $fieldset = Fieldset::make('contact')->setContents([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text']],
+                ['handle' => 'email', 'field' => ['type' => 'text']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('contact')->andReturn($fieldset);
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'name',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                                [
+                                    '_id' => 'import1',
+                                    'type' => 'import',
+                                    'fieldset' => 'contact',
+                                    'prefix' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle', 'import1.handle']);
+    }
+
+    #[Test]
+    public function it_allows_fieldset_import_with_prefix_to_avoid_duplicates()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $fieldset = Fieldset::make('contact')->setContents([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('contact')->andReturn($fieldset);
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'name',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                                [
+                                    '_id' => 'import1',
+                                    'type' => 'import',
+                                    'fieldset' => 'contact',
+                                    'prefix' => 'contact_',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSuccessful();
     }
 
     private function registerFieldtypeWithRequiredConfig(): void

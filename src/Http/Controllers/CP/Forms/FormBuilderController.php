@@ -9,8 +9,8 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
-use Statamic\Fields\FieldTransformer;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Forms\Fields\FormFieldTransformer;
@@ -21,6 +21,7 @@ use Statamic\Http\Controllers\CP\Fields\ManagesFields;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use function Statamic\trans as __;
 
 class FormBuilderController extends CpController
 {
@@ -76,6 +77,8 @@ class FormBuilderController extends CpController
         ]);
 
         $this->validateFields($request);
+
+        $this->validateUniqueHandles($request);
 
         $this->setFormFields($request, $form);
 
@@ -196,6 +199,51 @@ class FormBuilderController extends CpController
                             $errors["{$field['_id']}.{$handle}"] = $messages;
                         }
                     }
+                }
+            }
+        }
+
+        if (! empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
+    }
+
+    private function validateUniqueHandles(Request $request): void
+    {
+        $errors = [];
+        $handleToIds = [];
+
+        foreach ($request->pages as $page) {
+            foreach ($page['sections'] ?? [] as $section) {
+                foreach ($section['fields'] ?? [] as $field) {
+                    if ($field['type'] === 'link_fields') {
+                        continue;
+                    }
+
+                    if ($field['type'] === 'import') {
+                        if ($fieldset = Fieldset::find($field['fieldset'])) {
+                            $prefix = $field['prefix'] ?? '';
+
+                            foreach ($fieldset->fields()->all() as $importedField) {
+                                $handle = $prefix.$importedField->handle();
+                                $handleToIds[$handle][] = $field['_id'];
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    $handleToIds[$field['handle']][] = $field['_id'];
+                }
+            }
+        }
+
+        foreach ($handleToIds as $handle => $ids) {
+            if (count($ids) > 1) {
+                $message = __('statamic::validation.duplicate_field_handle', ['handle' => $handle]);
+
+                foreach (array_unique($ids) as $id) {
+                    $errors["{$id}.handle"] = [$message];
                 }
             }
         }
