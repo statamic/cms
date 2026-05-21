@@ -67,14 +67,14 @@ const clearInspector = (): void => {
     inspectorType.value = null;
 };
 
-const addPage = (atIndex: number | null = null) => {
+const addPage = (atIndex: number | null = null, sections = []) => {
     const page = {
         _id: uniqid(),
         display: null,
         instructions: null,
         button_label: null,
         previous_page_label: null,
-        sections: [],
+        sections,
     };
 
     formFields.value.pages.splice(atIndex ?? formFields.value.pages.length, 0, page);
@@ -120,20 +120,9 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
         });
     }
 
-    const newPage = {
-        _id: uniqid(),
-        display: null,
-        instructions: null,
-        button_label: null,
-        previous_page_label: null,
-        sections: sectionsForNewPage,
-    };
-
-    formFields.value.pages.splice(pageIndex + 1, 0, newPage);
+    const newPage = addPage(pageIndex + 1, sectionsForNewPage);
 
     inspect(InspectorType.Page, newPage);
-
-    dirty();
 };
 
 const addSection = (pageId: string, atIndex: number, fields = []) => {
