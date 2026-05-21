@@ -65,7 +65,7 @@ class FileTokenRepository extends TokenRepository
 
     private function isValidTokenName(string $token): bool
     {
-        return (bool) preg_match('/^[A-Za-z0-9_-]+$/', $token);
+        return (bool) preg_match('/^[A-Za-z0-9_-]+\z/', $token);
     }
 
     private function makeFromPath(string $path): FileToken

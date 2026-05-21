@@ -157,6 +157,7 @@ YAML;
             'dots only' => ['..'],
             'absolute path' => ['/etc/passwd'],
             'windows drive' => ['C:\\evil'],
+            'trailing newline' => ["evil\n"],
         ];
     }
 
