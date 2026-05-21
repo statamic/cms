@@ -239,7 +239,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                                                 <template #label>
                                                     <Label>
                                                         <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                            <Icon :name="fieldsetField.icon" data-collapsed-field-icon class="size-3.5 me-1 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                                                            <Icon name="link" data-collapsed-field-icon class="size-3.5 me-1 " :class="categoryColorClasses['fieldsets']?.icon" aria-hidden="true" />
                                                             {{ __(fieldsetField.config.display) }}
                                                             <span v-if="fieldsetField.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
                                                         </span>
