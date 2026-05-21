@@ -11,7 +11,7 @@ class FileTokenRepository extends TokenRepository
 {
     public function make(?string $token, string $handler, array $data = []): TokenContract
     {
-        if ($token && (str_contains($token, '/') || str_contains($token, '\\'))) {
+        if ($token && ! $this->isValidTokenName($token)) {
             $token = null;
         }
 
@@ -20,7 +20,7 @@ class FileTokenRepository extends TokenRepository
 
     public function find(string $token): ?TokenContract
     {
-        if (str_contains($token, '/') || str_contains($token, '\\')) {
+        if (! $this->isValidTokenName($token)) {
             return null;
         }
 
@@ -61,6 +61,11 @@ class FileTokenRepository extends TokenRepository
             ->map(fn ($path) => $this->makeFromPath($path))
             ->filter->hasExpired()
             ->each->delete();
+    }
+
+    private function isValidTokenName(string $token): bool
+    {
+        return (bool) preg_match('/^[A-Za-z0-9_-]+$/', $token);
     }
 
     private function makeFromPath(string $path): FileToken

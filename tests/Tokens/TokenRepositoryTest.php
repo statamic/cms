@@ -5,6 +5,7 @@ namespace Tests\Tokens;
 use Facades\Statamic\Tokens\Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\File;
@@ -138,11 +139,25 @@ YAML;
     }
 
     #[Test]
-    public function it_prevents_path_traversal_in_make()
+    #[DataProvider('invalidTokenNameProvider')]
+    public function it_rejects_invalid_token_names_in_make($token)
     {
         Generator::shouldReceive('generate')->once()->andReturn('generated-token');
 
-        $this->assertEquals('generated-token', $this->tokens->make('../evil', 'Handler')->token());
+        $this->assertEquals('generated-token', $this->tokens->make($token, 'Handler')->token());
+    }
+
+    public static function invalidTokenNameProvider()
+    {
+        return [
+            'parent traversal' => ['../evil'],
+            'backslash traversal' => ['..\\evil'],
+            'nested traversal' => ['foo/../../evil'],
+            'forward slash' => ['foo/evil'],
+            'dots only' => ['..'],
+            'absolute path' => ['/etc/passwd'],
+            'windows drive' => ['C:\\evil'],
+        ];
     }
 
     #[Test]
