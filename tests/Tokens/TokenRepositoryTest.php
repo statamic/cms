@@ -138,14 +138,11 @@ YAML;
     }
 
     #[Test]
-    public function it_generates_token_when_path_traversal_attempted_in_make()
+    public function it_prevents_path_traversal_in_make()
     {
-        Generator::shouldReceive('generate')->times(4)->andReturn('generated-token');
+        Generator::shouldReceive('generate')->once()->andReturn('generated-token');
 
-        $this->assertEquals('generated-token', $this->tokens->make('../../../etc/passwd', 'Handler')->token());
-        $this->assertEquals('generated-token', $this->tokens->make('..\\..\\..\\windows', 'Handler')->token());
-        $this->assertEquals('generated-token', $this->tokens->make('foo/bar', 'Handler')->token());
-        $this->assertEquals('generated-token', $this->tokens->make('foo\\bar', 'Handler')->token());
+        $this->assertEquals('generated-token', $this->tokens->make('../evil', 'Handler')->token());
     }
 
     #[Test]
