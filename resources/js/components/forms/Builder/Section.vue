@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { Button, Card, Field, Heading, Icon, Label, Panel, PanelHeader, PublishContainer } from '@ui';
-import WidthSelector from '@/components/fields/WidthSelector.vue';
+import { Button, Card, Heading, Icon, Panel, PanelHeader, PublishContainer } from '@ui';
 import { computed } from 'vue';
 import { uniqid, __ } from '@/bootstrap/globals.js';
-import { categories, categoryColorClasses } from './categories';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
-import { usePage } from '@inertiajs/vue3';
+import RegularFormField from './RegularFormField.vue';
+import ImportField from './ImportField.vue';
 
 const emit = defineEmits<{
     (e: 'deleted', value: null): void;
@@ -16,18 +15,10 @@ const props = defineProps<{
     canDeleteSection: boolean,
 }>();
 
-const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector, errors, dirty } = injectBuilderContext();
-
-const fieldsets = Object.values(usePage().props.fieldsets);
-
-const inspectField = (field: any) => inspect(InspectorType.Field, field);
-const isInspectingField = (field) => inspectorType.value === InspectorType.Field && inspecting.value?._id === field._id;
+const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector, dirty } = injectBuilderContext();
 
 const inspectLinkFields = (field: any) => inspect(InspectorType.LinkFields, field);
 const isInspectingLinkFields = (field) => inspectorType.value === InspectorType.LinkFields && inspecting.value?._id === field._id;
-
-const inspectFieldsetImport = (field: any) => inspect(InspectorType.FieldsetImport, field);
-const isInspectingFieldsetImport = (field) => inspectorType.value === InspectorType.FieldsetImport && inspecting.value?._id === field._id;
 
 const addLinkFieldsPlaceholder = () => {
     const placeholder = { _id: uniqid(), type: 'link_fields' };
@@ -36,22 +27,9 @@ const addLinkFieldsPlaceholder = () => {
     dirty();
 };
 
-const getFieldsetFields = (importField) => {
-    const fieldset = fieldsets.find((fs) => fs.handle === importField.fieldset);
-    if (!fieldset) return [];
-    return fieldset.fields.filter((f) => f.type !== 'import');
-};
-
 const toggleCollapsed = () => props.section.collapsed = !props.section.collapsed;
-const toggleFieldVisibility = (field) => field.config.hidden = !field.config.hidden;
 
-const fieldtypeCategory = (field) => {
-    const fieldtype = fieldtypes.find((f) => f.handle === field.fieldtype);
-    const hue = fieldtype?.categories?.[0] || 'other';
-    return categories[hue] ?? categories.other;
-};
-
-const fieldtypeIconColorClass = (field) => categoryColorClasses[fieldtypeCategory(field).color].icon;
+const inspectField = (field: any) => inspect(InspectorType.Field, field);
 
 const blueprint = computed(() => ({
     tabs: [{
@@ -74,11 +52,8 @@ const updateFieldWidth = (field, width) => {
     dirty();
 };
 
-const duplicateField = (fieldId) => {
+const duplicateField = (field) => {
     const { section } = props;
-    const field = section.fields.find((f) => f._id === fieldId);
-    if (!field) return;
-
     const index = section.fields.indexOf(field);
     const handle = uniqid();
 
@@ -100,20 +75,11 @@ const duplicateField = (fieldId) => {
     inspectField(newField);
 };
 
-const removeField = (fieldId) => {
-    const { section } = props;
-    const field = section.fields.find((f) => f._id === fieldId);
-    if (!field) return;
-
-    section.fields.splice(section.fields.indexOf(field), 1);
+const removeField = (field) => {
+    props.section.fields.splice(props.section.fields.indexOf(field), 1);
 
     dirty();
     clearInspector();
-};
-
-const fieldHasErrors = (fieldId: string) => {
-    const allErrors = errors?.value ?? {};
-    return Object.keys(allErrors).some(key => key.startsWith(`${fieldId}.`));
 };
 
 const editSection = () => inspect(InspectorType.Section, props.section);
@@ -187,7 +153,6 @@ const deleteSection = () => emit('deleted', props.section._id);
                         :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null"
                     >
                         <template v-for="field in section.fields" :key="field._id">
-                            <!-- Link Fields placeholder -->
                             <div
                                 v-if="field.type === 'link_fields'"
                                 :id="`fieldset-${field._id}`"
@@ -201,147 +166,20 @@ const deleteSection = () => emit('deleted', props.section._id);
                                 <span class="text-zinc-500 mr-2">{{ __('Select a field or fieldset to import') }}</span>
                             </div>
 
-                            <!-- Fieldset import -->
-                            <div
+                            <ImportField
                                 v-else-if="field.type === 'import'"
-                                :id="`import-${field._id}`"
-                                data-field-item
-                                :data-editing-field="isInspectingFieldsetImport(field) ? '' : undefined"
-                                :data-editing-item="isInspectingFieldsetImport(field) ? '' : undefined"
-                                :class="[{ 'cursor-pointer': !isInspectingFieldsetImport(field) }]"
-                                @click.stop="isInspectingFieldsetImport(field) || inspectFieldsetImport(field)"
-                            >
-                                <div
-                                    v-if="isInspectingFieldsetImport(field)"
-                                    class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
-                                >
-                                    <Button
-                                        size="sm"
-                                        inset
-                                        icon="trash"
-                                        variant="subtle"
-                                        :aria-label="__('Remove fieldset')"
-                                        :title="__('Remove fieldset')"
-                                        class="[&_svg]:opacity-45"
-                                        @click.stop="removeField(field._id)"
-                                    />
-                                </div>
-                                <div data-fieldset-group class="space-y-7">
-                                    <template v-for="(fieldsetField, fieldsetFieldIndex) in getFieldsetFields(field)" :key="fieldsetField.handle">
-                                        <div :id="fieldsetFieldIndex === 0 ? 'fieldset-start' : (fieldsetFieldIndex === getFieldsetFields(field).length - 1 ? 'fieldset-end' : undefined)">
-                                            <span v-if="fieldsetFieldIndex === 0" data-fieldset-label class="inline-flex gap-1.75 rounded-md font-mono text-2xs text-indigo-800">
-                                                <span class="inline-flex" v-tooltip="__('Linked Fieldset')">
-                                                    <Icon name="link" class="size-3.5" aria-hidden="true" />
-                                                </span>
-                                                <span class="sr-only">{{ __('Linked Fieldset') }}</span>
-                                            </span>
-                                            <Field :label="__(fieldsetField.config.display)" :instructions="fieldsetField.config.instructions">
-                                                <template #label>
-                                                    <Label>
-                                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                            <Icon name="link" data-collapsed-field-icon class="size-3.5 me-1 " :class="categoryColorClasses['fieldsets']?.icon" aria-hidden="true" />
-                                                            {{ __(fieldsetField.config.display) }}
-                                                            <span v-if="fieldsetField.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
-                                                        </span>
-                                                    </Label>
-                                                </template>
-                                                <div class="pointer-events-none" inert>
-                                                    <component
-                                                        :is="`${field.previews[fieldsetField.handle].config.component || field.previews[fieldsetField.handle].config.type}-fieldtype`"
-                                                        :config="field.previews[fieldsetField.handle].config"
-                                                        :value="field.previews[fieldsetField.handle].value"
-                                                        :meta="field.previews[fieldsetField.handle].meta"
-                                                        :handle="fieldsetField.handle"
-                                                    />
-                                                </div>
-                                            </Field>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
+                                :field
+                                @remove="removeField(field)"
+                            />
 
-                            <!-- Regular field -->
-                            <div
+                            <RegularFormField
                                 v-else
-                                :id="`field-${field._id}`"
-                                data-field-item
-                                :data-editing-field="isInspectingField(field) ? '' : undefined"
-                                :data-editing-item="isInspectingField(field) ? '' : undefined"
-                                :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspectingField(field) }]"
-                                @click.stop="isInspectingField(field) || inspectField(field)"
-                            >
-                                <div
-                                    v-if="isInspectingField(field)"
-                                    class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center"
-                                >
-                                    <WidthSelector
-                                        size="base"
-                                        variant="filled"
-                                        class="me-2 bg-blue-50! border-blue-300! dark:bg-blue-950/40! dark:border-blue-600! [&_[data-state]]:!border-blue-200 dark:[&_[data-state]]:!border-blue-700 [&_[data-state='selected']]:bg-blue-100! [&_[data-state='selected'][data-last='false']]:!border-blue-100 [&_[data-last='true']]:!border-blue-300 dark:[&_[data-state='selected']]:bg-blue-900! dark:[&_[data-state='selected'][data-last='false']]:!border-blue-900 dark:[&_[data-last='true']]:!border-blue-600"
-                                        :model-value="field.config.width || 100"
-                                        @update:model-value="updateFieldWidth(field, $event)"
-                                    />
-                                    <Button
-                                        size="sm"
-                                        inset
-                                        icon="duplicate"
-                                        variant="subtle"
-                                        :aria-label="__('Duplicate field')"
-                                        :title="__('Duplicate field')"
-                                        class="[&_svg]:opacity-45"
-                                        @click.stop="duplicateField(field._id)"
-                                    />
-                                    <Button
-                                        size="sm"
-                                        inset
-                                        :icon="field.config.hidden ? 'eye-closed' : 'eye'"
-                                        variant="subtle"
-                                        :aria-label="field.config.hidden ? __('Show field') : __('Hide field')"
-                                        :title="field.config.hidden ? __('Show field') : __('Hide field')"
-                                        class="[&_svg]:opacity-45"
-                                        @click.stop="toggleFieldVisibility(field)"
-                                    />
-                                    <Button
-                                        size="sm"
-                                        inset
-                                        icon="trash"
-                                        variant="subtle"
-                                        :aria-label="__('Remove field')"
-                                        :title="__('Remove field')"
-                                        class="[&_svg]:opacity-45"
-                                        @click.stop="removeField(field._id)"
-                                    />
-                                </div>
-                                <Field
-                                    :class="{ 'opacity-60': field.config.hidden }"
-                                    :label="field.config.display"
-                                    :instructions="field.config.instructions"
-                                    :error="fieldHasErrors(field._id) ? __('This field has errors. Please fix them before saving.') : null"
-                                >
-                                    <template #label>
-                                        <Label :class="{ 'cursor-pointer': !isInspectingField(field) }">
-                                        <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', fieldtypeIconColorClass(field)]" aria-hidden="true" />
-                                            <span>
-                                                {{ __(field.config.display) }}
-                                                <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
-                                            </span>
-                                            <Icon v-if="field.type === 'reference'" name="link" class="size-3! text-indigo-500 dark:text-indigo-400" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
-                                            <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
-                                        </span>
-                                        </Label>
-                                    </template>
-                                    <div v-if="field.preview" inert>
-                                        <component
-                                            :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                                            :config="field.preview.config"
-                                            :value="field.preview.value"
-                                            :meta="field.preview.meta"
-                                            :handle="field.handle"
-                                        />
-                                    </div>
-                                </Field>
-                            </div>
+                                :field
+                                :fieldtypes
+                                @duplicate="duplicateField(field)"
+                                @width-changed="updateFieldWidth(field, $event)"
+                                @remove="removeField(field)"
+                            />
                         </template>
                     </div>
                 </PublishContainer>
