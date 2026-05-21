@@ -12,7 +12,7 @@ class FileTokenRepository extends TokenRepository
     public function make(?string $token, string $handler, array $data = []): TokenContract
     {
         if ($token && ! $this->isValidTokenName($token)) {
-            $token = null;
+            throw new \InvalidArgumentException("Invalid token name [{$token}].");
         }
 
         return app()->makeWith(TokenContract::class, compact('token', 'handler', 'data'));

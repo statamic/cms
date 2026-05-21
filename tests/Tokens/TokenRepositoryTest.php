@@ -140,11 +140,11 @@ YAML;
 
     #[Test]
     #[DataProvider('invalidTokenNameProvider')]
-    public function it_rejects_invalid_token_names_in_make($token)
+    public function it_throws_when_making_a_token_with_an_invalid_name($token)
     {
-        Generator::shouldReceive('generate')->once()->andReturn('generated-token');
+        $this->expectException(\InvalidArgumentException::class);
 
-        $this->assertEquals('generated-token', $this->tokens->make($token, 'Handler')->token());
+        $this->tokens->make($token, 'Handler');
     }
 
     public static function invalidTokenNameProvider()
