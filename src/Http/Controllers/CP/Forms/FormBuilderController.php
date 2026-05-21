@@ -178,6 +178,10 @@ class FormBuilderController extends CpController
         foreach ($request->pages as $page) {
             foreach ($page['sections'] ?? [] as $section) {
                 foreach ($section['fields'] ?? [] as $field) {
+                    if (in_array($field['type'], ['import', 'link_fields'])) {
+                        continue;
+                    }
+
                     $fieldtype = FormFieldtypeRepository::find($field['fieldtype']);
                     $blueprint = $this->configBlueprint($fieldtype->configBlueprint());
 
@@ -231,6 +235,7 @@ class FormBuilderController extends CpController
                     return Arr::removeNullValues([
                         'display' => $section['display'] ?? null,
                         'fields' => collect($section['fields'])
+                            ->reject(fn (array $field) => $field['type'] === 'link_fields')
                             ->map(fn (array $field) => FormFieldTransformer::fromVue($field))
                             ->all(),
                     ]);

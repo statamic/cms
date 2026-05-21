@@ -492,6 +492,77 @@ class FormBuilderTest extends TestCase
         $this->assertEquals('Contact', $formFields->pages()[0]['sections'][1]['display']);
     }
 
+    #[Test]
+    public function it_skips_validation_for_import_fields()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'import1',
+                                    'type' => 'import',
+                                    'fieldset' => 'some_fieldset',
+                                    'prefix' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSuccessful();
+    }
+
+    #[Test]
+    public function it_filters_out_link_fields_placeholders_when_saving()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'placeholder1',
+                                    'type' => 'link_fields',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $form = Form::find('test');
+        $this->assertEmpty($form->formFields()->pages()[0]['sections'][0]['fields'] ?? []);
+    }
+
     private function registerFieldtypeWithRequiredConfig(): void
     {
         $formFieldtype = new class extends FormFieldtype

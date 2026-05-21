@@ -40,8 +40,23 @@ const originMeta = ref(null);
 const fieldtype = ref(null);
 const blueprint = ref(null);
 const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
+const modifiedFields = ref<string[]>([]);
+
+const adjustedBlueprint = computed(() => {
+    const bp = JSON.parse(JSON.stringify(blueprint.value));
+
+    bp.tabs[0].sections.forEach((section) => {
+        section.fields.forEach((field) => {
+            field.localizable = true;
+        });
+    });
+
+    return bp;
+});
 
 const load = () => {
+    modifiedFields.value = field.value.config_overrides ?? [];
+
     const cached = cache.get(field.value._id);
 
     if (cached) {
@@ -122,14 +137,16 @@ watch(field, () => {
     load();
 });
 
-watch(
-    values,
-    () => {
-        dirty();
-        updatePreview();
-    },
-    { deep: true }
-);
+watch(values, () => {
+    dirty();
+    updatePreview();
+}, { deep: true });
+
+watch(modifiedFields, (fields) => {
+    if (field.value.type === 'reference') {
+        field.value.config_overrides = fields;
+    }
+}, { deep: true });
 
 onMounted(() => load());
 </script>
@@ -171,18 +188,19 @@ onMounted(() => load());
 
                         <PublishContainer
                             ref="container"
-                            :blueprint
+                            :blueprint="adjustedBlueprint"
                             :meta
                             :errors="errors"
                             v-model="values"
+                            v-model:modified-fields="modifiedFields"
                             :origin-values
                             :origin-meta
                             :track-dirty-state="false"
                         >
-                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
+                            <PublishFieldsProvider :fields="adjustedBlueprint.tabs[0].sections[0].fields">
                                 <div class="publish-fields">
                                     <PublishField
-                                        v-for="field in blueprint.tabs[0].sections[0].fields"
+                                        v-for="field in adjustedBlueprint.tabs[0].sections[0].fields"
                                         :key="field.handle"
                                         :config="field"
                                         :class="[
@@ -271,18 +289,19 @@ onMounted(() => load());
 
                         <PublishContainer
                             ref="container"
-                            :blueprint
+                            :blueprint="adjustedBlueprint"
                             :meta
                             :errors="errors"
                             v-model="values"
+                            v-model:modified-fields="modifiedFields"
                             :origin-values
                             :origin-meta
                             :track-dirty-state="false"
                         >
-                            <PublishFieldsProvider :fields="blueprint.tabs[0].sections[0].fields">
+                            <PublishFieldsProvider :fields="adjustedBlueprint.tabs[0].sections[0].fields">
                                 <div class="publish-fields">
                                     <PublishField
-                                        v-for="field in blueprint.tabs[0].sections[0].fields"
+                                        v-for="field in adjustedBlueprint.tabs[0].sections[0].fields"
                                         :key="field.handle"
                                         :config="field"
                                         :class="[

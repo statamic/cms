@@ -5,6 +5,7 @@ import fuzzysort from 'fuzzysort';
 import { Button, Input } from '@ui';
 import { categories, categoryColorClasses } from './categories';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
+import { __ } from '@/bootstrap/globals';
 
 const { fieldtypes, formsProInstalled, fieldView, inspect } = injectBuilderContext();
 
@@ -35,6 +36,16 @@ const allFieldtypes = computed(() => {
             config: [],
         });
     }
+
+    options.push({
+        handle: 'fieldset',
+        title: __('Link Existing'),
+        description: __('Link one or more existing fields from a fieldset.'),
+        categories: ['fieldsets'],
+        keywords: [],
+        icon: 'link',
+        config: [],
+    });
 
     return options;
 });

@@ -9,6 +9,7 @@ export const categories = {
     datetime: { title: __('Date and Time'), color: 'fuchsia' },
     media: { title: __('Media'), color: 'cyan' },
     payment: { title: __('Payment'), color: 'green' },
+    fieldsets: { title: __('Fieldsets'), color: 'gray' },
     other: { title: __('Other'), color: 'gray' },
 };
 

@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms\Fields;
 
-use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
+use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Forms\Fieldtypes\Fallback;
@@ -20,8 +20,6 @@ class FormFieldTransformer extends FieldTransformer
 
     private static function importTabField(array $submitted)
     {
-        dd('TODO');
-
         return array_filter([
             'import' => $submitted['fieldset'],
             'prefix' => $submitted['prefix'] ?? null,
@@ -72,8 +70,6 @@ class FormFieldTransformer extends FieldTransformer
 
     private static function referenceTabField(array $submitted)
     {
-        dd('TODO');
-
         $config = Arr::removeNullValues(Arr::only($submitted['config'], $submitted['config_overrides']));
 
         return array_filter([
@@ -96,17 +92,18 @@ class FormFieldTransformer extends FieldTransformer
 
     private static function referenceFieldToVue($field): array
     {
-        dd('TODO');
-
         $fieldsetField = static::fieldsetFields()[$field['field']] ?? [];
 
         $mergedConfig = array_merge(
-            $fieldsetFieldConfig = Arr::get($fieldsetField, 'config', []),
+            Arr::get($fieldsetField, 'config', []),
             $config = Arr::get($field, 'config', [])
         );
 
         $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
-        $mergedConfig['localizable'] = $mergedConfig['localizable'] ?? false;
+        $mergedConfig['hidden'] = $mergedConfig['hidden'] ?? false;
+
+        $formField = new FormField($field['handle'], $mergedConfig);
+        $formFieldtype = FormFieldtypeRepository::find($mergedConfig['type'])->setField($formField);
 
         return [
             'handle' => $field['handle'],
@@ -114,8 +111,9 @@ class FormFieldTransformer extends FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $type = $mergedConfig['type'],
-            'icon' => FieldtypeRepository::find($type)->icon(),
+            'fieldtype' => $mergedConfig['type'],
+            'icon' => $formFieldtype->icon(),
+            'preview' => static::fieldtypePreview($formFieldtype),
         ];
     }
 
@@ -142,12 +140,12 @@ class FormFieldTransformer extends FieldTransformer
 
     private static function importFieldToVue($field): array
     {
-        dd('TODO');
-
         $import = [
+            '_id' => uniqid(),
             'type' => 'import',
             'fieldset' => $field['import'],
             'prefix' => $field['prefix'] ?? null,
+            'previews' => static::fieldsetPreviews($field['import']),
         ];
 
         if (isset($field['section_behavior'])) {
@@ -164,6 +162,35 @@ class FormFieldTransformer extends FieldTransformer
                 ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle']])
                 : (clone $fieldtype)->setField(new FormField($fieldtype->handle(), ['type' => $fieldtype->handle()]))->toField();
 
+            $field->setValue($field->defaultValue());
+
+            return [
+                'config' => $field->toPublishArray(),
+                'value' => $field->fieldtype()->preProcess($field->value()),
+                'meta' => $field->fieldtype()->preload(),
+            ];
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private static function fieldsetPreviews(string $handle): array
+    {
+        $fieldset = Fieldset::find($handle);
+
+        if (! $fieldset) {
+            return [];
+        }
+
+        return collect($fieldset->fields()->all())
+            ->mapWithKeys(fn (Field $field) => [$field->handle() => static::fieldPreview($field)])
+            ->all();
+    }
+
+    private static function fieldPreview(Field $field): ?array
+    {
+        try {
+            $field = new Field('preview', $field->config());
             $field->setValue($field->defaultValue());
 
             return [

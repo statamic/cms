@@ -7,6 +7,8 @@ export enum InspectorType {
     Field = 'field',
     Action = 'action',
     FieldtypeHint = 'fieldtype_hint',
+    LinkFields = 'link_fields',
+    FieldsetImport = 'import',
 }
 
 export enum FieldView {
@@ -35,6 +37,8 @@ import { __, uniqid } from '@/bootstrap/globals.js';
 import { useFieldtypeDraggable } from '@/components/forms/Builder/use-drag-and-drop';
 import ActionInspector from '@/components/forms/Builder/ActionInspector.vue';
 import axios from 'axios';
+import LinkFieldsInspector from '@/components/forms/Builder/LinkFieldsInspector.vue';
+import FieldsetInspector from '@/components/forms/Builder/FieldsetInspector.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -192,7 +196,7 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     dirty();
 };
 
-const handleFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
+const onFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
     if (fieldtypeHandle === 'page_break') {
         addPageAt(pageId, sectionIndex, fieldIndex);
         return;
@@ -206,12 +210,31 @@ const handleFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex,
         return;
     }
 
+    if (fieldtypeHandle === 'fieldset') {
+        const page = pages.value.find((p) => p._id === pageId);
+        if (!page) return;
+
+        const section = page.sections.find((s) => s._id === sectionId);
+        if (!section) return;
+
+        let fieldsetImport = {
+            _id: uniqid(),
+            type: 'link_fields',
+        };
+
+        section.fields.splice(fieldIndex, 0, fieldsetImport);
+
+        inspect(InspectorType.LinkFields, fieldsetImport);
+
+        return;
+    }
+
     addField(pageId, sectionId, fieldtypeHandle, fieldIndex);
 };
 
 useFieldtypeDraggable({
     pages,
-    onDrop: handleFieldtypeDrop,
+    onDrop: onFieldtypeDrop,
 });
 
 const avoidTrackingDirtyState = ref(false);
@@ -356,5 +379,7 @@ onUnmounted(() => {
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
         <FieldInspector v-if="inspectorType === InspectorType.Field" />
         <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
+        <LinkFieldsInspector v-if="inspectorType === InspectorType.LinkFields" />
+        <FieldsetInspector v-if="inspectorType === InspectorType.FieldsetImport" />
     </LayoutPanel>
 </template>

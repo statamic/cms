@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
+use Statamic\Fields\FieldTransformer;
+use Statamic\Support\Arr;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
@@ -33,15 +35,18 @@ class FormFieldsController extends CpController
             ->addValues($request->values)
             ->preProcess();
 
-        //        if ($request->reference) {
-        //            $originFields = $blueprint
-        //                ->fields()
-        //                ->addValues(FieldRepository::find($request->reference)->config())
-        //                ->preProcess();
-        //
-        //            $originValues = Arr::except($originFields->values()->all(), 'handle');
-        //            $originMeta = $originFields->meta()->all();
-        //        }
+        if ($request->reference) {
+            $fieldsetFields = FieldTransformer::fieldsetFields();
+            $originConfig = $fieldsetFields[$request->reference]['config'] ?? [];
+
+            $originFields = $blueprint
+                ->fields()
+                ->addValues($originConfig)
+                ->preProcess();
+
+            $originValues = Arr::except($originFields->values()->all(), 'handle');
+            $originMeta = $originFields->meta()->all();
+        }
 
         return [
             'fieldtype' => $fieldtype->toArray(),

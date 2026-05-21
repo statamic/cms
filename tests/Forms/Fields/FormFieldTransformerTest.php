@@ -317,4 +317,197 @@ class FormFieldTransformerTest extends TestCase
         $this->assertFalse($fromVue['field']['show_preview']);
         $this->assertFalse($fromVue['field']['allow_multiple']);
     }
+
+    #[Test]
+    public function it_converts_import_field_to_vue()
+    {
+        $field = [
+            'import' => 'my_fieldset',
+        ];
+
+        $vue = FormFieldTransformer::toVue($field);
+
+        $this->assertEquals('import', $vue['type']);
+        $this->assertEquals('my_fieldset', $vue['fieldset']);
+        $this->assertNull($vue['prefix']);
+        $this->assertArrayHasKey('_id', $vue);
+    }
+
+    #[Test]
+    public function it_converts_import_field_with_prefix_to_vue()
+    {
+        $field = [
+            'import' => 'my_fieldset',
+            'prefix' => 'hero_',
+        ];
+
+        $vue = FormFieldTransformer::toVue($field);
+
+        $this->assertEquals('import', $vue['type']);
+        $this->assertEquals('my_fieldset', $vue['fieldset']);
+        $this->assertEquals('hero_', $vue['prefix']);
+    }
+
+    #[Test]
+    public function it_converts_import_field_with_section_behavior_to_vue()
+    {
+        $field = [
+            'import' => 'my_fieldset',
+            'section_behavior' => 'flatten',
+        ];
+
+        $vue = FormFieldTransformer::toVue($field);
+
+        $this->assertEquals('import', $vue['type']);
+        $this->assertEquals('my_fieldset', $vue['fieldset']);
+        $this->assertEquals('flatten', $vue['section_behavior']);
+    }
+
+    #[Test]
+    public function it_converts_from_vue_to_import_field()
+    {
+        $submitted = [
+            'type' => 'import',
+            'fieldset' => 'my_fieldset',
+            'prefix' => 'hero_',
+        ];
+
+        $field = FormFieldTransformer::fromVue($submitted);
+
+        $this->assertEquals('my_fieldset', $field['import']);
+        $this->assertEquals('hero_', $field['prefix']);
+        $this->assertArrayNotHasKey('section_behavior', $field);
+    }
+
+    #[Test]
+    public function it_converts_from_vue_to_import_field_with_section_behavior()
+    {
+        $submitted = [
+            'type' => 'import',
+            'fieldset' => 'my_fieldset',
+            'section_behavior' => 'flatten',
+        ];
+
+        $field = FormFieldTransformer::fromVue($submitted);
+
+        $this->assertEquals('my_fieldset', $field['import']);
+        $this->assertEquals('flatten', $field['section_behavior']);
+    }
+
+    #[Test]
+    public function it_removes_preserve_section_behavior_from_import_field()
+    {
+        $submitted = [
+            'type' => 'import',
+            'fieldset' => 'my_fieldset',
+            'section_behavior' => 'preserve',
+        ];
+
+        $field = FormFieldTransformer::fromVue($submitted);
+
+        $this->assertEquals('my_fieldset', $field['import']);
+        $this->assertArrayNotHasKey('section_behavior', $field);
+    }
+
+    #[Test]
+    public function it_converts_reference_field_to_vue()
+    {
+        $fieldset = (new \Statamic\Fields\Fieldset)
+            ->setHandle('my_fieldset')
+            ->setContents(['fields' => [
+                [
+                    'handle' => 'my_field',
+                    'field' => ['type' => 'short_answer', 'display' => 'My Field', 'placeholder' => 'Enter text'],
+                ],
+            ]]);
+
+        \Statamic\Facades\Fieldset::shouldReceive('all')->andReturn(collect(['my_fieldset' => $fieldset]));
+
+        $field = [
+            'handle' => 'custom_handle',
+            'field' => 'my_fieldset.my_field',
+        ];
+
+        $vue = FormFieldTransformer::toVue($field);
+
+        $this->assertEquals('custom_handle', $vue['handle']);
+        $this->assertEquals('reference', $vue['type']);
+        $this->assertEquals('my_fieldset.my_field', $vue['field_reference']);
+        $this->assertEquals('short_answer', $vue['fieldtype']);
+        $this->assertEquals('My Field', $vue['config']['display']);
+        $this->assertEquals('Enter text', $vue['config']['placeholder']);
+        $this->assertEquals([], $vue['config_overrides']);
+    }
+
+    #[Test]
+    public function it_converts_reference_field_with_config_overrides_to_vue()
+    {
+        $fieldset = (new \Statamic\Fields\Fieldset)
+            ->setHandle('my_fieldset')
+            ->setContents(['fields' => [
+                [
+                    'handle' => 'my_field',
+                    'field' => ['type' => 'short_answer', 'display' => 'My Field'],
+                ],
+            ]]);
+
+        \Statamic\Facades\Fieldset::shouldReceive('all')->andReturn(collect(['my_fieldset' => $fieldset]));
+
+        $field = [
+            'handle' => 'custom_handle',
+            'field' => 'my_fieldset.my_field',
+            'config' => [
+                'display' => 'Custom Display',
+            ],
+        ];
+
+        $vue = FormFieldTransformer::toVue($field);
+
+        $this->assertEquals('reference', $vue['type']);
+        $this->assertEquals('Custom Display', $vue['config']['display']);
+        $this->assertEquals(['display'], $vue['config_overrides']);
+    }
+
+    #[Test]
+    public function it_converts_from_vue_to_reference_field()
+    {
+        $submitted = [
+            'handle' => 'custom_handle',
+            'type' => 'reference',
+            'field_reference' => 'my_fieldset.my_field',
+            'fieldtype' => 'short_answer',
+            'config' => [
+                'display' => 'Custom Display',
+                'placeholder' => 'Original placeholder',
+            ],
+            'config_overrides' => ['display'],
+        ];
+
+        $field = FormFieldTransformer::fromVue($submitted);
+
+        $this->assertEquals('custom_handle', $field['handle']);
+        $this->assertEquals('my_fieldset.my_field', $field['field']);
+        $this->assertEquals(['display' => 'Custom Display'], $field['config']);
+    }
+
+    #[Test]
+    public function it_removes_empty_config_from_reference_field()
+    {
+        $submitted = [
+            'handle' => 'custom_handle',
+            'type' => 'reference',
+            'field_reference' => 'my_fieldset.my_field',
+            'fieldtype' => 'short_answer',
+            'config' => [
+                'display' => 'My Field',
+            ],
+            'config_overrides' => [],
+        ];
+
+        $field = FormFieldTransformer::fromVue($submitted);
+
+        $this->assertEquals('custom_handle', $field['handle']);
+        $this->assertEquals('my_fieldset.my_field', $field['field']);
+        $this->assertArrayNotHasKey('config', $field);
+    }
 }
