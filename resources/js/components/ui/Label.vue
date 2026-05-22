@@ -1,5 +1,5 @@
 <script setup>
-import { useSlots } from 'vue';
+import { computed, useSlots } from 'vue';
 import Badge from './Badge.vue';
 
 const slots = useSlots();
@@ -14,11 +14,16 @@ const props = defineProps({
     /** The label text to display */
     text: { type: [String, Number, Boolean, null], default: null },
 });
+
+const hasVisibleLabel = computed(() => {
+    return hasDefaultSlot.value || !!props.text?.trim() || props.required;
+});
 </script>
 
 <template>
     <label
-        class="flex justify-between mb-1.5 text-sm font-medium [&_button]:font-medium text-gray-925 select-none dark:text-gray-300 [&_button:has(svg)]:h-auto"
+        class="flex justify-between text-sm font-medium [&_button]:font-medium text-gray-925 select-none dark:text-gray-300 [&_button:has(svg)]:h-auto"
+        :class="{ 'mb-1.5': hasVisibleLabel }"
         data-ui-label
         :for="for"
     >
