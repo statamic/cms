@@ -19,30 +19,29 @@ class FormFields
 {
     public function __construct(protected array $contents)
     {
-    }
-
-    public function contents(): array
-    {
         if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
-            return [
+            $this->contents = [
                 'sections' => collect($this->contents['pages'])
                     ->flatMap(fn (array $page): array => $page['sections'] ?? [])
                     ->all(),
             ];
         }
+    }
 
+    public function contents(): array
+    {
         return $this->contents;
     }
 
     public function pages(): Collection
     {
-        if (! isset($this->contents['pages'])) {
-            return collect([
-                ['sections' => $this->contents['sections'] ?? []],
-            ]);
+        if (isset($this->contents['pages'])) {
+            return collect($this->contents['pages']);
         }
 
-        return collect($this->contents['pages']);
+        return collect([
+            ['sections' => $this->contents['sections'] ?? []],
+        ]);
     }
 
     public function sections(): Collection

@@ -100,6 +100,24 @@ class FormFieldsTest extends TestCase
     }
 
     #[Test]
+    public function it_collapses_pages_to_single_page_when_forms_pro_is_not_installed()
+    {
+        $formFields = new FormFields([
+            'pages' => [
+                ['sections' => [['display' => 'Section A', 'fields' => []]]],
+                ['sections' => [['display' => 'Section B', 'fields' => []]]],
+            ],
+        ]);
+
+        $pages = $formFields->pages();
+
+        $this->assertCount(1, $pages);
+        $this->assertCount(2, $pages->first()['sections']);
+        $this->assertEquals('Section A', $pages->first()['sections'][0]['display']);
+        $this->assertEquals('Section B', $pages->first()['sections'][1]['display']);
+    }
+
+    #[Test]
     public function it_returns_single_page_when_using_sections()
     {
         $formFields = new FormFields([

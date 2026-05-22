@@ -6,7 +6,7 @@ import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { useSortable } from './use-drag-and-drop';
 import { __ } from '@/bootstrap/globals';
 
-const { inspecting, inspectorType, inspect, pages, addSection, dirty } = injectBuilderContext();
+const { inspecting, inspectorType, inspect, pages, addSection, dirty, formsProInstalled } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
@@ -59,6 +59,7 @@ onMounted(() => {
 <template>
     <div ref="container" :data-form-page="page._id">
         <div
+            v-if="formsProInstalled"
             :id="`page-${page._id}`"
             class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
             role="button"
