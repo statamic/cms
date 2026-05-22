@@ -111,6 +111,9 @@ const hasErrors = computed(() => {
                     </span>
                 </Label>
             </template>
+            <span v-if="field.config.if || field.config.unless" class="absolute z-(&#45;&#45;z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">
+                <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />
+            </span>
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
