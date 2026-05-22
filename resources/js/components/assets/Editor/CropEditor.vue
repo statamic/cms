@@ -478,6 +478,7 @@ function close() {
                         size="sm"
                         class="w-48"
                         :aria-label="__('Select aspect ratio')"
+                        :adaptive-width="true"
                         @update:modelValue="setAspectRatio"
                     />
                     <Button
