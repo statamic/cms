@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\OrderBy;
 
@@ -235,8 +236,20 @@ abstract class Relationship extends Fieldtype
     public function getItemData($values)
     {
         return collect($values)->map(function ($id) {
-            return $this->toItemArray($id);
+            return $this->authorizeItemData($id)
+                ? $this->toItemArray($id)
+                : $this->invalidItemArray($id);
         })->values();
+    }
+
+    protected function authorizeItemData($id): bool
+    {
+        return true;
+    }
+
+    protected function authorizeViewable($item): bool
+    {
+        return $item && User::current()->can('view', $item);
     }
 
     public function getItemHint($item): ?string

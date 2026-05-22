@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class AssetFolder extends Relationship
@@ -47,6 +49,15 @@ class AssetFolder extends Relationship
         ];
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        if (! $container = $this->config('container')) {
+            return true;
+        }
+
+        return $this->authorizeViewable(AssetContainer::find($container));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         return ['title' => $id, 'id' => $id];
@@ -54,7 +65,11 @@ class AssetFolder extends Relationship
 
     public function getIndexItems($request)
     {
-        return AssetContainer::find($request->container)
+        $container = AssetContainer::find($request->container);
+
+        throw_unless($container && User::current()->can('view', $container), new AuthorizationException);
+
+        return $container
             ->folders()
             ->map(function ($folder) {
                 return ['id' => $folder, 'title' => $folder];

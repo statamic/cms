@@ -3,7 +3,9 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Structure;
+use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
 
 class Structures extends Relationship
@@ -11,6 +13,12 @@ class Structures extends Relationship
     protected $canEdit = false;
     protected $canCreate = false;
     protected $statusIcons = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return User::current()->can('configure collections')
+            || User::current()->can('configure navs');
+    }
 
     protected function toItemArray($id)
     {
@@ -26,6 +34,11 @@ class Structures extends Relationship
 
     public function getIndexItems($request)
     {
+        throw_unless(
+            User::current()->can('configure collections') || User::current()->can('configure navs'),
+            new AuthorizationException
+        );
+
         return Structure::all()->map(function ($structure) {
             return [
                 'id' => $this->getStructureId($structure),

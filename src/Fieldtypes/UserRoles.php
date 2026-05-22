@@ -2,9 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Role;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\GraphQL\Types\RoleType;
 
 use function Statamic\trans as __;
@@ -14,6 +16,11 @@ class UserRoles extends Relationship
     protected $canEdit = false;
     protected $canCreate = false;
     protected $statusIcons = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return User::current()->can('edit roles');
+    }
 
     protected function toItemArray($id, $site = null)
     {
@@ -41,6 +48,8 @@ class UserRoles extends Relationship
 
     public function getIndexItems($request)
     {
+        throw_unless(User::current()->can('edit roles'), new AuthorizationException);
+
         return Role::all()->sortBy('title')->map(function ($role) {
             return [
                 'id' => $role->handle(),

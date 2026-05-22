@@ -382,6 +382,15 @@ class Terms extends Relationship
         return $blueprint->title();
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
+            $id = "{$this->taxonomies()[0]}::{$id}";
+        }
+
+        return $this->authorizeViewable(Term::find($id));
+    }
+
     protected function toItemArray($id)
     {
         if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {

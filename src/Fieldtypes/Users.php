@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
@@ -84,6 +85,11 @@ class Users extends Relationship
         return parent::preProcess($data);
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(User::find($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($user = User::find($id)) {
@@ -102,6 +108,8 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
+        throw_unless(User::current()->can('index', UserContract::class), new AuthorizationException);
+
         $query = User::query();
 
         if ($search = $request->search) {

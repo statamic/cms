@@ -9,6 +9,7 @@ use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Data\AugmentedCollection;
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Users;
@@ -99,15 +100,13 @@ class UsersTest extends TestCase
     }
 
     #[Test]
-    public function it_hides_email_from_index_items_without_view_users_permission()
+    public function it_forbids_index_items_without_view_users_permission()
     {
         $this->actingAs($this->cpUserWithPermissions(['access cp']));
 
-        $items = $this->fieldtype()->getIndexItems(new Request(['paginate' => false]));
-        $namelessUser = $items->firstWhere('id', '789');
+        $this->expectException(AuthorizationException::class);
 
-        $this->assertArrayNotHasKey('email', $namelessUser);
-        $this->assertEquals('789', $namelessUser['title']);
+        $this->fieldtype()->getIndexItems(new Request(['paginate' => false]));
     }
 
     #[Test]

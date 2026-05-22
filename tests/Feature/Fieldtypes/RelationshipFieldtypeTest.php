@@ -5,6 +5,7 @@ namespace Tests\Feature\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Role;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -186,6 +187,190 @@ class RelationshipFieldtypeTest extends TestCase
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}")
             ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_scopes_collection_listing_to_viewable_collections()
+    {
+        Collection::make('pages')->title('Pages')->save();
+        Collection::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view pages entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'collections']));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+
+        $this->assertContains('pages', $ids);
+        $this->assertNotContains('secret', $ids);
+    }
+
+    #[Test]
+    public function it_returns_empty_collection_listing_when_no_collections_are_viewable()
+    {
+        Collection::make('pages')->title('Pages')->save();
+        Collection::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'collections']));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+    }
+
+    #[Test]
+    public function it_forbids_user_listing_for_a_user_who_cannot_view_users()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'users']));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_forbids_user_role_listing_for_a_user_who_cannot_edit_roles()
+    {
+        Role::make('one')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'user_roles']));
+
+        $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_returns_a_placeholder_for_an_unviewable_item_by_id()
+    {
+        Collection::make('pages')->title('Pages')->save();
+        Collection::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view pages entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'collections']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['pages', 'secret'],
+            ])
+            ->assertOk();
+
+        $data = collect($response->json('data'))->keyBy('id');
+
+        $this->assertEquals('Pages', $data['pages']['title']);
+        $this->assertArrayNotHasKey('invalid', $data['pages']);
+
+        $this->assertTrue($data['secret']['invalid']);
+        $this->assertEquals('secret', $data['secret']['title']);
+    }
+
+    #[Test]
+    public function the_by_id_placeholder_does_not_reveal_whether_an_item_exists()
+    {
+        Collection::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'collections']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['secret', 'does-not-exist'],
+            ])
+            ->assertOk();
+
+        $data = collect($response->json('data'))->keyBy('id');
+
+        $this->assertEquals(
+            ['id' => 'secret', 'title' => 'secret', 'invalid' => true],
+            $data['secret']
+        );
+        $this->assertEquals(
+            ['id' => 'does-not-exist', 'title' => 'does-not-exist', 'invalid' => true],
+            $data['does-not-exist']
+        );
+    }
+
+    #[Test]
+    public function it_returns_a_placeholder_by_id_for_policy_less_types_without_the_permission()
+    {
+        Role::make('editor')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'user_roles']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['editor'],
+            ])
+            ->assertOk();
+
+        $this->assertTrue($response->json('data.0.invalid'));
+        $this->assertEquals('editor', $response->json('data.0.title'));
+    }
+
+    #[Test]
+    public function a_super_admin_gets_full_data_for_policy_less_types_by_id()
+    {
+        Role::make('editor')->title('Editor')->save();
+
+        $config = base64_encode(json_encode(['type' => 'user_roles']));
+
+        $response = $this
+            ->actingAs(User::make()->makeSuper()->save())
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['editor'],
+            ])
+            ->assertOk();
+
+        $this->assertEquals('Editor', $response->json('data.0.title'));
+        $this->assertNull($response->json('data.0.invalid'));
+    }
+
+    #[Test]
+    public function a_super_admin_can_list_policy_less_types()
+    {
+        Role::make('editor')->title('Editor')->save();
+
+        $config = base64_encode(json_encode(['type' => 'user_roles']));
+
+        $response = $this
+            ->actingAs(User::make()->makeSuper()->save())
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $this->assertContains('editor', collect($response->json('data'))->pluck('id')->all());
     }
 }
 

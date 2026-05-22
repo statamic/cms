@@ -355,6 +355,11 @@ class Entries extends Relationship
         return $blueprint->title();
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Entry::find($id));
+    }
+
     protected function toItemArray($id)
     {
         if (! $entry = Entry::find($id)) {

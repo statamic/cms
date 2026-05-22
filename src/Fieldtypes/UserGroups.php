@@ -2,8 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\GraphQL\Types\UserGroupType;
 
@@ -14,6 +16,11 @@ class UserGroups extends Relationship
     protected $canEdit = false;
     protected $canCreate = false;
     protected $statusIcons = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return User::current()->can('edit user groups');
+    }
 
     protected function toItemArray($id, $site = null)
     {
@@ -29,6 +36,8 @@ class UserGroups extends Relationship
 
     public function getIndexItems($request)
     {
+        throw_unless(User::current()->can('edit user groups'), new AuthorizationException);
+
         return UserGroup::all()->sortBy('title')->map(function ($group) {
             return [
                 'id' => $group->handle(),
