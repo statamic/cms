@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Field, Icon, Input } from '@ui';
-import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import { watch } from 'vue';
+import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-const { inspecting: section, dirty } = injectBuilderContext();
+const { dirty, inspecting: section } = injectBuilderContext();
 
 watch(() => section.value.display, dirty);
 </script>

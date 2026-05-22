@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Button, Description, Field, Icon, Label } from '@ui';
 import { computed } from 'vue';
-import { __ } from '@/bootstrap/globals.js';
-import { categoryColorClasses } from './categories';
-import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { usePage } from '@inertiajs/vue3';
+import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
+import { categoryColorClasses } from './categories';
+import { __ } from '@/bootstrap/globals';
 
 const props = defineProps<{
     field: any;
@@ -14,7 +14,7 @@ defineEmits<{
     (e: 'remove'): void;
 }>();
 
-const { inspecting, inspectorType, inspect, errors } = injectBuilderContext();
+const { errors, inspect, inspecting, inspectorType } = injectBuilderContext();
 
 const fieldsets = Object.values(usePage().props.fieldsets);
 

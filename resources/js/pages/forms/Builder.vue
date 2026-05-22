@@ -1,5 +1,5 @@
 <script lang="ts">
-import createContext from '@/util/createContext.js';
+import createContext from '@/util/createContext';
 
 export enum InspectorType {
     Page = 'page',
@@ -20,25 +20,25 @@ export const [injectBuilderContext, provideBuilderContext] = createContext('Form
 </script>
 
 <script setup lang="ts">
-import Layout from '@/pages/layout/Layout.vue';
-import PanelLayout from '@/pages/layout/PanelLayout.vue';
-import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
-import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
+import axios from 'axios';
+import FormsLayout from './Layout.vue';
 import Head from '@/pages/layout/Head.vue';
-import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
-import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
+import Layout from '@/pages/layout/Layout.vue';
+import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
+import PanelLayout from '@/pages/layout/PanelLayout.vue';
+import ActionInspector from '@/components/forms/Builder/ActionInspector.vue';
 import FieldInspector from '@/components/forms/Builder/FieldInspector.vue';
+import FieldsetInspector from '@/components/forms/Builder/FieldsetInspector.vue';
+import FieldtypeHint from '@/components/forms/Builder/FieldtypeHint.vue';
+import FieldtypeSelector from '@/components/forms/Builder/FieldtypeSelector.vue';
+import LinkFieldsInspector from '@/components/forms/Builder/LinkFieldsInspector.vue';
 import Page from '@/components/forms/Builder/Page.vue';
 import PageInspector from '@/components/forms/Builder/PageInspector.vue';
-import { __, uniqid } from '@/bootstrap/globals.js';
+import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
 import { useFieldtypeDraggable } from '@/components/forms/Builder/use-drag-and-drop';
-import ActionInspector from '@/components/forms/Builder/ActionInspector.vue';
-import axios from 'axios';
-import LinkFieldsInspector from '@/components/forms/Builder/LinkFieldsInspector.vue';
-import FieldsetInspector from '@/components/forms/Builder/FieldsetInspector.vue';
+import { __, uniqid } from '@/bootstrap/globals';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -276,19 +276,19 @@ const save = () => {
 };
 
 provideBuilderContext({
-    form: props.form,
-    formsProInstalled: props.formsProInstalled,
+    addSection,
+    clearInspector,
+    dirty,
+    errors,
     fieldtypes: props.fieldtypes,
     fieldView,
-    pages,
+    form: props.form,
+    formsProInstalled: props.formsProInstalled,
+    inspect,
     inspecting,
     inspectorType,
-    inspect,
-    clearInspector,
-    addSection,
-    errors,
-    dirty,
     isDirty,
+    pages,
     withoutDirtying,
 });
 

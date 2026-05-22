@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Button, Field, Icon, Label } from '@ui';
-import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { computed } from 'vue';
-import { __ } from '@/bootstrap/globals.js';
-import { categories, categoryColorClasses } from './categories';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
+import { categories, categoryColorClasses } from './categories';
+import WidthSelector from '@/components/fields/WidthSelector.vue';
+import { __ } from '@/bootstrap/globals';
 
 const props = defineProps<{
     field: any;
@@ -17,7 +17,7 @@ defineEmits<{
     (e: 'width-changed', width: number): void;
 }>();
 
-const { inspecting, inspectorType, inspect, errors, dirty } = injectBuilderContext();
+const { dirty, errors, inspect, inspecting, inspectorType } = injectBuilderContext();
 
 const inspectField = () => inspect(InspectorType.Field, props.field);
 const isInspecting = computed(() => inspectorType.value === InspectorType.Field && inspecting.value?._id === props.field._id);

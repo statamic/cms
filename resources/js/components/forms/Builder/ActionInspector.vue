@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { Field, Icon, Input, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger } from '@ui';
 import { computed, ref, watch } from 'vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
 
-const { inspecting: page, pages, dirty } = injectBuilderContext();
+const { dirty, inspecting: page, pages } = injectBuilderContext();
 
 enum ActionInspectorTabs {
     Settings = 'settings',
 }
 
-const activeTab = ref('settings');
+const activeTab = ref<ActionInspectorTabs>(ActionInspectorTabs.Settings);
 
 const isFirstPage = computed(() => pages.value.findIndex((p) => p._id === page.value._id) === 0);
 const isLastPage = computed(() => pages.value.findIndex((p) => p._id === page.value._id) === pages.value.length - 1);

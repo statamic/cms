@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
-import { Button, Tabs, TabList, TabTrigger, TabContent, PublishContainer, PublishFieldsProvider, PublishFields, Icon } from '@ui';
-import { ref, onMounted, watch, computed } from 'vue';
-import { injectBuilderContext } from '@/pages/forms/Builder.vue';
-import debounce from '@/util/debounce.js';
+import { Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, TabContent, TabList, Tabs, TabTrigger } from '@ui';
+import { computed, onMounted, ref, watch } from 'vue';
 import axios from 'axios';
+import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
+import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
+import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { form, inspecting: field, errors: contextErrors, dirty, withoutDirtying } = injectBuilderContext();
+const { dirty, errors: contextErrors, form, inspecting: field, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};

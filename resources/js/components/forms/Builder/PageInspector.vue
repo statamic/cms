@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
-import { Button, Field, Icon, Input, Textarea, Tabs, TabList, TabTrigger, TabContent } from '@ui';
+import { Button, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger, Textarea } from '@ui';
 import { computed, ref, watch } from 'vue';
+import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-const { inspecting: page, pages, dirty } = injectBuilderContext();
+const { dirty, inspecting: page, pages } = injectBuilderContext();
 
 enum PageInspectorTabs {
     Settings = 'settings',
@@ -108,7 +108,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.display ? __(page.display) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
+                                {{ page.display ? __(page.display) : placeholderTitle }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -189,7 +189,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.display ? __(page.display) : __('Page :current of :total', { current: 'FOO', total: pages.length }) }}
+                                {{ page.display ? __(page.display) : placeholderTitle }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />

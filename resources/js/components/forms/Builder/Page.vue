@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Button, Icon } from '@ui';
-import Section from './Section.vue';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { useSortable } from './use-drag-and-drop';
+import Section from './Section.vue';
 import { __ } from '@/bootstrap/globals';
 
-const { inspecting, inspectorType, inspect, pages, addSection, dirty, formsProInstalled } = injectBuilderContext();
+const { addSection, dirty, formsProInstalled, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
@@ -19,7 +19,6 @@ const isInspectingAction = computed(() => inspectorType.value === InspectorType.
 const container = useTemplateRef('container');
 const sections = computed(() => props.page.sections);
 const canDeleteSection = computed(() => sections.value.length > 1);
-const isFirstPage = computed(() => pages.value.findIndex((p) => p._id === props.page._id) === 0);
 const isLastPage = computed(() => pages.value.findIndex((p) => p._id === props.page._id) === pages.value.length - 1);
 
 const placeholderTitle = computed(() => {

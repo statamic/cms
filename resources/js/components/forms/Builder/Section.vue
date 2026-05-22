@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Button, Card, Heading, Panel, PanelHeader, PublishContainer } from '@ui';
 import { computed } from 'vue';
-import { uniqid, __ } from '@/bootstrap/globals.js';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
-import RegularFormField from './RegularFormField.vue';
 import ImportField from './ImportField.vue';
+import RegularFormField from './RegularFormField.vue';
+import { __, uniqid } from '@/bootstrap/globals';
 
 const emit = defineEmits<{
     (e: 'deleted', value: null): void;
@@ -15,7 +15,7 @@ const props = defineProps<{
     canDeleteSection: boolean,
 }>();
 
-const { fieldtypes, fieldView, inspecting, inspectorType, inspect, clearInspector, dirty } = injectBuilderContext();
+const { clearInspector, dirty, fieldtypes, fieldView, inspect, inspecting, inspectorType } = injectBuilderContext();
 
 const inspectLinkFields = (field: any) => inspect(InspectorType.LinkFields, field);
 const isInspectingLinkFields = (field) => inspectorType.value === InspectorType.LinkFields && inspecting.value?._id === field._id;

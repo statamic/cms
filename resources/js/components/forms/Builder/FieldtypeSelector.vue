@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { Button, Input } from '@ui';
 import { computed, ref } from 'vue';
 import { mapValues } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
-import { Button, Input } from '@ui';
-import { categories, categoryColorClasses } from './categories';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
+import { categories, categoryColorClasses } from './categories';
 import { __ } from '@/bootstrap/globals';
 
-const { fieldtypes, formsProInstalled, fieldView, inspect } = injectBuilderContext();
+const { fieldtypes, fieldView, formsProInstalled, inspect } = injectBuilderContext();
 
 const search = ref('');
 const isSearching = computed(() => search.value.length > 0);
@@ -161,8 +161,8 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                             class="h-2 shrink-0 rounded-full"
                             :class="{
                                 [categoryColorClasses[group.color].dot]: true,
-                                'w-2 opacity-100': fieldView === 'collapsed',
-                                'w-0 opacity-0': fieldView === 'expanded',
+                                'w-2 opacity-100': fieldView === FieldView.Collapsed,
+                                'w-0 opacity-0': fieldView === FieldView.Expanded,
                             }"
                             aria-hidden="true"
                         />

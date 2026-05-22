@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Field, Icon, Input, Combobox, RadioGroup, Radio } from '@ui';
+import { Combobox, Field, Icon, Input, Radio, RadioGroup } from '@ui';
 import { computed, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
-import { usePage } from '@inertiajs/vue3';
 
-const { inspecting: fieldsetImport, dirty } = injectBuilderContext();
+const { dirty, inspecting: fieldsetImport } = injectBuilderContext();
 
 const fieldsets = Object.values(usePage().props.fieldsets);
 
