@@ -84,6 +84,14 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['required', 'url']],
                 ['type' => 'website', 'display' => 'Website', 'validate' => ['required']],
             ],
+            'phone' => [
+                ['type' => 'text', 'display' => 'Phone', 'input_type' => 'tel'],
+                ['type' => 'phone', 'display' => 'Phone'],
+            ],
+            'phone, with placeholder' => [
+                ['type' => 'text', 'display' => 'Phone', 'input_type' => 'tel', 'placeholder' => '(555) 123-4567'],
+                ['type' => 'phone', 'display' => 'Phone', 'placeholder' => '(555) 123-4567'],
+            ],
             'short_answer' => [
                 ['type' => 'text', 'display' => 'Name'],
                 ['type' => 'short_answer', 'display' => 'Name'],
