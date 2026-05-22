@@ -10,7 +10,7 @@
 
             <div
                 v-if="item.invalid"
-                v-tooltip.top="__('This item is unavailable. It may have been deleted, or you may not have permission to view it.')"
+                v-tooltip.top="__('messages.relationship_item_unavailable')"
                 class="truncate"
                 v-text="__(item.title)" />
 

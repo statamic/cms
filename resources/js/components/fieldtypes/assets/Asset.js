@@ -63,7 +63,7 @@ export default {
         },
 
         invalidLabel() {
-            return __('This item is unavailable. It may have been deleted, or you may not have permission to view it.');
+            return __('messages.relationship_item_unavailable');
         }
     },
 
