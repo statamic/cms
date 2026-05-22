@@ -191,6 +191,7 @@ return [
     'publish_actions_publish' => 'Le modifiche alla copia di lavoro verranno applicate alla voce e sarà pubblicata immediatamente.',
     'publish_actions_schedule' => 'Le modifiche alla copia di lavoro verranno applicate alla voce ed apparirà pubblicata nella data selezionata.',
     'publish_actions_unpublish' => 'L\'attuale revisione non sarà pubblicata.',
+    'relationship_item_unavailable' => 'Questo elemento non è disponibile. Potrebbe essere stato eliminato oppure non hai i permessi per visualizzarlo.',
     'reset_password_notification_body' => 'Ricevi questa email perché abbiamo ricevuto una richiesta di reimpostazione della password per il tuo account.',
     'reset_password_notification_no_action' => 'Se non hai richiesto la reimpostazione della password, non sono necessarie ulteriori azioni.',
     'reset_password_notification_subject' => 'Reimposta la password',

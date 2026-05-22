@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => '对工作副本所做的更改将应用于该条目，并且将立即发布。',
     'publish_actions_schedule' => '对工作副本所做的更改将应用于该条目，并且将在选定的日期显示为已发布。',
     'publish_actions_unpublish' => '当前版本将不发布。',
+    'relationship_item_unavailable' => '此项目不可用。它可能已被删除，或者您可能没有查看权限。',
     'reset_password_notification_body' => '您收到此电子邮件是因为我们收到了您帐户的密码重置请求。',
     'reset_password_notification_no_action' => '如果您不要求重设密码，则无需采取进一步措施。',
     'reset_password_notification_subject' => '重置密码通知',
