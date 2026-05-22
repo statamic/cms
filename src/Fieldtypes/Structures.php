@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Structure;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
@@ -16,8 +15,20 @@ class Structures extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        return User::current()->can('configure collections')
-            || User::current()->can('configure navs');
+        return $this->authorizeStructure(Structure::find($id));
+    }
+
+    private function authorizeStructure($structure): bool
+    {
+        if (! $structure) {
+            return false;
+        }
+
+        if ($structure instanceof CollectionStructure) {
+            return User::current()->can('view', $structure->collection());
+        }
+
+        return User::current()->can('view', $structure);
     }
 
     protected function toItemArray($id)
@@ -34,17 +45,14 @@ class Structures extends Relationship
 
     public function getIndexItems($request)
     {
-        throw_unless(
-            User::current()->can('configure collections') || User::current()->can('configure navs'),
-            new AuthorizationException
-        );
-
-        return Structure::all()->map(function ($structure) {
-            return [
-                'id' => $this->getStructureId($structure),
-                'title' => $structure->title(),
-            ];
-        })->values();
+        return Structure::all()
+            ->filter(fn ($structure) => $this->authorizeStructure($structure))
+            ->map(function ($structure) {
+                return [
+                    'id' => $this->getStructureId($structure),
+                    'title' => $structure->title(),
+                ];
+            })->values();
     }
 
     public function augmentValue($value)

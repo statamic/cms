@@ -5,6 +5,7 @@ namespace Tests\Feature\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Role;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -371,6 +372,149 @@ class RelationshipFieldtypeTest extends TestCase
             ->assertOk();
 
         $this->assertContains('editor', collect($response->json('data'))->pluck('id')->all());
+    }
+
+    #[Test]
+    public function it_scopes_structure_listing_to_viewable_navs_and_collections()
+    {
+        Nav::make('main')->title('Main')->save();
+        Nav::make('secret')->title('Secret')->save();
+        Collection::make('pages')->title('Pages')->structureContents(['root' => true])->save();
+        Collection::make('hidden')->title('Hidden')->structureContents(['root' => true])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view main nav', 'view pages entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+
+        $this->assertContains('main', $ids);
+        $this->assertContains('collection::pages', $ids);
+        $this->assertNotContains('secret', $ids);
+        $this->assertNotContains('collection::hidden', $ids);
+    }
+
+    #[Test]
+    public function it_does_not_leak_structures_across_types()
+    {
+        Nav::make('main')->title('Main')->save();
+        Collection::make('pages')->title('Pages')->structureContents(['root' => true])->save();
+
+        // A user with only a nav permission must not see (or resolve) collection-backed structures.
+        $this->setTestRoles(['test' => ['access cp', 'view main nav']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+
+        $listing = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($listing->json('data'))->pluck('id')->all();
+        $this->assertContains('main', $ids);
+        $this->assertNotContains('collection::pages', $ids);
+
+        $byId = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['main', 'collection::pages'],
+            ])
+            ->assertOk();
+
+        $data = collect($byId->json('data'))->keyBy('id');
+        $this->assertArrayNotHasKey('invalid', $data['main']);
+        $this->assertTrue($data['collection::pages']['invalid']);
+    }
+
+    #[Test]
+    public function it_returns_a_placeholder_for_an_unviewable_structure_by_id()
+    {
+        Nav::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['secret'],
+            ])
+            ->assertOk();
+
+        $this->assertTrue($response->json('data.0.invalid'));
+        $this->assertEquals('secret', $response->json('data.0.title'));
+    }
+
+    #[Test]
+    public function the_structure_by_id_placeholder_does_not_reveal_whether_a_structure_exists()
+    {
+        Nav::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['secret', 'does-not-exist'],
+            ])
+            ->assertOk();
+
+        $data = collect($response->json('data'))->keyBy('id');
+
+        $this->assertEquals(
+            ['id' => 'secret', 'title' => 'secret', 'invalid' => true],
+            $data['secret']
+        );
+        $this->assertEquals(
+            ['id' => 'does-not-exist', 'title' => 'does-not-exist', 'invalid' => true],
+            $data['does-not-exist']
+        );
+    }
+
+    #[Test]
+    public function a_super_admin_sees_all_structures()
+    {
+        Nav::make('main')->title('Main')->save();
+        Collection::make('pages')->title('Pages')->structureContents(['root' => true])->save();
+
+        $config = base64_encode(json_encode(['type' => 'structures']));
+        $user = User::make()->makeSuper()->save();
+
+        $listing = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($listing->json('data'))->pluck('id')->all();
+        $this->assertContains('main', $ids);
+        $this->assertContains('collection::pages', $ids);
+
+        $byId = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['main', 'collection::pages'],
+            ])
+            ->assertOk();
+
+        $data = collect($byId->json('data'))->keyBy('id');
+        $this->assertArrayNotHasKey('invalid', $data['main']);
+        $this->assertArrayNotHasKey('invalid', $data['collection::pages']);
     }
 }
 

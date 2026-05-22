@@ -51,6 +51,9 @@ class AssetFolder extends Relationship
 
     protected function authorizeItemData($id): bool
     {
+        // No static container configured (dynamic/sibling-container mode); the by-id value
+        // only echoes the submitted folder path back, so there is nothing to authorize.
+        // Folder enumeration is gated separately, on the runtime container, in getIndexItems().
         if (! $container = $this->config('container')) {
             return true;
         }
