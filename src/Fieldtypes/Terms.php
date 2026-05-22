@@ -291,21 +291,32 @@ class Terms extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        // With no viewable taxonomies we return empty data and, crucially, no columns. The
-        // columns would otherwise be derived from the first configured taxonomy's blueprint,
-        // which the user isn't allowed to view.
-        if ($this->getViewableTaxonomies($this->getConfiguredTaxonomies())->isEmpty()) {
+        // Derive columns only from a taxonomy the user can view. With none viewable, return
+        // empty data and no columns rather than leaking the structure of an unviewable blueprint.
+        if (! $taxonomy = $this->getColumnTaxonomy($request)) {
             return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
         }
 
         return (new TermsResource($items, $this))
-            ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
+            ->blueprint($taxonomy->termBlueprint())
+            ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns");
     }
 
-    protected function getBlueprint($request)
+    protected function getBlueprint($request = null)
     {
-        return $this->getFirstTaxonomyFromRequest($request)->termBlueprint();
+        return $this->getColumnTaxonomy($request)?->termBlueprint();
+    }
+
+    protected function getColumnTaxonomy($request = null)
+    {
+        $taxonomy = $this->getFirstTaxonomyFromRequest($request);
+
+        // Only derive columns from a taxonomy the user can view. If the first configured
+        // taxonomy isn't viewable, fall back to the first viewable configured taxonomy,
+        // or none at all when the user can view none of them.
+        return User::current()->can('view', $taxonomy)
+            ? $taxonomy
+            : $this->getViewableTaxonomies($this->getConfiguredTaxonomies())->first();
     }
 
     protected function getFirstTaxonomyFromRequest($request)

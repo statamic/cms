@@ -3,6 +3,7 @@
 namespace Tests\Feature\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
@@ -197,6 +198,74 @@ class RelationshipFieldtypeTest extends TestCase
 
         // The columns must not be derived from a blueprint the user can't view.
         $this->assertEmpty($response->json('meta.columns'));
+    }
+
+    #[Test]
+    public function it_does_not_expose_columns_from_an_unviewable_taxonomy_blueprint()
+    {
+        Taxonomy::make('secret')->title('Secret')->save();
+        Taxonomy::make('topics')->title('Topics')->save();
+        Blueprint::make('secret')
+            ->setNamespace('taxonomies.secret')
+            ->setContents(['fields' => [
+                ['handle' => 'classified', 'field' => ['type' => 'text']],
+            ]])
+            ->save();
+        Blueprint::make('topics')
+            ->setNamespace('taxonomies.topics')
+            ->setContents(['fields' => [
+                ['handle' => 'summary', 'field' => ['type' => 'text']],
+            ]])
+            ->save();
+
+        // The user can view the second configured taxonomy but not the first.
+        $this->setTestRoles(['test' => ['access cp', 'view topics terms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'terms',
+            'taxonomies' => ['secret', 'topics'],
+        ]));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $columns = collect($response->json('meta.columns'))->pluck('field')->all();
+
+        // Columns come from the viewable taxonomy, never the unviewable first one.
+        $this->assertNotContains('classified', $columns);
+        $this->assertContains('summary', $columns);
+    }
+
+    #[Test]
+    public function an_authorized_user_still_gets_the_full_taxonomy_columns()
+    {
+        Taxonomy::make('secret')->title('Secret')->save();
+        Blueprint::make('secret')
+            ->setNamespace('taxonomies.secret')
+            ->setContents(['fields' => [
+                ['handle' => 'classified', 'field' => ['type' => 'text']],
+            ]])
+            ->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view secret terms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'terms',
+            'taxonomies' => ['secret'],
+        ]));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $columns = collect($response->json('meta.columns'))->pluck('field')->all();
+
+        $this->assertContains('classified', $columns);
     }
 
     #[Test]
