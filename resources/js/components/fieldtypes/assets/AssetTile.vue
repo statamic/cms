@@ -33,7 +33,7 @@
                         <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
                         <file-icon
                             v-else
-                            :extension="asset.extension"
+                            :extension="asset.extension ?? 'generic'"
                             class="p-4 h-full w-full"
                         />
                     </template>
