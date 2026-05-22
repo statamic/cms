@@ -5,6 +5,7 @@ namespace Tests\Feature\Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Form;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Role;
 use Statamic\Facades\Taxonomy;
@@ -515,6 +516,115 @@ class RelationshipFieldtypeTest extends TestCase
         $data = collect($byId->json('data'))->keyBy('id');
         $this->assertArrayNotHasKey('invalid', $data['main']);
         $this->assertArrayNotHasKey('invalid', $data['collection::pages']);
+    }
+
+    #[Test]
+    public function it_scopes_form_listing_to_viewable_forms()
+    {
+        Form::make('contact')->title('Contact')->save();
+        Form::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view contact form submissions']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'form']));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+
+        $this->assertContains('contact', $ids);
+        $this->assertNotContains('secret', $ids);
+    }
+
+    #[Test]
+    public function it_returns_a_placeholder_for_an_unviewable_form_by_id()
+    {
+        Form::make('contact')->title('Contact')->save();
+        Form::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view contact form submissions']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'form']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['contact', 'secret'],
+            ])
+            ->assertOk();
+
+        $data = collect($response->json('data'))->keyBy('id');
+
+        $this->assertArrayNotHasKey('invalid', $data['contact']);
+        $this->assertTrue($data['secret']['invalid']);
+        $this->assertEquals('secret', $data['secret']['title']);
+    }
+
+    #[Test]
+    public function the_form_by_id_placeholder_does_not_reveal_whether_a_form_exists()
+    {
+        Form::make('secret')->title('Secret')->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode(['type' => 'form']));
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['secret', 'does-not-exist'],
+            ])
+            ->assertOk();
+
+        $data = collect($response->json('data'))->keyBy('id');
+
+        $this->assertEquals(
+            ['id' => 'secret', 'title' => 'secret', 'invalid' => true],
+            $data['secret']
+        );
+        $this->assertEquals(
+            ['id' => 'does-not-exist', 'title' => 'does-not-exist', 'invalid' => true],
+            $data['does-not-exist']
+        );
+    }
+
+    #[Test]
+    public function a_super_admin_sees_all_forms()
+    {
+        Form::make('contact')->title('Contact')->save();
+        Form::make('secret')->title('Secret')->save();
+
+        $config = base64_encode(json_encode(['type' => 'form']));
+        $user = User::make()->makeSuper()->save();
+
+        $listing = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $ids = collect($listing->json('data'))->pluck('id')->all();
+        $this->assertContains('contact', $ids);
+        $this->assertContains('secret', $ids);
+
+        $byId = $this
+            ->actingAs($user)
+            ->postJson('/cp/fieldtypes/relationship/data', [
+                'config' => $config,
+                'selections' => ['contact', 'secret'],
+            ])
+            ->assertOk();
+
+        $data = collect($byId->json('data'))->keyBy('id');
+        $this->assertArrayNotHasKey('invalid', $data['contact']);
+        $this->assertArrayNotHasKey('invalid', $data['secret']);
     }
 }
 
