@@ -29,7 +29,7 @@ class Fallback extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        return $this->config();
+        return $this->field?->config() ?? [];
     }
 
     public function title(): string

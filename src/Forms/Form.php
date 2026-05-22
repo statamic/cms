@@ -179,6 +179,15 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
                         if (Arr::get($field, 'field.type') === 'select') {
                             Arr::set($field, 'field.type', 'dropdown');
+
+                            if (Arr::get($field, 'field.multiple') === true) {
+                                if ($maxItems = Arr::pull($field, 'field.max_items')) {
+                                    Arr::set($field, 'field.max_selections', $maxItems);
+                                }
+                            } else {
+                                Arr::pull($field, 'field.multiple');
+                                Arr::pull($field, 'field.max_items');
+                            }
                         }
 
                         return $field;

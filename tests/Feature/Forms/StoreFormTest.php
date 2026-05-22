@@ -40,7 +40,7 @@ class StoreFormTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->post(cp_route('forms.store'), $this->validParams())
-            ->assertJson(['redirect' => cp_route('forms.edit', 'test')])
+            ->assertJson(['redirect' => cp_route('forms.show', 'test')])
             ->assertSessionHas('success');
 
         $this->assertCount(1, Form::all());
