@@ -1,5 +1,5 @@
 <template>
-    <tr class="cursor-grab bg-white dark:bg-dark-750 hover:bg-gray-100 dark:hover:bg-dark-700">
+    <tr class="cursor-grab bg-white dark:bg-dark-750 hover:bg-gray-100 dark:hover:bg-dark-700" :class="{ 'is-invalid': asset.invalid }">
         <td class="flex items-center h-full">
             <div
                 v-if="canShowSvg"
@@ -24,10 +24,11 @@
                 v-if="showFilename"
                 @click="editOrOpen"
                 class="flex items-center flex-1 rtl:mr-3 ltr:ml-3 text-xs rtl:text-right ltr:text-left truncate w-full"
-                :title="__('Edit')"
+                :class="{ 'text-gray-600 dark:text-gray-400': asset.invalid }"
+                :title="asset.invalid ? invalidLabel : __('Edit')"
                 :aria-label="__('Edit Asset')"
             >
-                {{ asset.basename }}
+                {{ label }}
             </button>
 
             <button
@@ -71,6 +72,8 @@ export default {
 
     methods: {
         editOrOpen() {
+            if (this.asset.invalid) return;
+
             return this.readOnly ? this.open() : this.edit();
         }
     },

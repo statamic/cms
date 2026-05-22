@@ -142,6 +142,10 @@
     box-shadow: 0 0 0 1px theme('colors.blue.DEFAULT');
 }
 
+.asset-tile.is-invalid {
+    @apply bg-gray-100 dark:bg-dark-650 border-gray-300 dark:border-dark-200 text-gray-600 dark:text-gray-400 cursor-default;
+}
+
 .asset-thumbnail {
     @apply border border-white dark:border-dark-950;
 }
