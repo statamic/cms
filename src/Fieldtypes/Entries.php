@@ -2,12 +2,12 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -135,22 +135,21 @@ class Entries extends Relationship
     public function getIndexItems($request)
     {
         $configuredCollections = $this->getConfiguredCollections();
-        $this->authorizeCollectionAccess($configuredCollections);
+
+        // When the user can't view any of the configured collections, return an empty result
+        // set instead of throwing. The picker treats this like the filter-to-viewable case.
+        if ($this->getViewableCollections($configuredCollections)->isEmpty()) {
+            return collect();
+        }
 
         $query = $this->getIndexQuery($request);
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $user = User::current();
-
             $query->whereIn(
                 'collection',
-                collect($configuredCollections)
-                    ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
-                    ->filter(fn ($collection) => $collection && $user->can('view', $collection))
-                    ->map->handle()
-                    ->all()
+                $this->getViewableCollections($configuredCollections)->map->handle()->all()
             );
         }
 
@@ -171,19 +170,24 @@ class Entries extends Relationship
         return $paginate ? $results->setCollection($items) : $items;
     }
 
-    private function authorizeCollectionAccess(array $collections): void
+    private function getViewableCollections(array $collections): SupportCollection
     {
         $user = User::current();
 
-        $authorizedCollections = collect($collections)
+        return collect($collections)
             ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
             ->filter(fn ($collection) => $collection && $user->can('view', $collection));
-
-        throw_if($authorizedCollections->isEmpty(), new AuthorizationException);
     }
 
     public function getResourceCollection($request, $items)
     {
+        // With no viewable collections we return empty data and, crucially, no columns. The
+        // columns would otherwise be derived from the first configured collection's blueprint,
+        // which the user isn't allowed to view.
+        if ($this->getViewableCollections($this->getConfiguredCollections())->isEmpty()) {
+            return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
+        }
+
         return (new EntriesFieldtypeEntries($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")

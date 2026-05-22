@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -70,7 +69,10 @@ class AssetFolder extends Relationship
     {
         $container = AssetContainer::find($request->container);
 
-        throw_unless($container && User::current()->can('view', $container), new AuthorizationException);
+        // No/unviewable container: return an empty folder list rather than throwing.
+        if (! $container || ! User::current()->can('view', $container)) {
+            return collect();
+        }
 
         return $container
             ->folders()

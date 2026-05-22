@@ -2,12 +2,12 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Column;
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
@@ -264,7 +264,11 @@ class Terms extends Relationship
             return collect();
         }
 
-        $this->authorizeTaxonomyAccess($this->getConfiguredTaxonomies());
+        // When the user can't view any of the configured taxonomies, return an empty result
+        // set instead of throwing. The picker treats this like the filter-to-viewable case.
+        if ($this->getViewableTaxonomies($this->getConfiguredTaxonomies())->isEmpty()) {
+            return collect();
+        }
 
         $query = $this->getIndexQuery($request);
 
@@ -275,20 +279,25 @@ class Terms extends Relationship
         return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
     }
 
-    private function authorizeTaxonomyAccess(array $taxonomies): void
+    private function getViewableTaxonomies(array $taxonomies): Collection
     {
         $user = User::current();
 
-        $authorizedTaxonomies = collect($taxonomies)
+        return collect($taxonomies)
             ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
             ->filter()
             ->filter(fn ($taxonomy) => $user->can('view', $taxonomy));
-
-        throw_if($authorizedTaxonomies->isEmpty(), new AuthorizationException);
     }
 
     public function getResourceCollection($request, $items)
     {
+        // With no viewable taxonomies we return empty data and, crucially, no columns. The
+        // columns would otherwise be derived from the first configured taxonomy's blueprint,
+        // which the user isn't allowed to view.
+        if ($this->getViewableTaxonomies($this->getConfiguredTaxonomies())->isEmpty()) {
+            return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
+        }
+
         return (new TermsResource($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
@@ -437,11 +446,8 @@ class Terms extends Relationship
     protected function getIndexQuery($request)
     {
         $query = Term::query();
-        $user = User::current();
 
-        $taxonomies = collect($this->getConfiguredTaxonomies())
-            ->map(fn (string $taxonomyHandle) => Taxonomy::findByHandle($taxonomyHandle))
-            ->filter(fn ($taxonomy) => $taxonomy && $user->can('view', $taxonomy))
+        $taxonomies = $this->getViewableTaxonomies($this->getConfiguredTaxonomies())
             ->map->handle()
             ->all();
 

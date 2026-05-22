@@ -93,7 +93,7 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_denies_access_to_entries_when_user_cannot_view_any_of_the_collections()
+    public function it_returns_an_empty_listing_when_user_cannot_view_any_of_the_collections()
     {
         Collection::make('pages')->save();
         Entry::make()->collection('pages')->slug('home')->data(['title' => 'Home'])->save();
@@ -109,10 +109,14 @@ class RelationshipFieldtypeTest extends TestCase
             'collections' => ['pages', 'secret'],
         ]));
 
-        $this
+        $response = $this
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}")
-            ->assertForbidden();
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+
+        // The columns must not be derived from a blueprint the user can't view.
+        $this->assertEmpty($response->json('meta.columns'));
     }
 
     #[Test]
@@ -170,7 +174,7 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_forbids_access_to_terms_when_the_user_cannot_view_any_of_the_taxonomies()
+    public function it_returns_an_empty_listing_when_the_user_cannot_view_any_of_the_taxonomies()
     {
         Taxonomy::make('topics')->save();
         Taxonomy::make('secret')->save();
@@ -185,10 +189,14 @@ class RelationshipFieldtypeTest extends TestCase
             'taxonomies' => ['topics', 'secret'],
         ]));
 
-        $this
+        $response = $this
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}")
-            ->assertForbidden();
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+
+        // The columns must not be derived from a blueprint the user can't view.
+        $this->assertEmpty($response->json('meta.columns'));
     }
 
     #[Test]
@@ -232,8 +240,10 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_forbids_user_listing_for_a_user_who_cannot_view_users()
+    public function it_returns_an_empty_user_listing_for_a_user_who_cannot_view_users()
     {
+        User::make()->email('one@example.com')->save();
+
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
 
@@ -242,11 +252,12 @@ class RelationshipFieldtypeTest extends TestCase
         $this
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}")
-            ->assertForbidden();
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
     }
 
     #[Test]
-    public function it_forbids_user_role_listing_for_a_user_who_cannot_edit_roles()
+    public function it_returns_an_empty_user_role_listing_for_a_user_who_cannot_edit_roles()
     {
         Role::make('one')->save();
 
@@ -258,7 +269,8 @@ class RelationshipFieldtypeTest extends TestCase
         $this
             ->actingAs($user)
             ->getJson("/cp/fieldtypes/relationship?config={$config}")
-            ->assertForbidden();
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
     }
 
     #[Test]

@@ -5,7 +5,6 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
@@ -108,7 +107,11 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
-        throw_unless(User::current()->can('index', UserContract::class), new AuthorizationException);
+        // Don't reveal existence to a user who can't view the listing; return an empty
+        // result set instead of throwing, matching the picker's filter-to-viewable behavior.
+        if (! User::current()->can('index', UserContract::class)) {
+            return collect();
+        }
 
         $query = User::query();
 

@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -36,7 +35,9 @@ class UserGroups extends Relationship
 
     public function getIndexItems($request)
     {
-        throw_unless(User::current()->can('edit user groups'), new AuthorizationException);
+        if (! User::current()->can('edit user groups')) {
+            return collect();
+        }
 
         return UserGroup::all()->sortBy('title')->map(function ($group) {
             return [

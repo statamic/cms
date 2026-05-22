@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Role;
 use Statamic\Facades\Scope;
@@ -48,7 +47,9 @@ class UserRoles extends Relationship
 
     public function getIndexItems($request)
     {
-        throw_unless(User::current()->can('edit roles'), new AuthorizationException);
+        if (! User::current()->can('edit roles')) {
+            return collect();
+        }
 
         return Role::all()->sortBy('title')->map(function ($role) {
             return [
