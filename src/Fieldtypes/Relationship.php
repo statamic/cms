@@ -244,6 +244,8 @@ abstract class Relationship extends Fieldtype
 
     protected function authorizeItemData($id): bool
     {
+        // Fail-open so that we don't introduce a breaking change.
+        // Will change in an upcoming release.
         return true;
     }
 
