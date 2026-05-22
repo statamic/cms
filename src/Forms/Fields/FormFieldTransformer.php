@@ -159,8 +159,8 @@ class FormFieldTransformer extends FieldTransformer
     {
         try {
             $field = $fieldtype instanceof Fallback
-                ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle']])
-                : (clone $fieldtype)->setField(new FormField($fieldtype->handle(), ['type' => $fieldtype->handle()]))->toField();
+                ? new Field($fieldtype->toArray()['handle'], $fieldtype->field()->config())
+                : $fieldtype->toField();
 
             $field->setValue($field->defaultValue());
 
