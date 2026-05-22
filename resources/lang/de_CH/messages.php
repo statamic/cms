@@ -192,6 +192,7 @@ return [
     'publish_actions_publish' => 'Die Änderungen in der Arbeitskopie werden auf den Eintrag angewendet und dieser wird sofort veröffentlicht.',
     'publish_actions_schedule' => 'Die Änderungen in der Arbeitskopie werden auf den Eintrag angewendet und dieser wird am gewünschten Datum veröffentlicht.',
     'publish_actions_unpublish' => 'Die aktuelle Überarbeitung wird nicht veröffentlicht.',
+    'relationship_item_unavailable' => 'Dieses Element ist nicht verfügbar. Möglicherweise wurde es gelöscht oder du hast keine Berechtigung, es anzusehen.',
     'reset_password_notification_body' => 'Du bekommst dieses E-Mail, weil wir für dein Konto eine Anfrage zum Zurücksetzen des Passworts erhalten haben.',
     'reset_password_notification_no_action' => 'Sollte die Anfrage zum Zurücksetzen des Passworts nicht von dir stammen, sind keine weiteren Massnahmen erforderlich.',
     'reset_password_notification_subject' => 'Passwort zurücksetzen',

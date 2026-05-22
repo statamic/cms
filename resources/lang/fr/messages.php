@@ -192,6 +192,7 @@ return [
     'publish_actions_publish' => 'Les modifications apportées à la copie de travail s’appliqueront à l’entrée et celle-ci sera publiée immédiatement.',
     'publish_actions_schedule' => 'Les modifications apportées à la copie de travail s’appliqueront à l’entrée et celle-ci paraîtra publiée à la date sélectionnée.',
     'publish_actions_unpublish' => 'La révision actuelle sera dépubliée.',
+    'relationship_item_unavailable' => 'Cet élément n\'est pas disponible. Il a peut-être été supprimé, ou vous n\'avez pas l\'autorisation de le voir.',
     'reset_password_notification_body' => 'Vous recevez cet email car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
     'reset_password_notification_no_action' => 'Si vous n’avez pas demandé de réinitialisation de mot de passe, aucune autre action n’est requise.',
     'reset_password_notification_subject' => 'Notification de réinitialisation du mot de passe',
