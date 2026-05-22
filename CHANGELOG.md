@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.73.23 (2026-05-22)
+
+### What's fixed
+- Harden `DataCollection` sort value resolution [#14693](https://github.com/statamic/cms/issues/14693) by @duncanmcclean
+- Fix token path traversal [#14700](https://github.com/statamic/cms/issues/14700) by @duncanmcclean
+- Authorize relationship fieldtype data [#14718](https://github.com/statamic/cms/issues/14718) by @jasonvarga
+- Fix asset fieldtype icon [#14720](https://github.com/statamic/cms/issues/14720) by @jasonvarga
+
+
+
 ## 5.73.22 (2026-05-11)
 
 ### What's fixed
