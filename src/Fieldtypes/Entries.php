@@ -181,16 +181,15 @@ class Entries extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        // With no viewable collections we return empty data and, crucially, no columns. The
-        // columns would otherwise be derived from the first configured collection's blueprint,
-        // which the user isn't allowed to view.
-        if ($this->getViewableCollections($this->getConfiguredCollections())->isEmpty()) {
+        // Derive columns only from a collection the user can view. With none viewable, return
+        // empty data and no columns rather than leaking the structure of an unviewable blueprint.
+        if (! $collection = $this->getColumnCollection($request)) {
             return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
         }
 
         return (new EntriesFieldtypeEntries($items, $this))
-            ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
+            ->blueprint($collection->entryBlueprint())
+            ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
@@ -198,7 +197,19 @@ class Entries extends Relationship
 
     protected function getBlueprint($request = null)
     {
-        return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
+        return $this->getColumnCollection($request)?->entryBlueprint();
+    }
+
+    protected function getColumnCollection($request = null)
+    {
+        $collection = $this->getFirstCollectionFromRequest($request);
+
+        // Only derive columns from a collection the user can view. If the first requested or
+        // configured collection isn't viewable, fall back to the first viewable configured
+        // collection, or none at all when the user can view none of them.
+        return User::current()->can('view', $collection)
+            ? $collection
+            : $this->getViewableCollections($this->getConfiguredCollections())->first();
     }
 
     protected function getFirstCollectionFromRequest($request)
@@ -468,17 +479,21 @@ class Entries extends Relationship
 
     public function getColumns()
     {
-        if (count($this->getConfiguredCollections()) === 1) {
-            $columns = $this->getBlueprint()->columns();
+        // Don't derive columns from a blueprint the user can't view; fall back to the
+        // default columns when none of the configured collections are viewable.
+        if (! $collection = $this->getColumnCollection()) {
+            return parent::getColumns();
+        }
 
+        $columns = $collection->entryBlueprint()->columns();
+
+        if (count($this->getConfiguredCollections()) === 1) {
             $this->addColumn($columns, 'status');
 
-            $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
+            $columns->setPreferred("collections.{$collection->handle()}.columns");
 
             return $columns->rejectUnlisted()->values();
         }
-
-        $columns = $this->getBlueprint()->columns();
 
         if ($this->canSelectAcrossSites()) {
             $this->addColumn($columns, 'site');
