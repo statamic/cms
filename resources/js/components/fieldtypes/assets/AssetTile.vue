@@ -5,8 +5,9 @@
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
+            'is-invalid': asset.invalid,
         }"
-        :title="label"
+        :title="asset.invalid ? invalidLabel : label"
     >
         <asset-editor
             v-if="editing"
@@ -41,7 +42,7 @@
                 <div class="asset-controls">
                     <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
                         <template v-if="!readOnly">
-                            <button @click="edit" class="btn btn-icon" :title="__('Edit')">
+                            <button v-if="!asset.invalid" @click="edit" class="btn btn-icon" :title="__('Edit')">
                                 <svg-icon name="micro/sharp-pencil" class="h-4 my-2" />
                             </button>
 

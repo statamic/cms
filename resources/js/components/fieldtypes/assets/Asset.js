@@ -53,11 +53,17 @@ export default {
         },
 
         label() {
-            return this.asset.basename;
+            return this.asset.invalid ? this.asset.id : this.asset.basename;
         },
 
         needsAlt() {
+            if (this.asset.invalid) return false;
+
             return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
+        },
+
+        invalidLabel() {
+            return __('messages.relationship_item_unavailable');
         }
     },
 
@@ -66,6 +72,7 @@ export default {
 
         edit() {
             if (this.readOnly) return;
+            if (this.asset.invalid) return;
 
             this.editing = true;
         },

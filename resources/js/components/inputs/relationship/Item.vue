@@ -10,7 +10,8 @@
 
             <div
                 v-if="item.invalid"
-                v-tooltip.top="__('An item with this ID could not be found')"
+                v-tooltip.top="__('messages.relationship_item_unavailable')"
+                class="truncate"
                 v-text="__(item.title)" />
 
             <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="__(item.title)" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
