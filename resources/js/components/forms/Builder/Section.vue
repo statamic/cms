@@ -144,7 +144,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                 <PublishContainer
                     v-else
                     :name="'form-builder-' + section._id"
-                    :blueprint="blueprint"
+                    :blueprint
                     :track-dirty-state="false"
                 >
                     <div
