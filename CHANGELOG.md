@@ -1,5 +1,28 @@
 # Release Notes
 
+## 6.20.0 (2026-05-22)
+
+### What's new
+- Date picker today shortcut [#14651](https://github.com/statamic/cms/issues/14651) by @jaygeorge
+- When enabling Pro, prompts for license key [#14686](https://github.com/statamic/cms/issues/14686) by @jackmcdade
+- Include `is_pdf` in augmented asset data [#14699](https://github.com/statamic/cms/issues/14699) by @jacksleight
+
+### What's fixed
+- Make active nav anchor position more accurate [#14675](https://github.com/statamic/cms/issues/14675) by @jaygeorge
+- Don't show unsaved changes warning when switching tabs [#14678](https://github.com/statamic/cms/issues/14678) by @jasonvarga
+- Better collapsible sections [#14679](https://github.com/statamic/cms/issues/14679) by @jaygeorge
+- Swap image dimensions when EXIF orientation indicates a 90° rotation [#14685](https://github.com/statamic/cms/issues/14685) by @jasonvarga
+- Hook up "Add Row" config for List fields [#14689](https://github.com/statamic/cms/issues/14689) by @jackmcdade
+- Harden `DataCollection` sort value resolution [#14693](https://github.com/statamic/cms/issues/14693) by @duncanmcclean
+- Fix token path traversal [#14700](https://github.com/statamic/cms/issues/14700) by @duncanmcclean
+- Authorize relationship fieldtype data [#14718](https://github.com/statamic/cms/issues/14718) by @jasonvarga
+- Relationship UI adjustments [#14719](https://github.com/statamic/cms/issues/14719) by @jasonvarga
+- Update Italian translations [#14683](https://github.com/statamic/cms/issues/14683) by @sbellesis
+- French translations [#14680](https://github.com/statamic/cms/issues/14680) by @ebeauchamps
+- Bump shivammathur/setup-php from 2.37.0 to 2.37.1 in the github-actions group [#14682](https://github.com/statamic/cms/issues/14682) by @dependabot
+
+
+
 ## 6.19.0 (2026-05-13)
 
 ### What's new
