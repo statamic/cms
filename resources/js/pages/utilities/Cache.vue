@@ -173,7 +173,7 @@ function invalidateStaticUrls() {
                     <Description>{{ __('statamic::messages.cache_utility_static_cache_description') }}</Description>
                     <div class="flex flex-wrap gap-2 mt-3">
                         <Badge :prepend="__('Strategy')">{{ static.strategy }}</Badge>
-                        <Badge v-if="static.enabled" :prepend="__('Cached Pages')">{{ static.count }}</Badge>
+                        <Badge v-if="static.enabled" :prepend="__('Cached Pages (global)')">{{ static.count }}</Badge>
                     </div>
                 </Card>
             </Panel>
