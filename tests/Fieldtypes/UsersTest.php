@@ -61,6 +61,17 @@ class UsersTest extends TestCase
     }
 
     #[Test]
+    public function it_augments_the_current_user_when_value_is_the_current_string()
+    {
+        $this->actingAs(Facades\User::find('123'));
+
+        $augmented = $this->fieldtype(['max_items' => 1])->augment('current');
+
+        $this->assertInstanceOf(User::class, $augmented);
+        $this->assertEquals('123', $augmented->id());
+    }
+
+    #[Test]
     public function it_shallow_augments_to_a_collection_of_users()
     {
         $augmented = $this->fieldtype()->shallowAugment(['123', 456]);
