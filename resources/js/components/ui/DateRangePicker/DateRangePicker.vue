@@ -15,6 +15,7 @@ import {
     DateRangePickerHeading,
     DateRangePickerNext,
     DateRangePickerPrev,
+    DateRangePickerAnchor,
     DateRangePickerContent,
     DateRangePickerField,
     DateRangePickerInput,
@@ -136,6 +137,7 @@ const hoverCardDate = computed(() => {
             close-on-select
         >
             <DateRangePickerField v-slot="{ segments }" class="w-full">
+                <DateRangePickerAnchor as-child>
                 <div
                     :class="[
                         'flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
@@ -198,13 +200,13 @@ const hoverCardDate = computed(() => {
                     </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
+                </DateRangePickerAnchor>
             </DateRangePickerField>
 
             <DateRangePickerContent
                 v-if="!inline"
                 align="start"
-                :align-offset="-12"
-                :side-offset="14"
+                :side-offset="4"
                 class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
             >
                 <Card class="w-[20rem]">
