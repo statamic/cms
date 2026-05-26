@@ -131,7 +131,7 @@ export default {
         data: {
             deep: true,
             handler(data) {
-                this.updateDebounced(this.sortableToObject(data));
+                this.update(this.sortableToObject(data));
             },
         },
 
