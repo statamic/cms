@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'İşləyən nüsxədəki dəyişikliklər qeydə tətbiq ediləcək və dərhal dərc ediləcək.',
     'publish_actions_schedule' => 'İşləyən nüsxədəki dəyişikliklər qeydə tətbiq ediləcək və seçilmiş tarixdə dərc ediləcək.',
     'publish_actions_unpublish' => 'Cari təkrar dərc edilməyəcək.',
+    'relationship_item_unavailable' => 'Bu element əlçatan deyil. Silinmiş ola bilər və ya onu görməyə icazəniz olmaya bilər.',
     'reset_password_notification_body' => 'Bu e-poçtu şifrə sıfırlama tələbi aldığımız üçün alırsınız.',
     'reset_password_notification_no_action' => 'Əgər şifrə sıfırlama tələbi etməmisinizsə, heç bir əlavə tədbir görülməlidir.',
     'reset_password_notification_subject' => 'Şifrə Sıfırlama Bildirişi',
