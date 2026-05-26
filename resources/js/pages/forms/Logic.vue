@@ -8,6 +8,7 @@ import LogicRule from './logic-list/LogicRule.vue';
 import { computed, provide, ref, watchEffect } from 'vue';
 import { data_set } from '@/bootstrap/globals.js';
 import { nanoid as uniqid } from 'nanoid';
+import Head from '@/pages/layout/Head.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -193,6 +194,8 @@ provide(publishContextKey, {
 </script>
 
 <template>
+    <Head :title="[__('Logic'), form.title, __('Forms')]" />
+
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')">
             <Icon name="save" class="sm:hidden" />
