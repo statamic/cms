@@ -31,7 +31,7 @@
 }
 
 @utility st-custom-scrollbar {
-    --sb-size: 3px;
+    --sb-size: 5px;
     --sb-thumb-color: var(--color-gray-400);
     &:where(.dark, .dark *) {
         --sb-thumb-color: var(--color-gray-500);
