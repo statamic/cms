@@ -24,10 +24,10 @@
         }
         /* Adjust for the first and last field in a section because of the surrounding block padding */
         &:first-child::before {
-            inset-block-start: calc(-1.25rem - 1px);
+            inset-block-start: -1.25rem;
         }
         &:last-child::before {
-            inset-block-end: calc(-1.25rem - 1px);
+            inset-block-end: -1.25rem;
         }
     }
     /* Editing a button like "Next page" and "Submit" */
@@ -36,7 +36,7 @@
         &::before {
             content: '';
             position: absolute;
-            inset: -1rem calc(-1.25rem + 1px) -1.25rem;
+            inset: -2rem -1.25rem -1.25rem;
             border: 1px dashed var(--color-blue-400);
             border-radius: 10px;
             @apply bg-blue-50;
