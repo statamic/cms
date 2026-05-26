@@ -85,6 +85,8 @@ const addPage = (atIndex: number | null = null, sections = []) => {
 
     dirty();
 
+    inspect(InspectorType.Page, page);
+
     return page;
 };
 
@@ -124,9 +126,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
         });
     }
 
-    const newPage = addPage(pageIndex + 1, sectionsForNewPage);
-
-    inspect(InspectorType.Page, newPage);
+    addPage(pageIndex + 1, sectionsForNewPage);
 };
 
 const addSection = (pageId: string, atIndex: number, fields = []) => {
@@ -143,6 +143,8 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     page.sections.splice(atIndex, 0, section);
 
     dirty();
+
+    inspect(InspectorType.Section, section);
 
     return section;
 };
