@@ -7,13 +7,13 @@ use ParagonIE\ConstantTime\Base64UrlSafe;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 
 abstract class Passkey implements Contract
 {
     private string $name;
     private string $user;
-    private PublicKeyCredentialSource $credential;
+    private CredentialRecord $credential;
     private ?Carbon $lastLogin = null;
 
     public function id(): string
@@ -45,14 +45,14 @@ abstract class Passkey implements Contract
         return User::find($this->user);
     }
 
-    public function credential(): PublicKeyCredentialSource
+    public function credential(): CredentialRecord
     {
         return $this->credential;
     }
 
-    public function setCredential(array|PublicKeyCredentialSource $credential): Contract
+    public function setCredential(array|CredentialRecord $credential): Contract
     {
-        $this->credential = $credential instanceof PublicKeyCredentialSource
+        $this->credential = $credential instanceof CredentialRecord
             ? $credential
             : $this->credentialFromArray($credential);
 
@@ -95,15 +95,15 @@ abstract class Passkey implements Contract
         $this->lastLogin = $data['last_login'] ? Carbon::createFromTimestamp($data['last_login']) : null;
     }
 
-    private function credentialToArray(PublicKeyCredentialSource $credential): array
+    private function credentialToArray(CredentialRecord $credential): array
     {
         $json = app(Serializer::class)->serialize($credential, 'json');
 
         return json_decode($json, true);
     }
 
-    private function credentialFromArray(array $array): PublicKeyCredentialSource
+    private function credentialFromArray(array $array): CredentialRecord
     {
-        return app(Serializer::class)->deserialize(json_encode($array), PublicKeyCredentialSource::class, 'json');
+        return app(Serializer::class)->deserialize(json_encode($array), CredentialRecord::class, 'json');
     }
 }

@@ -17,7 +17,7 @@ use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 
 #[Group('user')]
 #[Group('2fa')]
@@ -198,9 +198,9 @@ class FileUserTest extends TestCase
         $user = $this->user();
         $this->assertCount(0, $user->passkeys());
 
-        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialA = \Mockery::mock(CredentialRecord::class);
         $mockCredentialA->publicKeyCredentialId = 'key-a';
-        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialB = \Mockery::mock(CredentialRecord::class);
         $mockCredentialB->publicKeyCredentialId = 'key-b';
 
         $user->setPasskeys(collect([
