@@ -197,6 +197,9 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     inspect(InspectorType.Field, field);
 
     dirty();
+
+    // TODO: Refactor to document.getElementById() when mobile/desktop variants are merged.
+    setTimeout(() => document.querySelectorAll('[id="field_display"]')[1]?.select(), 250);
 };
 
 const onFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
