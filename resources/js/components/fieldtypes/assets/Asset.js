@@ -78,10 +78,10 @@ export default {
 
         edit() {
             if (this.readOnly) return;
-            if (this.asset.invalid) return;
+            if (this.asset?.invalid) return;
 
             this.editing = true;
-            this.editingId = this.asset.id;
+            this.editingId = this.asset?.id ?? null;
         },
 
         remove() {
