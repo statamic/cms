@@ -138,7 +138,7 @@ const hoverCardDate = computed(() => {
             <DateRangePickerField v-slot="{ segments }" class="w-full">
                 <div
                     :class="[
-                        'flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
+                        'st-custom-scrollbar flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-gray-700',
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300 @max-xs:text-sm',
                         'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-2.5 disabled:shadow-none',
