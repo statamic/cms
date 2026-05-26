@@ -182,19 +182,7 @@ const stripThenGoTo = (text = '') => {
     return text.replace(new RegExp(marker, 'ig'), '').trim();
 };
 
-const formatPageReferenceChip = (text = '') => {
-    const trimmed = text.trim();
-    const normalized = trimmed.toLowerCase();
-    const pageOneLabel = __('Page 1').trim().toLowerCase();
-    if (normalized === pageOneLabel || normalized === '1' || /^page\s*1\b/i.test(trimmed)) {
-        return __('1 of 2');
-    }
-    return trimmed;
-};
-
-const pageLogicDestinationPart = computed(() => collapsedSummaryParts.value.find((part) => part.type === 'destination'));
-
-const pageLogicCollapsedSummaryParts = computed(() => collapsedSummaryParts.value.filter((part) => part.type !== 'destination'));
+const compactDestinationLabel = (text = '') => text.replace(/^page\s+/i, '').trim();
 
 const fieldLogicAnotherQuestionPart = computed(() => {
     const currentQuestion = (__(props.config?.display || props.config?.handle || '')).trim().toLowerCase();
@@ -377,7 +365,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         </template>
                         <span v-else-if="collapsedPreviewText" v-html="collapsedPreviewText" />
                         <template v-else>
-                            <template v-for="(part, index) in pageLogicCollapsedSummaryParts" :key="`${part.type}-${index}`">
+                            <template v-for="(part, index) in collapsedSummaryParts" :key="`${part.type}-${index}`">
                                 <Badge
                                     v-if="part.type === 'operator'"
                                     pill
@@ -387,6 +375,10 @@ reveal.use(rootEl, () => emit('expanded'));
                                 >
                                     {{ part.text }}
                                 </Badge>
+                                <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-1">
+                                    <Icon name="page" class="size-3! text-gray-500 dark:text-gray-300" aria-hidden="true" />
+                                    <span class="inline-block font-medium text-gray-900 dark:text-gray-100 text-xs" style="text-box: trim-start text; font-variant-numeric: lining-nums;">{{ compactDestinationLabel(part.text) }}</span>
+                                </span>
                                 <span v-else-if="part.type === 'operatorValue'" class="font-mono text-[0.75rem]">
                                     {{ part.text }}
                                 </span>
@@ -394,14 +386,10 @@ reveal.use(rootEl, () => emit('expanded'));
                                     v-else-if="!collapsedPrefixIcon && isThenGoToPart(part)"
                                     pill
                                     color="white"
-                                    class="inline-flex items-center gap-1 px-1.5 font-medium text-gray-800 dark:text-gray-200"
+                                    class="inline-block px-1.5 font-medium text-gray-800 dark:text-gray-200"
+                                    style="text-box: trim-start text;"
                                 >
-                                    <Icon name="page" class="size-3! shrink-0 me-0.5 text-gray-500 dark:text-gray-300" aria-hidden="true" />
-                                    <span style="text-box: trim-start text;">{{ __('go to') }}</span>
-                                    <span
-                                        v-if="pageLogicDestinationPart?.text"
-                                        style="text-box: trim-start text; font-variant-numeric: proportional-nums;"
-                                    >{{ formatPageReferenceChip(pageLogicDestinationPart.text) }}</span>
+                                    {{ __('go to') }}
                                 </Badge>
                                 <template v-else>{{ part.text }}</template>
                             </template>

@@ -23,7 +23,8 @@ watch(() => page.value.display, dirty);
 watch(() => page.value.instructions, dirty);
 
 // todo: refactor everything under this line
-const inspectorTarget = ref('page_1');
+const pageIndex = computed(() => pages.value.findIndex((p) => p._id === page.value._id));
+const inspectorTarget = computed(() => (pageIndex.value === 1 ? 'page_2' : 'page_1'));
 
 const selectedPageLogicMockPreset = computed(() => {
     if (inspectorTarget.value === 'page_2') {
@@ -51,8 +52,16 @@ const goodbyeSecondRuleMockPreset = {
     logicContainsOperator: 'contains',
     logicContainsAnswer: 'friend',
     logicBranchingAction: 'go_to',
-    logicDestination: 'second_favorite',
+    logicDestination: 'page_1',
 };
+
+const selectedPageHeadingLabel = computed(() => {
+    if (inspectorTarget.value === 'page_1') {
+        return __('Page :current of :total', { current: 1, total: pages.value.length });
+    }
+
+    return __('Goodbye');
+});
 
 const selectedPageDestinationStepLabel = computed(() => (
     inspectorTarget.value === 'page_2'
@@ -83,7 +92,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.display ? __(page.display) : placeholderTitle }}
+                                {{ page.display ? __(page.display) : selectedPageHeadingLabel }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -108,7 +117,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.display ? __(page.display) : placeholderTitle }}
+                                {{ page.display ? __(page.display) : selectedPageHeadingLabel }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -126,11 +135,11 @@ const selectedPageDestinationStepLabel = computed(() => (
                             :mock-preset="selectedPageLogicMockPreset"
                         />
 
-                        <div v-if="inspectorTarget === 'page_2'" class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
+                        <div v-if="inspectorTarget === 'page_2'" class="my-8 test border-t border-dashed border-gray-400 dark:border-gray-700"></div>
 
                         <LogicFlowMock
                             v-if="inspectorTarget === 'page_2'"
-                            :key="`mobile-page-logic-secondary-${inspectorTarget}`"
+                            :key="`mobile-page-logic-secondary-${inspectorTarget}-page-destination`"
                             :destination-step-label="__('Then go to Page 1')"
                             :show-destination-selector="true"
                             :show-rule-controls="true"
@@ -139,8 +148,8 @@ const selectedPageDestinationStepLabel = computed(() => (
                             :mock-preset="goodbyeSecondRuleMockPreset"
                         />
 
-                        <div class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
-                            <Button size="sm" :text="__('+ Add Rule')" />
+                        <div class="mt-6 border-t border-gray-300 dark:border-gray-700">
+                            <Button size="sm" variant="default" class="-ms-2" :text="__('+ Add Rule')" />
                         </div>
                     </div>
                 </TabContent>
@@ -164,7 +173,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                                 <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
                             <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.display ? __(page.display) : placeholderTitle }}
+                                {{ page.display ? __(page.display) : selectedPageHeadingLabel }}
                                 <div class="grid *:[grid-area:1/1]">
                                     <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                     <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -185,16 +194,18 @@ const selectedPageDestinationStepLabel = computed(() => (
                 <TabContent :name="PageInspectorTabs.Conditions">
                     <div class="group/logic-tab space-y-6 pt-8">
                         <div class="flex items-center gap-2.5">
-                            <div class="size-4">
-                                <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
-                            </div>
-                            <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                                {{ page.display ? __(page.display) : placeholderTitle }}
-                                <div class="grid *:[grid-area:1/1]">
-                                    <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
-                                    <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                            <div class="flex items-center gap-2.5">
+                                <div class="size-4">
+                                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                                 </div>
-                            </a>
+                                <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
+                                    {{ page.display ? __(page.display) : selectedPageHeadingLabel }}
+                                    <div class="grid *:[grid-area:1/1]">
+                                        <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
+                                        <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
+                                    </div>
+                                </a>
+                            </div>
                         </div>
 
                         <LogicFlowMock
@@ -211,7 +222,7 @@ const selectedPageDestinationStepLabel = computed(() => (
 
                         <LogicFlowMock
                             v-if="inspectorTarget === 'page_2'"
-                            :key="`desktop-page-logic-secondary-${inspectorTarget}`"
+                            :key="`desktop-page-logic-secondary-${inspectorTarget}-page-destination`"
                             :destination-step-label="__('Then go to Page 1')"
                             :show-destination-selector="true"
                             :show-rule-controls="true"

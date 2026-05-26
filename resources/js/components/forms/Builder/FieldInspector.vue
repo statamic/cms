@@ -206,7 +206,7 @@ onMounted(() => load());
 
                 <TabContent :name="FieldInspectorTabs.Conditions">
                     <div class="space-y-6 pt-8">
-                        <div data-field-settings class="flex items-center gap-2">
+                        <div class="flex items-center gap-2.5">
                             <div class="size-4">
                                 <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
@@ -297,7 +297,7 @@ onMounted(() => load());
 
                 <TabContent :name="FieldInspectorTabs.Conditions">
                     <div class="space-y-6 pt-8">
-                        <div data-field-settings class="flex items-center gap-2">
+                        <div class="flex items-center gap-2.5">
                             <div class="size-4">
                                 <Icon :name="field.icon" class="size-4 text-gray-500 dark:text-gray-300" />
                             </div>
