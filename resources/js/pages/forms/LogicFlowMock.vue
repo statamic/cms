@@ -139,8 +139,8 @@ const logicBranchingCalculationVariable = ref(props.mockPreset.logicBranchingCal
 
 const logicJoin = ref(props.mockPreset.logicJoin || 'and');
 const logicJoinOptions = [
-    { label: __('And'), value: 'and' },
-    { label: __('Or'), value: 'or' },
+    { label: __('All of the conditions pass'), short_label: __('And'), value: 'and' },
+    { label: __('Any of the conditions pass'), short_label: __('Or'), value: 'or' },
 ];
 
 const logicContainsOperator = ref(props.mockPreset.logicContainsOperator || 'contains');
@@ -217,113 +217,6 @@ watch(
     <div data-logic-text class="logic-text">
         <h3 class="sr-only">{{ __('Conditional logic') }}</h3>
 
-        <!-- Demo 1 -->
-        <!-- <ol>
-            <li>
-                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
-                    <Combobox
-                        v-model="logicWhen"
-                        size="sm"
-                        :options="logicWhenOptions"
-                        option-label="label"
-                        option-value="value"
-                        :searchable="false"
-                    />
-                </div>
-                <ol>
-                    <li>
-                        <div
-                            class="logic-text__pill"
-                        >
-                            <span
-                                class="logic-text__pill-icon size-5"
-                                :class="props.initialConditionIconClass"
-                            >
-                                <Icon :name="props.initialConditionIcon" class="size-3" />
-                            </span>
-                            <span class="logic-text__pill-text" :title="props.initialConditionLabel || __('Which album was your favorite?')">
-                                {{ props.initialConditionLabel || __('Which album was your favorite?') }}
-                            </span>
-                        </div>
-                    </li>
-                    <li>
-                        <Combobox
-                            v-model="logicOperator"
-                            size="sm"
-                            :options="logicOperatorOptions"
-                            option-label="label"
-                            option-value="value"
-                            :placeholder="__('Operator')"
-                            :searchable="false"
-                        />
-                    </li>
-                    <li>
-                        <Input
-                            v-if="calculationUsesNumberInput"
-                            v-model="logicValue"
-                            size="sm"
-                            :placeholder="__('Enter a number')"
-                        />
-                        <Combobox
-                            v-else
-                            v-model="logicValue"
-                            size="sm"
-                            :options="props.calculationMode ? logicCalculationSourceOptions : logicValueOptions"
-                            option-label="label"
-                            option-value="value"
-                            :placeholder="__('Value')"
-                            searchable
-                        />
-                    </li>
-                </ol>
-            </li>
-
-            <li v-if="!props.useWhenSelector">
-                <div class="logic-text-badge logic-text__condition" aria-hidden="true">
-                    {{ props.destinationStepLabel || __('Then go to …') }}
-                </div>
-                <ol v-if="props.showDestinationSelector">
-                    <li>
-                        <Combobox
-                            v-model="logicBranchingCalculation"
-                            size="sm"
-                            variant="default"
-                            :options="logicBranchingCalculationOptions"
-                            option-label="label"
-                            option-value="value"
-                            :dropdown-label="__('Calculations')"
-                            :placeholder="__('Destination')"
-                            searchable
-                        >
-                            <template #option="{ icon, label }">
-                                <div class="flex gap-2 text-left">
-                                    <Icon
-                                        v-if="icon"
-                                        :name="icon"
-                                        class="size-4 shrink-0 text-orange-500 dark:text-orange-400"
-                                    />
-                                    <span class="truncate" :class="{ 'font-mono': isVariableOption({ value }) }">{{ label }}</span>
-                                </div>
-                            </template>
-                            <template #selected-option="{ option }">
-                                <div class="flex items-center gap-2 -ms-0.75">
-                                    <div class="flex shrink-0 items-center justify-center size-6 text-orange-600 dark:text-orange-400">
-                                        <Icon
-                                            v-if="option.icon"
-                                            :name="option.icon"
-                                            class="size-4 shrink-0 text-orange-600 dark:text-orange-400"
-                                        />
-                                    </div>
-                                    <span>{{ option.label }}</span>
-                                </div>
-                            </template>
-                        </Combobox>
-                    </li>
-                </ol>
-            </li>
-        </ol> -->
-
-        <!-- Demo 2 -->
         <ol>
             <li>
                 <div v-if="props.useWhenSelector" class="logic-text__condition" aria-hidden="true">
@@ -515,7 +408,12 @@ watch(
                             option-value="value"
                             :placeholder="__('And')"
                             :searchable="false"
-                        />
+                            adaptive-width
+                        >
+                            <template #selected-option="{ option }">
+                                <span class="block truncate" v-text="option.short_label" />
+                            </template>
+                        </Combobox>
                     </div>
                     <Button
                         size="sm"
@@ -744,6 +642,7 @@ watch(
                 </ol>
             </li>
         </ol>
+
         <Button
             v-if="!props.useWhenSelector && props.showAddConditionBeforeThen"
             size="sm"
