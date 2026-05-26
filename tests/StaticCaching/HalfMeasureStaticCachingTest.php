@@ -126,6 +126,48 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertSee('1 3', false);
     }
 
+    public function shareErrorsEnabled($app)
+    {
+        $app['config']->set('statamic.static_caching.share_errors', true);
+    }
+
+    #[Test]
+    #[DefineEnvironment('shareErrorsEnabled')]
+    public function nocache_session_is_written_under_the_real_url_when_share_errors_is_enabled()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        // Regression: when share_errors is enabled, the middleware's copyError()
+        // step used to call Request::fakeStaticCacheStatus() on every cacheable
+        // response, including 200s. That mutated the singleton nocache Session
+        // URL to /__shared-errors/200, causing Session::write() to persist the
+        // regions list under the wrong cache key. On subsequent hits in a
+        // fresh PHP process, the cached page was found but its nocache regions
+        // could not be restored, a RegionNotFound was caught, and the request
+        // fell through to a full dynamic re-render — defeating half-measure
+        // caching. See discussion: nocache regions silently failing under
+        // share_errors on 200 responses.
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }} {{ nocache }}{{ title }}{{ /nocache }}');
+
+        $this->createPage('about', ['with' => ['title' => 'Hello']]);
+
+        $this->get('/about')->assertOk();
+
+        // The session metadata must be persisted under the real request URL,
+        // not under the fake /__shared-errors/200 URL.
+        $store = \Statamic\Facades\StaticCache::cacheStore();
+        $this->assertNotNull(
+            $store->get('nocache::session.'.md5('http://localhost/about')),
+            'Expected nocache session to be stored under the real request URL.'
+        );
+        $this->assertNull(
+            $store->get('nocache::session.'.md5('/__shared-errors/200')),
+            'nocache session must not be stored under the shared-errors URL for 200 responses.'
+        );
+    }
+
     #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags_in_loops()
     {
