@@ -13,6 +13,7 @@ class Dictionary extends FormFieldtype
     protected $description = 'Select from a predefined list like countries, timezones, or currencies.';
     protected $icon = 'fieldtype-dictionary';
     protected $categories = ['choice'];
+    protected $keywords = ['countries', 'timezones', 'currencies'];
 
     public function configFieldItems(): array
     {

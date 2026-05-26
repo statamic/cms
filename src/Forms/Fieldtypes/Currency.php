@@ -12,6 +12,7 @@ class Currency extends FormFieldtype
     protected $description = 'Collects a monetary amount.';
     protected $icon = 'currency';
     protected $categories = ['number'];
+    protected $keywords = ['money', 'number'];
 
     public function configFieldItems(): array
     {

@@ -11,6 +11,7 @@ class LongAnswer extends FormFieldtype
     protected $description = 'A larger field for detailed responses, comments, or messages.';
     protected $icon = 'text-long';
     protected $categories = ['text'];
+    protected $keywords = ['textarea'];
 
     public function configFieldItems(): array
     {

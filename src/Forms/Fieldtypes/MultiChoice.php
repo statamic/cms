@@ -13,6 +13,7 @@ class MultiChoice extends FormFieldtype
     protected $description = 'A question with a range of answer options. Respondents can only choose one answer.';
     protected $icon = 'fieldtype-radio';
     protected $categories = ['choice'];
+    protected $keywords = ['radio'];
 
     public function configFieldItems(): array
     {

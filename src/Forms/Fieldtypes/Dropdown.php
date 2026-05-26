@@ -13,6 +13,7 @@ class Dropdown extends FormFieldtype
     protected $description = 'A dropdown list where respondents pick from your options.';
     protected $icon = 'fieldtype-select';
     protected $categories = ['choice'];
+    protected $keywords = ['select'];
 
     public function configFieldItems(): array
     {

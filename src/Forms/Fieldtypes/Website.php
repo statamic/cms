@@ -11,6 +11,7 @@ class Website extends FormFieldtype
     protected $description = "Collects a website address and ensures it's properly formatted.";
     protected $icon = 'website';
     protected $categories = ['contact'];
+    protected $keywords = ['url'];
 
     public function configFieldItems(): array
     {

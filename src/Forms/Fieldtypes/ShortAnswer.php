@@ -11,6 +11,7 @@ class ShortAnswer extends FormFieldtype
     protected $description = 'A simple field for short, one-line answers.';
     protected $icon = 'text-short';
     protected $categories = ['text'];
+    protected $keywords = ['text'];
 
     public function configFieldItems(): array
     {
