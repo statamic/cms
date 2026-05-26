@@ -317,7 +317,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head :title="[form.title, __('Forms')]" />
+    <Head :title="[__('Edit'), form.title, __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')" @click="save">
