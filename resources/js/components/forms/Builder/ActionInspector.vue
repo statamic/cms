@@ -89,7 +89,7 @@ watch(() => page.value.previous_page_label, dirty);
                         </div>
 
                         <Field :label="submitButtonLabel">
-                            <Input v-model="page.button_label" :placeholder="submitButtonPlaceholder" />
+                            <Input v-model="page.button_label" :placeholder="submitButtonPlaceholder" focus />
                         </Field>
 
                         <Field v-if="!isFirstPage" :label="__('Previous Button Label')">

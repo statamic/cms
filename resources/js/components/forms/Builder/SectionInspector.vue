@@ -56,7 +56,7 @@ watch(() => section.value.display, dirty);
                 </div>
 
                 <Field :label="__('Label')">
-                    <Input v-model="section.display" />
+                    <Input v-model="section.display" focus />
                 </Field>
             </div>
         </div>

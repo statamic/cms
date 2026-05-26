@@ -64,6 +64,7 @@ class FormField
             'display' => [
                 'display' => __('Label'),
                 'type' => 'text',
+                'focus' => true,
             ],
             'instructions' => [
                 'display' => __('Help Text'),

@@ -173,7 +173,7 @@ const selectedPageDestinationStepLabel = computed(() => (
                         </div>
 
                         <Field :label="__('Label')">
-                            <Input v-model="page.display" :placeholder="placeholderTitle" />
+                            <Input v-model="page.display" :placeholder="placeholderTitle" focus />
                         </Field>
 
                         <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
