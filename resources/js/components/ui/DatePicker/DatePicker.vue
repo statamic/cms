@@ -178,7 +178,7 @@ const getInputLabel = (part) => {
                         >
                             <Icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
-                        <div class="flex flex-1 items-center @max-xs:text-sm">
+                        <div class="flex flex-1 items-center @max-xs:text-xs">
                             <template v-for="item in segments" :key="item.part">
                                 <div v-if="item.part === 'literal'">
                                     <DatePickerInput
@@ -210,7 +210,7 @@ const getInputLabel = (part) => {
                             :additional-timezones="additionalTimezones"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2.5" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"

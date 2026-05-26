@@ -140,7 +140,7 @@ const hoverCardDate = computed(() => {
                     :class="[
                         'st-custom-scrollbar flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-gray-700',
-                        'leading-[1.375rem] text-gray-600 dark:text-gray-300 @max-xs:text-sm',
+                        'leading-[1.375rem] text-gray-600 dark:text-gray-300 @max-xs:text-xs',
                         'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-2.5 disabled:shadow-none',
                         'data-invalid:border-red-500',
                         'disabled:shadow-none disabled:opacity-50',
@@ -190,7 +190,7 @@ const hoverCardDate = computed(() => {
                         :additional-timezones="additionalTimezones"
                         side="top"
                     >
-                        <Text class="text-gray-600! dark:text-gray-400! ms-2.5" size="xs" :text="timeZoneLabel" />
+                        <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
                     </TimezoneHoverCard>
                     <Button v-if="!readOnly" @click="emit('update:modelValue', null)" variant="subtle" size="sm" icon="x" class="-me-2" :disabled="disabled" />
                 </div>
