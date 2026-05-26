@@ -57,9 +57,11 @@
                 />
 
                 <asset-editor
-                    v-if="editing"
-                    :id="asset.id"
+                    v-if="editingId"
+                    :id="editingId"
                     :allow-deleting="false"
+                    @previous="navigateToPrevious"
+                    @next="navigateToNext"
                     @closed="closeEditor"
                     @saved="assetSaved"
                     @action-completed="actionCompleted"
