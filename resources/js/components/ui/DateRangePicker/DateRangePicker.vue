@@ -147,8 +147,12 @@ const hoverCardDate = computed(() => {
                         readOnly ? 'border-dashed' : '',
                     ]"
                 >
-                    <DateRangePickerTrigger v-if="!inline">
-                        <Button as="div" variant="ghost" size="sm" icon="calendar" class="-ms-2" />
+                    <DateRangePickerTrigger
+                        v-if="!inline"
+                        class="flex size-8 shrink-0 items-center justify-center rounded-lg -ms-2 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                        :aria-label="__('Open calendar')"
+                    >
+                        <Icon name="calendar" class="size-3.5!" />
                     </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
