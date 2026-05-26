@@ -4,9 +4,11 @@ namespace Tests\Data\Structures;
 
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\CollectionTreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -141,5 +143,113 @@ class CollectionTreeTest extends TestCase
         $tree->save();
 
         $this->assertFileDoesNotExist($tree->path());
+    }
+
+    #[Test]
+    public function it_fires_entries_moved_or_removed_event_when_entries_are_removed()
+    {
+        Event::fake();
+        Entry::shouldReceive('find')->andReturn(null);
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en', [
+            ['entry' => '1.0'],
+            ['entry' => '2.0'],
+        ]);
+
+        $tree->tree([
+            ['entry' => '1.0'],
+        ]);
+
+        $tree->save();
+
+        Event::assertDispatched(CollectionTreeEntriesMovedOrRemoved::class, function ($event) {
+            return $event->removed === ['2.0'] && $event->moved === [];
+        });
+    }
+
+    #[Test]
+    public function it_fires_entries_moved_or_removed_event_when_entries_change_ancestry()
+    {
+        Event::fake();
+        Entry::shouldReceive('find')->andReturn(null);
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en', [
+            ['entry' => '1.0', 'children' => [
+                ['entry' => '1.1'],
+            ]],
+            ['entry' => '2.0'],
+        ]);
+
+        $tree->tree([
+            ['entry' => '1.0'],
+            ['entry' => '2.0', 'children' => [
+                ['entry' => '1.1'],
+            ]],
+        ]);
+
+        $tree->save();
+
+        Event::assertDispatched(CollectionTreeEntriesMovedOrRemoved::class, function ($event) {
+            return $event->removed === [] && $event->moved === ['1.1'];
+        });
+    }
+
+    #[Test]
+    public function it_does_not_fire_entries_moved_or_removed_event_when_entries_are_only_reordered()
+    {
+        Event::fake();
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en', [
+            ['entry' => '1.0', 'children' => [
+                ['entry' => '1.1'],
+                ['entry' => '1.2'],
+            ]],
+        ]);
+
+        $tree->tree([
+            ['entry' => '1.0', 'children' => [
+                ['entry' => '1.2'],
+                ['entry' => '1.1'],
+            ]],
+        ]);
+
+        $tree->save();
+
+        Event::assertNotDispatched(CollectionTreeEntriesMovedOrRemoved::class);
+    }
+
+    #[Test]
+    public function it_does_not_fire_entries_moved_or_removed_event_when_saving_is_halted()
+    {
+        Event::fake([CollectionTreeEntriesMovedOrRemoved::class]);
+
+        Event::listen(CollectionTreeSaving::class, function () {
+            return false;
+        });
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en', [
+            ['entry' => '1.0'],
+            ['entry' => '2.0'],
+        ]);
+
+        $tree->tree([
+            ['entry' => '1.0'],
+        ]);
+
+        $tree->save();
+
+        Event::assertNotDispatched(CollectionTreeEntriesMovedOrRemoved::class);
     }
 }

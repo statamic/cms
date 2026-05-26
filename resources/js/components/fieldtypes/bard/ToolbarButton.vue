@@ -6,6 +6,7 @@
         size="sm"
         :aria-label="button.text"
         v-tooltip="button.text"
+        @mousedown.prevent
         @click="button.command(editor, button.args)"
     >
         <ui-icon :name="button.svg" v-if="button.svg" class="size-3.5! " :class="{ 'group-hover:text-white text-yellow-300!': active && variant === 'floating' }" />

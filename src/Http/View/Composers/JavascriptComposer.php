@@ -5,6 +5,7 @@ namespace Statamic\Http\View\Composers;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Statamic\Assets\CropAspectRatios;
 use Statamic\CommandPalette\Category;
 use Statamic\CP\Color;
 use Statamic\Facades\CommandPalette;
@@ -64,6 +65,8 @@ class JavascriptComposer
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
+            'cropAspectRatios' => CropAspectRatios::all(),
+            'elevatedSessionsEnabled' => config('statamic.users.elevated_sessions_enabled'),
             'user' => $this->user($user),
             'defaultPreferences' => Preference::default()->all(),
             'paginationSize' => config('statamic.cp.pagination_size'),
@@ -81,6 +84,7 @@ class JavascriptComposer
             'setPreviewImages' => Sets::previewImageConfig(),
             'linkToDocs' => config('statamic.cp.link_to_docs'),
             'defaultTheme' => $this->defaultTheme(),
+            'displayTimezone' => Statamic::displayTimezone(),
         ];
     }
 

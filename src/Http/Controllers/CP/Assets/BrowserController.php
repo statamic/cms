@@ -13,14 +13,19 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\AssetsIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class BrowserController extends CpController
 {
@@ -98,18 +103,18 @@ class BrowserController extends CpController
         $this->authorize('view', $container);
 
         $folder = $container->assetFolder($path);
-        $perPage = $request->perPage ?? config('statamic.cp.pagination_size');
+        $perPage = Statamic::cpPerPage($request->perPage) ?? config('statamic.cp.pagination_size');
         $page = Paginator::resolveCurrentPage();
 
         $folders = $folder->assetFolders();
         $totalFolders = $folders->count();
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
-        $totalAssets = $folder->queryAssets()->count();
+        $query = (new AssetsIndexQuery($folder->queryAssets(), $container))->query();
+        $totalAssets = $query->count();
         $totalItems = $totalAssets + $totalFolders;
 
-        if ($request->sort) {
-            $sort = $request->sort;
+        if ($sort = OrderBy::column($request->sort)) {
             $order = $request->order ?? 'asc';
         } else {
             $sort = $container->sortField();
@@ -119,13 +124,12 @@ class BrowserController extends CpController
         $sortByMethod = $order === 'desc' ? 'sortByDesc' : 'sortBy';
 
         $folders = $folders->$sortByMethod(
-            fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+            fn (AssetFolder $folder) => in_array($sort, ['basename', 'title', 'lastModified', 'size', 'count', 'path']) ? $folder->$sort() : $folder->basename()
         );
 
         $folders = $folders->slice(($page - 1) * $perPage, $perPage);
 
         if ($page >= $lastFolderPage) {
-            $query = $folder->queryAssets();
             $query->orderBy($sort, $order);
             $this->applyQueryScopes($query, $request->all());
 
@@ -190,8 +194,10 @@ class BrowserController extends CpController
             $query->where('folder', $path);
         }
 
-        if ($request->sort) {
-            $query->orderBy($request->sort, $request->order ?? 'asc');
+        $query = (new AssetsIndexQuery($query, $container))->query();
+
+        if ($sort = OrderBy::column($request->sort)) {
+            $query->orderBy($sort, $request->order ?? 'asc');
         }
 
         $this->applyQueryScopes($query, $request->all());
@@ -201,7 +207,7 @@ class BrowserController extends CpController
             'folder' => $path,
         ]);
 
-        $assets = $query->paginate(request('perPage'));
+        $assets = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         if ($request->search && $container->hasSearchIndex()) {
             $assets->setCollection($assets->getCollection()->map->getSearchable());

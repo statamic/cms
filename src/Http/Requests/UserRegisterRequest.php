@@ -13,6 +13,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Rules\UniqueUserValue;
 
+use function Statamic\trans as __;
+
 class UserRegisterRequest extends FormRequest
 {
     use Localizable;

@@ -73,7 +73,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :reference="initialReference"
+            :reference="reference"
             :blueprint="fieldset"
             v-model="values"
             :extra-values="extraValues"
@@ -82,6 +82,7 @@
             :origin-meta="originMeta"
             :errors="errors"
             :site="site"
+            :read-only="readOnly"
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
@@ -370,6 +371,7 @@ export default {
             originValues: this.initialOriginValues,
             originMeta: this.initialOriginMeta,
             site: this.initialSite,
+            reference: this.initialReference,
             selectingOrigin: false,
             selectedOrigin: null,
             isWorkingCopy: this.initialIsWorkingCopy,
@@ -687,6 +689,7 @@ export default {
                 this.fieldset = data.blueprint;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
+                this.reference = data.reference;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;

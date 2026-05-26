@@ -31,6 +31,8 @@
                     :each-droppable="eachDroppable"
                     :max-level="maxDepth"
                     :stat-handler="statHandler"
+                    :i18n="treeDraggableI18n"
+                    :aria-label="__('Tree Structure')"
                     @after-drop="afterDrop"
                     @open:node="nodeOpened"
                     @close:node="nodeClosed"
@@ -141,6 +143,12 @@ export default {
 
         direction() {
             return this.$config.get('direction', 'ltr');
+        },
+
+        treeDraggableI18n() {
+            return {
+                instructions: __('messages.tree_aria_instructions'),
+            };
         },
     },
 

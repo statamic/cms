@@ -7,6 +7,8 @@ use Inertia\Middleware;
 use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'statamic::layout';
@@ -29,6 +31,7 @@ class HandleInertiaRequests extends Middleware
                 'version' => Statamic::version(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
+                'isCpRoute' => Statamic::isCpRoute(),
             ],
             '_toasts' => $this->toasts($request),
         ]);
@@ -72,6 +75,11 @@ class HandleInertiaRequests extends Middleware
         $session = $request->session();
 
         if ($message = $session->get('success')) {
+            $this->toasts->success($message);
+        }
+
+        // Laravel's built-in auth flows (password reset, etc.) flash to 'status'.
+        if ($message = $session->get('status')) {
             $this->toasts->success($message);
         }
 

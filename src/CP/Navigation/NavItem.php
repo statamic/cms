@@ -3,7 +3,6 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
-use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\Link;
 use Statamic\Facades\CP\Nav;
@@ -12,6 +11,8 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Statamic\trans as __;
 
 class NavItem
 {
@@ -149,6 +150,7 @@ class NavItem
         $cpUrl = url(config('statamic.cp.route')).'/';
 
         $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+        $relativeUrl = rtrim($relativeUrl, '/');
 
         return $relativeUrl.'(/(.*)?|$)';
     }
@@ -216,11 +218,7 @@ class NavItem
     private function sanitizeSvg(string $svg): string
     {
         try {
-            $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
-
-            return $sanitizer->sanitize($svg, [
-                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
-            ]);
+            return Svg::sanitize($svg);
         } catch (\Throwable $e) {
             return '';
         }

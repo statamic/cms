@@ -4,6 +4,8 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts\Auth\User as UserContract;
 
+use function Statamic\trans as __;
+
 class SendPasswordReset extends Action
 {
     public $icon = 'mail';

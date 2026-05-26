@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
@@ -27,13 +28,12 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
 
-class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQueryableValues, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
@@ -43,7 +43,6 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $sites = [];
     protected $collection;
     protected $defaultPublishState = true;
-    protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
     protected $template;
@@ -319,20 +318,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             ->args(func_get_args());
     }
 
+    /** @deprecated */
     public function revisionsEnabled($enabled = null)
     {
-        return $this
-            ->fluentlyGetOrSet('revisions')
-            ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
-                    return false;
-                }
-
-                return false; // TODO
-
-                return $enabled;
-            })
-            ->args(func_get_args());
+        return func_num_args() === 0 ? false : $this;
     }
 
     public function url()
@@ -588,5 +577,23 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 type: $text,
                 url: $this->editBlueprintUrl($blueprint),
             ));
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return $this->get($field);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'collection', 'collections', 'defaultPublishState', 'editUrl', 'handle',
+            'hasSearchIndex', 'id', 'layout', 'path', 'revisionsEnabled', 'searchIndex', 'sites',
+            'sortDirection', 'sortField', 'template', 'termTemplate', 'title', 'uri', 'url',
+        ];
     }
 }

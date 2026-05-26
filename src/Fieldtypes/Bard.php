@@ -26,6 +26,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 
+use function Statamic\trans as __;
+
 class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls, Hookable;
@@ -788,7 +790,7 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = Str::after($url, 'statamic://');
+        $ref = str($url)->after('statamic://')->before('?')->before('#')->toString();
         [$type, $id] = explode('::', $ref, 2);
 
         $data = null;

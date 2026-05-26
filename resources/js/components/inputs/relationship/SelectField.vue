@@ -11,6 +11,7 @@
             :placeholder="__(config.placeholder) || __('Choose...')"
             :read-only="readOnly"
             :taggable="isTaggable"
+            :close-on-select="isTaggable"
             option-label="title"
             option-value="id"
             @update:modelValue="itemsSelected"
@@ -27,7 +28,7 @@
                 <div v-text="noOptionsText" />
             </template>
             <template #selected-option>
-                <span v-if="items.length === 1" v-text="items[0].title"></span>
+                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
             </template>
             <template #selected-options>
                 <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->

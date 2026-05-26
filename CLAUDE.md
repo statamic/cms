@@ -1,9 +1,5 @@
 # Statamic CMS - Claude AI Context
 
-## ⚠️ Always Check Before Making Changes
-
-- Are all user-facing strings localized?
-
 ## Project Overview
 
 This is the **Statamic CMS Core Package** - a Laravel-powered, flat-file (by default) CMS designed for building modern, easy-to-manage websites. This repository contains the core Composer package that gets installed into Laravel applications.
@@ -92,6 +88,14 @@ The project uses Vite for asset compilation with separate configs:
 - Our Vite bundle assembles everything the node module needs in `resouces/js/bootstrap/cms` and makes it available in the `window.__STATAMIC__` object.
 - The node module is defined in `packages/cms` and resolves everything through the `window` object.
 - Code needs to be in the `window` object to prevent addon bundles from re-including our code, and from needing to recompile our source files.
+
+## For PR Reviews
+
+- All user-facing strings should be localized.
+  - Short strings (like "Submit" or "Click here") can use the translation strings as keys. 
+  - Longer phrases or sentences should use keys and have their translations stored in an appropriate translation file.
+  - When adding to a translation file, only English strings need to be added. Other languages will be provided by contributors.
+
 
 ## Links
 

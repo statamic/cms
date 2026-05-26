@@ -14,6 +14,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class CacheController extends CpController
 {
     public function index()

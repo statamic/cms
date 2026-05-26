@@ -82,8 +82,11 @@ export { default as TableRows } from './Table/Rows.vue';
 export { default as TabList } from './Tabs/List.vue';
 export { default as Tabs } from './Tabs/Tabs.vue';
 export { default as TabTrigger } from './Tabs/Trigger.vue';
+export { default as Text } from './Text.vue';
 export { default as Textarea } from './Textarea.vue';
 export { default as TimePicker } from './TimePicker/TimePicker.vue';
+export { default as TimezoneHoverCard } from './TimezoneHoverCard.vue';
+export { default as Timezones } from './Timezones.vue';
 export { default as ToggleGroup } from './Toggle/Group.vue';
 export { default as ToggleItem } from './Toggle/Item.vue';
 

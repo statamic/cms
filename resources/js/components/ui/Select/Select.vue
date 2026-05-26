@@ -5,6 +5,11 @@ import Combobox from '../Combobox/Combobox.vue';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
+    /** When `true`, the dropdown will expand to fit longer option labels. */
+    adaptiveWidth: { type: Boolean, default: false },
+    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
+    align: { type: String, default: 'start' },
+    /** When `true`, the selected value will be clearable. */
     clearable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
@@ -52,6 +57,8 @@ const usingOptionSlot = !!slots['option'];
         :searchable="false"
         :size
         :variant
+        :align
+        :adaptive-width
         @update:modelValue="emit('update:modelValue', $event)"
     >
         <template #selected-option="{ option }" v-if="usingSelectedOptionSlot">

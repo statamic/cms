@@ -49,7 +49,7 @@
 
                     <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
-                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
                         <DropdownMenu>
                             <DropdownItem
@@ -84,6 +84,7 @@
                 <FieldsProvider
                     :fields="fields"
                     :as-config="false"
+                    :read-only="isReadOnly"
                     :field-path-prefix="fieldPathPrefix"
                     :meta-path-prefix="metaPathPrefix"
                 >
@@ -362,6 +363,7 @@ export default {
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
 				if (! values) return;
+                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
 
                 this.updateAttributes({ values });
             },

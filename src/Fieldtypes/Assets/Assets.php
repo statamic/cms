@@ -18,10 +18,12 @@ use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\GraphQL\Types\AssetInterface;
-use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Http\Resources\CP\Assets\AssetsFieldtypeAsset as AssetResource;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Assets extends Fieldtype
 {
@@ -343,11 +345,17 @@ class Assets extends Fieldtype
 
     public function getItemData($items)
     {
-        return collect($items)->map(function ($url) {
-            return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()['data']
-                : null;
-        })->filter()->values();
+        $user = User::current();
+
+        return collect($items)->map(function ($url) use ($user) {
+            $asset = Asset::find($url);
+
+            if (! $asset || ! $user->can('view', $asset)) {
+                return ['id' => $url, 'url' => $url, 'invalid' => true];
+            }
+
+            return (new AssetResource($asset))->resolve()['data'];
+        })->values();
     }
 
     public function augment($values)

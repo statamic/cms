@@ -224,6 +224,7 @@ function onSetDropdownClosed() {
                     <FieldsProvider
                         :fields="config.fields"
                         :as-config="false"
+                        :read-only
                         :field-path-prefix="fieldPathPrefix"
                         :meta-path-prefix="metaPathPrefix"
                     >

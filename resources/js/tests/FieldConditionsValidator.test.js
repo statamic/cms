@@ -26,6 +26,9 @@ const Statamic = {
     $dirty: {
         add: () => {},
     },
+    $events: {
+        $emit: () => {},
+    },
 };
 window.Statamic = Statamic;
 window.__ = (msg) => msg;

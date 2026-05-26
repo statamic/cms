@@ -47,6 +47,27 @@ test('it can statically format', () => {
     expect(DateFormatter.format('1995-03-13T22:45:19Z', { year: 'numeric' })).toBe('1995');
 });
 
+test('it can temporarily format with locale using callback', () => {
+    const formatter = new DateFormatter();
+    DateFormatter.defaultLocale = 'en-us';
+
+    const result = formatter.withLocale('de', (instance) => instance.format('2021-12-25T12:13:14Z', 'datetime'));
+
+    expect(result).toBe('25.12.2021, 12:13');
+    expect(DateFormatter.defaultLocale).toBe('en-us');
+});
+
+test('it resets locale after withLocale callback throws', () => {
+    const formatter = new DateFormatter();
+    DateFormatter.defaultLocale = 'en-us';
+
+    expect(() => formatter.withLocale('de', () => {
+        throw new Error('boom');
+    })).toThrow('boom');
+
+    expect(DateFormatter.defaultLocale).toBe('en-us');
+});
+
 test('it can format on the instance', () => {
     expect(new DateFormatter().format('1995-03-13T22:45:19Z')).toBe('3/13/1995, 10:45 PM');
     expect(new DateFormatter().format('1995-03-13T22:45:19Z', { year: 'numeric' })).toBe('1995');
@@ -186,6 +207,18 @@ test('it can get the locale', () => {
     expect(new DateFormatter().locale).toBe('fr');
 });
 
+test('it can set the default locale via setDefaultLocale', () => {
+    new DateFormatter().setDefaultLocale('de');
+    expect(DateFormatter.defaultLocale).toBe('de');
+    expect(new DateFormatter().locale).toBe('de');
+});
+
+test('it normalizes underscored locales to BCP 47 format', () => {
+    DateFormatter.defaultLocale = 'pt_BR';
+    expect(DateFormatter.defaultLocale).toBe('pt-BR');
+    expect(new DateFormatter().locale).toBe('pt-BR');
+});
+
 test.each([
     ['en', 'date', '12/25/2021'],
     ['en', 'time', '12:13 PM'],
@@ -200,6 +233,20 @@ test.each([
 
 test('an invalid preset throws an error', () => {
     expect(() => new DateFormatter().options('foo')).toThrow('Invalid date format: foo');
+});
+
+test('it can override preset options', () => {
+    expect(new DateFormatter().options({ preset: 'datetime', month: 'short' }).toString()).toBe(
+        'Dec 25, 2021, 12:13 PM',
+    );
+
+    expect(new DateFormatter().options({ preset: 'datetime', timeZone: 'Australia/Sydney' }).toString()).toBe(
+        '12/25/2021, 11:13 PM',
+    );
+});
+
+test('an invalid preset key throws an error when overriding', () => {
+    expect(() => new DateFormatter().options({ preset: 'foo', month: 'short' })).toThrow('Invalid date format: foo');
 });
 
 test.each([

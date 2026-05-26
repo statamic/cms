@@ -15,6 +15,8 @@ use Statamic\Facades\User;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class HandleAuthenticatedInertiaRequests
 {
     public function handle(Request $request, Closure $next)

@@ -7,7 +7,7 @@ import Cookies from 'cookies-js';
 import * as cms from './bootstrap/cms/index.js';
 import hmr from './bootstrap/hmr';
 
-import.meta.glob(['../img/**']);
+import.meta.glob(['../img/**'], { eager: true });
 
 let global_functions = Object.keys(Globals);
 global_functions.forEach((fnName) => {

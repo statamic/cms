@@ -5,5 +5,5 @@ const { components } = injectContainerContext();
 </script>
 
 <template>
-    <component v-for="component in components" :key="component.name" :is="component.name" v-bind="component.props" />
+    <component v-for="component in components" :key="component.id" :is="component.name" v-bind="component.props" v-on="component.events" />
 </template>

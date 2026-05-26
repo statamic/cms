@@ -15,7 +15,7 @@ Run `git --no-pager log $(git describe --tags --abbrev=0)..HEAD --oneline --no-d
 For each commit:
 - Extract the PR number from the commit message (e.g., `(#13331)`)
 - Remove the commit SHA and `[6.x]` prefix from the message
-- Fetch the PR author from GitHub using `gh pr view <number> --json author --jq '.author.login'` for all PRs in a single command.
+- Fetch the PR author from GitHub using a sequential loop — do NOT use parallel background jobs (`&`) as they interleave stdout unpredictably. Use: `for pr in <numbers>; do echo -n "PR $pr: "; gh pr view $pr --json author --jq '.author.login'; done`
 
 ## 3. Skip certain commits
 
