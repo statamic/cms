@@ -60,6 +60,7 @@
                     v-if="editingId"
                     :id="editingId"
                     :allow-deleting="false"
+                    :show-navigation="siblings.length > 1"
                     @previous="navigateToPrevious"
                     @next="navigateToNext"
                     @closed="closeEditor"
