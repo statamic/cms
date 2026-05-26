@@ -326,121 +326,51 @@ main.nav-closed {
 
 /* GROUP THREE PANEL STATES / SIDE PANELS
 =================================================== */
-.left-panel-popover,
-.right-panel-popover {
-    [class*="popover__menu"] {
-        overscroll-behavior-y: contain;
-        height: calc(100% + 3.5rem);
-
-        display: none;
-
-        &,
-        & [class*="popover__close-button"] {
-            opacity: 0;
-            transition: opacity 350ms, margin 350ms, display 350ms allow-discrete, overlay 350ms allow-discrete;
-        }
-
-        &:popover-open,
-        &:popover-open [class*="popover__close-button"] {
-            display: block;
-            opacity: 1;
-
-            @starting-style {
-                opacity: 0;
-                margin-block-start: 0;
-            }
-        }
-
-        background: var(--theme-color-body-bg);
-        @apply
-            px-2
-            shadow-2xl
-        ;
-    }
-
-    .left-panel-popover__menu,
-    .right-panel-popover__menu {
-        top: 3.5rem;
-        &:not(:popover-open) {
-            pointer-events: none;
-        }
-    }
-
-    [class*="popover__close-button"] {
+@media (max-width: 999px) {
+    #left-panel,
+    #right-panel {
         position: fixed;
         top: 3.5rem;
-        width: initial;
-        height: initial;
-        cursor: pointer;
-        padding: 1rem;
-        & svg {
-            width: calc(var(--spacing) * 3.5);
-            height: calc(var(--spacing) * 3.5);
-            aspect-ratio: 1;
-            inline-size: unset;
-        }
+        bottom: 0;
+        z-index: var(--z-index-modal);
+        transition: transform 0.3s ease;
+        background: var(--theme-color-body-bg);
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
     }
-}
 
-/* GROUP THREE PANEL STATES / SIDE PANELS / LEFT PANEL
-=================================================== */
-/* Hide the left panel button when the right panel is open to prevent unwanted/unnecessary click targets on the screen */
-#main:has(.right-panel-popover__menu:popover-open) {
-    button[popovertarget="popover-left-panel"] {
-        display: none;
-    }
-}
-
-.left-panel-popover {
-    .left-panel-popover__menu {
+    #left-panel {
+        left: 0;
         width: max(11rem, 33.33%);
-        &:popover-open,
-        &:popover-open .left-panel-popover__close-button {
-            @starting-style {
-                margin-inline-start: -50%;
-            }
-        }
-
-        @apply
-            border-r border-gray-200 dark:border-gray-700
-        ;
+        transform: translateX(-100%);
+        @apply border-r border-gray-200 dark:border-gray-700 shadow-2xl;
     }
 
-    .left-panel-popover__close-button {
-        left: max(11rem, 33.33%);
-    }
-}
-
-/* GROUP THREE PANEL STATES / SIDE PANELS / RIGHT PANEL
-=================================================== */
-/* Hide the right panel button when the left panel is open to prevent unwanted/unnecessary click targets on the screen */
-#main:has(.left-panel-popover__menu:popover-open) {
-    button[popovertarget="popover-right-panel"] {
-        display: none;
-    }
-}
-
-.right-panel-popover {
-    .right-panel-popover__menu {
+    #right-panel {
+        right: 0;
         width: max(18rem, 33.33%);
-        &:popover-open,
-        &:popover-open .right-panel-popover__close-button {
-            @starting-style {
-                margin-inline-end: -50%;
-            }
-        }
-
-        @apply
-            border-l border-gray-200 dark:border-gray-700
-        ;
+        transform: translateX(100%);
+        @apply border-l border-gray-200 dark:border-gray-700 shadow-2xl;
     }
 
-    #popover-right-panel {
-        margin-inline-start: auto;
+    /* Slide in when open */
+    #left-panel:has([data-mobile-open="true"]),
+    #right-panel:has([data-mobile-open="true"]) {
+        transform: translateX(0);
     }
+}
 
-    .right-panel-popover__close-button {
-        right: max(18rem, 33.33%);
+/* Backdrop for mobile panel click-outside-to-close */
+.mobile-panel-backdrop {
+    @apply hidden;
+}
+
+@media (max-width: 999px) {
+    .mobile-panel-backdrop[data-visible="true"] {
+        @apply block fixed inset-0 cursor-pointer;
+        top: 3.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: calc(var(--z-index-modal) - 1);
     }
 }
 

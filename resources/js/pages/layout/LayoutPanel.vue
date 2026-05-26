@@ -7,6 +7,10 @@ const props = defineProps({
         required: true,
         validator: (value) => ['left', 'right'].includes(value),
     },
+    mobileOpen: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const teleportTarget = props.side === 'left' ? '#left-panel' : '#right-panel';
@@ -34,6 +38,8 @@ onBeforeUnmount(() => {
 
 <template>
     <Teleport defer :to="teleportTarget">
-        <slot />
+        <div class="layout-panel-content" :data-mobile-open="mobileOpen">
+            <slot />
+        </div>
     </Teleport>
 </template>

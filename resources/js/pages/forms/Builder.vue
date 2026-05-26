@@ -55,6 +55,9 @@ const saving = ref<boolean>(false);
 const inspecting = ref<object | null>(null);
 const inspectorType = ref<InspectorType | null>(null);
 const fieldView = ref<FieldView>(FieldView.Expanded);
+const isLeftPanelOpen = ref<boolean>(false);
+const isRightPanelOpen = ref<boolean>(false);
+
 const pages = computed(() => formFields.value.pages);
 const allSections = computed(() => pages.value.flatMap(page => page.sections));
 const shouldShowViewSelector = computed(() => allSections.value.some(section => section.fields.length > 0));
@@ -70,6 +73,9 @@ const clearInspector = (): void => {
     inspecting.value = null;
     inspectorType.value = null;
 };
+
+const toggleLeftPanel = () => isLeftPanelOpen.value = !isLeftPanelOpen.value;
+const toggleRightPanel = () => isRightPanelOpen.value = !isRightPanelOpen.value;
 
 const addPage = (atIndex: number | null = null, sections = []) => {
     const page = {
@@ -293,12 +299,24 @@ provideBuilderContext({
     inspecting,
     inspectorType,
     isDirty,
+    isLeftPanelOpen,
+    isRightPanelOpen,
     pages,
+    toggleLeftPanel,
+    toggleRightPanel,
     withoutDirtying,
 });
 
 const onEscape = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && inspecting.value) {
+    if (event.key !== 'Escape') return;
+
+    if (isLeftPanelOpen.value || isRightPanelOpen.value) {
+        isLeftPanelOpen.value = false;
+        isRightPanelOpen.value = false;
+        return;
+    }
+
+    if (inspecting.value) {
         clearInspector();
     }
 };
@@ -328,12 +346,12 @@ onUnmounted(() => {
 
     <Button
         class="min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above) sm:-translate-x-3 md:-translate-x-9 col-start-1 row-start-1"
-        popovertarget="popover-left-panel"
         :text="__('Form Builder')"
         icon="bar-sidebar-left-panel-open"
+        @click="toggleLeftPanel"
     />
 
-    <LayoutPanel side="left">
+    <LayoutPanel side="left" :mobile-open="isLeftPanelOpen">
         <FieldtypeSelector />
     </LayoutPanel>
 
@@ -374,12 +392,12 @@ onUnmounted(() => {
     <Button
         v-if="inspectorType"
         class="min-[1000px]:hidden sticky top-3 mt-3 z-(--z-index-above) sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
-        popovertarget="popover-right-panel"
         :text="__('Settings')"
         icon="cog"
+        @click="toggleRightPanel"
     />
 
-    <LayoutPanel side="right">
+    <LayoutPanel side="right" :mobile-open="isRightPanelOpen">
         <ActionInspector v-if="inspectorType === InspectorType.Action" />
         <PageInspector v-if="inspectorType === InspectorType.Page" />
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
@@ -388,4 +406,10 @@ onUnmounted(() => {
         <LinkFieldsInspector v-if="inspectorType === InspectorType.LinkFields" />
         <FieldsetInspector v-if="inspectorType === InspectorType.FieldsetImport" />
     </LayoutPanel>
+
+    <div
+        class="mobile-panel-backdrop"
+        :data-visible="isLeftPanelOpen || isRightPanelOpen"
+        @click="isLeftPanelOpen = false; isRightPanelOpen = false"
+    />
 </template>
