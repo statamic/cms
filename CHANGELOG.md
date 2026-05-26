@@ -1,5 +1,49 @@
 # Release Notes
 
+## 6.20.0 (2026-05-22)
+
+### What's new
+- Date picker today shortcut [#14651](https://github.com/statamic/cms/issues/14651) by @jaygeorge
+- When enabling Pro, prompts for license key [#14686](https://github.com/statamic/cms/issues/14686) by @jackmcdade
+- Include `is_pdf` in augmented asset data [#14699](https://github.com/statamic/cms/issues/14699) by @jacksleight
+
+### What's fixed
+- Make active nav anchor position more accurate [#14675](https://github.com/statamic/cms/issues/14675) by @jaygeorge
+- Don't show unsaved changes warning when switching tabs [#14678](https://github.com/statamic/cms/issues/14678) by @jasonvarga
+- Better collapsible sections [#14679](https://github.com/statamic/cms/issues/14679) by @jaygeorge
+- Swap image dimensions when EXIF orientation indicates a 90° rotation [#14685](https://github.com/statamic/cms/issues/14685) by @jasonvarga
+- Hook up "Add Row" config for List fields [#14689](https://github.com/statamic/cms/issues/14689) by @jackmcdade
+- Harden `DataCollection` sort value resolution [#14693](https://github.com/statamic/cms/issues/14693) by @duncanmcclean
+- Fix token path traversal [#14700](https://github.com/statamic/cms/issues/14700) by @duncanmcclean
+- Authorize relationship fieldtype data [#14718](https://github.com/statamic/cms/issues/14718) by @jasonvarga
+- Relationship UI adjustments [#14719](https://github.com/statamic/cms/issues/14719) by @jasonvarga
+- Update Italian translations [#14683](https://github.com/statamic/cms/issues/14683) by @sbellesis
+- French translations [#14680](https://github.com/statamic/cms/issues/14680) by @ebeauchamps
+- Bump shivammathur/setup-php from 2.37.0 to 2.37.1 in the github-actions group [#14682](https://github.com/statamic/cms/issues/14682) by @dependabot
+
+
+
+## 6.19.0 (2026-05-13)
+
+### What's new
+- Show crop dimensions in the crop editor [#14654](https://github.com/statamic/cms/issues/14654) by @jasonvarga
+- Add configurable `@blueprint` template base path [#11632](https://github.com/statamic/cms/issues/11632) by @o1y
+- Add Blade field templates for `statamic-forms` publish command [#14639](https://github.com/statamic/cms/issues/14639) by @martyf
+
+### What's fixed
+- Fix layout shift in Entries Fieldtype mode switcher [#14646](https://github.com/statamic/cms/issues/14646) by @jackmcdade
+- Fix `/index.php` request poisoning `Site::absoluteUrl` [#14647](https://github.com/statamic/cms/issues/14647) by @jasonvarga
+- Remove `overscroll-behavior-x: contain` on panels [#14642](https://github.com/statamic/cms/issues/14642) by @jaygeorge
+- Fix `nav:breadcrumbs` for multi-site [#13789](https://github.com/statamic/cms/issues/13789) by @nopticon
+- Fix date time overflow [#14652](https://github.com/statamic/cms/issues/14652) by @jaygeorge
+- Fix scrollbars showing all the time on the calendar view [#14653](https://github.com/statamic/cms/issues/14653) by @jaygeorge
+- Fix grid header overlapping nav [#14640](https://github.com/statamic/cms/issues/14640) by @wiktorm12
+- Collapse equal range endpoints in NumberFormatter [#14657](https://github.com/statamic/cms/issues/14657) by @jasonvarga
+- Don't show Visit URL for terms that aren't routable [#14658](https://github.com/statamic/cms/issues/14658) by @edalzell
+- Cap CP `perPage` query parameter to configured ceiling [#14668](https://github.com/statamic/cms/issues/14668) by @jasonvarga
+
+
+
 ## 6.18.1 (2026-05-11)
 
 ### What's fixed

@@ -1,21 +1,28 @@
 name: Create Release
 
-on:
+on: # zizmor: ignore[concurrency-limits]
   push:
     tags:
       - 'v*'
 
+permissions: {}
+
 jobs:
-  build:
+  build: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create GitHub release and upload assets
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Use Node.js 20.19.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 20.19.0
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm ci
@@ -25,62 +32,27 @@ jobs:
 
       - name: Get Changelog
         id: changelog
-        uses: statamic/changelog-action@v1
+        uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1
         with:
           version: ${{ github.ref }}
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.changelog.outputs.version }}
-          release_name: ${{ steps.changelog.outputs.version }}
-          body: ${{ steps.changelog.outputs.text }}
-          prerelease: false
-
-      - name: Upload dist zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist.tar.gz
-          asset_name: dist.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-dev zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-dev.tar.gz
-          asset_name: dist-dev.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-frontend zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-frontend.tar.gz
-          asset_name: dist-frontend.tar.gz
-          asset_content_type: application/tar+gz
-
-      - name: Upload dist-package zip to release
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resources/dist-package.tar.gz
-          asset_name: dist-package.tar.gz
-          asset_content_type: application/tar+gz
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.changelog.outputs.version }}
+          RELEASE_NOTES: ${{ steps.changelog.outputs.text }}
+        run: |
+          gh release create "$RELEASE_VERSION" \
+            --title "$RELEASE_VERSION" \
+            --notes "$RELEASE_NOTES" \
+            ./resources/dist.tar.gz \
+            ./resources/dist-dev.tar.gz \
+            ./resources/dist-frontend.tar.gz \
+            ./resources/dist-package.tar.gz
 
       - name: Deploy Storybook to Forge
         continue-on-error: true
+        env:
+          FORGE_STORYBOOK_WEBHOOK: ${{ secrets.FORGE_STORYBOOK_WEBHOOK }}
         run: |
-          curl -X POST "${{ secrets.FORGE_STORYBOOK_WEBHOOK }}"
+          curl -X POST "$FORGE_STORYBOOK_WEBHOOK"
