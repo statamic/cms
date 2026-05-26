@@ -7,7 +7,7 @@ const SORT_CONTAINER_SELECTOR = '.field-sort-container';
  * Handles dragging fieldtypes from the source panel onto drop zones.
  * Should be used once at the Builder level.
  */
-export function useFieldtypeDraggable({ pages, onDrop }) {
+export function useFieldtypeDraggable({ pages, onDragStart, onDrop }) {
     let draggable = null;
     let lastClientY = 0;
 
@@ -30,11 +30,15 @@ export function useFieldtypeDraggable({ pages, onDrop }) {
 
         draggable = new Draggable(containers, {
             draggable: '.fieldtype-draggable',
-            distance: 5,
+            delay: { mouse: 0, touch: 150 },
+            distance: 0,
             mirror: { constrainDimensions: true, appendTo: 'body' },
         });
 
-        draggable.on('drag:start', () => dropTarget.reset());
+        draggable.on('drag:start', () => {
+            dropTarget.reset();
+            onDragStart?.();
+        });
 
         draggable.on('mirror:created', (event) => {
             const width = `${event.source.offsetWidth}px`;

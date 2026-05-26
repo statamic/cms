@@ -246,6 +246,7 @@ const onFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fie
 
 useFieldtypeDraggable({
     pages,
+    onDragStart: () => isLeftPanelOpen.value = false,
     onDrop: onFieldtypeDrop,
 });
 
