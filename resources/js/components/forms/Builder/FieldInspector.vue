@@ -190,7 +190,7 @@ onMounted(() => load());
                             ref="container"
                             :blueprint="adjustedBlueprint"
                             :meta
-                            :errors="errors"
+                            :errors
                             v-model="values"
                             v-model:modified-fields="modifiedFields"
                             :origin-values
@@ -281,7 +281,7 @@ onMounted(() => load());
                             ref="container"
                             :blueprint="adjustedBlueprint"
                             :meta
-                            :errors="errors"
+                            :errors
                             v-model="values"
                             v-model:modified-fields="modifiedFields"
                             :origin-values
