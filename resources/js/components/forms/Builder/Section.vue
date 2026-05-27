@@ -224,6 +224,7 @@ const deleteSection = () => emit('deleted', props.section._id);
 .publish-section-collapsible--expanded .publish-section-collapsible__inner {
     animation: calc(var(--speed) * 2) var(--timing) section-fade-in both;
     overflow: clip;
+    overflow-clip-margin: 4px;
 }
 
 .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
