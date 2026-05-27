@@ -98,7 +98,15 @@ onMounted(() => {
             >
                 <template v-if="section.fields.length && sectionIndex === (sections.length - 1)" #footer>
                     <div :id="`actions-${page._id}`" class="mt-8">
-                        <div class="cursor-pointer" @click.prevent="inspectAction">
+                        <div class="cursor-pointer flex gap-2.5" @click.prevent="inspectAction">
+                            <Button
+                                variant="filled"
+                                icon="chevron-left"
+                                :data-editing-field="isInspectingAction ? '' : undefined"
+                                :data-editing-item="isInspectingAction ? '' : undefined"
+                                class="ps-3"
+                                :text="__('Back to Quiz')"
+                            />
                             <Button
                                 variant="primary"
                                 :data-editing-field="isInspectingAction ? '' : undefined"
