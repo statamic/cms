@@ -6,7 +6,7 @@ import { useSortable } from './use-drag-and-drop';
 import Section from './Section.vue';
 import { __ } from '@/bootstrap/globals';
 
-const { addSection, dirty, formsProInstalled, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
+const { addSection, clearInspector, dirty, formsProInstalled, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
@@ -51,6 +51,7 @@ useSortable({
 onMounted(() => {
     if (sections.value.length === 0) {
         addSection(props.page._id, 0);
+        clearInspector();
     }
 });
 </script>
