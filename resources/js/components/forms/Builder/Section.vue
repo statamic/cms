@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button, Card, Heading, Panel, PanelHeader, PublishContainer } from '@ui';
-import { computed } from 'vue';
+import { Button, Card, ConfirmationModal, Heading, Panel, PanelHeader, PublishContainer } from '@ui';
+import { computed, ref } from 'vue';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import ImportField from './ImportField.vue';
 import RegularFormField from './RegularFormField.vue';
@@ -86,6 +86,9 @@ const removeField = (field) => {
 };
 
 const editSection = () => inspect(InspectorType.Section, props.section);
+
+const confirmingDelete = ref(false);
+const confirmDelete = () => confirmingDelete.value = true;
 const deleteSection = () => emit('deleted', props.section._id);
 </script>
 
@@ -112,7 +115,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                     icon="trash"
                     size="sm"
                     variant="ghost"
-                    @click.stop="deleteSection"
+                    @click.stop="confirmDelete"
                 />
                 <Button
                     class="[&_svg]:size-3.5 rounded-xl after:content-[''] after:absolute after:inset-0"
@@ -195,6 +198,15 @@ const deleteSection = () => emit('deleted', props.section._id);
             </Card>
             </div>
         </div>
+
+        <ConfirmationModal
+            v-model:open="confirmingDelete"
+            :title="__('Delete Section')"
+            :body-text="__('Are you sure you want to delete this section? All fields in this section will also be deleted.')"
+            :button-text="__('Delete')"
+            danger
+            @confirm="deleteSection"
+        />
     </Panel>
 </template>
 

@@ -29,6 +29,7 @@ const placeholderTitle = computed(() => {
 
 const sectionDeleted = (sectionId) => {
     dirty();
+    clearInspector();
     props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
 };
 
