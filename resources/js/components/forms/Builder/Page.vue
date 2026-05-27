@@ -100,12 +100,13 @@ onMounted(() => {
                     <div :id="`actions-${page._id}`" class="mt-8">
                         <div class="cursor-pointer flex gap-2.5" @click.prevent="inspectAction">
                             <Button
+                                v-if="page.previous_page_label"
                                 variant="filled"
                                 icon="chevron-left"
                                 :data-editing-field="isInspectingAction ? '' : undefined"
                                 :data-editing-item="isInspectingAction ? '' : undefined"
                                 class="ps-3"
-                                :text="__('Back to Quiz')"
+                                :text="__(page.previous_page_label)"
                             />
                             <Button
                                 variant="primary"
