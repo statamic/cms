@@ -343,20 +343,21 @@ main.nav-closed {
         left: 0;
         width: max(11rem, 33.33%);
         transform: translateX(-100%);
-        @apply border-r border-gray-200 dark:border-gray-700 shadow-2xl;
+        @apply border-r border-gray-200 dark:border-gray-700;
     }
 
     #right-panel {
         right: 0;
         width: max(18rem, 33.33%);
         transform: translateX(100%);
-        @apply border-l border-gray-200 dark:border-gray-700 shadow-2xl;
+        @apply border-l border-gray-200 dark:border-gray-700;
     }
 
     /* Slide in when open */
     #left-panel:has([data-mobile-open="true"]),
     #right-panel:has([data-mobile-open="true"]) {
         transform: translateX(0);
+        @apply shadow-2xl;
     }
 }
 
