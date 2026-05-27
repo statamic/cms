@@ -97,7 +97,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
         <div class="fieldtype-source-container px-0.5 pt-6">
             <Input icon="magnifying-glass" :legible-text="false" input-class="rounded-xl" :placeholder="__('Search Field Types...')" v-model="search" />
 
-            <ul class="py-10 pb-40 grid gap-8 @container">
+            <ul class="py-10 max-[1000px]:pb-20 grid gap-8 @container">
                 <li
                     v-for="group in displayedFieldtypes"
                     :key="group.handle"
