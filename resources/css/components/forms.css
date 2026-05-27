@@ -17,17 +17,10 @@
         &::before {
             content: '';
             position: absolute;
-            inset: -0.5rem calc(-1rem - 2px) -1rem;
+            inset: -0.5rem calc(-1rem - 2px) -1.1rem;
             border: 1px dashed var(--color-blue-400);
             border-radius: 10px;
             @apply bg-blue-50;
-        }
-        /* Adjust for the first and last field in a section because of the surrounding block padding */
-        &:first-child::before {
-            inset-block-start: -1.25rem;
-        }
-        &:last-child::before {
-            inset-block-end: -1.25rem;
         }
     }
     /* Editing a button like "Next page" and "Submit" */
