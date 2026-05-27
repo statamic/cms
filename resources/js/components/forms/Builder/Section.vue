@@ -74,8 +74,7 @@ const duplicateField = (field) => {
     dirty();
     inspectField(newField);
 
-    // TODO: Refactor to document.getElementById() when mobile/desktop variants are merged.
-    setTimeout(() => document.querySelectorAll('[id="field_display"]')[1]?.select(), 250);
+    setTimeout(() => document.getElementById('field_display')?.select(), 250);
 };
 
 const removeField = (field) => {
