@@ -94,7 +94,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
         style="--graph-paper-y-offset: 9rem;"
         class="bg-graph-paper [&_button]:w-full [&_button>div]:truncate [&_button>div]:block [&_button]:rounded-xl [&_button]:font-normal [&_button]:justify-start [&_button]:h-9 [&_button_svg]:size-3.5"
     >
-        <div class="fieldtype-source-container px-0.5 pt-6">
+        <div class="fieldtype-source-container px-0.5 max-sm:ps-2 pt-6">
             <Input icon="magnifying-glass" :legible-text="false" input-class="rounded-xl" :placeholder="__('Search Field Types...')" v-model="search" />
 
             <ul class="py-10 max-[1000px]:pb-20 grid gap-8 @container">

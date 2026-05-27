@@ -91,7 +91,7 @@ onUnmounted(() => {
             id="left-panel"
             tabindex="-1"
             style="order: -1"
-            class="sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full min-[1000px]:grid mx-auto focus:outline-none max-sm:ps-2 pe-2"
+            class="sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full min-[1000px]:grid mx-auto focus:outline-none pe-2"
         ></div>
     </Teleport>
 
@@ -103,7 +103,7 @@ onUnmounted(() => {
             id="right-panel"
             tabindex="-1"
             style="order: 2"
-            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-mr-2 min-[1000px]:grid mx-auto focus:outline-none max-sm:ps-2 ps-2"
+            class="sticky top-0 overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-mr-2 min-[1000px]:grid mx-auto focus:outline-none ps-2"
         ></div>
     </Teleport>
 

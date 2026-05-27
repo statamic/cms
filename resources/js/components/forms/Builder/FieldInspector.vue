@@ -185,7 +185,7 @@ onMounted(() => load());
 </script>
 
 <template>
-    <div class="@container relative pt-6 pb-40 min-[1000px]:pb-12 px-2.5 min-[1000px]:pe-4.5">
+    <div class="@container relative pt-6 pb-40 max-[1000px]:pb-12 px-2.5 pe-4.5">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <Icon name="loading" />
         </div>

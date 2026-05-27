@@ -24,7 +24,7 @@ watch(() => page.value.previous_page_label, dirty);
 </script>
 
 <template>
-    <div class="@container relative pt-6 pb-40 min-[1000px]:pb-12 px-2.5 min-[1000px]:pe-4.5">
+    <div class="@container relative pt-6 pb-40 max-[1000px]:pb-12 px-2.5 pe-4.5">
         <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">
             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                 <TabTrigger :name="ActionInspectorTabs.Settings" :text="__('Settings')" />
