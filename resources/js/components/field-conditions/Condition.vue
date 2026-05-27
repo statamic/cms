@@ -1,210 +1,138 @@
+<script setup>
+import { Combobox, Input, Switch } from '@ui';
+import { computed } from 'vue';
+import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+
+const emit = defineEmits(['update:condition']);
+
+const props = defineProps({
+    condition: Object,
+    conditions: Array,
+    suggestableFields: Array,
+    excludeHandle: String,
+    size: String,
+});
+
+const operatorOptions = [
+    { label: __('Equals'), value: 'equals' },
+    { label: __('Does not equal'), value: 'not' },
+    { label: __('Contains'), value: 'contains' },
+    { label: __('Contains Any'), value: 'contains_any' },
+    { label: '===', value: '===' },
+    { label: '!==', value: '!==' },
+    { label: '>', value: '>' },
+    { label: '>=', value: '>=' },
+    { label: '<', value: '<' },
+    { label: '<=', value: '<=' },
+    { label: __('Custom'), value: 'custom' },
+];
+
+const selectedField = computed(() => props.suggestableFields.find((field) => field.handle === props.condition.field));
+
+const fieldOptions = computed(() => {
+    const conditionFields = props.conditions.map((condition) => condition.field);
+
+    return props.suggestableFields
+        .filter((field) => {
+            return !(
+                field.handle === props.excludeHandle ||
+                props.condition.field === field.handle ||
+                conditionFields.includes(field.handle)
+            );
+        })
+        .map((field) => {
+            let display = field.config.display;
+
+            if (!display) {
+                display = field.handle.replace(/_/g, ' ').replace(/(?:^|\s)\S/g, function (a) {
+                    return a.toUpperCase();
+                });
+            }
+
+            return { value: field.handle, label: display };
+        });
+});
+
+const isToggleField = computed(() => selectedField.value && ['toggle', 'revealer', 'yes_no'].includes(selectedField.value.config.type));
+const showValueToggle = computed(() => isToggleField.value && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
+
+const showValueDropdown = computed(() => {
+    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice'];
+    return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
+});
+
+const valueOptions = computed(() => {
+    if (!showValueDropdown.value || !selectedField.value?.config.options) return null;
+    return HasInputOptions.methods.normalizeInputOptions(selectedField.value.config.options);
+});
+
+const onFieldBlur = (search) => search ? update('field', search) : null;
+const onValueBlur = (value) => value ? update('value', value) : null;
+const onValueToggle = (checked) => update('value', checked.toString());
+
+const update = (key, value) => emit('update:condition', { ...props.condition, [key]: value });
+</script>
+
 <template>
-    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-gray-900">
-        <Description v-if="index === 0" class="w-full mb-4" :text="__('messages.field_conditions_field_instructions')" />
-
-        <div class="mb-2 w-full md:mb-0 md:w-1/3">
-            <Combobox
-                ref="fieldSelect"
-                :model-value="condition.field"
-                :options="fieldOptions"
-                :placeholder="__('Field')"
-                :taggable="true"
-                @update:modelValue="fieldSelected"
-                search:blur="fieldSelectBlur"
-            >
-                <template #no-options><div class="hidden" /></template>
-                <template #option="option">
-                    <div class="flex items-center">
-                        <span class="flex-shrink-0 truncate" v-text="option.label" />
-                        <span
-                            v-text="option.value"
-                            class="font-mono text-2xs text-gray-500 dark:text-gray-300 truncate"
-                            :class="{ 'ml-2': option.label }"
-                        />
-                    </div>
-                </template>
-                <template #selected-option="{ option }">
-                    <div class="truncate" v-text="__(field?.config.display) || option.value" />
-                </template>
-            </Combobox>
-        </div>
-
-        <div class="w-auto min-w-40">
-            <Select
-                class="w-full"
-                :model-value="condition.operator"
-                :options="operatorOptions"
-                @update:model-value="operatorSelected"
-            />
-        </div>
-
+    <li>
+        <Combobox
+            :model-value="condition.field"
+            :options="fieldOptions"
+            option-label="label"
+            option-value="value"
+            :placeholder="__('Field')"
+            :size
+            searchable
+            adaptive-width
+            taggable
+            @update:model-value="update('field', $event)"
+            @search:blur="onFieldBlur"
+        >
+            <template v-if="$slots['field-option']" #option="optionProps">
+                <slot name="field-option" v-bind="optionProps" />
+            </template>
+            <template v-if="$slots['field-selected']" #selected-option="{ option }">
+                <slot name="field-selected" :option="option" :field="selectedField" />
+            </template>
+        </Combobox>
+    </li>
+    <li>
+        <Combobox
+            :model-value="condition.operator"
+            :options="operatorOptions"
+            option-label="label"
+            option-value="value"
+            :placeholder="__('Operator')"
+            :searchable="false"
+            :size
+            adaptive-width
+            @update:model-value="update('operator', $event)"
+        />
+    </li>
+    <li>
         <Switch
             v-if="showValueToggle"
             :model-value="condition.value === 'true'"
-            @update:model-value="valueUpdated"
+            @update:model-value="onValueToggle"
         />
-
         <Combobox
             v-else-if="showValueDropdown"
-            ref="valueSelect"
             :model-value="condition.value"
-            class="mb-2 w-full md:mb-0 md:w-52"
             :options="valueOptions"
-            :placeholder="__('Option')"
-            :taggable="false"
-            @update:model-value="valueUpdated"
-            search:blur="valueSelectBlur"
-        >
-            <template #no-options><div class="hidden" /></template>
-        </Combobox>
-
+            option-label="label"
+            option-value="value"
+            :placeholder="__('Value')"
+            :size
+            searchable
+            @update:model-value="update('value', $event)"
+            @search:blur="onValueBlur"
+        />
         <Input
             v-else
-            class="flex-1"
             :model-value="condition.value"
-            @update:model-value="valueUpdated"
+            :placeholder="__('Value')"
+            :size
+            @update:model-value="update('value', $event)"
         />
-
-        <Button variant="ghost" size="sm" icon="trash" @click="remove" />
-    </div>
+    </li>
 </template>
-
-<script>
-import HasInputOptions from '../fieldtypes/HasInputOptions.js';
-import { Description, Combobox, Input, Button } from '@/components/ui';
-import { Select, Switch } from '@ui';
-
-export default {
-    mixins: [HasInputOptions],
-
-    components: { Description, Combobox, Input, Button, Select, Switch },
-
-    props: {
-        config: {
-            type: Object,
-            required: true,
-        },
-        condition: {
-            type: Object,
-            required: true,
-        },
-        conditions: {
-            type: Array,
-            required: true,
-        },
-        index: {
-            type: Number,
-            required: true,
-        },
-        suggestableFields: {
-            type: Array,
-            required: true,
-        },
-    },
-
-    computed: {
-        field() {
-            return this.suggestableFields.find((field) => field.handle === this.condition.field);
-        },
-
-        showValueToggle() {
-            return (
-                this.field &&
-                ['toggle', 'revealer'].includes(this.field.config.type) &&
-                ['equals', 'not', '===', '!=='].includes(this.condition.operator)
-            );
-        },
-
-        showValueDropdown() {
-            return (
-                this.field &&
-                ['button_group', 'checkboxes', 'radio', 'select'].includes(this.field.config.type) &&
-                ['equals', 'not', '===', '!=='].includes(this.condition.operator)
-            );
-        },
-
-        valueOptions() {
-            if (!this.showValueDropdown) return;
-
-            return this.normalizeInputOptions(this.field.config.options);
-        },
-
-        fieldOptions() {
-            const conditions = this.conditions.map((condition) => condition.field);
-
-            return this.suggestableFields
-                .filter((field) => {
-                    return !(
-                        field.handle === this.config.handle || // Exclude the field you're adding a condition to.
-                        this.condition.field === field.handle || // Exclude the field being used in the current condition.
-                        conditions.includes(field.handle)
-                    ); // Exclude fields already used in other conditions.
-                })
-                .map((field) => {
-                    let display = field.config.display;
-
-                    if (!display) {
-                        display = field.handle.replace(/_/g, ' ').replace(/(?:^|\s)\S/g, function (a) {
-                            return a.toUpperCase();
-                        });
-                    }
-
-                    return { value: field.handle, label: display };
-                });
-        },
-
-        operatorOptions() {
-            return this.normalizeInputOptions({
-                equals: __('Equals'),
-                not: __('Not'),
-                contains: __('Contains'),
-                contains_any: __('Contains Any'),
-                '===': '===',
-                '!==': '!==',
-                '>': '>',
-                '>=': '>=',
-                '<': '<',
-                '<=': '<=',
-                custom: __('Custom'),
-            });
-        },
-    },
-
-    methods: {
-        fieldSelected(field) {
-            this.$emit('updated', {
-                ...this.condition,
-                field: field,
-            });
-        },
-
-        fieldSelectBlur() {
-            const value = this.$refs.fieldSelect.$refs.search.value;
-            if (value) this.fieldUpdated(value);
-        },
-
-        operatorSelected(operator) {
-            this.$emit('updated', {
-                ...this.condition,
-                operator: operator,
-            });
-        },
-
-        valueUpdated(value) {
-            this.$emit('updated', {
-                ...this.condition,
-                value: value.toString(),
-            });
-        },
-
-        valueSelectBlur() {
-            const value = this.$refs.valueSelect.$refs.search.value;
-            if (value) this.valueUpdated(value);
-        },
-
-        remove() {
-            this.$emit('removed');
-        },
-    },
-};
-</script>

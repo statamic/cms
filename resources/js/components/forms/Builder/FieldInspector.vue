@@ -4,12 +4,13 @@ import { computed, onMounted, ref, watch } from 'vue';
 import axios from 'axios';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
-import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
+import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
+import { categories, categoryColorClasses } from './categories';
 import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { dirty, errors: contextErrors, form, inspecting: field, withoutDirtying } = injectBuilderContext();
+const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};
@@ -131,6 +132,38 @@ const updatePreview = debounce(() => {
         });
 }, 500);
 
+const suggestableConditionFields = computed(() => {
+    return pages.value
+        .flatMap((page) => page.sections)
+        .flatMap((section) => section.fields)
+        .filter((f) => f._id !== field.value._id)
+        .map((f) => ({
+            handle: f.handle,
+            config: {
+                ...f.config,
+                type: f.fieldtype,
+            },
+            icon: f.icon,
+        }));
+});
+
+const getFieldtypeCategory = (fieldtypeHandle: string) => {
+    const fieldtype = fieldtypes?.find((field) => field.handle === fieldtypeHandle);
+    const categoryKey = fieldtype?.categories?.[0] || 'other';
+    return categories[categoryKey] ?? categories.other;
+};
+
+const fieldIconClasses = (fieldtypeHandle: string) => `size-4 shrink-0 ${categoryColorClasses[getFieldtypeCategory(fieldtypeHandle)?.color]?.icon}`;
+const findSuggestableField = (handle: string) => suggestableConditionFields.value.find((f) => f.handle === handle);
+
+const updateFieldConditions = (conditions: Record<string, any>) => {
+    const keysToRemove = ['if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'];
+    keysToRemove.forEach((key) => delete field.value.config[key]);
+
+    Object.assign(field.value.config, conditions);
+    dirty();
+};
+
 watch(field, () => {
     updatePreview.cancel();
     loading.value = !cache.has(field.value._id);
@@ -212,10 +245,34 @@ onMounted(() => load());
                         </a>
                     </div>
 
-                    <div class="space-y-4">
-                        <LogicFlowMock :use-when-selector="true" />
-                        <Button size="sm" variant="subtle" class="ms-4 bg-transparent!" :text="__('+ Add Condition')" />
-                    </div>
+                    <FieldConditionsBuilder
+                        :config="field.config"
+                        :suggestable-fields="suggestableConditionFields"
+                        :allow-custom-conditions="false"
+                        size="sm"
+                        @updated="updateFieldConditions"
+                    >
+                        <template #field-option="{ value, label }">
+                            <span class="inline-flex items-center gap-2">
+                                <Icon
+                                    v-if="findSuggestableField(value)?.icon"
+                                    :name="findSuggestableField(value).icon"
+                                    :class="fieldIconClasses(findSuggestableField(value).config.type)"
+                                />
+                                <span class="truncate">{{ __(label) }}</span>
+                            </span>
+                        </template>
+                        <template #field-selected="{ option, field: selectedField }">
+                            <span class="inline-flex items-center gap-2">
+                                <Icon
+                                    v-if="selectedField?.icon"
+                                    :name="selectedField.icon"
+                                    :class="fieldIconClasses(selectedField.config.type)"
+                                />
+                                <span class="truncate">{{ __(findSuggestableField(option.value).config.display ?? option.value) }}</span>
+                            </span>
+                        </template>
+                    </FieldConditionsBuilder>
                 </div>
             </TabContent>
 

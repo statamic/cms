@@ -12,7 +12,7 @@ import {
     ComboboxVirtualizer,
     FocusScope
 } from 'reka-ui';
-import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
 import Button from '../Button/Button.vue';
 import Icon from '../Icon/Icon.vue';
@@ -74,6 +74,7 @@ defineOptions({
 });
 
 const attrs = useAttrs();
+const slots = useSlots();
 
 const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class));
 const wrapperAttrs = computed(() => {
@@ -208,7 +209,12 @@ const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelec
 
 const shouldShowInput = computed(() => {
     if (!props.searchable) return false;
-    if (props.taggable) return true;
+
+    // When taggable, we always want to show the input unless the `selected-option`
+    // slot is provided, in which case we only want to show the input when the dropdown is open.
+    if (props.taggable) {
+        return !!slots['selected-option'] ? dropdownOpen.value : true;
+    }
 
     return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
 });
