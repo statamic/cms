@@ -79,10 +79,9 @@ const duplicateField = (field) => {
 };
 
 const removeField = (field) => {
-    props.section.fields.splice(props.section.fields.indexOf(field), 1);
-
     dirty();
     clearInspector();
+    props.section.fields.splice(props.section.fields.indexOf(field), 1);
 };
 
 const editSection = () => inspect(InspectorType.Section, props.section);
