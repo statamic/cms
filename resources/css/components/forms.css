@@ -22,6 +22,64 @@
             border-radius: 10px;
             @apply bg-blue-50;
         }
+        &:first-child::before {
+            inset-block-start: -1.25rem;
+        }
+        /* Adjustments for all width combinations where the second child ends up on the first row */
+        :is(
+          .field-w-25,
+          .field-w-33,
+          .field-w-50,
+          .field-w-66,
+          .field-w-75
+        ):first-child + &.field-w-25,
+
+        :is(
+          .field-w-25,
+          .field-w-33,
+          .field-w-50,
+          .field-w-66
+        ):first-child + &.field-w-33,
+
+        :is(
+          .field-w-25,
+          .field-w-33,
+          .field-w-50
+        ):first-child + &.field-w-50,
+
+        :is(
+          .field-w-25,
+          .field-w-33
+        ):first-child + &.field-w-66,
+
+        .field-w-25:first-child + &.field-w-75,
+
+        /* Adjustments for all width combinations where the third child ends up on the first row */
+        :is(
+          .field-w-25 + .field-w-25,
+          .field-w-25 + .field-w-33,
+          .field-w-25 + .field-w-50,
+          .field-w-33 + .field-w-25,
+          .field-w-33 + .field-w-33,
+          .field-w-50 + .field-w-25
+        ):nth-child(2) + &.field-w-25,
+
+        :is(
+          .field-w-25 + .field-w-25,
+          .field-w-25 + .field-w-33,
+          .field-w-33 + .field-w-25,
+          .field-w-33 + .field-w-33
+        ):nth-child(2) + &.field-w-33,
+
+        .field-w-25:nth-child(2) + .field-w-25 + &.field-w-50,
+
+        /* Adjustments for all width combinations where the fourth child ends up on the first row */
+        .field-w-25:first-child + .field-w-25 + .field-w-25 + &.field-w-25
+        {
+            &::before {
+                inset-block-start: -1.25rem;
+            }
+        }
     }
     /* Editing a button like "Next page" and "Submit" */
     :has(> button&) {
