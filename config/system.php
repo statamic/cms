@@ -286,4 +286,20 @@ return [
         //
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | File Uploads
+    |--------------------------------------------------------------------------
+    |
+    | Temporary file uploads from the Files fieldtype are stored here before
+    | being moved to their final destination. You may configure the disk and
+    | path to use a shared filesystem in multiserver environments.
+    |
+    */
+
+    'file_uploads' => [
+        'disk' => env('STATAMIC_FILE_UPLOADS_DISK', 'local'),
+        'path' => env('STATAMIC_FILE_UPLOADS_PATH', 'statamic/file-uploads'),
+    ],
+
 ];
