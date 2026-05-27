@@ -83,6 +83,32 @@
             }
         }
 
+
+        /* Where the 4th to last child ends up on the last row */
+        .field-w-25:nth-last-child(4)&:has(
+            + .field-w-25 + .field-w-25 + .field-w-25
+        ) {
+            &::before {
+                inset-block-end: -1.25rem;
+            }
+        }
+        /* Where the 3rd to last child ends up on the last row */
+        .field-w-25 + .field-w-25:nth-last-child(3)&:has(
+            + .field-w-25 + .field-w-25
+        ) {
+            &::before {
+                inset-block-end: -1.25rem;
+            }
+        }
+        /* Where the 2nd to last child ends up on the last row */
+        :is(.field-w-50, .field-w-25 + .field-w-25) + .field-w-25:nth-last-child(2)&:has(
+            + .field-w-25
+        ) {
+            &::before {
+                inset-block-end: -1.25rem;
+            }
+        }
+
         &:last-child::before {
             inset-block-end: -1.25rem;
         }
