@@ -39,6 +39,8 @@ import PageInspector from '@/components/forms/Builder/PageInspector.vue';
 import SectionInspector from '@/components/forms/Builder/SectionInspector.vue';
 import { useFieldtypeDraggable } from '@/components/forms/Builder/use-drag-and-drop';
 import { __, uniqid } from '@/bootstrap/globals';
+import { progress, keys } from '@api';
+import type Binding from '@/components/keys/Binding';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -57,6 +59,7 @@ const inspectorType = ref<InspectorType | null>(null);
 const fieldView = ref<FieldView>(FieldView.Expanded);
 const isLeftPanelOpen = ref<boolean>(false);
 const isRightPanelOpen = ref<boolean>(false);
+const saveBinding = ref<Binding>(null);
 
 const pages = computed(() => formFields.value.pages);
 const allSections = computed(() => pages.value.flatMap(page => page.sections));
@@ -322,16 +325,23 @@ const onEscape = (event: KeyboardEvent) => {
     }
 };
 
-watch(saving, (saving) => Statamic.$progress.loading('form-builder', saving));
+watch(saving, (saving) => progress.loading('form-builder', saving));
 
 onMounted(() => {
     if (formFields.value.pages.length === 0) addPage();
+
     document.addEventListener('keydown', onEscape);
+
+    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+        e.preventDefault();
+        save();
+    });
 });
 
 onUnmounted(() => {
     clearDirtyState();
     document.removeEventListener('keydown', onEscape);
+    saveBinding.value?.destroy();
 });
 </script>
 
@@ -403,9 +413,9 @@ onUnmounted(() => {
         <PageInspector v-if="inspectorType === InspectorType.Page" />
         <SectionInspector v-if="inspectorType === InspectorType.Section" />
         <FieldInspector v-if="inspectorType === InspectorType.Field" />
-        <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
         <LinkFieldsInspector v-if="inspectorType === InspectorType.LinkFields" />
         <FieldsetInspector v-if="inspectorType === InspectorType.FieldsetImport" />
+        <FieldtypeHint v-if="inspectorType === InspectorType.FieldtypeHint" />
     </LayoutPanel>
 
     <div
