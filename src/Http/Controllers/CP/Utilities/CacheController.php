@@ -12,6 +12,7 @@ use Statamic\Facades\StaticCache;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -75,11 +76,16 @@ class CacheController extends CpController
     protected function getStaticCacheStats()
     {
         $strategy = config('statamic.static_caching.strategy');
+        $cacher = StaticCache::driver();
+
+        $count = $cacher instanceof AbstractCacher
+            ? $cacher->getDomains()->sum(fn ($domain) => $cacher->getUrls($domain)->count())
+            : $cacher->getUrls()->count();
 
         return [
             'enabled' => (bool) $strategy,
             'strategy' => $strategy ?? __('Disabled'),
-            'count' => StaticCache::driver()->getUrls()->count(),
+            'count' => $count,
         ];
     }
 
