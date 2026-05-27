@@ -15,7 +15,9 @@ const props = defineProps<{
     canDeleteSection: boolean,
 }>();
 
-const { clearInspector, dirty, fieldtypes, fieldView, inspect, inspecting, inspectorType } = injectBuilderContext();
+const { clearInspector, dirty, fieldtypes, fieldView, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
+
+const isOnlySection = computed(() => pages.value.flatMap((page) => page.sections).length === 1);
 
 const inspectLinkFields = (field: any) => inspect(InspectorType.LinkFields, field);
 const isInspectingLinkFields = (field) => inspectorType.value === InspectorType.LinkFields && inspecting.value?._id === field._id;
@@ -134,7 +136,11 @@ const deleteSection = () => emit('deleted', props.section._id);
                     class="field-sort-container"
                     :data-sort-section="section._id"
                 >
-                    <div data-empty-section class="h-[670px] flex items-center justify-center rounded-lg border border-dashed border-zinc-300">
+                    <div
+                        data-empty-section
+                        class="flex items-center justify-center rounded-lg border border-dashed border-zinc-300"
+                        :class="{ 'h-[670px]': isOnlySection, 'h-[200px]': !isOnlySection }"
+                    >
                         <div>
                             <span class="text-zinc-500 mr-2">{{ __('Drag fields here to build your form or') }}</span>
                             <Button size="xs" pill icon="link" :text="__('Link Existing')" @click="addLinkFieldsPlaceholder" />
