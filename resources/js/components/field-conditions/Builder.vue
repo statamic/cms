@@ -222,12 +222,13 @@ onMounted(() => {
             />
         </div>
 
-        <Field
-            class="mt-6"
-            :label="__('Always Save')"
-            :instructions="__('messages.field_conditions_always_save_instructions')"
-        >
-            <Switch v-model="alwaysSave" />
-        </Field>
+        <div class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
+            <Field
+                :label="__('Always Save')"
+                :instructions="__('messages.field_conditions_always_save_instructions')"
+            >
+                <Switch v-model="alwaysSave" />
+            </Field>
+        </div>
     </div>
 </template>
