@@ -101,6 +101,14 @@ const hasErrors = computed(() => {
             <template #label>
                 <Label :class="{ 'cursor-pointer': !isInspecting }">
                     <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <Icon
+                            v-if="field.config.if || field.config.unless"
+                            data-logic-attached
+                            name="logic-tree"
+                            class="size-3.5! text-gray-400 dark:text-gray-500 me-0.5"
+                            :aria-label="__('Logic attached')"
+                            v-tooltip="__('Logic attached')"
+                        />
                         <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', iconColorClass]" aria-hidden="true" />
                         <span>
                             {{ __(field.config.display) }}
@@ -111,19 +119,6 @@ const hasErrors = computed(() => {
                     </span>
                 </Label>
             </template>
-            <!-- Keep logic icon farther left for full-width fields, but pull it closer on narrower/non-editing cards to avoid clashing with surrounding fields. -->
-            <span
-                v-if="field.config.if || field.config.unless"
-                class="absolute z-(&#45;&#45;z-index-above) top-1 max-sm:-right-2"
-                :class="
-                    (field.config.width || 100) === 100
-                        ? 'sm:-left-13'
-                        : (isInspecting ? 'sm:-left-12' : 'sm:-left-7')
-                "
-                v-tooltip="__('Logic attached')"
-            >
-                <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
-            </span>
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
