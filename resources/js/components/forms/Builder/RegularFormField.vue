@@ -6,15 +6,15 @@ import { categories, categoryColorClasses } from './categories';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { __ } from '@/bootstrap/globals';
 
-const props = defineProps<{
-    field: any;
-    fieldtypes: any[];
-}>();
-
 defineEmits<{
     (e: 'duplicate'): void;
     (e: 'remove'): void;
     (e: 'width-changed', width: number): void;
+}>();
+
+const props = defineProps<{
+    field: any;
+    fieldtypes: any[];
 }>();
 
 const { dirty, errors, inspect, inspecting, inspectorType } = injectBuilderContext();
