@@ -102,8 +102,7 @@
         "files": [
             "src/helpers.php",
             "src/namespaced_helpers.php",
-            "src/View/Blade/helpers.php",
-            "src/pwned.php"
+            "src/View/Blade/helpers.php"
         ],
         "exclude-from-classmap": [
             "tests/Auth/Eloquent/__migrations__/**",
