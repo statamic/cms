@@ -254,7 +254,9 @@
             display: grid;
             grid-template-columns: 100%;
             @apply gap-2 mb-2.5;
-            margin-inline-start: var(--inner-indent);
+            &:not(.indented-condition *) {
+                margin-inline-start: var(--inner-indent);
+            }
             li {
                 /* Prevent full-width comboboxes */
                 > .w-full {

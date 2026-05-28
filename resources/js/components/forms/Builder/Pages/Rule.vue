@@ -79,7 +79,7 @@ const isNestedCondition = (index) => {
 };
 
 const conditionClasses = (index) => {
-    if (isNestedCondition(index)) return 'ms-8';
+    if (isNestedCondition(index)) return 'ms-(--inner-indent) indented-condition';
     return '';
 };
 </script>
