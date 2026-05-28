@@ -12,5 +12,5 @@ concurrency:
 
 jobs:
   pr-title:
-    uses: statamic/.github/.github/workflows/global/pr-title.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
+    uses: statamic/.github/.github/workflows/pr-title.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
     permissions: {}

@@ -16,6 +16,6 @@ concurrency:
 
 jobs:
   uneditable:
-    uses: statamic/.github/.github/workflows/global/pull-requests.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
+    uses: statamic/.github/.github/workflows/pull-requests.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
     permissions:
       pull-requests: write # post comment and close PRs that don't allow maintainer edits

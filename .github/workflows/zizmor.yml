@@ -19,5 +19,5 @@ concurrency:
 
 jobs:
   zizmor:
-    uses: statamic/.github/.github/workflows/global/zizmor.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
+    uses: statamic/.github/.github/workflows/zizmor.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
     permissions: {}
