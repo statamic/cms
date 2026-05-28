@@ -118,7 +118,7 @@ const hasErrors = computed(() => {
                 :class="
                     (field.config.width || 100) === 100
                         ? 'sm:-left-13'
-                        : (isInspecting ? 'sm:-left-12' : 'sm:-left-8')
+                        : (isInspecting ? 'sm:-left-12' : 'sm:-left-7')
                 "
                 v-tooltip="__('Logic attached')"
             >
