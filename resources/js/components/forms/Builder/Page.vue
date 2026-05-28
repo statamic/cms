@@ -33,7 +33,7 @@ const sectionDeleted = (sectionId) => {
     props.page.sections = props.page.sections.filter(section => section._id !== sectionId);
 };
 
-const moveField = (fromSectionId, toSectionId, oldIndex, newIndex) => {
+const moveField = (fromSectionId: string, toSectionId: string, oldIndex: number, newIndex: number) => {
     const fromSection = sections.value.find((s) => s._id === fromSectionId);
     const toSection = sections.value.find((s) => s._id === toSectionId);
     if (!fromSection || !toSection) return;
