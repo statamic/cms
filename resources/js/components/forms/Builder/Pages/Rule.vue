@@ -71,13 +71,24 @@ const getFieldtypeCategory = (fieldtypeHandle) => {
 
 const fieldIconClasses = (fieldtypeHandle) => `size-4 shrink-0 ${categoryColorClasses[getFieldtypeCategory(fieldtypeHandle)?.color]?.icon || 'text-gray-600 dark:text-gray-400'}`;
 const findSuggestableField = (handle) => props.suggestableFields.find((f) => f.handle === handle);
+
+const isNestedCondition = (index) => {
+    if (index === 0) return false;
+    const condition = conditions.value[index];
+    return condition.join === 'and';
+};
+
+const conditionClasses = (index) => {
+    if (isNestedCondition(index)) return 'ms-8';
+    return '';
+};
 </script>
 
 <template>
     <div class="group/rule" data-logic-text>
         <div class="logic-text">
             <ol>
-                <li v-for="(condition, index) in conditions" :key="condition._id">
+                <li v-for="(condition, index) in conditions" :key="condition._id" :class="conditionClasses(index)">
                     <template v-if="index === 0">
                         <div class="flex items-center">
                             <div class="logic-text-badge logic-text__condition" aria-hidden="true">
