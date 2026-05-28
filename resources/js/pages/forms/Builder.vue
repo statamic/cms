@@ -99,17 +99,6 @@ const addPage = (atIndex: number | null = null, sections = []) => {
     return page;
 };
 
-const deletePage = (pageId: string) => {
-    if (pages.value.length <= 1) return;
-
-    const pageIndex = pages.value.findIndex((p) => p._id === pageId);
-    if (pageIndex === -1) return;
-
-    formFields.value.pages.splice(pageIndex, 1);
-    clearInspector();
-    dirty();
-};
-
 const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | null = null) => {
     const pageIndex = pages.value.findIndex(p => p._id === pageId);
     if (pageIndex === -1) return;
@@ -149,6 +138,17 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
     addPage(pageIndex + 1, sectionsForNewPage);
 };
 
+const deletePage = (pageId: string) => {
+    if (pages.value.length <= 1) return;
+
+    const pageIndex = pages.value.findIndex((p) => p._id === pageId);
+    if (pageIndex === -1) return;
+
+    formFields.value.pages.splice(pageIndex, 1);
+    clearInspector();
+    dirty();
+};
+
 const addSection = (pageId: string, atIndex: number, fields = []) => {
     const page = pages.value.find((p) => p._id === pageId);
     if (!page) return;
@@ -161,9 +161,7 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     };
 
     page.sections.splice(atIndex, 0, section);
-
     dirty();
-
     inspect(InspectorType.Section, section);
 
     return section;
@@ -213,13 +211,10 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     };
 
     section.fields.splice(atIndex, 0, field);
-
     inspect(InspectorType.Field, field);
-
     dirty();
 
-    // TODO: Refactor to document.getElementById() when mobile/desktop variants are merged.
-    setTimeout(() => document.querySelectorAll('[id="field_display"]')[1]?.select(), 250);
+    setTimeout(() => document.getElementById('field_display')?.select(), 250);
 };
 
 const onFieldtypeDrop = ({ pageId, fieldtypeHandle, sectionId, sectionIndex, fieldIndex }) => {
