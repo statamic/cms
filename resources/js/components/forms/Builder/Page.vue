@@ -90,7 +90,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="section-gap-drop-zone mx-auto max-w-5xl h-6 flex items-center" data-section-gap-index="0" />
+        <div class="section-gap-drop-zone mx-auto max-w-5xl h-6 flex items-center -mt-4" data-section-gap-index="0" />
 
         <template v-for="(section, sectionIndex) in sections" :key="section._id">
             <Section
