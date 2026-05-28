@@ -1,8 +1,5 @@
 name: Pull Requests
 
-# Credit: https://github.com/github/docs/blob/main/.github/workflows/notify-when-maintainers-cannot-edit.yaml
-#         https://github.com/laravel/.github/blob/main/.github/workflows/pull-requests.yml
-
 on:
   pull_request_target: # zizmor: ignore[dangerous-triggers]
     types:
