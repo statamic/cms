@@ -80,7 +80,7 @@ onMounted(() => {
                 <div
                     class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200 scroll-mt-[7rem]"
                     :data-editing-item="isInspectingPage ? '' : undefined"
-                    :class="isInspectingPage ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-700!' : ''"
+                    :class="isInspectingPage ? 'bg-blue-50 border-blue-400! dark:bg-blue-950 dark:border-blue-500/75!' : ''"
                 >
                     <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                     {{ page.display ? __(page.display) : placeholderTitle }}
