@@ -111,8 +111,18 @@ const hasErrors = computed(() => {
                     </span>
                 </Label>
             </template>
-            <span v-if="field.config.if || field.config.unless" class="absolute z-(&#45;&#45;z-index-above) top-1 max-sm:-right-2 sm:-left-14" v-tooltip="__('Logic attached')">
-                <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-600" aria-hidden="true" />
+            <!-- Keep logic icon farther left for full-width fields, but pull it closer on narrower/non-editing cards to avoid clashing with surrounding fields. -->
+            <span
+                v-if="field.config.if || field.config.unless"
+                class="absolute z-(&#45;&#45;z-index-above) top-1 max-sm:-right-2"
+                :class="
+                    (field.config.width || 100) === 100
+                        ? 'sm:-left-13'
+                        : (isInspecting ? 'sm:-left-12' : 'sm:-left-8')
+                "
+                v-tooltip="__('Logic attached')"
+            >
+                <Icon data-logic-attached name="logic-tree" class="size-3.5! text-gray-400 dark:text-gray-500" aria-hidden="true" />
             </span>
             <div v-if="field.preview" inert>
                 <component

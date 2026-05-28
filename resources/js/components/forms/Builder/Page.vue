@@ -75,7 +75,7 @@ onMounted(() => {
                 <div class="flex items-center gap-2 flex-1">
                     <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
 <!--                    <span v-tooltip="__('Logic attached')">-->
-<!--                        <Icon data-logic-attached name="logic-tree" class="size-3.5! shrink-0 text-gray-400 dark:text-gray-600" aria-hidden="true" />-->
+<!--                        <Icon data-logic-attached name="logic-tree" class="size-3.5! shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true" />-->
 <!--                    </span>-->
                 </div>
                 <div

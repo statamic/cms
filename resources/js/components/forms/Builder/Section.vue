@@ -236,7 +236,8 @@ const deleteSection = () => emit('deleted', props.section._id);
 .publish-section-collapsible--expanded .publish-section-collapsible__inner {
     animation: calc(var(--speed) * 2) var(--timing) section-fade-in both;
     overflow: clip;
-    overflow-clip-margin: 4px;
+    /* We need to increase the clip margin here vs regular collapsible sections because we have things appearing outside the section such as the logic indicator icon. */
+    overflow-clip-margin: 2.5rem;
 }
 
 .publish-section-collapsible--collapsed .publish-section-collapsible__inner {
