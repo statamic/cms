@@ -52,7 +52,7 @@ const hasErrors = computed(() => {
     >
         <div
             v-if="isInspecting"
-            class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center bg-blue-50 ps-3"
+            class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center bg-blue-50 dark:bg-blue-950 ps-3"
         >
             <WidthSelector
                 size="base"

@@ -22,6 +22,9 @@
             border-radius: 10px;
             @apply bg-blue-50;
         }
+        :where(.dark) &::before {
+            @apply bg-blue-950 border-blue-500/75;
+        }
         &:first-child::before {
             inset-block-start: -1.25rem;
         }
@@ -92,9 +95,6 @@
             border-radius: 10px;
             @apply bg-blue-50;
         }
-    }
-    :where(.dark) &::before {
-        @apply bg-blue-950/75 border-blue-500/75;
     }
 }
 
