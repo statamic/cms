@@ -19,6 +19,9 @@ const { clearInspector, dirty, fieldtypes, fieldView, inspect, inspecting, inspe
 
 const isOnlySection = computed(() => pages.value.flatMap((page) => page.sections).length === 1);
 
+const editSection = () => inspect(InspectorType.Section, props.section);
+const isInspecting = computed(() => inspectorType.value === InspectorType.Section && inspecting.value?._id === props.section._id);
+
 const inspectLinkFields = (field: any) => inspect(InspectorType.LinkFields, field);
 const isInspectingLinkFields = (field) => inspectorType.value === InspectorType.LinkFields && inspecting.value?._id === field._id;
 
@@ -85,8 +88,6 @@ const removeField = (field) => {
     props.section.fields.splice(props.section.fields.indexOf(field), 1);
 };
 
-const editSection = () => inspect(InspectorType.Section, props.section);
-
 const confirmingDelete = ref(false);
 const confirmDelete = () => confirmingDelete.value = true;
 const deleteSection = () => emit('deleted', props.section._id);
@@ -98,6 +99,7 @@ const deleteSection = () => emit('deleted', props.section._id);
         class="mx-auto max-w-5xl"
         :class="{ 'pb-0': section.collapsed }"
         :data-panel-collapsed="section.collapsed ? 'true' : 'false'"
+        :data-editing-item="isInspecting ? '' : undefined"
     >
         <PanelHeader class="flex items-center justify-between" @click="toggleCollapsed">
             <Heading class="cursor-pointer flex-1" :text="__(section.display)" />
