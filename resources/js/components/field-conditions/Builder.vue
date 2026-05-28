@@ -168,15 +168,6 @@ onMounted(() => {
                                 :size
                                 inset
                                 variant="subtle"
-                                class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px] [&_svg]:opacity-80"
-                                icon="indent-right"
-                                :aria-label="__('Indent right')"
-                                :title="__('Indent right')"
-                            />
-                            <Button
-                                :size
-                                inset
-                                variant="subtle"
                                 class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px]"
                                 :text="'×'"
                                 :aria-label="__('Remove condition')"
