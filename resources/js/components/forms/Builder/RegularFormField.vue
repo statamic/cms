@@ -52,7 +52,7 @@ const hasErrors = computed(() => {
     >
         <div
             v-if="isInspecting"
-            class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center bg-blue-50 dark:bg-blue-950 ps-3"
+            class="!absolute z-(--z-index-above) -top-[calc(0.1rem-1px)] end-0.5 flex items-center bg-blue-50 dark:bg-blue-950 ps-3"
         >
             <WidthSelector
                 size="base"
@@ -99,24 +99,22 @@ const hasErrors = computed(() => {
             :error="hasErrors ? __('This field has errors. Please fix them before saving.') : null"
         >
             <template #label>
-                <Label :class="{ 'cursor-pointer': !isInspecting }">
-                    <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <Icon
-                            v-if="field.config.if || field.config.unless"
-                            data-logic-attached
-                            name="logic-tree"
-                            class="size-3.5! text-gray-400 dark:text-gray-500 me-0.5"
-                            :aria-label="__('Logic attached')"
-                            v-tooltip="__('Logic attached')"
-                        />
-                        <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 me-1', iconColorClass]" aria-hidden="true" />
-                        <span>
-                            {{ __(field.config.display) }}
-                            <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
-                        </span>
-                        <Icon v-if="field.type === 'reference'" name="link" class="size-3! text-indigo-500 dark:text-indigo-400" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
-                        <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
+                <Label :class="['', { 'cursor-pointer': !isInspecting }]">
+                    <Icon
+                        v-if="field.config.if || field.config.unless"
+                        data-logic-attached
+                        name="logic-tree"
+                        class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
+                        :aria-label="__('Logic attached')"
+                        v-tooltip="__('Logic attached')"
+                    />
+                    <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
+                    <span>
+                        {{ __(field.config.display) }}
+                        <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
                     </span>
+                    <Icon v-if="field.type === 'reference'" name="link" class="size-3! text-indigo-500 dark:text-indigo-400" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
+                    <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                 </Label>
             </template>
             <div v-if="field.preview" inert>
