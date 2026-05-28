@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button, ConfirmationModal, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger, Textarea } from '@ui';
 import { computed, ref, watch } from 'vue';
-import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
+import RuleBuilder from './Pages/RuleBuilder.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
 const { deletePage, dirty, inspecting: page, pages } = injectBuilderContext();
@@ -11,68 +11,59 @@ enum PageInspectorTabs {
     Conditions = 'conditions',
 }
 
+const confirmingDelete = ref(false);
 const activeTab = ref<PageInspectorTabs>(PageInspectorTabs.Settings);
 
-const placeholderTitle = computed(() => {
-    let pageIndex = pages.value.findIndex((p) => p._id === page.value._id);
+const pageIndex = computed(() => pages.value.findIndex((p) => p._id === page.value._id));
+const canDeletePage = computed(() => pages.value.length > 1);
+const pageTitle = computed(() => page.value.display ? __(page.value.display) : placeholderTitle.value);
+const placeholderTitle = computed(() => __('Page :current of :total', {
+    current: pageIndex.value + 1,
+    total: pages.value.length,
+}));
 
-    return __('Page :current of :total', { current: pageIndex + 1, total: pages.value.length });
+const confirmDelete = () => confirmingDelete.value = true;
+const handleDeletePage = () => deletePage(page.value._id);
+
+const suggestableConditionFields = computed(() => {
+    const currentPageIndex = pageIndex.value;
+
+    return pages.value
+        .slice(0, currentPageIndex + 1)
+        .flatMap((page) => page.sections)
+        .flatMap((section) => section.fields)
+        .map((f) => ({
+            handle: f.handle,
+            config: {
+                ...f.config,
+                type: f.fieldtype,
+            },
+            icon: f.icon,
+        }));
+});
+
+const pageDestinationOptions = computed(() => {
+    const currentPageIndex = pageIndex.value;
+
+    return pages.value
+        .slice(currentPageIndex + 1)
+        .map((p, index) => {
+            const actualIndex = currentPageIndex + 1 + index;
+            const label = p.display
+                ? __(p.display)
+                : __('Page :current of :total', { current: actualIndex + 1, total: pages.value.length });
+
+            return {
+                value: p._id,
+                label,
+                icon: 'page',
+            };
+        });
 });
 
 watch(() => page.value.display, dirty);
 watch(() => page.value.instructions, dirty);
-
-// todo: refactor everything under this line
-const pageIndex = computed(() => pages.value.findIndex((p) => p._id === page.value._id));
-const inspectorTarget = computed(() => (pageIndex.value === 1 ? 'page_2' : 'page_1'));
-
-const selectedPageLogicMockPreset = computed(() => {
-    if (inspectorTarget.value === 'page_2') {
-        return {
-            logicBranchingConditionField: 'age',
-            logicOperator: 'contains',
-            logicValue: '21',
-            logicBranchingAction: 'divide',
-            logicBranchingCalculationSource: 'variable_score',
-            logicBranchingCalculationVariable: 'engagement_weight',
-            logicContainsOperator: 'contains',
-            logicContainsAnswer: 'google',
-        };
-    }
-
-    return {};
-});
-
-const goodbyeSecondRuleMockPreset = {
-    logicBranchingConditionField: 'email_notifications',
-    logicOperator: 'equals',
-    logicValue: 'referral',
-    logicJoin: 'or',
-    logicConditionField: 'fan_length',
-    logicContainsOperator: 'contains',
-    logicContainsAnswer: 'friend',
-    logicBranchingAction: 'go_to',
-    logicDestination: 'page_1',
-};
-
-const selectedPageHeadingLabel = computed(() => {
-    if (inspectorTarget.value === 'page_1') {
-        return __('Page :current of :total', { current: 1, total: pages.value.length });
-    }
-
-    return __('Goodbye');
-});
-
-const selectedPageDestinationStepLabel = computed(() => (
-    inspectorTarget.value === 'page_2'
-        ? __('Then go to Page 1')
-        : __('Then go to Goodbye')
-));
-
-const canDeletePage = computed(() => pages.value.length > 1);
-const confirmingDelete = ref(false);
-const confirmDelete = () => confirmingDelete.value = true;
-const handleDeletePage = () => deletePage(page.value._id);
+watch(() => page.value.rules, dirty, { deep: true });
 </script>
 
 <template>
@@ -90,7 +81,7 @@ const handleDeletePage = () => deletePage(page.value._id);
                             <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                         </div>
                         <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                            {{ page.display ? __(page.display) : selectedPageHeadingLabel }}
+                            {{ pageTitle }}
                             <div class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -115,13 +106,13 @@ const handleDeletePage = () => deletePage(page.value._id);
             </TabContent>
 
             <TabContent :name="PageInspectorTabs.Conditions">
-                <div class="group/logic-tab space-y-6 pt-8">
+                <div class="space-y-6 pt-8">
                     <div class="flex items-center gap-2.5">
                         <div class="size-4">
                             <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                         </div>
                         <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                            {{ page.display ? __(page.display) : selectedPageHeadingLabel }}
+                            {{ pageTitle }}
                             <div class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -129,32 +120,11 @@ const handleDeletePage = () => deletePage(page.value._id);
                         </a>
                     </div>
 
-                    <LogicFlowMock
-                        :key="`page-logic-${inspectorTarget}`"
-                        :destination-step-label="selectedPageDestinationStepLabel"
-                        :show-destination-selector="true"
-                        :show-rule-controls="true"
-                        :show-add-condition-before-then="true"
-                        :use-page-destination-options="true"
-                        :mock-preset="selectedPageLogicMockPreset"
+                    <RuleBuilder
+                        v-model:rules="page.rules"
+                        :suggestable-fields="suggestableConditionFields"
+                        :page-options="pageDestinationOptions"
                     />
-
-                    <div v-if="inspectorTarget === 'page_2'" class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"></div>
-
-                    <LogicFlowMock
-                        v-if="inspectorTarget === 'page_2'"
-                        :key="`page-logic-secondary-${inspectorTarget}-page-destination`"
-                        :destination-step-label="__('Then go to Page 1')"
-                        :show-destination-selector="true"
-                        :show-rule-controls="true"
-                        :show-add-condition-before-then="true"
-                        :use-page-destination-options="true"
-                        :mock-preset="goodbyeSecondRuleMockPreset"
-                    />
-
-                    <div class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
-                        <Button size="sm" :text="__('+ Add Rule')" />
-                    </div>
                 </div>
             </TabContent>
         </Tabs>

@@ -87,6 +87,7 @@ const addPage = (atIndex: number | null = null, sections = []) => {
         instructions: null,
         button_label: null,
         previous_page_label: null,
+        rules: [],
         sections,
     };
 

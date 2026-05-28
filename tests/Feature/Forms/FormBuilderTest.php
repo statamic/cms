@@ -706,6 +706,172 @@ class FormBuilderTest extends TestCase
             ->assertSuccessful();
     }
 
+    #[Test]
+    public function it_can_save_page_rules()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'rules' => [
+                        [
+                            '_id' => 'rule1',
+                            'conditions' => [
+                                [
+                                    '_id' => 'cond1',
+                                    'field' => 'favorite_color',
+                                    'operator' => 'equals',
+                                    'value' => 'blue',
+                                ],
+                                [
+                                    '_id' => 'cond2',
+                                    'join' => 'or',
+                                    'field' => 'age',
+                                    'operator' => 'contains',
+                                    'value' => '21',
+                                ],
+                            ],
+                            'destination' => 'page2',
+                        ],
+                    ],
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [],
+                        ],
+                    ],
+                ],
+                [
+                    '_id' => 'page2',
+                    'sections' => [
+                        [
+                            '_id' => 'section2',
+                            'display' => 'Section',
+                            'fields' => [],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $form = Form::find('test');
+        $rules = $form->formFields()->pages()[0]['rules'];
+
+        $this->assertCount(1, $rules);
+        $this->assertEquals('page2', $rules[0]['destination']);
+        $this->assertCount(2, $rules[0]['conditions']);
+        $this->assertEquals('favorite_color', $rules[0]['conditions'][0]['field']);
+        $this->assertEquals('or', $rules[0]['conditions'][1]['join']);
+        $this->assertArrayNotHasKey('_id', $rules[0]);
+        $this->assertArrayNotHasKey('_id', $rules[0]['conditions'][0]);
+    }
+
+    #[Test]
+    public function it_filters_out_incomplete_page_rules()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'rules' => [
+                        [
+                            '_id' => 'rule1',
+                            'conditions' => [
+                                ['_id' => 'cond1', 'field' => null, 'operator' => 'equals', 'value' => null],
+                            ],
+                            'destination' => 'page2',
+                        ],
+                        [
+                            '_id' => 'rule2',
+                            'conditions' => [
+                                ['_id' => 'cond2', 'field' => 'name', 'operator' => 'equals', 'value' => 'test'],
+                            ],
+                            'destination' => null,
+                        ],
+                        [
+                            '_id' => 'rule3',
+                            'conditions' => [
+                                ['_id' => 'cond3', 'field' => 'name', 'operator' => 'equals', 'value' => 'valid'],
+                            ],
+                            'destination' => 'page2',
+                        ],
+                    ],
+                    'sections' => [
+                        ['_id' => 'section1', 'display' => 'Section', 'fields' => []],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $form = Form::find('test');
+        $rules = $form->formFields()->pages()[0]['rules'] ?? [];
+
+        $this->assertCount(1, $rules);
+        $this->assertEquals('valid', $rules[0]['conditions'][0]['value']);
+    }
+
+    #[Test]
+    public function it_loads_page_rules_with_ids_for_vue()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                [
+                    'rules' => [
+                        [
+                            'conditions' => [
+                                ['field' => 'name', 'operator' => 'equals', 'value' => 'test'],
+                            ],
+                            'destination' => 'page2',
+                        ],
+                    ],
+                    'sections' => [
+                        ['display' => 'Section', 'fields' => []],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.builder.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Builder')
+                ->has('initialFormFields.pages.0.rules', 1)
+                ->has('initialFormFields.pages.0.rules.0._id')
+                ->has('initialFormFields.pages.0.rules.0.conditions.0._id')
+                ->where('initialFormFields.pages.0.rules.0.destination', 'page2')
+            );
+    }
+
     private function registerFieldtypeWithRequiredConfig(): void
     {
         $formFieldtype = new class extends FormFieldtype

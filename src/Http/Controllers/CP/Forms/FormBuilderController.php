@@ -114,6 +114,15 @@ class FormBuilderController extends CpController
             'instructions' => $page['instructions'] ?? null,
             'button_label' => $page['button_label'] ?? null,
             'previous_page_label' => $page['previous_page_label'] ?? null,
+            'rules' => collect($page['rules'] ?? [])->map(function (array $rule): array {
+                return [
+                    '_id' => Str::random(),
+                    'conditions' => collect($rule['conditions'] ?? [])->map(function (array $condition): array {
+                        return array_merge($condition, ['_id' => Str::random()]);
+                    })->values()->all(),
+                    'destination' => $rule['destination'] ?? null,
+                ];
+            })->values()->all(),
             'sections' => collect($page['sections'])->map(function (array $section): array {
                 return array_merge($this->sectionToVue($section), ['_id' => Str::random()]);
             })->values()->all(),
@@ -280,6 +289,20 @@ class FormBuilderController extends CpController
                 'instructions' => $page['instructions'] ?? null,
                 'button_label' => $page['button_label'] ?? null,
                 'previous_page_label' => $page['previous_page_label'] ?? null,
+                'rules' => collect($page['rules'] ?? [])
+                    ->map(fn (array $rule) => Arr::only($rule, ['conditions', 'destination']))
+                    ->map(function (array $rule) {
+                        $rule['conditions'] = collect($rule['conditions'] ?? [])
+                            ->map(fn (array $condition) => Arr::only($condition, ['join', 'field', 'operator', 'value']))
+                            ->filter(fn (array $condition) => $condition['field'] && $condition['value'])
+                            ->values()
+                            ->all();
+
+                        return $rule;
+                    })
+                    ->reject(fn (array $rule) => empty($rule['conditions']) || empty($rule['destination']))
+                    ->values()
+                    ->all(),
                 'sections' => collect($page['sections'])->map(function (array $section) {
                     return Arr::removeNullValues([
                         'display' => $section['display'] ?? null,

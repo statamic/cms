@@ -10,10 +10,11 @@ const props = defineProps({
     conditions: Array,
     suggestableFields: Array,
     excludeHandle: String,
+    excludeOperators: { type: Array, default: () => [] },
     size: String,
 });
 
-const operatorOptions = [
+const operatorOptions = computed(() => [
     { label: __('Equals'), value: 'equals' },
     { label: __('Does not equal'), value: 'not' },
     { label: __('Contains'), value: 'contains' },
@@ -25,7 +26,7 @@ const operatorOptions = [
     { label: '<', value: '<' },
     { label: '<=', value: '<=' },
     { label: __('Custom'), value: 'custom' },
-];
+].filter((op) => !props.excludeOperators.includes(op.value)));
 
 const selectedField = computed(() => props.suggestableFields.find((field) => field.handle === props.condition.field));
 
