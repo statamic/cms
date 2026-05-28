@@ -102,7 +102,7 @@ class FormBuilderController extends CpController
     {
         return [
             'pages' => $formFields->pages()->map(function (array $page): array {
-                return array_merge($this->pageToVue($page), ['_id' => Str::random()]);
+                return array_merge($this->pageToVue($page), ['_id' => $page['id'] ?? Str::random(8)]);
             })->values()->all(),
         ];
     }
@@ -275,6 +275,7 @@ class FormBuilderController extends CpController
     {
         $pages = collect($request->pages)->map(function (array $page) {
             return Arr::removeNullValues([
+                'id' => $page['_id'],
                 'display' => $page['display'] ?? null,
                 'instructions' => $page['instructions'] ?? null,
                 'button_label' => $page['button_label'] ?? null,
