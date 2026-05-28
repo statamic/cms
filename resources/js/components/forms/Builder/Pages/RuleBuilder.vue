@@ -56,7 +56,6 @@ const removeRule = (index) => {
                 :rule="rule"
                 :suggestable-fields="suggestableFields"
                 :page-options="pageOptions"
-                :fieldtypes="fieldtypes"
                 @update:rule="updateRule(index, $event)"
                 @remove="removeRule(index)"
             />
