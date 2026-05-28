@@ -14,6 +14,7 @@ class Dropdown extends FormFieldtype
     protected $icon = 'fieldtype-select';
     protected $categories = ['choice'];
     protected $keywords = ['select'];
+    protected $order = 1;
 
     public function configFieldItems(): array
     {

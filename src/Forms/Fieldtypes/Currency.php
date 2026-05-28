@@ -13,6 +13,7 @@ class Currency extends FormFieldtype
     protected $icon = 'currency';
     protected $categories = ['number'];
     protected $keywords = ['money', 'number'];
+    protected $order = 2;
 
     public function configFieldItems(): array
     {

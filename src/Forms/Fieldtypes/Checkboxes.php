@@ -11,6 +11,7 @@ class Checkboxes extends FormFieldtype
     protected $description = 'Respondents can select multiple options from a list.';
     protected $icon = 'fieldtype-checkboxes';
     protected $categories = ['choice'];
+    protected $order = 4;
 
     public function configFieldItems(): array
     {

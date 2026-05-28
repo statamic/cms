@@ -22,6 +22,7 @@ const allFieldtypes = computed(() => {
         categories: ['structure'],
         keywords: [],
         icon: 'add-section',
+        order: 1,
         config: [],
     });
 
@@ -33,6 +34,7 @@ const allFieldtypes = computed(() => {
             categories: ['structure'],
             keywords: [],
             icon: 'page',
+            order: 2,
             config: [],
         });
     }
@@ -59,6 +61,17 @@ const groupedFieldtypes = computed(() => {
             let categories = fieldtype.categories;
             if (categories.length === 0) categories = ['other'];
             if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
+        });
+
+        category.fieldtypes.sort((a, b) => {
+            const aHasOrder = a.order != null;
+            const bHasOrder = b.order != null;
+
+            if (aHasOrder && bHasOrder) return a.order - b.order;
+            if (aHasOrder) return -1;
+            if (bHasOrder) return 1;
+
+            return a.title.localeCompare(b.title);
         });
 
         return category;

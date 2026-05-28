@@ -12,6 +12,7 @@ class ShortAnswer extends FormFieldtype
     protected $icon = 'text-short';
     protected $categories = ['text'];
     protected $keywords = ['text'];
+    protected $order = 1;
 
     public function configFieldItems(): array
     {

@@ -14,6 +14,7 @@ class MultiChoice extends FormFieldtype
     protected $icon = 'fieldtype-radio';
     protected $categories = ['choice'];
     protected $keywords = ['radio'];
+    protected $order = 3;
 
     public function configFieldItems(): array
     {

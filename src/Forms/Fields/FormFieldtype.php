@@ -31,6 +31,7 @@ abstract class FormFieldtype implements Arrayable
     protected $keywords = [];
     protected $configFields = [];
     protected $icon;
+    protected $order;
 
     public function title(): string
     {
@@ -87,6 +88,11 @@ abstract class FormFieldtype implements Arrayable
     public function icon(): string
     {
         return $this->icon ?? "form-field-{$this->handle()}";
+    }
+
+    public function order(): ?int
+    {
+        return $this->order;
     }
 
     public function config(?string $key = null, $fallback = null)
@@ -204,6 +210,7 @@ abstract class FormFieldtype implements Arrayable
             'categories' => $this->categories(),
             'keywords' => $this->keywords(),
             'icon' => $this->icon(),
+            'order' => $this->order(),
             'config' => $this->configFields()->toPublishArray(),
         ];
     }

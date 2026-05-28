@@ -11,6 +11,7 @@ class Email extends FormFieldtype
     protected $description = "Collects an email address and ensures it's properly formatted.";
     protected $icon = 'mail-sign-at';
     protected $categories = ['contact'];
+    protected $order = 2;
 
     public function configFieldItems(): array
     {

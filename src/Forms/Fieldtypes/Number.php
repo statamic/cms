@@ -12,6 +12,7 @@ class Number extends FormFieldtype
     protected $icon = 'number';
     protected $categories = ['number'];
     protected $keywords = ['integer', 'float'];
+    protected $order = 1;
 
     public function configFieldItems(): array
     {

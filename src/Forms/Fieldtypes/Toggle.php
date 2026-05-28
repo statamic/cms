@@ -11,6 +11,7 @@ class Toggle extends FormFieldtype
     protected $description = 'A simple yes or no switch.';
     protected $icon = 'fieldtype-toggle';
     protected $categories = ['choice'];
+    protected $order = 5;
 
     public function configFieldItems(): array
     {

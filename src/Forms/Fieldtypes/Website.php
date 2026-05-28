@@ -12,6 +12,7 @@ class Website extends FormFieldtype
     protected $icon = 'website';
     protected $categories = ['contact'];
     protected $keywords = ['url'];
+    protected $order = 3;
 
     public function configFieldItems(): array
     {

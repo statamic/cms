@@ -13,6 +13,7 @@ class Phone extends FormFieldtype
     protected $description = 'A field for collecting phone numbers.';
     protected $icon = 'mail-sign-hashtag';
     protected $categories = ['contact'];
+    protected $order = 4;
 
     public function configFieldItems(): array
     {

@@ -11,6 +11,7 @@ class Name extends FormFieldtype
     protected $description = "Collects someone's name.";
     protected $icon = 'user-avatar-flush';
     protected $categories = ['contact'];
+    protected $order = 1;
 
     public function configFieldItems(): array
     {

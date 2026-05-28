@@ -14,6 +14,7 @@ class YesNo extends FormFieldtype
     protected $description = 'A simple yes or no question.';
     protected $icon = 'like';
     protected $categories = ['choice'];
+    protected $order = 2;
 
     public function configFieldItems(): array
     {
