@@ -222,7 +222,7 @@ onMounted(() => {
             />
         </div>
 
-        <div class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
+        <div data-always-save-decoration class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
             <Field
                 :label="__('Always Save')"
                 :instructions="__('messages.field_conditions_always_save_instructions')"
@@ -232,3 +232,12 @@ onMounted(() => {
         </div>
     </div>
 </template>
+
+<style>
+[data-ui-card] [data-always-save-decoration] {
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+    padding-top: 0;
+    border-top-width: 0;
+}
+</style>
