@@ -99,6 +99,17 @@ const addPage = (atIndex: number | null = null, sections = []) => {
     return page;
 };
 
+const deletePage = (pageId: string) => {
+    if (pages.value.length <= 1) return;
+
+    const pageIndex = pages.value.findIndex((p) => p._id === pageId);
+    if (pageIndex === -1) return;
+
+    formFields.value.pages.splice(pageIndex, 1);
+    clearInspector();
+    dirty();
+};
+
 const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | null = null) => {
     const pageIndex = pages.value.findIndex(p => p._id === pageId);
     if (pageIndex === -1) return;
@@ -292,6 +303,7 @@ const save = () => {
 
 provideBuilderContext({
     addSection,
+    deletePage,
     clearInspector,
     dirty,
     errors,

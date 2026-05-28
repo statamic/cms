@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Button, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger, Textarea } from '@ui';
+import { Button, ConfirmationModal, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger, Textarea } from '@ui';
 import { computed, ref, watch } from 'vue';
 import LogicFlowMock from '@/pages/forms/LogicFlowMock.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-const { dirty, inspecting: page, pages } = injectBuilderContext();
+const { deletePage, dirty, inspecting: page, pages } = injectBuilderContext();
 
 enum PageInspectorTabs {
     Settings = 'settings',
@@ -68,6 +68,11 @@ const selectedPageDestinationStepLabel = computed(() => (
         ? __('Then go to Page 1')
         : __('Then go to Goodbye')
 ));
+
+const canDeletePage = computed(() => pages.value.length > 1);
+const confirmingDelete = ref(false);
+const confirmDelete = () => confirmingDelete.value = true;
+const handleDeletePage = () => deletePage(page.value._id);
 </script>
 
 <template>
@@ -100,6 +105,12 @@ const selectedPageDestinationStepLabel = computed(() => (
                     <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
                         <Textarea v-model="page.instructions" :rows="2" resize="vertical" />
                     </Field>
+                    <Button
+                        size="sm"
+                        icon="trash"
+                        :text="__('Delete Page')"
+                        @click="confirmDelete"
+                    />
                 </div>
             </TabContent>
 
@@ -147,5 +158,14 @@ const selectedPageDestinationStepLabel = computed(() => (
                 </div>
             </TabContent>
         </Tabs>
+
+        <ConfirmationModal
+            v-model:open="confirmingDelete"
+            :title="__('Delete Page')"
+            :body-text="__('Are you sure you want to delete this page? All sections and fields in this page will also be deleted.')"
+            :button-text="__('Delete')"
+            danger
+            @confirm="handleDeletePage"
+        />
     </div>
 </template>
