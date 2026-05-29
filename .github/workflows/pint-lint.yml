@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Check PHP code style issues
-        uses: aglipanci/laravel-pint-action@v2
+        uses: aglipanci/laravel-pint-action@8eedec46a1856977c41667f9c66d5562fa3f9c08 # v2
         with:
           testMode: true
           verboseMode: true
