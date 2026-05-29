@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Button, CommandPaletteItem, EmptyStateMenu, EmptyStateItem, DocsCallout, Icon, Listing, DropdownItem } from '@ui';
+import { Header, Button, Badge, CommandPaletteItem, EmptyStateMenu, EmptyStateItem, DocsCallout, Icon, Listing, DropdownItem } from '@ui';
 import useStatamicPageProps from '@/composables/page-props.js';
 import { Link, router } from '@inertiajs/vue3';
 
@@ -70,7 +70,13 @@ const reloadPage = () => router.reload();
                     <Link :href="form.show_url">{{ form.title }}</Link>
                 </template>
                 <template #cell-submissions="{ row: form, value: submissions }">
-                    <Link :href="form.submissions_url">{{ submissions }}</Link>
+                    <Badge
+                        :href="form.submissions_url"
+                        :prepend="String(submissions)"
+                        :text="__('Results')"
+                        color="white"
+                        pill
+                    />
                 </template>
                 <template #prepended-row-actions="{ row: form }">
                     <DropdownItem v-if="form.can_edit" :text="__('Configure')" :href="form.edit_url" icon="cog" />
