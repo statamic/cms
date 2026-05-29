@@ -3,6 +3,7 @@
 namespace Tests\Forms\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
+use Illuminate\Support\Facades\View;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Fields\FormFieldtype;
 use Tests\TestCase;
@@ -53,5 +54,60 @@ class FormFieldtypeTest extends TestCase
         $this->assertFalse($formFieldtype->isSelectable());
         $this->assertFalse(FormFieldtypeRepository::hasBeenMadeSelectable('test-unselectable'));
         $this->assertTrue(FormFieldtypeRepository::selectableIsOverriden('test-unselectable'));
+    }
+
+    #[Test]
+    public function it_resolves_view_using_form_fieldtype_handle()
+    {
+        View::addNamespace('statamic', __DIR__.'/__fixtures__/views');
+
+        $formFieldtype = new class extends FormFieldtype
+        {
+            public static $handle = 'short_answer';
+            protected static $fieldtype = 'text';
+
+            public function toFieldArray(): array
+            {
+                return ['type' => 'text'];
+            }
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.short_answer', $formFieldtype->view());
+    }
+
+    #[Test]
+    public function it_falls_back_to_underlying_fieldtype_handle_view()
+    {
+        View::addNamespace('statamic', __DIR__.'/__fixtures__/views');
+
+        $formFieldtype = new class extends FormFieldtype
+        {
+            public static $handle = 'unknown_form_fieldtype';
+            protected static $fieldtype = 'text';
+
+            public function toFieldArray(): array
+            {
+                return ['type' => 'text'];
+            }
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.text', $formFieldtype->view());
+    }
+
+    #[Test]
+    public function it_falls_back_to_underlying_fieldtype_view_method()
+    {
+        $formFieldtype = new class extends FormFieldtype
+        {
+            public static $handle = 'totally_unknown';
+            protected static $fieldtype = 'text';
+
+            public function toFieldArray(): array
+            {
+                return ['type' => 'text'];
+            }
+        };
+
+        $this->assertEquals('statamic::forms.antlers.fields.default', $formFieldtype->view());
     }
 }

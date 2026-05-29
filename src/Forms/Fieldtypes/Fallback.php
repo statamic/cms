@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\Fields\FormFieldtype;
 
@@ -51,5 +52,41 @@ class Fallback extends FormFieldtype
             'icon' => $this->wrappedFieldtype->icon(),
             'config' => $this->wrappedFieldtype->configFields()->toPublishArray(),
         ];
+    }
+
+    public function view(): string
+    {
+        if (! $this->wrappedFieldtype) {
+            return parent::view();
+        }
+
+        $handle = $this->wrappedFieldtype->handle();
+        $language = config('statamic.templates.language', 'antlers');
+
+        $views = [
+            "statamic::forms.fields.{$handle}",
+            "statamic::forms.{$language}.fields.{$handle}",
+        ];
+
+        if ($equivalentFormFieldtype = $this->equivalentFormFieldtype()) {
+            $views = [
+                ...$views,
+                "statamic::forms.fields.{$equivalentFormFieldtype->handle()}",
+                "statamic::forms.{$language}.fields.{$equivalentFormFieldtype->handle()}",
+            ];
+        }
+
+        return collect($views)->first(fn (string $view): bool => view()->exists($view))
+            ?? $this->wrappedFieldtype->view();
+    }
+
+    private function equivalentFormFieldtype(): ?FormFieldtype
+    {
+        $class = FormFieldtypeRepository::classes()
+            ->filter(fn ($class) => $class::fieldtype() === $this->wrappedFieldtype->handle())
+            ->sortBy(fn ($class) => app($class)->order() ?? PHP_INT_MAX)
+            ->first();
+
+        return $class ? app($class) : null;
     }
 }

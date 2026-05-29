@@ -166,20 +166,24 @@ abstract class FormFieldtype implements Arrayable
 
     public function view(): string
     {
-        $language = config('statamic.templates.language', 'antlers');
         $handle = $this->handle();
+        $language = config('statamic.templates.language', 'antlers');
 
         $views = [
             "statamic::forms.fields.{$handle}",
             "statamic::forms.{$language}.fields.{$handle}",
         ];
 
-        if ($view = collect($views)->first(fn ($view) => view()->exists($view))) {
-            return $view;
+        if ($underlyingFieldtype = static::fieldtype()) {
+            $views = [
+                ...$views,
+                "statamic::forms.fields.{$underlyingFieldtype}",
+                "statamic::forms.{$language}.fields.{$underlyingFieldtype}",
+            ];
         }
 
-        // Remove in v7. Add default views to the $views array and check the wrapped fieldtype view.
-        return $this->toField()->fieldtype()->view();
+        return collect($views)->first(fn (string $view): bool => view()->exists($view))
+            ?? $this->toField()->fieldtype()->view();
     }
 
     public function isSelectable(): bool
