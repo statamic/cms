@@ -257,7 +257,7 @@ onMounted(() => load());
                                 <Icon
                                     v-if="findSuggestableField(value)?.icon"
                                     :name="findSuggestableField(value).icon"
-                                    :class="fieldIconClasses(findSuggestableField(value).config.type)"
+                                    :class="fieldIconClasses(findSuggestableField(value)?.config?.type)"
                                 />
                                 <span class="truncate">{{ __(label) }}</span>
                             </span>
@@ -269,7 +269,7 @@ onMounted(() => load());
                                     :name="selectedField.icon"
                                     :class="fieldIconClasses(selectedField.config.type)"
                                 />
-                                <span class="truncate">{{ __(findSuggestableField(option.value).config.display ?? option.value) }}</span>
+                                <span class="truncate">{{ __(findSuggestableField(option.value)?.config?.display ?? option.value) }}</span>
                             </span>
                         </template>
                     </FieldConditionsBuilder>
