@@ -268,12 +268,6 @@
             }
         }
     }
-
-    [data-ui-combobox-trigger] {
-        display: inline-flex;
-        width: unset;
-        max-width: min(90cqw, 100%);
-    }
 }
 
 .logic-text-badge {
