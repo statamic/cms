@@ -32,7 +32,17 @@
                         <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
                     </Field>
                     <Field :label="__('Handle')" class="form-group field-w-100">
-                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)" />
+                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)">
+                            <template #append>
+                                <Button
+                                    icon="sync"
+                                    size="sm"
+                                    variant="ghost"
+                                    @click="regenerateHandle"
+                                    v-tooltip="__('Regenerate from: :field', { field: __('Title') })"
+                                />
+                            </template>
+                        </Input>
                     </Field>
                     <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
                         <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
@@ -98,17 +108,8 @@ export default {
             instructions: this.tab.instructions,
             icon: this.tab.icon,
             editing: false,
-            handleSyncedWithDisplay: false,
             saveKeyBinding: null,
         };
-    },
-
-    created() {
-        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
-        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
-        if (!this.handle || this.handle == 'new_tab' || this.handle == 'new_set_group') {
-            this.handleSyncedWithDisplay = true;
-        }
     },
 
     computed: {
@@ -149,15 +150,19 @@ export default {
     },
 
     methods: {
+        regenerateHandle() {
+            this.handle = snake_case(this.display);
+        },
+
         edit() {
+            this.display = this.tab.display;
+            this.handle = this.tab.handle;
+            this.instructions = this.tab.instructions;
+            this.icon = this.tab.icon;
             this.editing = true;
         },
 
         editConfirmed() {
-            if (!this.handle) {
-                this.handle = snake_case(this.display);
-            }
-
             this.$emit('updated', {
                 ...this.tab,
                 handle: this.handle,
@@ -194,14 +199,6 @@ export default {
         },
 
         fieldUpdated(handle, value) {
-            if (handle === 'display' && this.handleSyncedWithDisplay) {
-                this.handle = snake_case(value);
-            }
-
-            if (handle === 'handle') {
-                this.handleSyncedWithDisplay = false;
-            }
-
             this[handle] = value;
         },
 
