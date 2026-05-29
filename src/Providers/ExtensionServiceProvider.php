@@ -71,6 +71,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\FormBanner::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\ButtonGroup::class,
         Fieldtypes\Checkboxes::class,
@@ -90,9 +91,11 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Group::class,
+        Fieldtypes\FormHeading::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
+        Fieldtypes\ImageChoice::class,
         Fieldtypes\Integer::class,
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
@@ -100,7 +103,10 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Markdown\Buttons::class,
         Fieldtypes\Navs::class,
         Fieldtypes\NestedFields::class,
+        Fieldtypes\OpinionScale::class,
+        Fieldtypes\FormParagraph::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Ranking::class,
         Fieldtypes\Range::class,
         Fieldtypes\Replicator::class,
         Fieldtypes\Revealer::class,
@@ -111,6 +117,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Structures::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Spacer::class,
+        Fieldtypes\StarRating::class,
         Fieldtypes\Table::class,
         Fieldtypes\Taggable::class,
         Fieldtypes\Terms::class,
@@ -132,21 +139,43 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $formFieldtypes = [
-        Forms\Fieldtypes\Checkboxes::class,
-        Forms\Fieldtypes\Currency::class,
-        Forms\Fieldtypes\Dictionary::class,
-        Forms\Fieldtypes\Dropdown::class,
-        Forms\Fieldtypes\Email::class,
-        Forms\Fieldtypes\LongAnswer::class,
-        Forms\Fieldtypes\MultiChoice::class,
-        Forms\Fieldtypes\Name::class,
-        Forms\Fieldtypes\Number::class,
-        Forms\Fieldtypes\Phone::class,
+        // Information
+        Forms\Fieldtypes\Heading::class,
+        Forms\Fieldtypes\Paragraph::class,
+        Forms\Fieldtypes\Banner::class,
+
+        // Text
         Forms\Fieldtypes\ShortAnswer::class,
-        Forms\Fieldtypes\TimePicker::class,
-        Forms\Fieldtypes\Toggle::class,
-        Forms\Fieldtypes\Website::class,
+        Forms\Fieldtypes\LongAnswer::class,
+
+        // Choice
+        Forms\Fieldtypes\Dropdown::class,
         Forms\Fieldtypes\YesNo::class,
+        Forms\Fieldtypes\MultiChoice::class,
+        Forms\Fieldtypes\Checkboxes::class,
+        Forms\Fieldtypes\Toggle::class,
+        Forms\Fieldtypes\ImageChoice::class,
+
+        // Rate
+        Forms\Fieldtypes\StarRating::class,
+        Forms\Fieldtypes\Ranking::class,
+        Forms\Fieldtypes\OpinionScale::class,
+
+        // Contact Info
+        Forms\Fieldtypes\Name::class,
+        Forms\Fieldtypes\Email::class,
+        Forms\Fieldtypes\Website::class,
+        Forms\Fieldtypes\Phone::class,
+
+        // Number
+        Forms\Fieldtypes\Number::class,
+        Forms\Fieldtypes\Currency::class,
+
+        // Date and Time
+        Forms\Fieldtypes\TimePicker::class,
+
+        // Other
+        Forms\Fieldtypes\Dictionary::class,
     ];
 
     protected $modifierAliases = [
