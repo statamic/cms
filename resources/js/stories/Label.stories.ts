@@ -104,3 +104,25 @@ export const _WithSlot: Story = {
         template: withSlotCode,
     }),
 };
+
+const hideDisplayCode = `
+<Field hide-display>
+    <Label for="section" hide-display>
+        <span class="sr-only">Section</span>
+    </Label>
+    <Input id="section" placeholder="Content…" />
+</Field>
+`;
+
+export const _HideDisplay: Story = {
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            source: { code: hideDisplayCode }
+        }
+    },
+    render: () => ({
+        components: { Label, Input, Field },
+        template: hideDisplayCode,
+    }),
+};

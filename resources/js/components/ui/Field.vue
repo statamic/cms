@@ -1,6 +1,6 @@
 <script setup>
 import { cva } from 'cva';
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 import Description from './Description.vue';
 import Label from './Label.vue';
 import ErrorMessage from './ErrorMessage.vue';
@@ -10,6 +10,8 @@ import { twMerge } from 'tailwind-merge';
 defineOptions({
     inheritAttrs: false,
 });
+
+const slots = useSlots();
 
 const props = defineProps({
     /** When `true`, the field is styled as a configuration field with a two-column grid layout. */
@@ -30,6 +32,8 @@ const props = defineProps({
     instructionsBelow: { type: Boolean, default: false },
     /** Label text for the field. */
     label: { type: String },
+    /** When `true`, the display label is hidden (e.g. visually hidden for accessibility only). */
+    hideDisplay: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
 });
@@ -37,6 +41,7 @@ const props = defineProps({
 const labelProps = computed(() => ({
     badge: props.badge,
     for: props.id,
+    hideDisplay: props.hideDisplay,
     required: props.required,
     text: props.label,
 }));
@@ -92,6 +97,14 @@ const hasErrors = computed(() => {
     if (!errors.value) return false;
     return Array.isArray(errors.value) ? errors.value.length > 0 : Object.keys(errors.value).length > 0;
 });
+
+const hasVisibleLabel = computed(() => {
+    if (props.hideDisplay) {
+        return false;
+    }
+
+    return !!slots.label || !!props.label?.trim() || props.required;
+});
 </script>
 
 <template>
@@ -113,7 +126,7 @@ const hasErrors = computed(() => {
             <div
                 v-if="(!$slots.actions && (label || (instructions && !instructionsBelow) || $slots.label)) || ($slots.actions && instructions && !instructionsBelow)"
                 data-ui-field-text
-                :class="inline ? 'mb-0' : 'mb-2'"
+                :class="inline ? 'mb-0' : hasVisibleLabel ? 'mb-2' : undefined"
             >
                 <slot v-if="!$slots.actions" name="label">
                     <Label v-if="label" v-bind="labelProps" class="flex-1" />

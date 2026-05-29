@@ -239,10 +239,11 @@ const fieldtypeComponentEvents = computed(() => ({
             :read-only="isReadOnly"
             :inline="asConfig"
             :full-width-setting="config.full_width_setting"
+            :hide-display="config.hide_display"
             v-bind="$attrs"
         >
             <template #label v-if="shouldShowLabel">
-                <Label :for="fieldId" :required="isRequired" class="relative">
+                <Label :for="fieldId" :required="isRequired" :hide-display="config.hide_display" class="relative">
                     <Transition name="lock-avatar-pop" mode="out-in">
                         <Avatar
                             v-if="isLocked"
