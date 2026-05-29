@@ -34,7 +34,8 @@ class Currency extends FormFieldtype
 
         return [
             'type' => 'integer',
-            'prepend' => Arr::get($currency->extra(), 'symbol'),
+            'prepend' => $symbol = Arr::get($currency->extra(), 'symbol'),
+            'currency_symbol' => $symbol,
             ...Arr::except($this->config(), ['type', 'currency']),
         ];
     }
