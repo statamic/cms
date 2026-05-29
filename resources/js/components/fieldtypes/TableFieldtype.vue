@@ -23,7 +23,6 @@
                                     <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')" v-tooltip="__('Delete Column')" class="-me-1" />
                                 </div>
                             </th>
-                            <th class="visibility-controls" v-if="canToggleRowVisibility"></th>
                             <th class="row-controls" v-if="canDeleteRows"></th>
                         </tr>
                     </thead>
@@ -44,17 +43,6 @@
                                     <ui-input
                                         v-model="row.value.cells[cellIndex]"
                                         :readonly="isReadOnly"
-                                    />
-                                </td>
-                                <td class="visibility-controls" v-if="canToggleRowVisibility">
-                                    <ui-button
-                                        :icon="row.value.hidden ? 'eye-closed' : 'eye'"
-                                        variant="subtle"
-                                        size="xs"
-                                        round
-                                        @click="toggleRowHidden(rowIndex)"
-                                        :aria-label="row.value.hidden ? __('Show Option') : __('Hide Option')"
-                                        v-tooltip="row.value.hidden ? __('Show Option') : __('Hide Option')"
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
@@ -173,10 +161,6 @@ export default {
             return !this.isReadOnly;
         },
 
-        canToggleRowVisibility() {
-            return !this.isReadOnly && this.config.show_hide_toggle === true;
-        },
-
         canAddColumns() {
             return !this.isReadOnly && this.rowCount > 0;
         },
@@ -226,13 +210,8 @@ export default {
             this.data.push(
                 this.newSortableValue({
                     cells: new Array(this.columnCount || 1),
-                    hidden: false,
                 }),
             );
-        },
-
-        toggleRowHidden(index) {
-            this.data[index].value.hidden = !this.data[index].value.hidden;
         },
 
         addColumn() {

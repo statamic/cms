@@ -36,9 +36,19 @@ class MultiChoice extends FormFieldtype
     {
         return [
             'type' => 'radio',
-            'options' => $this->config('options'),
+            'options' => $this->enabledOptions(),
             ...Arr::except($this->config(), ['type', 'options']),
         ];
+    }
+
+    private function enabledOptions(): array
+    {
+        return collect($this->config('options'))
+            ->reject(fn ($option): bool => is_array($option) && ($option['hidden'] ?? false) === true)
+            ->mapWithKeys(fn ($option, $key): array => [
+                is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
+            ])
+            ->all();
     }
 
     public function example(): ?array

@@ -59,12 +59,22 @@ class Dropdown extends FormFieldtype
     {
         return [
             'type' => 'select',
-            'options' => $this->config('options'),
+            'options' => $this->enabledOptions(),
             'placeholder' => $this->config('placeholder'),
             'multiple' => $this->config('multiple'),
             'max_items' => $this->config('max_selections', $this->config('max_items')),
             ...Arr::except($this->config(), ['type', 'options', 'placeholder', 'multiple', 'max_items', 'max_selections']),
         ];
+    }
+
+    private function enabledOptions(): array
+    {
+        return collect($this->config('options'))
+            ->reject(fn ($option): bool => is_array($option) && ($option['hidden'] ?? false) === true)
+            ->mapWithKeys(fn ($option, $key): array => [
+                is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
+            ])
+            ->all();
     }
 
     public function example(): ?array
