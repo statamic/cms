@@ -161,7 +161,7 @@ const shouldBeIndented = (index) => {
                                 </span>
                             </template>
                             <template #field-selected="{ option, field: selectedField }">
-                                <span class="inline-flex items-center gap-2">
+                                <span class="inline-flex items-center gap-2 truncate">
                                     <Icon
                                         v-if="selectedField?.icon"
                                         :name="selectedField.icon"
