@@ -17,7 +17,7 @@
         &::before {
             content: '';
             position: absolute;
-            inset: -0.5rem calc(-1rem - 2px) -1.1rem;
+            inset: -0.5rem calc(-1rem - 2px) -1.25rem;
             border: 1px dashed var(--color-blue-400);
             border-radius: 10px;
             @apply bg-blue-50;
