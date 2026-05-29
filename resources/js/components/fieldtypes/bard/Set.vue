@@ -26,7 +26,7 @@
                 <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
                     <Icon name="handles" class="size-4 text-gray-400" />
                 </span>
-                <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-scroll p-2 pe-4 focus:outline-none [--mask:linear-gradient(to_left,transparent_0%,black_1rem)] [-webkit-mask:var(--mask)] [mask:var(--mask)]" @click="toggleCollapsedState">
+                <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 pe-4 focus:outline-none [--mask:linear-gradient(to_left,transparent_0%,black_1rem)] [-webkit-mask:var(--mask)] [mask:var(--mask)]" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
                             {{ __(setGroup.display) }}
