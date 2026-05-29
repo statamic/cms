@@ -59,6 +59,7 @@
                                     icon="sync"
                                     size="sm"
                                     variant="ghost"
+                                    :aria-label="__('Regenerate from: :field', { field: __('Display') })"
                                     @click="regenerateHandle"
                                     v-tooltip="__('Regenerate from: :field', { field: __('Display') })"
                                 />
