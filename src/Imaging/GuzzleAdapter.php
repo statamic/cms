@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\UriResolver;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
@@ -14,6 +16,13 @@ use Statamic\Exceptions\InvalidRemoteUrlException;
 
 class GuzzleAdapter implements FilesystemAdapter
 {
+    /**
+     * The maximum number of redirects to follow.
+     *
+     * @var int
+     */
+    const MAX_REDIRECTS = 5;
+
     /**
      * Whether this endpoint supports head requests.
      *
@@ -149,18 +158,12 @@ class GuzzleAdapter implements FilesystemAdapter
     protected function get($path)
     {
         try {
-            $response = $this->client->get($this->base.$path, $this->requestOptions());
-        } catch (InvalidRemoteUrlException $e) {
-            throw $e;
+            $response = $this->send('GET', $this->base.$path);
         } catch (BadResponseException $e) {
             return false;
         }
 
-        if ($response->getStatusCode() !== 200) {
-            return false;
-        }
-
-        return $response;
+        return $response->getStatusCode() === 200 ? $response : false;
     }
 
     /**
@@ -176,7 +179,7 @@ class GuzzleAdapter implements FilesystemAdapter
         }
 
         try {
-            $response = $this->client->head($this->base.$path, $this->requestOptions());
+            $response = $this->send('HEAD', $this->base.$path);
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() === 405) {
                 $this->supportsHead = false;
@@ -185,27 +188,54 @@ class GuzzleAdapter implements FilesystemAdapter
             }
 
             return false;
-        } catch (InvalidRemoteUrlException $e) {
-            throw $e;
         } catch (BadResponseException $e) {
             return false;
         }
 
-        if ($response->getStatusCode() !== 200) {
-            return false;
+        return $response->getStatusCode() === 200 ? $response : false;
+    }
+
+    /**
+     * Send a request, pinning the connection to the validated IP so the host
+     * cannot be rebound to an internal address between validation and the
+     * actual fetch. Redirects are followed manually so each hop is validated
+     * and pinned too.
+     */
+    protected function send(string $method, string $url, int $redirects = 0)
+    {
+        // The connection is pinned to the validated IP via curl's CURLOPT_RESOLVE,
+        // which the stream handler has no equivalent for. Rather than silently fall
+        // back to an unpinned (rebindable) request, refuse to fetch without curl.
+        if (! $this->supportsConnectionPinning()) {
+            throw new \RuntimeException('The curl PHP extension is required to fetch remote images.');
+        }
+
+        $resolved = app(RemoteUrlValidator::class)->resolve($url);
+
+        $response = $this->client->request($method, $url, [
+            'allow_redirects' => false,
+            'curl' => [
+                CURLOPT_RESOLVE => [sprintf('%s:%d:%s', $resolved['host'], $resolved['port'], implode(',', $resolved['ips']))],
+            ],
+        ]);
+
+        $status = $response->getStatusCode();
+
+        if ($status >= 300 && $status < 400 && $response->hasHeader('Location')) {
+            if ($redirects >= self::MAX_REDIRECTS) {
+                throw new InvalidRemoteUrlException('Too many redirects.');
+            }
+
+            $location = UriResolver::resolve(new Uri($url), new Uri($response->getHeaderLine('Location')));
+
+            return $this->send($method, (string) $location, $redirects + 1);
         }
 
         return $response;
     }
 
-    protected function requestOptions()
+    protected function supportsConnectionPinning(): bool
     {
-        return [
-            'allow_redirects' => [
-                'on_redirect' => function ($request, $response, $uri) {
-                    app(RemoteUrlValidator::class)->validate((string) $uri);
-                },
-            ],
-        ];
+        return extension_loaded('curl');
     }
 }
