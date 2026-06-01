@@ -45,7 +45,7 @@ defineExpose({ focus });
         class="relative block w-full space-y-2"
         :class="{
             'flex flex-wrap space-y-0 gap-x-4 gap-y-2': resolvedAppearance === 'inline' || resolvedAppearance === 'chips',
-            'gap-x-2!': resolvedAppearance === 'chips',
+            'gap-x-2.5!': resolvedAppearance === 'chips',
         }"
         :data-appearance="resolvedAppearance !== 'default' ? resolvedAppearance : undefined"
         data-ui-input
