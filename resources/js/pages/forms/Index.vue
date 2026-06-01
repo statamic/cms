@@ -72,7 +72,7 @@ const reloadPage = () => router.reload();
                 <template #cell-submissions="{ row: form, value: submissions }">
                     <Badge
                         :href="form.submissions_url"
-                        :prepend="String(submissions)"
+                        :append="String(submissions)"
                         :text="__('Results')"
                         color="white"
                         pill
