@@ -43,6 +43,11 @@ class Writer
             return false;
         }
 
+        // Truncate the file before writing. Since the "c" mode doesn't truncate and leaves
+        // the pointer at the start, writing content shorter than what's already on disk
+        // would otherwise leave stale bytes behind, producing an invalid document.
+        ftruncate($handle, 0);
+
         fwrite($handle, $content);
         chmod($path, $this->permissions['file']);
 
