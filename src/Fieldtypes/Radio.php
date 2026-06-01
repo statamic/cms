@@ -34,10 +34,16 @@ class Radio extends Fieldtype
             [
                 'display' => __('Appearance'),
                 'fields' => [
-                    'inline' => [
-                        'display' => __('Inline'),
-                        'instructions' => __('statamic::fieldtypes.radio.config.inline'),
-                        'type' => 'toggle',
+                    'appearance' => [
+                        'display' => __('Appearance'),
+                        'instructions' => __('statamic::fieldtypes.radio.config.appearance'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Default'),
+                            'inline' => __('Inline'),
+                            'chips' => __('Chips'),
+                        ],
                     ],
                 ],
             ],
