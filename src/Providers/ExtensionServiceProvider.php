@@ -139,44 +139,29 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $formFieldtypes = [
-        // Information
-        Forms\Fieldtypes\Heading::class,
-        Forms\Fieldtypes\Paragraph::class,
         Forms\Fieldtypes\Banner::class,
-
-        // Text
-        Forms\Fieldtypes\ShortAnswer::class,
-        Forms\Fieldtypes\LongAnswer::class,
-
-        // Choice
-        Forms\Fieldtypes\Dropdown::class,
-        Forms\Fieldtypes\YesNo::class,
-        Forms\Fieldtypes\MultiChoice::class,
         Forms\Fieldtypes\Checkboxes::class,
-        Forms\Fieldtypes\Toggle::class,
-        Forms\Fieldtypes\ImageChoice::class,
-
-        // Rate
-        Forms\Fieldtypes\StarRating::class,
-        Forms\Fieldtypes\Ranking::class,
-        Forms\Fieldtypes\OpinionScale::class,
-
-        // Contact Info
-        Forms\Fieldtypes\Name::class,
-        Forms\Fieldtypes\Email::class,
-        Forms\Fieldtypes\Website::class,
-        Forms\Fieldtypes\Phone::class,
-
-        // Number
-        Forms\Fieldtypes\Number::class,
         Forms\Fieldtypes\Currency::class,
-
-        // Date and Time
         Forms\Fieldtypes\DatePicker::class,
-        Forms\Fieldtypes\TimePicker::class,
-
-        // Other
         Forms\Fieldtypes\Dictionary::class,
+        Forms\Fieldtypes\Dropdown::class,
+        Forms\Fieldtypes\Email::class,
+        Forms\Fieldtypes\Heading::class,
+        Forms\Fieldtypes\ImageChoice::class,
+        Forms\Fieldtypes\LongAnswer::class,
+        Forms\Fieldtypes\MultiChoice::class,
+        Forms\Fieldtypes\Name::class,
+        Forms\Fieldtypes\Number::class,
+        Forms\Fieldtypes\OpinionScale::class,
+        Forms\Fieldtypes\Paragraph::class,
+        Forms\Fieldtypes\Phone::class,
+        Forms\Fieldtypes\Ranking::class,
+        Forms\Fieldtypes\ShortAnswer::class,
+        Forms\Fieldtypes\StarRating::class,
+        Forms\Fieldtypes\TimePicker::class,
+        Forms\Fieldtypes\Toggle::class,
+        Forms\Fieldtypes\Website::class,
+        Forms\Fieldtypes\YesNo::class,
     ];
 
     protected $modifierAliases = [
