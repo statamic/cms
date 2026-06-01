@@ -157,10 +157,8 @@ const fieldIconClasses = (fieldtypeHandle: string) => `size-4 shrink-0 ${categor
 const findSuggestableField = (handle: string) => suggestableConditionFields.value.find((f) => f.handle === handle);
 
 const updateFieldConditions = (conditions: Record<string, any>) => {
-    const keysToRemove = ['if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'];
-    keysToRemove.forEach((key) => delete field.value.config[key]);
-
     Object.assign(field.value.config, conditions);
+    Object.assign(values.value, conditions);
     dirty();
 };
 
