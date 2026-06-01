@@ -22,9 +22,10 @@ class FallbackTest extends TestCase
     }
 
     #[Test]
-    public function it_finds_form_fieldtype_view_for_wrapped_fieldtype()
+    public function it_falls_back_to_the_equivalent_form_fieldtype_view()
     {
         // The Textarea fieldtype is wrapped by the LongAnswer form fieldtype.
+        // Since there's no textarea view, it falls back to long_answer.
         $fallback = (new Fallback)->wrapping(new Textarea);
 
         $this->assertEquals('statamic::forms.antlers.fields.long_answer', $fallback->view());

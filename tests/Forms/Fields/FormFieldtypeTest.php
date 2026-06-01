@@ -57,7 +57,7 @@ class FormFieldtypeTest extends TestCase
     }
 
     #[Test]
-    public function it_resolves_view_using_form_fieldtype_handle()
+    public function it_resolves_view_using_underlying_fieldtype_handle()
     {
         View::addNamespace('statamic', __DIR__.'/__fixtures__/views');
 
@@ -72,18 +72,18 @@ class FormFieldtypeTest extends TestCase
             }
         };
 
-        $this->assertEquals('statamic::forms.antlers.fields.short_answer', $formFieldtype->view());
+        $this->assertEquals('statamic::forms.antlers.fields.text', $formFieldtype->view());
     }
 
     #[Test]
-    public function it_falls_back_to_underlying_fieldtype_handle_view()
+    public function it_resolves_view_using_form_fieldtype_handle()
     {
         View::addNamespace('statamic', __DIR__.'/__fixtures__/views');
 
         $formFieldtype = new class extends FormFieldtype
         {
-            public static $handle = 'unknown_form_fieldtype';
-            protected static $fieldtype = 'text';
+            public static $handle = 'short_answer';
+            protected static $fieldtype = 'unknown_underlying_fieldtype';
 
             public function toFieldArray(): array
             {
@@ -91,7 +91,7 @@ class FormFieldtypeTest extends TestCase
             }
         };
 
-        $this->assertEquals('statamic::forms.antlers.fields.text', $formFieldtype->view());
+        $this->assertEquals('statamic::forms.antlers.fields.short_answer', $formFieldtype->view());
     }
 
     #[Test]

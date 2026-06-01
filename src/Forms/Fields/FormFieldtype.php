@@ -176,9 +176,9 @@ abstract class FormFieldtype implements Arrayable
 
         if ($underlyingFieldtype = static::fieldtype()) {
             $views = [
-                ...$views,
                 "statamic::forms.fields.{$underlyingFieldtype}",
                 "statamic::forms.{$language}.fields.{$underlyingFieldtype}",
+                ...$views,
             ];
         }
 
