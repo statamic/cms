@@ -143,6 +143,7 @@ return [
     'picker.category.special.description' => 'These fields are special, each in their own way.',
     'picker.category.structured.description' => 'Fields that store structured data. Some can even nest other fields inside themselves.',
     'picker.category.text.description' => 'Fields that store strings of text, rich content, or both.',
+    'radio.config.appearance' => 'Choose how the radio buttons are displayed.',
     'radio.config.inline' => 'Show the radio buttons in a row.',
     'radio.config.options' => 'Set the array keys and their optional labels.',
     'radio.title' => 'Radio',
