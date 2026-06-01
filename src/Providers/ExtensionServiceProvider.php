@@ -172,6 +172,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\Currency::class,
 
         // Date and Time
+        Forms\Fieldtypes\DatePicker::class,
         Forms\Fieldtypes\TimePicker::class,
 
         // Other
