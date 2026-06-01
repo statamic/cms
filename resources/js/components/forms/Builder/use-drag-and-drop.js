@@ -31,7 +31,7 @@ export function useFieldtypeDraggable({ pages, onDragStart, onDrop }) {
         draggable = new Draggable(containers, {
             draggable: '.fieldtype-draggable',
             delay: { mouse: 0, touch: 150 },
-            distance: 0,
+            distance: 5,
             mirror: { constrainDimensions: true, appendTo: 'body' },
         });
 
