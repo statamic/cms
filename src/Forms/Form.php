@@ -162,8 +162,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::pull($field, 'field.input_type');
                         }
 
-                        if (Arr::get($field, 'field.type') === 'text') {
+                        if (
+                            Arr::get($field, 'field.type') === 'text'
+                            && (! Arr::has($field, 'field.input_type') || Arr::get($field, 'field.input_type') === 'text')
+                        ) {
                             Arr::set($field, 'field.type', 'short_answer');
+                            Arr::pull($field, 'field.input_type');
                         }
 
                         if (Arr::get($field, 'field.type') === 'textarea') {

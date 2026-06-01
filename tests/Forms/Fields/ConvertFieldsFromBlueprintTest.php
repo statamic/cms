@@ -93,8 +93,12 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'phone', 'display' => 'Phone', 'placeholder' => '(555) 123-4567'],
             ],
             'short_answer' => [
-                ['type' => 'text', 'display' => 'Name'],
+                ['type' => 'text', 'display' => 'Name', 'input_type' => 'text'],
                 ['type' => 'short_answer', 'display' => 'Name'],
+            ],
+            'text with input_type' => [
+                ['type' => 'text', 'input_type' => 'date'],
+                ['type' => 'text', 'input_type' => 'date'],
             ],
             'long_answer' => [
                 ['type' => 'textarea', 'display' => 'Message'],
