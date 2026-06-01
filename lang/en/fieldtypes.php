@@ -49,6 +49,7 @@ return [
     'bard.config.word_count' => 'Show the word count at the bottom of the field.',
     'bard.title' => 'Bard',
     'button_group.title' => 'Button Group',
+    'checkboxes.config.appearance' => 'Choose how the checkboxes are displayed.',
     'checkboxes.config.inline' => 'Show the checkboxes in a row.',
     'checkboxes.config.options' => 'Set the array keys and their optional labels.',
     'checkboxes.title' => 'Checkboxes',

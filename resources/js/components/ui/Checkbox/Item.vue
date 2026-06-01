@@ -1,6 +1,6 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
-import { computed, useAttrs } from 'vue';
+import { computed, inject, useAttrs } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 
@@ -9,6 +9,8 @@ defineOptions({ inheritAttrs: false });
 const attrs = useAttrs();
 
 const props = defineProps({
+    /** Additional classes applied when the group appearance is `chips` */
+    chipsClass: { type: String, default: 'border border-gray-300 dark:border-gray-700 mb-0 p-2 pe-4 shadow-ui-xs rounded-full' },
     /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
     /** Description text to display below the label */
@@ -33,6 +35,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue', 'keydown']);
+
+const appearance = inject('checkboxAppearance', computed(() => 'default'));
 
 const id = useId();
 
@@ -76,7 +80,7 @@ const containerClasses = computed(() => {
         },
     })({ ...props });
 
-    return twMerge(classes, attrs.class);
+    return twMerge(classes, appearance.value === 'chips' ? props.chipsClass : null, attrs.class);
 });
 
 const conditionalProps = computed(() => {
@@ -104,7 +108,7 @@ const conditionalProps = computed(() => {
 </script>
 
 <template>
-    <div :class="containerClasses">
+    <div :class="containerClasses" data-ui-checkbox-item>
         <CheckboxRoot
             :disabled="readOnly || disabled"
             :id
