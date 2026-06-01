@@ -3,6 +3,8 @@ import { computed, inject, useId } from 'vue';
 import { RadioGroupIndicator, RadioGroupItem } from 'reka-ui';
 
 const props = defineProps({
+    /** Additional classes applied when the group appearance is `chips` */
+    chipsClass: { type: String, default: 'border border-gray-300 dark:border-gray-700 mb-0 p-2 pe-4 shadow-ui-xs rounded-full' },
     /** Description text to display below the label */
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
@@ -14,31 +16,16 @@ const props = defineProps({
 });
 
 const appearance = inject('radioAppearance', computed(() => 'default'));
-const isChips = computed(() => appearance.value === 'chips');
-const id = useId();
 
-const chipClasses = [
-    'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 h-10 text-sm font-medium antialiased cursor-default',
-    'border border-gray-300 bg-linear-to-b from-white to-gray-50 text-gray-900 shadow-ui-xs',
-    'hover:to-gray-100 data-[state=checked]:from-gray-100 data-[state=checked]:to-gray-100 data-[state=checked]:inset-shadow-sm/10',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
-    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 dark:border-white/10 dark:text-gray-300 dark:shadow-lg',
-    'dark:data-[state=checked]:from-gray-950 dark:data-[state=checked]:to-gray-850 dark:data-[state=checked]:text-white',
-];
+const id = useId();
 </script>
 
 <template>
-    <RadioGroupItem
-        v-if="isChips"
-        :id
-        :value="value"
-        :disabled="readOnly || disabled"
-        :class="chipClasses"
+    <div
+        class="flex items-start gap-1.5"
+        :class="appearance === 'chips' ? chipsClass : null"
         data-ui-radio-item
     >
-        <slot>{{ label || value }}</slot>
-    </RadioGroupItem>
-    <div v-else class="flex items-start gap-1.5" data-ui-radio-item>
         <RadioGroupItem
             :id
             :value="value"
