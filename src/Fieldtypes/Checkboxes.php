@@ -37,10 +37,16 @@ class Checkboxes extends Fieldtype
             [
                 'display' => __('Appearance'),
                 'fields' => [
-                    'inline' => [
-                        'display' => __('Inline'),
-                        'instructions' => __('statamic::fieldtypes.checkboxes.config.inline'),
-                        'type' => 'toggle',
+                    'appearance' => [
+                        'display' => __('Appearance'),
+                        'instructions' => __('statamic::fieldtypes.checkboxes.config.appearance'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Default'),
+                            'inline' => __('Inline'),
+                            'chips' => __('Chips'),
+                        ],
                     ],
                 ],
             ],
