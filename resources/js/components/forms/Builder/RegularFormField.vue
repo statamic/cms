@@ -113,7 +113,7 @@ const hasErrors = computed(() => {
                         {{ __(field.config.display) }}
                         <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
                     </span>
-                    <Icon v-if="field.type === 'reference'" name="link" class="size-3! text-indigo-500 dark:text-indigo-400" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
+                    <Icon v-if="field.type === 'reference'" name="link" class="inline-block size-3! text-indigo-500 dark:text-indigo-400 mb-0.5 ms-2" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
                     <Icon v-if="field.config.hidden" name="eye-closed" class="size-3.5! text-gray-400 dark:text-gray-500" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
                 </Label>
             </template>
