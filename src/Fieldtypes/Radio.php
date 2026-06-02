@@ -37,8 +37,10 @@ class Radio extends Fieldtype
                     'appearance' => [
                         'display' => __('Appearance'),
                         'instructions' => __('statamic::fieldtypes.radio.config.appearance'),
-                        'type' => 'radio',
+                        'type' => 'button_group',
                         'default' => 'default',
+                        'appearance_previews' => true,
+                        'control' => 'radio',
                         'options' => [
                             'default' => __('Default'),
                             'inline' => __('Inline'),
