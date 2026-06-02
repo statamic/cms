@@ -32,7 +32,10 @@ const addLinkFieldsPlaceholder = () => {
     dirty();
 };
 
-const toggleCollapsed = () => props.section.collapsed = !props.section.collapsed;
+const toggleCollapsed = () => {
+    props.section.collapsibleInteracted = true;
+    props.section.collapsed = !props.section.collapsed;
+};
 
 const inspectField = (field: any) => inspect(InspectorType.Field, field);
 
@@ -173,7 +176,10 @@ const deleteSection = () => emit('deleted', props.section._id);
 
         <div
             class="publish-section-collapsible grid"
-            :class="section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded'"
+            :class="[
+                section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded',
+                { 'publish-section-collapsible--interacted': section.collapsibleInteracted },
+            ]"
         >
             <div class="publish-section-collapsible__inner min-h-0">
             <Card class="section-drop-zone" :data-section-drop-zone="section._id">
@@ -259,50 +265,6 @@ const deleteSection = () => emit('deleted', props.section._id);
         />
     </Panel>
 </template>
-
-<style scoped>
-[class*="publish-section-collapsible"] {
-    --speed: 0ms;
-    /* Only setting the animation speed when the panel is hovered prevents the animation triggering on page load. */
-    [data-ui-panel]:hover & {
-        --speed: 250ms;
-    }
-    --timing: ease;
-
-    @media (prefers-reduced-motion: reduce) {
-        --speed: 0ms;
-    }
-}
-
-.publish-section-collapsible--expanded {
-    /* We can animate collapse/expand using grid rows */
-    animation: expand-rows var(--speed) var(--timing) forwards;
-}
-
-.publish-section-collapsible--collapsed {
-    animation: collapse-rows var(--speed) var(--timing) forwards;
-}
-
-.publish-section-collapsible--expanded .publish-section-collapsible__inner {
-    animation: calc(var(--speed) * 2) var(--timing) section-fade-in both;
-    overflow: clip;
-    /* We need to increase the clip margin here vs regular collapsible sections because we have things appearing outside the section such as the logic indicator icon. */
-    overflow-clip-margin: 2.5rem;
-}
-
-.publish-section-collapsible--collapsed .publish-section-collapsible__inner {
-    animation:
-        clip-overflow 0ms var(--speed) forwards,
-        make-invisible 0ms var(--speed) forwards;
-    overflow: clip;
-}
-
-@keyframes section-fade-in { from { opacity: 0%; } to { opacity: 100%; } }
-@keyframes make-invisible { from { visibility: visible; } to { visibility: hidden; } }
-@keyframes collapse-rows  { from { grid-template-rows: 1fr; } to { grid-template-rows: 0fr; } }
-@keyframes expand-rows    { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
-@keyframes clip-overflow  { to { overflow: clip; } }
-</style>
 
 <style>
 [data-drop-indicator]:has(~ [data-empty-section]) {
