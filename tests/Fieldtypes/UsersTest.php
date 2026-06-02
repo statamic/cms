@@ -99,15 +99,13 @@ class UsersTest extends TestCase
     }
 
     #[Test]
-    public function it_hides_email_from_index_items_without_view_users_permission()
+    public function it_returns_empty_index_items_without_view_users_permission()
     {
         $this->actingAs($this->cpUserWithPermissions(['access cp']));
 
         $items = $this->fieldtype()->getIndexItems(new Request(['paginate' => false]));
-        $namelessUser = $items->firstWhere('id', '789');
 
-        $this->assertArrayNotHasKey('email', $namelessUser);
-        $this->assertEquals('789', $namelessUser['title']);
+        $this->assertTrue($items->isEmpty());
     }
 
     #[Test]

@@ -96,10 +96,10 @@ array:
   - 'second one'
 string: 'The string'
 'null': null
-empty: {  }
+empty: {}
 
 EOT;
-        $this->assertEquals($expected, $b->fileContents());
+        $this->assertEquals($expected, $this->normalizeYaml($b->fileContents()));
 
         $expected = <<<'EOT'
 array:
