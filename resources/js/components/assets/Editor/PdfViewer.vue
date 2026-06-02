@@ -21,6 +21,7 @@ let observer = null;
 let pageStates = [];
 
 const supportsOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
+const scale = Math.min(2, window.devicePixelRatio || 2);
 
 onMounted(() => renderPdf());
 
@@ -52,8 +53,6 @@ async function renderPdf() {
         const viewerContext = await initViewer(pdf);
 
         if (renderId !== currentRenderId) return;
-
-        const scale = window.devicePixelRatio || 2;
 
         // Phase 1: Create all page placeholders with correctly-sized empty canvases.
         // This gives the user the full scrollable document structure immediately,
