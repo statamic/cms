@@ -175,10 +175,13 @@
     [data-editing-item] {
         /* Tweak things optically, since the field is no longer here */
         > *:first-child {
-            top: -0.085rem;
+            top: -0.175rem;
         }
         &::before {
             inset-block: -0.75rem;
+        }
+        &.field--last-row::before {
+            inset-block-end: -1.25rem;
         }
     }
     /* Field Icons */
