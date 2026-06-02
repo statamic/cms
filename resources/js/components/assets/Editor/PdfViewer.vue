@@ -249,7 +249,6 @@ function cleanup({ invalidateRender = true } = {}) {
 }
 
 .pdf-page .annotationLayer {
-    position: absolute;
     inset: 0;
 }
 
