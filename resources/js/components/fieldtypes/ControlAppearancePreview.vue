@@ -15,7 +15,7 @@ const props = defineProps({
 const isRadio = props.control === 'radio';
 const chipClass = isRadio
     ? 'rounded-full px-2 py-1'
-    : 'items-center rounded-lg px-2 py-1';
+    : 'items-center rounded-sm px-2 py-1';
 </script>
 
 <template>
@@ -46,7 +46,7 @@ const chipClass = isRadio
             </div>
             <div
                 v-else
-                class="flex size-2 shrink-0 items-center justify-center rounded-sm border shadow-ui-xs"
+                class="flex size-2 shrink-0 items-center justify-center rounded-[2px] border shadow-ui-xs"
                 :class="
                     selected
                         ? 'border-ui-accent-bg bg-ui-accent-bg dark:border-none'
@@ -58,7 +58,7 @@ const chipClass = isRadio
                     viewBox="0 0 10 8"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    class="size-1.5 shrink-0 text-white"
+                    class="size-1.5 shrink-0 !text-white !opacity-100"
                     aria-hidden="true"
                 >
                     <path
@@ -71,7 +71,7 @@ const chipClass = isRadio
                 </svg>
             </div>
             <div
-                class="h-1 rounded-sm bg-gray-300 dark:bg-gray-600"
+                class="h-1 rounded-[2px] bg-gray-300 dark:bg-gray-600"
                 :class="[selected ? 'w-5 dark:bg-gray-500' : 'w-4 dark:bg-gray-700']"
             />
         </div>
