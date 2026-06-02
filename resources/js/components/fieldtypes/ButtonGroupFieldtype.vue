@@ -71,14 +71,14 @@ export default {
                 return [
                     base,
                     'from-white to-white hover:from-white hover:to-white',
-                    'dark:from-gray-900 dark:to-gray-900  dark:hover:from-gray-900 dark:hover:to-gray-900',
+                    'dark:from-gray-850 dark:to-gray-850 dark:hover:from-gray-950 dark:hover:to-gray-900',
                 ];
             }
 
             return [
                 base,
-                'from-gray-150 to-gray-50',
-                'dark:from-gray-800 dark:to-gray-850',
+                'from-gray-150 to-gray-50 border-gray-300',
+                'dark:from-gray-925 dark:to-gray-900 dark:border-gray-700/80',
             ];
         },
 

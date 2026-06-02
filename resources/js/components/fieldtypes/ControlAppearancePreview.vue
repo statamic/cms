@@ -31,18 +31,18 @@ const chipClass = isRadio
             v-for="selected in [true, false]"
             :key="selected ? 'on' : 'off'"
             class="flex items-center gap-1"
-            :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 bg-white dark:bg-gray-500 ${chipClass}` : null"
+            :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 ${chipClass}` : null"
         >
             <div
-                class="shrink-0 border border-gray-500 dark:border-gray-500"
+                class="shrink-0 border border-gray-500 bg-white dark:border-none dark:bg-gray-500"
                 :class="[
                     isRadio ? 'size-2 rounded-full' : 'size-2 rounded-sm',
-                    selected ? 'border-ui-accent-bg bg-ui-accent-bg/15 dark:bg-gray-300/30' : 'bg-white dark:bg-gray-500',
+                    selected ? 'border-ui-accent-bg bg-ui-accent-bg/15 dark:border-none dark:bg-gray-300' : null,
                 ]"
             />
             <div
                 class="h-1 rounded-sm bg-gray-300 dark:bg-gray-600"
-                :class="selected ? 'w-5' : 'w-4'"
+                :class="[selected ? 'w-5 dark:bg-gray-500' : 'w-4 dark:bg-gray-700']"
             />
         </div>
     </div>
