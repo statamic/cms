@@ -100,6 +100,7 @@ const hasErrors = computed(() => {
         >
             <template #label>
                 <Label :class="['', { 'cursor-pointer': !isInspecting }]">
+                    <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
                         v-if="field.config.if || field.config.unless"
                         data-logic-attached
@@ -108,7 +109,6 @@ const hasErrors = computed(() => {
                         :aria-label="__('Logic attached')"
                         v-tooltip="__('Logic attached')"
                     />
-                    <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <span>
                         {{ __(field.config.display) }}
                         <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
