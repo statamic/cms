@@ -51,9 +51,7 @@ async function renderPdf() {
         pdfDocument = pdf;
         const viewerContext = await initViewer(pdf);
 
-        // Phase 1: Create all page placeholders with correctly-sized empty canvases.
-        // This gives the user the full scrollable document structure immediately,
-        // while the actual rendering happens lazily via IntersectionObserver.
+        // Create page placeholders with sized canvases for scrollable layout
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
             const page = await pdf.getPage(pageNumber);
 
@@ -85,9 +83,7 @@ async function renderPdf() {
             });
         }
 
-        // Phase 2: Observe pages for viewport proximity and render on demand.
-        // rootMargin pre-renders pages 200px before they scroll into view
-        // to avoid blank flashes during normal scrolling.
+        // Observe pages for viewport proximity and render on demand
         observer = new IntersectionObserver(
             (entries) => {
                 for (const entry of entries) {
