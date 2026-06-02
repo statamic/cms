@@ -34,7 +34,7 @@ const chipClass = isRadio
             :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 bg-white dark:bg-gray-500 ${chipClass}` : null"
         >
             <div
-                class="shrink-0 border border-gray-400/75 dark:border-gray-500"
+                class="shrink-0 border border-gray-500 dark:border-gray-500"
                 :class="[
                     isRadio ? 'size-2 rounded-full' : 'size-2 rounded-sm',
                     selected ? 'border-ui-accent-bg bg-ui-accent-bg/15 dark:bg-gray-300/30' : 'bg-white dark:bg-gray-500',
