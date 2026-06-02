@@ -34,19 +34,41 @@ const chipClass = isRadio
             :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 ${chipClass}` : null"
         >
             <div
-                class="relative flex shrink-0 items-center justify-center border"
-                :class="[
-                    isRadio ? 'size-2 rounded-full' : 'size-2 rounded-sm',
+                v-if="isRadio"
+                class="relative flex size-2 shrink-0 items-center justify-center rounded-full border shadow-ui-xs"
+                :class="
                     selected
-                        ? 'border-ui-accent-bg bg-ui-accent-bg/15 dark:border-none dark:bg-gray-300'
-                        : 'border-gray-400/75 bg-white dark:border-none dark:bg-gray-500',
-                ]"
+                        ? 'border-ui-accent-bg bg-white dark:bg-gray-300'
+                        : 'border-gray-400/75 bg-white dark:border-none dark:bg-gray-500'
+                "
             >
-                <div
+                <div v-if="selected" class="size-1 rounded-full bg-ui-accent-bg" />
+            </div>
+            <div
+                v-else
+                class="flex size-2 shrink-0 items-center justify-center rounded-sm border shadow-ui-xs"
+                :class="
+                    selected
+                        ? 'border-ui-accent-bg bg-ui-accent-bg dark:border-none'
+                        : 'border-gray-400/75 bg-white dark:border-none dark:bg-gray-500'
+                "
+            >
+                <svg
                     v-if="selected"
-                    class="bg-ui-accent-bg/10 dark:bg-ui-accent-bg"
-                    :class="isRadio ? 'size-1 rounded-full' : 'size-1 rounded-sm'"
-                />
+                    viewBox="0 0 10 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="size-1.5 shrink-0 text-white"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M9 1L3.5 6.5L1 4"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
             </div>
             <div
                 class="h-1 rounded-sm bg-gray-300 dark:bg-gray-600"
