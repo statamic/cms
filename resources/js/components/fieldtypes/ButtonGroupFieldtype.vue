@@ -10,7 +10,7 @@
             :text="config.appearance_previews ? null : (option.label || option.value)"
             :value="option.value"
             :variant="value == option.value ? 'pressed' : 'default'"
-            :class="config.appearance_previews ? 'min-w-34 h-auto items-start justify-start py-1.5' : null"
+            :class="appearancePreviewButtonClass(option.value)"
             @click="updateSelectedOption(option.value)"
         >
             <div v-if="config.appearance_previews" class="flex w-full flex-col items-start gap-2 py-0.5 text-left">
@@ -49,6 +49,28 @@ export default {
     },
 
     methods: {
+        appearancePreviewButtonClass(optionValue) {
+            if (!this.config.appearance_previews) {
+                return null;
+            }
+
+            const base = 'min-w-34 h-auto items-start justify-start py-1.5';
+
+            if (this.value != optionValue) {
+                return [
+                    base,
+                    'from-white to-white hover:from-white hover:to-white',
+                    'dark:from-gray-900 dark:to-gray-900  dark:hover:from-gray-900 dark:hover:to-gray-900',
+                ];
+            }
+
+            return [
+                base,
+                'from-gray-150 to-gray-50',
+                'dark:from-gray-800 dark:to-gray-850',
+            ];
+        },
+
         updateSelectedOption(newValue) {
             this.update(this.value == newValue && this.config.clearable ? null : newValue);
         },
