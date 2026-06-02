@@ -300,8 +300,7 @@ function cleanup({ invalidateRender = true } = {}) {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9ca3af;
-    font-size: 0.875rem;
+    @apply text-sm text-gray-400;
 }
 </style>
 
