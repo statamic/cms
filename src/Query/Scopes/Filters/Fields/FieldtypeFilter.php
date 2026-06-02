@@ -84,6 +84,8 @@ class FieldtypeFilter
 
     public function isComplete($values): bool
     {
+        $values = Arr::removeNullValues($values);
+
         if (! $operator = Arr::get($values, 'operator')) {
             return false;
         }
@@ -92,8 +94,6 @@ class FieldtypeFilter
             return true;
         }
 
-        $value = Arr::get($values, 'value');
-
-        return $value !== null && $value !== '';
+        return Arr::has($values, 'value');
     }
 }
