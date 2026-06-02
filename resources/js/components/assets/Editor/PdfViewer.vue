@@ -17,8 +17,8 @@ const hasError = ref(false);
 let currentRenderId = 0;
 let loadingTask = null;
 let pdfDocument = null;
-let observer = null;
 let pageStates = [];
+let observer = null;
 
 const scale = Math.min(2, window.devicePixelRatio || 2);
 
@@ -50,8 +50,6 @@ async function renderPdf() {
 
         pdfDocument = pdf;
         const viewerContext = await initViewer(pdf);
-
-        if (renderId !== currentRenderId) return;
 
         // Phase 1: Create all page placeholders with correctly-sized empty canvases.
         // This gives the user the full scrollable document structure immediately,
