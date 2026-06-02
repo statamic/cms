@@ -32,16 +32,18 @@ const id = useId();
             :disabled="readOnly || disabled"
             class="
                 shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
-                focus:focus-outline border border-gray-400/75 dark:border-none with-contrast:border-gray-100 bg-white outline-hidden
+                focus:focus-outline border border-gray-400/75 bg-white with-contrast:border-gray-100
                 data-[state=checked]:border-ui-accent-bg data-[disabled]:opacity-50
-                dark:bg-gray-500 dark:data-[state=checked]:border-none dark:data-[state=checked]:bg-gray-300
+                dark:border-gray-700 dark:bg-gray-500
+                dark:data-[state=checked]:border-ui-accent-bg dark:data-[state=checked]:bg-ui-accent-bg
             "
         >
             <RadioGroupIndicator
                 class="
                     relative flex h-full w-full items-center justify-center rounded-[50%]
-                    border border-ui-accent-bg after:block after:h-[0.5rem] after:w-[0.5rem] after:rounded-[50%]
-                    after:bg-ui-accent-bg after:content-[''] dark:border-none
+                    border border-ui-accent-bg after:block after:h-2 after:w-2 after:rounded-[50%]
+                    after:bg-ui-accent-bg after:content-['']
+                    dark:border-none dark:after:bg-white
                 "
             />
         </RadioGroupItem>
