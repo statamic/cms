@@ -22,6 +22,7 @@ class WriterTest extends TestCase
     public function tearDown(): void
     {
         @unlink($this->path);
+        @rmdir(dirname($this->path));
 
         parent::tearDown();
     }
