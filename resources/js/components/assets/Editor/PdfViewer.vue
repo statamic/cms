@@ -20,7 +20,6 @@ let pdfDocument = null;
 let observer = null;
 let pageStates = [];
 
-const supportsOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
 const scale = Math.min(2, window.devicePixelRatio || 2);
 
 onMounted(() => renderPdf());
@@ -136,27 +135,12 @@ async function renderPage(state, renderId, viewerContext) {
         const { canvas, page, viewport, container } = state;
         const { linkService, AnnotationLayerBuilder } = viewerContext;
 
-        if (supportsOffscreenCanvas) {
-            const offscreen = new OffscreenCanvas(canvas.width, canvas.height);
-            const offCtx = offscreen.getContext('2d');
+        const canvasContext = canvas.getContext('2d');
+        if (!canvasContext) return;
 
-            const task = page.render({ canvasContext: offCtx, viewport });
-            state.renderTask = task;
-            await task.promise;
-
-            if (renderId !== currentRenderId) return;
-
-            // Transfer rendered pixels to the visible canvas.
-            const visibleCtx = canvas.getContext('2d');
-            visibleCtx.drawImage(offscreen, 0, 0);
-        } else {
-            const canvasContext = canvas.getContext('2d');
-            if (!canvasContext) return;
-
-            const task = page.render({ canvasContext, viewport });
-            state.renderTask = task;
-            await task.promise;
-        }
+        const task = page.render({ canvasContext, viewport });
+        state.renderTask = task;
+        await task.promise;
 
         if (renderId !== currentRenderId) return;
 
