@@ -16,7 +16,7 @@ class CsvExporter extends Exporter
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
         $this->writer->setDelimiter(Arr::get($this->config, 'delimiter', config('statamic.forms.csv_delimiter', ',')));
-        $this->writer->addFormatter(new EscapeFormula);
+        $this->writer->addFormatter(new EscapeFormula("'"));
 
         $this->insertHeaders();
 
