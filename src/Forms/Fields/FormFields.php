@@ -85,6 +85,8 @@ class FormFields
                         return [
                             ...$section,
                             'fields' => collect($section['fields'] ?? [])
+                                ->reject(fn (array $config): bool => $config['field']['hidden'] ?? false)
+                                ->values()
                                 ->map(function (array $config): array {
                                     if (isset($config['import']) || is_string($config['field'])) {
                                         return $config;

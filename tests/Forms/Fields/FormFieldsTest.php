@@ -531,4 +531,29 @@ class FormFieldsTest extends TestCase
             ],
         ], $blueprint->contents());
     }
+
+    #[Test]
+    public function it_excludes_hidden_fields_from_blueprint()
+    {
+        $formFields = new FormFields([
+            'sections' => [
+                [
+                    'display' => 'Contact Info',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                        ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email', 'hidden' => true]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint = $formFields->toBlueprint();
+
+        $fields = $blueprint->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertCount(2, $fields);
+        $this->assertEquals('name', $fields[0]['handle']);
+        $this->assertEquals('message', $fields[1]['handle']);
+    }
 }
