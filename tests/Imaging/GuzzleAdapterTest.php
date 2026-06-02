@@ -47,23 +47,22 @@ class GuzzleAdapterTest extends TestCase
     }
 
     #[Test]
-    public function it_pins_the_connection_even_when_dns_would_rebind_after_validation()
+    public function it_resolves_the_host_once_and_pins_that_ip()
     {
-        // Simulates the DNS rebinding attack: validation sees a public IP, but a
-        // second lookup at connection time would resolve to localhost. Because we
-        // pin the validated IP via CURLOPT_RESOLVE, the connection can never use
-        // the rebound address — curl is told exactly which IP to connect to.
-        $rebindingResolver = function () {
-            static $calls = 0;
-
-            return [['ip' => ++$calls === 1 ? '93.184.216.34' : '127.0.0.1']];
+        // DNS rebinding works by returning a public IP for the validation lookup,
+        // then a private one for the connection's lookup. The fix resolves the host
+        // a single time and pins that IP to the connection via CURLOPT_RESOLVE, so
+        // the rebound answer below (127.0.0.1) is never reached. We assert both: the
+        // pin is the public IP, and the resolver is consulted exactly once.
+        $lookups = 0;
+        $resolver = function () use (&$lookups) {
+            return [['ip' => ++$lookups === 1 ? '93.184.216.34' : '127.0.0.1']];
         };
 
-        $this->app->bind(RemoteUrlValidator::class, fn () => new RemoteUrlValidator($rebindingResolver));
+        $this->app->bind(RemoteUrlValidator::class, fn () => new RemoteUrlValidator($resolver));
 
         $client = Mockery::mock(ClientInterface::class);
         $client->shouldReceive('request')->once()->andReturnUsing(function ($method, $url, $options) {
-            // The pinned IP is the public one resolved during validation, not the rebound one.
             $this->assertSame(['example.com:443:93.184.216.34'], $options['curl'][CURLOPT_RESOLVE]);
 
             return new Response(200, [], 'image-bytes');
@@ -72,6 +71,7 @@ class GuzzleAdapterTest extends TestCase
         $adapter = new GuzzleAdapter('https://example.com', $client);
 
         $this->assertSame('image-bytes', $adapter->read('foo.jpg'));
+        $this->assertSame(1, $lookups, 'The host should be resolved once; the connection must reuse that result, not re-resolve.');
     }
 
     #[Test]
