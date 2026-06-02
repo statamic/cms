@@ -138,33 +138,26 @@ async function renderPage(state, renderId, viewerContext) {
 
         if (renderId !== currentRenderId) return;
 
-        const annotationLayerBuilder = new AnnotationLayerBuilder({
+        await new AnnotationLayerBuilder({
             pdfPage: page,
             linkService,
             renderForms: true,
             onAppend: (div) => container.appendChild(div),
-        });
-
-        await annotationLayerBuilder.render({ viewport });
+        }).render({ viewport });
 
         state.rendered = true;
 
-        // Release parsed operator lists and font data.
-        // The canvas retains its rendered pixels.
         page.cleanup();
     } catch (error) {
         if (renderId !== currentRenderId) return;
-
-        // Cancelled renders are expected during cleanup — not an error.
         if (error?.name === 'RenderingCancelledException') return;
-
-        // Per-page error: show an indicator but keep the rest of the viewer alive.
-        console.warn(`Failed to render PDF page ${state.pageNumber}:`, error);
 
         const errorDiv = document.createElement('div');
         errorDiv.className = 'pdf-page-error';
-        errorDiv.textContent = `Page ${state.pageNumber} failed to render`;
+        errorDiv.textContent = __('Something went wrong');
         state.container.appendChild(errorDiv);
+
+        console.warn(`Failed to render PDF page ${state.pageNumber}`, error);
     } finally {
         state.rendering = false;
         state.renderTask = null;
