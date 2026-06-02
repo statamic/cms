@@ -117,6 +117,8 @@ const isInvalid = computed(() => {
     return props.modelValue === null && props.required;
 });
 
+const hasTime = computed(() => props.granularity != null && props.granularity !== 'day');
+
 const getInputLabel = (part) => {
     switch (part) {
         case 'day':
@@ -178,7 +180,7 @@ const getInputLabel = (part) => {
                         >
                             <Icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
-                        <div class="flex items-center flex-1">
+                        <div class="flex flex-1 items-center" :class="{ '@max-xs:text-xs': hasTime }">
                             <template v-for="item in segments" :key="item.part">
                                 <div v-if="item.part === 'literal'">
                                     <DatePickerInput
@@ -210,7 +212,7 @@ const getInputLabel = (part) => {
                             :additional-timezones="additionalTimezones"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2.5 me-1" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
