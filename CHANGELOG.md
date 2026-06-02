@@ -1,5 +1,14 @@
 # Release Notes
 
+## 5.73.24 (2026-06-02)
+
+### What's fixed
+- Escape formula characters in form submission CSV exports [#14760](https://github.com/statamic/cms/issues/14760) by @jasonvarga
+- Harden remote URL validation [#14761](https://github.com/statamic/cms/issues/14761) by @jasonvarga
+- Fix Bard/Link Blink cache type collision [#14739](https://github.com/statamic/cms/issues/14739) by @simonerd
+
+
+
 ## 5.73.23 (2026-05-22)
 
 ### What's fixed
