@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\Exporters;
 
+use League\Csv\EscapeFormula;
 use League\Csv\Writer;
 use SplTempFileObject;
 use Statamic\Support\Arr;
@@ -17,6 +18,7 @@ class CsvExporter extends Exporter
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
         $this->writer->setDelimiter(Arr::get($this->config, 'delimiter', config('statamic.forms.csv_delimiter', ',')));
+        $this->writer->addFormatter(new EscapeFormula("'"));
 
         $this->insertHeaders();
 
