@@ -47,6 +47,47 @@ const blueprint = computed(() => ({
     }],
 }));
 
+/* LAST ROW DETECTION
+=================================================== */
+// Work out which fields land in the final visual row so we can add a `field--last-row` helper class (something CSS alone can't reliably detect).
+const normalizedWidth = (field) => {
+    const raw = Number(field?.config?.width ?? 100);
+
+    if (!Number.isFinite(raw) || raw <= 0) {
+        return 100;
+    }
+
+    return Math.min(raw, 100);
+};
+
+const lastRowIndexes = computed(() => {
+    const rows = [];
+    let currentRow = [];
+    let currentRowWidth = 0;
+
+    props.section.fields.forEach((field, index) => {
+        const width = normalizedWidth(field);
+
+        if (currentRowWidth > 0 && currentRowWidth + width > 100) {
+            rows.push(currentRow);
+            currentRow = [];
+            currentRowWidth = 0;
+        }
+
+        currentRow.push(index);
+        currentRowWidth += width;
+    });
+
+    if (currentRow.length > 0) {
+        rows.push(currentRow);
+    }
+
+    return rows.at(-1) ?? [];
+});
+
+const isFieldInLastRow = (index) => lastRowIndexes.value.includes(index);
+/* END LAST ROW DETECTION */
+
 const updateFieldWidth = (field, width) => {
     field.config.width = width;
 
@@ -164,14 +205,19 @@ const deleteSection = () => emit('deleted', props.section._id);
                         :data-sort-section="section._id"
                         :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null"
                     >
-                        <template v-for="field in section.fields" :key="field._id">
+                        <template v-for="(field, fieldIndex) in section.fields" :key="field._id">
                             <div
                                 v-if="field.type === 'link_fields'"
                                 :id="`fieldset-${field._id}`"
                                 data-field-item
                                 :data-editing-field="isInspectingLinkFields(field) ? '' : undefined"
                                 :data-editing-item="isInspectingLinkFields(field) ? '' : undefined"
-                                :class="[{ 'cursor-pointer': !isInspectingLinkFields(field) }]"
+                                :class="[
+                                    {
+                                        'cursor-pointer': !isInspectingLinkFields(field),
+                                        'field--last-row': isFieldInLastRow(fieldIndex),
+                                    },
+                                ]"
                                 class="border border-dashed rounded-lg p-4 flex items-center justify-center"
                                 @click.stop="isInspectingLinkFields(field) || inspectLinkFields(field)"
                             >
@@ -181,6 +227,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                             <ImportField
                                 v-else-if="field.type === 'import'"
                                 :field
+                                :is-last-row="isFieldInLastRow(fieldIndex)"
                                 @remove="removeField(field)"
                             />
 
@@ -188,6 +235,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                                 v-else
                                 :field
                                 :fieldtypes
+                                :is-last-row="isFieldInLastRow(fieldIndex)"
                                 @duplicate="duplicateField(field)"
                                 @width-changed="updateFieldWidth(field, $event)"
                                 @remove="removeField(field)"

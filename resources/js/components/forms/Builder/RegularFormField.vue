@@ -15,6 +15,7 @@ defineEmits<{
 const props = defineProps<{
     field: any;
     fieldtypes: any[];
+    isLastRow?: boolean;
 }>();
 
 const { dirty, errors, inspect, inspecting, inspectorType } = injectBuilderContext();
@@ -47,7 +48,7 @@ const hasErrors = computed(() => {
         data-field-item
         :data-editing-field="isInspecting ? '' : undefined"
         :data-editing-item="isInspecting ? '' : undefined"
-        :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspecting }]"
+        :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspecting, 'field--last-row': isLastRow }]"
         @click.stop="isInspecting || inspectField()"
     >
         <div
