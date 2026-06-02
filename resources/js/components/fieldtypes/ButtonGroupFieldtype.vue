@@ -70,8 +70,8 @@ export default {
             if (this.value != optionValue) {
                 return [
                     base,
-                    'from-white to-white hover:from-white hover:to-white',
-                    'dark:from-gray-850 dark:to-gray-850 dark:hover:from-gray-950 dark:hover:to-gray-900',
+                    'from-white to-white hover:from-white hover:to-gray-50',
+                    'dark:from-gray-850 dark:to-gray-850 dark:hover:from-gray-800 dark:hover:to-gray-850',
                 ];
             }
 
