@@ -215,34 +215,23 @@ function cleanup({ invalidateRender = true } = {}) {
 
     isRendering.value = false;
 
-    // Cancel all in-flight page renders.
     for (const state of pageStates) {
-        if (state.renderTask) {
-            state.renderTask.cancel();
-            state.renderTask = null;
-        }
+        state.renderTask?.cancel();
+        state.renderTask = null;
     }
 
-    if (observer) {
-        observer.disconnect();
-        observer = null;
-    }
+    observer?.disconnect();
+    observer = null;
 
-    if (loadingTask) {
-        loadingTask.destroy();
-        loadingTask = null;
-    }
+    loadingTask?.destroy();
+    loadingTask = null;
 
-    if (pdfDocument) {
-        pdfDocument.destroy();
-        pdfDocument = null;
-    }
+    pdfDocument?.destroy();
+    pdfDocument = null;
 
     pageStates = [];
 
-    if (pages.value) {
-        pages.value.replaceChildren();
-    }
+    pages.value?.replaceChildren();
 }
 </script>
 
