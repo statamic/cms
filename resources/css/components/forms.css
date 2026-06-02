@@ -17,10 +17,13 @@
         &::before {
             content: '';
             position: absolute;
-            inset: -0.5rem calc(-1rem - 2px) -1.25rem;
+            inset: -0.5rem calc(-1rem - 2px) -1rem;
             border: 1px dashed var(--color-blue-400);
             border-radius: 10px;
             @apply bg-blue-50;
+        }
+        &.field--last-row::before {
+            inset-block-end: -1.25rem;
         }
         :where(.dark) &::before {
             @apply bg-blue-950 border-blue-500/75;
