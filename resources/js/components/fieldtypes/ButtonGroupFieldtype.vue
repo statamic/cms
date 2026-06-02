@@ -1,23 +1,34 @@
 <template>
     <ButtonGroup :overflow="config.appearance_previews ? 'gap' : 'stack'" ref="buttonGroup">
-        <Button
-            v-for="(option, $index) in options"
-            ref="button"
-            :disabled="config.disabled"
-            :key="$index"
-            :name="name"
-            :read-only="isReadOnly"
-            :text="config.appearance_previews ? null : (option.label || option.value)"
-            :value="option.value"
-            :variant="value == option.value ? 'pressed' : 'default'"
-            :class="appearancePreviewButtonClass(option.value)"
-            @click="updateSelectedOption(option.value)"
-        >
-            <div v-if="config.appearance_previews" class="flex w-full flex-col items-start gap-2 py-0.5 text-left">
-                <span class="text-sm font-medium">{{ option.label || option.value }}</span>
-                <ControlAppearancePreview :appearance="option.value" :control="config.control || 'radio'" />
-            </div>
-        </Button>
+        <template v-for="(option, $index) in options" :key="$index">
+            <Button
+                v-if="config.appearance_previews"
+                ref="button"
+                :disabled="config.disabled"
+                :name="name"
+                :read-only="isReadOnly"
+                :value="option.value"
+                :variant="value == option.value ? 'pressed' : 'default'"
+                :class="appearancePreviewButtonClass(option.value)"
+                @click="updateSelectedOption(option.value)"
+            >
+                <div class="flex w-full flex-col items-start gap-2 py-0.5 text-left">
+                    <span class="text-sm font-medium">{{ option.label || option.value }}</span>
+                    <ControlAppearancePreview :appearance="option.value" :control="config.control || 'radio'" />
+                </div>
+            </Button>
+            <Button
+                v-else
+                ref="button"
+                :disabled="config.disabled"
+                :name="name"
+                :read-only="isReadOnly"
+                :text="option.label || option.value"
+                :value="option.value"
+                :variant="value == option.value ? 'pressed' : 'default'"
+                @click="updateSelectedOption(option.value)"
+            />
+        </template>
     </ButtonGroup>
 </template>
 
