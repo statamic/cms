@@ -1,5 +1,38 @@
 # Release Notes
 
+## 6.20.1 (2026-06-02)
+
+### What's fixed
+- Avoid crop aspect ratios select being truncated [#14712](https://github.com/statamic/cms/issues/14712) by @duncanmcclean
+- Stop excessive logging of `ElevatedSessionAuthorizationException` [#14725](https://github.com/statamic/cms/issues/14725) by @joshuablum
+- Remove `pt-4` as the default padding for a Group fieldtype [#14708](https://github.com/statamic/cms/issues/14708) by @martyf
+- Fix `Cached Pages` count for multi-site setups [#14726](https://github.com/statamic/cms/issues/14726) by @joshuablum
+- Hash URL in static caching lock key [#14716](https://github.com/statamic/cms/issues/14716) by @duncanmcclean
+- Fix entry revision localizations to filter unauthorized sites [#14714](https://github.com/statamic/cms/issues/14714) by @duncanmcclean
+- Date scrollbar fix [#14730](https://github.com/statamic/cms/issues/14730) by @jaygeorge
+- Remove custom scrollbar from date fields [#14731](https://github.com/statamic/cms/issues/14731) by @jaygeorge
+- Fix form box-shadows being clipped by expanding/collapsing sections [#14736](https://github.com/statamic/cms/issues/14736) by @jaygeorge
+- Improve modal text formatting and dark mode background [#14740](https://github.com/statamic/cms/issues/14740) by @jaygeorge
+- Handle replicator handle overflow [#14746](https://github.com/statamic/cms/issues/14746) by @jaygeorge
+- More elegantly mask horizontal overflow for sets [#14753](https://github.com/statamic/cms/issues/14753) by @jaygeorge
+- Improve collapsible section trigger [#14758](https://github.com/statamic/cms/issues/14758) by @jaygeorge
+- Fix asset fieldtype icon [#14720](https://github.com/statamic/cms/issues/14720) by @jasonvarga
+- Escape formula characters in form submission CSV exports [#14760](https://github.com/statamic/cms/issues/14760) by @jasonvarga
+- Harden remote URL validation [#14761](https://github.com/statamic/cms/issues/14761) by @jasonvarga
+- Scope shared static cache errors to sites [#14763](https://github.com/statamic/cms/issues/14763) by @joshuablum
+- Fix `share_errors` breaking nocache regions on successful responses [#14729](https://github.com/statamic/cms/issues/14729) by @joshuablum
+- Truncate full measure static cache files before writing [#14755](https://github.com/statamic/cms/issues/14755) by @joshuablum
+- Fix `current` augmentation handling in users fieldtype [#14724](https://github.com/statamic/cms/issues/14724) by @joshuablum
+- Fix clipboard pasting of validation rules [#14754](https://github.com/statamic/cms/issues/14754) by @joshuablum
+- Fix Bard/Link Blink cache type collision [#14739](https://github.com/statamic/cms/issues/14739) by @simonerd
+- French translations [#14738](https://github.com/statamic/cms/issues/14738) by @ebeauchamps
+- Bump zizmorcore/zizmor-action from 0.5.3 to 0.5.6 in the github-actions group [#14722](https://github.com/statamic/cms/issues/14722) by @dependabot
+- Bump qs from 6.15.0 to 6.15.2 [#14721](https://github.com/statamic/cms/issues/14721) by @dependabot
+- Bump js-cookie from 3.0.5 to 3.0.7 [#14705](https://github.com/statamic/cms/issues/14705) by @dependabot
+- Bump league/csv [#14768](https://github.com/statamic/cms/issues/14768) by @jasonvarga
+
+
+
 ## 6.20.0 (2026-05-22)
 
 ### What's new
