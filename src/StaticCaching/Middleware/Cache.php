@@ -106,13 +106,15 @@ class Cache
 
     private function copyError($request, $response)
     {
-        $status = $response->getStatusCode();
+        if ($response->isSuccessful()) {
+            return;
+        }
 
         if (! config('statamic.static_caching.share_errors')) {
             return;
         }
 
-        $request = Request::createFrom($request)->fakeStaticCacheStatus($status);
+        $request = Request::createFrom($request)->fakeStaticCacheStatus($response->getStatusCode());
 
         if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
