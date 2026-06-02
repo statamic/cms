@@ -259,7 +259,6 @@ function cleanup({ invalidateRender = true } = {}) {
     display: flex;
     align-items: center;
     justify-content: center;
-    @apply text-sm text-gray-400;
 }
 </style>
 
@@ -270,6 +269,6 @@ function cleanup({ invalidateRender = true } = {}) {
             <div v-if="hasError" class="text-gray-500 flex gap-2" v-text="__('Something went wrong')" />
         </div>
 
-        <div ref="pages" class="pdf-pages h-full min-h-0 overflow-auto"></div>
+        <div ref="pages" class="pdf-pages h-full min-h-0 overflow-auto text-gray-500"></div>
     </div>
 </template>
