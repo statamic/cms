@@ -14,8 +14,8 @@ const props = defineProps({
 
 const isRadio = props.control === 'radio';
 const chipClass = isRadio
-    ? 'rounded-full px-2 py-1'
-    : 'items-center rounded-sm px-2 py-1';
+    ? 'rounded-full px-1.5 pe-2 py-1'
+    : 'items-center rounded-sm px-1.5 pe-2 py-1';
 </script>
 
 <template>
