@@ -176,7 +176,7 @@ const deleteSection = () => emit('deleted', props.section._id);
             :class="section.collapsed ? 'publish-section-collapsible--collapsed' : 'publish-section-collapsible--expanded'"
         >
             <div class="publish-section-collapsible__inner min-h-0">
-            <Card class="section-drop-zone pb-[calc(var(--spacing)_*_5_-_2px)]!" :data-section-drop-zone="section._id">
+            <Card class="section-drop-zone" :data-section-drop-zone="section._id">
                 <div
                     v-if="section.fields.length === 0"
                     class="field-sort-container"
