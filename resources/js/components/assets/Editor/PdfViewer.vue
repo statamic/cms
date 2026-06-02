@@ -17,7 +17,10 @@ const hasError = ref(false);
 let currentRenderId = 0;
 let loadingTask = null;
 let pdfDocument = null;
-let pageElements = [];
+let observer = null;
+let pageStates = [];
+
+const supportsOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
 
 onMounted(() => renderPdf());
 
@@ -46,14 +49,22 @@ async function renderPdf() {
         if (renderId !== currentRenderId) return;
 
         pdfDocument = pdf;
-        const { linkService, AnnotationLayerBuilder } = await initViewer(pdf);
+        const viewerContext = await initViewer(pdf);
 
+        if (renderId !== currentRenderId) return;
+
+        const scale = window.devicePixelRatio || 2;
+
+        // Phase 1: Create all page placeholders with correctly-sized empty canvases.
+        // This gives the user the full scrollable document structure immediately,
+        // while the actual rendering happens lazily via IntersectionObserver.
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
             const page = await pdf.getPage(pageNumber);
 
             if (renderId !== currentRenderId) return;
 
-            const viewport = page.getViewport({ scale: 2 });
+            const viewport = page.getViewport({ scale });
+
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page';
             pageContainer.dataset.pageNumber = String(pageNumber);
@@ -65,29 +76,46 @@ async function renderPdf() {
             pageContainer.appendChild(canvas);
 
             pages.value?.appendChild(pageContainer);
-            pageElements.push(pageContainer);
 
-            const canvasContext = canvas.getContext('2d');
-            if (!canvasContext) continue;
-
-            await page.render({
-                canvasContext,
+            pageStates.push({
+                pageNumber,
+                page,
                 viewport,
-            }).promise;
-
-            const annotationLayerBuilder = new AnnotationLayerBuilder({
-                pdfPage: page,
-                linkService,
-                renderForms: true,
-                onAppend: (div) => pageContainer.appendChild(div),
+                canvas,
+                container: pageContainer,
+                rendered: false,
+                rendering: false,
+                renderTask: null,
             });
-
-            await annotationLayerBuilder.render({ viewport });
-
-            if (pageNumber === 1 && renderId === currentRenderId) {
-                isLoading.value = false;
-            }
         }
+
+        // Phase 2: Observe pages for viewport proximity and render on demand.
+        // rootMargin pre-renders pages 200px before they scroll into view
+        // to avoid blank flashes during normal scrolling.
+        observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+
+                    const pageNumber = parseInt(entry.target.dataset.pageNumber, 10);
+                    const state = pageStates[pageNumber - 1];
+
+                    if (state && !state.rendered && !state.rendering) {
+                        renderPage(state, renderId, viewerContext);
+                    }
+                }
+            },
+            {
+                root: pages.value,
+                rootMargin: '200px 0px',
+            },
+        );
+
+        for (const state of pageStates) {
+            observer.observe(state.container);
+        }
+
+        isLoading.value = false;
     } catch (error) {
         if (renderId === currentRenderId) {
             hasError.value = true;
@@ -95,9 +123,74 @@ async function renderPdf() {
         }
     } finally {
         if (renderId === currentRenderId) {
-            isLoading.value = false;
             isRendering.value = false;
         }
+    }
+}
+
+async function renderPage(state, renderId, viewerContext) {
+    if (renderId !== currentRenderId) return;
+
+    state.rendering = true;
+
+    try {
+        const { canvas, page, viewport, container } = state;
+        const { linkService, AnnotationLayerBuilder } = viewerContext;
+
+        if (supportsOffscreenCanvas) {
+            const offscreen = new OffscreenCanvas(canvas.width, canvas.height);
+            const offCtx = offscreen.getContext('2d');
+
+            const task = page.render({ canvasContext: offCtx, viewport });
+            state.renderTask = task;
+            await task.promise;
+
+            if (renderId !== currentRenderId) return;
+
+            // Transfer rendered pixels to the visible canvas.
+            const visibleCtx = canvas.getContext('2d');
+            visibleCtx.drawImage(offscreen, 0, 0);
+        } else {
+            const canvasContext = canvas.getContext('2d');
+            if (!canvasContext) return;
+
+            const task = page.render({ canvasContext, viewport });
+            state.renderTask = task;
+            await task.promise;
+        }
+
+        if (renderId !== currentRenderId) return;
+
+        const annotationLayerBuilder = new AnnotationLayerBuilder({
+            pdfPage: page,
+            linkService,
+            renderForms: true,
+            onAppend: (div) => container.appendChild(div),
+        });
+
+        await annotationLayerBuilder.render({ viewport });
+
+        state.rendered = true;
+
+        // Release parsed operator lists and font data.
+        // The canvas retains its rendered pixels.
+        page.cleanup();
+    } catch (error) {
+        if (renderId !== currentRenderId) return;
+
+        // Cancelled renders are expected during cleanup — not an error.
+        if (error?.name === 'RenderingCancelledException') return;
+
+        // Per-page error: show an indicator but keep the rest of the viewer alive.
+        console.warn(`Failed to render PDF page ${state.pageNumber}:`, error);
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'pdf-page-error';
+        errorDiv.textContent = `Page ${state.pageNumber} failed to render`;
+        state.container.appendChild(errorDiv);
+    } finally {
+        state.rendering = false;
+        state.renderTask = null;
     }
 }
 
@@ -130,10 +223,10 @@ async function initViewer(pdf) {
         isInPresentationMode: false,
         pageLabelToPageNumber: () => null,
         scrollPageIntoView: ({ pageNumber }) => {
-            const pageElement = pageElements[pageNumber - 1];
+            const state = pageStates[pageNumber - 1];
 
-            if (pageElement) {
-                pageElement.scrollIntoView({
+            if (state?.container) {
+                state.container.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start',
                 });
@@ -152,6 +245,19 @@ function cleanup({ invalidateRender = true } = {}) {
 
     isRendering.value = false;
 
+    // Cancel all in-flight page renders.
+    for (const state of pageStates) {
+        if (state.renderTask) {
+            state.renderTask.cancel();
+            state.renderTask = null;
+        }
+    }
+
+    if (observer) {
+        observer.disconnect();
+        observer = null;
+    }
+
     if (loadingTask) {
         loadingTask.destroy();
         loadingTask = null;
@@ -162,7 +268,7 @@ function cleanup({ invalidateRender = true } = {}) {
         pdfDocument = null;
     }
 
-    pageElements = [];
+    pageStates = [];
 
     if (pages.value) {
         pages.value.replaceChildren();
@@ -184,7 +290,18 @@ function cleanup({ invalidateRender = true } = {}) {
 }
 
 .pdf-page .annotationLayer {
+    position: absolute;
     inset: 0;
+}
+
+.pdf-page-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
 }
 </style>
 
