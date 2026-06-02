@@ -22,7 +22,7 @@ const chipClass = isRadio
     <div
         class="pointer-events-none select-none"
         :class="{
-            'flex flex-col gap-1.5': appearance === 'default',
+            'flex flex-col gap-1.5 pb-0.75': appearance === 'default',
             'flex flex-wrap gap-1.5': appearance === 'inline' || appearance === 'chips',
         }"
         aria-hidden="true"
@@ -31,7 +31,7 @@ const chipClass = isRadio
             v-for="selected in [true, false]"
             :key="selected ? 'on' : 'off'"
             class="flex items-center gap-1"
-            :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 ${chipClass}` : null"
+            :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 bg-white dark:bg-gray-500 ${chipClass}` : null"
         >
             <div
                 class="shrink-0 border border-gray-400/75 dark:border-gray-500"
