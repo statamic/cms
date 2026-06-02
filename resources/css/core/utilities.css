@@ -55,6 +55,27 @@
     }
 }
 
+/* =Jay. Mask the horizontal overflow of an element, e.g. in a long Bard Set header that overflows its container. Override the default mask by changing the --mask-stop variable. */
+@utility st-mask-horizontal-overflow {
+    --mask-stop: 1rem;
+    --mask: linear-gradient(to left, transparent 0%, black var(--mask-stop));
+    mask-image: var(--mask);
+    mask-repeat: no-repeat;
+    animation: mask-overflow-horizontal linear both;
+    animation-timeline: scroll(self inline);
+    animation-range: calc(100% - var(--mask-stop)) 100%;
+}
+
+@keyframes mask-overflow-horizontal {
+    from {
+        mask-image: var(--mask);
+    }
+
+    to {
+        mask-image: unset;
+    }
+}
+
 /* UTILITIES / TEXT
 =================================================== */
 /* Avoid prefixing things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
