@@ -26,6 +26,13 @@ use Tests\TestCase;
 
 class DefaultInvalidatorTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
+        parent::tearDown();
+    }
+
     #[Test]
     public function specifying_all_as_invalidation_rule_will_just_flush_the_cache()
     {
@@ -422,8 +429,8 @@ class DefaultInvalidatorTest extends TestCase
             'collections' => [
                 'blog' => [
                     'urls' => [
-                        '/blog/one/',
-                        '/blog/two/',
+                        '/blog/one',
+                        '/blog/two',
                         'http://localhost/blog/three/',
                     ],
                 ],
@@ -431,8 +438,6 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($entry));
-
-        URL::enforceTrailingSlashes(false);
     }
 
     #[Test]
