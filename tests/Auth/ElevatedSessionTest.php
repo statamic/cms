@@ -76,12 +76,12 @@ class ElevatedSessionTest extends TestCase
             ]);
     }
 
+    /**
+     * @see https://github.com/statamic/cms/pull/14771
+     **/
     #[Test]
     public function it_handles_string_config_value_for_elevated_session_duration()
     {
-        // This tests GitHub issue #14769 - when env() returns a string value
-        // for STATAMIC_ELEVATED_SESSION_DURATION, Carbon's addMinutes() should
-        // handle it gracefully without throwing a type error.
         config(['statamic.users.elevated_session_duration' => '15']);
 
         $this
