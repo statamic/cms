@@ -1633,7 +1633,12 @@ class EntryTest extends TestCase
     {
         $query = Mockery::mock(QueryBuilder::class);
         $query->shouldReceive('where')->with('collection', 'pages')->andReturnSelf();
-        $query->shouldReceive('where')->with('origin', Mockery::type('string'))->andReturnSelf();
+
+        if ($whereInOrigins === null) {
+            // directDescendants() uses where('origin', string); batched levels use whereIn.
+            $query->shouldReceive('where')->with('origin', Mockery::type('string'))->andReturnSelf();
+        }
+
         $query->shouldReceive('whereIn')->with('origin', $whereInOrigins ?? Mockery::type('array'))->andReturnSelf();
         $query->shouldReceive('get')->andReturn($results);
 
