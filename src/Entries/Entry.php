@@ -874,20 +874,25 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         // node, calling directDescendants() (a query) once per localization,
         // which is O(number of localizations) queries. On a heavily localized
         // multi-site, resolving a single entry could fire hundreds of queries.
-        $origins = $localizations->map->id()->all();
+        $origins = $localizations->map->id()->values()->all();
+        $seen = array_merge($origins, [$this->id()]);
 
         while (! empty($origins)) {
             $children = Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->whereIn('origin', $origins)
-                ->get();
+                ->get()
+                // Guard against cyclic or duplicate origin data, which would
+                // otherwise loop forever as the same entries reappear.
+                ->reject(fn ($entry) => in_array($entry->id(), $seen, true));
 
             if ($children->isEmpty()) {
                 break;
             }
 
             $localizations = $localizations->merge($children->keyBy->locale());
-            $origins = $children->map->id()->all();
+            $origins = $children->map->id()->values()->all();
+            $seen = array_merge($seen, $origins);
         }
 
         return $localizations;

@@ -1595,8 +1595,8 @@ class EntryTest extends TestCase
         // exist. The previous recursive implementation issued one query per
         // node, i.e. O(number of localizations).
         Facades\Entry::shouldReceive('query')->times(2)->andReturn(
-            $this->fakeDescendantsQuery(collect([$fr, $de, $es])),
-            $this->fakeDescendantsQuery(collect()),
+            $this->fakeDescendantsQuery(collect([$fr, $de, $es])),       // direct descendants of 'a'
+            $this->fakeDescendantsQuery(collect(), ['b', 'c', 'd']),     // batched lookup for the next level
         );
 
         $descendants = $entry->descendants();
@@ -1617,9 +1617,9 @@ class EntryTest extends TestCase
         $de = (new Entry)->id('c')->locale('de')->origin('b')->collection($collection);
 
         Facades\Entry::shouldReceive('query')->times(3)->andReturn(
-            $this->fakeDescendantsQuery(collect([$fr])), // direct descendants of en
-            $this->fakeDescendantsQuery(collect([$de])), // descendants of fr
-            $this->fakeDescendantsQuery(collect()),       // descendants of de
+            $this->fakeDescendantsQuery(collect([$fr])),         // direct descendants of en
+            $this->fakeDescendantsQuery(collect([$de]), ['b']),  // batched descendants of fr
+            $this->fakeDescendantsQuery(collect(), ['c']),       // batched descendants of de
         );
 
         $descendants = $entry->descendants();
@@ -1629,11 +1629,12 @@ class EntryTest extends TestCase
         $this->assertSame($de, $descendants->get('de'));
     }
 
-    private function fakeDescendantsQuery($results): QueryBuilder
+    private function fakeDescendantsQuery($results, ?array $whereInOrigins = null): QueryBuilder
     {
         $query = Mockery::mock(QueryBuilder::class);
-        $query->shouldReceive('where')->andReturnSelf();
-        $query->shouldReceive('whereIn')->andReturnSelf();
+        $query->shouldReceive('where')->with('collection', 'pages')->andReturnSelf();
+        $query->shouldReceive('where')->with('origin', Mockery::type('string'))->andReturnSelf();
+        $query->shouldReceive('whereIn')->with('origin', $whereInOrigins ?? Mockery::type('array'))->andReturnSelf();
         $query->shouldReceive('get')->andReturn($results);
 
         return $query;
