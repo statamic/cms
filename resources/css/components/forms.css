@@ -17,10 +17,15 @@
         &::before {
             content: '';
             position: absolute;
-            inset: -0.5rem calc(-1rem - 2px) -1rem;
+            /* Bit of optical alignment here */
+            inset: -0.5rem calc(-1rem - 2px) -0.75rem;
             border: 1px dashed var(--color-blue-400);
             border-radius: 10px;
             @apply bg-blue-50;
+        }
+        &:has([data-form-banner])::before {
+            /* Exception for the banner since it's more uniform */
+            inset-block-end: -0.5rem;
         }
         &.field--last-row::before {
             inset-block-end: -1.25rem;
