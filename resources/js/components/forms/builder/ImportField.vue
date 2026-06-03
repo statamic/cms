@@ -48,6 +48,7 @@ const errorMessage = computed(() => {
         <div
             v-if="isInspecting"
             class="!absolute z-(--z-index-above) -top-0.5 end-0.5 flex items-center bg-blue-50 ps-2.5"
+            data-editing-field-actions
         >
             <Button
                 size="sm"

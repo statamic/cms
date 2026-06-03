@@ -23,9 +23,15 @@
             border-radius: 10px;
             @apply bg-blue-50;
         }
-        &:has([data-form-banner])::before {
-            /* Exception for the banner since it's more uniform */
-            inset-block-end: -0.5rem;
+        &:has([data-form-banner]) {
+            &::before {
+                /* Exception for the banner since it's more uniform */
+                inset-block-end: -0.5rem;
+            }
+            &::before,
+            [data-editing-field-actions] {
+                background: transparent;
+            }
         }
         &.field--last-row::before {
             inset-block-end: -1.25rem;
