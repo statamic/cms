@@ -12,6 +12,8 @@ const props = defineProps({
     variant: { type: String, default: 'default' },
     /** Icon name to display. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
+    /** When `false`, no icon is shown unless the `icon` prop is set. */
+    iconFallback: { type: Boolean, default: true },
 });
 
 const alertRole = computed(() => {
@@ -78,8 +80,14 @@ const alertClasses = computed(() => {
     })({ variant: props.variant });
 });
 
-const defaultIcon = computed(() => {
-    if (props.icon) return props.icon;
+const resolvedIcon = computed(() => {
+    if (props.icon) {
+        return props.icon;
+    }
+
+    if (! props.iconFallback) {
+        return null;
+    }
 
     switch (props.variant) {
         case 'warning':
@@ -103,8 +111,8 @@ const defaultIcon = computed(() => {
         :data-variant="variant"
     >
         <Icon
-            v-if="defaultIcon"
-            :name="defaultIcon"
+            v-if="resolvedIcon"
+            :name="resolvedIcon"
             class="size-5 shrink-0 opacity-70"
             aria-hidden="true"
         />

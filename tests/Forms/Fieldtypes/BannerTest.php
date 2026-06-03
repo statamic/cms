@@ -18,6 +18,7 @@ class BannerTest extends TestCase
 
         $this->assertEquals([
             'type' => 'form_banner',
+            'hide_display' => true,
         ], $fieldtype->toFieldArray());
     }
 
@@ -31,6 +32,7 @@ class BannerTest extends TestCase
 
         $this->assertEquals([
             'type' => 'form_banner',
+            'hide_display' => true,
             'display' => 'Important Notice',
         ], $fieldtype->toFieldArray());
     }
