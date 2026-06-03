@@ -106,13 +106,15 @@ class Cache
 
     private function copyError($request, $response)
     {
-        $status = $response->getStatusCode();
+        if ($response->isSuccessful()) {
+            return;
+        }
 
         if (! config('statamic.static_caching.share_errors')) {
             return;
         }
 
-        $request = Request::createFrom($request)->fakeStaticCacheStatus($status);
+        $request = Request::createFrom($request)->fakeStaticCacheStatus($response->getStatusCode());
 
         if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
@@ -241,7 +243,7 @@ class Cache
             $store = AppCache::store('null');
         } else {
             $store = StaticCache::cacheStore();
-            $key .= '-'.$this->cacher->getUrl($request);
+            $key .= '-'.md5($this->cacher->getUrl($request));
         }
 
         return $store->lock($key, $this->lockFor);
