@@ -271,7 +271,10 @@ provide(publishContextKey, {
         <Panel class="mt-6">
             <PanelHeader>
                 <div class="flex items-center justify-between gap-3">
-                    <Heading :text="__('Field Logic')" />
+                    <div class="flex items-center gap-2.5">
+                        <Icon name="form-text-field" class="size-4 text-gray-500 dark:text-gray-300" />
+                        <Heading :text="__('Field Logic')" />
+                    </div>
                     <ToggleGroup :model-value="allFieldRulesView" size="xs">
                         <ToggleItem value="expanded" icon="expand" :aria-label="__('Expand all rules')" @click="expandAllRules('field')" />
                         <ToggleItem value="collapsed" icon="collapse" :aria-label="__('Collapse all rules')" @click="collapseAllRules('field')" />
