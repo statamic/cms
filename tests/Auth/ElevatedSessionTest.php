@@ -77,6 +77,26 @@ class ElevatedSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_handles_string_config_value_for_elevated_session_duration()
+    {
+        // This tests GitHub issue #14769 - when env() returns a string value
+        // for STATAMIC_ELEVATED_SESSION_DURATION, Carbon's addMinutes() should
+        // handle it gracefully without throwing a type error.
+        config(['statamic.users.elevated_session_duration' => '15']);
+
+        $this
+            ->withElevatedSession(now()->subMinutes(5))
+            ->actingAs($this->user)
+            ->get('/cp/elevated-session')
+            ->assertOk()
+            ->assertJson([
+                'elevated' => true,
+                'expiry' => now()->addMinutes(10)->timestamp,
+                'method' => 'password_confirmation',
+            ]);
+    }
+
+    #[Test]
     public function it_can_get_status_of_elevated_session_when_session_key_does_not_exist()
     {
         $this
