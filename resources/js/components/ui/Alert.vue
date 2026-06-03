@@ -30,14 +30,14 @@ const ariaLive = computed(() => {
 const alertClasses = computed(() => {
     return cva({
         base: [
-            'relative flex items-start gap-3 rounded-xl border p-4 [&:has(p)]:py-5 [&:has([data-ui-description])]:py-5 text-sm',
-            '[&_h1]:mb-1 [&_h1]:font-bold',
-            '[&_h2]:mb-1 [&_h2]:font-bold',
-            '[&_h3]:mb-1 [&_h3]:font-bold',
-            '[&_h4]:mb-1 [&_h4]:font-bold',
-            '[&_h5]:mb-1 [&_h5]:font-bold',
-            '[&_h6]:mb-1 [&_h6]:font-bold',
-            '[&_[data-ui-heading]]:mb-1 [&_[data-ui-heading]]:font-bold',
+            'relative flex items-start gap-3 rounded-xl border p-4 pb-3 [&:has(p)]:py-5 [&:has([data-ui-description])]:py-5 text-sm',
+            '[&_h1:not(:last-of-type)]:mb-1 [&_h1]:font-bold',
+            '[&_h2:not(:last-of-type)]:mb-1 [&_h2]:font-bold',
+            '[&_h3:not(:last-of-type)]:mb-1 [&_h3]:font-bold',
+            '[&_h4:not(:last-of-type)]:mb-1 [&_h4]:font-bold',
+            '[&_h5:not(:last-of-type)]:mb-1 [&_h5]:font-bold',
+            '[&_h6:not(:last-of-type)]:mb-1 [&_h6]:font-bold',
+            '[&_[data-ui-heading]:not(:last-of-type)]:mb-1 [&_[data-ui-heading]]:font-bold',
             '[&_[data-ui-heading]]:-mt-0.5',
             '[&_[data-ui-heading].text-lg]:-mt-1',
             '[&_[data-ui-heading].text-2xl]:mt-[-0.45rem] [&_[data-ui-heading].text-2xl]:mb-2',
