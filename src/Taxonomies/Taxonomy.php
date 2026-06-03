@@ -28,6 +28,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -44,6 +45,8 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
     protected $collection;
     protected $defaultPublishState = true;
     protected $searchIndex;
+    protected $sortField;
+    protected $sortDirection;
     protected $previewTargets = [];
     protected $template;
     protected $termTemplate;
@@ -177,14 +180,32 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->termBlueprints()->reject->hidden()->isNotEmpty();
     }
 
-    public function sortField()
+    public function sortField($field = null)
     {
-        return 'title'; // todo
+        return $this
+            ->fluentlyGetOrSet('sortField')
+            ->getter(function ($sortField) {
+                return $sortField ?? 'title';
+            })
+            ->args(func_get_args());
     }
 
-    public function sortDirection()
+    public function sortDirection($dir = null)
     {
-        return 'asc'; // todo
+        return $this
+            ->fluentlyGetOrSet('sortDirection')
+            ->getter(function ($sortDirection) {
+                if ($sortDirection) {
+                    return $sortDirection;
+                }
+
+                if ($this->sortField) {
+                    return 'asc';
+                }
+
+                return 'asc';
+            })
+            ->args(func_get_args());
     }
 
     public function queryTerms()
@@ -289,6 +310,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
             'term_template' => $this->termTemplate,
             'layout' => $this->layout,
         ];
+
+        $data = Arr::removeNullValues(array_merge($data, [
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
+        ]));
 
         if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
