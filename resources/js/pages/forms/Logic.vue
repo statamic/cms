@@ -6,7 +6,7 @@ import { Button, Header, Icon, StatusIndicator } from '@ui';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
 import Head from '@/pages/layout/Head.vue';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { keys } from '@api';
 import axios from 'axios';
 
@@ -36,6 +36,9 @@ const suggestableFields = computed(() => {
     }));
 });
 
+const dirty = () => Statamic.$dirty.add('form-logic');
+const clearDirtyState = () => Statamic.$dirty.remove('form-logic');
+
 const save = () => {
     if (saving.value) return;
 
@@ -57,7 +60,7 @@ const save = () => {
         })),
     })
         .then((response) => {
-            // clearDirtyState();
+            clearDirtyState();
             Statamic.$toast.success(__('Saved'));
         })
         .catch((e) => {
@@ -71,6 +74,9 @@ const save = () => {
         .finally(() => saving.value = false);
 };
 
+watch(pages, dirty, { deep: true });
+watch(fields, dirty, { deep: true });
+
 onMounted(() => {
     saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
         e.preventDefault();
@@ -78,7 +84,10 @@ onMounted(() => {
     });
 });
 
-onUnmounted(() => saveBinding.value?.destroy());
+onUnmounted(() => {
+    clearDirtyState();
+    saveBinding.value?.destroy();
+});
 </script>
 
 <template>
