@@ -109,6 +109,7 @@ export default {
             instructions: this.tab.instructions,
             icon: this.tab.icon,
             editing: false,
+            handleSyncedWithDisplay: false,
             saveKeyBinding: null,
         };
     },
@@ -160,10 +161,15 @@ export default {
             this.handle = this.tab.handle;
             this.instructions = this.tab.instructions;
             this.icon = this.tab.icon;
+            this.handleSyncedWithDisplay = !this.tab.handle || ['new_tab', 'new_set_group'].includes(this.tab.handle);
             this.editing = true;
         },
 
         editConfirmed() {
+            if (!this.handle) {
+                this.handle = snake_case(this.display);
+            }
+
             this.$emit('updated', {
                 ...this.tab,
                 handle: this.handle,
@@ -200,6 +206,14 @@ export default {
         },
 
         fieldUpdated(handle, value) {
+            if (handle === 'display' && this.handleSyncedWithDisplay) {
+                this.handle = snake_case(value);
+            }
+
+            if (handle === 'handle') {
+                this.handleSyncedWithDisplay = false;
+            }
+
             this[handle] = value;
         },
 

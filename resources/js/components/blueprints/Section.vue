@@ -53,6 +53,7 @@
                             type="text"
                             class="font-mono text-sm"
                             v-model="editingSection.handle"
+                            @input="handleSyncedWithDisplay = false"
                         >
                             <template #append>
                                 <ui-button
@@ -166,6 +167,7 @@ export default {
         return {
             editingSection: false,
             editingField: null,
+            handleSyncedWithDisplay: false,
             saveKeyBinding: null,
         };
     },
@@ -199,6 +201,12 @@ export default {
             handler(section) {
                 this.$emit('updated', section);
             },
+        },
+
+        'editingSection.display': function (display) {
+            if (this.editingSection && this.handleSyncedWithDisplay) {
+                this.editingSection.handle = snake_case(display);
+            }
         },
 
         editingSection: {
@@ -253,6 +261,7 @@ export default {
         },
 
         edit() {
+            this.handleSyncedWithDisplay = !this.section.handle || ['new_section', 'new_set'].includes(this.section.handle);
             this.editingSection = {
                 display: this.section.display,
                 handle: this.section.handle,
@@ -266,6 +275,10 @@ export default {
         },
 
         editConfirmed() {
+            if (!this.editingSection.handle) {
+                this.editingSection.handle = snake_case(this.editingSection.display);
+            }
+
             this.$emit('updated', { ...this.section, ...this.editingSection });
             this.editingSection = false;
         },
