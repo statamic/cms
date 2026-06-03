@@ -561,10 +561,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this->value('order');
         }
 
-        return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+        return $this->structure()->in($this->locale())->entryOrder($this->id) + 1;
     }
 
     public function template($template = null)
