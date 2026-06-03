@@ -869,8 +869,25 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     {
         $localizations = $this->directDescendants();
 
-        foreach ($localizations as $loc) {
-            $localizations = $localizations->merge($loc->descendants());
+        // Walk the localization tree breadth-first, fetching each level in a
+        // single batched query. The previous implementation recursed into every
+        // node, calling directDescendants() (a query) once per localization,
+        // which is O(number of localizations) queries. On a heavily localized
+        // multi-site, resolving a single entry could fire hundreds of queries.
+        $origins = $localizations->map->id()->all();
+
+        while (! empty($origins)) {
+            $children = Facades\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->whereIn('origin', $origins)
+                ->get();
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $localizations = $localizations->merge($children->keyBy->locale());
+            $origins = $children->map->id()->all();
         }
 
         return $localizations;
