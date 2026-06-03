@@ -20,6 +20,7 @@ class Banner extends FormFieldtype
             'icon' => [
                 'display' => __('Icon'),
                 'type' => 'icon',
+                'default' => 'lightbulb-idea',
                 'clearable' => true,
             ],
         ];
@@ -42,7 +43,7 @@ class Banner extends FormFieldtype
             'config' => [
                 'display' => __('Important'),
                 'instructions' => __('Please review the following information before continuing.'),
-                'icon' => 'warning-diamond',
+                'icon' => 'lightbulb-idea',
             ],
         ];
     }
