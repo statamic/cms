@@ -11,7 +11,11 @@ defineExpose(expose);
 
 <template>
     <div data-form-heading>
-        <Heading :text="__(config.display)" size="xl" />
+        <Heading
+            :text="__(config.display)"
+            size="xl"
+            class="!font-bold"
+        />
         <Subheading v-if="config.instructions" :text="__(config.instructions)" class="mt-1" />
     </div>
 </template>
