@@ -1,12 +1,9 @@
 <script setup>
-import { Button, Combobox, Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Icon } from '@ui';
+import { Button, Combobox, Icon } from '@ui';
 import { computed } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import Condition from '@/components/field-conditions/Condition.vue';
 import { categories, categoryColorClasses } from '../categories';
-import { injectBuilderContext } from '@/pages/forms/Builder.vue';
-
-const { fieldtypes } = injectBuilderContext();
 
 const emit = defineEmits(['update:rule', 'remove']);
 
@@ -14,6 +11,7 @@ const props = defineProps({
     rule: { type: Object, required: true },
     suggestableFields: { type: Array, required: true },
     pageOptions: { type: Array, required: true },
+    fieldtypes: { type: Array, default: () => [] },
 });
 
 const joinOptions = [
@@ -64,7 +62,7 @@ const removeCondition = (index) => {
 };
 
 const getFieldtypeCategory = (fieldtypeHandle) => {
-    const fieldtype = fieldtypes?.find((field) => field.handle === fieldtypeHandle);
+    const fieldtype = props.fieldtypes?.find((field) => field.handle === fieldtypeHandle);
     const categoryKey = fieldtype?.categories?.[0] || 'other';
     return categories[categoryKey] ?? categories.other;
 };

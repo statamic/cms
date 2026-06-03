@@ -1,10 +1,7 @@
 <script setup>
 import { Button } from '@ui';
 import { nanoid as uniqid } from 'nanoid';
-import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import Rule from './Rule.vue';
-
-const { fieldtypes } = injectBuilderContext();
 
 const emit = defineEmits(['update:rules']);
 
@@ -12,6 +9,7 @@ const props = defineProps({
     rules: { type: Array, required: true },
     suggestableFields: { type: Array, required: true },
     pageOptions: { type: Array, required: true },
+    fieldtypes: { type: Array, default: () => [] },
 });
 
 const updateRule = (index, rule) => {
@@ -54,8 +52,9 @@ const removeRule = (index) => {
 
             <Rule
                 :rule="rule"
-                :suggestable-fields="suggestableFields"
-                :page-options="pageOptions"
+                :suggestable-fields
+                :page-options
+                :fieldtypes
                 @update:rule="updateRule(index, $event)"
                 @remove="removeRule(index)"
             />

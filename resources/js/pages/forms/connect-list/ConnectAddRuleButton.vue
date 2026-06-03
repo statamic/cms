@@ -1,6 +1,6 @@
 <template>
     <div class="inline-block" v-if="variant === 'button'">
-        <logic-rule-picker
+        <LogicRulePicker
             :enabled="enabled"
             :sets="groups"
             align="start"
@@ -14,9 +14,9 @@
                     <Button v-if="enabled" size="sm" :text="label" icon="plus" class="relative" />
                 </div>
             </template>
-        </logic-rule-picker>
+        </LogicRulePicker>
     </div>
-    <logic-rule-picker
+    <LogicRulePicker
         v-else
         :enabled="enabled"
         :sets="groups"
@@ -51,11 +51,11 @@
                 <Button v-if="enabled" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity delay-10 duration-250" />
             </div>
         </template>
-    </logic-rule-picker>
+    </LogicRulePicker>
 </template>
 
 <script setup>
-import LogicRulePicker from '../logic-list/LogicRulePicker.vue';
+import LogicRulePicker from '@/components/forms/logic/LogicRulePicker.vue';
 import { Button } from '@/components/ui';
 import { computed } from 'vue';
 

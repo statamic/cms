@@ -1,6 +1,6 @@
 <script setup>
 import { Button, Combobox, Field, Icon, Input, Switch, Text } from '@ui';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import Condition from './Condition.vue';
 import Converter from './Converter.js';
@@ -12,9 +12,11 @@ const props = defineProps({
     config: { type: Object, required: true },
     suggestableFields: { type: Array, required: true },
     allowCustomConditions: { type: Boolean, default: true },
+    showAlwaysSave: { type: Boolean, default: true },
     size: { type: String, default: 'base' },
 });
 
+const initialized = ref(false);
 const when = ref('always');
 const type = ref('all');
 const customMethod = ref(null);
@@ -100,13 +102,19 @@ const getInitialConditions = () => {
 
 const getInitialAlwaysSaveState = () => alwaysSave.value = props.config?.always_save ?? false;
 
-watch(saveableConditions, (conditions) => emit('updated', conditions), { deep: true });
-watch(alwaysSave, (value) => emit('updated-always-save', value));
+watch(saveableConditions, (conditions) => {
+    if (initialized.value) emit('updated', conditions);
+}, { deep: true });
+
+watch(alwaysSave, (value) => {
+    if (initialized.value) emit('updated-always-save', value);
+});
 
 onMounted(() => {
     getInitialConditions();
     getInitialAlwaysSaveState();
     if (conditions.value.length === 0) add();
+    nextTick(() => initialized.value = true);
 });
 </script>
 
@@ -213,7 +221,7 @@ onMounted(() => {
             />
         </div>
 
-        <div data-always-save-decoration class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
+        <div v-if="showAlwaysSave" data-always-save-decoration class="mt-8 mb-6 pt-4 border-t border-dashed border-gray-300 dark:border-gray-700">
             <Field
                 :label="__('Always Save')"
                 :instructions="__('messages.field_conditions_always_save_instructions')"

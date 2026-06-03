@@ -60,12 +60,12 @@ const fieldView = ref<FieldView>(FieldView.Expanded);
 const isLeftPanelOpen = ref<boolean>(false);
 const isRightPanelOpen = ref<boolean>(false);
 const saveBinding = ref<Binding>(null);
+const errors = ref<Record<string, Record<string, string[]>>>({});
 
 const pages = computed(() => formFields.value.pages);
 const allSections = computed(() => pages.value.flatMap(page => page.sections));
 const shouldShowViewSelector = computed(() => allSections.value.some(section => section.fields.length > 0));
 const fieldCount = computed(() => allSections.value.flatMap(section => section.fields).length);
-const errors = ref<Record<string, Record<string, string[]>>>({});
 
 const inspect = (type: InspectorType, data: object): void => {
     inspecting.value = data;
@@ -280,6 +280,8 @@ function withoutDirtying(callback: () => void) {
 }
 
 const save = () => {
+    if (saving.value) return;
+
     errors.value = {};
     saving.value = true;
 
@@ -292,6 +294,8 @@ const save = () => {
             if (e.response?.status === 422) {
                 errors.value = e.response.data.errors;
                 Statamic.$toast.error(e.response.data.message);
+            } else {
+                Statamic.$toast.error(__('Something went wrong'));
             }
         })
         .finally(() => saving.value = false);
@@ -357,7 +361,7 @@ onUnmounted(() => {
     <Head :title="[__('Edit'), form.title, __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
-        <Button variant="primary" :aria-label="__('Save')" @click="save">
+        <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
             <Icon name="save" class="sm:hidden" />
             <span class="hidden sm:inline">{{ __('Save') }}</span>
         </Button>

@@ -354,7 +354,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/{form}/builder/fields/edit', [FormFieldsController::class, 'edit'])->name('forms.builder.fields.edit');
     Route::post('forms/{form}/builder/fields/update', [FormFieldsController::class, 'update'])->name('forms.builder.fields.update');
     Route::post('forms/{form}/builder/fieldset-previews', FormFieldsetPreviewsController::class)->name('forms.builder.fieldset-previews');
-    Route::get('forms/{form}/logic', FormLogicController::class)->name('forms.logic.index');
+    Route::get('forms/{form}/logic', [FormLogicController::class, 'edit'])->name('forms.logic.edit');
+    Route::patch('forms/{form}/logic', [FormLogicController::class, 'update'])->name('forms.logic.update');
     Route::get('forms/{form}/connect', FormConnectController::class)->name('forms.connect.index');
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
 

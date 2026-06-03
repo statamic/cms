@@ -1,0 +1,173 @@
+<script setup>
+import { Button, Card, Heading, Icon, Panel, PanelHeader } from '@ui';
+import AddLogicRuleButton from './AddLogicRuleButton.vue';
+import PageLogicRule from './PageLogicRule.vue';
+import { computed, nextTick, ref, watch } from 'vue';
+import { nanoid as uniqid } from 'nanoid';
+
+const props = defineProps({
+    pages: { type: Array, required: true },
+    suggestableFields: { type: Array, required: true },
+});
+
+const emit = defineEmits(['update:pages']);
+
+const collapsed = ref([]);
+
+const pagesWithLogic = computed(() => props.pages.filter(page => page.rules && page.rules.length > 0));
+const pagesWithoutLogic = computed(() => props.pages.filter(page => !page.rules || page.rules.length === 0));
+
+const expand = (id) => collapsed.value = collapsed.value.filter(setId => setId !== id);
+const expandAll = () => collapsed.value = [];
+const collapseAll = () => collapsed.value = pagesWithLogic.value.map(page => page._id);
+
+const collapse = (id) => {
+    if (!collapsed.value.includes(id)) {
+        collapsed.value.push(id);
+    }
+};
+
+const allPagesAreCollapsed = computed(() => pagesWithLogic.value.every(page => collapsed.value.includes(page._id)));
+const rulesView = computed(() => allPagesAreCollapsed.value ? 'collapsed' : 'expanded');
+
+const availableItems = computed(() => {
+    return pagesWithoutLogic.value.map(page => ({
+        handle: page._id,
+        display: page.display,
+        icon: 'page',
+    }));
+});
+
+const pageOptions = computed(() => {
+    return props.pages.map((page, index) => ({
+        label: page.display || __('Page :number', { number: index + 1 }),
+        value: page._id,
+        icon: 'page',
+    }));
+});
+
+const getPageConfig = (page) => ({
+    handle: page._id,
+    display: page.display,
+    icon: 'page',
+});
+
+const addRule = (pageId) => {
+    const newRule = {
+        _id: uniqid(),
+        conditions: [{
+            _id: uniqid(),
+            field: null,
+            operator: 'equals',
+            value: null,
+        }],
+        destination: null,
+    };
+
+    const pages = props.pages.map(page =>
+        page._id === pageId
+            ? { ...page, rules: [...(page.rules || []), newRule] }
+            : page
+    );
+
+    emit('update:pages', pages);
+    nextTick(() => expand(pageId));
+};
+
+const removeRule = (pageId) => {
+    const pages = props.pages.map(page =>
+        page._id === pageId ? { ...page, rules: [] } : page
+    );
+
+    emit('update:pages', pages);
+    collapsed.value = collapsed.value.filter(id => id !== pageId);
+};
+
+const updateRules = (pageId, rules) => {
+    const pages = props.pages.map(page =>
+        page._id === pageId ? { ...page, rules } : page
+    );
+
+    emit('update:pages', pages);
+};
+
+watch(
+    pagesWithLogic,
+    (pages, oldPages) => {
+        const oldIds = new Set((oldPages || []).map(page => page._id));
+
+        pages.forEach(page => {
+            if (!oldIds.has(page._id)) {
+                collapsed.value.push(page._id);
+            }
+        });
+    },
+    { immediate: true }
+);
+</script>
+
+<template>
+    <Panel>
+        <PanelHeader>
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
+                    <Heading :text="__('Page Logic')" />
+                </div>
+                <div v-if="pagesWithLogic.length > 0" class="flex items-center gap-2">
+                    <Button
+                        size="xs"
+                        variant="ghost"
+                        :icon="rulesView === 'collapsed' ? 'expand' : 'collapse'"
+                        :aria-label="rulesView === 'collapsed' ? __('Expand all rules') : __('Collapse all rules')"
+                        @click="rulesView === 'collapsed' ? expandAll() : collapseAll()"
+                    />
+                </div>
+            </div>
+        </PanelHeader>
+        <Card>
+            <div v-if="pagesWithLogic.length > 0" class="relative space-y-6 mb-0" data-logic-list>
+                <PageLogicRule
+                    v-for="page in pagesWithLogic"
+                    :id="page._id"
+                    :key="page._id"
+                    :config="getPageConfig(page)"
+                    :collapsed="collapsed.includes(page._id)"
+                    :read-only="false"
+                    :enabled="true"
+                    :has-error="false"
+                    :rules="page.rules"
+                    :suggestable-fields
+                    :page-options
+                    @collapsed="collapse(page._id)"
+                    @expanded="expand(page._id)"
+                    @removed="removeRule(page._id)"
+                    @update:rules="updateRules(page._id, $event)"
+                />
+            </div>
+            <AddLogicRuleButton
+                v-if="availableItems.length > 0"
+                :items="availableItems"
+                :show-connector="pagesWithLogic.length > 0"
+                :label="__('Add Rule')"
+                :search-placeholder="__('Search Pages')"
+                @added="addRule"
+            />
+        </Card>
+    </Panel>
+</template>
+
+<style scoped>
+[data-logic-list]::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    bottom: 0;
+    inset-inline-start: 0.875rem;
+    border-inline-start: 1px dashed var(--color-gray-400);
+}
+
+.dark [data-logic-list]::before {
+    border-inline-start-color: var(--color-gray-600);
+}
+</style>

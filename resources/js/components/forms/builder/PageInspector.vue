@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue';
 import RuleBuilder from './Pages/RuleBuilder.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-const { deletePage, dirty, inspecting: page, pages } = injectBuilderContext();
+const { deletePage, dirty, fieldtypes, inspecting: page, pages } = injectBuilderContext();
 
 enum PageInspectorTabs {
     Settings = 'settings',
@@ -124,6 +124,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                         v-model:rules="page.rules"
                         :suggestable-fields="suggestableConditionFields"
                         :page-options="pageDestinationOptions"
+                        :fieldtypes
                     />
                 </div>
             </TabContent>
