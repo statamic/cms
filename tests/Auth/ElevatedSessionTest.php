@@ -82,7 +82,7 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_handles_string_config_value_for_elevated_session_duration()
     {
-        config(['statamic.users.elevated_session_duration' => '15']);
+        config(['statamic.users.elevated_session_duration' => '15.5']);
 
         $this
             ->withElevatedSession(now()->subMinutes(5))
