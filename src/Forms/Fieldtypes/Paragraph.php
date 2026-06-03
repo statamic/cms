@@ -16,6 +16,7 @@ class Paragraph extends FormFieldtype
     {
         return [
             'type' => 'form_paragraph',
+            'hide_display' => true,
             ...Arr::except($this->config(), ['type']),
         ];
     }

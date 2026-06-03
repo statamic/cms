@@ -18,6 +18,7 @@ class ParagraphTest extends TestCase
 
         $this->assertEquals([
             'type' => 'form_paragraph',
+            'hide_display' => true,
         ], $fieldtype->toFieldArray());
     }
 
@@ -31,6 +32,7 @@ class ParagraphTest extends TestCase
 
         $this->assertEquals([
             'type' => 'form_paragraph',
+            'hide_display' => true,
             'display' => 'Introduction',
         ], $fieldtype->toFieldArray());
     }
