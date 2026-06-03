@@ -869,11 +869,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     {
         $localizations = $this->directDescendants();
 
-        // Walk the localization tree breadth-first, fetching each level in a
-        // single batched query. The previous implementation recursed into every
-        // node, calling directDescendants() (a query) once per localization,
-        // which is O(number of localizations) queries. On a heavily localized
-        // multi-site, resolving a single entry could fire hundreds of queries.
+        // Breadth-first: fetch each level in one batched query instead of one query per node.
         $origins = $localizations->map->id()->values()->all();
         $seen = array_merge($origins, [$this->id()]);
 
