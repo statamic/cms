@@ -16,6 +16,7 @@ class Heading extends FormFieldtype
     {
         return [
             'type' => 'form_heading',
+            'hide_display' => true,
             ...Arr::except($this->config(), ['type']),
         ];
     }

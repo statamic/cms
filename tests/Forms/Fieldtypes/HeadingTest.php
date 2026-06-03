@@ -18,6 +18,7 @@ class HeadingTest extends TestCase
 
         $this->assertEquals([
             'type' => 'form_heading',
+            'hide_display' => true,
         ], $fieldtype->toFieldArray());
     }
 
@@ -31,6 +32,7 @@ class HeadingTest extends TestCase
 
         $this->assertEquals([
             'type' => 'form_heading',
+            'hide_display' => true,
             'display' => 'Contact Information',
         ], $fieldtype->toFieldArray());
     }
