@@ -4,7 +4,7 @@ import { RadioGroupIndicator, RadioGroupItem } from 'reka-ui';
 
 const props = defineProps({
     /** Additional classes applied when the group appearance is `chips` */
-    chipsClass: { type: String, default: 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-1.75 pe-4 shadow-ui-xs rounded-full' },
+    chipsClass: { type: String, default: 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full' },
     /** Description text to display below the label */
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
