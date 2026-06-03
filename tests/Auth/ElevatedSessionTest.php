@@ -91,7 +91,7 @@ class ElevatedSessionTest extends TestCase
             ->assertOk()
             ->assertJson([
                 'elevated' => true,
-                'expiry' => now()->addMinutes(10)->timestamp,
+                'expiry' => now()->addMinutes(10.5)->timestamp,
                 'method' => 'password_confirmation',
             ]);
     }
