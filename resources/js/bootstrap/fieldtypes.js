@@ -43,7 +43,6 @@ import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
 import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
 import OpinionScaleFieldtype from '../components/fieldtypes/OpinionScaleFieldtype.vue';
-import FormParagraphFieldtype from '../components/fieldtypes/FormParagraphFieldtype.vue';
 import RadioFieldtype from '../components/fieldtypes/RadioFieldtype.vue';
 import RankingFieldtype from '../components/fieldtypes/RankingFieldtype.vue';
 import RangeFieldtype from '../components/fieldtypes/RangeFieldtype.vue';
@@ -127,7 +126,6 @@ export default function registerFieldtypes(app) {
     );
     app.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
     app.component('opinion_scale-fieldtype', OpinionScaleFieldtype);
-    app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
     app.component('radio-fieldtype', RadioFieldtype);
     app.component('ranking-fieldtype', RankingFieldtype);
     app.component('range-fieldtype', RangeFieldtype);

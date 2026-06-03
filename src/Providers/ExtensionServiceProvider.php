@@ -104,7 +104,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Navs::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\OpinionScale::class,
-        Fieldtypes\FormParagraph::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Ranking::class,
         Fieldtypes\Range::class,
