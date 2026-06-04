@@ -24,7 +24,12 @@ const hasContent = computed(() => props.config.display || text.value);
 
 <template>
     <div data-form-banner>
-        <Alert v-if="hasContent" :icon="config.icon" :icon-fallback="false">
+        <Alert
+            v-if="hasContent"
+            :icon="config.icon"
+            :icon-fallback="false"
+            class="shadow-ui-xs"
+        >
             <Heading v-if="config.display" :text="__(config.display)" size="xl" />
             <Description v-if="text" :text="text" />
         </Alert>
