@@ -10,7 +10,9 @@ class NavTreePolicy extends NavPolicy
 
     public function before($user)
     {
-        if (User::fromUser($user)->isSuper()) {
+        $user = User::fromUser($user);
+
+        if ($user->isSuper() || $user->hasPermission('configure navs')) {
             return true;
         }
     }
