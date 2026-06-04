@@ -24,53 +24,53 @@
     mask-size: var(--s);
     -webkit-mask-repeat: repeat;
     mask-repeat: repeat;
-}
 
-:where(.dark) .star-rating-input {
-    --_fill: #fcd34d;
-    --_empty: #4b5563;
-}
+    :where(.dark) & {
+        --_fill: #fcd34d;
+        --_empty: #4b5563;
+    }
 
-.star-rating-input:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
 
-.star-rating-input:focus-visible {
-    outline: 2px solid #60a5fa;
-    outline-offset: 3px;
-    border-radius: 0.25rem;
-}
+    &:focus-visible {
+        outline: 2px solid #60a5fa;
+        outline-offset: 3px;
+        border-radius: 0.25rem;
+    }
 
-.star-rating-input::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 1px;
-    height: 0;
-    background: transparent;
-    border: none;
-    border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
-}
+    &::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 1px;
+        height: 0;
+        background: transparent;
+        border: none;
+        border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
+    }
 
-.star-rating-input::-moz-range-thumb {
-    appearance: none;
-    width: 1px;
-    height: 0;
-    background: transparent;
-    border: none;
-    border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
-}
+    &::-moz-range-thumb {
+        appearance: none;
+        width: 1px;
+        height: 0;
+        background: transparent;
+        border: none;
+        border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
+    }
 
-.star-rating-input::-webkit-slider-runnable-track {
-    appearance: none;
-    -webkit-appearance: none;
-    height: var(--s);
-    background: transparent;
-}
+    &::-webkit-slider-runnable-track {
+        appearance: none;
+        -webkit-appearance: none;
+        height: var(--s);
+        background: transparent;
+    }
 
-.star-rating-input::-moz-range-track {
-    appearance: none;
-    height: var(--s);
-    background: transparent;
-    border: none;
+    &::-moz-range-track {
+        appearance: none;
+        height: var(--s);
+        background: transparent;
+        border: none;
+    }
 }
