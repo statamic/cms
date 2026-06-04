@@ -44,7 +44,7 @@ class DeleteTemporaryFileUploads
         $disk
             ->getFilesRecursively($dir = ChunkUploads::baseDirectory())
             ->filter(fn ($path) => str_ends_with($path, '/.meta'))
-            ->filter(fn ($path) => (int) $disk->get($path) < now()->subHour()->timestamp)
+            ->filter(fn ($path) => (int) $disk->get($path) < now()->subDay()->timestamp)
             ->each(fn ($meta) => $disk->getFilesRecursively(dirname($meta))->each(fn ($path) => $disk->delete($path)));
 
         $disk->deleteEmptySubfolders($dir);
