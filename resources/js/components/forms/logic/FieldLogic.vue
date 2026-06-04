@@ -3,8 +3,7 @@ import { Button, Card, Heading, Icon, Panel, PanelHeader } from '@ui';
 import AddLogicRuleButton from './AddLogicRuleButton.vue';
 import FieldLogicRule from './FieldLogicRule.vue';
 import { computed, nextTick, ref, watch } from 'vue';
-import { __ } from '@/bootstrap/globals';
-import { categories, categoryColorClasses } from '@/components/forms/Builder/categories';
+import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 
 const emit = defineEmits(['update:fields']);
 
