@@ -107,6 +107,12 @@ async function renderPdf() {
             observer.observe(state.container);
         }
 
+        if (pageStates.length > 0) {
+            await renderPage(pageStates[0], renderId, viewerContext);
+        }
+
+        if (renderId !== currentRenderId) return;
+
         isLoading.value = false;
     } catch (error) {
         if (renderId === currentRenderId) {
