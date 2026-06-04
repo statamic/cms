@@ -10,6 +10,8 @@ class DeleteTemporaryFileUploads
 {
     public function handle($request, Closure $next)
     {
+        $this->deleteFilesOverAnHourOld();
+        $this->deleteAbandonedChunks();
         $lottery = [2, 100];
 
         if (random_int(1, $lottery[1]) <= $lottery[0]) {
@@ -41,11 +43,15 @@ class DeleteTemporaryFileUploads
     {
         $disk = File::disk(ChunkUploads::diskName());
 
+        // Each upload is a folder of chunks; delete it once nothing has been written to it for an hour.
         $disk
             ->getFilesRecursively($dir = ChunkUploads::baseDirectory())
-            ->filter(fn ($path) => str_ends_with($path, '/.meta'))
-            ->filter(fn ($path) => (int) $disk->get($path) < now()->subDay()->timestamp)
-            ->each(fn ($meta) => $disk->getFilesRecursively(dirname($meta))->each(fn ($path) => $disk->delete($path)));
+            ->groupBy(fn ($path) => dirname($path))
+            ->each(function ($files) use ($disk) {
+                if ($files->max(fn ($path) => $disk->lastModified($path)) < now()->subHour()->timestamp) {
+                    $files->each(fn ($path) => $disk->delete($path));
+                }
+            });
 
         $disk->deleteEmptySubfolders($dir);
     }

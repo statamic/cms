@@ -49,15 +49,10 @@ class ChunksController extends CpController
         $chunkIndex = (int) $request->chunkIndex;
         $totalChunks = (int) $request->totalChunks;
 
-        if (! $disk->exists($directory.'/.meta')) {
-            $disk->put($directory.'/.meta', (string) now()->timestamp);
-        }
-
         $disk->putFileAs($directory, $request->file('chunk'), (string) $chunkIndex);
 
         if ($limit = ChunkUploads::maxFilesizeBytes($container->validationRules())) {
             $received = collect($disk->files($directory))
-                ->reject(fn ($path) => str_ends_with($path, '.meta'))
                 ->sum(fn ($path) => $disk->size($path));
 
             if ($received > $limit) {

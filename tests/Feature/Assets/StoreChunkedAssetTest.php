@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades;
+use Statamic\Http\Middleware\DeleteTemporaryFileUploads;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -147,6 +148,25 @@ class StoreChunkedAssetTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->postChunk('hello', 0, 1, ['uploadId' => '../../etc/passwd'])
             ->assertStatus(422);
+    }
+
+    #[Test]
+    public function it_deletes_chunk_folders_with_no_activity_for_an_hour()
+    {
+        Carbon::setTestNow();
+
+        Storage::disk('local')->put('statamic/chunks/abandoned/0', 'data');
+        Storage::disk('local')->put('statamic/chunks/active/0', 'data');
+
+        // The abandoned upload's newest chunk is over an hour old; the active one was just written.
+        touch(Storage::disk('local')->path('statamic/chunks/abandoned/0'), now()->subHours(2)->timestamp);
+
+        (function () {
+            $this->deleteAbandonedChunks();
+        })->call(new DeleteTemporaryFileUploads);
+
+        Storage::disk('local')->assertMissing('statamic/chunks/abandoned/0');
+        Storage::disk('local')->assertExists('statamic/chunks/active/0');
     }
 
     private function uploadChunks($content, $chunkSize = 5, $overrides = [])
