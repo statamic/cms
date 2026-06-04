@@ -7,8 +7,8 @@
     --star-rating-step: 1;
     --_cell: calc(var(--s) + var(--star-rating-gap));
     --_pad: calc(var(--star-rating-step) * var(--_cell) / 2);
-    --_fill: #fbbf24;
-    --_empty: #d1d5db;
+    --_fill: var(--color-primary);
+    --_empty: var(--color-gray-300);
 
     display: block;
     width: calc(var(--_cell) * var(--star-rating-max));
