@@ -132,8 +132,15 @@ const updatePreview = debounce(() => {
         });
 }, 500);
 
+const currentPageIndex = computed(() => {
+    return pages.value.findIndex((page) =>
+        page.sections.some((section) => section.fields.some((f) => f._id === field.value._id))
+    );
+});
+
 const suggestableConditionFields = computed(() => {
     return pages.value
+        .slice(0, currentPageIndex.value + 1)
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
