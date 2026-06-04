@@ -1526,9 +1526,9 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
