@@ -25,7 +25,7 @@
                 {{ /if }}
             >
             <span class="flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors border-gray-300 bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary">
-                <span class="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                <span class="flex items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800" style="aspect-ratio: {{ aspect_ratio ?? '16/9' }};">
                     {{ if image }}
                         <img class="block size-full object-cover" src="{{ image }}" alt="{{ label ?? key }}">
                     {{ /if }}

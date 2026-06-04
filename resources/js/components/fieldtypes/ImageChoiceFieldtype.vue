@@ -32,6 +32,13 @@ const gridClass = computed(() => {
     }[columns.value] ?? 'grid-cols-3';
 });
 
+const aspectRatio = computed(() => {
+    const allowed = ['1/1', '4/3', '3/2', '16/9', '3/4', '2/3'];
+    const ratio = props.config.aspect_ratio ?? '16/9';
+
+    return allowed.includes(ratio) ? ratio : '16/9';
+});
+
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 
 function normalizeOptions(raw) {
@@ -182,7 +189,10 @@ const cardClasses = [
                 @change="toggleOption(option.value)"
             >
             <span :class="cardClasses">
-                <span class="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                <span
+                    class="flex items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800"
+                    :style="{ aspectRatio: aspectRatio }"
+                >
                     <img
                         v-if="option.image"
                         class="block size-full object-cover"

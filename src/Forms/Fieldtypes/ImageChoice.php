@@ -73,6 +73,21 @@ class ImageChoice extends FormFieldtype
                 'max' => 4,
                 'width' => 50,
             ],
+            'aspect_ratio' => [
+                'display' => __('Aspect Ratio'),
+                'instructions' => __('Shape of the image area for each option.'),
+                'type' => 'select',
+                'default' => '16/9',
+                'options' => [
+                    '1/1' => __('Square'),
+                    '4/3' => __('4:3'),
+                    '3/2' => __('3:2'),
+                    '16/9' => __('16:9'),
+                    '3/4' => __('3:4'),
+                    '2/3' => __('2:3'),
+                ],
+                'width' => 50,
+            ],
         ];
     }
 
@@ -94,41 +109,17 @@ class ImageChoice extends FormFieldtype
             'image_options' => $this->normalizedOptions(),
             'multiple' => (bool) $this->config('multiple'),
             'columns' => $columns,
-            ...Arr::except($this->config(), ['type', 'options', 'multiple', 'columns']),
+            'aspect_ratio' => $this->normalizedAspectRatio(),
+            ...Arr::except($this->config(), ['type', 'options', 'multiple', 'columns', 'aspect_ratio']),
         ];
     }
 
-    public function example(): ?array
+    private function normalizedAspectRatio(): string
     {
-        return [
-            'config' => [
-                'display' => __('Pick your favorite season'),
-                'columns' => 3,
-                'options' => [
-                    [
-                        'key' => 'spring',
-                        'label' => __('Spring'),
-                        'image' => 'https://picsum.photos/seed/spring/320/240',
-                    ],
-                    [
-                        'key' => 'summer',
-                        'label' => __('Summer'),
-                        'image' => 'https://picsum.photos/seed/summer/320/240',
-                    ],
-                    [
-                        'key' => 'autumn',
-                        'label' => __('Autumn'),
-                        'image' => 'https://picsum.photos/seed/autumn/320/240',
-                    ],
-                    [
-                        'key' => 'winter',
-                        'label' => __('Winter'),
-                        'image' => 'https://picsum.photos/seed/winter/320/240',
-                    ],
-                ],
-            ],
-            'value' => null,
-        ];
+        $allowed = ['1/1', '4/3', '3/2', '16/9', '3/4', '2/3'];
+        $ratio = $this->config('aspect_ratio') ?? '16/9';
+
+        return in_array($ratio, $allowed, true) ? $ratio : '16/9';
     }
 
     private function normalizedOptions(): array

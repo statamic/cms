@@ -11,6 +11,8 @@
     $selected = $value ?? ($isMultiple ? [] : null);
     $cardClasses = 'flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors border-gray-300 bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary';
     $letterClasses = 'flex size-7 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200';
+    $allowedAspectRatios = ['1/1', '4/3', '3/2', '16/9', '3/4', '2/3'];
+    $aspectRatio = in_array($aspect_ratio ?? null, $allowedAspectRatios, true) ? $aspect_ratio : '16/9';
 @endphp
 
 <fieldset
@@ -45,7 +47,7 @@
                 @endif
             >
             <span class="{{ $cardClasses }}">
-                <span class="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                <span class="flex items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800" style="aspect-ratio: {{ $aspectRatio }};">
                     @if ($image)
                         <img class="block size-full object-cover" src="{{ $image }}" alt="{{ $label }}">
                     @endif
