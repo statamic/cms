@@ -29,7 +29,7 @@ class ChunkUploads
 
     public static function chunkSize(): int
     {
-        $overhead = (int) config('statamic.assets.chunked_upload.chunk_overhead', 1024 * 1024);
+        $overhead = (int) config('statamic.assets.chunked_upload.chunk_overhead', 64 * 1024);
         $max = (int) config('statamic.assets.chunked_upload.max_chunk_size', 10 * 1024 * 1024);
 
         return max(1, min(self::phpMaxUploadSize() - $overhead, $max));
