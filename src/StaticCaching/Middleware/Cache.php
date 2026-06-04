@@ -22,6 +22,7 @@ use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
+use Statamic\StaticCaching\UrlExcluder;
 
 use function Statamic\trans as __;
 
@@ -76,6 +77,8 @@ class Cache
         }
 
         if ($response = $this->attemptToServeCachedResponse($request)) {
+            $response->isNotModified($request);
+
             return $response;
         }
 
@@ -88,6 +91,10 @@ class Cache
 
             $this->nocache->write();
 
+            if ($this->cacher instanceof FileCacher && $response instanceof Request && ! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
+                $response->makeCacheControlCacheable();
+                $response->isNotModified($request);
+            }
             if ($paginator = Blink::get('tag-paginator')) {
                 if ($paginator->hasMorePages()) {
                     $response->headers->set('X-Statamic-Pagination', [
@@ -141,6 +148,9 @@ class Cache
             $this->makeReplacements($response);
 
             $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
+            if ($this->cacher instanceof FileCacher) {
+                $response->makeCacheControlCacheable();
+            }
 
             return $response;
         }
