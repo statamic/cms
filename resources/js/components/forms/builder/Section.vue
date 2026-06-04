@@ -50,51 +50,6 @@ const blueprint = computed(() => ({
     }],
 }));
 
-/* ROW DETECTION
-=================================================== */
-// Work out which fields land in the first and final visual rows so we can add `data-first-row` and `data-last-row` (something CSS alone can't reliably detect).
-const normalizedWidth = (field) => {
-    const raw = Number(field?.config?.width ?? 100);
-
-    if (!Number.isFinite(raw) || raw <= 0) {
-        return 100;
-    }
-
-    return Math.min(raw, 100);
-};
-
-const fieldRows = computed(() => {
-    const rows = [];
-    let currentRow = [];
-    let currentRowWidth = 0;
-
-    props.section.fields.forEach((field, index) => {
-        const width = normalizedWidth(field);
-
-        if (currentRowWidth > 0 && currentRowWidth + width > 100) {
-            rows.push(currentRow);
-            currentRow = [];
-            currentRowWidth = 0;
-        }
-
-        currentRow.push(index);
-        currentRowWidth += width;
-    });
-
-    if (currentRow.length > 0) {
-        rows.push(currentRow);
-    }
-
-    return rows;
-});
-
-const firstRowIndexes = computed(() => fieldRows.value.at(0) ?? []);
-const lastRowIndexes = computed(() => fieldRows.value.at(-1) ?? []);
-
-const isFieldInFirstRow = (index) => firstRowIndexes.value.includes(index);
-const isFieldInLastRow = (index) => lastRowIndexes.value.includes(index);
-/* END ROW DETECTION */
-
 const updateFieldWidth = (field, width) => {
     field.config.width = width;
 
@@ -139,6 +94,35 @@ const removeField = (field) => {
 const confirmingDelete = ref(false);
 const confirmDelete = () => confirmingDelete.value = true;
 const deleteSection = () => emit('deleted', props.section._id);
+
+const getFieldWidth = (field): number => {
+    const w = Number(field?.config?.width);
+    return (w > 0 && w <= 100) ? w : 100;
+};
+
+const rowBoundaries = computed(() => {
+    const fields = props.section.fields;
+    let width = 0;
+    let firstRowEnd = fields.length - 1;
+    let lastRowStart = 0;
+    let wrapped = false;
+
+    for (let i = 0; i < fields.length; i++) {
+        const fieldWidth = getFieldWidth(fields[i]);
+        if (width > 0 && width + fieldWidth > 100) {
+            if (!wrapped) firstRowEnd = i - 1;
+            lastRowStart = i;
+            width = 0;
+            wrapped = true;
+        }
+        width += fieldWidth;
+    }
+
+    return { firstRowEnd, lastRowStart };
+});
+
+const isFieldInFirstRow = (index): boolean => index <= rowBoundaries.value.firstRowEnd;
+const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRowStart;
 </script>
 
 <template>
