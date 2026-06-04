@@ -4,12 +4,12 @@
     id="{{ $id }}"
     type="range"
     name="{{ $name }}"
-    class="star-rating-input"
+    @class(['star-rating-input', 'star-rating-input--unrated' => ($value ?? 0) == 0])
     data-star-rating
-    min="{{ ! empty($allow_half_stars) ? 0.5 : 1 }}"
+    min="0"
     max="{{ $max_stars ?? 5 }}"
     step="{{ $step ?? 1 }}"
-    value="{{ $value ?? (! empty($allow_half_stars) ? 0.5 : 1) }}"
+    value="{{ $value ?? 0 }}"
     style="--star-rating-max: {{ $max_stars ?? 5 }}; --star-rating-step: {{ $step ?? 1 }};"
     @if (isset($js_driver)) {!! $js_attributes !!} @endif
     @required(in_array('required', $validate ?? []))

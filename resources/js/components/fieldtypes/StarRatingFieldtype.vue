@@ -28,7 +28,7 @@ const allowHalfStars = computed(() => Boolean(props.config.allow_half_stars));
 
 const step = computed(() => (allowHalfStars.value ? 0.5 : 1));
 
-const min = computed(() => (allowHalfStars.value ? 0.5 : 1));
+const min = computed(() => 0);
 
 const normalizedValue = computed(() => {
     if (props.value == null || props.value === '') {
@@ -48,7 +48,9 @@ const normalizedValue = computed(() => {
     return Math.round(value * 2) / 2;
 });
 
-const rangeValue = computed(() => normalizedValue.value ?? min.value);
+const rangeValue = computed(() => normalizedValue.value ?? 0);
+
+const isUnrated = computed(() => normalizedValue.value == null || normalizedValue.value === 0);
 
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 
@@ -84,6 +86,7 @@ defineReplicatorPreview(() => {
         ref="rangeInput"
         type="range"
         class="star-rating-input"
+        :class="{ 'star-rating-input--unrated': isUnrated }"
         data-star-rating
         :name="name"
         :min="min"

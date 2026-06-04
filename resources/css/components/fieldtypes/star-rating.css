@@ -14,7 +14,7 @@
     width: calc(var(--_cell) * var(--star-rating-max));
     max-width: 100%;
     height: var(--s);
-    padding-inline: var(--_pad);
+    padding-inline: 0 var(--_pad);
     box-sizing: border-box;
     appearance: none;
     cursor: pointer;
@@ -60,6 +60,16 @@
         background: transparent;
         border: none;
         border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
+    }
+
+    &.star-rating-input--unrated {
+        &::-webkit-slider-thumb {
+            border-image: conic-gradient(var(--_empty) 0) fill 0 // var(--s) 500px;
+        }
+
+        &::-moz-range-thumb {
+            border-image: conic-gradient(var(--_empty) 0) fill 0 // var(--s) 500px;
+        }
     }
 
     &::-webkit-slider-runnable-track {
