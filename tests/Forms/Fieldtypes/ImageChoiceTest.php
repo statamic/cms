@@ -49,6 +49,7 @@ class ImageChoiceTest extends TestCase
                 'key' => 'calm',
                 'label' => 'Calm',
                 'image' => 'https://example.com/calm.jpg',
+                'letter' => 'A',
             ],
         ], $array['image_options']);
     }
@@ -69,6 +70,7 @@ class ImageChoiceTest extends TestCase
                     'key' => 'fun',
                     'label' => 'Fun',
                     'image' => '/assets/fun.jpg',
+                    'letter' => 'A',
                 ],
             ],
         ], $fieldtype->preload());

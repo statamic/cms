@@ -22,6 +22,7 @@
             $key = $option['key'] ?? null;
             $label = $option['label'] ?? $key;
             $image = $option['image'] ?? null;
+            $letter = $option['letter'] ?? null;
             $isSelected = $isMultiple
                 ? in_array($key, is_array($selected) ? $selected : [], true)
                 : $selected === $key;
@@ -49,7 +50,7 @@
                     @endif
                 </span>
                 @if ($label)
-                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">@if ($letter){{ $letter }} @endif{{ $label }}</span>
                 @endif
             </span>
         </label>

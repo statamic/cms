@@ -42,10 +42,11 @@ function normalizeOptions(raw) {
     if (Array.isArray(raw)) {
         return raw
             .filter((row) => row && (row.key || row.value))
-            .map((row) => ({
+            .map((row, index) => ({
                 value: row.key ?? row.value,
                 label: row.label ?? row.key ?? row.value,
                 image: resolveImage(row.image),
+                letter: row.letter ?? String.fromCharCode(65 + index),
             }));
     }
 
@@ -196,7 +197,7 @@ const cardClasses = [
                     v-if="option.label"
                     class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300"
                 >
-                    {{ __(option.label) }}
+                    <template v-if="option.letter">{{ option.letter }} </template>{{ __(option.label) }}
                 </span>
             </span>
         </label>

@@ -136,7 +136,8 @@ class ImageChoice extends FormFieldtype
         return collect($this->config('options'))
             ->filter(fn ($option) => is_array($option))
             ->reject(fn (array $option): bool => ($option['hidden'] ?? false) === true)
-            ->map(function (array $option): ?array {
+            ->values()
+            ->map(function (array $option, int $index): ?array {
                 $key = $option['key'] ?? null;
 
                 if (blank($key)) {
@@ -147,6 +148,7 @@ class ImageChoice extends FormFieldtype
                     'key' => $key,
                     'label' => $option['label'] ?? $key,
                     'image' => $this->resolveImageUrl($option['image'] ?? null),
+                    'letter' => chr(65 + $index),
                 ];
             })
             ->filter()

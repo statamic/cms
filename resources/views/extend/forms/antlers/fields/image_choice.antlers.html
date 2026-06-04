@@ -31,7 +31,7 @@
                     {{ /if }}
                 </span>
                 {{ if label }}
-                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">{{ label }}</span>
+                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">{{ if letter }}{{ letter }} {{ /if }}{{ label }}</span>
                 {{ /if }}
             </span>
         </label>
