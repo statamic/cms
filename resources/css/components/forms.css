@@ -43,6 +43,12 @@
             @apply bg-blue-950 border-blue-500/75;
         }
     }
+    /* Pull the field actions up a bit for the first row */
+    &[data-first-row] {
+        [data-editing-field-actions] {
+            top: -0.85rem;
+        }
+    }
     /* Editing a button like "Next page" and "Submit" */
     :has(> button&) {
         position: relative;
