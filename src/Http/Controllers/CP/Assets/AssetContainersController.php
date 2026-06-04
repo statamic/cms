@@ -72,7 +72,7 @@ class AssetContainersController extends CpController
 
         return PublishForm::make($this->formBlueprint())
             ->title(__('Create Asset Container'))
-            ->values(['disk' => $this->disks()->first()])
+            ->values(['disk' => $this->disks()->first(), 'chunked_uploads' => true])
             ->asConfig()
             ->submittingTo(cp_route('asset-containers.store'), 'POST');
     }
@@ -95,7 +95,8 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->chunkedUploads(($values['chunked_uploads'] ?? false) ? true : null);
 
         $container->save();
 
