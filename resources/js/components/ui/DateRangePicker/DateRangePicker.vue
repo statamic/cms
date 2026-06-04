@@ -154,7 +154,7 @@ const hoverCardDate = computed(() => {
                         class="flex size-8 shrink-0 items-center justify-center rounded-lg -ms-2 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                         :aria-label="__('Open calendar')"
                     >
-                        <Icon name="calendar" class="size-3.5!" />
+                        <Icon name="calendar" class="size-4" />
                     </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
                         <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
