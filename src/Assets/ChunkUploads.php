@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Support\Str;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ChunkUploads
 {
@@ -21,10 +22,7 @@ class ChunkUploads
 
     public static function phpMaxUploadSize(): int
     {
-        return min(
-            Str::parseBytes(ini_get('upload_max_filesize')),
-            Str::parseBytes(ini_get('post_max_size')),
-        );
+        return (int) UploadedFile::getMaxFilesize();
     }
 
     public static function chunkSize(): int

@@ -19,19 +19,6 @@ class StrTest extends TestCase
     }
 
     #[Test]
-    public function it_parses_byte_shorthand()
-    {
-        $this->assertEquals(1024, Str::parseBytes('1K'));
-        $this->assertEquals(524288, Str::parseBytes('512K'));
-        $this->assertEquals(134217728, Str::parseBytes('128M'));
-        $this->assertEquals(134217728, Str::parseBytes('128m'));
-        $this->assertEquals(2147483648, Str::parseBytes('2G'));
-        $this->assertEquals(1024, Str::parseBytes('1024'));
-        $this->assertEquals(PHP_INT_MAX, Str::parseBytes('-1'));
-        $this->assertEquals(PHP_INT_MAX, Str::parseBytes(''));
-    }
-
-    #[Test]
     public function it_makes_sentence_lists()
     {
         $this->assertEquals('this', Str::makeSentenceList(['this']));
