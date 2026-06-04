@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button, ConfirmationModal, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger, Textarea } from '@ui';
 import { computed, ref, watch } from 'vue';
-import PageRuleBuilder from './Pages/PageRuleBuilder.vue';
+import PageRuleBuilder from './pages/PageRuleBuilder.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
 const { deletePage, dirty, fieldtypes, inspecting: page, pages } = injectBuilderContext();
@@ -15,6 +15,7 @@ const confirmingDelete = ref(false);
 const activeTab = ref<PageInspectorTabs>(PageInspectorTabs.Settings);
 
 const pageIndex = computed(() => pages.value.findIndex((p) => p._id === page.value._id));
+const isLastPage = computed(() => pageIndex.value === pages.value.length - 1);
 const canDeletePage = computed(() => pages.value.length > 1);
 const pageTitle = computed(() => page.value.display ? __(page.value.display) : placeholderTitle.value);
 const placeholderTitle = computed(() => __('Page :current of :total', {
@@ -71,7 +72,7 @@ watch(() => page.value.rules, dirty, { deep: true });
         <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">
             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                 <TabTrigger :name="PageInspectorTabs.Settings" :text="__('Settings')" />
-                <TabTrigger :name="PageInspectorTabs.Conditions" :text="__('Logic')" />
+                <TabTrigger v-if="!isLastPage" :name="PageInspectorTabs.Conditions" :text="__('Logic')" />
             </TabList>
 
             <TabContent :name="PageInspectorTabs.Settings">
@@ -105,7 +106,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                 </div>
             </TabContent>
 
-            <TabContent :name="PageInspectorTabs.Conditions">
+            <TabContent v-if="!isLastPage" :name="PageInspectorTabs.Conditions">
                 <div class="space-y-6 pt-8">
                     <div class="flex items-center gap-2.5">
                         <div class="size-4">
