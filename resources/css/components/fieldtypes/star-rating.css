@@ -1,7 +1,7 @@
 /* CSS-only star rating via range input — https://css-tricks.com/a-css-only-star-rating-component-and-more-part-1/ */
 
 .star-rating-input {
-    --s: 1.6rem;
+    --s: 1.65rem;
     --star-rating-gap: 0.175rem;
     --star-rating-max: 5;
     --star-rating-step: 1;
