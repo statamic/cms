@@ -1,0 +1,21 @@
+<fieldset class="star-rating" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
+    {{ foreach:stars as="star" }}
+        <label class="star-rating__star">
+            <input
+                id="{{ id }}-{{ star }}"
+                type="radio"
+                name="{{ name }}"
+                value="{{ star }}"
+                {{ if js_driver }}{{ js_attributes }}{{ /if }}
+                {{ if value == star }}checked{{ /if }}
+                {{ if validate|contains:required }}required{{ /if }}
+                {{ if error }}
+                    aria-invalid="true" aria-describedby="{{ id }}-error"
+                {{ elseif instructions }}
+                    aria-describedby="{{ id }}-instructions"
+                {{ /if }}
+            >
+            <span aria-hidden="true">★</span>
+        </label>
+    {{ /foreach:stars }}
+</fieldset>
