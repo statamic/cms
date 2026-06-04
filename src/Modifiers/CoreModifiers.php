@@ -1536,6 +1536,10 @@ class CoreModifiers extends Modifier
             return Arr::last($value);
         }
 
+        if ($value instanceof Collection) {
+            return $value->last();
+        }
+
         return Stringy::last($value, Arr::get($params, 0));
     }
 
