@@ -52,7 +52,7 @@ const blueprint = computed(() => ({
 
 /* ROW DETECTION
 =================================================== */
-// Work out which fields land in the first and final visual rows so we can add helper classes (something CSS alone can't reliably detect). `field--first-row` and `field--last-row` is added.
+// Work out which fields land in the first and final visual rows so we can add `data-first-row` and `data-last-row` (something CSS alone can't reliably detect).
 const normalizedWidth = (field) => {
     const raw = Number(field?.config?.width ?? 100);
 
@@ -222,11 +222,11 @@ const deleteSection = () => emit('deleted', props.section._id);
                                 data-field-item
                                 :data-editing-field="isInspectingLinkFields(field) ? '' : undefined"
                                 :data-editing-item="isInspectingLinkFields(field) ? '' : undefined"
+                                :data-first-row="isFieldInFirstRow(fieldIndex) ? '' : undefined"
+                                :data-last-row="isFieldInLastRow(fieldIndex) ? '' : undefined"
                                 :class="[
                                     {
                                         'cursor-pointer': !isInspectingLinkFields(field),
-                                        'field--first-row': isFieldInFirstRow(fieldIndex),
-                                        'field--last-row': isFieldInLastRow(fieldIndex),
                                     },
                                 ]"
                                 class="border border-dashed rounded-lg p-4 flex items-center justify-center"

@@ -53,7 +53,9 @@ const hasErrors = computed(() => {
         data-field-item
         :data-editing-field="isInspecting ? '' : undefined"
         :data-editing-item="isInspecting ? '' : undefined"
-        :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspecting, 'field--first-row': isFirstRow, 'field--last-row': isLastRow }]"
+        :data-first-row="isFirstRow ? '' : undefined"
+        :data-last-row="isLastRow ? '' : undefined"
+        :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspecting }]"
         @click.stop="isInspecting || inspectField()"
     >
         <div

@@ -43,7 +43,9 @@ const errorMessage = computed(() => {
         data-field-item
         :data-editing-field="isInspecting ? '' : undefined"
         :data-editing-item="isInspecting ? '' : undefined"
-        :class="[{ 'cursor-pointer': !isInspecting, 'field--first-row': isFirstRow, 'field--last-row': isLastRow }]"
+        :data-first-row="isFirstRow ? '' : undefined"
+        :data-last-row="isLastRow ? '' : undefined"
+        :class="[{ 'cursor-pointer': !isInspecting }]"
         @click.stop="isInspecting || inspectFieldsetImport()"
     >
         <div

@@ -33,10 +33,10 @@
                 background: transparent;
             }
         }
-        &.field--first-row::before {
+        &[data-first-row]::before {
             inset-block-start: -1.25rem;
         }
-        &.field--last-row::before {
+        &[data-last-row]::before {
             inset-block-end: -1.25rem;
         }
         :where(.dark) &::before {
@@ -145,10 +145,10 @@
         &::before {
             inset-block: -0.75rem;
         }
-        &.field--first-row::before {
+        &[data-first-row]::before {
             inset-block-start: -1.25rem;
         }
-        &.field--last-row::before {
+        &[data-last-row]::before {
             inset-block-end: -1.25rem;
         }
     }
