@@ -23,9 +23,14 @@ const columns = computed(() => {
     return Math.max(1, Math.min(Math.round(cols), 4));
 });
 
-const gridStyle = computed(() => ({
-    '--image-choice-columns': columns.value,
-}));
+const gridClass = computed(() => {
+    return {
+        1: 'grid-cols-1',
+        2: 'grid-cols-2',
+        3: 'grid-cols-3',
+        4: 'grid-cols-4',
+    }[columns.value] ?? 'grid-cols-3';
+});
 
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 
@@ -145,23 +150,29 @@ defineExpose({
     ...expose,
 });
 
+const cardClasses = [
+    'flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors',
+    'border-gray-300 bg-gray-50 hover:border-gray-400',
+    'dark:border-gray-600 dark:bg-gray-900',
+    'peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary',
+    'peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary',
+];
+
 </script>
 
 <template>
     <div
-        class="image-choice"
-        :class="{ 'image-choice--multiple': multiple }"
-        :style="gridStyle"
+        class="grid gap-3"
+        :class="gridClass"
         :role="multiple ? 'group' : 'radiogroup'"
     >
         <label
             v-for="option in options"
             :key="option.value"
-            class="image-choice__option"
-            :class="{ 'image-choice__option--selected': isSelected(option.value) }"
+            class="group cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60"
         >
             <input
-                class="image-choice__input"
+                class="peer sr-only"
                 :type="multiple ? 'checkbox' : 'radio'"
                 :name="multiple ? `${name}[]` : name"
                 :value="option.value"
@@ -169,19 +180,24 @@ defineExpose({
                 :disabled="isDisabled"
                 @change="toggleOption(option.value)"
             >
-            <span class="image-choice__card">
-                <span class="image-choice__media">
+            <span :class="cardClasses">
+                <span class="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
                     <img
                         v-if="option.image"
-                        class="image-choice__image"
+                        class="block size-full object-cover"
                         :src="option.image"
                         :alt="option.label"
                     >
-                    <span v-else class="image-choice__placeholder" aria-hidden="true">
+                    <span v-else class="flex size-full items-center justify-center" aria-hidden="true">
                         <ui-icon name="image" class="size-6 text-gray-400" />
                     </span>
                 </span>
-                <span v-if="option.label" class="image-choice__label">{{ __(option.label) }}</span>
+                <span
+                    v-if="option.label"
+                    class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300"
+                >
+                    {{ __(option.label) }}
+                </span>
             </span>
         </label>
     </div>

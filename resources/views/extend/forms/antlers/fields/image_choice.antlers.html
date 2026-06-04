@@ -1,16 +1,12 @@
-{{ once }}
-    <link rel="stylesheet" href="{{ config:app:url }}/vendor/statamic/forms/image-choice.css">
-{{ /once }}
 <fieldset
-    class="image-choice"
-    style="--image-choice-columns: {{ columns ?? 3 }};"
+    class="grid gap-3 {{ if columns == 1 }}grid-cols-1{{ elseif columns == 2 }}grid-cols-2{{ elseif columns == 4 }}grid-cols-4{{ else }}grid-cols-3{{ /if }}"
     {{ unless multiple }}role="radiogroup"{{ /unless }}
     {{ if multiple }}role="group"{{ /if }}
 >
     {{ image_options }}
-        <label class="image-choice__option{{ if multiple }}{{ if value|in_array:key }} image-choice__option--selected{{ /if }}{{ else }}{{ if value == key }} image-choice__option--selected{{ /if }}{{ /if }}">
+        <label class="group cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60">
             <input
-                class="image-choice__input"
+                class="peer sr-only"
                 id="{{ id }}-{{ key | slugify }}-option"
                 type="{{ multiple ? 'checkbox' : 'radio' }}"
                 name="{{ multiple ? '{name}[]' : name }}"
@@ -28,14 +24,14 @@
                     aria-describedby="{{ id }}-instructions"
                 {{ /if }}
             >
-            <span class="image-choice__card">
-                <span class="image-choice__media">
+            <span class="flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors border-gray-300 bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary">
+                <span class="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
                     {{ if image }}
-                        <img class="image-choice__image" src="{{ image }}" alt="{{ label ?? key }}">
+                        <img class="block size-full object-cover" src="{{ image }}" alt="{{ label ?? key }}">
                     {{ /if }}
                 </span>
                 {{ if label }}
-                    <span class="image-choice__label">{{ label }}</span>
+                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">{{ label }}</span>
                 {{ /if }}
             </span>
         </label>

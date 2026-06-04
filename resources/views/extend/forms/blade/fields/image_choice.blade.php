@@ -1,15 +1,19 @@
-@include('statamic::forms.partials.image-choice-styles')
-
 @php
     $imageOptions = $image_options ?? [];
     $columnCount = max(1, min(4, (int) ($columns ?? 3)));
+    $gridClass = match ($columnCount) {
+        1 => 'grid-cols-1',
+        2 => 'grid-cols-2',
+        4 => 'grid-cols-4',
+        default => 'grid-cols-3',
+    };
     $isMultiple = ! empty($multiple);
     $selected = $value ?? ($isMultiple ? [] : null);
+    $cardClasses = 'flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors border-gray-300 bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary';
 @endphp
 
 <fieldset
-    class="image-choice"
-    style="--image-choice-columns: {{ $columnCount }};"
+    class="grid gap-3 {{ $gridClass }}"
     @unless ($isMultiple) role="radiogroup" @endunless
     @if ($isMultiple) role="group" @endif
 >
@@ -22,9 +26,9 @@
                 ? in_array($key, is_array($selected) ? $selected : [], true)
                 : $selected === $key;
         @endphp
-        <label @class(['image-choice__option', 'image-choice__option--selected' => $isSelected])>
+        <label class="group cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60">
             <input
-                class="image-choice__input"
+                class="peer sr-only"
                 id="{{ $id }}-{{ \Illuminate\Support\Str::slug($key) }}-option"
                 type="{{ $isMultiple ? 'checkbox' : 'radio' }}"
                 name="{{ $isMultiple ? $name.'[]' : $name }}"
@@ -38,14 +42,14 @@
                     aria-describedby="{{ $id }}-instructions"
                 @endif
             >
-            <span class="image-choice__card">
-                <span class="image-choice__media">
+            <span class="{{ $cardClasses }}">
+                <span class="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
                     @if ($image)
-                        <img class="image-choice__image" src="{{ $image }}" alt="{{ $label }}">
+                        <img class="block size-full object-cover" src="{{ $image }}" alt="{{ $label }}">
                     @endif
                 </span>
                 @if ($label)
-                    <span class="image-choice__label">{{ $label }}</span>
+                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
                 @endif
             </span>
         </label>
