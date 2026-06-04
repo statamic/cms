@@ -41,18 +41,15 @@ class DeleteTemporaryFileUploads
 
     private function deleteAbandonedChunks()
     {
-        $disk = File::disk(ChunkUploads::diskName());
+        $disk = ChunkUploads::disk();
 
         // Each upload is a folder of chunks; delete it once nothing has been written to it for an hour.
-        $disk
-            ->getFilesRecursively($dir = ChunkUploads::baseDirectory())
-            ->groupBy(fn ($path) => dirname($path))
-            ->each(function ($files) use ($disk) {
-                if ($files->max(fn ($path) => $disk->lastModified($path)) < now()->subHour()->timestamp) {
-                    $files->each(fn ($path) => $disk->delete($path));
-                }
-            });
+        foreach ($disk->directories(ChunkUploads::baseDirectory()) as $folder) {
+            $files = $disk->allFiles($folder);
 
-        $disk->deleteEmptySubfolders($dir);
+            if ($files && max(array_map(fn ($path) => $disk->lastModified($path), $files)) < now()->subHour()->timestamp) {
+                $disk->deleteDirectory($folder);
+            }
+        }
     }
 }
