@@ -62,37 +62,46 @@ class FormLogicController extends CpController
 
     private function fieldsToVue($formFields): array
     {
-        return $formFields->items()
-            ->filter(fn (array $config): bool => isset($config['handle']))
-            ->map(function (array $config) use ($formFields): array {
-                $handle = $config['handle'];
-                $field = $config['field'] ?? [];
+        $fields = [];
 
-                $formField = $formFields->field($handle);
-                $fieldtype = $formField->fieldtype();
+        foreach ($formFields->pages() as $pageIndex => $page) {
+            foreach ($page['sections'] ?? [] as $section) {
+                foreach ($section['fields'] ?? [] as $config) {
+                    if (! isset($config['handle'])) {
+                        continue;
+                    }
 
-                $result = [
-                    '_id' => $handle,
-                    'handle' => $handle,
-                    'display' => $field['display'] ?? $handle,
-                    'icon' => $fieldtype?->icon() ?? 'generic-field',
-                    'category' => $fieldtype->categories()[0] ?? 'other',
-                    'fieldtype' => $field['type'] ?? 'short_answer',
-                    'if' => $field['if'] ?? null,
-                    'unless' => $field['unless'] ?? null,
-                    'if_any' => $field['if_any'] ?? null,
-                    'unless_any' => $field['unless_any'] ?? null,
-                    'always_save' => $field['always_save'] ?? false,
-                ];
+                    $handle = $config['handle'];
+                    $field = $config['field'] ?? [];
 
-                if (isset($field['options'])) {
-                    $result['options'] = $field['options'];
+                    $formField = $formFields->field($handle);
+                    $fieldtype = $formField->fieldtype();
+
+                    $result = [
+                        '_id' => $handle,
+                        'handle' => $handle,
+                        'page_index' => $pageIndex,
+                        'display' => $field['display'] ?? $handle,
+                        'icon' => $fieldtype?->icon() ?? 'generic-field',
+                        'category' => $fieldtype->categories()[0] ?? 'other',
+                        'fieldtype' => $field['type'] ?? 'short_answer',
+                        'if' => $field['if'] ?? null,
+                        'unless' => $field['unless'] ?? null,
+                        'if_any' => $field['if_any'] ?? null,
+                        'unless_any' => $field['unless_any'] ?? null,
+                        'always_save' => $field['always_save'] ?? false,
+                    ];
+
+                    if (isset($field['options'])) {
+                        $result['options'] = $field['options'];
+                    }
+
+                    $fields[] = $result;
                 }
+            }
+        }
 
-                return $result;
-            })
-            ->values()
-            ->all();
+        return $fields;
     }
 
     private function mergeLogicIntoForm(Request $request, Form $form): void

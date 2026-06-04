@@ -31,6 +31,7 @@ const suggestableFields = computed(() => {
         handle: field.handle,
         icon: field.icon,
         category: field.category,
+        pageIndex: field.page_index,
         config: {
             type: field.fieldtype,
             display: field.display,

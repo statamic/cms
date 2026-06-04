@@ -46,16 +46,24 @@ const collapse = (id) => {
 const allRulesAreCollapsed = computed(() => rules.value.every(rule => collapsed.value.includes(rule._id)));
 const rulesView = computed(() => allRulesAreCollapsed.value ? 'collapsed' : 'expanded');
 
-const pageDestinationOptions = computed(() => {
-    return props.pages.map((page, index) => ({
-        label: page.display || __('Page :number', { number: index + 1 }),
-        value: page._id,
-        icon: 'page',
-    }));
-});
+const getSuggestableFieldsForPage = (pageId) => {
+    const pageIndex = props.pages.findIndex(page => page._id === pageId);
+    return props.suggestableFields.filter(field => field.pageIndex <= pageIndex);
+};
+
+const getPageDestinationOptions = (pageId) => {
+    const pageIndex = props.pages.findIndex(page => page._id === pageId);
+    return props.pages
+        .slice(pageIndex + 1)
+        .map((page, index) => ({
+            label: page.display || __('Page :number', { number: pageIndex + index + 2 }),
+            value: page._id,
+            icon: 'page',
+        }));
+};
 
 const availablePages = computed(() => {
-    return props.pages.map((page, index) => ({
+    return props.pages.slice(0, -1).map((page, index) => ({
         handle: page._id,
         display: page.display || __('Page :number', { number: index + 1 }),
         icon: 'page',
@@ -158,8 +166,8 @@ watch(
                     :page-id="rule._pageId"
                     :page-display="rule._pageDisplay"
                     :collapsed="collapsed.includes(rule._id)"
-                    :suggestable-fields
-                    :page-destination-options
+                    :suggestable-fields="getSuggestableFieldsForPage(rule._pageId)"
+                    :page-destination-options="getPageDestinationOptions(rule._pageId)"
                     :fieldtypes
                     @collapsed="collapse(rule._id)"
                     @expanded="expand(rule._id)"

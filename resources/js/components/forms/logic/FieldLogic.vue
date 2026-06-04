@@ -71,6 +71,10 @@ const getConditionsConfig = (field) => ({
     always_save: field.always_save,
 });
 
+const getSuggestableFieldsForField = (field) => {
+    return props.suggestableFields.filter(f => f.pageIndex <= field.page_index && f.handle !== field.handle);
+};
+
 const addCondition = (fieldId) => {
     const fields = props.fields.map(field =>
         field._id === fieldId ? { ...field, if: {} } : field
@@ -155,7 +159,7 @@ watch(
                     :enabled="true"
                     :has-error="false"
                     :conditions="getConditionsConfig(field)"
-                    :suggestable-fields
+                    :suggestable-fields="getSuggestableFieldsForField(field)"
                     :fieldtypes
                     @collapsed="collapse(field._id)"
                     @expanded="expand(field._id)"
