@@ -146,8 +146,6 @@ async function renderPage(state, renderId, viewerContext) {
         }).render({ viewport });
 
         state.rendered = true;
-
-        page.cleanup();
     } catch (error) {
         if (renderId !== currentRenderId) return;
         if (error?.name === 'RenderingCancelledException') return;
@@ -159,6 +157,7 @@ async function renderPage(state, renderId, viewerContext) {
 
         console.warn(`Failed to render PDF page ${state.pageNumber}`, error);
     } finally {
+        state.page.cleanup();
         state.rendering = false;
         state.renderTask = null;
     }
