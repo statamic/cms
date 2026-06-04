@@ -9,20 +9,19 @@ import {
     Icon,
     Subheading,
 } from '@/components/ui';
-import RuleBuilder from '@/components/forms/builder/Pages/RuleBuilder.vue';
+import Rule from '@/components/forms/builder/Pages/Rule.vue';
+import { categories, categoryColorClasses } from '@/components/forms/Builder/categories';
 
-const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:rules']);
+const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:rule']);
 
 const props = defineProps({
-    config: Object,
+    rule: { type: Object, required: true },
+    pageId: { type: String, required: true },
+    pageDisplay: { type: String, required: true },
     id: String,
     collapsed: Boolean,
-    readOnly: Boolean,
-    enabled: Boolean,
-    hasError: Boolean,
-    rules: { type: Array, default: () => [] },
     suggestableFields: { type: Array, default: () => [] },
-    pageOptions: { type: Array, default: () => [] },
+    pageDestinationOptions: { type: Array, default: () => [] },
 });
 
 const operatorLabels = {
@@ -45,43 +44,69 @@ const operatorLabels = {
 };
 
 const getOperatorLabel = (operator) => operatorLabels[operator] || operator || __('equals');
-const getFieldDisplay = (handle) => props.suggestableFields.find(field => field.handle === handle)?.config?.display || handle;
+
+const getFieldConfig = (handle) => props.suggestableFields.find(field => field.handle === handle);
+const getFieldDisplay = (handle) => getFieldConfig(handle)?.config?.display || handle;
+
+const getIconClass = (category) => {
+    const color = categories[category]?.color || 'gray';
+    return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
+};
+
+const firstFieldConfig = computed(() => {
+    const firstCondition = props.rule.conditions?.[0];
+    if (!firstCondition?.field) return null;
+    const field = getFieldConfig(firstCondition.field);
+    return {
+        display: field?.config?.display || firstCondition.field,
+        icon: field?.icon || 'generic-field',
+        iconClass: getIconClass(field?.category),
+    };
+});
 
 const previewParts = computed(() => {
-    if (props.rules.length === 0) return null;
-
-    const rule = props.rules[0];
-    if (!rule.conditions || rule.conditions.length === 0) return null;
-
-    const condition = rule.conditions[0];
-    if (!condition.field) return null;
+    if (!props.rule.conditions || props.rule.conditions.length === 0) return null;
 
     const parts = [];
-    parts.push({ type: 'field', text: getFieldDisplay(condition.field) });
-    parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
 
-    if (condition.value !== null && condition.value !== undefined) {
-        parts.push({ type: 'value', text: String(condition.value) });
-    }
+    props.rule.conditions.forEach((condition, index) => {
+        if (!condition.field) return;
 
-    if (rule.conditions.length > 1) {
-        parts.push({ type: 'more', text: `+${rule.conditions.length - 1}` });
-    }
+        if (index === 0) {
+            parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
+
+            if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
+                const displayValue = Array.isArray(condition.value)
+                    ? condition.value.join(', ')
+                    : String(condition.value);
+                parts.push({ type: 'value', text: displayValue });
+            }
+        } else {
+            parts.push({ type: 'join', text: condition.join === 'or' ? __('or') : __('and') });
+            parts.push({ type: 'field-plain', text: getFieldDisplay(condition.field) });
+            parts.push({ type: 'operator', text: getOperatorLabel(condition.operator) });
+
+            if (condition.value !== null && condition.value !== undefined && condition.value !== '') {
+                const displayValue = Array.isArray(condition.value)
+                    ? condition.value.join(', ')
+                    : String(condition.value);
+                parts.push({ type: 'value', text: displayValue });
+            }
+        }
+    });
+
+    if (parts.length === 0) return null;
 
     parts.push({ type: 'goto', text: __('go to') });
 
-    const dest = props.pageOptions.find(p => p.value === rule.destination);
-    parts.push({ type: 'destination', text: dest?.label || rule.destination || __('Select page') });
-
-    if (props.rules.length > 1) {
-        parts.push({ type: 'moreRules', text: `+${props.rules.length - 1} ${__('more')}` });
-    }
+    const destination = props.pageDestinationOptions.find(p => p.value === props.rule.destination);
+    parts.push({ type: 'destination', text: destination?.label || props.rule.destination || __('Select page') });
 
     return parts;
 });
 
 const collapsedSummary = computed(() => {
-    if (props.rules.length === 0) return __('No rules configured');
+    if (!props.rule.conditions || props.rule.conditions.length === 0) return __('No conditions configured');
     if (!previewParts.value) return __('Configure conditions');
     return null;
 });
@@ -95,11 +120,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
             layout
             data-replicator-rule
             class="@container relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm"
-            :class="{ 'border-red-500': hasError }"
             :data-collapsed="collapsed ?? undefined"
-            :data-error="hasError ?? undefined"
-            :data-readonly="readOnly ?? undefined"
-            :data-type="config?.handle"
         >
             <header
                 class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 dark:bg-gray-925 border-gray-300 dark:shadow-md"
@@ -109,18 +130,17 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                 }"
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 ps-0 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
-                    <Badge v-if="collapsed" pill size="sm" color="white" class="gap-1.5">
-                        <span>{{ __('If') }}</span>
+                    <Badge v-if="collapsed" pill color="white" class="px-1.5 font-medium text-gray-800 dark:text-gray-200">
+                        {{ __('If') }}
                     </Badge>
-                    <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                    <Badge v-if="collapsed && firstFieldConfig" size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                         <Icon
-                            v-if="config?.icon"
-                            :name="config.icon"
+                            :name="firstFieldConfig.icon"
                             class="size-3.5 me-1 rounded-sm opacity-100!"
-                            :class="config.iconClass"
+                            :class="firstFieldConfig.iconClass"
                             aria-hidden="true"
                         />
-                        {{ __(config?.display) || config?.handle }}
+                        {{ firstFieldConfig.display }}
                     </Badge>
                     <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap text-xs flex items-center gap-1">
                         <template v-if="collapsedSummary">
@@ -128,9 +148,8 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                         </template>
                         <template v-else-if="previewParts">
                             <template v-for="(part, index) in previewParts" :key="index">
-                                <span v-if="part.type === 'field'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
                                 <Badge
-                                    v-else-if="part.type === 'operator'"
+                                    v-if="part.type === 'operator'"
                                     pill
                                     size="sm"
                                     color="white"
@@ -138,8 +157,17 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <span v-else-if="part.type === 'value'" class="font-mono text-[0.7rem] text-gray-900 dark:text-gray-100">{{ part.text }}</span>
-                                <span v-else-if="part.type === 'more'" class="text-gray-500 dark:text-gray-400 text-2xs">{{ part.text }}</span>
+                                <span v-else-if="part.type === 'value'" class="text-gray-900 dark:text-gray-100">{{ part.text }}</span>
+                                <Badge
+                                    v-else-if="part.type === 'join'"
+                                    pill
+                                    size="sm"
+                                    color="white"
+                                    class="px-1.5 font-medium text-gray-700 dark:text-gray-300"
+                                >
+                                    {{ part.text }}
+                                </Badge>
+                                <span v-else-if="part.type === 'field-plain'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
                                 <Badge
                                     v-else-if="part.type === 'goto'"
                                     pill
@@ -149,14 +177,22 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-1">
-                                    <Icon name="page" class="size-3 text-gray-500 dark:text-gray-400" />
-                                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ part.text }}</span>
+                                <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-0.5">
+                                    <Icon name="page" class="size-2.5 text-gray-500 dark:text-gray-400" />
+                                    <span class="text-gray-900 dark:text-gray-100">{{ part.text }}</span>
                                 </span>
-                                <span v-else-if="part.type === 'moreRules'" class="text-gray-500 dark:text-gray-400 text-2xs ms-1">{{ part.text }}</span>
                             </template>
                         </template>
                     </Subheading>
+                    <Badge v-if="!collapsed && firstFieldConfig" size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                        <Icon
+                            :name="firstFieldConfig.icon"
+                            class="size-3.5 me-0.5 rounded-sm opacity-100!"
+                            :class="firstFieldConfig.iconClass"
+                            aria-hidden="true"
+                        />
+                        {{ firstFieldConfig.display }}
+                    </Badge>
                 </button>
                 <Dropdown align="end">
                     <template #trigger>
@@ -180,11 +216,12 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <div class="p-4">
-                        <RuleBuilder
-                            :rules
+                        <Rule
+                            :rule="rule"
                             :suggestable-fields
-                            :page-options
-                            @update:rules="emit('update:rules', $event)"
+                            :page-destination-options
+                            @update:rule="emit('update:rule', $event)"
+                            @remove="emit('removed')"
                         />
                     </div>
                 </div>

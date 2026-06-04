@@ -10,7 +10,7 @@ const emit = defineEmits(['update:rule', 'remove']);
 const props = defineProps({
     rule: { type: Object, required: true },
     suggestableFields: { type: Array, required: true },
-    pageOptions: { type: Array, required: true },
+    pageDestinationOptions: { type: Array, required: true },
     fieldtypes: { type: Array, default: () => [] },
 });
 
@@ -230,7 +230,7 @@ const shouldBeIndented = (index) => {
                                 v-model="destination"
                                 size="sm"
                                 variant="default"
-                                :options="pageOptions"
+                                :options="pageDestinationOptions"
                                 option-label="label"
                                 option-value="value"
                                 :placeholder="__('Select a page')"

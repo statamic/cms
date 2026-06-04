@@ -28,6 +28,8 @@ const errors = ref({});
 const suggestableFields = computed(() => {
     return fields.value.map(field => ({
         handle: field.handle,
+        icon: field.icon,
+        category: field.category,
         config: {
             type: field.fieldtype,
             display: field.display,

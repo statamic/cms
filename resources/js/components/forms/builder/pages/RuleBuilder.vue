@@ -8,7 +8,7 @@ const emit = defineEmits(['update:rules']);
 const props = defineProps({
     rules: { type: Array, required: true },
     suggestableFields: { type: Array, required: true },
-    pageOptions: { type: Array, required: true },
+    pageDestinationOptions: { type: Array, required: true },
     fieldtypes: { type: Array, default: () => [] },
 });
 
@@ -19,7 +19,7 @@ const updateRule = (index, rule) => {
 };
 
 const addRule = () => {
-    const defaultDestination = props.pageOptions.length > 0 ? props.pageOptions[0].value : null;
+    const defaultDestination = props.pageDestinationOptions.length > 0 ? props.pageDestinationOptions[0].value : null;
 
     const newRules = [...props.rules, {
         _id: uniqid(),
@@ -53,7 +53,7 @@ const removeRule = (index) => {
             <Rule
                 :rule="rule"
                 :suggestable-fields
-                :page-options
+                :page-destination-options
                 :fieldtypes
                 @update:rule="updateRule(index, $event)"
                 @remove="removeRule(index)"

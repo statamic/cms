@@ -123,7 +123,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                     <RuleBuilder
                         v-model:rules="page.rules"
                         :suggestable-fields="suggestableConditionFields"
-                        :page-options="pageDestinationOptions"
+                        :page-destination-options
                         :fieldtypes
                     />
                 </div>

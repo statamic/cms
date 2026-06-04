@@ -14,12 +14,27 @@ const emit = defineEmits(['update:pages']);
 
 const collapsed = ref([]);
 
-const pagesWithLogic = computed(() => props.pages.filter(page => page.rules && page.rules.length > 0));
-const pagesWithoutLogic = computed(() => props.pages.filter(page => !page.rules || page.rules.length === 0));
+const rules = computed(() => {
+    const rules = [];
 
-const expand = (id) => collapsed.value = collapsed.value.filter(setId => setId !== id);
+    props.pages.forEach((page, pageIndex) => {
+        if (page.rules && page.rules.length > 0) {
+            page.rules.forEach(rule => {
+                rules.push({
+                    ...rule,
+                    _pageId: page._id,
+                    _pageDisplay: page.display || __('Page :number', { number: pageIndex + 1 }),
+                });
+            });
+        }
+    });
+
+    return rules;
+});
+
+const expand = (id) => collapsed.value = collapsed.value.filter(ruleId => ruleId !== id);
 const expandAll = () => collapsed.value = [];
-const collapseAll = () => collapsed.value = pagesWithLogic.value.map(page => page._id);
+const collapseAll = () => collapsed.value = rules.value.map(rule => rule._id);
 
 const collapse = (id) => {
     if (!collapsed.value.includes(id)) {
@@ -27,18 +42,10 @@ const collapse = (id) => {
     }
 };
 
-const allPagesAreCollapsed = computed(() => pagesWithLogic.value.every(page => collapsed.value.includes(page._id)));
-const rulesView = computed(() => allPagesAreCollapsed.value ? 'collapsed' : 'expanded');
+const allRulesAreCollapsed = computed(() => rules.value.every(rule => collapsed.value.includes(rule._id)));
+const rulesView = computed(() => allRulesAreCollapsed.value ? 'collapsed' : 'expanded');
 
-const availableItems = computed(() => {
-    return pagesWithoutLogic.value.map(page => ({
-        handle: page._id,
-        display: page.display,
-        icon: 'page',
-    }));
-});
-
-const pageOptions = computed(() => {
+const pageDestinationOptions = computed(() => {
     return props.pages.map((page, index) => ({
         label: page.display || __('Page :number', { number: index + 1 }),
         value: page._id,
@@ -46,10 +53,12 @@ const pageOptions = computed(() => {
     }));
 });
 
-const getPageConfig = (page) => ({
-    handle: page._id,
-    display: page.display,
-    icon: 'page',
+const availablePages = computed(() => {
+    return props.pages.map((page, index) => ({
+        handle: page._id,
+        display: page.display || __('Page :number', { number: index + 1 }),
+        icon: 'page',
+    }));
 });
 
 const addRule = (pageId) => {
@@ -71,34 +80,47 @@ const addRule = (pageId) => {
     );
 
     emit('update:pages', pages);
-    nextTick(() => expand(pageId));
+
+    nextTick(() => expand(newRule._id));
 };
 
-const removeRule = (pageId) => {
-    const pages = props.pages.map(page =>
-        page._id === pageId ? { ...page, rules: [] } : page
-    );
+const removeRule = (ruleId, pageId) => {
+    const pages = props.pages.map(page => {
+        if (page._id !== pageId) return page;
+        return {
+            ...page,
+            rules: page.rules.filter(rule => rule._id !== ruleId),
+        };
+    });
 
     emit('update:pages', pages);
-    collapsed.value = collapsed.value.filter(id => id !== pageId);
+
+    collapsed.value = collapsed.value.filter(id => id !== ruleId);
 };
 
-const updateRules = (pageId, rules) => {
-    const pages = props.pages.map(page =>
-        page._id === pageId ? { ...page, rules } : page
-    );
+const updateRule = (ruleId, pageId, updatedRule) => {
+    const pages = props.pages.map(page => {
+        if (page._id !== pageId) return page;
+
+        return {
+            ...page,
+            rules: page.rules.map(rule =>
+                rule._id === ruleId ? { ...updatedRule, _id: ruleId } : rule
+            ),
+        };
+    });
 
     emit('update:pages', pages);
 };
 
 watch(
-    pagesWithLogic,
-    (pages, oldPages) => {
-        const oldIds = new Set((oldPages || []).map(page => page._id));
+    rules,
+    (rules, oldRules) => {
+        const oldIds = new Set((oldRules || []).map(rule => rule._id));
 
-        pages.forEach(page => {
-            if (!oldIds.has(page._id)) {
-                collapsed.value.push(page._id);
+        rules.forEach(rule => {
+            if (!oldIds.has(rule._id)) {
+                collapsed.value.push(rule._id);
             }
         });
     },
@@ -114,7 +136,7 @@ watch(
                     <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                     <Heading :text="__('Page Logic')" />
                 </div>
-                <div v-if="pagesWithLogic.length > 0" class="flex items-center gap-2">
+                <div v-if="rules.length > 0" class="flex items-center gap-2">
                     <Button
                         size="xs"
                         variant="ghost"
@@ -126,29 +148,27 @@ watch(
             </div>
         </PanelHeader>
         <Card>
-            <div v-if="pagesWithLogic.length > 0" class="relative space-y-6 mb-0" data-logic-list>
+            <div v-if="rules.length > 0" class="relative space-y-6 mb-0" data-logic-list>
                 <PageLogicRule
-                    v-for="page in pagesWithLogic"
-                    :id="page._id"
-                    :key="page._id"
-                    :config="getPageConfig(page)"
-                    :collapsed="collapsed.includes(page._id)"
-                    :read-only="false"
-                    :enabled="true"
-                    :has-error="false"
-                    :rules="page.rules"
+                    v-for="rule in rules"
+                    :id="rule._id"
+                    :key="rule._id"
+                    :rule="rule"
+                    :page-id="rule._pageId"
+                    :page-display="rule._pageDisplay"
+                    :collapsed="collapsed.includes(rule._id)"
                     :suggestable-fields
-                    :page-options
-                    @collapsed="collapse(page._id)"
-                    @expanded="expand(page._id)"
-                    @removed="removeRule(page._id)"
-                    @update:rules="updateRules(page._id, $event)"
+                    :page-destination-options
+                    @collapsed="collapse(rule._id)"
+                    @expanded="expand(rule._id)"
+                    @removed="removeRule(rule._id, rule._pageId)"
+                    @update:rule="updateRule(rule._id, rule._pageId, $event)"
                 />
             </div>
             <AddLogicRuleButton
-                v-if="availableItems.length > 0"
-                :items="availableItems"
-                :show-connector="pagesWithLogic.length > 0"
+                v-if="availablePages.length > 0"
+                :items="availablePages"
+                :show-connector="rules.length > 0"
                 :label="__('Add Rule')"
                 :search-placeholder="__('Search Pages')"
                 @added="addRule"

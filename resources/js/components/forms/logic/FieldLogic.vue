@@ -45,7 +45,7 @@ const getIconClass = (category) => {
     return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
 };
 
-const availableItems = computed(() => {
+const availableFields = computed(() => {
     return fieldsWithoutLogic.value.map(field => ({
         handle: field._id,
         display: field.display,
@@ -162,8 +162,8 @@ watch(
                 />
             </div>
             <AddLogicRuleButton
-                v-if="availableItems.length > 0"
-                :items="availableItems"
+                v-if="availableFields.length > 0"
+                :items="availableFields"
                 :show-connector="fieldsWithLogic.length > 0"
                 :label="__('Add Rule')"
                 :search-placeholder="__('Search Fields')"
