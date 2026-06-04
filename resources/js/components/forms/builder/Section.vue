@@ -170,79 +170,79 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
             ]"
         >
             <div class="publish-section-collapsible__inner min-h-0">
-            <Card class="section-drop-zone" :data-section-drop-zone="section._id">
-                <div
-                    v-if="section.fields.length === 0"
-                    class="field-sort-container"
-                    :data-sort-section="section._id"
-                >
+                <Card class="section-drop-zone" :data-section-drop-zone="section._id">
                     <div
-                        data-empty-section
-                        class="flex items-center justify-center rounded-lg border border-dashed border-zinc-300"
-                        :class="{ 'h-[670px]': isOnlySection, 'h-[200px]': !isOnlySection }"
+                        v-if="section.fields.length === 0"
+                        class="field-sort-container"
+                        :data-sort-section="section._id"
                     >
-                        <div>
-                            <span class="text-zinc-500 mr-2">{{ __('Drag fields here to build your form or') }}</span>
-                            <Button size="xs" pill icon="link" :text="__('Link Existing')" @click="addLinkFieldsPlaceholder" />
+                        <div
+                            data-empty-section
+                            class="flex items-center justify-center rounded-lg border border-dashed border-zinc-300"
+                            :class="{ 'h-[670px]': isOnlySection, 'h-[200px]': !isOnlySection }"
+                        >
+                            <div>
+                                <span class="text-zinc-500 mr-2">{{ __('Drag fields here to build your form or') }}</span>
+                                <Button size="xs" pill icon="link" :text="__('Link Existing')" @click="addLinkFieldsPlaceholder" />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <PublishContainer
-                    v-else
-                    :name="'form-builder-' + section._id"
-                    :blueprint
-                    :track-dirty-state="false"
-                >
-                    <div
-                        class="field-sort-container field-grid"
-                        :data-sort-section="section._id"
-                        :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null"
+                    <PublishContainer
+                        v-else
+                        :name="'form-builder-' + section._id"
+                        :blueprint
+                        :track-dirty-state="false"
                     >
-                        <template v-for="(field, fieldIndex) in section.fields" :key="field._id">
-                            <div
-                                v-if="field.type === 'link_fields'"
-                                :id="`fieldset-${field._id}`"
-                                data-field-item
-                                :data-editing-field="isInspectingLinkFields(field) ? '' : undefined"
-                                :data-editing-item="isInspectingLinkFields(field) ? '' : undefined"
-                                :data-first-row="isFieldInFirstRow(fieldIndex) ? '' : undefined"
-                                :data-last-row="isFieldInLastRow(fieldIndex) ? '' : undefined"
-                                :class="[
-                                    {
-                                        'cursor-pointer': !isInspectingLinkFields(field),
-                                    },
-                                ]"
-                                class="border border-dashed rounded-lg p-4 flex items-center justify-center"
-                                @click.stop="isInspectingLinkFields(field) || inspectLinkFields(field)"
-                            >
-                                <span class="text-zinc-500 mr-2">{{ __('Select a field or fieldset to import') }}</span>
-                            </div>
+                        <div
+                            class="field-sort-container field-grid"
+                            :data-sort-section="section._id"
+                            :data-fields-collapsed="fieldView === FieldView.Collapsed ? 'true' : null"
+                        >
+                            <template v-for="(field, fieldIndex) in section.fields" :key="field._id">
+                                <div
+                                    v-if="field.type === 'link_fields'"
+                                    :id="`fieldset-${field._id}`"
+                                    data-field-item
+                                    :data-editing-field="isInspectingLinkFields(field) ? '' : undefined"
+                                    :data-editing-item="isInspectingLinkFields(field) ? '' : undefined"
+                                    :data-first-row="isFieldInFirstRow(fieldIndex) ? '' : undefined"
+                                    :data-last-row="isFieldInLastRow(fieldIndex) ? '' : undefined"
+                                    :class="[
+                                        {
+                                            'cursor-pointer': !isInspectingLinkFields(field),
+                                        },
+                                    ]"
+                                    class="border border-dashed rounded-lg p-4 flex items-center justify-center"
+                                    @click.stop="isInspectingLinkFields(field) || inspectLinkFields(field)"
+                                >
+                                    <span class="text-zinc-500 mr-2">{{ __('Select a field or fieldset to import') }}</span>
+                                </div>
 
-                            <ImportField
-                                v-else-if="field.type === 'import'"
-                                :field
-                                :is-first-row="isFieldInFirstRow(fieldIndex)"
-                                :is-last-row="isFieldInLastRow(fieldIndex)"
-                                @remove="removeField(field)"
-                            />
+                                <ImportField
+                                    v-else-if="field.type === 'import'"
+                                    :field
+                                    :is-first-row="isFieldInFirstRow(fieldIndex)"
+                                    :is-last-row="isFieldInLastRow(fieldIndex)"
+                                    @remove="removeField(field)"
+                                />
 
-                            <RegularFormField
-                                v-else
-                                :field
-                                :fieldtypes
-                                :is-first-row="isFieldInFirstRow(fieldIndex)"
-                                :is-last-row="isFieldInLastRow(fieldIndex)"
-                                @duplicate="duplicateField(field)"
-                                @width-changed="updateFieldWidth(field, $event)"
-                                @remove="removeField(field)"
-                            />
-                        </template>
-                    </div>
-                </PublishContainer>
+                                <RegularFormField
+                                    v-else
+                                    :field
+                                    :fieldtypes
+                                    :is-first-row="isFieldInFirstRow(fieldIndex)"
+                                    :is-last-row="isFieldInLastRow(fieldIndex)"
+                                    @duplicate="duplicateField(field)"
+                                    @width-changed="updateFieldWidth(field, $event)"
+                                    @remove="removeField(field)"
+                                />
+                            </template>
+                        </div>
+                    </PublishContainer>
 
-                <slot name="footer" />
-            </Card>
+                    <slot name="footer" />
+                </Card>
             </div>
         </div>
 
