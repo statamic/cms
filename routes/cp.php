@@ -11,6 +11,7 @@ use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainersController;
 use Statamic\Http\Controllers\CP\Assets\AssetsController;
 use Statamic\Http\Controllers\CP\Assets\BrowserController;
+use Statamic\Http\Controllers\CP\Assets\ChunksController;
 use Statamic\Http\Controllers\CP\Assets\FieldtypeController;
 use Statamic\Http\Controllers\CP\Assets\FolderActionController;
 use Statamic\Http\Controllers\CP\Assets\FoldersController;
@@ -255,6 +256,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
+    Route::post('assets/chunks', [ChunksController::class, 'store'])->name('assets.chunks.store');
     Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');

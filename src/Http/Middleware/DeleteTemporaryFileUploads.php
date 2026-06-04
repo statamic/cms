@@ -3,6 +3,7 @@
 namespace Statamic\Http\Middleware;
 
 use Closure;
+use Statamic\Assets\ChunkUploads;
 use Statamic\Facades\File;
 
 class DeleteTemporaryFileUploads
@@ -13,6 +14,7 @@ class DeleteTemporaryFileUploads
 
         if (random_int(1, $lottery[1]) <= $lottery[0]) {
             $this->deleteFilesOverAnHourOld();
+            $this->deleteAbandonedChunks();
         }
 
         return $next($request);
@@ -31,6 +33,19 @@ class DeleteTemporaryFileUploads
                 return $timestamp < now()->subHour()->timestamp;
             })
             ->each(fn ($path) => $disk->delete($path));
+
+        $disk->deleteEmptySubfolders($dir);
+    }
+
+    private function deleteAbandonedChunks()
+    {
+        $disk = File::disk(ChunkUploads::diskName());
+
+        $disk
+            ->getFilesRecursively($dir = ChunkUploads::baseDirectory())
+            ->filter(fn ($path) => str_ends_with($path, '/.meta'))
+            ->filter(fn ($path) => (int) $disk->get($path) < now()->subHour()->timestamp)
+            ->each(fn ($meta) => $disk->getFilesRecursively(dirname($meta))->each(fn ($path) => $disk->delete($path)));
 
         $disk->deleteEmptySubfolders($dir);
     }

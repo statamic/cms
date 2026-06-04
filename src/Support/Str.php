@@ -151,6 +151,29 @@ class Str
         return trans('statamic::messages.units.B', ['count' => $bytes]);
     }
 
+    /**
+     * Parse a byte size from PHP ini shorthand (e.g. "128M", "2G", "512K").
+     *
+     * An empty value or "-1" represents no limit.
+     */
+    public static function parseBytes($value): int
+    {
+        $value = trim((string) $value);
+
+        if ($value === '' || $value === '-1') {
+            return PHP_INT_MAX;
+        }
+
+        $bytes = (int) $value;
+
+        return match (strtolower(substr($value, -1))) {
+            'g' => $bytes * 1024 ** 3,
+            'm' => $bytes * 1024 ** 2,
+            'k' => $bytes * 1024,
+            default => $bytes,
+        };
+    }
+
     public static function durationForHumans($s)
     {
         $s = (int) round($s);

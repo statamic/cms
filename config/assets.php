@@ -254,6 +254,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Chunked Uploads
+    |--------------------------------------------------------------------------
+    |
+    | When enabled and opted into on an asset container, large Control Panel
+    | uploads are split into smaller chunks to get past PHP and proxy (e.g.
+    | Cloudflare) upload size limits. The chunk size is derived from your PHP
+    | limits, less "chunk_overhead", but never larger than "max_chunk_size" so
+    | it stays under a proxy or load balancer's request limit. Chunks are staged
+    | in "directory" on the "disk" (which must be a local filesystem) while a
+    | file is assembled.
+    |
+    */
+
+    'chunked_upload' => [
+        'enabled' => true,
+        'max_chunk_size' => 10 * 1024 * 1024,
+        'chunk_overhead' => 1024 * 1024,
+        'disk' => 'local',
+        'directory' => 'statamic/chunks',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | FFmpeg
     |--------------------------------------------------------------------------
     |
