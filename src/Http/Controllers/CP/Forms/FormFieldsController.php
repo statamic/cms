@@ -91,16 +91,20 @@ class FormFieldsController extends CpController
         try {
             $formField = new FormField($config['handle'] ?? 'field', ['type' => $fieldtype->handle(), ...$config]);
 
+            $fieldtype = $fieldtype instanceof Fallback
+                ? $fieldtype
+                : (clone $fieldtype)->setField($formField);
+
             $field = $fieldtype instanceof Fallback
                 ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle'], ...$config])
-                : (clone $fieldtype)->setField($formField)->toField();
+                : $fieldtype->toField();
 
             $field->setValue($field->defaultValue());
 
             return [
                 'config' => $field->toPublishArray(),
                 'value' => $field->fieldtype()->preProcess($field->value()),
-                'meta' => $field->fieldtype()->preload(),
+                'meta' => $fieldtype instanceof Fallback ? $field->fieldtype()->preload() : $fieldtype->preload(),
             ];
         } catch (\Throwable $e) {
             return null;

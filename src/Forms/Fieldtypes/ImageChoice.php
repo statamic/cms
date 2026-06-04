@@ -3,8 +3,10 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -166,18 +168,18 @@ class ImageChoice extends FormFieldtype
             return null;
         }
 
-        if ($asset = Asset::find($image) ?? Asset::findByUrl($image)) {
-            return $asset->url();
-        }
-
         if (filter_var($image, FILTER_VALIDATE_URL) || str_starts_with($image, '/')) {
             return $image;
         }
 
-        if ($asset = Asset::findByPath($image)) {
-            return $asset->url();
+        if (Str::contains($image, '::')) {
+            return Asset::find($image)?->url();
         }
 
-        return null;
+        return AssetContainer::all()
+            ->map(fn ($container) => $container->asset($image))
+            ->filter()
+            ->first()
+            ?->url();
     }
 }

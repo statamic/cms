@@ -193,21 +193,24 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
 
     const handle = uniqid();
 
+    const initialPreview = fieldtype.example ?? fieldtype.preview;
+
     const field = {
         _id: handle,
         config: {
             type: fieldtypeHandle,
             display: __(fieldtype.title),
             hidden: false,
+            ...initialPreview?.config,
         },
         fieldtype: fieldtypeHandle,
         handle,
         icon: fieldtype?.icon || 'fieldtype-generic',
         type: 'inline',
         preview: {
-            config: { ...fieldtype.preview?.config, handle },
-            value: fieldtype.preview?.value,
-            meta: fieldtype.preview?.meta,
+            config: { ...initialPreview?.config, handle, type: fieldtypeHandle },
+            value: initialPreview?.value,
+            meta: initialPreview?.meta,
         },
     };
 
