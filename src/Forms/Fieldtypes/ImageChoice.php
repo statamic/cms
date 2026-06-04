@@ -110,7 +110,8 @@ class ImageChoice extends FormFieldtype
             'multiple' => (bool) $this->config('multiple'),
             'columns' => $columns,
             'aspect_ratio' => $this->normalizedAspectRatio(),
-            ...Arr::except($this->config(), ['type', 'options', 'multiple', 'columns', 'aspect_ratio']),
+            'gap' => $this->normalizedGap(),
+            ...Arr::except($this->config(), ['type', 'options', 'multiple', 'columns', 'aspect_ratio', 'gap']),
         ];
     }
 
@@ -119,33 +120,41 @@ class ImageChoice extends FormFieldtype
         return [
             'config' => [
                 'display' => __('Pick your favorite season'),
-                'columns' => 3,
-                'aspect_ratio' => '16/9',
+                'columns' => 2,
+                'gap' => 2,
+                'aspect_ratio' => '4/3',
                 'options' => [
                     [
                         'key' => 'spring',
                         'label' => __('Spring'),
-                        'image' => 'https://picsum.photos/seed/image-choice-spring/640/360',
+                        'image' => 'https://picsum.photos/seed/image-choice-spring/640/480',
                     ],
                     [
                         'key' => 'summer',
                         'label' => __('Summer'),
-                        'image' => 'https://picsum.photos/seed/image-choice-summer/640/360',
+                        'image' => 'https://picsum.photos/seed/image-choice-summer/640/480',
                     ],
                     [
                         'key' => 'autumn',
                         'label' => __('Autumn'),
-                        'image' => 'https://picsum.photos/seed/image-choice-autumn/640/360',
+                        'image' => 'https://picsum.photos/seed/image-choice-autumn/640/480',
                     ],
                     [
                         'key' => 'winter',
                         'label' => __('Winter'),
-                        'image' => 'https://picsum.photos/seed/image-choice-winter/640/360',
+                        'image' => 'https://picsum.photos/seed/image-choice-winter/640/480',
                     ],
                 ],
             ],
             'value' => null,
         ];
+    }
+
+    private function normalizedGap(): int
+    {
+        $gap = (int) ($this->config('gap') ?? 3);
+
+        return in_array($gap, [2, 3, 4], true) ? $gap : 3;
     }
 
     private function normalizedAspectRatio(): string

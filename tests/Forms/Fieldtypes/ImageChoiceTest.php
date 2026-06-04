@@ -22,6 +22,7 @@ class ImageChoiceTest extends TestCase
             'multiple' => false,
             'columns' => 3,
             'aspect_ratio' => '16/9',
+            'gap' => 3,
         ], $fieldtype->toFieldArray());
     }
 

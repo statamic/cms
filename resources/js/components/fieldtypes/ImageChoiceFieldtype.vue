@@ -32,6 +32,16 @@ const gridClass = computed(() => {
     }[columns.value] ?? 'grid-cols-3';
 });
 
+const gapClass = computed(() => {
+    const gap = Number(props.config.gap);
+
+    return {
+        2: 'gap-2',
+        3: 'gap-3',
+        4: 'gap-4',
+    }[Number.isFinite(gap) ? gap : 3] ?? 'gap-3';
+});
+
 const aspectRatio = computed(() => {
     const allowed = ['1/1', '4/3', '3/2', '16/9', '3/4', '2/3'];
     const ratio = props.config.aspect_ratio ?? '16/9';
@@ -170,8 +180,8 @@ const cardClasses = [
 
 <template>
     <div
-        class="grid gap-3"
-        :class="gridClass"
+        class="grid"
+        :class="[gapClass, gridClass]"
         :role="multiple ? 'group' : 'radiogroup'"
     >
         <label

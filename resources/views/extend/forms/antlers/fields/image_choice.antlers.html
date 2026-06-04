@@ -1,5 +1,5 @@
 <fieldset
-    class="grid gap-3 {{ if columns == 1 }}grid-cols-1{{ elseif columns == 2 }}grid-cols-2{{ elseif columns == 4 }}grid-cols-4{{ else }}grid-cols-3{{ /if }}"
+    class="grid {{ if gap == 2 }}gap-2{{ elseif gap == 4 }}gap-4{{ else }}gap-3{{ /if }} {{ if columns == 1 }}grid-cols-1{{ elseif columns == 2 }}grid-cols-2{{ elseif columns == 4 }}grid-cols-4{{ else }}grid-cols-3{{ /if }}"
     {{ unless multiple }}role="radiogroup"{{ /unless }}
     {{ if multiple }}role="group"{{ /if }}
 >

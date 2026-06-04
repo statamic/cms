@@ -13,10 +13,15 @@
     $letterClasses = 'flex size-7 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200';
     $allowedAspectRatios = ['1/1', '4/3', '3/2', '16/9', '3/4', '2/3'];
     $aspectRatio = in_array($aspect_ratio ?? null, $allowedAspectRatios, true) ? $aspect_ratio : '16/9';
+    $gapClass = match ((int) ($gap ?? 3)) {
+        2 => 'gap-2',
+        4 => 'gap-4',
+        default => 'gap-3',
+    };
 @endphp
 
 <fieldset
-    class="grid gap-3 {{ $gridClass }}"
+    class="grid {{ $gapClass }} {{ $gridClass }}"
     @unless ($isMultiple) role="radiogroup" @endunless
     @if ($isMultiple) role="group" @endif
 >
