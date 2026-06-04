@@ -3,6 +3,7 @@ import { Upload } from 'upload';
 import { nanoid as uniqid } from 'nanoid';
 import { h } from 'vue';
 import ChunkedUpload from './ChunkedUpload';
+import { useUploadsStore } from '../../stores/uploads';
 
 export default {
     emits: ['updated', 'upload-complete', 'error'],
@@ -62,6 +63,10 @@ export default {
             dragging: false,
             uploads: [],
         };
+    },
+
+    created() {
+        this.uploadsStore = useUploadsStore();
     },
 
     mounted() {
@@ -185,16 +190,22 @@ export default {
             const id = uniqid();
             const tooLarge = this.maxFilesize && file.size > this.maxFilesize;
 
-            this.uploads.push({
+            const upload = {
                 id,
                 basename: file.name,
                 extension: file.name.split('.').pop(),
                 percent: 0,
                 errorMessage: tooLarge ? __('Upload failed. The file is larger than is allowed.') : null,
                 errorStatus: tooLarge ? 413 : null,
+            };
+
+            this.uploads.push({
+                ...upload,
                 instance: tooLarge ? { state: 'failed', form: { get: () => file } } : this.makeUpload(id, file, data),
                 retry: (opts) => this.retry(id, opts),
             });
+
+            this.uploadsStore.add(this.container, { ...upload });
         },
 
         findUpload(id) {
@@ -229,7 +240,9 @@ export default {
                   });
 
             upload.on('progress', (progress) => {
-                this.findUpload(id).percent = progress * 100;
+                const percent = progress * 100;
+                this.findUpload(id).percent = percent;
+                this.uploadsStore.update(this.container, id, { percent });
             });
 
             return upload;
@@ -296,6 +309,7 @@ export default {
         handleUploadSuccess(id, response) {
             this.$emit('upload-complete', response.data, this.uploads);
             this.uploads.splice(this.findUploadIndex(id), 1);
+            this.uploadsStore.remove(this.container, id);
 
             this.handleToasts(response._toasts ?? []);
         },
@@ -319,6 +333,7 @@ export default {
 
             upload.errorMessage = msg;
             upload.errorStatus = status;
+            this.uploadsStore.update(this.container, id, { errorMessage: msg, errorStatus: status });
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
         },
@@ -331,6 +346,7 @@ export default {
             let file = this.findUpload(id).instance.form.get('file');
             this.addFile(file, args);
             this.uploads.splice(this.findUploadIndex(id), 1);
+            this.uploadsStore.remove(this.container, id);
         },
     },
 };
