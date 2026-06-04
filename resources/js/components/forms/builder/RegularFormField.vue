@@ -15,6 +15,7 @@ defineEmits<{
 const props = defineProps<{
     field: any;
     fieldtypes: any[];
+    isFirstRow?: boolean;
     isLastRow?: boolean;
 }>();
 
@@ -52,7 +53,7 @@ const hasErrors = computed(() => {
         data-field-item
         :data-editing-field="isInspecting ? '' : undefined"
         :data-editing-item="isInspecting ? '' : undefined"
-        :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspecting, 'field--last-row': isLastRow }]"
+        :class="[`field-w-${field.config.width || 100}`, { 'cursor-pointer': !isInspecting, 'field--first-row': isFirstRow, 'field--last-row': isLastRow }]"
         @click.stop="isInspecting || inspectField()"
     >
         <div

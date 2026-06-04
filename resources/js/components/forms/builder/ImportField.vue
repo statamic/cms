@@ -8,6 +8,7 @@ import { __ } from '@/bootstrap/globals';
 
 const props = defineProps<{
     field: any;
+    isFirstRow?: boolean;
     isLastRow?: boolean;
 }>();
 
@@ -42,7 +43,7 @@ const errorMessage = computed(() => {
         data-field-item
         :data-editing-field="isInspecting ? '' : undefined"
         :data-editing-item="isInspecting ? '' : undefined"
-        :class="[{ 'cursor-pointer': !isInspecting, 'field--last-row': isLastRow }]"
+        :class="[{ 'cursor-pointer': !isInspecting, 'field--first-row': isFirstRow, 'field--last-row': isLastRow }]"
         @click.stop="isInspecting || inspectFieldsetImport()"
     >
         <div

@@ -50,9 +50,9 @@ const blueprint = computed(() => ({
     }],
 }));
 
-/* LAST ROW DETECTION
+/* ROW DETECTION
 =================================================== */
-// Work out which fields land in the final visual row so we can add a `field--last-row` helper class (something CSS alone can't reliably detect).
+// Work out which fields land in the first and final visual rows so we can add helper classes (something CSS alone can't reliably detect). `field--first-row` and `field--last-row` is added.
 const normalizedWidth = (field) => {
     const raw = Number(field?.config?.width ?? 100);
 
@@ -63,7 +63,7 @@ const normalizedWidth = (field) => {
     return Math.min(raw, 100);
 };
 
-const lastRowIndexes = computed(() => {
+const fieldRows = computed(() => {
     const rows = [];
     let currentRow = [];
     let currentRowWidth = 0;
@@ -85,11 +85,15 @@ const lastRowIndexes = computed(() => {
         rows.push(currentRow);
     }
 
-    return rows.at(-1) ?? [];
+    return rows;
 });
 
+const firstRowIndexes = computed(() => fieldRows.value.at(0) ?? []);
+const lastRowIndexes = computed(() => fieldRows.value.at(-1) ?? []);
+
+const isFieldInFirstRow = (index) => firstRowIndexes.value.includes(index);
 const isFieldInLastRow = (index) => lastRowIndexes.value.includes(index);
-/* END LAST ROW DETECTION */
+/* END ROW DETECTION */
 
 const updateFieldWidth = (field, width) => {
     field.config.width = width;
@@ -221,6 +225,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                                 :class="[
                                     {
                                         'cursor-pointer': !isInspectingLinkFields(field),
+                                        'field--first-row': isFieldInFirstRow(fieldIndex),
                                         'field--last-row': isFieldInLastRow(fieldIndex),
                                     },
                                 ]"
@@ -233,6 +238,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                             <ImportField
                                 v-else-if="field.type === 'import'"
                                 :field
+                                :is-first-row="isFieldInFirstRow(fieldIndex)"
                                 :is-last-row="isFieldInLastRow(fieldIndex)"
                                 @remove="removeField(field)"
                             />
@@ -241,6 +247,7 @@ const deleteSection = () => emit('deleted', props.section._id);
                                 v-else
                                 :field
                                 :fieldtypes
+                                :is-first-row="isFieldInFirstRow(fieldIndex)"
                                 :is-last-row="isFieldInLastRow(fieldIndex)"
                                 @duplicate="duplicateField(field)"
                                 @width-changed="updateFieldWidth(field, $event)"
