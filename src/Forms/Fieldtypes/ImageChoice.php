@@ -46,7 +46,7 @@ class ImageChoice extends FormFieldtype
                     [
                         'handle' => 'image',
                         'field' => [
-                            'type' => 'assets',
+                            'type' => 'single_asset',
                             'display' => __('Image'),
                             'max_files' => 1,
                             'mode' => 'grid',
