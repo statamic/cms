@@ -5,12 +5,13 @@ import PageLogicRule from './PageLogicRule.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 
+const emit = defineEmits(['update:pages']);
+
 const props = defineProps({
     pages: { type: Array, required: true },
     suggestableFields: { type: Array, required: true },
+    fieldtypes: Array,
 });
-
-const emit = defineEmits(['update:pages']);
 
 const collapsed = ref([]);
 
@@ -159,6 +160,7 @@ watch(
                     :collapsed="collapsed.includes(rule._id)"
                     :suggestable-fields
                     :page-destination-options
+                    :fieldtypes
                     @collapsed="collapse(rule._id)"
                     @expanded="expand(rule._id)"
                     @removed="removeRule(rule._id, rule._pageId)"

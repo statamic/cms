@@ -22,6 +22,7 @@ const props = defineProps({
     collapsed: Boolean,
     suggestableFields: { type: Array, default: () => [] },
     pageDestinationOptions: { type: Array, default: () => [] },
+    fieldtypes: Array,
 });
 
 const operatorLabels = {
@@ -220,6 +221,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                             :rule="rule"
                             :suggestable-fields
                             :page-destination-options
+                            :fieldtypes
                             @update:rule="emit('update:rule', $event)"
                             @remove="emit('removed')"
                         />

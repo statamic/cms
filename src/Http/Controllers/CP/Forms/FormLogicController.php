@@ -15,6 +15,8 @@ use Statamic\Support\Str;
 
 class FormLogicController extends CpController
 {
+    use ManagesFormFields;
+
     public function edit($form)
     {
         $this->authorize('edit', $form);
@@ -22,6 +24,7 @@ class FormLogicController extends CpController
         $formFields = $form->formFields();
 
         return Inertia::render('forms/Logic', [
+            ...$this->fieldProps(),
             'form' => $form,
             'pages' => $this->pagesToVue($formFields->pages()),
             'fields' => $this->fieldsToVue($formFields),

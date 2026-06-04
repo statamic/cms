@@ -6,12 +6,13 @@ import { computed, nextTick, ref, watch } from 'vue';
 import { __ } from '@/bootstrap/globals';
 import { categories, categoryColorClasses } from '@/components/forms/Builder/categories';
 
+const emit = defineEmits(['update:fields']);
+
 const props = defineProps({
     fields: { type: Array, required: true },
     suggestableFields: { type: Array, required: true },
+    fieldtypes: Array,
 });
-
-const emit = defineEmits(['update:fields']);
 
 const collapsed = ref([]);
 
@@ -154,7 +155,8 @@ watch(
                     :enabled="true"
                     :has-error="false"
                     :conditions="getConditionsConfig(field)"
-                    :suggestable-fields="suggestableFields"
+                    :suggestable-fields
+                    :fieldtypes
                     @collapsed="collapse(field._id)"
                     @expanded="expand(field._id)"
                     @removed="removeCondition(field._id)"

@@ -25,45 +25,23 @@ use function Statamic\trans as __;
 
 class FormBuilderController extends CpController
 {
-    use ManagesFields;
+    use ManagesFormFields;
 
     public function edit($form)
     {
         $this->authorize('edit', $form);
 
-        $formFieldtypes = app('statamic.form-fieldtypes')
-            ->unique()
-            ->map(fn ($class) => app($class))
-            ->filter->isSelectable()
-            ->reject(fn (FormFieldtype $fieldtype) => $this->wrappedFieldtypeIsUnselectable($fieldtype))
-            ->values();
-
-        $fieldtypesPortedToFormFieldtypes = $formFieldtypes
-            ->map(fn (FormFieldtype $fieldtype) => $fieldtype::fieldtype())
-            ->filter()
-            ->unique()
-            ->values();
-
-        $legacySelectableFieldtypes = FieldtypeRepository::classes()
-            ->map(fn ($class) => app($class))
-            ->filter->selectableInForms()
-            ->reject(fn ($fieldtype) => $fieldtypesPortedToFormFieldtypes->contains($fieldtype->handle()))
-            ->map(fn ($fieldtype) => (new Fallback)->wrapping($fieldtype))
-            ->values();
-
-        $fieldtypes = $formFieldtypes->merge($legacySelectableFieldtypes)->sortBy->title()->values();
-
         return Inertia::render('forms/Builder', [
+            ...$this->fieldProps(),
             'form' => $form,
             'initialFormFields' => $this->toVueObject($form->formFields()),
             'formsProInstalled' => Statamic::formsProInstalled(),
-            'fieldtypes' => $fieldtypes->map(fn (FormFieldtype $fieldtype): array => [
+            'fieldtypes' => $this->fieldtypes()->map(fn (FormFieldtype $fieldtype): array => [
                 ...$fieldtype->toArray(),
                 'preview' => $this->fieldtypePreview($fieldtype),
                 'example' => $this->fieldtypeExample($fieldtype),
             ]),
             'action' => cp_route('forms.builder.update', $form->handle()),
-            ...$this->fieldProps(),
         ]);
     }
 
@@ -83,19 +61,6 @@ class FormBuilderController extends CpController
         $this->setFormFields($request, $form);
 
         $form->save();
-    }
-
-    private function wrappedFieldtypeIsUnselectable(FormFieldtype $fieldtype): bool
-    {
-        if (! $handle = $fieldtype::fieldtype()) {
-            return false;
-        }
-
-        if (! FieldtypeRepository::selectableInFormIsOverriden($handle)) {
-            return false;
-        }
-
-        return ! FieldtypeRepository::hasBeenMadeSelectableInForms($handle);
     }
 
     private function toVueObject(FormFields $formFields): array

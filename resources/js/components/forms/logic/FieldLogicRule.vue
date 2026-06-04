@@ -10,6 +10,7 @@ import {
     Subheading,
 } from '@/components/ui';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
+import { categories, categoryColorClasses } from '@/components/forms/builder/categories.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:conditions']);
 
@@ -22,6 +23,7 @@ const props = defineProps({
     hasError: Boolean,
     conditions: { type: Object, default: () => ({}) },
     suggestableFields: { type: Array, default: () => [] },
+    fieldtypes: Array,
 });
 
 const operatorLabels = {
@@ -96,6 +98,15 @@ const collapsedSummary = computed(() => {
 
 const prefixLabel = computed(() => isHideCondition.value ? __('Hide when') : __('Show when'));
 const prefixIcon = computed(() => isHideCondition.value ? 'eye-closed' : 'eye');
+
+const getFieldtypeCategory = (fieldtypeHandle) => {
+    const fieldtype = props.fieldtypes?.find((field) => field.handle === fieldtypeHandle);
+    const categoryKey = fieldtype?.categories?.[0] || 'other';
+    return categories[categoryKey] ?? categories.other;
+};
+
+const fieldIconClasses = (fieldtypeHandle) => `size-4 shrink-0 ${categoryColorClasses[getFieldtypeCategory(fieldtypeHandle)?.color]?.icon}`;
+const findSuggestableField = (handle) => props.suggestableFields.find((f) => f.handle === handle);
 
 const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('collapsed');
 
@@ -189,12 +200,34 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                         <FieldConditionsBuilder
                             :config="conditions"
                             :suggestable-fields
+                            :fieldtypes
                             :allow-custom-conditions="false"
                             :show-always-save="false"
                             size="sm"
                             @updated="onConditionsUpdated"
                             @updated-always-save="onAlwaysSaveUpdated"
-                        />
+                        >
+                            <template #field-option="{ value, label }">
+                                <span class="inline-flex items-center gap-2">
+                                    <Icon
+                                        v-if="findSuggestableField(value)?.icon"
+                                        :name="findSuggestableField(value).icon"
+                                        :class="fieldIconClasses(findSuggestableField(value)?.config?.type)"
+                                    />
+                                    <span class="truncate">{{ __(label) }}</span>
+                                </span>
+                            </template>
+                            <template #field-selected="{ option, field: selectedField }">
+                                <span class="inline-flex items-center gap-2 truncate">
+                                    <Icon
+                                        v-if="selectedField?.icon"
+                                        :name="selectedField.icon"
+                                        :class="fieldIconClasses(selectedField.config.type)"
+                                    />
+                                    <span class="truncate">{{ __(findSuggestableField(option.value)?.config?.display ?? option.value) }}</span>
+                                </span>
+                            </template>
+                        </FieldConditionsBuilder>
                     </div>
                 </div>
             </div>

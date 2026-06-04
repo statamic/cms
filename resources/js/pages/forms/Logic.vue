@@ -17,6 +17,7 @@ const props = defineProps({
     pages: Array,
     fields: Array,
     action: String,
+    fieldtypes: Array,
 });
 
 const pages = ref(props.pages);
@@ -115,11 +116,13 @@ onUnmounted(() => {
             class="mb-6"
             v-model:pages="pages"
             :suggestable-fields
+            :fieldtypes
         />
 
         <FieldLogic
             v-model:fields="fields"
             :suggestable-fields
+            :fieldtypes
         />
     </div>
 </template>
