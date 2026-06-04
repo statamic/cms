@@ -10,6 +10,7 @@
     $isMultiple = ! empty($multiple);
     $selected = $value ?? ($isMultiple ? [] : null);
     $cardClasses = 'flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors border-gray-300 bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary';
+    $letterClasses = 'flex size-7 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200';
 @endphp
 
 <fieldset
@@ -50,7 +51,12 @@
                     @endif
                 </span>
                 @if ($label)
-                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">@if ($letter){{ $letter }} @endif{{ $label }}</span>
+                    <span class="flex items-center justify-center gap-2">
+                        @if ($letter)
+                            <span class="{{ $letterClasses }}">{{ $letter }}</span>
+                        @endif
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                    </span>
                 @endif
             </span>
         </label>

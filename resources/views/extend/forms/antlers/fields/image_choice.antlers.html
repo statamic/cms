@@ -31,7 +31,12 @@
                     {{ /if }}
                 </span>
                 {{ if label }}
-                    <span class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300">{{ if letter }}{{ letter }} {{ /if }}{{ label }}</span>
+                    <span class="flex items-center justify-center gap-2">
+                        {{ if letter }}
+                            <span class="flex size-7 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ letter }}</span>
+                        {{ /if }}
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ label }}</span>
+                    </span>
                 {{ /if }}
             </span>
         </label>

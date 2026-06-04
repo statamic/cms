@@ -195,9 +195,17 @@ const cardClasses = [
                 </span>
                 <span
                     v-if="option.label"
-                    class="block text-center text-xs font-medium text-gray-700 dark:text-gray-300"
+                    class="flex items-center justify-center gap-2"
                 >
-                    <template v-if="option.letter">{{ option.letter }} </template>{{ __(option.label) }}
+                    <span
+                        v-if="option.letter"
+                        class="flex size-6.5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
+                    >
+                        {{ option.letter }}
+                    </span>
+                    <span class="text-xs text-gray-800 dark:text-gray-200" style="text-box-trim: trim-start;">
+                        {{ __(option.label) }}
+                    </span>
                 </span>
             </span>
         </label>
