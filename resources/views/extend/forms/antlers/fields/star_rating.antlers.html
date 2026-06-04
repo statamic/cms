@@ -1,42 +1,23 @@
-<fieldset class="star-rating" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }} {{ if allow_half_stars }}data-allow-half-stars{{ /if }}>
-    {{ foreach:star_inputs }}
-        <span class="star-rating__star">
-            {{ if half_value }}
-                <label class="star-rating__half star-rating__half--left">
-                    <input
-                        id="{{ id }}-{{ star }}-half"
-                        type="radio"
-                        name="{{ name }}"
-                        value="{{ half_value }}"
-                        {{ if js_driver }}{{ js_attributes }}{{ /if }}
-                        {{ if value == half_value }}checked{{ /if }}
-                        {{ if validate|contains:required }}required{{ /if }}
-                        {{ if error }}
-                            aria-invalid="true" aria-describedby="{{ id }}-error"
-                        {{ elseif instructions }}
-                            aria-describedby="{{ id }}-instructions"
-                        {{ /if }}
-                    >
-                    <span aria-hidden="true">★</span>
-                </label>
-            {{ /if }}
-            <label class="star-rating__half star-rating__half--right">
-                <input
-                    id="{{ id }}-{{ star }}"
-                    type="radio"
-                    name="{{ name }}"
-                    value="{{ full_value }}"
-                    {{ if js_driver }}{{ js_attributes }}{{ /if }}
-                    {{ if value == full_value }}checked{{ /if }}
-                    {{ if validate|contains:required }}required{{ /if }}
-                    {{ if error }}
-                        aria-invalid="true" aria-describedby="{{ id }}-error"
-                    {{ elseif instructions }}
-                        aria-describedby="{{ id }}-instructions"
-                    {{ /if }}
-                >
-                <span aria-hidden="true">★</span>
-            </label>
-        </span>
-    {{ /foreach:star_inputs }}
-</fieldset>
+{{ once }}
+    <link rel="stylesheet" href="{{ config:app:url }}/vendor/statamic/forms/star-rating.css">
+{{ /once }}
+<input
+    id="{{ id }}"
+    type="range"
+    name="{{ name }}"
+    class="star-rating-input"
+    data-star-rating
+    min="{{ allow_half_stars ? 0.5 : 1 }}"
+    max="{{ max_stars }}"
+    step="{{ step ?? 1 }}"
+    value="{{ value ?? (allow_half_stars ? 0.5 : 1) }}"
+    style="--star-rating-max: {{ max_stars }}; --star-rating-step: {{ step ?? 1 }};"
+    {{ if js_driver }}{{ js_attributes }}{{ /if }}
+    {{ if validate|contains:required }}required{{ /if }}
+    {{ if display }}aria-label="{{ display }}"{{ /if }}
+    {{ if error }}
+        aria-invalid="true" aria-describedby="{{ id }}-error"
+    {{ elseif instructions }}
+        aria-describedby="{{ id }}-instructions"
+    {{ /if }}
+>

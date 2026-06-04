@@ -75,6 +75,10 @@ class AppServiceProvider extends ServiceProvider
             "{$this->root}/resources/dist-frontend" => public_path('vendor/statamic/frontend'),
         ], 'statamic-frontend');
 
+        $this->publishes([
+            "{$this->root}/resources/css/components/fieldtypes/star-rating.css" => public_path('vendor/statamic/forms/star-rating.css'),
+        ], 'statamic');
+
         $this->loadTranslationsFrom("{$this->root}/lang", 'statamic');
         $this->loadJsonTranslationsFrom("{$this->root}/lang");
 

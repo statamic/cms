@@ -1,18 +1,17 @@
 <script setup>
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { __ } from '@/bootstrap/globals';
-import { Icon } from '@ui';
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, update, isReadOnly, defineReplicatorPreview } = Fieldtype.use(emit, props);
+const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
 
-const firstControl = useTemplateRef('firstControl');
+const rangeInput = useTemplateRef('rangeInput');
 
 defineExpose({
     ...expose,
-    focus: () => firstControl.value?.focus(),
+    focus: () => rangeInput.value?.focus(),
 });
 
 const maxStars = computed(() => {
@@ -27,9 +26,9 @@ const maxStars = computed(() => {
 
 const allowHalfStars = computed(() => Boolean(props.config.allow_half_stars));
 
-const stars = computed(() => Array.from({ length: maxStars.value }, (_, index) => index + 1));
+const step = computed(() => (allowHalfStars.value ? 0.5 : 1));
 
-const hoverRating = ref(null);
+const min = computed(() => (allowHalfStars.value ? 0.5 : 1));
 
 const normalizedValue = computed(() => {
     if (props.value == null || props.value === '') {
@@ -49,79 +48,26 @@ const normalizedValue = computed(() => {
     return Math.round(value * 2) / 2;
 });
 
-const displayRating = computed(() => hoverRating.value ?? normalizedValue.value);
+const rangeValue = computed(() => normalizedValue.value ?? min.value);
 
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 
-const ratingsEqual = (a, b) => Math.abs(a - b) < 0.001;
+const rangeStyle = computed(() => ({
+    '--star-rating-max': maxStars.value,
+    '--star-rating-step': step.value,
+}));
 
-const select = (rating) => {
-    if (isDisabled.value) {
-        return;
+const ariaLabel = computed(() => {
+    if (props.config.display) {
+        return __(props.config.display);
     }
 
-    update(normalizedValue.value !== null && ratingsEqual(normalizedValue.value, rating) ? null : rating);
+    return __('Star rating');
+});
+
+const onInput = (event) => {
+    update(Number(event.target.value));
 };
-
-const onMouseEnter = (rating) => {
-    if (isDisabled.value) {
-        return;
-    }
-
-    hoverRating.value = rating;
-};
-
-const onMouseLeave = () => {
-    hoverRating.value = null;
-};
-
-const starFill = (star) => {
-    const rating = displayRating.value;
-
-    if (rating === null) {
-        return 'empty';
-    }
-
-    if (rating >= star) {
-        return 'full';
-    }
-
-    if (allowHalfStars.value && rating >= star - 0.5) {
-        return 'half';
-    }
-
-    return 'empty';
-};
-
-const starIcon = (star) => {
-    const fill = starFill(star);
-
-    if (fill === 'half') {
-        return 'star-half';
-    }
-
-    return 'star';
-};
-
-const starIconClass = (star) => {
-    const fill = starFill(star);
-
-    if (fill === 'empty') {
-        return 'text-gray-300 dark:text-gray-600';
-    }
-
-    return 'text-amber-400 dark:text-amber-300';
-};
-
-const ratingLabel = (rating) => {
-    if (allowHalfStars.value && rating % 1 !== 0) {
-        return __(':rating of :max stars', { rating, max: maxStars.value });
-    }
-
-    return __(':count of :max stars', { count: rating, max: maxStars.value });
-};
-
-const isSelected = (rating) => normalizedValue.value !== null && ratingsEqual(normalizedValue.value, rating);
 
 defineReplicatorPreview(() => {
     if (normalizedValue.value == null) {
@@ -134,72 +80,19 @@ defineReplicatorPreview(() => {
 </script>
 
 <template>
-    <div
-        role="radiogroup"
-        :aria-label="config.display ? __(config.display) : undefined"
-        class="inline-flex items-center gap-0.5"
+    <input
+        ref="rangeInput"
+        type="range"
+        class="star-rating-input"
         data-star-rating
-        :data-allow-half-stars="allowHalfStars ? '' : undefined"
-        @mouseleave="onMouseLeave"
-    >
-        <div
-            v-for="star in stars"
-            :key="star"
-            class="relative size-7 shrink-0"
-        >
-            <Icon
-                :name="starIcon(star)"
-                class="pointer-events-none absolute inset-0 m-auto size-6"
-                :class="starIconClass(star)"
-                aria-hidden="true"
-            />
-            <div
-                v-if="allowHalfStars"
-                class="absolute inset-0 flex"
-            >
-                <button
-                    :ref="star === 1 ? 'firstControl' : undefined"
-                    type="button"
-                    role="radio"
-                    class="h-full w-1/2 rounded-s p-0 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                    :class="isDisabled ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100/80 dark:hover:bg-gray-800/80'"
-                    :aria-checked="isSelected(star - 0.5) ? 'true' : 'false'"
-                    :aria-label="ratingLabel(star - 0.5)"
-                    :disabled="isDisabled"
-                    @click="select(star - 0.5)"
-                    @mouseenter="onMouseEnter(star - 0.5)"
-                    @focus="onMouseEnter(star - 0.5)"
-                    @blur="onMouseLeave"
-                />
-                <button
-                    type="button"
-                    role="radio"
-                    class="h-full w-1/2 rounded-e p-0 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                    :class="isDisabled ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100/80 dark:hover:bg-gray-800/80'"
-                    :aria-checked="isSelected(star) ? 'true' : 'false'"
-                    :aria-label="ratingLabel(star)"
-                    :disabled="isDisabled"
-                    @click="select(star)"
-                    @mouseenter="onMouseEnter(star)"
-                    @focus="onMouseEnter(star)"
-                    @blur="onMouseLeave"
-                />
-            </div>
-            <button
-                v-else
-                :ref="star === 1 ? 'firstControl' : undefined"
-                type="button"
-                role="radio"
-                class="absolute inset-0 rounded p-0 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                :class="isDisabled ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'"
-                :aria-checked="isSelected(star) ? 'true' : 'false'"
-                :aria-label="ratingLabel(star)"
-                :disabled="isDisabled"
-                @click="select(star)"
-                @mouseenter="onMouseEnter(star)"
-                @focus="onMouseEnter(star)"
-                @blur="onMouseLeave"
-            />
-        </div>
-    </div>
+        :name="name"
+        :min="min"
+        :max="maxStars"
+        :step="step"
+        :value="rangeValue"
+        :disabled="isDisabled"
+        :aria-label="ariaLabel"
+        :style="rangeStyle"
+        @input="onInput"
+    />
 </template>

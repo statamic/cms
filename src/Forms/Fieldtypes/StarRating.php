@@ -28,7 +28,7 @@ class StarRating extends FormFieldtype
             ],
             'allow_half_stars' => [
                 'display' => __('Allow Half Stars'),
-                'instructions' => __('Support half-star ratings (e.g., 4.5 stars).'),
+                'instructions' => __('Allow ratings like 4.5.'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
@@ -45,36 +45,10 @@ class StarRating extends FormFieldtype
             'type' => 'star_rating',
             'max_stars' => $maxStars,
             'allow_half_stars' => $allowHalfStars,
+            'min' => $allowHalfStars ? 0.5 : 1,
             'step' => $allowHalfStars ? 0.5 : 1,
-            'stars' => range(1, $maxStars),
-            'rating_values' => $this->ratingValues($maxStars, $allowHalfStars),
-            'star_inputs' => collect(range(1, $maxStars))
-                ->map(fn (int $star) => [
-                    'star' => $star,
-                    'half_value' => $allowHalfStars ? $star - 0.5 : null,
-                    'full_value' => $star,
-                ])
-                ->all(),
             ...Arr::except($this->config(), ['type', 'max_stars', 'allow_half_stars']),
         ];
-    }
-
-    /**
-     * @return array<int, float|int>
-     */
-    protected function ratingValues(int $maxStars, bool $allowHalfStars): array
-    {
-        if (! $allowHalfStars) {
-            return range(1, $maxStars);
-        }
-
-        $values = [];
-
-        for ($value = 0.5; $value <= $maxStars; $value += 0.5) {
-            $values[] = $value;
-        }
-
-        return $values;
     }
 
     public function example(): ?array

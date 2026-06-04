@@ -1,0 +1,79 @@
+/* CSS-only star rating via range input — https://css-tricks.com/a-css-only-star-rating-component-and-more-part-1/ */
+
+.star-rating-input {
+    --s: 1.75rem;
+    --star-rating-max: 5;
+    --star-rating-step: 1;
+    --_pad: calc(var(--star-rating-step) * var(--s) / 2);
+    --_fill: #fbbf24;
+    --_empty: #d1d5db;
+
+    display: block;
+    width: calc(var(--s) * var(--star-rating-max));
+    max-width: 100%;
+    height: var(--s);
+    aspect-ratio: var(--star-rating-max);
+    padding-inline: var(--_pad);
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 1.75l2.55 5.17 5.7.83-4.13 4.02.97 5.68L12 14.77l-5.09 2.68.97-5.68-4.13-4.02 5.7-.83z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 1.75l2.55 5.17 5.7.83-4.13 4.02.97 5.68L12 14.77l-5.09 2.68.97-5.68-4.13-4.02 5.7-.83z'/%3E%3C/svg%3E");
+    -webkit-mask-size: var(--s);
+    mask-size: var(--s);
+    -webkit-mask-repeat: repeat;
+    mask-repeat: repeat;
+}
+
+:where(.dark) .star-rating-input {
+    --_fill: #fcd34d;
+    --_empty: #4b5563;
+}
+
+.star-rating-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.star-rating-input:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 3px;
+    border-radius: 0.25rem;
+}
+
+.star-rating-input::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1px;
+    height: 0;
+    background: transparent;
+    border: none;
+    -webkit-border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
+    border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
+}
+
+.star-rating-input::-moz-range-thumb {
+    appearance: none;
+    width: 1px;
+    height: 0;
+    background: transparent;
+    border: none;
+    border-image: conic-gradient(at calc(50% + var(--_pad)), var(--_empty) 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
+}
+
+.star-rating-input::-webkit-slider-runnable-track {
+    appearance: none;
+    -webkit-appearance: none;
+    height: var(--s);
+    background: transparent;
+}
+
+.star-rating-input::-moz-range-track {
+    appearance: none;
+    height: var(--s);
+    background: transparent;
+    border: none;
+}
