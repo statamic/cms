@@ -9,7 +9,7 @@ import {
     Icon,
     Subheading,
 } from '@/components/ui';
-import Rule from '@/components/forms/builder/Pages/Rule.vue';
+import PageRule from '@/components/forms/builder/Pages/PageRule.vue';
 import { categories, categoryColorClasses } from '@/components/forms/Builder/categories';
 
 const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:rule']);
@@ -217,7 +217,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
             >
                 <div :tabindex="collapsed ? -1 : undefined" :inert="collapsed">
                     <div class="p-4">
-                        <Rule
+                        <PageRule
                             :rule="rule"
                             :suggestable-fields
                             :page-destination-options

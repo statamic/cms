@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button, ConfirmationModal, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger, Textarea } from '@ui';
 import { computed, ref, watch } from 'vue';
-import RuleBuilder from './Pages/RuleBuilder.vue';
+import PageRuleBuilder from './Pages/PageRuleBuilder.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
 const { deletePage, dirty, fieldtypes, inspecting: page, pages } = injectBuilderContext();
@@ -120,7 +120,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                         </a>
                     </div>
 
-                    <RuleBuilder
+                    <PageRuleBuilder
                         v-model:rules="page.rules"
                         :suggestable-fields="suggestableConditionFields"
                         :page-destination-options

@@ -29,6 +29,11 @@ const destination = computed({
     set: (value) => update('destination', value),
 });
 
+const destinationPageIsMissing = computed(() => {
+    if (!destination.value) return false;
+    return !props.pageDestinationOptions.find(option => option.value === destination.value);
+});
+
 const update = (key, value) => emit('update:rule', { ...props.rule, [key]: value });
 
 const addCondition = () => {
@@ -247,7 +252,13 @@ const shouldBeIndented = (index) => {
                                     </div>
                                 </template>
                                 <template #selected-option="{ option }">
-                                    <div class="flex min-w-0 items-center gap-1 -ms-0.75">
+                                    <div v-if="destinationPageIsMissing" class="flex min-w-0 items-center gap-1 -ms-0.75">
+                                        <div class="flex shrink-0 items-center justify-center size-6 text-red-600 dark:text-red-500">
+                                            <Icon name="trash" class="size-4 shrink-0 text-red-600 dark:text-red-500" />
+                                        </div>
+                                        <span class="block truncate text-red-600 dark:text-red-500">{{ __('Deleted page') }}</span>
+                                    </div>
+                                    <div v-else class="flex min-w-0 items-center gap-1 -ms-0.75">
                                         <div class="flex shrink-0 items-center justify-center size-6 text-gray-500 dark:text-gray-300">
                                             <Icon
                                                 v-if="option.icon"

@@ -1,7 +1,7 @@
 <script setup>
 import { Button } from '@ui';
 import { nanoid as uniqid } from 'nanoid';
-import Rule from './Rule.vue';
+import PageRule from './PageRule.vue';
 
 const emit = defineEmits(['update:rules']);
 
@@ -50,7 +50,7 @@ const removeRule = (index) => {
                 class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"
             />
 
-            <Rule
+            <PageRule
                 :rule="rule"
                 :suggestable-fields
                 :page-destination-options
