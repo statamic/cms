@@ -114,6 +114,40 @@ class ImageChoice extends FormFieldtype
         ];
     }
 
+    public function example(): ?array
+    {
+        return [
+            'config' => [
+                'display' => __('Pick your favorite season'),
+                'columns' => 3,
+                'aspect_ratio' => '16/9',
+                'options' => [
+                    [
+                        'key' => 'spring',
+                        'label' => __('Spring'),
+                        'image' => 'https://picsum.photos/seed/image-choice-spring/640/360',
+                    ],
+                    [
+                        'key' => 'summer',
+                        'label' => __('Summer'),
+                        'image' => 'https://picsum.photos/seed/image-choice-summer/640/360',
+                    ],
+                    [
+                        'key' => 'autumn',
+                        'label' => __('Autumn'),
+                        'image' => 'https://picsum.photos/seed/image-choice-autumn/640/360',
+                    ],
+                    [
+                        'key' => 'winter',
+                        'label' => __('Winter'),
+                        'image' => 'https://picsum.photos/seed/image-choice-winter/640/360',
+                    ],
+                ],
+            ],
+            'value' => null,
+        ];
+    }
+
     private function normalizedAspectRatio(): string
     {
         $allowed = ['1/1', '4/3', '3/2', '16/9', '3/4', '2/3'];
