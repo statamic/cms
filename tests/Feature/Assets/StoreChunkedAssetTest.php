@@ -3,6 +3,7 @@
 namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
@@ -37,6 +38,14 @@ class StoreChunkedAssetTest extends TestCase
         Storage::fake('local');
     }
 
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        // Isolate these tests from image preset generation, which decodes the (fake) image bytes.
+        $app['config']->set('statamic.assets.image_manipulation.generate_presets_on_upload', false);
+    }
+
     #[Test]
     public function it_uploads_an_asset_in_chunks()
     {
@@ -56,6 +65,22 @@ class StoreChunkedAssetTest extends TestCase
         Storage::disk('test')->assertExists('path/to/test.jpg');
         $this->assertEquals('hello chunked world', Storage::disk('test')->get('path/to/test.jpg'));
         $this->assertEmpty(Storage::disk('local')->allFiles('statamic/chunks'));
+    }
+
+    #[Test]
+    public function it_appends_a_timestamp_to_a_duplicate_filename()
+    {
+        Carbon::setTestNow(Carbon::createFromTimestamp(1700000000, config('app.timezone')));
+        Storage::disk('test')->put('path/to/test.jpg', 'existing');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->uploadChunks('new contents')
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'path/to/test-1700000000.jpg']]);
+
+        $this->assertEquals('existing', Storage::disk('test')->get('path/to/test.jpg'));
+        $this->assertEquals('new contents', Storage::disk('test')->get('path/to/test-1700000000.jpg'));
     }
 
     #[Test]

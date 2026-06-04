@@ -96,6 +96,11 @@ class ChunksController extends CpController
 
         $file = new UploadedFile($assembledPath, $originalName, (new MimeTypes)->guessMimeType($assembledPath), null, test: true);
 
+        // Re-uploading a large file to resolve a name clash is impractical, so default to appending a timestamp.
+        if (! $request->filled('option')) {
+            $request->merge(['option' => 'timestamp']);
+        }
+
         try {
             return $this->finalizeUpload($file, $container, $request);
         } finally {
