@@ -17,11 +17,11 @@ defineExpose({
 const maxStars = computed(() => {
     const max = Number(props.config.max_stars);
 
-    if (! Number.isFinite(max) || max < 1) {
+    if (! Number.isFinite(max)) {
         return 5;
     }
 
-    return Math.min(Math.round(max), 10);
+    return Math.max(1, Math.min(Math.round(max), 10));
 });
 
 const allowHalfStars = computed(() => Boolean(props.config.allow_half_stars));

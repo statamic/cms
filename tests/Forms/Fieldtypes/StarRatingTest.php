@@ -53,6 +53,13 @@ class StarRatingTest extends TestCase
         ]));
 
         $this->assertEquals(10, $fieldtype->toFieldArray()['max_stars']);
+
+        $fieldtype = (new StarRating)->setField(new FormField('rating', [
+            'type' => 'star_rating',
+            'max_stars' => 0,
+        ]));
+
+        $this->assertEquals(1, $fieldtype->toFieldArray()['max_stars']);
     }
 
     #[Test]

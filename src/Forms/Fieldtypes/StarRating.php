@@ -23,6 +23,8 @@ class StarRating extends FormFieldtype
                 'instructions' => __('The maximum number of selectable stars.'),
                 'type' => 'integer',
                 'default' => 5,
+                'min' => 1,
+                'max' => 10,
                 'width' => 50,
                 'validate' => 'integer|min:1|max:10',
             ],
@@ -38,7 +40,10 @@ class StarRating extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        $maxStars = max(1, min(10, (int) ($this->config('max_stars') ?: 5)));
+        $configured = $this->config('max_stars');
+        $maxStars = ($configured === null || $configured === '') ? 5 : (int) $configured;
+
+        $maxStars = max(1, min(10, $maxStars));
         $allowHalfStars = (bool) $this->config('allow_half_stars');
 
         return [
