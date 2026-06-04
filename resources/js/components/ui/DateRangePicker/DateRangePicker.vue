@@ -143,7 +143,7 @@ const hoverCardDate = computed(() => {
                         'flex items-center w-full overflow-x-auto overflow-y-hidden bg-white dark:bg-gray-900',
                         'border border-gray-300 dark:border-gray-700',
                         'leading-[1.375rem] text-gray-600 dark:text-gray-300 @max-xs:text-xs',
-                        'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-2.5 disabled:shadow-none',
+                        'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                         'data-invalid:border-red-500',
                         'disabled:shadow-none disabled:opacity-50',
                         readOnly ? 'border-dashed' : '',
@@ -151,13 +151,13 @@ const hoverCardDate = computed(() => {
                 >
                     <DateRangePickerTrigger
                         v-if="!inline"
-                        class="flex size-8 shrink-0 items-center justify-center rounded-lg -ms-2 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                        class="flex shrink-0 items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                         :aria-label="__('Open calendar')"
                     >
                         <Icon name="calendar" class="size-4" />
                     </DateRangePickerTrigger>
                     <template v-for="item in segments.start" :key="item.part">
-                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
+                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start" class="whitespace-pre">
                             {{ item.value }}
                         </DateRangePickerInput>
                         <DateRangePickerInput
@@ -174,7 +174,7 @@ const hoverCardDate = computed(() => {
                     </template>
                     <span class="mx-0.75 text-gray-400 dark:text-gray-600">&ndash;</span>
                     <template v-for="item in segments.end" :key="item.part">
-                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end">
+                        <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end" class="whitespace-pre">
                             {{ item.value }}
                         </DateRangePickerInput>
                         <DateRangePickerInput
