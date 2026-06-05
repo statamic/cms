@@ -170,7 +170,7 @@ function syncPreviewFromValues() {
             ...field.value.preview.config,
             ...values.value,
             handle: field.value.handle,
-            type: field.value.fieldtype,
+            type: field.value.preview.config.type,
         },
         value: nextValue,
         meta: {

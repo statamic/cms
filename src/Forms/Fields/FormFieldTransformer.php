@@ -11,6 +11,27 @@ use Statamic\Support\Arr;
 
 class FormFieldTransformer extends FieldTransformer
 {
+    private static function publishOnlyConfigKeys(): array
+    {
+        return [
+            'type',
+            'component',
+            'hide_display',
+            'handle',
+            'prefix',
+            'required',
+            'visibility',
+            'read_only',
+            'always_save',
+            'listable',
+            'sortable',
+            'replicator_preview',
+            'duplicate',
+            'actions',
+            'instructions_position',
+        ];
+    }
+
     public static function fromVue(array $submitted)
     {
         $method = $submitted['type'].'TabField';
@@ -38,7 +59,11 @@ class FormFieldTransformer extends FieldTransformer
 
         $field = collect($submitted['config'])
             ->reject(function ($value, $key) use ($fields) {
-                if ($key === 'icon') {
+                if (in_array($key, static::publishOnlyConfigKeys(), true)) {
+                    return true;
+                }
+
+                if ($key === 'icon' && ! $fields->get('icon')) {
                     return true;
                 }
 
@@ -61,6 +86,8 @@ class FormFieldTransformer extends FieldTransformer
                 return $field->defaultValue() === $value;
             })
             ->all();
+
+        $field['type'] = $fieldtype->handle();
 
         return array_filter([
             'handle' => $submitted['handle'],
@@ -111,7 +138,7 @@ class FormFieldTransformer extends FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $mergedConfig['type'],
+            'fieldtype' => $formFieldtype->handle(),
             'icon' => $formFieldtype->icon(),
             'preview' => static::fieldtypePreview($formFieldtype),
         ];
@@ -132,7 +159,7 @@ class FormFieldTransformer extends FieldTransformer
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $config,
-            'fieldtype' => $config['type'] ?? 'short_answer',
+            'fieldtype' => $formFieldtype->handle(),
             'icon' => $formFieldtype->icon(),
             'preview' => static::fieldtypePreview($formFieldtype),
         ];
