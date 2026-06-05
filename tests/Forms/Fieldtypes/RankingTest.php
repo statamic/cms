@@ -55,6 +55,24 @@ class RankingTest extends TestCase
     }
 
     #[Test]
+    public function it_ignores_blank_options()
+    {
+        $fieldtype = (new Ranking)->setField(new FormField('preferences', [
+            'type' => 'ranking',
+            'options' => [
+                'summer' => 'Summer',
+                'null' => null,
+                ['key' => null, 'value' => null],
+                ['key' => '', 'value' => ''],
+            ],
+        ]));
+
+        $this->assertEquals([
+            'summer' => 'Summer',
+        ], $fieldtype->toFieldArray()['options']);
+    }
+
+    #[Test]
     public function it_preloads_normalized_options()
     {
         $fieldtype = (new Ranking)->setField(new FormField('preferences', [

@@ -11,6 +11,12 @@ const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.
 const sortableItemClass = 'ranking-item';
 const sortableHandleClass = 'ranking-handle';
 
+function isCompleteOption(option) {
+    const { value } = option;
+
+    return value != null && value !== '' && value !== 'null';
+}
+
 function normalizeOptions(raw) {
     if (! raw) {
         return [];
@@ -31,13 +37,16 @@ function normalizeOptions(raw) {
                     value: row,
                     label: row,
                 };
-            });
+            })
+            .filter(isCompleteOption);
     }
 
-    return Object.entries(raw).map(([value, label]) => ({
-        value,
-        label: typeof label === 'string' ? label : value,
-    }));
+    return Object.entries(raw)
+        .map(([value, label]) => ({
+            value,
+            label: typeof label === 'string' ? label : value,
+        }))
+        .filter(isCompleteOption);
 }
 
 const options = computed(() => normalizeOptions(props.meta?.options ?? props.config.options));

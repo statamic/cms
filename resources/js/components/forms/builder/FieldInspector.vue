@@ -107,28 +107,38 @@ const load = () => {
         });
 };
 
+function isCompleteOption(option) {
+    const { value } = option;
+
+    return value != null && value !== '' && value !== 'null';
+}
+
 function normalizeOptionsMeta(options) {
     if (!options) {
         return [];
     }
 
     if (Array.isArray(options)) {
-        return options.map((row) => {
-            if (typeof row !== 'object') {
-                return { value: row, label: row };
-            }
+        return options
+            .map((row) => {
+                if (typeof row !== 'object') {
+                    return { value: row, label: row };
+                }
 
-            return {
-                value: row.key ?? row.value,
-                label: row.label ?? row.value ?? row.key,
-            };
-        });
+                return {
+                    value: row.key ?? row.value,
+                    label: row.label ?? row.value ?? row.key,
+                };
+            })
+            .filter(isCompleteOption);
     }
 
-    return Object.entries(options).map(([value, label]) => ({
-        value,
-        label: typeof label === 'string' ? label : value,
-    }));
+    return Object.entries(options)
+        .map(([value, label]) => ({
+            value,
+            label: typeof label === 'string' ? label : value,
+        }))
+        .filter(isCompleteOption);
 }
 
 function syncPreviewFromValues() {
