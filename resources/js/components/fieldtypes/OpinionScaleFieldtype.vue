@@ -7,7 +7,7 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
 
-const optionClass = 'relative flex min-w-10 shrink-0 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+const optionClass = 'relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
 
 const min = computed(() => {
     const value = Number(props.config.min);
@@ -85,7 +85,7 @@ defineExpose({
 <template>
     <div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale>
         <div
-            class="flex overflow-x-auto"
+            class="flex gap-2"
             role="radiogroup"
             :aria-label="ariaLabel"
         >
@@ -95,9 +95,7 @@ defineExpose({
                 :class="[
                     optionClass,
                     {
-                        'z-1 ms-0 rounded-s-lg border-primary bg-primary/10 text-primary dark:bg-primary/20': selectedValue === value,
-                        'rounded-s-lg ms-0': index === 0 && selectedValue !== value,
-                        'rounded-e-lg': index === scaleValues.length - 1,
+                        'border-primary bg-primary/10 text-primary dark:bg-primary/20': selectedValue === value,
                     },
                 ]"
             >

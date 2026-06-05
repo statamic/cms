@@ -1,9 +1,9 @@
 {{ opinion_value = value }}
 
 <div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale id="{{ id }}">
-    <div class="flex overflow-x-auto" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
+    <div class="flex gap-2" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
         {{ scale_values }}
-            <label class="relative flex min-w-10 shrink-0 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925{{ if value == opinion_value }} z-1 border-primary bg-primary/10 text-primary dark:bg-primary/20{{ /if }}{{ if first }} ms-0 rounded-s-lg{{ /if }}{{ if last }} rounded-e-lg{{ /if }}">
+            <label class="relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925{{ if value == opinion_value }} border-primary bg-primary/10 text-primary dark:bg-primary/20{{ /if }}">
                 <input
                     type="radio"
                     class="absolute pointer-events-none opacity-0"

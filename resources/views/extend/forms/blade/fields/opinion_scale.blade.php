@@ -5,18 +5,16 @@
     $max = max($min + 1, min($min + 10, $max));
     $selected = isset($value) && $value !== '' ? (int) $value : null;
 
-    $optionClass = 'relative flex min-w-10 shrink-0 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
-    $selectedClass = 'z-1 border-primary bg-primary/10 text-primary dark:bg-primary/20';
+    $optionClass = 'relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+    $selectedClass = 'border-primary bg-primary/10 text-primary dark:bg-primary/20';
 @endphp
 
 <div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale id="{{ $id }}">
-    <div class="flex overflow-x-auto" role="radiogroup" @if (! empty($display)) aria-label="{{ $display }}" @endif>
+    <div class="flex gap-2" role="radiogroup" @if (! empty($display)) aria-label="{{ $display }}" @endif>
         @for ($option = $min; $option <= $max; $option++)
             <label @class([
                 $optionClass,
                 $selectedClass => $selected === $option,
-                'ms-0 rounded-s-lg' => $option === $min,
-                'rounded-e-lg' => $option === $max,
             ])>
                 <input
                     type="radio"
