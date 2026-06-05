@@ -220,7 +220,7 @@ const cardClasses = [
                 >
                     <span
                         v-if="option.letter"
-                        class="flex size-6.5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
+                        class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200"
                     >
                         {{ option.letter }}
                     </span>
