@@ -2,18 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
-use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\FieldTransformer;
-use Statamic\Support\Arr;
-use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
 
 class FormFieldsController extends CpController
 {
@@ -71,14 +69,12 @@ class FormFieldsController extends CpController
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
-        $values = $blueprint
+        $fields = $blueprint
             ->fields()
             ->addValues($request->values)
-            ->process()
-            ->values()
-            ->all();
+            ->preProcess();
 
-        $values = array_merge($request->values, $values);
+        $values = array_merge($request->values, $fields->values()->all());
 
         return [
             'values' => $values,

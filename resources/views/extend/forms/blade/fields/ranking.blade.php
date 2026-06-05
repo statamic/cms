@@ -1,0 +1,24 @@
+@php
+    $options = $options ?? [];
+    $ranked = is_array($value ?? null) && count($value) ? $value : array_keys($options);
+@endphp
+
+@once
+    <style>
+        [data-ranking] { display: flex; flex-direction: column; gap: 0.5rem; list-style: none; padding: 0; margin: 0; }
+        [data-ranking-item] { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background: #f9fafb; }
+        [data-ranking-rank] { display: flex; width: 1.5rem; height: 1.5rem; flex-shrink: 0; align-items: center; justify-content: center; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #fff; font-size: 0.75rem; font-weight: 700; }
+        [data-ranking-label] { flex: 1 1 0%; min-width: 0; font-size: 0.875rem; }
+    </style>
+@endonce
+
+<ol data-ranking id="{{ $id }}" role="list">
+    @foreach ($ranked as $index => $key)
+        @php($label = $options[$key] ?? $key)
+        <li data-ranking-item>
+            <span data-ranking-rank aria-hidden="true">{{ $index + 1 }}</span>
+            <span data-ranking-label>{{ $label }}</span>
+            <input type="hidden" name="{{ $name }}[]" value="{{ $key }}">
+        </li>
+    @endforeach
+</ol>
