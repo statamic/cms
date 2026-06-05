@@ -5,12 +5,12 @@
     $max = max($min + 1, min($min + 10, $max));
     $selected = isset($value) && $value !== '' ? (int) $value : null;
 
-    $optionClass = 'relative flex min-w-10 flex-1 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+    $optionClass = 'relative flex min-w-10 shrink-0 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
     $selectedClass = 'z-1 border-primary bg-primary/10 text-primary dark:bg-primary/20';
 @endphp
 
-<div class="flex max-w-full flex-col gap-2" data-opinion-scale id="{{ $id }}">
-    <div class="flex w-fit max-w-full overflow-x-auto" role="radiogroup" @if (! empty($display)) aria-label="{{ $display }}" @endif>
+<div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale id="{{ $id }}">
+    <div class="flex overflow-x-auto" role="radiogroup" @if (! empty($display)) aria-label="{{ $display }}" @endif>
         @for ($option = $min; $option <= $max; $option++)
             <label @class([
                 $optionClass,
@@ -38,15 +38,15 @@
     </div>
 
     @if (! empty($left_label) || ! empty($center_label) || ! empty($right_label))
-        <div class="grid grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400">
             @if (! empty($left_label))
-                <span class="justify-self-start text-start">{{ $left_label }}</span>
+                <span class="col-start-1 justify-self-start text-start">{{ $left_label }}</span>
             @endif
             @if (! empty($center_label))
-                <span class="justify-self-center text-center">{{ $center_label }}</span>
+                <span class="col-start-2 justify-self-center text-center">{{ $center_label }}</span>
             @endif
             @if (! empty($right_label))
-                <span class="justify-self-end text-end">{{ $right_label }}</span>
+                <span class="col-start-3 justify-self-end text-end">{{ $right_label }}</span>
             @endif
         </div>
     @endif

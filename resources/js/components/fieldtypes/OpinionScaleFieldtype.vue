@@ -7,7 +7,7 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
 
-const optionClass = 'relative flex min-w-10 flex-1 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+const optionClass = 'relative flex min-w-10 shrink-0 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
 
 const min = computed(() => {
     const value = Number(props.config.min);
@@ -83,9 +83,9 @@ defineExpose({
 </script>
 
 <template>
-    <div class="flex max-w-full flex-col gap-2" data-opinion-scale>
+    <div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale>
         <div
-            class="flex w-fit max-w-full overflow-x-auto"
+            class="flex overflow-x-auto"
             role="radiogroup"
             :aria-label="ariaLabel"
         >
@@ -116,15 +116,15 @@ defineExpose({
 
         <div
             v-if="hasLabels"
-            class="grid grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400"
+            class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400"
         >
-            <span v-if="config.left_label" class="justify-self-start text-start">
+            <span v-if="config.left_label" class="col-start-1 justify-self-start text-start">
                 {{ __(config.left_label) }}
             </span>
-            <span v-if="config.center_label" class="justify-self-center text-center">
+            <span v-if="config.center_label" class="col-start-2 justify-self-center text-center">
                 {{ __(config.center_label) }}
             </span>
-            <span v-if="config.right_label" class="justify-self-end text-end">
+            <span v-if="config.right_label" class="col-start-3 justify-self-end text-end">
                 {{ __(config.right_label) }}
             </span>
         </div>

@@ -1,9 +1,9 @@
 {{ opinion_value = value }}
 
-<div class="flex max-w-full flex-col gap-2" data-opinion-scale id="{{ id }}">
-    <div class="flex w-fit max-w-full overflow-x-auto" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
+<div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale id="{{ id }}">
+    <div class="flex overflow-x-auto" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
         {{ scale_values }}
-            <label class="relative flex min-w-10 flex-1 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925{{ if value == opinion_value }} z-1 border-primary bg-primary/10 text-primary dark:bg-primary/20{{ /if }}{{ if first }} ms-0 rounded-s-lg{{ /if }}{{ if last }} rounded-e-lg{{ /if }}">
+            <label class="relative flex min-w-10 shrink-0 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925{{ if value == opinion_value }} z-1 border-primary bg-primary/10 text-primary dark:bg-primary/20{{ /if }}{{ if first }} ms-0 rounded-s-lg{{ /if }}{{ if last }} rounded-e-lg{{ /if }}">
                 <input
                     type="radio"
                     class="absolute pointer-events-none opacity-0"
@@ -24,15 +24,15 @@
     </div>
 
     {{ if left_label || center_label || right_label }}
-        <div class="grid grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400">
             {{ if left_label }}
-                <span class="justify-self-start text-start">{{ left_label }}</span>
+                <span class="col-start-1 justify-self-start text-start">{{ left_label }}</span>
             {{ /if }}
             {{ if center_label }}
-                <span class="justify-self-center text-center">{{ center_label }}</span>
+                <span class="col-start-2 justify-self-center text-center">{{ center_label }}</span>
             {{ /if }}
             {{ if right_label }}
-                <span class="justify-self-end text-end">{{ right_label }}</span>
+                <span class="col-start-3 justify-self-end text-end">{{ right_label }}</span>
             {{ /if }}
         </div>
     {{ /if }}
