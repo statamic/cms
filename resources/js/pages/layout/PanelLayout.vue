@@ -10,14 +10,14 @@ const left = {
     ref: useTemplateRef('leftPanel'),
     active: ref(false),
     edge: 'right',
-    defaults: [minWidth, 270, 320],
+    defaults: [minWidth, 262, 320],
 };
 
 const right = {
     ref: useTemplateRef('rightPanel'),
     active: ref(false),
     edge: 'left',
-    defaults: [300, 300, 320],
+    defaults: [300, 290, 320],
 };
 
 provide('leftPanelActive', left.active);
