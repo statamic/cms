@@ -7,6 +7,8 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
 
+const optionClass = 'relative flex min-w-10 flex-1 cursor-pointer items-center justify-center border border-gray-300 -ms-px bg-white px-3 py-2 text-center text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+
 const min = computed(() => {
     const value = Number(props.config.min);
 
@@ -81,43 +83,48 @@ defineExpose({
 </script>
 
 <template>
-    <div class="opinion-scale" data-opinion-scale>
+    <div class="flex max-w-full flex-col gap-2" data-opinion-scale>
         <div
-            class="opinion-scale__options"
+            class="flex w-fit max-w-full overflow-x-auto"
             role="radiogroup"
             :aria-label="ariaLabel"
         >
             <label
                 v-for="(value, index) in scaleValues"
                 :key="value"
-                class="opinion-scale__option"
-                :class="{
-                    'opinion-scale__option--selected': selectedValue === value,
-                    'opinion-scale__option--first': index === 0,
-                    'opinion-scale__option--last': index === scaleValues.length - 1,
-                }"
+                :class="[
+                    optionClass,
+                    {
+                        'z-1 ms-0 rounded-s-lg border-primary bg-primary/10 text-primary dark:bg-primary/20': selectedValue === value,
+                        'rounded-s-lg ms-0': index === 0 && selectedValue !== value,
+                        'rounded-e-lg': index === scaleValues.length - 1,
+                    },
+                ]"
             >
                 <input
                     type="radio"
-                    class="opinion-scale__input"
+                    class="absolute pointer-events-none opacity-0"
                     :name="name"
                     :value="value"
                     :checked="selectedValue === value"
                     :disabled="isDisabled"
                     @change="selectValue(value)"
                 >
-                <span class="opinion-scale__value">{{ value }}</span>
+                <span class="leading-none">{{ value }}</span>
             </label>
         </div>
 
-        <div v-if="hasLabels" class="opinion-scale__labels">
-            <span v-if="config.left_label" class="opinion-scale__label opinion-scale__label--left">
+        <div
+            v-if="hasLabels"
+            class="grid grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400"
+        >
+            <span v-if="config.left_label" class="justify-self-start text-start">
                 {{ __(config.left_label) }}
             </span>
-            <span v-if="config.center_label" class="opinion-scale__label opinion-scale__label--center">
+            <span v-if="config.center_label" class="justify-self-center text-center">
                 {{ __(config.center_label) }}
             </span>
-            <span v-if="config.right_label" class="opinion-scale__label opinion-scale__label--right">
+            <span v-if="config.right_label" class="justify-self-end text-end">
                 {{ __(config.right_label) }}
             </span>
         </div>
