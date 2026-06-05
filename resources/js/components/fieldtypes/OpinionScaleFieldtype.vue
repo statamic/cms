@@ -114,7 +114,7 @@ defineExpose({
 
         <div
             v-if="hasLabels"
-            class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400"
+            class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 px-0.75 text-xs text-gray-500 dark:text-gray-400"
         >
             <span v-if="config.low_label" class="col-start-1 justify-self-start text-start">
                 {{ __(config.low_label) }}
