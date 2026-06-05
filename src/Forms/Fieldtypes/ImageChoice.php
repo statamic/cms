@@ -23,7 +23,6 @@ class ImageChoice extends FormFieldtype
         return [
             'options' => [
                 'display' => __('Options'),
-                'instructions' => __('Add choices with a unique key, optional label, and image.'),
                 'type' => 'grid',
                 'mode' => 'stacked',
                 'add_row' => __('Add Option'),
@@ -59,7 +58,7 @@ class ImageChoice extends FormFieldtype
             ],
             'multiple' => [
                 'display' => __('Allow Multiple'),
-                'instructions' => __('Let respondents select more than one option.'),
+                'instructions' => __('Allow multiple selections.'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,

@@ -169,7 +169,7 @@ defineExpose({
 });
 
 const cardClasses = [
-    'flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors',
+    'flex flex-col gap-2 h-full p-1 rounded-lg border transition-colors',
     'border-gray-300 bg-gray-50 hover:border-gray-400',
     'dark:border-gray-600 dark:bg-gray-900',
     'peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary',
