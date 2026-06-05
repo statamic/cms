@@ -7,7 +7,7 @@ const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
 
-const optionClass = 'relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+const optionClass = 'relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
 
 const min = computed(() => {
     const value = Number(props.config.min);
