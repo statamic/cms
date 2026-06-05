@@ -38,5 +38,6 @@
 @import './components/fieldtypes/relationship.css';
 @import './components/fieldtypes/section.css';
 @import './components/fieldtypes/star-rating.css';
+@import './components/fieldtypes/opinion-scale.css';
 @import './components/fieldtypes/table.css';
 @import './components/fieldtypes/width.css';

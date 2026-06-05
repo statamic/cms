@@ -1,0 +1,43 @@
+{{ once }}
+    <link rel="stylesheet" href="{{ config:app:url }}/vendor/statamic/forms/opinion-scale.css">
+{{ /once }}
+
+{{ opinion_value = value }}
+
+<div class="opinion-scale" data-opinion-scale id="{{ id }}">
+    <div class="opinion-scale__options" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
+        {{ scale_values }}
+            <label class="opinion-scale__option{{ if value == opinion_value }} opinion-scale__option--selected{{ /if }}{{ if first }} opinion-scale__option--first{{ /if }}{{ if last }} opinion-scale__option--last{{ /if }}">
+                <input
+                    type="radio"
+                    class="opinion-scale__input"
+                    name="{{ name }}"
+                    value="{{ value }}"
+                    {{ if value == opinion_value }}checked{{ /if }}
+                    {{ if validate|contains:required }}required{{ /if }}
+                    {{ if js_driver }}{{ js_attributes }}{{ /if }}
+                    {{ if error }}
+                        aria-invalid="true" aria-describedby="{{ id }}-error"
+                    {{ elseif instructions }}
+                        aria-describedby="{{ id }}-instructions"
+                    {{ /if }}
+                >
+                <span class="opinion-scale__value">{{ value }}</span>
+            </label>
+        {{ /scale_values }}
+    </div>
+
+    {{ if left_label || center_label || right_label }}
+        <div class="opinion-scale__labels">
+            {{ if left_label }}
+                <span class="opinion-scale__label opinion-scale__label--left">{{ left_label }}</span>
+            {{ /if }}
+            {{ if center_label }}
+                <span class="opinion-scale__label opinion-scale__label--center">{{ center_label }}</span>
+            {{ /if }}
+            {{ if right_label }}
+                <span class="opinion-scale__label opinion-scale__label--right">{{ right_label }}</span>
+            {{ /if }}
+        </div>
+    {{ /if }}
+</div>

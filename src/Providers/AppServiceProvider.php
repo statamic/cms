@@ -77,6 +77,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->publishes([
             "{$this->root}/resources/css/components/fieldtypes/star-rating.css" => public_path('vendor/statamic/forms/star-rating.css'),
+            "{$this->root}/resources/css/components/fieldtypes/opinion-scale.css" => public_path('vendor/statamic/forms/opinion-scale.css'),
         ], 'statamic');
 
         $this->loadTranslationsFrom("{$this->root}/lang", 'statamic');
