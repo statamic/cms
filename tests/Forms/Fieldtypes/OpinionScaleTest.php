@@ -21,9 +21,9 @@ class OpinionScaleTest extends TestCase
             'min' => 0,
             'max' => 10,
             'scale_values' => range(0, 10),
-            'left_label' => null,
-            'center_label' => null,
-            'right_label' => null,
+            'low_label' => null,
+            'middle_label' => null,
+            'high_label' => null,
         ], $fieldtype->toFieldArray());
     }
 
@@ -35,9 +35,9 @@ class OpinionScaleTest extends TestCase
             'display' => 'How satisfied are you?',
             'min' => 1,
             'max' => 5,
-            'left_label' => 'Not satisfied',
-            'center_label' => 'Neutral',
-            'right_label' => 'Very satisfied',
+            'low_label' => 'Not satisfied',
+            'middle_label' => 'Neutral',
+            'high_label' => 'Very satisfied',
         ]));
 
         $this->assertEquals([
@@ -45,9 +45,9 @@ class OpinionScaleTest extends TestCase
             'min' => 1,
             'max' => 5,
             'scale_values' => range(1, 5),
-            'left_label' => 'Not satisfied',
-            'center_label' => 'Neutral',
-            'right_label' => 'Very satisfied',
+            'low_label' => 'Not satisfied',
+            'middle_label' => 'Neutral',
+            'high_label' => 'Very satisfied',
             'display' => 'How satisfied are you?',
         ], $fieldtype->toFieldArray());
     }
@@ -80,8 +80,8 @@ class OpinionScaleTest extends TestCase
         $this->assertSame('How likely are you to recommend us?', $example['config']['display']);
         $this->assertEquals(0, $example['config']['min']);
         $this->assertEquals(10, $example['config']['max']);
-        $this->assertEquals('Not likely', $example['config']['left_label']);
-        $this->assertEquals('Very likely', $example['config']['right_label']);
+        $this->assertEquals('Not likely', $example['config']['low_label']);
+        $this->assertEquals('Very likely', $example['config']['high_label']);
         $this->assertSame(8, $example['value']);
     }
 }

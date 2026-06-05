@@ -37,16 +37,16 @@
         @endfor
     </div>
 
-    @if (! empty($left_label) || ! empty($center_label) || ! empty($right_label))
+    @if (! empty($low_label) || ! empty($middle_label) || ! empty($high_label))
         <div class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400">
-            @if (! empty($left_label))
-                <span class="col-start-1 justify-self-start text-start">{{ $left_label }}</span>
+            @if (! empty($low_label))
+                <span class="col-start-1 justify-self-start text-start">{{ $low_label }}</span>
             @endif
-            @if (! empty($center_label))
-                <span class="col-start-2 justify-self-center text-center">{{ $center_label }}</span>
+            @if (! empty($middle_label))
+                <span class="col-start-2 justify-self-center text-center">{{ $middle_label }}</span>
             @endif
-            @if (! empty($right_label))
-                <span class="col-start-3 justify-self-end text-end">{{ $right_label }}</span>
+            @if (! empty($high_label))
+                <span class="col-start-3 justify-self-end text-end">{{ $high_label }}</span>
             @endif
         </div>
     @endif

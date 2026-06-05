@@ -19,8 +19,7 @@ class OpinionScale extends FormFieldtype
     {
         return [
             'min' => [
-                'display' => __('Min'),
-                'instructions' => __('The lowest value on the scale.'),
+                'display' => __('Min Value'),
                 'type' => 'integer',
                 'default' => 0,
                 'min' => 0,
@@ -28,27 +27,26 @@ class OpinionScale extends FormFieldtype
                 'width' => 50,
             ],
             'max' => [
-                'display' => __('Max'),
-                'instructions' => __('The highest value on the scale.'),
+                'display' => __('Max Value'),
                 'type' => 'integer',
                 'default' => 10,
                 'min' => 1,
                 'max' => 11,
                 'width' => 50,
             ],
-            'left_label' => [
-                'display' => __('Left Label'),
-                'instructions' => __('Label shown below the lowest value.'),
+            'low_label' => [
+                'display' => __('Low Label'),
+                'instructions' => __('Shown below the lowest value.'),
                 'type' => 'text',
             ],
-            'center_label' => [
-                'display' => __('Center Label'),
-                'instructions' => __('Optional label shown below the middle of the scale.'),
+            'middle_label' => [
+                'display' => __('Middle Label'),
+                'instructions' => __('(Optional) shown below the middle value.'),
                 'type' => 'text',
             ],
-            'right_label' => [
-                'display' => __('Right Label'),
-                'instructions' => __('Label shown below the highest value.'),
+            'high_label' => [
+                'display' => __('High Label'),
+                'instructions' => __('Shown below the highest value.'),
                 'type' => 'text',
             ],
         ];
@@ -63,10 +61,10 @@ class OpinionScale extends FormFieldtype
             'min' => $min,
             'max' => $max,
             'scale_values' => range($min, $max),
-            'left_label' => $this->config('left_label'),
-            'center_label' => $this->config('center_label'),
-            'right_label' => $this->config('right_label'),
-            ...Arr::except($this->config(), ['type', 'min', 'max', 'left_label', 'center_label', 'right_label']),
+            'low_label' => $this->config('low_label'),
+            'middle_label' => $this->config('middle_label'),
+            'high_label' => $this->config('high_label'),
+            ...Arr::except($this->config(), ['type', 'min', 'max', 'low_label', 'middle_label', 'high_label']),
         ];
     }
 
@@ -77,8 +75,8 @@ class OpinionScale extends FormFieldtype
                 'display' => __('How likely are you to recommend us?'),
                 'min' => 0,
                 'max' => 10,
-                'left_label' => __('Not likely'),
-                'right_label' => __('Very likely'),
+                'low_label' => __('Not likely'),
+                'high_label' => __('Very likely'),
             ],
             'value' => 8,
         ];

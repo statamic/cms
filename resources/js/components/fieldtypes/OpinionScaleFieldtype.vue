@@ -56,7 +56,7 @@ const selectedValue = computed(() => {
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 
 const hasLabels = computed(() => Boolean(
-    props.config.left_label || props.config.center_label || props.config.right_label,
+    props.config.low_label || props.config.middle_label || props.config.high_label,
 ));
 
 const ariaLabel = computed(() => props.config.display ? __(props.config.display) : __('Opinion scale'));
@@ -118,14 +118,14 @@ defineExpose({
             v-if="hasLabels"
             class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 text-xs text-gray-500 dark:text-gray-400"
         >
-            <span v-if="config.left_label" class="col-start-1 justify-self-start text-start">
-                {{ __(config.left_label) }}
+            <span v-if="config.low_label" class="col-start-1 justify-self-start text-start">
+                {{ __(config.low_label) }}
             </span>
-            <span v-if="config.center_label" class="col-start-2 justify-self-center text-center">
-                {{ __(config.center_label) }}
+            <span v-if="config.middle_label" class="col-start-2 justify-self-center text-center">
+                {{ __(config.middle_label) }}
             </span>
-            <span v-if="config.right_label" class="col-start-3 justify-self-end text-end">
-                {{ __(config.right_label) }}
+            <span v-if="config.high_label" class="col-start-3 justify-self-end text-end">
+                {{ __(config.high_label) }}
             </span>
         </div>
     </div>
