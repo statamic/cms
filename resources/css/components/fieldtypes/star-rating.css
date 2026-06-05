@@ -41,8 +41,8 @@
     }
 
     :where(.dark) & {
-        --_fill: #fcd34d;
-        --_empty: #4b5563;
+        /* --_fill: #fcd34d; */
+        --_empty: var(--color-gray-400);
     }
 
     &:disabled {
