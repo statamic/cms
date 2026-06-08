@@ -24,7 +24,7 @@ class FormFieldsController extends CpController
             'values' => 'array',
         ]);
 
-        $fieldtype = FormFieldtypeRepository::find($request->type);
+        $fieldtype = FormFieldtypeRepository::findForBuilder($request->type, $request->values ?? []);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -65,7 +65,7 @@ class FormFieldsController extends CpController
             'values' => 'required|array',
         ]);
 
-        $fieldtype = FormFieldtypeRepository::find($request->type);
+        $fieldtype = FormFieldtypeRepository::findForBuilder($request->type, $request->values ?? []);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 

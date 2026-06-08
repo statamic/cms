@@ -138,7 +138,7 @@ class FormFieldTransformer extends FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $formFieldtype->handle(),
+            'fieldtype' => static::fieldtypeHandle($formFieldtype, $mergedConfig),
             'icon' => $formFieldtype->icon(),
             'preview' => static::fieldtypePreview($formFieldtype),
         ];
@@ -159,10 +159,19 @@ class FormFieldTransformer extends FieldTransformer
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $config,
-            'fieldtype' => $formFieldtype->handle(),
+            'fieldtype' => static::fieldtypeHandle($formFieldtype, $config),
             'icon' => $formFieldtype->icon(),
             'preview' => static::fieldtypePreview($formFieldtype),
         ];
+    }
+
+    private static function fieldtypeHandle(FormFieldtype $formFieldtype, array $config): string
+    {
+        if ($formFieldtype instanceof Fallback) {
+            return $config['type'] ?? $formFieldtype->handle();
+        }
+
+        return $formFieldtype->handle();
     }
 
     private static function importFieldToVue($field): array
