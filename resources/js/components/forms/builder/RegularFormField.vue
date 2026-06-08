@@ -116,24 +116,29 @@ const previewKey = computed(() => {
                 @click.stop="$emit('remove')"
             />
         </div>
-        <div v-if="isInformationField" :class="{ 'opacity-60': field.config.hidden }">
-            <Label
-                v-if="fieldView === FieldView.Collapsed"
-                :class="['mb-0', { 'cursor-pointer': !isInspecting }]"
-            >
-                <Icon :name="field.icon" :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
-                <Icon
-                    v-if="field.config.if || field.config.unless"
-                    name="logic-tree"
-                    class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
-                    :aria-label="__('Logic attached')"
-                    v-tooltip="__('Logic attached')"
-                />
-                <span>{{ __(field.config.display) }}</span>
-                <Icon v-if="field.type === 'reference'" name="link" class="inline-block size-3! text-indigo-500 dark:text-indigo-400 mb-0.5 ms-2" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
-                <Icon v-if="field.config.hidden" name="eye-closed" class="inline-block size-3.5! text-gray-400 dark:text-gray-500 mb-0.5 ms-2" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
-            </Label>
-            <div v-else-if="field.preview" inert>
+        <Field
+            v-if="isInformationField && fieldView === FieldView.Collapsed"
+            :class="{ 'opacity-60': field.config.hidden }"
+        >
+            <template #label>
+                <Label :class="['mb-0', { 'cursor-pointer': !isInspecting }]">
+                    <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
+                    <Icon
+                        v-if="field.config.if || field.config.unless"
+                        data-logic-attached
+                        name="logic-tree"
+                        class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
+                        :aria-label="__('Logic attached')"
+                        v-tooltip="__('Logic attached')"
+                    />
+                    <span>{{ __(field.config.display) }}</span>
+                    <Icon v-if="field.type === 'reference'" name="link" class="inline-block size-3! text-indigo-500 dark:text-indigo-400 mb-0.5 ms-2" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
+                    <Icon v-if="field.config.hidden" name="eye-closed" class="inline-block size-3.5! text-gray-400 dark:text-gray-500 mb-0.5 ms-2" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
+                </Label>
+            </template>
+        </Field>
+        <div v-else-if="isInformationField" :class="{ 'opacity-60': field.config.hidden }">
+            <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
                     :key="previewKey"
