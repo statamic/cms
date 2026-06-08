@@ -2,9 +2,10 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Header, Icon, StatusIndicator } from '@ui';
+import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
+import LogicTree from './LogicTree.vue';
 import Head from '@/pages/layout/Head.vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { keys } from '@api';
@@ -22,6 +23,7 @@ const props = defineProps({
 
 const pages = ref(props.pages);
 const fields = ref(props.fields);
+const logicView = ref('list');
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
@@ -110,18 +112,34 @@ onUnmounted(() => {
                 <StatusIndicator status="published" />
                 {{ form.title }}
             </template>
+            <template #actions>
+                <ToggleGroup v-model="logicView" size="sm">
+                    <ToggleItem value="list" icon="layout-list" :label="__('List')" />
+                    <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
+                </ToggleGroup>
+            </template>
         </Header>
 
-        <PageLogic
-            v-if="pages.length > 1"
-            class="mb-6"
-            v-model:pages="pages"
-            :suggestable-fields
-            :fieldtypes
-        />
+        <template v-if="logicView === 'list'">
+            <PageLogic
+                v-if="pages.length > 1"
+                class="mb-6"
+                v-model:pages="pages"
+                :suggestable-fields
+                :fieldtypes
+            />
 
-        <FieldLogic
-            v-model:fields="fields"
+            <FieldLogic
+                v-model:fields="fields"
+                :suggestable-fields
+                :fieldtypes
+            />
+        </template>
+
+        <LogicTree
+            v-else
+            :pages
+            :fields
             :suggestable-fields
             :fieldtypes
         />
