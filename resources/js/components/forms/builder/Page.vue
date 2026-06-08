@@ -72,7 +72,7 @@ onMounted(() => {
         <div
             v-if="formsProInstalled"
             :id="`page-${page._id}`"
-            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-4 -mt-2"
+            class="mx-auto max-w-5xl max-[600px]:px-5 px-5.75 sm:px-6.25 mb-2 -mt-2"
             role="button"
             tabindex="0"
             :aria-label="page.display ? __(page.display) : placeholderTitle"
