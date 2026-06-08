@@ -8,7 +8,13 @@ defineProps({
 </script>
 
 <template>
-    <div class="rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-600 dark:text-gray-400">
-        {{ __('Tree view prototype') }}
-    </div>
+    <ul class="space-y-2">
+        <li
+            v-for="field in fields"
+            :key="field._id"
+            class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 dark:border-white/10 dark:bg-gray-900 dark:text-gray-100"
+        >
+            {{ field.display }}
+        </li>
+    </ul>
 </template>
