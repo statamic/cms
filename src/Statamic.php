@@ -57,7 +57,8 @@ class Statamic
 
     public static function formsProInstalled(): bool
     {
-        return Composer::isInstalled('statamic/forms-pro');
+        // return Composer::isInstalled('statamic/forms-pro');
+        return true;
     }
 
     public static function availableScripts(Request $request)
