@@ -21,6 +21,16 @@ const sections = computed(() => props.page.sections);
 const canDeleteSection = computed(() => sections.value.length > 1);
 const isLastPage = computed(() => pages.value.findIndex((p) => p._id === props.page._id) === pages.value.length - 1);
 
+const hasPageLogic = computed(() => {
+    return (props.page.rules ?? []).some((rule) => {
+        if (!rule.destination) {
+            return false;
+        }
+
+        return (rule.conditions ?? []).some((condition) => condition.field && condition.value);
+    });
+});
+
 const placeholderTitle = computed(() => {
     let pageIndex = pages.value.findIndex((p) => p._id === props.page._id);
 
@@ -74,7 +84,7 @@ onMounted(() => {
             <div class="flex items-center gap-4 cursor-pointer">
                 <div class="flex items-center gap-2 flex-1">
                     <div class="h-px min-w-0 flex-1 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
-                    <span v-if="page.rules" v-tooltip="__('Logic attached')">
+                    <span v-if="hasPageLogic" v-tooltip="__('Logic attached')">
                         <Icon data-logic-attached name="logic-tree" class="size-3.5! shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                     </span>
                 </div>
