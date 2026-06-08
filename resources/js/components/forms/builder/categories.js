@@ -17,7 +17,7 @@ export const categoryColorClasses = {
     purple: { dot: 'bg-purple-500', icon: 'text-purple-600 dark:text-purple-400' },
     pink: { dot: 'bg-pink-500', icon: 'text-pink-600 dark:text-pink-400' },
     orange: { dot: 'bg-orange-500', icon: 'text-orange-600 dark:text-orange-400' },
-    amber: { dot: 'bg-amber-500', icon: 'text-amber-600 dark:text-amber-400' },
+    amber: { dot: 'bg-green-500', icon: 'text-green-600 dark:text-green-400' },
     blue: { dot: 'bg-blue-500', icon: 'text-blue-600 dark:text-blue-400' },
     teal: { dot: 'bg-teal-500', icon: 'text-teal-600 dark:text-teal-400' },
     fuchsia: { dot: 'bg-fuchsia-500', icon: 'text-fuchsia-600 dark:text-fuchsia-400' },
