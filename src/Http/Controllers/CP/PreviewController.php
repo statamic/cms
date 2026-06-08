@@ -17,7 +17,7 @@ class PreviewController extends CpController
 
     public function edit(Request $request, $_, $data)
     {
-        $this->authorize('view', $data);
+        $this->authorize('update', $data);
 
         $fields = $data->blueprint()
             ->fields()
