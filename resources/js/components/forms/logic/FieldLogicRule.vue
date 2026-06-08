@@ -149,13 +149,12 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                                 <Badge
                                     v-else-if="part.type === 'operator'"
                                     pill
-                                    size="sm"
-                                    color="white"
-                                    class="px-1.5 font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                    class="inline-block px-1.5 font-medium lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                    style="text-box: trim-start text;"
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <span v-else-if="part.type === 'value'" class="font-mono text-[0.7rem] text-gray-900 dark:text-gray-100">{{ part.text }}</span>
+                                <span v-else-if="part.type === 'value'" class="font-mono text-[0.75rem] text-gray-900 dark:text-gray-100">{{ part.text }}</span>
                                 <span v-else-if="part.type === 'more'" class="text-gray-500 dark:text-gray-400 text-2xs">{{ part.text }}</span>
                             </template>
                         </template>
