@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.74.0 (2026-06-08)
+
+### What's fixed
+- Drop support for Laravel 10/11 [#14793](https://github.com/statamic/cms/issues/14793) by @jasonvarga
+- Fix permission for Live Preview [#14791](https://github.com/statamic/cms/issues/14791) by @jasonvarga
+
+
+
 ## 5.73.24 (2026-06-02)
 
 ### What's fixed
