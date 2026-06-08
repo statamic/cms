@@ -20,7 +20,7 @@ use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
-class Statamic //
+class Statamic
 {
     const CORE_SLUG = 'statamic';
     const PACKAGE = 'statamic/cms';
