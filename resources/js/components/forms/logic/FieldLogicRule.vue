@@ -10,7 +10,10 @@ import {
     Subheading,
 } from '@/components/ui';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
+import Converter from '@/components/field-conditions/Converter.js';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories.js';
+
+const converter = new Converter();
 
 const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:conditions']);
 
@@ -27,25 +30,20 @@ const props = defineProps({
 });
 
 const operatorLabels = {
-    '': __('equals'),
-    'equals': __('equals'),
-    'not': __('not'),
-    'not_equals': __('does not equal'),
-    'contains': __('contains'),
-    'not_contains': __('does not contain'),
-    'is_empty': __('is empty'),
-    'not_empty': __('is not empty'),
-    'starts_with': __('starts with'),
-    'ends_with': __('ends with'),
-    '==': __('equals'),
-    '!=': __('does not equal'),
-    '>': __('is greater than'),
-    '<': __('is less than'),
-    '>=': __('is at least'),
-    '<=': __('is at most'),
+    equals: __('Equals'),
+    not: __('Does not equal'),
+    contains: __('Contains'),
+    contains_any: __('Contains Any'),
+    '===': '===',
+    '!==': '!==',
+    '>': '>',
+    '>=': '>=',
+    '<': '<',
+    '<=': '<=',
+    custom: __('Custom'),
 };
 
-const getOperatorLabel = (operator) => operatorLabels[operator] || operator || __('equals');
+const getOperatorLabel = (operator) => operatorLabels[operator] ?? operator ?? __('Equals');
 const getFieldDisplay = (handle) => props.suggestableFields.find(field => field.handle === handle)?.config?.display || handle;
 
 const hasConditions = computed(() => props.conditions.if || props.conditions.unless || props.conditions.if_any || props.conditions.unless_any);
@@ -63,19 +61,7 @@ const previewParts = computed(() => {
 
     parts.push({ type: 'field', text: getFieldDisplay(fieldHandle) });
 
-    let operator = '';
-    let value = rawValue;
-
-    if (typeof rawValue === 'string') {
-        const operatorPrefixes = ['not ', 'contains ', 'is empty', 'not empty', 'starts_with ', 'ends_with '];
-        for (const prefix of operatorPrefixes) {
-            if (rawValue.toLowerCase().startsWith(prefix)) {
-                operator = prefix.trim();
-                value = rawValue.slice(prefix.length).trim();
-                break;
-            }
-        }
-    }
+    const { operator, value } = converter.splitRhs(fieldHandle, rawValue);
 
     parts.push({ type: 'operator', text: getOperatorLabel(operator) });
 
