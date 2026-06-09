@@ -51,7 +51,9 @@
         --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
 
-        --buffer-top-pull: 2rem;
+        --item-padding: 1rem;
+
+        --buffer-top-pull: calc(1rem + var(--item-padding));
         --buffer-left-pull: 1.5rem;
 
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
@@ -78,7 +80,7 @@
                 border: 1px solid var(--clr-lines);
                 display: flex;
                 align-items: center;
-                padding: 1rem 1.5rem;
+                padding: var(--item-padding) 1.5rem;
 
                 label {
                     flex: 1;
@@ -184,3 +186,4 @@
         }
     }
 }
+
