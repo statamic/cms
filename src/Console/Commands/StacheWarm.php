@@ -13,7 +13,7 @@ class StacheWarm extends Command
 {
     use HasExcludes, RunsInPlease;
 
-    protected $signature = 'statamic:stache:warm {--exclude=}';
+    protected $signature = 'statamic:stache:warm {--exclude= : Comma-separated list of store keys to exclude}';
 
     protected $description = 'Build the "Stache" cache';
 

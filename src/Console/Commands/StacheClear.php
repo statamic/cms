@@ -11,7 +11,7 @@ class StacheClear extends Command
 {
     use HasExcludes, RunsInPlease;
 
-    protected $signature = 'statamic:stache:clear {--exclude=}';
+    protected $signature = 'statamic:stache:clear {--exclude= : Comma-separated list of store keys to exclude}';
 
     protected $description = 'Clear the "Stache" cache';
 

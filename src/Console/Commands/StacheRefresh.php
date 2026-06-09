@@ -13,7 +13,7 @@ class StacheRefresh extends Command
 {
     use HasExcludes, RunsInPlease;
 
-    protected $signature = 'statamic:stache:refresh {--exclude=}';
+    protected $signature = 'statamic:stache:refresh {--exclude= : Comma-separated list of store keys to exclude}';
 
     protected $description = 'Clear and rebuild the "Stache" cache';
 
