@@ -41,7 +41,7 @@
     /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
     .linked-list {
         --join-stroke: 1px;
-        --join-line: var(--join-stroke) dashed var(--color-blue-400);
+        --join-line: var(--join-stroke) solid var(--color-blue-400);
         --join-radius: 20px;
         --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
@@ -165,7 +165,7 @@
         &::after {
             /* display: none; */
             top: calc(anchor(center --checked-option) - var(--buffer-top-pull) - var(--join-stroke));
-            bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull) / 2 + var(--join-stroke) * 3);
+            bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull) / 2);
             width: calc(var(--buffer-left-pull) + var(--join-stroke) * 2);
             left: calc(anchor(right --checked-option) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
             border-inline-start: var(--join-line);
