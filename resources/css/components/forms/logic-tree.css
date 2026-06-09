@@ -93,10 +93,10 @@
 
             /* GROUP LOGIC TREE CONNECTORS / SOURCE ANCHOR
             =================================================== */
-            &.items li:has(:checked) label {
+            /* li*/
+            .linked-list__linked {
                 anchor-name: --checked-option;
                 anchor-scope: --checked-option; /* one anchor per checked source */
-                border-color: var(--checkbox-checked-border-color);
 
                 /* GROUP LOGIC TREE CONNECTORS / CONNECTOR BASE
                 =================================================== */
