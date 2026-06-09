@@ -3,39 +3,44 @@
 /*
     URL: /cp/forms/{handle}/logic (Tree view)
 
-    Connects checked source fields (left column) to the selected destination
-    (right column) using CSS anchor positioning. Inspired by:
-    https://codepen.io/cbolson/pen/emzegWP
+    Connects source fields to destination page headers using CSS anchor
+    positioning. Inspired by: https://codepen.io/cbolson/pen/emzegWP
 
-    Anatomy (source above target, data-relation="-1"):
+    Markup (LogicTree.vue):
 
-        [source]────┐
-                    │ ::before  — source leg (horizontal out + vertical down)
-                    │
-                    └──────┐ ::after   — destination leg (horizontal in + corner)
+        - Each page column is a <ul>.
+        - Page headers: .linked-list__page-label with anchor-name: --page-N.
+        - Source fields: .linked-list__connector with --end-connection: --page-N, pointing at the target page’s anchor name.
+        - Multi-column hops: add .linked-list__page-leap on the source <li> and a .linked-list__extra-leap-connector child for the bridge segment. This helps separate multi-column connectors from adjacent pages.
+
+    Direct leap anatomy (source below destination page header):
+
+        [destination page header]
+                           ┌────── ::after — gap midpoint → destination corner
                            │
-                      [destination]
+        [source]───────────┘ ::before — source centre → gap midpoint
 
-    Each connector is two pseudo-elements on the source label:
+    Each direct connector is two pseudo-elements on .linked-list__connector:
 
-        ::before  —  left half of the gap + vertical leg from the source
-        ::after   —  right half of the gap + rounded corner at the destination
+        ::before — vertical leg from source centre up toward the destination,
+                   plus the left half of the inter-column gap
+        ::after  — right half of the gap + rounded corner at the destination
 
+    Page leaps (.linked-list__page-leap + .linked-list__extra-leap-connector):
 
+        ::before on .linked-list__extra-leap-connector — stub out from the
+                   source and along the first gap
+        ::after  on .linked-list__extra-leap-connector — corner into the
+                   second column
+        ::before on .linked-list__connector — vertical leg from the buffer
+                   rail down to the destination page header
 
+    Anchors:
 
-
-
-    How it works
-
-    - A checkbox in .items is checked → the parent li matches :has(:checked).
-    - The label inside that li gets anchor-name: --checked-option.
-    - Connector pseudo-elements on that same label reference it with anchor(right --checked-option), anchor(center --checked-option), etc.
-    - anchor-scope: --checked-option scopes the anchor so each checked row gets its own connector (they don’t all fight over one anchor).
-
-    Pairing
-
-    The destination anchor is set separately on the page radio row:
+        --start-connection — set on each .linked-list__connector <li> (the source)
+        var(--end-connection) — anchor name of the target page header, declared in
+                             markup as --end-connection: --page-N on the source <li>
+        anchor-scope: --start-connection — keeps each source’s connector isolated
 */
 @layer components {
     /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
@@ -47,7 +52,7 @@
         --clr-lines: rgba(0 0 0 / 0.25);
 
         --buffer-top-pull: 2rem;
-        --buffer-left-pull: 1rem;
+        --buffer-left-pull: 1.5rem;
 
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
         =================================================== */
@@ -96,16 +101,15 @@
                 }
             }
 
-            /* GROUP LOGIC TREE CONNECTORS / SOURCE ANCHOR
+            /* GROUP LOGIC TREE CONNECTORS / SOURCE
             =================================================== */
             .linked-list__connector {
-                anchor-name: --checked-option;
-                anchor-scope: --checked-option; /* one anchor per checked source */
+                anchor-name: --start-connection;
+                anchor-scope: --start-connection; /* one anchor per source row */
 
-                /* GROUP LOGIC TREE CONNECTORS / CONNECTOR BASE
+                /* GROUP LOGIC TREE CONNECTORS / DIRECT LEAP
                 =================================================== */
-                /* Shared by all relations — sets the horizontal width of both legs.
-                   ::before spans source right edge → gap midpoint.
+                /* ::before spans source right edge → gap midpoint.
                    ::after  spans gap midpoint → destination left edge. */
                 &::before,
                 &::after {
@@ -113,13 +117,13 @@
                     position: absolute;
                     pointer-events: none;
                     border: var(--join-line);
-                    right: calc(anchor(left var(--destination)) + var(--gap) / 2);
-                    left: anchor(right --checked-option);
+                    right: calc(anchor(left var(--end-connection)) + var(--gap) / 2);
+                    left: anchor(right --start-connection);
                 }
 
                 &::before {
-                    top: anchor(bottom var(--destination));
-                    bottom: anchor(center --checked-option);
+                    top: anchor(bottom var(--end-connection));
+                    bottom: anchor(center --start-connection);
                     border-left-color: transparent;
                     border-top-color: transparent;
                     border-radius: 0 0 var(--join-radius) 0;
@@ -127,23 +131,29 @@
 
                 &::after {
                     top: auto;
-                    right: anchor(left var(--destination));
-                    bottom: calc(anchor(bottom var(--destination)) - var(--join-stroke));
-                    left: calc(anchor(left var(--destination)) - var(--gap) / 2 - var(--join-stroke));
+                    right: anchor(left var(--end-connection));
+                    bottom: calc(anchor(bottom var(--end-connection)) - var(--join-stroke));
+                    left: calc(anchor(left var(--end-connection)) - var(--gap) / 2 - var(--join-stroke));
                     height: var(--join-radius);
                     border-right-color: transparent;
                     border-bottom-color: transparent;
                     border-radius: var(--join-radius) 0 0 0;
                 }
             }
+            /* GROUP LOGIC TREE CONNECTORS / PAGE LEAP (SOURCE → NON-ADJACENT PAGE)
+            =================================================== */
+            /* Overrides the direct-hop ::before to terminate at the buffer rail instead of the source centre, leaving room for the bridge element. */
             .linked-list__page-leap {
                 &::before {
-                    bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull));
-                    left: calc(anchor(right --checked-option) + var(--gap));
+                    bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull));
+                    left: calc(anchor(right --start-connection) + var(--gap));
                 }
             }
         }
     }
+
+    /* GROUP LOGIC TREE CONNECTORS / LEAP BRIDGE (FIRST GAP + CORNER)
+    =================================================== */
     .linked-list__extra-leap-connector {
         &::before,
         &::after {
@@ -153,9 +163,9 @@
         }
 
         &::before {
-            top: calc(anchor(top --checked-option) + var(--buffer-top-pull) / 2 - var(--join-stroke) * 4);
-            bottom: anchor(center --checked-option);
-            left: anchor(right --checked-option);
+            top: calc(anchor(top --start-connection) + var(--buffer-top-pull) / 2 - var(--join-stroke) * 4);
+            bottom: anchor(center --start-connection);
+            left: anchor(right --start-connection);
             width: calc(var(--gap) - var(--buffer-left-pull));
             border-block-end: var(--join-line);
             border-inline-end: var(--join-line);
@@ -164,10 +174,10 @@
 
         &::after {
             /* display: none; */
-            top: calc(anchor(center --checked-option) - var(--buffer-top-pull) - var(--join-stroke));
-            bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull) / 2);
+            top: calc(anchor(center --start-connection) - var(--buffer-top-pull) - var(--join-stroke));
+            bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull) / 2);
             width: calc(var(--buffer-left-pull) + var(--join-stroke) * 2);
-            left: calc(anchor(right --checked-option) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
+            left: calc(anchor(right --start-connection) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
             border-inline-start: var(--join-line);
             border-block-start: var(--join-line);
             border-top-left-radius: var(--join-radius);
