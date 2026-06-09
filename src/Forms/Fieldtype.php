@@ -7,6 +7,7 @@ use Statamic\Data\DataCollection;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
@@ -89,6 +90,11 @@ class Fieldtype extends Relationship
         ];
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Facades\Form::find($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($form = Facades\Form::find($id)) {
@@ -104,7 +110,9 @@ class Fieldtype extends Relationship
     public function getIndexItems($request)
     {
         $query = (new ItemQueryBuilder())
-            ->withItems(new DataCollection(Facades\Form::all()));
+            ->withItems(new DataCollection(
+                Facades\Form::all()->filter(fn ($form) => User::current()->can('view', $form))
+            ));
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');

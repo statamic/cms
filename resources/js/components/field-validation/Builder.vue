@@ -34,6 +34,7 @@
                 multiple
                 searchable
                 taggable
+                paste-delimiter="|"
                 close-on-select
                 :model-value="rules"
                 @selected="add($event)"
