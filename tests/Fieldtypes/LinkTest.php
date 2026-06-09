@@ -356,6 +356,23 @@ class LinkTest extends TestCase
     }
 
     #[Test]
+    public function it_preloads_null_initial_option_when_default_option_unavailable_and_not_required()
+    {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
+
+        $field = new Field('test', [
+            'type' => 'link',
+            'default_option' => 'asset',
+        ]);
+
+        $field->setValue(null);
+        $fieldtype = (new Link)->setField($field);
+
+        $this->assertNull($fieldtype->preload()['initialOption']);
+    }
+
+    #[Test]
     public function it_preloads_the_values_initial_option_when_set()
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
