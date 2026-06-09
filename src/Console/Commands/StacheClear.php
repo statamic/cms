@@ -3,13 +3,13 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Concerns\HasExcludes;
+use Statamic\Console\Commands\Concerns\HasStacheExcludes;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
 
 class StacheClear extends Command
 {
-    use HasExcludes, RunsInPlease;
+    use HasStacheExcludes, RunsInPlease;
 
     protected $signature = 'statamic:stache:clear {--exclude= : Comma-separated list of store keys to exclude}';
 

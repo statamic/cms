@@ -3,7 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Concerns\HasExcludes;
+use Statamic\Console\Commands\Concerns\HasStacheExcludes;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
 
@@ -11,7 +11,7 @@ use function Laravel\Prompts\spin;
 
 class StacheRefresh extends Command
 {
-    use HasExcludes, RunsInPlease;
+    use HasStacheExcludes, RunsInPlease;
 
     protected $signature = 'statamic:stache:refresh {--exclude= : Comma-separated list of store keys to exclude}';
 

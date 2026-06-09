@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands\Concerns;
 
 use Statamic\Facades\Stache;
 
-trait HasExcludes
+trait HasStacheExcludes
 {
     protected function addExcludes(?string $excludes = null): void
     {
