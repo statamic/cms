@@ -1,28 +1,3 @@
-<script setup>
-import { onMounted, ref } from 'vue';
-
-// https://codepen.io/cbolson/pen/emzegWP
-const root = ref(null);
-const REL = ['-1', '0', '1'];
-
-function updateRelations() {
-    const rootEl = root.value;
-    if (!rootEl) return;
-
-    const radioLi = rootEl.querySelector('.options li:has(input[type=radio]:checked)');
-    if (!radioLi) return;
-
-    const radioIndex = [...radioLi.parentElement.children].indexOf(radioLi);
-
-    rootEl.querySelectorAll('.items li:has(input[type=checkbox]:checked)').forEach((li) => {
-        const i = [...li.parentElement.children].indexOf(li);
-        li.dataset.relation = REL[Math.sign(i - radioIndex) + 1];
-    });
-}
-
-onMounted(updateRelations);
-</script>
-
 <template>
   <div id="linked-list" ref="root" class="linked-list" @change="updateRelations">
     <ul class="items">

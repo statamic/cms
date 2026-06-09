@@ -21,13 +21,6 @@
         ::before  —  left half of the gap + vertical leg from the source
         ::after   —  right half of the gap + rounded corner at the destination
 
-    JS (LogicTree.vue) sets data-relation on each source <li> by comparing
-    list index to the checked destination:
-
-        -1  source above destination
-         0  source level with destination (straight line, no ::after)
-         1  source below destination
-
 
 
 
@@ -120,83 +113,24 @@
                     left: anchor(right --checked-option);
                 }
 
-                &::after {
-                    right: anchor(left var(--destination));
-                    left: calc(anchor(left var(--destination)) - var(--gap) / 2 - var(--join-stroke));
-                }
-            }
-
-            /* GROUP LOGIC TREE CONNECTORS / RELATION -1 (SOURCE ABOVE)
-            =================================================== */
-            &.items li[data-relation="-1"]:has(:checked) label {
-                /* ::before — source leg: out from source centre, down to destination top */
                 &::before {
-                    border-left-color: transparent;
-                    border-bottom-color: transparent;
-                    border-radius: 0 var(--join-radius) 0 0;
-                    top: anchor(center --checked-option);
-                    bottom: anchor(top var(--destination));
-                }
-
-                /* ::after — destination corner: short segment + curve at destination top */
-                &::after {
-                    border-right-color: transparent;
-                    border-top-color: transparent;
-                    border-radius: 0 0 0 var(--join-radius);
-                    top: calc(anchor(top var(--destination)) - var(--join-stroke));
-                    height: var(--join-radius);
-                    bottom: auto;
-                }
-            }
-
-            /* GROUP LOGIC TREE CONNECTORS / RELATION 1 (SOURCE BELOW)
-            =================================================== */
-            &.items li[data-relation="1"]:has(:checked) label {
-                /* ::before — source leg: up from destination bottom, to source centre */
-                &::before {
+                    top: anchor(bottom var(--destination));
+                    bottom: anchor(center --checked-option);
                     border-left-color: transparent;
                     border-top-color: transparent;
                     border-radius: 0 0 var(--join-radius) 0;
-                    top: anchor(bottom var(--destination));
-                    bottom: anchor(center --checked-option);
                 }
 
-                /* ::after — destination corner: short segment + curve at destination bottom */
                 &::after {
+                    top: auto;
+                    right: anchor(left var(--destination));
+                    bottom: calc(anchor(bottom var(--destination)) - var(--join-stroke));
+                    left: calc(anchor(left var(--destination)) - var(--gap) / 2 - var(--join-stroke));
+                    height: var(--join-radius);
                     border-right-color: transparent;
                     border-bottom-color: transparent;
                     border-radius: var(--join-radius) 0 0 0;
-                    top: auto;
-                    bottom: calc(anchor(bottom var(--destination)) - var(--join-stroke));
-                    height: var(--join-radius);
                 }
-            }
-
-            /* GROUP LOGIC TREE CONNECTORS / RELATION 0 (SOURCE LEVEL)
-            =================================================== */
-            &.items li[data-relation="0"]:has(:checked) label {
-                /* ::before only — straight horizontal line between row centres */
-                &::before {
-                    border-top-color: transparent;
-                    border-right-color: transparent;
-                    border-left-color: transparent;
-                    border-radius: 0;
-                    top: calc(anchor(center var(--destination)) - var(--join-stroke));
-                    bottom: calc(anchor(center --checked-option) + var(--join-stroke));
-                    right: anchor(left var(--destination));
-                    left: anchor(right --checked-option);
-                }
-
-                &::after {
-                    display: none;
-                }
-            }
-
-            /* GROUP LOGIC TREE CONNECTORS / DESTINATION ANCHOR (PAGE RADIO)
-            =================================================== */
-            &.options li.linked-list__page-label:has(input[type=radio]:checked) {
-                anchor-name: var(--destination);
-                border-color: var(--radio-checked-border-color);
             }
         }
     }
