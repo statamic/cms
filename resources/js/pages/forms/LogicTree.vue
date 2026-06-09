@@ -27,7 +27,7 @@ onMounted(updateRelations);
   <div id="linked-list" ref="root" class="linked-list" @change="updateRelations">
     <ul class="items">
       <li class="linked-list__page-label">{{ __('Page :number', { number: 1 }) }}</li>
-      <li>
+      <li style="--destination: --page-2;">
         <label for="logic-tree-item-1">
           <input id="logic-tree-item-1" type="checkbox" class="cb" value="1" checked>
           Item 1
@@ -39,13 +39,13 @@ onMounted(updateRelations);
           Item 2
         </label>
       </li>
-      <li>
+      <li style="--destination: --page-2;">
         <label for="logic-tree-item-3">
           <input id="logic-tree-item-3" type="checkbox" class="cb" value="3" checked>
           Item 3
         </label>
       </li>
-      <li>
+      <li style="--destination: --page-2;">
         <label for="logic-tree-item-4">
           <input id="logic-tree-item-4" type="checkbox" class="cb" value="4" checked>
           Item 4
@@ -54,7 +54,7 @@ onMounted(updateRelations);
     </ul>
 
     <ul class="options" role="radiogroup" :aria-label="__('Destination page')">
-      <li class="linked-list__page-label">
+      <li class="linked-list__page-label" style="anchor-name: --page-2;">
         <label for="logic-tree-page-2">
           <input id="logic-tree-page-2" type="radio" name="logic-tree-destination" class="rb" value="2" checked>
           {{ __('Page :number', { number: 2 }) }}
@@ -103,5 +103,7 @@ onMounted(updateRelations);
         </label>
       </li>
     </ul>
+
+    
   </div>
 </template>

@@ -27,6 +27,22 @@
         -1  source above destination
          0  source level with destination (straight line, no ::after)
          1  source below destination
+
+
+
+
+
+
+    How it works
+
+    - A checkbox in .items is checked → the parent li matches :has(:checked).
+    - The label inside that li gets anchor-name: --checked-option.
+    - Connector pseudo-elements on that same label reference it with anchor(right --checked-option), anchor(center --checked-option), etc.
+    - anchor-scope: --checked-option scopes the anchor so each checked row gets its own connector (they don’t all fight over one anchor).
+
+    Pairing
+
+    The destination anchor is set separately on the page radio row:
 */
 @layer components {
     /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
@@ -36,7 +52,7 @@
         --join-stroke: 1px;
         --join-line: var(--join-stroke) dashed var(--color-blue-400);
         --join-radius: 15px;
-        --gap: 10vw;
+        --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
 
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
@@ -44,8 +60,8 @@
         position: relative;
         display: grid;
         align-items: start;
-        grid-template-columns: 1fr 1fr;
-        width: min(100%, 800px);
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        /* width: min(100%, 800px); */
         gap: var(--gap);
 
         :where(.dark) & {
@@ -100,13 +116,13 @@
                     position: absolute;
                     pointer-events: none;
                     border: var(--join-line);
-                    right: calc(anchor(left --radio-option) + var(--gap) / 2);
+                    right: calc(anchor(left var(--destination)) + var(--gap) / 2);
                     left: anchor(right --checked-option);
                 }
 
                 &::after {
-                    right: anchor(left --radio-option);
-                    left: calc(anchor(left --radio-option) - var(--gap) / 2 - var(--join-stroke));
+                    right: anchor(left var(--destination));
+                    left: calc(anchor(left var(--destination)) - var(--gap) / 2 - var(--join-stroke));
                 }
             }
 
@@ -119,7 +135,7 @@
                     border-bottom-color: transparent;
                     border-radius: 0 var(--join-radius) 0 0;
                     top: anchor(center --checked-option);
-                    bottom: anchor(top --radio-option);
+                    bottom: anchor(top var(--destination));
                 }
 
                 /* ::after — destination corner: short segment + curve at destination top */
@@ -127,7 +143,7 @@
                     border-right-color: transparent;
                     border-top-color: transparent;
                     border-radius: 0 0 0 var(--join-radius);
-                    top: calc(anchor(top --radio-option) - var(--join-stroke));
+                    top: calc(anchor(top var(--destination)) - var(--join-stroke));
                     height: var(--join-radius);
                     bottom: auto;
                 }
@@ -141,7 +157,7 @@
                     border-left-color: transparent;
                     border-top-color: transparent;
                     border-radius: 0 0 var(--join-radius) 0;
-                    top: anchor(bottom --radio-option);
+                    top: anchor(bottom var(--destination));
                     bottom: anchor(center --checked-option);
                 }
 
@@ -151,7 +167,7 @@
                     border-bottom-color: transparent;
                     border-radius: var(--join-radius) 0 0 0;
                     top: auto;
-                    bottom: calc(anchor(bottom --radio-option) - var(--join-stroke));
+                    bottom: calc(anchor(bottom var(--destination)) - var(--join-stroke));
                     height: var(--join-radius);
                 }
             }
@@ -165,9 +181,9 @@
                     border-right-color: transparent;
                     border-left-color: transparent;
                     border-radius: 0;
-                    top: calc(anchor(center --radio-option) - var(--join-stroke));
+                    top: calc(anchor(center var(--destination)) - var(--join-stroke));
                     bottom: calc(anchor(center --checked-option) + var(--join-stroke));
-                    right: anchor(left --radio-option);
+                    right: anchor(left var(--destination));
                     left: anchor(right --checked-option);
                 }
 
@@ -179,7 +195,7 @@
             /* GROUP LOGIC TREE CONNECTORS / DESTINATION ANCHOR (PAGE RADIO)
             =================================================== */
             &.options li.linked-list__page-label:has(input[type=radio]:checked) {
-                anchor-name: --radio-option;
+                anchor-name: var(--destination);
                 border-color: var(--radio-checked-border-color);
             }
         }
