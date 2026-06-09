@@ -1,0 +1,125 @@
+/* https://codepen.io/cbolson/pen/emzegWP */
+.linked-list {
+    --checkbox-checked-border-color: var(--color-blue-400);
+    --radio-checked-border-color: var(--color-blue-400);
+    --join-stroke: 1px;
+    --join-line: var(--join-stroke) dashed var(--color-blue-400);
+    --join-radius: 25px;
+    --gap: 10vw;
+    --clr-lines: rgba(0 0 0 / 0.25);
+
+    position: relative;
+    display: grid;
+    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    width: min(100%, 800px);
+    gap: var(--gap);
+
+    :where(.dark) & {
+        --clr-lines: rgba(255 255 255 / 0.25);
+    }
+
+    .list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.5rem;
+
+        & > li {
+            border: 1px solid var(--clr-lines);
+            display: flex;
+            align-items: center;
+
+            & > label {
+                flex: 1;
+                padding: 0.5rem;
+                cursor: pointer;
+            }
+        }
+
+        &.items li:has(:checked) label {
+            anchor-name: --checked-option;
+            anchor-scope: --checked-option;
+            border-color: var(--checkbox-checked-border-color);
+
+            &::before,
+            &::after {
+                content: '';
+                position: absolute;
+                pointer-events: none;
+                border: var(--join-line);
+                right: calc(anchor(left --radio-option) + var(--gap) / 2);
+                left: anchor(right --checked-option);
+            }
+
+            &::after {
+                right: anchor(left --radio-option);
+                left: calc(anchor(left --radio-option) - var(--gap) / 2 - var(--join-stroke));
+            }
+        }
+
+        /* source above target */
+        &.items li[data-relation="-1"]:has(:checked) label {
+            &::before {
+                border-left-color: transparent;
+                border-bottom-color: transparent;
+                border-radius: 0 var(--join-radius) 0 0;
+                top: anchor(center --checked-option);
+                bottom: anchor(top --radio-option);
+            }
+
+            &::after {
+                border-right-color: transparent;
+                border-top-color: transparent;
+                border-radius: 0 0 0 var(--join-radius);
+                top: calc(anchor(top --radio-option) - var(--join-stroke));
+                height: var(--join-radius);
+                bottom: auto;
+            }
+        }
+
+        /* source below target */
+        &.items li[data-relation="1"]:has(:checked) label {
+            &::before {
+                border-left-color: transparent;
+                border-top-color: transparent;
+                border-radius: 0 0 var(--join-radius) 0;
+                top: anchor(bottom --radio-option);
+                bottom: anchor(center --checked-option);
+            }
+
+            &::after {
+                border-right-color: transparent;
+                border-bottom-color: transparent;
+                border-radius: var(--join-radius) 0 0 0;
+                top: auto;
+                bottom: calc(anchor(bottom --radio-option) - var(--join-stroke));
+                height: var(--join-radius);
+            }
+        }
+
+        /* source level with target */
+        &.items li[data-relation="0"]:has(:checked) label {
+            &::before {
+                border-top-color: transparent;
+                border-right-color: transparent;
+                border-left-color: transparent;
+                border-radius: 0;
+                top: calc(anchor(center --radio-option) - var(--join-stroke));
+                bottom: calc(anchor(center --checked-option) + var(--join-stroke));
+                right: anchor(left --radio-option);
+                left: anchor(right --checked-option);
+            }
+
+            &::after {
+                display: none;
+            }
+        }
+
+        &.options li:has(:checked) {
+            anchor-name: --radio-option;
+            border-color: var(--radio-checked-border-color);
+        }
+    }
+}
