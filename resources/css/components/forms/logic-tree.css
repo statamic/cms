@@ -40,8 +40,6 @@
 @layer components {
     /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
     .linked-list {
-        --checkbox-checked-border-color: var(--color-blue-400);
-        --radio-checked-border-color: var(--color-blue-400);
         --join-stroke: 1px;
         --join-line: var(--join-stroke) dashed var(--color-blue-400);
         --join-radius: 15px;
@@ -68,19 +66,20 @@
             display: grid;
             gap: 0.5rem;
 
-            & > li {
+            li {
                 border: 1px solid var(--clr-lines);
                 display: flex;
                 align-items: center;
+                padding: 1rem 1.5rem;
 
-                & > label {
+                label {
                     flex: 1;
                     padding: 0.5rem;
                     cursor: pointer;
                 }
             }
 
-            & > li.linked-list__page-label {
+            .linked-list__page-label {
                 font-size: 0.875rem;
                 font-weight: 500;
                 color: light-dark(var(--color-gray-700, #374151), var(--color-gray-200, #e5e7eb));
@@ -115,7 +114,7 @@
 
                 &::before {
                     top: anchor(bottom var(--destination));
-                    bottom: anchor(center --checked-option);
+                    bottom: calc(anchor(center --checked-option) + 1.5rem);
                     border-left-color: transparent;
                     border-top-color: transparent;
                     border-radius: 0 0 var(--join-radius) 0;
@@ -130,6 +129,11 @@
                     border-right-color: transparent;
                     border-bottom-color: transparent;
                     border-radius: var(--join-radius) 0 0 0;
+                }
+            }
+            .linked-list__linked--neighbor {
+                &::before {
+                    bottom: anchor(center --checked-option);
                 }
             }
         }

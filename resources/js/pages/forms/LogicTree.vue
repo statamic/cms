@@ -1,19 +1,19 @@
 <template>
     <div class="linked-list">
         <ul>
-            <li class="linked-list__page-label">
+            <li class="linked-list__page-label" style="anchor-name: --page-1;">
                 {{ __('Page :number', { number: 1 }) }}
             </li>
-            <li class="linked-list__linked" style="--destination: --page-2;">
+            <li class="linked-list__linked linked-list__linked--neighbor" style="--destination: --page-2;">
                 Item 1
             </li>
-            <li>
+            <li class="linked-list__linked" style="--destination: --page-3;">
                 Item 2
             </li>
             <li class="linked-list__linked" style="--destination: --page-3;">
                 Item 3
             </li>
-            <li class="linked-list__linked" style="--destination: --page-2;">
+            <li class="linked-list__linked linked-list__linked--neighbor" style="--destination: --page-2;">
                 Item 4
             </li>
         </ul>
