@@ -1,5 +1,13 @@
 # Release Notes
 
+## 6.20.3 (2026-06-08)
+
+### What's fixed
+- Trigger the grid table mode at lower viewports because it's more useful [#14792](https://github.com/statamic/cms/issues/14792) by @jaygeorge
+- Fix permission for Live Preview [#14791](https://github.com/statamic/cms/issues/14791) by @jasonvarga
+
+
+
 ## 6.20.2 (2026-06-05)
 
 ### What's fixed
