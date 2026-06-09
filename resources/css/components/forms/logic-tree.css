@@ -137,37 +137,40 @@
             .linked-list__linked--leap {
                 &::before {
                     bottom: calc(anchor(center --checked-option) + var(--buffer-h));
-                    right: calc(anchor(left var(--destination)) + var(--gap) / 2);
-                    left: calc(anchor(right --checked-option) + var(--gap) * 2 - var(--buffer-offset) * 2 - var(--join-stroke));
+                    left: calc(anchor(right --checked-option) + var(--gap));
                 }
             }
         }
     }
     .linked-list__connector-buffer {
-        --corner-h: 12px;
-        anchor-name: --checked-option;
-        position: absolute;
-        pointer-events: none;
-        top: calc(anchor(center --checked-option) - var(--buffer-h) + var(--corner-h));
-        left: anchor(right --checked-option);
-        width: calc(var(--gap) - var(--buffer-offset));
-        height: calc(var(--buffer-h) - var(--corner-h));
-        border-block-end: var(--join-line);
-        border-inline-end: var(--join-line);
-        border-bottom-right-radius: var(--join-radius);
+        --corner-h: 18px;
 
-        &::before {
+        &::before,
+        &::after {
             content: '';
             position: absolute;
-            top: calc(0% - var(--join-stroke) - var(--corner-h));
+            pointer-events: none;
+        }
+
+        &::before {
+            top: calc(anchor(center --checked-option) - var(--buffer-h) + var(--corner-h));
             left: anchor(right --checked-option);
-            right: calc(0% - var(--gap) + var(--buffer-offset));
             width: calc(var(--gap) - var(--buffer-offset));
-            height: var(--buffer-h);
-            height: calc(var(--buffer-h) - 21px);
-            border-block-start: var(--join-line);
+            height: calc(var(--buffer-h) - var(--corner-h));
+            border-block-end: var(--join-line);
+            border-inline-end: var(--join-line);
+            border-bottom-right-radius: var(--join-radius);
+        }
+
+        &::after {
+            --join-height: 1rem;
+            bottom: calc(anchor(center --checked-option) + var(--join-height));
+            width: var(--buffer-offset);
+            height: var(--join-height);
+            left: calc(anchor(right --checked-option) + var(--gap) - var(--buffer-offset));
             border-inline-start: var(--join-line);
-            border-start-start-radius: var(--join-radius);
+            border-block-start: var(--join-line);
+            border-top-left-radius: var(--join-radius);
         }
     }
 }
