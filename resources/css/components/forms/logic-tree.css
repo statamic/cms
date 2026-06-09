@@ -42,7 +42,7 @@
     .linked-list {
         --join-stroke: 1px;
         --join-line: var(--join-stroke) dashed var(--color-blue-400);
-        --join-radius: 15px;
+        --join-radius: 20px;
         --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
 
@@ -145,8 +145,6 @@
         }
     }
     .linked-list__extra-leap-connector {
-        --join-radius: 5px;
-
         &::before,
         &::after {
             content: '';
@@ -155,7 +153,7 @@
         }
 
         &::before {
-            top: calc(anchor(top --checked-option));
+            top: calc(anchor(top --checked-option) + var(--buffer-top-pull) / 2 - var(--join-stroke) * 4);
             bottom: anchor(center --checked-option);
             left: anchor(right --checked-option);
             width: calc(var(--gap) - var(--buffer-left-pull));
@@ -166,8 +164,9 @@
 
         &::after {
             /* display: none; */
-            bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull));
-            width: var(--buffer-left-pull);
+            top: calc(anchor(center --checked-option) - var(--buffer-top-pull) - var(--join-stroke));
+            bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull) / 2 + var(--join-stroke) * 3);
+            width: calc(var(--buffer-left-pull) + var(--join-stroke) * 2);
             left: calc(anchor(right --checked-option) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
             border-inline-start: var(--join-line);
             border-block-start: var(--join-line);
