@@ -91,11 +91,14 @@
                 &:not(:has(> label)) {
                     padding: 0.5rem;
                 }
+                &::after {
+                    content: unset;
+                }
             }
 
             /* GROUP LOGIC TREE CONNECTORS / SOURCE ANCHOR
             =================================================== */
-            li {
+            .linked-list__connector {
                 anchor-name: --checked-option;
                 anchor-scope: --checked-option; /* one anchor per checked source */
 
