@@ -11,11 +11,19 @@ class FileTokenRepository extends TokenRepository
 {
     public function make(?string $token, string $handler, array $data = []): TokenContract
     {
+        if ($token && ! $this->isValidTokenName($token)) {
+            throw new \InvalidArgumentException("Invalid token name [{$token}].");
+        }
+
         return app()->makeWith(TokenContract::class, compact('token', 'handler', 'data'));
     }
 
     public function find(string $token): ?TokenContract
     {
+        if (! $this->isValidTokenName($token)) {
+            return null;
+        }
+
         $path = storage_path('statamic/tokens/'.$token.'.yaml');
 
         if (! File::exists($path)) {
@@ -53,6 +61,11 @@ class FileTokenRepository extends TokenRepository
             ->map(fn ($path) => $this->makeFromPath($path))
             ->filter->hasExpired()
             ->each->delete();
+    }
+
+    private function isValidTokenName(string $token): bool
+    {
+        return (bool) preg_match('/^[A-Za-z0-9_-]+\z/', $token);
     }
 
     private function makeFromPath(string $path): FileToken

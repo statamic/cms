@@ -22,9 +22,12 @@ use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
+
+use function Statamic\trans as __;
 
 class EntriesController extends CpController
 {
@@ -55,7 +58,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(Statamic::cpPerPage(request('perPage')));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());

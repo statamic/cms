@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Width extends Fieldtype
 {
     use HasSelectOptions;

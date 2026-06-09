@@ -8,6 +8,8 @@ use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\Page;
 
+use function Statamic\trans as __;
+
 class NavigationPagesController extends CpController
 {
     /**

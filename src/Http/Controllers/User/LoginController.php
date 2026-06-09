@@ -13,6 +13,8 @@ use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
+use function Statamic\trans as __;
+
 class LoginController extends Controller
 {
     use HandlesLogins;

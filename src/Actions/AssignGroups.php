@@ -5,6 +5,8 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\UserGroup;
 
+use function Statamic\trans as __;
+
 class AssignGroups extends Action
 {
     public $icon = 'add-group';

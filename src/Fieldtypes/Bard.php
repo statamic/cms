@@ -26,6 +26,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 
+use function Statamic\trans as __;
+
 class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls, Hookable;
@@ -645,7 +647,7 @@ class Bard extends Replicator
             $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
                 return Collection::all()->reject(function ($collection) use ($site) {
                     return is_null($collection->route($site));
-                })->map->handle()->values();
+                })->map->handle()->values()->all();
             });
         }
 

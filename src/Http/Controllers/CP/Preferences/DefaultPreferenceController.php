@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Preference;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class DefaultPreferenceController extends CpController
 {
     use ManagesPreferences;

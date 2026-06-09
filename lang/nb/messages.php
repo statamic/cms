@@ -190,6 +190,7 @@ return [
     'publish_actions_publish' => 'Endringer i arbeidskopien brukes, og den publiseres umiddelbart.',
     'publish_actions_schedule' => 'Endringer i arbeidskopien brukes, og den publiseres på den valgte datoen.',
     'publish_actions_unpublish' => 'Den gjeldende revisjonen vil ikke bli publisert.',
+    'relationship_item_unavailable' => 'Dette elementet er ikke tilgjengelig. Det kan ha blitt slettet, eller du har kanskje ikke tilgang til å se det.',
     'reset_password_notification_body' => 'Du får denne e-posten fordi vi har mottatt en forespørsel om tilbakestilling av passordet som er tilknyttet kontoen din.',
     'reset_password_notification_no_action' => 'Hvis du ikke har sendt inn en forespørsel om tilbakestilling av passord, trenger du ikke å foreta deg noe.',
     'reset_password_notification_subject' => 'Varsel om tilbakestilling av passord',
