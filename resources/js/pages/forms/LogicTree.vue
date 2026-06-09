@@ -1,6 +1,6 @@
 <template>
     <div class="linked-list">
-        <ul class="items">
+        <ul>
             <li class="linked-list__page-label">
                 {{ __('Page :number', { number: 1 }) }}
             </li>
@@ -18,7 +18,7 @@
             </li>
         </ul>
         
-        <ul class="options" role="radiogroup" :aria-label="__('Destination page')">
+        <ul>
             <li class="linked-list__page-label" style="anchor-name: --page-2;">
                 {{ __('Page :number', { number: 2 }) }}
             </li>
