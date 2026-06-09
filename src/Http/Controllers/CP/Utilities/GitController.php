@@ -6,6 +6,8 @@ use Inertia\Inertia;
 use Statamic\Facades\Git;
 use Statamic\Http\Controllers\CP\CpController;
 
+use function Statamic\trans as __;
+
 class GitController extends CpController
 {
     public function index()

@@ -19,16 +19,20 @@
                     :alt="asset.basename"
                     v-if="thumbnail"
                 />
-                <file-icon :extension="asset.extension" v-else class="size-7" />
+                <file-icon :extension="asset.extension ?? 'generic'" v-else class="size-7" />
             </button>
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="min-w-0 flex-1 truncate text-start text-sm leading-5 text-gray-600 dark:text-gray-400"
-                :title="__('Edit')"
+                class="min-w-0 flex-1 truncate text-start text-sm leading-5"
+                :class="{
+                    'text-gray-600 dark:text-gray-300': !asset.invalid,
+                    'text-gray-500 dark:text-gray-400': asset.invalid
+                }"
+                :title="asset.invalid ? invalidLabel : __('Edit')"
                 :aria-label="__('Edit Asset')"
             >
-                {{ asset.basename }}
+                {{ label }}
             </button>
             <div v-if="readOnly" v-text="asset.size" class="asset-filesize hidden shrink-0 px-2 text-sm leading-5 text-gray-600 dark:text-gray-400 @xs:block" />
         </td>
@@ -53,9 +57,12 @@
                 />
 
                 <asset-editor
-                    v-if="editing"
-                    :id="asset.id"
+                    v-if="editingId"
+                    :id="editingId"
                     :allow-deleting="false"
+                    :show-navigation="siblings.length > 1"
+                    @previous="navigateToPrevious"
+                    @next="navigateToNext"
                     @closed="closeEditor"
                     @saved="assetSaved"
                     @action-completed="actionCompleted"

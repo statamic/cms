@@ -15,6 +15,8 @@ use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\GraphQL\Types\LinkValueType;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Link extends Fieldtype
 {
     use UpdatesReferences;

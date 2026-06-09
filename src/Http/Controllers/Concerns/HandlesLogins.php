@@ -11,6 +11,8 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\URL;
 
+use function Statamic\trans;
+
 trait HandlesLogins
 {
     use ThrottlesLogins;

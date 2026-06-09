@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => '作業コピーへの変更はエントリに適用され、すぐに公開されます。',
     'publish_actions_schedule' => '作業コピーへの変更がエントリに適用され、選択した日付に公開されるようになります。',
     'publish_actions_unpublish' => '現在のリビジョンは非公開になります。',
+    'relationship_item_unavailable' => 'この項目は利用できません。削除されたか、表示する権限がない可能性があります。',
     'reset_password_notification_body' => 'このメールは、アカウントのパスワード リセット リクエストを受け取ったためにお送りしています。',
     'reset_password_notification_no_action' => 'パスワードのリセットを要求していない場合は、それ以上のアクションは必要ありません。',
     'reset_password_notification_subject' => 'パスワードリセット通知',

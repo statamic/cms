@@ -213,6 +213,12 @@ test('it can set the default locale via setDefaultLocale', () => {
     expect(new DateFormatter().locale).toBe('de');
 });
 
+test('it normalizes underscored locales to BCP 47 format', () => {
+    DateFormatter.defaultLocale = 'pt_BR';
+    expect(DateFormatter.defaultLocale).toBe('pt-BR');
+    expect(new DateFormatter().locale).toBe('pt-BR');
+});
+
 test.each([
     ['en', 'date', '12/25/2021'],
     ['en', 'time', '12:13 PM'],

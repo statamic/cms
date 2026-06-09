@@ -22,7 +22,10 @@ use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class BrowserController extends CpController
 {
@@ -100,7 +103,7 @@ class BrowserController extends CpController
         $this->authorize('view', $container);
 
         $folder = $container->assetFolder($path);
-        $perPage = $request->perPage ?? config('statamic.cp.pagination_size');
+        $perPage = Statamic::cpPerPage($request->perPage) ?? config('statamic.cp.pagination_size');
         $page = Paginator::resolveCurrentPage();
 
         $folders = $folder->assetFolders();
@@ -204,7 +207,7 @@ class BrowserController extends CpController
             'folder' => $path,
         ]);
 
-        $assets = $query->paginate(request('perPage'));
+        $assets = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         if ($request->search && $container->hasSearchIndex()) {
             $assets->setCollection($assets->getCollection()->map->getSearchable());

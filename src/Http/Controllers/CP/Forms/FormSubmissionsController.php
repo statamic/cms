@@ -9,6 +9,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 
 class FormSubmissionsController extends CpController
 {
@@ -35,7 +36,7 @@ class FormSubmissionsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $submissions = $query->paginate(request('perPage'));
+        $submissions = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
         return (new Submissions($submissions))
             ->blueprint($form->blueprint())

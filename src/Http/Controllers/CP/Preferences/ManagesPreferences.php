@@ -12,6 +12,8 @@ use Statamic\Facades\User;
 use Statamic\Jobs\ReportThemeUsage;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 trait ManagesPreferences
 {
     protected function view(string $title, string $actionUrl, array $preferences)

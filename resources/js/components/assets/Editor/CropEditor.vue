@@ -38,14 +38,9 @@ const showConfirmation = ref(false);
 const uploading = ref(false);
 const pendingBlob = ref(null);
 const pendingMimeType = ref(null);
+const cropDimensions = ref(null);
 
-const aspectRatios = ref([
-    { label: '16:9', value: 16 / 9 },
-    { label: '4:3', value: 4 / 3 },
-    { label: '3:2', value: 3 / 2 },
-    { label: '2:1', value: 2 / 1 },
-    { label: '1:1', value: 1 },
-]);
+const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
 
 watch(() => props.open, (newValue) => {
     if (newValue) {
@@ -73,6 +68,7 @@ function resetState() {
     uploading.value = false;
     pendingBlob.value = null;
     pendingMimeType.value = null;
+    cropDimensions.value = null;
 }
 
 function destroyCropper() {
@@ -124,7 +120,15 @@ function createCropper(imageElement) {
         cropstart: onCropStart,
         cropmove: onCropMove,
         cropend: onCropEnd,
+        crop: onCrop,
     });
+}
+
+function onCrop(event) {
+    cropDimensions.value = {
+        width: Math.round(event.detail.width),
+        height: Math.round(event.detail.height),
+    };
 }
 
 function onCropStart() {
@@ -452,11 +456,18 @@ function close() {
                 <div class="h-full w-full min-h-0 flex items-center justify-center overflow-hidden">
                     <img ref="image" :src="asset.preview" :crossorigin="crossOrigin" :alt="__('Image to crop')" class="max-w-full max-h-full" @error="onImageError" />
                 </div>
+                <div
+                    v-if="cropDimensions"
+                    class="absolute top-5 end-5 z-10 rounded-md bg-gray-900/75 px-2 py-1 text-xs font-medium text-white tabular-nums pointer-events-none"
+                    :aria-label="__('Dimensions')"
+                    v-text="__('messages.width_x_height', { width: cropDimensions.width, height: cropDimensions.height })"
+                />
+
             </div>
 
             <!-- Footer -->
-            <div class="flex flex-wrap items-center justify-between gap-3 border-t dark:border-gray-700 px-4 py-3">
-                <div class="flex gap-3">
+            <div class="flex flex-wrap items-center gap-3 border-t dark:border-gray-700 px-4 py-3">
+                <div v-if="aspectRatios.length" class="flex gap-3">
                     <Select
                         clearable
                         v-model="selectedRatio"
@@ -467,6 +478,7 @@ function close() {
                         size="sm"
                         class="w-48"
                         :aria-label="__('Select aspect ratio')"
+                        adaptive-width
                         @update:modelValue="setAspectRatio"
                     />
                     <Button
@@ -480,7 +492,7 @@ function close() {
                         @click="toggleOrientation"
                     />
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3 ms-auto">
                     <Button variant="ghost" :text="__('Cancel')" :aria-label="__('Cancel cropping')" @click="close" />
                     <Button variant="ghost" :text="__('Reset')" :aria-label="__('Reset crop selection')" @click="reset" />
                     <Button variant="primary" :text="__('Finish')" :aria-label="__('Finish cropping')" :disabled="!cropper" @click="crop" />

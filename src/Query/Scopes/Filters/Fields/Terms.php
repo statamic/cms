@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Terms extends FieldtypeFilter
 {
     public function fieldItems()
@@ -68,7 +70,7 @@ class Terms extends FieldtypeFilter
 
     public function isComplete($values): bool
     {
-        $values = array_filter($values);
+        $values = Arr::removeNullValues($values);
 
         if (! $operator = Arr::get($values, 'operator')) {
             return false;

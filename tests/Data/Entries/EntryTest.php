@@ -1578,6 +1578,74 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_descendants_with_one_query_per_level_rather_than_one_per_localization()
+    {
+        $collection = (new Collection)->handle('pages')->save();
+
+        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+
+        // Three direct localizations, all leaves (no further descendants).
+        $fr = (new Entry)->id('b')->locale('fr')->origin('a')->collection($collection);
+        $de = (new Entry)->id('c')->locale('de')->origin('a')->collection($collection);
+        $es = (new Entry)->id('d')->locale('es')->origin('a')->collection($collection);
+
+        // A flat tree is one level deep, so it should take exactly two queries
+        // (the direct descendants, then a single batched lookup for the next
+        // level which comes back empty) regardless of how many localizations
+        // exist. The previous recursive implementation issued one query per
+        // node, i.e. O(number of localizations).
+        Facades\Entry::shouldReceive('query')->times(2)->andReturn(
+            $this->fakeDescendantsQuery(collect([$fr, $de, $es])),       // direct descendants of 'a'
+            $this->fakeDescendantsQuery(collect(), ['b', 'c', 'd']),     // batched lookup for the next level
+        );
+
+        $descendants = $entry->descendants();
+
+        $this->assertEquals(['de', 'es', 'fr'], $descendants->keys()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function it_includes_descendants_nested_via_an_origin_chain()
+    {
+        $collection = (new Collection)->handle('pages')->save();
+
+        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+
+        // de's origin is fr, whose origin is en: a grandchild only reachable by
+        // walking past the first level. The flattened result must include it.
+        $fr = (new Entry)->id('b')->locale('fr')->origin('a')->collection($collection);
+        $de = (new Entry)->id('c')->locale('de')->origin('b')->collection($collection);
+
+        Facades\Entry::shouldReceive('query')->times(3)->andReturn(
+            $this->fakeDescendantsQuery(collect([$fr])),         // direct descendants of en
+            $this->fakeDescendantsQuery(collect([$de]), ['b']),  // batched descendants of fr
+            $this->fakeDescendantsQuery(collect(), ['c']),       // batched descendants of de
+        );
+
+        $descendants = $entry->descendants();
+
+        $this->assertEquals(['de', 'fr'], $descendants->keys()->sort()->values()->all());
+        $this->assertSame($fr, $descendants->get('fr'));
+        $this->assertSame($de, $descendants->get('de'));
+    }
+
+    private function fakeDescendantsQuery($results, ?array $whereInOrigins = null): QueryBuilder
+    {
+        $query = Mockery::mock(QueryBuilder::class);
+        $query->shouldReceive('where')->with('collection', 'pages')->andReturnSelf();
+
+        if ($whereInOrigins === null) {
+            // directDescendants() uses where('origin', string); batched levels use whereIn.
+            $query->shouldReceive('where')->with('origin', Mockery::type('string'))->andReturnSelf();
+        }
+
+        $query->shouldReceive('whereIn')->with('origin', $whereInOrigins ?? Mockery::type('array'))->andReturnSelf();
+        $query->shouldReceive('get')->andReturn($results);
+
+        return $query;
+    }
+
+    #[Test]
     public function it_doesnt_fire_events_when_propagating_entry_and_saved_quietly()
     {
         Event::fake();
@@ -2046,6 +2114,35 @@ class EntryTest extends TestCase
         // entry level template overrides `@blueprint` on the collection
         $entry->template('articles.custom');
         $this->assertEquals('articles.custom', $entry->template());
+    }
+
+    #[Test]
+    public function it_respects_custom_blueprint_template_path_per_collection()
+    {
+        config(['statamic.system.blueprint_templates' => [
+            'articles' => 'custom.path',
+        ]]);
+
+        $articles = tap(Collection::make('articles')->template('@blueprint'))->save();
+        $pages = tap(Collection::make('pages')->template('@blueprint'))->save();
+        $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
+
+        $articleEntry = Entry::make('test')->collection($articles)->blueprint($blueprint->handle());
+        $pageEntry = Entry::make('test')->collection($pages)->blueprint($blueprint->handle());
+
+        // mapped collection uses the mapped prefix instead of the collection handle
+        $this->assertEquals('custom.path.standard_article', $articleEntry->template());
+
+        // unmapped collection still uses its handle as the prefix
+        $this->assertEquals('pages.standard_article', $pageEntry->template());
+
+        // mapped collection uses slugified prefix when that template exists
+        View::shouldReceive('exists')->with('custom.path.standard-article')->andReturn(true);
+        $this->assertEquals('custom.path.standard-article', $articleEntry->template());
+
+        // entry level template still overrides @blueprint
+        $articleEntry->template('articles.custom');
+        $this->assertEquals('articles.custom', $articleEntry->template());
     }
 
     #[Test]

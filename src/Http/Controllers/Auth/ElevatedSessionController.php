@@ -13,6 +13,8 @@ use Statamic\Facades\WebAuthn;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\Auth\ElevatedSessionConfirmationRequest;
 
+use function Statamic\trans as __;
+
 class ElevatedSessionController extends Controller
 {
     public function showForm(Request $request)

@@ -7,6 +7,9 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Exceptions\ValidationException;
 
+use function Statamic\trans;
+use function Statamic\trans as __;
+
 class ReuploadAsset extends Action
 {
     protected $icon = 'upload-cloud';
