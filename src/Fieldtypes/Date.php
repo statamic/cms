@@ -15,6 +15,8 @@ use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Rules\DateFieldtype as ValidationRule;
 use Statamic\Support\DateFormat;
 
+use function Statamic\trans as __;
+
 class Date extends Fieldtype
 {
     protected $categories = ['special'];

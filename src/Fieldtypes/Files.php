@@ -12,6 +12,8 @@ use Statamic\Fieldtypes\Assets\MinRule;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Files extends Fieldtype
 {
     protected $selectable = false;

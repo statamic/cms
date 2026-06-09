@@ -40,13 +40,6 @@ const submit = () => {
             processing.value = true;
             errors.value = {};
         },
-        onSuccess: (page) => {
-            if (page.component === 'auth/two-factor/Challenge') {
-                return;
-            }
-
-            window.location.href = page.url;
-        },
         onError: () => processing.value = false
     });
 }

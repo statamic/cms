@@ -7,6 +7,8 @@ use Inertia\Middleware;
 use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'statamic::layout';
@@ -26,7 +28,6 @@ class HandleInertiaRequests extends Middleware
         return array_filter([
             ...parent::share($request),
             '_statamic' => [
-                'version' => Statamic::version(),
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
                 'isCpRoute' => Statamic::isCpRoute(),

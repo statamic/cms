@@ -6,6 +6,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Video\Providers;
 use Statamic\Fieldtypes\Video\Video as VideoDetails;
 
+use function Statamic\trans as __;
+
 class Video extends Fieldtype
 {
     protected $categories = ['media'];

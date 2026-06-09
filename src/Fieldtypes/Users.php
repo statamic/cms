@@ -14,7 +14,10 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class Users extends Relationship
 {
@@ -99,6 +102,11 @@ class Users extends Relationship
         return parent::preProcess($data);
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(User::find($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($user = User::find($id)) {
@@ -117,6 +125,12 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
+        // Don't reveal existence to a user who can't view the listing; return an empty
+        // result set instead of throwing, matching the picker's filter-to-viewable behavior.
+        if (! User::current()->can('index', UserContract::class)) {
+            return collect();
+        }
+
         $query = User::query();
 
         if ($search = $request->search) {
@@ -167,7 +181,7 @@ class Users extends Relationship
         };
 
         if ($request->boolean('paginate', true)) {
-            $users = $query->paginate();
+            $users = $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15);
 
             $users->getCollection()->transform($userFields);
 
@@ -240,7 +254,11 @@ class Users extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        $ids = Arr::wrap($values);
+        $ids = collect(Arr::wrap($values))
+            ->map(fn ($id) => $id === 'current' ? User::current()?->id() : $id)
+            ->filter()
+            ->values()
+            ->all();
 
         $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
 

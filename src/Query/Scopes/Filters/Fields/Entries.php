@@ -6,6 +6,8 @@ use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Entries extends FieldtypeFilter
 {
     public function fieldItems()

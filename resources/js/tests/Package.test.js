@@ -208,6 +208,8 @@ it('exports ui', async () => {
         'Tabs',
         'Textarea',
         'TimePicker',
+        'TimezoneHoverCard',
+        'Timezones',
         'ToggleGroup',
         'ToggleItem',
         'registerIconSet',

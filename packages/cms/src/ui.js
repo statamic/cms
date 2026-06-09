@@ -117,6 +117,8 @@ export const {
     Text,
     Textarea,
     TimePicker,
+    TimezoneHoverCard,
+    Timezones,
     ToggleGroup,
     ToggleItem,
     Widget,

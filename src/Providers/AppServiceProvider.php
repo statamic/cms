@@ -28,6 +28,8 @@ use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\Scaffolding\TemplateGenerator;
 
+use function Statamic\trans as __;
+
 class AppServiceProvider extends ServiceProvider
 {
     protected $root = __DIR__.'/../..';
@@ -82,8 +84,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
+        $formsSource = config('statamic.templates.language', 'antlers') === 'blade'
+            ? "{$this->root}/resources/views/extend/forms/blade"
+            : "{$this->root}/resources/views/extend/forms/antlers";
+
         $this->publishes([
-            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
+            $formsSource => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
         $this->publishes([
@@ -351,7 +357,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return Carbon::createFromTimestamp($lastElevated)
-                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
+                ->addMinutes((float) config('statamic.users.elevated_session_duration', 15))
                 ->timestamp;
         });
 

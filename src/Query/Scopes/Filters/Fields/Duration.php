@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Illuminate\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 /**
  * Integer filter but with a "seconds" appended to the input for clarity
  */

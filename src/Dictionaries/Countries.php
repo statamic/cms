@@ -4,6 +4,8 @@ namespace Statamic\Dictionaries;
 
 use Illuminate\Support\Collection;
 
+use function Statamic\trans as __;
+
 class Countries extends BasicDictionary
 {
     protected string $valueKey = 'iso3';

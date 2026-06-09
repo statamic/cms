@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'A munkapéldány módosításai a bejegyzésre alkalmazódnak, és azonnal közzétételre kerülnek.',
     'publish_actions_schedule' => 'A munkapéldány módosításai a bejegyzésre alkalmazódnak, és a kiválasztott napon megjelennek.',
     'publish_actions_unpublish' => 'A jelenlegi revízió közzététele visszavonásra kerül.',
+    'relationship_item_unavailable' => 'Ez az elem nem érhető el. Lehet, hogy törölték, vagy nincs jogosultsága a megtekintéséhez.',
     'reset_password_notification_body' => 'Azért kapta ezt az e-mailt, mert jelszó-visszaállítási kérést kaptunk fiókjához.',
     'reset_password_notification_no_action' => 'Ha nem kérte a jelszó visszaállítását, nincs szükség további teendőkre.',
     'reset_password_notification_subject' => 'Jelszó-visszaállítási kérés',

@@ -37,6 +37,10 @@ use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
 
+use function Statamic\trans;
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
+
 class CoreModifiers extends Modifier
 {
     use ChecksDumpability {
@@ -1522,14 +1526,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
         if (is_array($value)) {
             return Arr::last($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->last();
         }
 
         return Stringy::last($value, Arr::get($params, 0));
