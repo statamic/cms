@@ -95,8 +95,7 @@
 
             /* GROUP LOGIC TREE CONNECTORS / SOURCE ANCHOR
             =================================================== */
-            /* li*/
-            .linked-list__linked {
+            li {
                 anchor-name: --checked-option;
                 anchor-scope: --checked-option; /* one anchor per checked source */
 
@@ -134,7 +133,7 @@
                     border-radius: var(--join-radius) 0 0 0;
                 }
             }
-            .linked-list__linked--leap {
+            .linked-list__page-leap {
                 &::before {
                     bottom: calc(anchor(center --checked-option) + var(--buffer-h));
                     left: calc(anchor(right --checked-option) + var(--gap));
@@ -142,7 +141,7 @@
             }
         }
     }
-    .linked-list__connector-buffer {
+    .linked-list__extra-leap-connector {
         --corner-h: 18px;
 
         &::before,

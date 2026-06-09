@@ -4,18 +4,18 @@
             <li class="linked-list__page-label" style="anchor-name: --page-1;">
                 {{ __('Page :number', { number: 1 }) }}
             </li>
-            <li class="linked-list__linked" style="--destination: --page-2;">
+            <li class="" style="--destination: --page-2;">
                 Item 1
             </li>
-            <li class="linked-list__linked linked-list__linked--leap" style="--destination: --page-3;">
-                <div class="linked-list__connector-buffer"></div>
+            <li class="linked-list__page-leap" style="--destination: --page-3;">
+                <div class="linked-list__extra-leap-connector"></div>
                 Item 2
             </li>
-            <li class="linked-list__linked linked-list__linked--leap" style="--destination: --page-3;">
-                <div class="linked-list__connector-buffer"></div>
+            <li class="linked-list__page-leap" style="--destination: --page-3;">
+                <div class="linked-list__extra-leap-connector"></div>
                 Item 3
             </li>
-            <li class="linked-list__linked" style="--destination: --page-2;">
+            <li class="" style="--destination: --page-2;">
                 Item 4
             </li>
         </ul>
