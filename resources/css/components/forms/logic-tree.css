@@ -46,8 +46,8 @@
         --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
 
-        --buffer-h: 2rem;
-        --buffer-offset: 1rem;
+        --buffer-top-pull: 2rem;
+        --buffer-left-pull: 1rem;
 
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
         =================================================== */
@@ -138,14 +138,14 @@
             }
             .linked-list__page-leap {
                 &::before {
-                    bottom: calc(anchor(center --checked-option) + var(--buffer-h));
+                    bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull));
                     left: calc(anchor(right --checked-option) + var(--gap));
                 }
             }
         }
     }
     .linked-list__extra-leap-connector {
-        --corner-h: 18px;
+        --join-radius: 5px;
 
         &::before,
         &::after {
@@ -155,21 +155,20 @@
         }
 
         &::before {
-            top: calc(anchor(center --checked-option) - var(--buffer-h) + var(--corner-h));
+            top: calc(anchor(top --checked-option));
+            bottom: anchor(center --checked-option);
             left: anchor(right --checked-option);
-            width: calc(var(--gap) - var(--buffer-offset));
-            height: calc(var(--buffer-h) - var(--corner-h));
+            width: calc(var(--gap) - var(--buffer-left-pull));
             border-block-end: var(--join-line);
             border-inline-end: var(--join-line);
             border-bottom-right-radius: var(--join-radius);
         }
 
         &::after {
-            --join-height: 1rem;
-            bottom: calc(anchor(center --checked-option) + var(--join-height));
-            width: var(--buffer-offset);
-            height: var(--join-height);
-            left: calc(anchor(right --checked-option) + var(--gap) - var(--buffer-offset));
+            /* display: none; */
+            bottom: calc(anchor(center --checked-option) + var(--buffer-top-pull));
+            width: var(--buffer-left-pull);
+            left: calc(anchor(right --checked-option) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
             border-inline-start: var(--join-line);
             border-block-start: var(--join-line);
             border-top-left-radius: var(--join-radius);
