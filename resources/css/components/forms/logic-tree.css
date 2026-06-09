@@ -71,6 +71,17 @@
                 }
             }
 
+            & > li.linked-list__page-label {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: light-dark(var(--color-gray-700, #374151), var(--color-gray-200, #e5e7eb));
+                background: light-dark(var(--color-gray-50, #f9fafb), var(--color-gray-900, #111827));
+
+                &:not(:has(> label)) {
+                    padding: 0.5rem;
+                }
+            }
+
             /* GROUP LOGIC TREE CONNECTORS / SOURCE ANCHOR
             =================================================== */
             &.items li:has(:checked) label {
@@ -165,9 +176,9 @@
                 }
             }
 
-            /* GROUP LOGIC TREE CONNECTORS / DESTINATION ANCHOR
+            /* GROUP LOGIC TREE CONNECTORS / DESTINATION ANCHOR (PAGE RADIO)
             =================================================== */
-            &.options li:has(:checked) {
+            &.options li.linked-list__page-label:has(input[type=radio]:checked) {
                 anchor-name: --radio-option;
                 border-color: var(--radio-checked-border-color);
             }
