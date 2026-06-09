@@ -40,6 +40,7 @@ class ProEnable extends Command
         }
 
         $this->checkInfo('Statamic Pro successfully enabled in .env file!');
+        $this->promptToSetLicenseKey();
 
         if ($this->option('update-config') && $this->updateConfig()) {
             $this->checkInfo('Statamic editions config successfully updated to reference .env var!');
@@ -53,7 +54,7 @@ class ProEnable extends Command
             $this->crossLine('Statamic editions config not currently referencing .env var!');
             $this->comment('Please re-run this command with the `--update-config` option.');
         } else {
-            $this->laravel['config']['statamic.editions.pro'] = true;
+            config()->set('statamic.editions.pro', true);
         }
     }
 
@@ -84,7 +85,7 @@ class ProEnable extends Command
      */
     protected function proEnvVarExists()
     {
-        return preg_match('/^STATAMIC_PRO_ENABLED=/m', $this->envContents());
+        return preg_match('/^#?\s*STATAMIC_PRO_ENABLED=/m', $this->envContents());
     }
 
     /**
@@ -95,7 +96,7 @@ class ProEnable extends Command
     protected function ensureProInEnv()
     {
         file_put_contents($this->envPath(), preg_replace(
-            '/^STATAMIC_PRO_ENABLED=.*$/m',
+            '/^#?\s*STATAMIC_PRO_ENABLED=.*$/m',
             'STATAMIC_PRO_ENABLED=true',
             $this->envContents()
         ));
@@ -112,13 +113,105 @@ class ProEnable extends Command
     }
 
     /**
+     * Prompt to set the license key in the environment file.
+     *
+     * @return void
+     */
+    protected function promptToSetLicenseKey()
+    {
+        if (! $this->input->isInteractive()) {
+            return;
+        }
+
+        if ($this->licenseKeyAlreadySet()) {
+            return;
+        }
+
+        $licenseKey = trim((string) $this->ask('If you have a Statamic license key, paste it now (leave blank to add later)'));
+
+        if ($licenseKey === '') {
+            $this->comment('Add `STATAMIC_LICENSE_KEY=...` to your `.env` before or when your site goes live.');
+
+            return;
+        }
+
+        if ($this->licenseKeyEnvVarExists()) {
+            $this->replaceLicenseKeyInEnv($licenseKey);
+        } else {
+            $this->appendLicenseKeyToEnv($licenseKey);
+        }
+
+        $this->checkInfo('Statamic license key saved in .env file.');
+    }
+
+    /**
+     * Check whether a non-empty license key already exists.
+     *
+     * @return bool
+     */
+    protected function licenseKeyAlreadySet()
+    {
+        $licenseKey = $this->licenseKeyFromEnv();
+
+        return $licenseKey !== null && $licenseKey !== '';
+    }
+
+    /**
+     * Check whether the license key env var exists.
+     *
+     * @return bool
+     */
+    protected function licenseKeyEnvVarExists()
+    {
+        return preg_match('/^#?\s*STATAMIC_LICENSE_KEY=/m', $this->envContents());
+    }
+
+    /**
+     * Replace key in .env file.
+     *
+     * @param  string  $licenseKey
+     * @return void
+     */
+    protected function replaceLicenseKeyInEnv($licenseKey)
+    {
+        file_put_contents($this->envPath(), preg_replace_callback(
+            '/^#?\s*STATAMIC_LICENSE_KEY=.*$/m',
+            fn () => 'STATAMIC_LICENSE_KEY='.$licenseKey,
+            $this->envContents()
+        ));
+    }
+
+    /**
+     * Append key to end of .env file.
+     *
+     * @param  string  $licenseKey
+     * @return void
+     */
+    protected function appendLicenseKeyToEnv($licenseKey)
+    {
+        file_put_contents($this->envPath(), $this->envContents()."\nSTATAMIC_LICENSE_KEY={$licenseKey}");
+    }
+
+    /**
+     * Get the license key from .env.
+     *
+     * @return string|null
+     */
+    protected function licenseKeyFromEnv()
+    {
+        preg_match('/^STATAMIC_LICENSE_KEY=(.*)$/m', $this->envContents(), $matches);
+
+        return isset($matches[1]) ? trim($matches[1]) : null;
+    }
+
+    /**
      * Get app .env path.
      *
      * @return string
      */
     protected function envPath()
     {
-        return $this->laravel->environmentFilePath();
+        return app()->environmentFilePath();
     }
 
     /**
