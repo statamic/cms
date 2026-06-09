@@ -268,6 +268,7 @@ class LinkTest extends TestCase
     #[Test]
     public function it_preloads_the_configured_initial_option()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
         $field = new Field('test', [
@@ -284,6 +285,7 @@ class LinkTest extends TestCase
     #[Test]
     public function it_preloads_the_url_initial_option_when_required()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
         $field = new Field('test', [
@@ -300,6 +302,7 @@ class LinkTest extends TestCase
     #[Test]
     public function it_preloads_the_expected_initial_option_when_default_option_not_set()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
         $field = new Field('test', [
@@ -316,6 +319,7 @@ class LinkTest extends TestCase
     #[Test]
     public function it_preloads_initial_option_of_first_child_only_when_available()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
         $field = new Field('test', [
@@ -335,6 +339,7 @@ class LinkTest extends TestCase
     #[Test]
     public function it_preloads_initial_option_of_asset_only_when_available()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
         $field = new Field('test', [
@@ -353,6 +358,7 @@ class LinkTest extends TestCase
     #[Test]
     public function it_preloads_the_values_initial_option_when_set()
     {
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
         $field = new Field('test', [
