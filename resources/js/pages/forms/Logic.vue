@@ -8,7 +8,7 @@ import PageLogic from '@/components/forms/logic/PageLogic.vue';
 import LogicTree from './LogicTree.vue';
 import Head from '@/pages/layout/Head.vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { keys } from '@api';
+import { keys, preferences } from '@api';
 import axios from 'axios';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
@@ -23,7 +23,9 @@ const props = defineProps({
 
 const pages = ref(props.pages);
 const fields = ref(props.fields);
-const logicView = ref('list');
+const logicViewPreferenceKey = 'forms.logic.view';
+const logicView = ref(preferences.get(logicViewPreferenceKey, 'list'));
+watch(logicView, (view) => preferences.set(logicViewPreferenceKey, view));
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
