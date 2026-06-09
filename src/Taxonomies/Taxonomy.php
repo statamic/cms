@@ -180,32 +180,28 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
         return $this->termBlueprints()->reject->hidden()->isNotEmpty();
     }
 
-    public function sortField($field = null)
+    public function sortField()
     {
-        return $this
-            ->fluentlyGetOrSet('sortField')
-            ->getter(function ($sortField) {
-                return $sortField ?? 'title';
-            })
-            ->args(func_get_args());
+        return $this->sortField ?? 'title';
     }
 
-    public function sortDirection($dir = null)
+    public function setSortField($field)
     {
-        return $this
-            ->fluentlyGetOrSet('sortDirection')
-            ->getter(function ($sortDirection) {
-                if ($sortDirection) {
-                    return $sortDirection;
-                }
+        $this->sortField = $field;
 
-                if ($this->sortField) {
-                    return 'asc';
-                }
+        return $this;
+    }
 
-                return 'asc';
-            })
-            ->args(func_get_args());
+    public function sortDirection()
+    {
+        return $this->sortDirection ?? 'asc';
+    }
+
+    public function setSortDirection($dir)
+    {
+        $this->sortDirection = $dir;
+
+        return $this;
     }
 
     public function queryTerms()

@@ -189,11 +189,11 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('title', $taxonomy->sortField());
         $this->assertEquals('asc', $taxonomy->sortDirection());
 
-        $taxonomy->sortField('foo');
+        $taxonomy->setSortField('foo');
         $this->assertEquals('foo', $taxonomy->sortField());
         $this->assertEquals('asc', $taxonomy->sortDirection());
 
-        $taxonomy->sortDirection('desc');
+        $taxonomy->setSortDirection('desc');
         $this->assertEquals('desc', $taxonomy->sortDirection());
     }
 
@@ -336,8 +336,8 @@ class TaxonomyTest extends TestCase
         ], $taxonomy->fileData());
 
         $taxonomy
-            ->sortField('foo')
-            ->sortDirection('desc');
+            ->setSortField('foo')
+            ->setSortDirection('desc');
 
         $this->assertEquals([
             'title' => 'Tags',
