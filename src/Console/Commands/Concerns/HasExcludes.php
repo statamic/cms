@@ -13,7 +13,7 @@ trait HasExcludes
         }
 
         foreach (explode(',', $excludes) as $key) {
-            Stache::exclude($key);
+            Stache::exclude(trim($key));
         }
     }
 }

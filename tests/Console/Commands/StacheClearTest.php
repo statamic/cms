@@ -36,4 +36,14 @@ class StacheClearTest extends TestCase
 
         $this->artisan(StacheClear::class, ['--exclude' => 'foo,bar']);
     }
+
+    #[Test]
+    public function it_trims_whitespace_from_excludes()
+    {
+        Stache::shouldReceive('exclude')->once()->with('foo')->andReturn()
+            ->shouldReceive('exclude')->once()->with('bar')->andReturn()
+            ->shouldReceive('clear')->once()->andReturn();
+
+        $this->artisan(StacheClear::class, ['--exclude' => 'foo, bar']);
+    }
 }
