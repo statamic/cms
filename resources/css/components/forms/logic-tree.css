@@ -46,6 +46,9 @@
         --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
 
+        --buffer-h: 2rem;
+        --buffer-offset: 1rem;
+
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
         =================================================== */
         position: relative;
@@ -114,7 +117,7 @@
 
                 &::before {
                     top: anchor(bottom var(--destination));
-                    bottom: calc(anchor(center --checked-option) + 1.5rem);
+                    bottom: anchor(center --checked-option);
                     border-left-color: transparent;
                     border-top-color: transparent;
                     border-radius: 0 0 var(--join-radius) 0;
@@ -131,11 +134,40 @@
                     border-radius: var(--join-radius) 0 0 0;
                 }
             }
-            .linked-list__linked--neighbor {
+            .linked-list__linked--leap {
                 &::before {
-                    bottom: anchor(center --checked-option);
+                    bottom: calc(anchor(center --checked-option) + var(--buffer-h));
+                    right: calc(anchor(left var(--destination)) + var(--gap) / 2);
+                    left: calc(anchor(right --checked-option) + var(--gap) * 2 - var(--buffer-offset) * 2 - var(--join-stroke));
                 }
             }
+        }
+    }
+    .linked-list__connector-buffer {
+        --corner-h: 12px;
+        anchor-name: --checked-option;
+        position: absolute;
+        pointer-events: none;
+        top: calc(anchor(center --checked-option) - var(--buffer-h) + var(--corner-h));
+        left: anchor(right --checked-option);
+        width: calc(var(--gap) - var(--buffer-offset));
+        height: calc(var(--buffer-h) - var(--corner-h));
+        border-block-end: var(--join-line);
+        border-inline-end: var(--join-line);
+        border-bottom-right-radius: var(--join-radius);
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: calc(0% - var(--join-stroke) - var(--corner-h));
+            left: anchor(right --checked-option);
+            right: calc(0% - var(--gap) + var(--buffer-offset));
+            width: calc(var(--gap) - var(--buffer-offset));
+            height: var(--buffer-h);
+            height: calc(var(--buffer-h) - 21px);
+            border-block-start: var(--join-line);
+            border-inline-start: var(--join-line);
+            border-start-start-radius: var(--join-radius);
         }
     }
 }
