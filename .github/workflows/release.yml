@@ -32,7 +32,7 @@ jobs:
 
       - name: Get Changelog
         id: changelog
-        uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1
+        uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1.0.2
         with:
           version: ${{ github.ref }}
 
