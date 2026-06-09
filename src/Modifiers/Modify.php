@@ -118,7 +118,7 @@ class Modify implements \IteratorAggregate
         if (! is_array($this->value)) {
             throw new ModifierException(sprintf(
                 'Attempted to access modified value as an array, but encountered [%s]',
-                is_string($this->value) ? 'string' : get_class($this->value)
+                get_debug_type($this->value)
             ));
         }
 

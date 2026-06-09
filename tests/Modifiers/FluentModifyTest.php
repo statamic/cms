@@ -77,6 +77,15 @@ class FluentModifyTest extends TestCase
     }
 
     #[Test]
+    public function it_throws_modifier_exception_when_iterating_over_a_scalar()
+    {
+        $this->expectException(ModifierException::class);
+        $this->expectExceptionMessage('Attempted to access modified value as an array, but encountered [int]');
+
+        iterator_to_array(Modify::value(42));
+    }
+
+    #[Test]
     public function values_instances_get_converted_to_an_array_when_passing_to_a_modifier()
     {
         (new class extends Modifier
