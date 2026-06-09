@@ -52,7 +52,7 @@
             --clr-lines: rgba(255 255 255 / 0.25);
         }
 
-        .list {
+        ul {
             margin: 0;
             padding: 0;
             list-style: none;

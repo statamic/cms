@@ -25,7 +25,7 @@ onMounted(updateRelations);
 
 <template>
   <div id="linked-list" ref="root" class="linked-list" @change="updateRelations">
-    <ul class="list items">
+    <ul class="items">
       <li class="linked-list__page-label">{{ __('Page :number', { number: 1 }) }}</li>
       <li>
         <label for="logic-tree-item-1">
@@ -53,7 +53,7 @@ onMounted(updateRelations);
       </li>
     </ul>
 
-    <ul class="list options" role="radiogroup" :aria-label="__('Destination page')">
+    <ul class="options" role="radiogroup" :aria-label="__('Destination page')">
       <li class="linked-list__page-label">
         <label for="logic-tree-page-2">
           <input id="logic-tree-page-2" type="radio" name="logic-tree-destination" class="rb" value="2" checked>
