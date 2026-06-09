@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
@@ -266,127 +267,34 @@ class LinkTest extends TestCase
     }
 
     #[Test]
-    public function it_preloads_the_configured_initial_option()
+    #[DataProvider('initialOptionProvider')]
+    public function it_preloads_the_initial_option(array $config, mixed $value, bool $withParent, mixed $expected)
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
         tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
 
-        $field = new Field('test', [
-            'type' => 'link',
-            'default_option' => 'entry',
-        ]);
+        $field = new Field('test', $config);
+        $field->setValue($value);
 
-        $field->setValue(null);
+        if ($withParent) {
+            $field->setParent(Mockery::mock());
+        }
+
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertEquals('entry', $fieldtype->preload()['initialOption']);
+        $this->assertSame($expected, $fieldtype->preload()['initialOption']);
     }
 
-    #[Test]
-    public function it_preloads_the_url_initial_option_when_required()
+    public static function initialOptionProvider(): array
     {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
-
-        $field = new Field('test', [
-            'type' => 'link',
-            'required' => true,
-        ]);
-
-        $field->setValue(null);
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
-    }
-
-    #[Test]
-    public function it_preloads_the_expected_initial_option_when_default_option_not_set()
-    {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
-
-        $field = new Field('test', [
-            'type' => 'link',
-        ]);
-
-        $field->setValue(null);
-
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertNull($fieldtype->preload()['initialOption']);
-    }
-
-    #[Test]
-    public function it_preloads_initial_option_of_first_child_only_when_available()
-    {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
-
-        $field = new Field('test', [
-            'type' => 'link',
-            'default_option' => 'first-child',
-            'required' => true,
-        ]);
-
-        $field->setValue(null);
-        $field->setParent(Mockery::mock());
-
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
-    }
-
-    #[Test]
-    public function it_preloads_initial_option_of_asset_only_when_available()
-    {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
-
-        $field = new Field('test', [
-            'type' => 'link',
-            'default_option' => 'asset',
-            'required' => true,
-        ]);
-
-        $field->setValue(null);
-
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
-    }
-
-    #[Test]
-    public function it_preloads_null_initial_option_when_default_option_unavailable_and_not_required()
-    {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
-
-        $field = new Field('test', [
-            'type' => 'link',
-            'default_option' => 'asset',
-        ]);
-
-        $field->setValue(null);
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertNull($fieldtype->preload()['initialOption']);
-    }
-
-    #[Test]
-    public function it_preloads_the_values_initial_option_when_set()
-    {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-        tap(Facades\Collection::make('pages')->routes('{slug}'))->sites(['en'])->save();
-
-        $field = new Field('test', [
-            'type' => 'link',
-            'default_option' => 'entry',
-        ]);
-
-        $field->setValue('https://example.com');
-
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertEquals('url', $fieldtype->preload()['initialOption']);
+        return [
+            'configured option is used' => [['type' => 'link', 'default_option' => 'entry'], null, false, 'entry'],
+            'url when required and no default option' => [['type' => 'link', 'required' => true], null, false, 'url'],
+            'null when optional and no default option' => [['type' => 'link'], null, false, null],
+            'first-child falls back to url when unavailable' => [['type' => 'link', 'default_option' => 'first-child', 'required' => true], null, true, 'url'],
+            'asset falls back to url when unavailable and required' => [['type' => 'link', 'default_option' => 'asset', 'required' => true], null, false, 'url'],
+            'asset falls back to null when unavailable and optional' => [['type' => 'link', 'default_option' => 'asset'], null, false, null],
+            'existing value overrides default option' => [['type' => 'link', 'default_option' => 'entry'], 'https://example.com', false, 'url'],
+        ];
     }
 }
