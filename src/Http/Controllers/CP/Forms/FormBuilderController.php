@@ -159,7 +159,7 @@ class FormBuilderController extends CpController
                         continue;
                     }
 
-                    $fieldtype = FormFieldtypeRepository::findForBuilder($field['fieldtype'], $field['config'] ?? []);
+                    $fieldtype = FormFieldtypeRepository::find($field['fieldtype']);
                     $blueprint = $this->configBlueprint($fieldtype->configBlueprint());
 
                     $fields = $blueprint

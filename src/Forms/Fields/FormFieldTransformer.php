@@ -138,15 +138,6 @@ class FormFieldTransformer extends FieldTransformer
         ];
     }
 
-    private static function fieldtypeHandle(FormFieldtype $formFieldtype, array $config): string
-    {
-        if ($formFieldtype instanceof Fallback) {
-            return $config['type'] ?? $formFieldtype->handle();
-        }
-
-        return $formFieldtype->handle();
-    }
-
     private static function importFieldToVue($field): array
     {
         $import = [
