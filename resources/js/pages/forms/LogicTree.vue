@@ -63,9 +63,13 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
 
 <template>
     <div class="linked-list w-full">
-        <ul v-for="{ page, pageIndex, fields: pageFields } in fieldsByPage" :key="page._id">
-            <li
-                class="linked-list__page-name !h-auto items-stretch border-0 bg-transparent px-0 py-0"
+        <div
+            v-for="{ page, pageIndex, fields: pageFields } in fieldsByPage"
+            :key="page._id"
+            class="linked-list__column"
+        >
+            <div
+                class="linked-list__page-name"
                 :style="{ 'anchor-name': pageAnchor(pageIndex) }"
             >
                 <div class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5">
@@ -81,19 +85,22 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
                         <span class="st-line-clamp">{{ pageTitle(page, pageIndex) }}</span>
                     </div>
                 </div>
-            </li>
-            <li
-                v-for="field in pageFields"
-                :key="field._id"
-                :class="{
-                    'linked-list__connector': fieldConnection(field),
-                    'linked-list__page-leap': fieldConnection(field)?.leap,
-                }"
-                :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
-            >
-                <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                <span class="st-line-clamp">{{ field.display }}</span>
-            </li>
-        </ul>
+            </div>
+
+            <ul>
+                <li
+                    v-for="field in pageFields"
+                    :key="field._id"
+                    :class="{
+                        'linked-list__connector': fieldConnection(field),
+                        'linked-list__page-leap': fieldConnection(field)?.leap,
+                    }"
+                    :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
+                >
+                    <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
+                    <span class="st-line-clamp">{{ field.display }}</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
