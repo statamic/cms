@@ -162,8 +162,7 @@
 
             /* GROUP LOGIC TREE CONNECTORS / SOURCE
             =================================================== */
-            > li.linked-list__connector,
-            .linked-list__field-row.linked-list__connector {
+            .linked-list__connector {
                 anchor-name: --start-connection;
                 anchor-scope: --start-connection; /* one anchor per source row */
 
@@ -203,8 +202,7 @@
             /* GROUP LOGIC TREE CONNECTORS / PAGE LEAP (SOURCE → NON-ADJACENT PAGE)
             =================================================== */
             /* Overrides the direct-hop ::before to terminate at the buffer rail instead of the source centre, leaving room for the bridge element. */
-            > li.linked-list__page-leap,
-            .linked-list__field-row.linked-list__page-leap {
+            .linked-list__page-leap {
                 &::before,
                 &::after {
                     border-style: dashed;
@@ -220,7 +218,7 @@
     /* GROUP LOGIC TREE CONNECTORS / VIEW MODES
     =================================================== */
     .linked-list__field-name {
-        @apply line-clamp-1;
+        @apply line-clamp-1 select-none;
     }
 
     .linked-list--expanded {
