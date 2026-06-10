@@ -113,7 +113,7 @@ onUnmounted(() => {
     </Teleport>
 
     <div class="mx-auto max-w-5xl">
-        <Header class="mb-2">
+        <Header class="mb-2 md:py-9">
             <template #title>
                 <StatusIndicator status="published" />
                 {{ form.title }}
