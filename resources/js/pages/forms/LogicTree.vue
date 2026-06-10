@@ -6,6 +6,7 @@ import { computed } from 'vue';
 const props = defineProps({
     pages: { type: Array, required: true },
     fields: { type: Array, required: true },
+    expanded: { type: Boolean, default: false },
 });
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
@@ -87,7 +88,7 @@ const fieldIconClass = (category) => {
 </script>
 
 <template>
-    <div class="linked-list w-full">
+    <div class="linked-list w-full" :class="{ 'linked-list--expanded': expanded }">
         <div
             v-for="{ page, pageIndex, fields: pageFields } in fieldsByPage"
             :key="page._id"

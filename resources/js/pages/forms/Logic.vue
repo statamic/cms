@@ -26,6 +26,10 @@ const fields = ref(props.fields);
 const logicViewPreferenceKey = 'forms.logic.view';
 const logicView = ref(preferences.get(logicViewPreferenceKey, 'list'));
 watch(logicView, (view) => preferences.set(logicViewPreferenceKey, view));
+
+const treeDensityPreferenceKey = 'forms.logic.tree.density';
+const treeDensity = ref(preferences.get(treeDensityPreferenceKey, 'compressed'));
+watch(treeDensity, (density) => preferences.set(treeDensityPreferenceKey, density));
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
@@ -116,10 +120,26 @@ onUnmounted(() => {
                     {{ form.title }}
                 </template>
                 <template #actions>
-                    <ToggleGroup v-model="logicView" size="sm">
-                        <ToggleItem value="list" icon="layout-list" :label="__('List')" />
-                        <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
-                    </ToggleGroup>
+                    <div class="flex items-start gap-4">
+                        <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
+                            <ToggleItem
+                                value="compressed"
+                                icon="collapse"
+                                :aria-label="__('Compressed view')"
+                                v-tooltip="__('Compressed view')"
+                            />
+                            <ToggleItem
+                                value="expanded"
+                                icon="expand"
+                                :aria-label="__('Uncompressed view')"
+                                v-tooltip="__('Uncompressed view')"
+                            />
+                        </ToggleGroup>
+                        <ToggleGroup v-model="logicView" size="sm">
+                            <ToggleItem value="list" icon="layout-list" :label="__('List')" />
+                            <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
+                        </ToggleGroup>
+                    </div>
                 </template>
             </Header>
 
@@ -140,6 +160,11 @@ onUnmounted(() => {
             </template>
         </div>
 
-        <LogicTree v-if="logicView === 'tree'" :pages="pages" :fields="fields" />
+        <LogicTree
+            v-if="logicView === 'tree'"
+            :pages="pages"
+            :fields="fields"
+            :expanded="treeDensity === 'expanded'"
+        />
     </div>
 </template>
