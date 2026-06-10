@@ -1,5 +1,25 @@
 # Release Notes
 
+## 6.21.0 (2026-06-10)
+
+### What's new
+- Add default sorting support for taxonomies [#14772](https://github.com/statamic/cms/issues/14772) by @finnjsmith
+- Add default initial option configuration option for Link fieldtype [#14698](https://github.com/statamic/cms/issues/14698) by @martyf
+- Add `exclude` param to stache commands [#14788](https://github.com/statamic/cms/issues/14788) by @edalzell
+
+### What's fixed
+- Fix Modify::__toString() throwing TypeError for non-string scalar values [#14674](https://github.com/statamic/cms/issues/14674) by @VerburgtJimmy
+- Speed up Stache warming for large structured collections [#14781](https://github.com/statamic/cms/issues/14781) by @o1y
+- Implement permissions cache on eloquent users [#14661](https://github.com/statamic/cms/issues/14661) by @ryanmitchell
+- Adjust listing skeleton to match configured features [#14796](https://github.com/statamic/cms/issues/14796) by @daun
+- Fix docs for `Listing` component [#14798](https://github.com/statamic/cms/issues/14798) by @duncanmcclean
+- Don't reserve space when a field's display label is hidden [#14803](https://github.com/statamic/cms/issues/14803) by @jasonvarga
+- Bump web-auth/webauthn-lib to ^5.3.0 [#14727](https://github.com/statamic/cms/issues/14727) by @sstraakenbroek
+- Prevent overlapping git commit jobs [#14672](https://github.com/statamic/cms/issues/14672) by @aerni
+- French translations [#14789](https://github.com/statamic/cms/issues/14789) by @ebeauchamps
+
+
+
 ## 6.20.3 (2026-06-08)
 
 ### What's fixed
