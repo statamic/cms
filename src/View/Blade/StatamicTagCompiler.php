@@ -3,6 +3,7 @@
 namespace Statamic\View\Blade;
 
 use Illuminate\Support\Str;
+use Statamic\View\Antlers\Language\Analyzers\TagIdentifierAnalyzer;
 use Statamic\View\Blade\Concerns\CompilesComponents;
 use Statamic\View\Blade\Concerns\CompilesNavs;
 use Statamic\View\Blade\Concerns\CompilesNocache;
@@ -125,15 +126,10 @@ class StatamicTagCompiler
 
     protected function extractMethodNames(ComponentNode $component): array
     {
-        $name = $component->tagName;
+        [$name, $methodPart] = TagIdentifierAnalyzer::splitNameAndMethodPart($component->tagName);
 
-        if ($pos = strpos($name, ':')) {
-            $originalMethod = substr($name, $pos + 1);
-            $method = Str::camel($originalMethod);
-            $name = substr($name, 0, $pos);
-        } else {
-            $method = $originalMethod = 'index';
-        }
+        $originalMethod = $methodPart ?: 'index';
+        $method = Str::camel($originalMethod);
 
         return [$name, $method, $originalMethod];
     }
