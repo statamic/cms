@@ -49,7 +49,7 @@
         --join-line: var(--join-stroke) solid var(--color-blue-400);
         --join-radius: 20px;
         --gap: 7rem;
-        --column-width: 10rem;
+        --column-width: 12rem;
 
         --item-padding: 1rem;
         --item-height: 4.5rem;
@@ -82,18 +82,8 @@
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white text-xs;
             }
 
-            .linked-list__page-label {
-                font-size: 0.875rem;
-                font-weight: 500;
-                color: light-dark(var(--color-gray-700, #374151), var(--color-gray-200, #e5e7eb));
-                background: light-dark(var(--color-gray-50, #f9fafb), var(--color-gray-900, #111827));
-
-                &:not(:has(> label)) {
-                    padding: 0.5rem;
-                }
-                &::after {
-                    content: unset;
-                }
+            .linked-list__page-label::after {
+                content: unset;
             }
 
             /* GROUP LOGIC TREE CONNECTORS / SOURCE
