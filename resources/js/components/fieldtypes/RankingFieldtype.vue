@@ -1,57 +1,23 @@
 <script setup>
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { SortableList } from '@/components/sortable/Sortable.js';
-import { __ } from '@/bootstrap/globals';
+import { DragHandle } from '@/components/ui';
 import { computed, ref, watch } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
+const { expose, update, isReadOnly, name } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
 const sortableItemClass = 'ranking-item';
 const sortableHandleClass = 'ranking-handle';
 
-function isCompleteOption(option) {
-    const { value } = option;
-
-    return value != null && value !== '' && value !== 'null';
-}
-
-function normalizeOptions(raw) {
-    if (! raw) {
-        return [];
-    }
-
-    if (Array.isArray(raw)) {
-        return raw
-            .filter((row) => row)
-            .map((row) => {
-                if (typeof row === 'object') {
-                    return {
-                        value: row.key ?? row.value,
-                        label: row.label ?? row.value ?? row.key,
-                    };
-                }
-
-                return {
-                    value: row,
-                    label: row,
-                };
-            })
-            .filter(isCompleteOption);
-    }
-
-    return Object.entries(raw)
-        .map(([value, label]) => ({
-            value,
-            label: typeof label === 'string' ? label : value,
-        }))
-        .filter(isCompleteOption);
-}
-
-const options = computed(() => normalizeOptions(props.meta?.options ?? props.config.options));
-
 const rankedValues = ref([]);
+
+const options = computed(() => {
+    const raw = props.config.options ?? {};
+    return Object.entries(raw).map(([value, label]) => ({ value, label: label || value }));
+});
 
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 
@@ -82,9 +48,7 @@ function buildRankedValues(value) {
 
 watch(
     [() => props.value, options],
-    () => {
-        rankedValues.value = buildRankedValues(props.value);
-    },
+    () => rankedValues.value = buildRankedValues(props.value),
     { deep: true, immediate: true },
 );
 
@@ -102,17 +66,6 @@ watch(
     { deep: true },
 );
 
-defineReplicatorPreview(() => {
-    if (! orderedRows.value.length) {
-        return null;
-    }
-
-    return orderedRows.value.map((row) => row.label).join(', ');
-});
-
-defineExpose({
-    ...expose,
-});
 </script>
 
 <template>
@@ -132,7 +85,7 @@ defineExpose({
                 :class="sortableItemClass"
                 class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
             >
-                <ui-drag-handle
+                <DragHandle
                     v-if="!isDisabled"
                     :class="sortableHandleClass"
                     class="cursor-grab [&_svg]:opacity-75 dark:[&_svg]:opacity-50"

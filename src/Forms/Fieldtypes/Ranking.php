@@ -39,6 +39,16 @@ class Ranking extends FormFieldtype
         ];
     }
 
+    private function enabledOptions(): array
+    {
+        return collect($this->config('options'))
+            ->reject(fn ($option): bool => is_array($option) && ($option['hidden'] ?? false) === true)
+            ->mapWithKeys(fn ($option, $key): array => [
+                is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
+            ])
+            ->all();
+    }
+
     public function example(): ?array
     {
         return [
@@ -53,26 +63,5 @@ class Ranking extends FormFieldtype
             ],
             'value' => ['summer', 'spring', 'autumn', 'winter'],
         ];
-    }
-
-    private function enabledOptions(): array
-    {
-        return collect($this->config('options'))
-            ->reject(fn ($option, $key): bool => $this->isBlankOption($option, $key))
-            ->mapWithKeys(fn ($option, $key): array => [
-                is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
-            ])
-            ->all();
-    }
-
-    private function isBlankOption(mixed $option, mixed $key): bool
-    {
-        if (is_array($option) && ($option['hidden'] ?? false) === true) {
-            return true;
-        }
-
-        $optionKey = is_array($option) ? ($option['key'] ?? null) : $key;
-
-        return $optionKey === null || $optionKey === '' || $optionKey === 'null';
     }
 }
