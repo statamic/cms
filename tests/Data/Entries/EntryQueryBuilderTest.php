@@ -251,6 +251,46 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 2'], $entries->map->title->all());
     }
 
+    #[Test]
+    public function carbon_instances_in_where_date_are_converted_to_app_timezone()
+    {
+        // Entries are interpreted in app timezone when stored.
+        // A UTC Carbon that falls on a *different calendar date* in the app timezone
+        // must match entries for the app-timezone date, not the UTC date.
+        config(['app.timezone' => 'America/New_York']);
+
+        $this->createWhereDateTestEntries();
+
+        // Post 1 stored as '2021-11-15 20:31:04' NY → UTC '2021-11-16 01:31:04'.
+        // Passing a UTC Carbon for that exact instant: UTC date = Nov 16, NY date = Nov 15.
+        // With app-tz normalisation we should find entries on NY Nov 15 (Posts 1 and 3).
+        $utcCarbon = Carbon::parse('2021-11-16 01:31:04', 'UTC');
+
+        $entries = Entry::query()->whereDate('test_date', $utcCarbon)->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function carbon_instances_in_where_time_are_converted_to_app_timezone()
+    {
+        // Post 2 is stored as '2021-11-14 09:00:00' interpreted in NY time → UTC '2021-11-14 14:00:00'.
+        // Passing the UTC Carbon representing that instant: UTC time = 14:00, NY time = 09:00.
+        // The query converts it to NY (09:00) and should find Post 2 (the only entry at 09:00 NY).
+        config(['app.timezone' => 'America/New_York']);
+
+        $this->createWhereDateTestEntries();
+
+        // UTC 14:00 = NY 09:00 (EST, UTC-5).
+        $utcCarbon = Carbon::parse('2021-11-14 14:00:00', 'UTC');
+
+        $entries = Entry::query()->whereTime('test_date', $utcCarbon)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
     private function createWhereDateTestEntries()
     {
         $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
