@@ -8,63 +8,6 @@ use Tests\Antlers\ParserTestCase;
 
 class NamespacedTagsTest extends ParserTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->registerNamespacedTag('acme', new class extends Tags
-        {
-            public static $handle = 'ns_greet';
-
-            protected static $aliases = ['ns_hi'];
-
-            public function index()
-            {
-                return 'greetings';
-            }
-
-            public function hello()
-            {
-                return 'hi';
-            }
-
-            public function details()
-            {
-                return $this->tag.'|'.$this->method;
-            }
-
-            public function wildcard($method)
-            {
-                return 'wildcard: '.$method;
-            }
-        });
-
-        $this->registerNamespacedTag('acme', new class extends Tags
-        {
-            public static $handle = 'ns_items';
-
-            public function index()
-            {
-                return [['value' => 'a'], ['value' => 'b']];
-            }
-        });
-    }
-
-    private function registerNamespacedTag(string $namespace, $tag): void
-    {
-        $extensions = app('statamic.extensions');
-
-        $extensions[Tags::class] = with($extensions[Tags::class] ?? collect(), function ($bindings) use ($namespace, $tag) {
-            $bindings[$namespace.'::'.$tag::handle()] = get_class($tag);
-
-            foreach ($tag::aliases() as $alias) {
-                $bindings[$namespace.'::'.$alias] = get_class($tag);
-            }
-
-            return $bindings;
-        });
-    }
-
     public function test_namespaced_tag_with_method_can_be_rendered()
     {
         $this->assertSame('hi', $this->renderString('{{ acme::ns_greet:hello }}', [], true));
@@ -119,5 +62,47 @@ class NamespacedTagsTest extends ParserTestCase
     public function test_namespaced_tag_can_be_resolved_fluently()
     {
         $this->assertSame('hi', (string) Statamic::tag('acme::ns_greet:hello'));
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        (new class extends Tags
+        {
+            public static $handle = 'ns_greet';
+
+            protected static $aliases = ['ns_hi'];
+
+            public function index()
+            {
+                return 'greetings';
+            }
+
+            public function hello()
+            {
+                return 'hi';
+            }
+
+            public function details()
+            {
+                return $this->tag.'|'.$this->method;
+            }
+
+            public function wildcard($method)
+            {
+                return 'wildcard: '.$method;
+            }
+        })::register('acme');
+
+        (new class extends Tags
+        {
+            public static $handle = 'ns_items';
+
+            public function index()
+            {
+                return [['value' => 'a'], ['value' => 'b']];
+            }
+        })::register('acme');
     }
 }

@@ -112,12 +112,8 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
 
         [$name, $methodPart] = TagIdentifierAnalyzer::splitNameAndMethodPart($this->name);
 
-        if ($methodPart !== null && $methodPart !== '') {
-            $originalMethod = $methodPart;
-            $method = Str::camel($originalMethod);
-        } else {
-            $method = $originalMethod = 'index';
-        }
+        $originalMethod = $methodPart ?: 'index';
+        $method = Str::camel($originalMethod);
 
         $tagName = $name.':'.$originalMethod;
         $profileTagName = 'tag_'.$tagName.microtime();

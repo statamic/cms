@@ -28,12 +28,12 @@ class TagIdentifierAnalyzer
 
         [$name, $methodPart] = self::splitNameAndMethodPart($input);
 
+        $identifier->name = trim($name);
+
         if ($methodPart === null) {
-            $identifier->name = trim($name);
             $identifier->methodPart = null;
             $identifier->compound = $identifier->name;
         } else {
-            $identifier->name = trim($name);
             $identifier->methodPart = trim($methodPart);
             $identifier->compound = $identifier->name.':'.$identifier->methodPart;
         }
@@ -56,20 +56,12 @@ class TagIdentifierAnalyzer
      */
     public static function splitNameAndMethodPart($input)
     {
-        $len = strlen($input);
-
-        for ($i = 0; $i < $len; $i++) {
-            if ($input[$i] === ':') {
-                if ($i + 1 < $len && $input[$i + 1] === ':') {
-                    $i++;
-
-                    continue;
-                }
-
-                return [substr($input, 0, $i), substr($input, $i + 1)];
-            }
+        // Mask double colons so the namespace separator
+        // is not mistaken for the name/method boundary.
+        if (($pos = strpos(strtr($input, ['::' => '__']), ':')) === false) {
+            return [$input, null];
         }
 
-        return [$input, null];
+        return [substr($input, 0, $pos), substr($input, $pos + 1)];
     }
 }

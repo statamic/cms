@@ -309,32 +309,9 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->merge($this->autoloadFilesFromFolder('Tags', Tags::class))
             ->unique();
 
-        if ($this->tagNamespace) {
-            return $this->registerNamespacedTags($tags);
-        }
-
         foreach ($tags as $class) {
-            $class::register();
+            $class::register($this->tagNamespace);
         }
-
-        return $this;
-    }
-
-    private function registerNamespacedTags($tags)
-    {
-        $extensions = app('statamic.extensions');
-
-        $extensions[Tags::class] = with($extensions[Tags::class] ?? collect(), function ($bindings) use ($tags) {
-            foreach ($tags as $class) {
-                $bindings[$this->tagNamespace.'::'.$class::handle()] = $class;
-
-                foreach ($class::aliases() as $alias) {
-                    $bindings[$this->tagNamespace.'::'.$alias] = $class;
-                }
-            }
-
-            return $bindings;
-        });
 
         return $this;
     }

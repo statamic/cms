@@ -14,24 +14,7 @@ class NamespacedTagsTest extends TestCase
     #[Test]
     public function it_registers_namespaced_tags_when_a_tag_namespace_is_set()
     {
-        $provider = new class($this->app) extends AddonServiceProvider
-        {
-            protected $tags = [NamespacedTestTag::class];
-
-            protected $tagNamespace = 'acme';
-
-            protected function autoloadFilesFromFolder($folder, $requiredClass = null)
-            {
-                return [];
-            }
-
-            public function callBootTags()
-            {
-                return $this->bootTags();
-            }
-        };
-
-        $provider->callBootTags();
+        $this->makeProvider('acme')->callBootTags();
 
         $tags = $this->app['statamic.tags'];
 
@@ -44,11 +27,30 @@ class NamespacedTagsTest extends TestCase
     #[Test]
     public function it_does_not_register_namespaced_tags_without_a_tag_namespace()
     {
-        $provider = new class($this->app) extends AddonServiceProvider
+        $this->makeProvider(null)->callBootTags();
+
+        $tags = $this->app['statamic.tags'];
+
+        $this->assertSame(NamespacedTestTag::class, $tags->get('namespaced_test'));
+        $this->assertSame(NamespacedTestTag::class, $tags->get('namespaced_test_alias'));
+        $this->assertNull($tags->get('acme::namespaced_test'));
+        $this->assertNull($tags->get('acme::namespaced_test_alias'));
+    }
+
+    private function makeProvider(?string $tagNamespace): AddonServiceProvider
+    {
+        return new class($this->app, $tagNamespace) extends AddonServiceProvider
         {
             protected $tags = [NamespacedTestTag::class];
 
-            protected function autoloadFilesFromFolder($folder, $requiredClass = null)
+            public function __construct($app, $tagNamespace)
+            {
+                parent::__construct($app);
+
+                $this->tagNamespace = $tagNamespace;
+            }
+
+            protected function autoloadFilesFromFolder($folder, $requiredClass = null): array
             {
                 return [];
             }
@@ -58,15 +60,6 @@ class NamespacedTagsTest extends TestCase
                 return $this->bootTags();
             }
         };
-
-        $provider->callBootTags();
-
-        $tags = $this->app['statamic.tags'];
-
-        $this->assertSame(NamespacedTestTag::class, $tags->get('namespaced_test'));
-        $this->assertSame(NamespacedTestTag::class, $tags->get('namespaced_test_alias'));
-        $this->assertNull($tags->get('acme::namespaced_test'));
-        $this->assertNull($tags->get('acme::namespaced_test_alias'));
     }
 }
 
@@ -76,7 +69,7 @@ class NamespacedTestTag extends Tags
 
     protected static $aliases = ['namespaced_test_alias'];
 
-    public function index()
+    public function index(): string
     {
         return 'hello';
     }
