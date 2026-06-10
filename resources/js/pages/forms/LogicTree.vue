@@ -71,7 +71,7 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
                 :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
             >
                 <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                {{ field.display }}
+                <span class="st-line-clamp">{{ field.display }}</span>
             </li>
         </ul>
     </div>

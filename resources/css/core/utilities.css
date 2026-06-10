@@ -100,6 +100,17 @@
     text-box: ex alphabetic;
 }
 
+@utility st-line-clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    /* Stop padding ruining the clamp and use margin instead */
+    padding-block-end: 0;
+    overflow: hidden;
+    -webkit-line-clamp: var(--clamp, 2);
+    line-clamp: var(--clamp, 2);
+}
+
 @utility placeholder-xs {
     /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
     &::placeholder {

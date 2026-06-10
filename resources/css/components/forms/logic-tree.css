@@ -46,10 +46,10 @@
     /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
     .linked-list {
         --join-stroke: 1px;
-        --join-line: var(--join-stroke) dashed var(--color-blue-400);
+        --join-line: var(--join-stroke) solid var(--color-blue-400);
         --join-radius: 20px;
         --gap: 7rem;
-        --clr-lines: rgba(0 0 0 / 0.25);
+        --column-width: 10rem;
 
         --item-padding: 1rem;
         --item-height: 4.5rem;
@@ -63,33 +63,23 @@
         position: relative;
         display: grid;
         align-items: start;
-        grid-template-columns: repeat(auto-fill, 10rem);
+        grid-template-columns: repeat(auto-fill, var(--column-width));
         /* width: min(100%, 800px); */
         gap: var(--gap);
 
-        :where(.dark) & {
-            --clr-lines: rgba(255 255 255 / 0.25);
-        }
-
         ul {
             margin: 0;
-            padding: 0;
             list-style: none;
             display: grid;
             gap: 0.5rem;
+            @apply p-2 bg-gray-100 rounded-md;
 
             li {
-                border: 1px solid var(--clr-lines);
                 display: flex;
                 align-items: center;
                 height: var(--item-height);
-                padding: var(--item-padding) 1.5rem;
-
-                label {
-                    flex: 1;
-                    padding: 0.5rem;
-                    cursor: pointer;
-                }
+                padding-block: var(--item-padding);
+                @apply px-3 border-1 border-gray-300 rounded-md bg-white text-xs;
             }
 
             .linked-list__page-label {
@@ -149,6 +139,10 @@
             =================================================== */
             /* Overrides the direct-hop ::before to terminate at the buffer rail instead of the source centre, leaving room for the bridge element. */
             .linked-list__page-leap {
+                &::before,
+                &::after {
+                    border-style: dashed;
+                }
                 &::before {
                     bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull));
                     left: calc(anchor(right --start-connection) + var(--gap));
@@ -160,13 +154,6 @@
     /* GROUP LOGIC TREE CONNECTORS / LEAP BRIDGE (FIRST GAP + CORNER)
     =================================================== */
     .linked-list__extra-leap-connector {
-        &::before,
-        &::after {
-            content: '';
-            position: absolute;
-            pointer-events: none;
-        }
-
         &::before {
             top: calc(anchor(top --start-connection) + var(--buffer-top-pull) / 2 - var(--join-stroke) * 4);
             bottom: anchor(center --start-connection);
@@ -186,6 +173,14 @@
             border-inline-start: var(--join-line);
             border-block-start: var(--join-line);
             border-top-left-radius: var(--join-radius);
+        }
+
+        &::before,
+        &::after {
+            border-style: dashed;
+            content: '';
+            position: absolute;
+            pointer-events: none;
         }
     }
 }
