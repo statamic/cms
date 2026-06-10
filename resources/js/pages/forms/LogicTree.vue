@@ -72,7 +72,10 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
                 class="linked-list__page-name"
                 :style="{ 'anchor-name': pageAnchor(pageIndex) }"
             >
-                <div class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5">
+                <div
+                    class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
+                    :class="{ '-ms-1.5': hasPageRules(page) }"
+                >
                     <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
                         <Icon
                             name="logic-tree"
@@ -80,9 +83,12 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
                             aria-hidden="true"
                         />
                     </span>
-                    <div class="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
-                        <Icon name="page" class="size-4 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                        <span class="st-line-clamp">{{ pageTitle(page, pageIndex) }}</span>
+                    <div
+                        class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                        :class="{ 'w-[85%]!': hasPageRules(page) }"
+                    >
+                        <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                        <span class="line-clamp-1">{{ pageTitle(page, pageIndex) }}</span>
                     </div>
                 </div>
             </div>
