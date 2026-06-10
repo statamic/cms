@@ -52,10 +52,10 @@
         --column-width: 12.5rem;
 
         --item-padding: 1rem;
-        --item-height: 4.5rem;
+        --item-height: 3.2rem;
 
         /* Bit of a magic number here to pull the line into the gap between the items */
-        --buffer-top-pull: calc(1.45rem + var(--item-padding));
+        --buffer-top-pull: calc(0.8rem + var(--item-padding));
         --buffer-left-pull: 1.5rem;
 
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
@@ -144,6 +144,21 @@
                     left: calc(anchor(right --start-connection) + var(--gap));
                 }
             }
+        }
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / VIEW MODES
+    =================================================== */
+    .linked-list__field-name {
+        @apply line-clamp-1;
+    }
+
+    .linked-list--expanded {
+        /* Bit of a magic number here to pull the line into the gap between the items */
+        --buffer-top-pull: calc(1.45rem + var(--item-padding));
+        --item-height: 4.5rem;
+        .linked-list__field-name {
+            @apply line-clamp-2;
         }
     }
 

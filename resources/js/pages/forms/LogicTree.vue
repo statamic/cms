@@ -141,7 +141,7 @@ const fieldIconClass = (category) => {
                         :class="['size-4 shrink-0', fieldIconClass(field.category)]"
                         aria-hidden="true"
                     />
-                    <span class="min-w-0 line-clamp-2">{{ field.display }}</span>
+                    <span class="linked-list__field-name">{{ field.display }}</span>
                 </li>
             </ul>
         </div>
