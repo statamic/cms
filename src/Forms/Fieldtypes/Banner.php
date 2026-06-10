@@ -17,6 +17,17 @@ class Banner extends FormFieldtype
     public function configFieldItems(): array
     {
         return [
+            'display' => [
+                'display' => __('Heading'),
+                'type' => 'text',
+                'focus' => true,
+                'validate' => 'required',
+            ],
+            'instructions' => ['type' => 'hidden'],
+            'text' => [
+                'display' => __('Text'),
+                'type' => 'textarea',
+            ],
             'icon' => [
                 'display' => __('Icon'),
                 'type' => 'icon',
@@ -31,7 +42,9 @@ class Banner extends FormFieldtype
         return [
             'type' => 'form_banner',
             'hide_display' => true,
-            ...Arr::except($this->config(), ['type']),
+            'display' => $this->config('display'),
+            'text' => $this->config('text'),
+            'icon' => $this->config('icon'),
         ];
     }
 

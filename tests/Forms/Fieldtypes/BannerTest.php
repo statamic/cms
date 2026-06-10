@@ -14,27 +14,16 @@ class BannerTest extends TestCase
     {
         $fieldtype = (new Banner)->setField(new FormField('notice', [
             'type' => 'form_banner',
-        ]));
-
-        $this->assertEquals([
-            'type' => 'form_banner',
-            'hide_display' => true,
+            'display' => 'Important Notice',
+            'text' => 'Please read this before submitting the form.',
             'icon' => 'info',
-        ], $fieldtype->toFieldArray());
-    }
-
-    #[Test]
-    public function it_passes_through_extra_config()
-    {
-        $fieldtype = (new Banner)->setField(new FormField('notice', [
-            'type' => 'form_banner',
-            'display' => 'Important Notice',
         ]));
 
         $this->assertEquals([
             'type' => 'form_banner',
-            'hide_display' => true,
             'display' => 'Important Notice',
+            'text' => 'Please read this before submitting the form.',
+            'hide_display' => true,
             'icon' => 'info',
         ], $fieldtype->toFieldArray());
     }

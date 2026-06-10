@@ -18,8 +18,16 @@ class Paragraph extends FormFieldtype
     protected function configFieldItems(): array
     {
         return [
-            'content' => [
-                'display' => __('Content'),
+            'display' => [
+                'display' => __('Label'),
+                'instructions' => __('statamic::form-fieldtypes.paragraph.config.display.instructions'),
+                'type' => 'text',
+                'focus' => true,
+                'validate' => 'required',
+            ],
+            'instructions' => ['type' => 'hidden'],
+            'text' => [
+                'display' => __('Text'),
                 'type' => 'textarea',
             ],
         ];
@@ -27,14 +35,11 @@ class Paragraph extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        $content = $this->config('content');
-        $html = $content ? Markdown::parse($content) : null;
-
         return [
-            'type' => 'html',
-            'html' => $html,
+            'type' => 'form_paragraph',
+            'text' => $this->config('text'),
+            'display' => $this->config('display'),
             'hide_display' => true,
-            ...Arr::except($this->config(), ['type', 'content']),
         ];
     }
 }

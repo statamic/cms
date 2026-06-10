@@ -66,6 +66,7 @@ import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import StarRatingFieldtype from '../components/fieldtypes/StarRatingFieldtype.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue';
+import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
 
 export default function registerFieldtypes(app) {
     app.component('relationship-input', RelationshipInput);
@@ -85,7 +86,6 @@ export default function registerFieldtypes(app) {
         defineAsyncComponent(() => import('../components/fieldtypes/bard/Set.vue')),
     );
     app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
-    app.component('form_banner-fieldtype', FormBannerFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
     app.component('blueprints-fieldtype', BlueprintsFieldtype);
     app.component('checkboxes-fieldtype', CheckboxesFieldtype);
@@ -110,7 +110,9 @@ export default function registerFieldtypes(app) {
     app.component('grid-fieldtype', Grid);
     app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);
+    app.component('form_banner-fieldtype', FormBannerFieldtype);
     app.component('form_heading-fieldtype', FormHeadingFieldtype);
+    app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
     app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);

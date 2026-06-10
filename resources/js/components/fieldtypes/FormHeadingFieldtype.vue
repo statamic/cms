@@ -15,6 +15,6 @@ defineExpose(expose);
             size="xl"
             class="!font-bold"
         />
-        <Subheading v-if="config.instructions" :text="__(config.instructions)" class="mt-1" />
+        <Subheading v-if="config.subheading" :text="__(config.subheading)" class="mt-1" />
     </div>
 </template>

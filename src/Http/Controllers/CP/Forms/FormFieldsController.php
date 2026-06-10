@@ -112,10 +112,11 @@ class FormFieldsController extends CpController
                 'main' => [
                     'sections' => [
                         [
-                            'fields' => [
-                                ...FormField::commonFieldOptions()->items(),
-                                ...$blueprint->contents()['tabs']['main']['sections'][0]['fields'],
-                            ],
+                            'fields' => collect(FormField::commonFieldOptions()->items())
+                                ->merge($blueprint->contents()['tabs']['main']['sections'][0]['fields'])
+                                ->reverse()->unique('handle')->reverse() // Prioritize the duplicate from the fieldtype
+                                ->values()
+                                ->all(),
                         ],
                     ],
                 ],
