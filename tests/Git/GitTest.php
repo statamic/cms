@@ -253,13 +253,8 @@ EOT;
 
         Git::commit('Message"; echo "deleting all your files now"; #');
 
-        $expectedUser = 'Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>';
-        $expectedMessage = 'Message\; echo deleting all your files now\; \#';
-
-        if (static::isRunningWindows()) {
-            $expectedUser = str_replace('\\', '^', $expectedUser);
-            $expectedMessage = str_replace('\\', '^', $expectedMessage);
-        }
+        $expectedUser = 'Jimmy; echo deleting all your files now; # <jimmy@haxor.org; echo deleting all your files now; #>';
+        $expectedMessage = 'Message; echo deleting all your files now; #';
 
         $lastCommit = $this->showLastCommit(base_path('content'));
 
@@ -416,12 +411,19 @@ EOT;
     #[Test]
     public function it_attributes_coalesced_commits_to_the_configured_user()
     {
-        Cache::put('statamic-git-pending-saves', 3);
+        Cache::put('statamic-git-pending-saves', [
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+            ['name' => 'Bob', 'email' => 'bob@example.com'],
+        ]);
 
         $user = User::make()->email('alice@example.com');
 
         Git::shouldReceive('as')->with(null)->andReturnSelf()->once();
-        Git::shouldReceive('commit')->with('Entry saved')->once();
+        Git::shouldReceive('commit')->withArgs(function ($message) {
+            return str_contains($message, 'Entry saved')
+                && str_contains($message, 'Co-Authored-By: Alice <alice@example.com>')
+                && str_contains($message, 'Co-Authored-By: Bob <bob@example.com>');
+        })->once();
 
         (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
     }
@@ -429,12 +431,50 @@ EOT;
     #[Test]
     public function it_attributes_non_coalesced_commits_to_the_authenticated_user()
     {
-        Cache::put('statamic-git-pending-saves', 1);
+        Cache::put('statamic-git-pending-saves', [
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+        ]);
 
         $user = User::make()->email('alice@example.com');
 
         Git::shouldReceive('as')->with($user)->andReturnSelf()->once();
         Git::shouldReceive('commit')->with('Entry saved')->once();
+
+        (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
+    }
+
+    #[Test]
+    public function it_adds_co_authored_by_trailers_for_coalesced_saves()
+    {
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        $message = "Content saved\n\nCo-Authored-By: Alice <alice@example.com>\nCo-Authored-By: Bob <bob@example.com>";
+
+        Git::commit($message);
+
+        $commit = $this->showLastCommit(base_path('content'));
+
+        $this->assertStringContainsString('Co-Authored-By: Alice <alice@example.com>', $commit);
+        $this->assertStringContainsString('Co-Authored-By: Bob <bob@example.com>', $commit);
+    }
+
+    #[Test]
+    public function it_deduplicates_co_authors_for_repeated_saves_by_the_same_user()
+    {
+        Cache::put('statamic-git-pending-saves', [
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+            ['name' => 'Bob', 'email' => 'bob@example.com'],
+        ]);
+
+        $user = User::make()->email('alice@example.com');
+
+        Git::shouldReceive('as')->with(null)->andReturnSelf()->once();
+        Git::shouldReceive('commit')->withArgs(function ($message) {
+            return substr_count($message, 'Co-Authored-By:') === 2
+                && str_contains($message, 'Co-Authored-By: Alice <alice@example.com>')
+                && str_contains($message, 'Co-Authored-By: Bob <bob@example.com>');
+        })->once();
 
         (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
     }

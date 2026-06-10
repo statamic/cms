@@ -10,6 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Git;
 
+use function Statamic\trans as __;
+
 class CommitJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
@@ -29,8 +31,17 @@ class CommitJob implements ShouldBeUnique, ShouldQueue
      */
     public function handle()
     {
-        $committer = Cache::pull('statamic-git-pending-saves', 0) > 1 ? null : $this->committer;
+        $saves = Cache::pull('statamic-git-pending-saves', []);
+        $users = collect($saves)->unique('email')->values();
+        $coalesced = $users->count() > 1;
 
-        Git::as($committer)->commit($this->message);
+        $message = $this->message;
+
+        if ($coalesced) {
+            $trailers = $users->map(fn ($u) => "Co-Authored-By: {$u['name']} <{$u['email']}>")->implode("\n");
+            $message = ($message ?? __('Content saved'))."\n\n".$trailers;
+        }
+
+        Git::as($coalesced ? null : $this->committer)->commit($message);
     }
 }
