@@ -98,7 +98,19 @@
             @apply p-1.5 px-1.5 bg-gray-100 rounded-lg;
 
             > li {
-                display: flex;
+                /* Use a grid instead of flexbox so we can force things into column 1 and 2.
+                   If we use flexbox then invisible items such as .linked-list__extra-leap-connector will take up an flex child space, changing the layout of items with a leap connector. */
+                display: grid;
+                grid-template-columns: 1rem 1fr;
+                > * {
+                    grid-row: 1;
+                }
+                & > svg {
+                    grid-column: 1;
+                }
+                .linked-list__field-name {
+                    grid-column: 2;
+                }
                 gap: 0.5rem;
                 height: var(--item-height);
                 padding-block: var(--item-padding);
