@@ -108,36 +108,38 @@ onUnmounted(() => {
         </Button>
     </Teleport>
 
-    <div class="py-4 mx-auto max-w-5xl">
-        <Header class="mb-2">
-            <template #title>
-                <StatusIndicator status="published" />
-                {{ form.title }}
+    <div class="py-4">
+        <div class="mx-auto max-w-5xl">
+            <Header class="mb-2">
+                <template #title>
+                    <StatusIndicator status="published" />
+                    {{ form.title }}
+                </template>
+                <template #actions>
+                    <ToggleGroup v-model="logicView" size="sm">
+                        <ToggleItem value="list" icon="layout-list" :label="__('List')" />
+                        <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
+                    </ToggleGroup>
+                </template>
+            </Header>
+
+            <template v-if="logicView === 'list'">
+                <PageLogic
+                    v-if="pages.length > 1"
+                    class="mb-6"
+                    v-model:pages="pages"
+                    :suggestable-fields
+                    :fieldtypes
+                />
+
+                <FieldLogic
+                    v-model:fields="fields"
+                    :suggestable-fields
+                    :fieldtypes
+                />
             </template>
-            <template #actions>
-                <ToggleGroup v-model="logicView" size="sm">
-                    <ToggleItem value="list" icon="layout-list" :label="__('List')" />
-                    <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
-                </ToggleGroup>
-            </template>
-        </Header>
+        </div>
 
-        <template v-if="logicView === 'list'">
-            <PageLogic
-                v-if="pages.length > 1"
-                class="mb-6"
-                v-model:pages="pages"
-                :suggestable-fields
-                :fieldtypes
-            />
-
-            <FieldLogic
-                v-model:fields="fields"
-                :suggestable-fields
-                :fieldtypes
-            />
-        </template>
-
-        <LogicTree v-else :pages="pages" :fields="fields" />
+        <LogicTree v-if="logicView === 'tree'" :pages="pages" :fields="fields" />
     </div>
 </template>

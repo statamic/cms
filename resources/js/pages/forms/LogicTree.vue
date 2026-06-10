@@ -53,7 +53,7 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
 </script>
 
 <template>
-    <div class="linked-list">
+    <div class="linked-list w-full">
         <ul v-for="{ page, pageIndex, fields: pageFields } in fieldsByPage" :key="page._id">
             <li
                 class="linked-list__page-label"
