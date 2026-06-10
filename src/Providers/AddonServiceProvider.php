@@ -171,6 +171,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $viewNamespace;
 
     /**
+     * When set, the addon's tags (and their aliases) are additionally
+     * registered under this namespace, e.g. `{{ my-namespace::my_tag }}`.
+     * Must be a simple slug without colons.
+     *
+     * @var string|null
+     */
+    protected $tagNamespace;
+
+    /**
      * @var bool
      */
     protected $publishAfterInstall = true;
@@ -304,7 +313,28 @@ abstract class AddonServiceProvider extends ServiceProvider
             $class::register();
         }
 
+        if ($this->tagNamespace) {
+            $this->registerNamespacedTags($tags);
+        }
+
         return $this;
+    }
+
+    private function registerNamespacedTags($tags)
+    {
+        $extensions = app('statamic.extensions');
+
+        $extensions[Tags::class] = with($extensions[Tags::class] ?? collect(), function ($bindings) use ($tags) {
+            foreach ($tags as $class) {
+                $bindings[$this->tagNamespace.'::'.$class::handle()] = $class;
+
+                foreach ($class::aliases() as $alias) {
+                    $bindings[$this->tagNamespace.'::'.$alias] = $class;
+                }
+            }
+
+            return $bindings;
+        });
     }
 
     protected function bootScopes()
