@@ -65,7 +65,7 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
     <div class="linked-list w-full">
         <ul v-for="{ page, pageIndex, fields: pageFields } in fieldsByPage" :key="page._id">
             <li
-                class="linked-list__page-label !h-auto items-stretch border-0 bg-transparent px-0 py-1"
+                class="linked-list__page-name !h-auto items-stretch border-0 bg-transparent px-0 py-1"
                 :style="{ 'anchor-name': pageAnchor(pageIndex) }"
             >
                 <div class="flex w-full min-w-0 items-center gap-2">

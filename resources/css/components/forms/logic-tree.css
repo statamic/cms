@@ -9,7 +9,7 @@
     Markup (LogicTree.vue):
 
         - Each page column is a <ul>.
-        - Page headers: .linked-list__page-label with anchor-name: --page-N.
+        - Page headers: .linked-list__page-name with anchor-name: --page-N.
         - Source fields: .linked-list__connector with --end-connection: --page-N, pointing at the target page’s anchor name.
         - Multi-column hops: add .linked-list__page-leap on the source <li> and a .linked-list__extra-leap-connector child for the bridge segment. This helps separate multi-column connectors from adjacent pages.
 
@@ -82,7 +82,7 @@
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white text-xs;
             }
 
-            .linked-list__page-label::after {
+            .linked-list__page-name::after {
                 content: unset;
             }
 
