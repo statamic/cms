@@ -20,7 +20,6 @@ class Paragraph extends FormFieldtype
         return [
             'content' => [
                 'display' => __('Content'),
-                'instructions' => __('statamic::form-fields.paragraph.config.content'),
                 'type' => 'textarea',
             ],
         ];
