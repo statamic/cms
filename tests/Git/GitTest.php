@@ -399,6 +399,8 @@ EOT;
     #[Test]
     public function it_only_dispatches_one_commit_job_at_a_time()
     {
+        // ShouldBeUnique acquires its cache lock in Bus\Dispatcher before the job
+        // reaches the queue driver, so Queue::fake() still enforces uniqueness here.
         Queue::fake();
 
         Git::dispatchCommit();
