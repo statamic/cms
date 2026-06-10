@@ -10,6 +10,7 @@ class SingleAsset extends Assets
 {
     protected $component = 'assets';
     protected $selectable = false;
+    protected $selectableInForms = false;
 
     public function preProcess($values)
     {
