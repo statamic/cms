@@ -20,6 +20,7 @@ class CurrencyTest extends TestCase
         $this->assertEquals([
             'type' => 'integer',
             'prepend' => '$',
+            'currency_symbol' => '$',
         ], $fieldtype->toFieldArray());
     }
 
@@ -35,6 +36,7 @@ class CurrencyTest extends TestCase
         $this->assertEquals([
             'type' => 'integer',
             'prepend' => '€',
+            'currency_symbol' => '€',
             'default' => 100,
         ], $fieldtype->toFieldArray());
     }
