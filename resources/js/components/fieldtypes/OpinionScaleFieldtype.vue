@@ -5,80 +5,30 @@ import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, update, isReadOnly, defineReplicatorPreview, name } = Fieldtype.use(emit, props);
+const { expose, update, isReadOnly, name } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
-const optionClass = 'relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925';
+const optionClasses = [
+    'relative flex size-9 shrink-0 cursor-pointer items-center justify-center',
+    'rounded-md border shadow-ui-xs text-xs font-medium transition-colors',
+    'border-gray-300 bg-white text-gray-800 hover:bg-gray-50',
+    'dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925',
+];
 
-const min = computed(() => {
-    const value = Number(props.config.min);
-
-    return value === 1 ? 1 : 0;
-});
-
-const max = computed(() => {
-    const value = Number(props.config.max);
-
-    if (! Number.isFinite(value)) {
-        return 10;
-    }
-
-    return Math.max(min.value + 1, Math.min(min.value + 10, Math.round(value)));
-});
+const min = computed(() => props.config.min ?? 0);
+const max = computed(() => props.config.max ?? 10);
+const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
+const ariaLabel = computed(() => __(props.config.display ?? 'Opinion scale'));
+const hasLabels = computed(() => Boolean(props.config.low_label || props.config.middle_label || props.config.high_label));
 
 const scaleValues = computed(() => {
     const values = [];
 
-    for (let value = min.value; value <= max.value; value++) {
-        values.push(value);
+    for (let i = min.value; i <= max.value; i++) {
+        values.push(i);
     }
 
     return values;
-});
-
-const selectedValue = computed(() => {
-    if (props.value == null || props.value === '') {
-        return null;
-    }
-
-    const value = Number(props.value);
-
-    if (! Number.isFinite(value)) {
-        return null;
-    }
-
-    if (value < min.value || value > max.value) {
-        return null;
-    }
-
-    return value;
-});
-
-const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
-
-const hasLabels = computed(() => Boolean(
-    props.config.low_label || props.config.middle_label || props.config.high_label,
-));
-
-const ariaLabel = computed(() => props.config.display ? __(props.config.display) : __('Opinion scale'));
-
-function selectValue(value) {
-    if (isDisabled.value) {
-        return;
-    }
-
-    update(value);
-}
-
-defineReplicatorPreview(() => {
-    if (selectedValue.value == null) {
-        return null;
-    }
-
-    return `${selectedValue.value}/${max.value}`;
-});
-
-defineExpose({
-    ...expose,
 });
 </script>
 
@@ -90,25 +40,23 @@ defineExpose({
             :aria-label="ariaLabel"
         >
             <label
-                v-for="(value, index) in scaleValues"
-                :key="value"
+                v-for="scaleValue in scaleValues"
+                :key="scaleValue"
                 :class="[
-                    optionClass,
-                    {
-                        'border-primary bg-primary/10 text-primary dark:bg-primary/20': selectedValue === value,
-                    },
+                    optionClasses,
+                    { 'border-primary bg-primary/10 text-primary dark:bg-primary/20': value == scaleValue },
                 ]"
             >
                 <input
                     type="radio"
                     class="absolute pointer-events-none opacity-0"
                     :name="name"
-                    :value="value"
-                    :checked="selectedValue === value"
+                    :value="scaleValue"
+                    :checked="value === scaleValue"
                     :disabled="isDisabled"
-                    @change="selectValue(value)"
+                    @change="update(scaleValue)"
                 >
-                <span class="leading-none">{{ value }}</span>
+                <span class="leading-none">{{ scaleValue }}</span>
             </label>
         </div>
 

@@ -41,7 +41,7 @@ class OpinionScale extends FormFieldtype
             ],
             'middle_label' => [
                 'display' => __('Middle Label'),
-                'instructions' => __('(Optional) shown below the middle value.'),
+                'instructions' => __('Shown below the middle value.'),
                 'type' => 'text',
             ],
             'high_label' => [
@@ -60,7 +60,6 @@ class OpinionScale extends FormFieldtype
             'type' => 'opinion_scale',
             'min' => $min,
             'max' => $max,
-            'scale_values' => range($min, $max),
             'low_label' => $this->config('low_label'),
             'middle_label' => $this->config('middle_label'),
             'high_label' => $this->config('high_label'),
@@ -74,7 +73,7 @@ class OpinionScale extends FormFieldtype
             'config' => [
                 'display' => __('How likely are you to recommend us?'),
                 'min' => 0,
-                'max' => 10,
+                'max' => 5,
                 'low_label' => __('Not likely'),
                 'high_label' => __('Very likely'),
             ],

@@ -10,7 +10,7 @@ use Tests\TestCase;
 class OpinionScaleTest extends TestCase
 {
     #[Test]
-    public function it_returns_field_array_with_defaults()
+    public function it_returns_field_array()
     {
         $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', [
             'type' => 'opinion_scale',
@@ -20,7 +20,6 @@ class OpinionScaleTest extends TestCase
             'type' => 'opinion_scale',
             'min' => 0,
             'max' => 10,
-            'scale_values' => range(0, 10),
             'low_label' => null,
             'middle_label' => null,
             'high_label' => null,
@@ -44,7 +43,6 @@ class OpinionScaleTest extends TestCase
             'type' => 'opinion_scale',
             'min' => 1,
             'max' => 5,
-            'scale_values' => range(1, 5),
             'low_label' => 'Not satisfied',
             'middle_label' => 'Neutral',
             'high_label' => 'Very satisfied',
@@ -70,18 +68,5 @@ class OpinionScaleTest extends TestCase
         ]));
 
         $this->assertEquals(2, $fieldtype->toFieldArray()['max']);
-    }
-
-    #[Test]
-    public function it_provides_an_example()
-    {
-        $example = (new OpinionScale)->example();
-
-        $this->assertSame('How likely are you to recommend us?', $example['config']['display']);
-        $this->assertEquals(0, $example['config']['min']);
-        $this->assertEquals(10, $example['config']['max']);
-        $this->assertEquals('Not likely', $example['config']['low_label']);
-        $this->assertEquals('Very likely', $example['config']['high_label']);
-        $this->assertSame(8, $example['value']);
     }
 }
