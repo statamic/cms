@@ -1,5 +1,6 @@
 <script setup>
 import { Icon } from '@ui';
+import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 import { computed } from 'vue';
 
 const props = defineProps({
@@ -77,6 +78,12 @@ const connectorDestinationPageIndices = computed(() => {
 const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.value.has(pageIndex);
 
 const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
+
+const fieldIconClass = (category) => {
+    const color = categories[category]?.color || 'gray';
+
+    return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
+};
 </script>
 
 <template>
@@ -128,7 +135,12 @@ const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(page
                     :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
                 >
                     <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                    <span class="line-clamp-2">{{ field.display }}</span>
+                    <Icon
+                        :name="field.icon || 'generic-field'"
+                        :class="['size-4 shrink-0', fieldIconClass(field.category)]"
+                        aria-hidden="true"
+                    />
+                    <span class="min-w-0 line-clamp-2">{{ field.display }}</span>
                 </li>
             </ul>
         </div>
