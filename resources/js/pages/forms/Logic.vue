@@ -159,10 +159,11 @@ onUnmounted(() => {
         </template>
     </div>
 
-    <LogicTree
-        v-if="logicView === 'tree'"
-        :pages="pages"
-        :fields="fields"
-        :expanded="treeDensity === 'expanded'"
-    />
+    <div v-if="logicView === 'tree'" class="min-w-0 w-full">
+        <LogicTree
+            :pages="pages"
+            :fields="fields"
+            :expanded="treeDensity === 'expanded'"
+        />
+    </div>
 </template>

@@ -43,7 +43,23 @@
         anchor-scope: --start-connection — keeps each source’s connector isolated
 */
 @layer components {
-    /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
+    /* .content-card is #content-card's grid item — min-width: auto lets it grow to fit max-content children */
+    .content-card:has(.linked-list-container) {
+        min-width: 0;
+        overflow-x: clip;
+    }
+
+    .linked-list-container {
+        /* Don't let max-content grid width expand ancestors — scroll inside here only */
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+        contain: inline-size;
+        overscroll-behavior-x: contain;
+    }
+
     .linked-list {
         --join-stroke: 1px;
         --join-line: var(--join-stroke) solid var(--color-blue-400);
@@ -63,7 +79,10 @@
         position: relative;
         display: grid;
         align-items: start;
-        grid-template-columns: repeat(auto-fill, var(--column-width));
+        grid-auto-flow: column;
+        grid-auto-columns: var(--column-width);
+        width: max-content;
+        margin-inline: auto;
         gap: var(--gap);
 
         .linked-list__column {
