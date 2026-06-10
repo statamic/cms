@@ -140,7 +140,7 @@ const fieldIconClass = (field) => {
                         <Icon
                             v-if="isConnectorDestination(pageIndex)"
                             name="chevron-right"
-                            class="size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400"
+                            class="size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400 dark:text-blue-500"
                             aria-hidden="true"
                         />
                         <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
@@ -151,7 +151,7 @@ const fieldIconClass = (field) => {
                             />
                         </span>
                         <div
-                            class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                            class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
                             :class="{ 'w-[85%]!': hasPageNameLeadingIcons(page, pageIndex) }"
                         >
                             <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />

@@ -58,6 +58,10 @@
         --join-stroke: 1px;
         --join-line: var(--join-stroke) solid var(--color-blue-400);
         --join-radius: 20px;
+
+        :where(.dark) & {
+            --join-line: var(--join-stroke) solid var(--color-blue-500);
+        }
         --gap: 6rem;
         --column-width: 12.5rem;
 
@@ -95,7 +99,7 @@
             list-style: none;
             display: grid;
             gap: 0.5rem;
-            @apply p-1.5 px-1.5 bg-gray-100 rounded-lg;
+            @apply p-1.5 px-1.5 bg-gray-100 rounded-lg dark:bg-gray-900/60;
 
             > li {
                 /* Use a grid instead of flexbox so we can force things into column 1 and 2.
@@ -114,7 +118,7 @@
                 gap: 0.5rem;
                 height: var(--item-height);
                 padding-block: var(--item-padding);
-                @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs;
+                @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
             }
 
             > li.linked-list__fieldset-wrap {
@@ -132,7 +136,7 @@
             .linked-list__fieldset-group {
                 display: flex;
                 flex-direction: column;
-                @apply rounded-lg shadow-ui-xs;
+                @apply rounded-lg shadow-ui-xs dark:shadow-none dark:ring-1 dark:ring-white/10;
             }
 
             .linked-list__field-row {
@@ -141,7 +145,7 @@
                 gap: 0.5rem;
                 height: var(--item-height);
                 padding-block: var(--item-padding);
-                @apply border-x border-b border-gray-300 bg-white px-3 text-xs;
+                @apply border-x border-b border-gray-300 bg-white px-3 text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200;
 
                 &:first-child {
                     @apply rounded-t-md border-t;
