@@ -112,59 +112,57 @@ onUnmounted(() => {
         </Button>
     </Teleport>
 
-    <div class="py-4">
-        <div class="mx-auto max-w-5xl">
-            <Header class="mb-2">
-                <template #title>
-                    <StatusIndicator status="published" />
-                    {{ form.title }}
-                </template>
-                <template #actions>
-                    <div class="flex items-start gap-4">
-                        <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
-                            <ToggleItem
-                                value="compressed"
-                                icon="collapse"
-                                :aria-label="__('Compressed view')"
-                                v-tooltip="__('Compressed view')"
-                            />
-                            <ToggleItem
-                                value="expanded"
-                                icon="expand"
-                                :aria-label="__('Uncompressed view')"
-                                v-tooltip="__('Uncompressed view')"
-                            />
-                        </ToggleGroup>
-                        <ToggleGroup v-model="logicView" size="sm">
-                            <ToggleItem value="list" icon="layout-list" :label="__('List')" />
-                            <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
-                        </ToggleGroup>
-                    </div>
-                </template>
-            </Header>
-
-            <template v-if="logicView === 'list'">
-                <PageLogic
-                    v-if="pages.length > 1"
-                    class="mb-6"
-                    v-model:pages="pages"
-                    :suggestable-fields
-                    :fieldtypes
-                />
-
-                <FieldLogic
-                    v-model:fields="fields"
-                    :suggestable-fields
-                    :fieldtypes
-                />
+    <div class="mx-auto max-w-5xl">
+        <Header class="mb-2">
+            <template #title>
+                <StatusIndicator status="published" />
+                {{ form.title }}
             </template>
-        </div>
+            <template #actions>
+                <div class="flex items-start gap-4">
+                    <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
+                        <ToggleItem
+                            value="compressed"
+                            icon="collapse"
+                            :aria-label="__('Compressed view')"
+                            v-tooltip="__('Compressed view')"
+                        />
+                        <ToggleItem
+                            value="expanded"
+                            icon="expand"
+                            :aria-label="__('Uncompressed view')"
+                            v-tooltip="__('Uncompressed view')"
+                        />
+                    </ToggleGroup>
+                    <ToggleGroup v-model="logicView" size="sm">
+                        <ToggleItem value="list" icon="layout-list" :label="__('List')" />
+                        <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
+                    </ToggleGroup>
+                </div>
+            </template>
+        </Header>
 
-        <LogicTree
-            v-if="logicView === 'tree'"
-            :pages="pages"
-            :fields="fields"
-            :expanded="treeDensity === 'expanded'"
-        />
+        <template v-if="logicView === 'list'">
+            <PageLogic
+                v-if="pages.length > 1"
+                class="mb-6"
+                v-model:pages="pages"
+                :suggestable-fields
+                :fieldtypes
+            />
+
+            <FieldLogic
+                v-model:fields="fields"
+                :suggestable-fields
+                :fieldtypes
+            />
+        </template>
     </div>
+
+    <LogicTree
+        v-if="logicView === 'tree'"
+        :pages="pages"
+        :fields="fields"
+        :expanded="treeDensity === 'expanded'"
+    />
 </template>
