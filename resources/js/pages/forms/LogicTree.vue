@@ -142,7 +142,29 @@ const fieldIconClass = (category) => {
                             :class="['size-4 shrink-0', fieldIconClass(field.category)]"
                             aria-hidden="true"
                         />
-                        <span class="linked-list__field-name">{{ field.display }}</span>
+                        <span
+                            v-if="field.type === 'reference'"
+                            v-tooltip="__('Linked Field')"
+                            class="inline-flex shrink-0"
+                        >
+                            <Icon
+                                name="link"
+                                class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span
+                            v-else-if="field.type === 'import' && field.fieldset_link"
+                            v-tooltip="__('Linked Fieldset')"
+                            class="inline-flex shrink-0"
+                        >
+                            <Icon
+                                name="link"
+                                class="size-4 shrink-0 rotate-90 text-indigo-500 dark:text-indigo-400"
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span class="linked-list__field-name min-w-0 flex-1">{{ field.display }}</span>
                     </li>
                 </ul>
             </div>

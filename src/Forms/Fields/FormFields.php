@@ -74,6 +74,11 @@ class FormFields
         return $this->fields()->get($handle);
     }
 
+    public function importedFields(array $config): array
+    {
+        return $this->getImportedFields($config);
+    }
+
     public function toBlueprint(): Blueprint
     {
         $tabs = $this->pages()

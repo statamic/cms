@@ -67,41 +67,80 @@ class FormLogicController extends CpController
         foreach ($formFields->pages() as $pageIndex => $page) {
             foreach ($page['sections'] ?? [] as $section) {
                 foreach ($section['fields'] ?? [] as $config) {
+                    if (isset($config['import'])) {
+                        $isFirst = true;
+
+                        foreach ($formFields->importedFields($config) as $formField) {
+                            $fields[] = $this->formFieldToVue(
+                                $formField,
+                                $pageIndex,
+                                'import',
+                                fieldsetLink: $isFirst,
+                                importFieldset: $config['import'],
+                            );
+                            $isFirst = false;
+                        }
+
+                        continue;
+                    }
+
                     if (! isset($config['handle'])) {
                         continue;
                     }
 
-                    $handle = $config['handle'];
-                    $field = $config['field'] ?? [];
+                    $type = is_string($config['field'] ?? null) ? 'reference' : 'inline';
 
-                    $formField = $formFields->field($handle);
-                    $fieldtype = $formField->fieldtype();
-
-                    $result = [
-                        '_id' => $handle,
-                        'handle' => $handle,
-                        'page_index' => $pageIndex,
-                        'display' => $field['display'] ?? $handle,
-                        'icon' => $fieldtype?->icon() ?? 'generic-field',
-                        'category' => $fieldtype->categories()[0] ?? 'other',
-                        'fieldtype' => $field['type'] ?? 'short_answer',
-                        'if' => $field['if'] ?? null,
-                        'unless' => $field['unless'] ?? null,
-                        'if_any' => $field['if_any'] ?? null,
-                        'unless_any' => $field['unless_any'] ?? null,
-                        'always_save' => $field['always_save'] ?? false,
-                    ];
-
-                    if (isset($field['options'])) {
-                        $result['options'] = $field['options'];
-                    }
-
-                    $fields[] = $result;
+                    $fields[] = $this->formFieldToVue(
+                        $formFields->field($config['handle']),
+                        $pageIndex,
+                        $type,
+                        handle: $config['handle'],
+                    );
                 }
             }
         }
 
         return $fields;
+    }
+
+    private function formFieldToVue(
+        ?FormField $formField,
+        int $pageIndex,
+        string $type,
+        bool $fieldsetLink = false,
+        ?string $importFieldset = null,
+        ?string $handle = null,
+    ): array {
+        $handle = $handle ?? $formField?->handle();
+        $fieldConfig = $formField?->config() ?? [];
+        $fieldtype = $formField?->fieldtype();
+
+        $result = [
+            '_id' => $handle,
+            'handle' => $handle,
+            'page_index' => $pageIndex,
+            'display' => $fieldConfig['display'] ?? $handle,
+            'icon' => $fieldtype?->icon() ?? 'generic-field',
+            'category' => $fieldtype->categories()[0] ?? 'other',
+            'fieldtype' => $fieldConfig['type'] ?? 'short_answer',
+            'type' => $type,
+            'if' => $fieldConfig['if'] ?? null,
+            'unless' => $fieldConfig['unless'] ?? null,
+            'if_any' => $fieldConfig['if_any'] ?? null,
+            'unless_any' => $fieldConfig['unless_any'] ?? null,
+            'always_save' => $fieldConfig['always_save'] ?? false,
+        ];
+
+        if ($type === 'import') {
+            $result['fieldset_link'] = $fieldsetLink;
+            $result['import'] = $importFieldset;
+        }
+
+        if (isset($fieldConfig['options'])) {
+            $result['options'] = $fieldConfig['options'];
+        }
+
+        return $result;
     }
 
     private function mergeLogicIntoForm(Request $request, Form $form): void
