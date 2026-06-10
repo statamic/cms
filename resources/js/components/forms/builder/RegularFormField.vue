@@ -124,7 +124,7 @@ const hasErrors = computed(() => {
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                                        :config="field.preview.config"
+                    :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
                     :handle="field.handle"
@@ -160,7 +160,7 @@ const hasErrors = computed(() => {
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                                        :config="field.preview.config"
+                    :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
                     :handle="field.handle"
