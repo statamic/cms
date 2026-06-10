@@ -130,7 +130,6 @@ class ImageChoice extends FormFieldtype
                     ],
                 ],
             ],
-            'value' => null,
         ];
     }
 

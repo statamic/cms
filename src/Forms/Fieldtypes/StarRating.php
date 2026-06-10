@@ -64,7 +64,6 @@ class StarRating extends FormFieldtype
                 'max_stars' => 5,
                 'allow_half_stars' => true,
             ],
-            'value' => null,
         ];
     }
 }
