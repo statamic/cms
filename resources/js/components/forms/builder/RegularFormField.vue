@@ -21,10 +21,6 @@ const props = defineProps<{
 
 const { dirty, errors, fieldView, inspect, inspecting, inspectorType } = injectBuilderContext();
 
-const informationFieldtypes = ['heading', 'paragraph', 'banner'];
-
-const isInformationField = computed(() => informationFieldtypes.includes(props.field.fieldtype));
-
 const inspectField = () => inspect(InspectorType.Field, props.field);
 const isInspecting = computed(() => inspectorType.value === InspectorType.Field && inspecting.value?._id === props.field._id);
 
@@ -38,6 +34,8 @@ const fieldtypeCategory = computed(() => {
     const hue = fieldtype?.categories?.[0] || 'other';
     return categories[hue] ?? categories.other;
 });
+
+const isInformationField = computed(() => fieldtypeCategory.value === categories.information);
 
 const iconColorClass = computed(() => categoryColorClasses[fieldtypeCategory.value.color].icon);
 
