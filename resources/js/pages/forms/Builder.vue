@@ -193,9 +193,7 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
 
     const handle = uniqid();
 
-    const initialPreview = fieldtype.handle === 'image_choice'
-        ? fieldtype.preview
-        : (fieldtype.example ?? fieldtype.preview);
+    const initialPreview = fieldtype.example ?? fieldtype.preview;
 
     const field = {
         _id: handle,
