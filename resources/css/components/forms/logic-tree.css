@@ -43,12 +43,6 @@
         anchor-scope: --start-connection — keeps each source’s connector isolated
 */
 @layer components {
-    /* .content-card is #content-card's grid item — min-width: auto lets it grow to fit max-content children */
-    .content-card:has(.linked-list-container) {
-        min-width: 0;
-        overflow-x: clip;
-    }
-
     .linked-list-container {
         /* Don't let max-content grid width expand ancestors — scroll inside here only */
         width: 100%;

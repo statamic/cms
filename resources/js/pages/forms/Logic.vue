@@ -112,7 +112,7 @@ onUnmounted(() => {
         </Button>
     </Teleport>
 
-    <div class="mx-auto max-w-5xl">
+    <div class="mx-auto max-w-5xl min-w-0">
         <Header class="mb-2 md:py-9">
             <template #title>
                 <StatusIndicator status="published" />
@@ -159,7 +159,7 @@ onUnmounted(() => {
         </template>
     </div>
 
-    <div v-if="logicView === 'tree'" class="min-w-0 w-full">
+    <div v-if="logicView === 'tree'" class="st-full-bleed-content">
         <LogicTree
             :pages="pages"
             :fields="fields"

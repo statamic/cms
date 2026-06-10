@@ -14,10 +14,6 @@
     display: none;
 }
 
-@utility max-h-screen-px {
-    max-height: calc(100vh - 1px) !important;
-}
-
 .z-max {
     z-index: var(--z-index-max);
 }
@@ -74,6 +70,37 @@
     to {
         mask-image: unset;
     }
+}
+
+/*
+    Break out of .content-card horizontal padding and [data-max-width-wrapper] max-w-page
+    so content can span the card while staying aligned with padded siblings on scroll.
+
+    HTML Example:
+    <div class="content-card">
+        (direct descendants only)
+        <div class="st-full-bleed-content">
+            <div>…wide / scrollable content…</div>
+        </div>
+    </div>
+*/
+@utility st-full-bleed-content {
+    @apply -mx-2 sm:-mx-6 md:-mx-12 min-w-0;
+
+    & > * {
+        @apply px-2 sm:px-6 md:px-12 min-w-0;
+    }
+}
+.content-card:has(.st-full-bleed-content) {
+    min-width: 0;
+    overflow-x: clip;
+}
+[data-max-width-wrapper]:has(.st-full-bleed-content) {
+    max-width: none !important;
+}
+
+@utility max-h-screen-px {
+    max-height: calc(100vh - 1px) !important;
 }
 
 /* UTILITIES / TEXT
