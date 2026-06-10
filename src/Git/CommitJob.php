@@ -14,16 +14,14 @@ class CommitJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    /**
-     * The number of seconds after which the job's unique lock will be released.
-     */
-    public int $uniqueFor = 120;
+    public int $uniqueFor;
 
     /**
      * Create a new job instance.
      */
     public function __construct(public $message = null, public $committer = null)
     {
+        $this->uniqueFor = config('statamic.git.unique_lock_expiry', 120);
     }
 
     /**
