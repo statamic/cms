@@ -55,7 +55,7 @@
                 @apply outline-hidden;
 
                 > td {
-                    @apply border-b px-2 py-3 align-top dark:border-gray-900;
+                    @apply border-b px-1 @2xl:px-2 py-3 align-top dark:border-gray-900;
         
                     &:first-child.grid-cell {
                         @apply ltr:pl-3 rtl:pr-3;

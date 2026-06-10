@@ -168,6 +168,44 @@ class HalfMeasureStaticCachingTest extends TestCase
     }
 
     #[Test]
+    #[DefineEnvironment('shareErrorsEnabled')]
+    public function nocache_session_is_written_under_the_real_url_for_shared_errors()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        // Regression: when share_errors is enabled, rendering an error repoints the
+        // singleton nocache Session URL at /__shared-errors/<site>/<status> (via
+        // RendersHttpExceptions::getCachedError and the middleware's copyError).
+        // Session::write() then persisted the regions list only under that shared
+        // URL. But half-measure caching also stores the error page under its real
+        // URL, so a repeat request to that same URL restored the session by its
+        // real URL, found nothing, caught a RegionNotFound, and fell through to a
+        // full dynamic re-render. The session must be persisted under both URLs.
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.404', '404 {{ nocache }}dynamic{{ /nocache }}');
+
+        $this->get('/this-does-not-exist')->assertNotFound();
+
+        $store = \Statamic\Facades\StaticCache::cacheStore();
+
+        // Stored under the real request URL so repeat requests (served from the
+        // per-URL cache) can restore their nocache regions.
+        $this->assertNotNull(
+            $store->get('nocache::session.'.md5('http://localhost/this-does-not-exist')),
+            'Expected nocache session to be stored under the real request URL.'
+        );
+
+        // Still stored under the shared-errors URL so the same error served for
+        // other erroring URLs can restore its nocache regions.
+        $this->assertNotNull(
+            $store->get('nocache::session.'.md5('/__shared-errors/en/404')),
+            'Expected nocache session to be stored under the shared-errors URL.'
+        );
+    }
+
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags_in_loops()
     {
         // Use a tag that outputs something dynamic but consistent.
