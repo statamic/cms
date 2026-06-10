@@ -115,7 +115,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Sites::class,
         Fieldtypes\Structures::class,
         Fieldtypes\Slug::class,
-        Fieldtypes\SingleAsset::class,
         Fieldtypes\Spacer::class,
         Fieldtypes\StarRating::class,
         Fieldtypes\Table::class,
