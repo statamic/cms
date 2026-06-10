@@ -59,6 +59,24 @@ const hasPageRules = (page) => (page.rules ?? []).some((rule) => {
 });
 
 const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
+
+const connectorDestinationPageIndices = computed(() => {
+    const indices = new Set();
+
+    Object.values(fieldConnections.value).forEach((connection) => {
+        const pageNumber = Number(connection.endConnection.replace('--page-', ''));
+
+        if (! Number.isNaN(pageNumber)) {
+            indices.add(pageNumber - 1);
+        }
+    });
+
+    return indices;
+});
+
+const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.value.has(pageIndex);
+
+const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
 </script>
 
 <template>
@@ -74,8 +92,14 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
             >
                 <div
                     class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
-                    :class="{ '-ms-1.5': hasPageRules(page) }"
+                    :class="{ '-ms-1.5': hasPageNameLeadingIcons(page, pageIndex) }"
                 >
+                    <Icon
+                        v-if="isConnectorDestination(pageIndex)"
+                        name="chevron-right"
+                        class="size-3! shrink-0 -ms-1.5 relative -top-0.25 text-blue-400"
+                        aria-hidden="true"
+                    />
                     <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
                         <Icon
                             name="logic-tree"
@@ -85,7 +109,7 @@ const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
                     </span>
                     <div
                         class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
-                        :class="{ 'w-[85%]!': hasPageRules(page) }"
+                        :class="{ 'w-[85%]!': hasPageNameLeadingIcons(page, pageIndex) }"
                     >
                         <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                         <span class="line-clamp-1">{{ pageTitle(page, pageIndex) }}</span>
