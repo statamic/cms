@@ -11,11 +11,39 @@ const props = defineProps({
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
+const groupPageFields = (pageFields) => {
+    const groups = [];
+    let fieldsetGroup = null;
+
+    pageFields.forEach((field) => {
+        if (field.import) {
+            if (fieldsetGroup?.import === field.import) {
+                fieldsetGroup.fields.push(field);
+            } else {
+                fieldsetGroup = {
+                    type: 'fieldset',
+                    import: field.import,
+                    title: field.import_title,
+                    fields: [field],
+                };
+                groups.push(fieldsetGroup);
+            }
+
+            return;
+        }
+
+        fieldsetGroup = null;
+        groups.push({ type: 'field', field });
+    });
+
+    return groups;
+};
+
 const fieldsByPage = computed(() => {
     return props.pages.map((page, pageIndex) => ({
         page,
         pageIndex,
-        fields: props.fields.filter((field) => field.page_index === pageIndex),
+        groups: groupPageFields(props.fields.filter((field) => field.page_index === pageIndex)),
     }));
 });
 
@@ -91,7 +119,7 @@ const fieldIconClass = (category) => {
     <div class="linked-list-container">
         <div class="linked-list" :class="{ 'linked-list--expanded': expanded }">
             <div
-                v-for="{ page, pageIndex, fields: pageFields } in fieldsByPage"
+                v-for="{ page, pageIndex, groups } in fieldsByPage"
                 :key="page._id"
                 class="linked-list__column"
             >
@@ -127,45 +155,80 @@ const fieldIconClass = (category) => {
                 </div>
 
                 <ul>
-                    <li
-                        v-for="field in pageFields"
-                        :key="field._id"
-                        :class="{
-                            'linked-list__connector': fieldConnection(field),
-                            'linked-list__page-leap': fieldConnection(field)?.leap,
-                        }"
-                        :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
-                    >
-                        <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                        <Icon
-                            :name="field.icon || 'generic-field'"
-                            :class="['size-4 shrink-0', fieldIconClass(field.category)]"
-                            aria-hidden="true"
-                        />
-                        <span
-                            v-if="field.type === 'reference'"
-                            v-tooltip="__('Linked Field')"
-                            class="inline-flex shrink-0"
+                    <template v-for="group in groups" :key="group.type === 'field' ? group.field._id : group.import">
+                        <li
+                            v-if="group.type === 'field'"
+                            :class="{
+                                'linked-list__connector': fieldConnection(group.field),
+                                'linked-list__page-leap': fieldConnection(group.field)?.leap,
+                            }"
+                            :style="fieldConnection(group.field) ? { '--end-connection': fieldConnection(group.field).endConnection } : null"
                         >
+                            <div v-if="fieldConnection(group.field)?.leap" class="linked-list__extra-leap-connector" />
                             <Icon
-                                name="link"
-                                class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
+                                :name="group.field.icon || 'generic-field'"
+                                :class="['size-4 shrink-0', fieldIconClass(group.field.category)]"
                                 aria-hidden="true"
                             />
-                        </span>
-                        <span
-                            v-else-if="field.type === 'import' && field.fieldset_link"
-                            v-tooltip="__('Linked Fieldset')"
-                            class="inline-flex shrink-0"
-                        >
-                            <Icon
-                                name="link"
-                                class="size-4 shrink-0 rotate-90 text-indigo-500 dark:text-indigo-400"
-                                aria-hidden="true"
-                            />
-                        </span>
-                        <span class="linked-list__field-name min-w-0 flex-1">{{ field.display }}</span>
-                    </li>
+                            <span
+                                v-if="group.field.type === 'reference'"
+                                v-tooltip="__('Linked Field')"
+                                class="inline-flex size-4 shrink-0"
+                            >
+                                <Icon
+                                    name="link"
+                                    class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
+                                    aria-hidden="true"
+                                />
+                            </span>
+                            <span class="linked-list__field-name min-w-0 flex-1">{{ group.field.display }}</span>
+                        </li>
+                        <li v-else class="linked-list__fieldset-wrap">
+                            <div class="linked-list__fieldset-group">
+                                <div
+                                    v-for="(field, fieldIndex) in group.fields"
+                                    :key="field._id"
+                                    class="linked-list__field-row"
+                                    :class="{
+                                        'linked-list__connector': fieldConnection(field),
+                                        'linked-list__page-leap': fieldConnection(field)?.leap,
+                                    }"
+                                    :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
+                                >
+                                    <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
+                                    <span
+                                        v-if="fieldIndex === 0"
+                                        v-tooltip="group.title ? __('Linked Fieldset: :title', { title: group.title }) : __('Linked Fieldset')"
+                                        class="inline-flex size-4 shrink-0"
+                                    >
+                                        <Icon
+                                            name="link"
+                                            class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+                                    <span v-else class="inline-flex size-4 shrink-0" aria-hidden="true" />
+                                    <Icon
+                                        :name="field.icon || 'generic-field'"
+                                        :class="['size-4 shrink-0', fieldIconClass(field.category)]"
+                                        aria-hidden="true"
+                                    />
+                                    <span
+                                        v-if="field.type === 'reference'"
+                                        v-tooltip="__('Linked Field')"
+                                        class="inline-flex size-4 shrink-0"
+                                    >
+                                        <Icon
+                                            name="link"
+                                            class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+                                    <span class="linked-list__field-name min-w-0 flex-1">{{ field.display }}</span>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
                 </ul>
             </div>
         </div>

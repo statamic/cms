@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -68,17 +69,16 @@ class FormLogicController extends CpController
             foreach ($page['sections'] ?? [] as $section) {
                 foreach ($section['fields'] ?? [] as $config) {
                     if (isset($config['import'])) {
-                        $isFirst = true;
+                        $fieldset = FieldsetRepository::find($config['import']);
 
                         foreach ($formFields->importedFields($config) as $formField) {
                             $fields[] = $this->formFieldToVue(
                                 $formField,
                                 $pageIndex,
-                                'import',
-                                fieldsetLink: $isFirst,
+                                'inline',
                                 importFieldset: $config['import'],
+                                importTitle: $fieldset?->title(),
                             );
-                            $isFirst = false;
                         }
 
                         continue;
@@ -107,8 +107,8 @@ class FormLogicController extends CpController
         ?FormField $formField,
         int $pageIndex,
         string $type,
-        bool $fieldsetLink = false,
         ?string $importFieldset = null,
+        ?string $importTitle = null,
         ?string $handle = null,
     ): array {
         $handle = $handle ?? $formField?->handle();
@@ -131,9 +131,9 @@ class FormLogicController extends CpController
             'always_save' => $fieldConfig['always_save'] ?? false,
         ];
 
-        if ($type === 'import') {
-            $result['fieldset_link'] = $fieldsetLink;
+        if ($importFieldset) {
             $result['import'] = $importFieldset;
+            $result['import_title'] = $importTitle;
         }
 
         if (isset($fieldConfig['options'])) {

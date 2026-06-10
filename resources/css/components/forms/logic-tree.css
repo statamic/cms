@@ -97,7 +97,7 @@
             gap: 0.5rem;
             @apply p-1.5 px-1.5 bg-gray-100 rounded-lg;
 
-            li {
+            > li {
                 display: flex;
                 gap: 0.5rem;
                 height: var(--item-height);
@@ -105,9 +105,53 @@
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs;
             }
 
+            > li.linked-list__fieldset-wrap {
+                display: block;
+                height: auto;
+                padding: 0;
+                border: 0;
+                background: transparent;
+                box-shadow: none;
+                gap: 0;
+            }
+
+            /* GROUP LOGIC TREE / FIELDSETS (stacked cards)
+            =================================================== */
+            .linked-list__fieldset-group {
+                display: flex;
+                flex-direction: column;
+                @apply rounded-lg shadow-ui-xs;
+            }
+
+            .linked-list__field-row {
+                position: relative;
+                display: flex;
+                gap: 0.5rem;
+                height: var(--item-height);
+                padding-block: var(--item-padding);
+                @apply border-x border-b border-gray-300 bg-white px-3 text-xs;
+
+                &:first-child {
+                    @apply rounded-t-md border-t;
+                }
+
+                &:last-child {
+                    @apply rounded-b-md;
+                }
+
+                &:only-child {
+                    @apply rounded-md;
+                }
+
+                &:not(:first-child) {
+                    @apply border-t-0;
+                }
+            }
+
             /* GROUP LOGIC TREE CONNECTORS / SOURCE
             =================================================== */
-            .linked-list__connector {
+            > li.linked-list__connector,
+            .linked-list__field-row.linked-list__connector {
                 anchor-name: --start-connection;
                 anchor-scope: --start-connection; /* one anchor per source row */
 
@@ -147,7 +191,8 @@
             /* GROUP LOGIC TREE CONNECTORS / PAGE LEAP (SOURCE → NON-ADJACENT PAGE)
             =================================================== */
             /* Overrides the direct-hop ::before to terminate at the buffer rail instead of the source centre, leaving room for the bridge element. */
-            .linked-list__page-leap {
+            > li.linked-list__page-leap,
+            .linked-list__field-row.linked-list__page-leap {
                 &::before,
                 &::after {
                     border-style: dashed;
