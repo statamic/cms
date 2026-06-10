@@ -108,10 +108,16 @@ const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.va
 
 const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
 
-const fieldIconClass = (category) => {
-    const color = categories[category]?.color || 'gray';
+const mutedIconClass = 'text-gray-600 dark:text-gray-400';
 
-    return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
+const fieldIconClass = (field) => {
+    if (field.type === 'reference' || field.import) {
+        return mutedIconClass;
+    }
+
+    const color = categories[field.category]?.color || 'gray';
+
+    return categoryColorClasses[color]?.icon || mutedIconClass;
 };
 </script>
 
@@ -167,9 +173,10 @@ const fieldIconClass = (category) => {
                             <div v-if="fieldConnection(group.field)?.leap" class="linked-list__extra-leap-connector" />
                             <Icon
                                 :name="group.field.icon || 'generic-field'"
-                                :class="['size-4 shrink-0', fieldIconClass(group.field.category)]"
+                                :class="['size-4 shrink-0', fieldIconClass(group.field)]"
                                 aria-hidden="true"
                             />
+                            <span class="linked-list__field-name min-w-0 flex-1">{{ group.field.display }}</span>
                             <span
                                 v-if="group.field.type === 'reference'"
                                 v-tooltip="__('Linked Field')"
@@ -181,7 +188,6 @@ const fieldIconClass = (category) => {
                                     aria-hidden="true"
                                 />
                             </span>
-                            <span class="linked-list__field-name min-w-0 flex-1">{{ group.field.display }}</span>
                         </li>
                         <li v-else class="linked-list__fieldset-wrap">
                             <div class="linked-list__fieldset-group">
@@ -196,23 +202,12 @@ const fieldIconClass = (category) => {
                                     :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
                                 >
                                     <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                                    <span
-                                        v-if="fieldIndex === 0"
-                                        v-tooltip="group.title ? __('Linked Fieldset: :title', { title: group.title }) : __('Linked Fieldset')"
-                                        class="inline-flex size-4 shrink-0"
-                                    >
-                                        <Icon
-                                            name="link"
-                                            class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
-                                            aria-hidden="true"
-                                        />
-                                    </span>
-                                    <span v-else class="inline-flex size-4 shrink-0" aria-hidden="true" />
                                     <Icon
                                         :name="field.icon || 'generic-field'"
-                                        :class="['size-4 shrink-0', fieldIconClass(field.category)]"
+                                        :class="['size-4 shrink-0', fieldIconClass(field)]"
                                         aria-hidden="true"
                                     />
+                                    <span class="linked-list__field-name min-w-0 flex-1">{{ field.display }}</span>
                                     <span
                                         v-if="field.type === 'reference'"
                                         v-tooltip="__('Linked Field')"
@@ -224,7 +219,17 @@ const fieldIconClass = (category) => {
                                             aria-hidden="true"
                                         />
                                     </span>
-                                    <span class="linked-list__field-name min-w-0 flex-1">{{ field.display }}</span>
+                                    <span
+                                        v-if="fieldIndex === 0"
+                                        v-tooltip="group.title ? __('Linked Fieldset: :title', { title: group.title }) : __('Linked Fieldset')"
+                                        class="inline-flex size-4 shrink-0"
+                                    >
+                                        <Icon
+                                            name="link"
+                                            class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
                                 </div>
                             </div>
                         </li>

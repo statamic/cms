@@ -8,7 +8,6 @@ use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
-use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
