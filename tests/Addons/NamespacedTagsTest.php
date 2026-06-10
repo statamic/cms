@@ -35,8 +35,8 @@ class NamespacedTagsTest extends TestCase
 
         $tags = $this->app['statamic.tags'];
 
-        $this->assertSame(NamespacedTestTag::class, $tags->get('namespaced_test'));
-        $this->assertSame(NamespacedTestTag::class, $tags->get('namespaced_test_alias'));
+        $this->assertNull($tags->get('namespaced_test'));
+        $this->assertNull($tags->get('namespaced_test_alias'));
         $this->assertSame(NamespacedTestTag::class, $tags->get('acme::namespaced_test'));
         $this->assertSame(NamespacedTestTag::class, $tags->get('acme::namespaced_test_alias'));
     }

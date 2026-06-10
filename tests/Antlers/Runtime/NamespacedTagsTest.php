@@ -52,11 +52,9 @@ class NamespacedTagsTest extends ParserTestCase
 
     private function registerNamespacedTag(string $namespace, $tag): void
     {
-        $tag::register();
-
         $extensions = app('statamic.extensions');
 
-        $extensions[Tags::class] = with($extensions[Tags::class], function ($bindings) use ($namespace, $tag) {
+        $extensions[Tags::class] = with($extensions[Tags::class] ?? collect(), function ($bindings) use ($namespace, $tag) {
             $bindings[$namespace.'::'.$tag::handle()] = get_class($tag);
 
             foreach ($tag::aliases() as $alias) {
@@ -92,10 +90,10 @@ class NamespacedTagsTest extends ParserTestCase
         $this->assertSame('hi', $this->renderString('{{ acme::ns_hi:hello }}', [], true));
     }
 
-    public function test_bare_handle_still_works_alongside_namespace()
+    public function test_bare_handle_is_not_registered_for_namespaced_tags()
     {
-        $this->assertSame('hi', $this->renderString('{{ ns_greet:hello }}', [], true));
-        $this->assertSame('hi', $this->renderString('{{ ns_hi:hello }}', [], true));
+        $this->assertSame('', $this->renderString('{{ ns_greet:hello }}', [], true));
+        $this->assertSame('', $this->renderString('{{ ns_hi:hello }}', [], true));
     }
 
     public function test_double_colons_in_method_part_route_to_wildcard()

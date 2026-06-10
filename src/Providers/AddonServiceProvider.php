@@ -171,8 +171,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $viewNamespace;
 
     /**
-     * When set, the addon's tags (and their aliases) are additionally
-     * registered under this namespace, e.g. `{{ my-namespace::my_tag }}`.
+     * When set, the addon's tags (and their aliases) are registered under
+     * this namespace instead of their bare handles, e.g. `{{ my-namespace::my_tag }}`.
      * Must be a simple slug without colons.
      *
      * @var string|null
@@ -309,12 +309,12 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->merge($this->autoloadFilesFromFolder('Tags', Tags::class))
             ->unique();
 
-        foreach ($tags as $class) {
-            $class::register();
+        if ($this->tagNamespace) {
+            return $this->registerNamespacedTags($tags);
         }
 
-        if ($this->tagNamespace) {
-            $this->registerNamespacedTags($tags);
+        foreach ($tags as $class) {
+            $class::register();
         }
 
         return $this;
@@ -335,6 +335,8 @@ abstract class AddonServiceProvider extends ServiceProvider
 
             return $bindings;
         });
+
+        return $this;
     }
 
     protected function bootScopes()
