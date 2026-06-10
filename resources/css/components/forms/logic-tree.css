@@ -46,14 +46,16 @@
     /* Inspired by https://codepen.io/cbolson/pen/emzegWP */
     .linked-list {
         --join-stroke: 1px;
-        --join-line: var(--join-stroke) solid var(--color-blue-400);
+        --join-line: var(--join-stroke) dashed var(--color-blue-400);
         --join-radius: 20px;
         --gap: 7rem;
         --clr-lines: rgba(0 0 0 / 0.25);
 
         --item-padding: 1rem;
+        --item-height: 4.5rem;
 
-        --buffer-top-pull: calc(1rem + var(--item-padding));
+        /* Bit of a magic number here to pull the line into the gap between the items */
+        --buffer-top-pull: calc(1.45rem + var(--item-padding));
         --buffer-left-pull: 1.5rem;
 
         /* GROUP LOGIC TREE CONNECTORS / LAYOUT
@@ -61,7 +63,7 @@
         position: relative;
         display: grid;
         align-items: start;
-        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        grid-template-columns: repeat(auto-fill, 10rem);
         /* width: min(100%, 800px); */
         gap: var(--gap);
 
@@ -80,6 +82,7 @@
                 border: 1px solid var(--clr-lines);
                 display: flex;
                 align-items: center;
+                height: var(--item-height);
                 padding: var(--item-padding) 1.5rem;
 
                 label {
@@ -177,7 +180,7 @@
         &::after {
             /* display: none; */
             top: calc(anchor(center --start-connection) - var(--buffer-top-pull) - var(--join-stroke));
-            bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull) / 2);
+            bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull) / 2  + var(--join-stroke));
             width: calc(var(--buffer-left-pull) + var(--join-stroke) * 2);
             left: calc(anchor(right --start-connection) + var(--gap) - var(--buffer-left-pull) - var(--join-stroke));
             border-inline-start: var(--join-line);
@@ -186,4 +189,3 @@
         }
     }
 }
-

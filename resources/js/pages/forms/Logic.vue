@@ -138,6 +138,6 @@ onUnmounted(() => {
             />
         </template>
 
-        <LogicTree v-else />
+        <LogicTree v-else :pages="pages" :fields="fields" />
     </div>
 </template>
