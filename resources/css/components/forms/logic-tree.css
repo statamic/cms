@@ -48,7 +48,7 @@
         --join-stroke: 1px;
         --join-line: var(--join-stroke) solid var(--color-blue-400);
         --join-radius: 20px;
-        --gap: 7rem;
+        --gap: 6rem;
         --column-width: 12.5rem;
 
         --item-padding: 1rem;
