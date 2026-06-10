@@ -73,6 +73,7 @@
             display: grid;
             gap: 0.5rem;
             @apply p-2 bg-gray-100 rounded-md;
+            padding-top: 0;
 
             li {
                 display: flex;
