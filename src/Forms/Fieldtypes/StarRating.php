@@ -40,11 +40,8 @@ class StarRating extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        $configured = $this->config('max_stars');
-        $maxStars = ($configured === null || $configured === '') ? 5 : (int) $configured;
-
-        $maxStars = max(1, min(10, $maxStars));
         $allowHalfStars = (bool) $this->config('allow_half_stars');
+        $maxStars = max(1, min(10, (int) $this->config('max_stars', 5)));
 
         return [
             'type' => 'star_rating',
