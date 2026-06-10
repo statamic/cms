@@ -30,16 +30,6 @@ class Ranking extends FormFieldtype
         ];
     }
 
-    public function preload(): array
-    {
-        return [
-            'options' => collect($this->enabledOptions())
-                ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
-                ->values()
-                ->all(),
-        ];
-    }
-
     public function toFieldArray(): array
     {
         return [

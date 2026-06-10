@@ -45,16 +45,6 @@ const hasErrors = computed(() => {
     const allErrors = errors?.value ?? {};
     return Object.keys(allErrors).some(key => key.startsWith(`${props.field._id}.`));
 });
-
-const previewKey = computed(() => {
-    const preview = props.field.preview;
-
-    if (!preview) {
-        return props.field._id;
-    }
-
-    return `${props.field._id}-${JSON.stringify(preview.meta?.options ?? preview.config?.options ?? '')}-${JSON.stringify(preview.value ?? '')}`;
-});
 </script>
 
 <template>
@@ -136,8 +126,7 @@ const previewKey = computed(() => {
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                    :key="previewKey"
-                    :config="field.preview.config"
+                                        :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
                     :handle="field.handle"
@@ -173,8 +162,7 @@ const previewKey = computed(() => {
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                    :key="previewKey"
-                    :config="field.preview.config"
+                                        :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
                     :handle="field.handle"

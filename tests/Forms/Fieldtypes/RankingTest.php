@@ -71,21 +71,4 @@ class RankingTest extends TestCase
             'summer' => 'Summer',
         ], $fieldtype->toFieldArray()['options']);
     }
-
-    #[Test]
-    public function it_preloads_normalized_options()
-    {
-        $fieldtype = (new Ranking)->setField(new FormField('preferences', [
-            'type' => 'ranking',
-            'options' => [
-                ['key' => 'summer', 'value' => 'Summer'],
-                ['key' => 'winter', 'value' => 'Winter'],
-            ],
-        ]));
-
-        $this->assertEquals([
-            ['value' => 'summer', 'label' => 'Summer'],
-            ['value' => 'winter', 'label' => 'Winter'],
-        ], $fieldtype->preload()['options']);
-    }
 }
