@@ -1,22 +1,61 @@
 name: Create Release
 
 on: # zizmor: ignore[concurrency-limits]
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v6.2.0)'
+        required: true
+        type: string
+      source-ref:
+        description: 'Branch to build and tag from'
+        required: true
+        default: '6.x'
+        type: choice
+        options:
+          - 6.x
+          - 5.x
+          - master
 
 permissions: {}
 
 jobs:
-  build: # zizmor: ignore[anonymous-definition]
+  release: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # create GitHub release and upload assets
+    environment: release
+    permissions: {} # all writes go through the App token; GITHUB_TOKEN needs no scopes
     steps:
-      - name: Checkout code
+      - name: Validate version format
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if ! printf '%s' "$VERSION" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::error::Version must match v#.#.# format (got: $VERSION)"
+            exit 1
+          fi
+
+      - name: Get release bot token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Checkout source ref
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          persist-credentials: false
+          ref: ${{ inputs.source-ref }}
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true # zizmor: ignore[artipacked] App token is needed to push the tag
+
+      - name: Assert tag does not already exist
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if git ls-remote --tags origin "$VERSION" | grep -q .; then
+            echo "::error::Tag $VERSION already exists on remote. Aborting."
+            exit 1
+          fi
 
       - name: Use Node.js 20.19.0
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -30,25 +69,41 @@ jobs:
       - name: Build release assets
         run: bash ./scripts/build-release.sh
 
+      - name: Create the build commit
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "statamic-release-bot[bot]"
+          git config user.email "statamic-release-bot[bot]@users.noreply.github.com"
+          git add --force \
+            resources/dist \
+            resources/dist-dev \
+            resources/dist-frontend \
+            resources/dist-package
+          git commit -m "Build assets for $VERSION"
+
+      - name: Tag and push the build commit
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git tag "$VERSION"
+          git push origin "$VERSION"
+
       - name: Get Changelog
         id: changelog
         uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1.0.2
         with:
-          version: ${{ github.ref }}
+          version: ${{ inputs.version }}
 
       - name: Create release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           RELEASE_VERSION: ${{ steps.changelog.outputs.version }}
           RELEASE_NOTES: ${{ steps.changelog.outputs.text }}
         run: |
           gh release create "$RELEASE_VERSION" \
             --title "$RELEASE_VERSION" \
-            --notes "$RELEASE_NOTES" \
-            ./resources/dist.tar.gz \
-            ./resources/dist-dev.tar.gz \
-            ./resources/dist-frontend.tar.gz \
-            ./resources/dist-package.tar.gz
+            --notes "$RELEASE_NOTES"
 
       - name: Deploy Storybook to Forge
         continue-on-error: true
