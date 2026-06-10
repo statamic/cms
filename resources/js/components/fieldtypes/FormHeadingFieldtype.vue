@@ -4,8 +4,7 @@ import { Heading, Subheading } from '@ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, update } = Fieldtype.use(emit, props);
-
+const { expose } = Fieldtype.use(emit, props);
 defineExpose(expose);
 </script>
 
