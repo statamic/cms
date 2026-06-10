@@ -49,6 +49,8 @@ class ImageChoice extends FormFieldtype
                             'max_files' => 1,
                             'mode' => 'grid',
                             'width' => 33,
+                            'container' => config('statamic.assets.image_choice_images.container'),
+                            'folder' => config('statamic.assets.image_choice_images.folder'),
                         ],
                     ],
                 ],
