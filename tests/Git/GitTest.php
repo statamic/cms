@@ -480,6 +480,30 @@ EOT;
     }
 
     #[Test]
+    public function it_wires_dispatch_to_co_authored_by_trailers_end_to_end()
+    {
+        Queue::fake();
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        $alice = User::make()->email('alice@example.com')->data(['name' => 'Alice'])->makeSuper();
+        $bob = User::make()->email('bob@example.com')->data(['name' => 'Bob'])->makeSuper();
+
+        $this->actingAs($alice);
+        Git::dispatchCommit();
+
+        $this->actingAs($bob);
+        Git::dispatchCommit(); // dropped by ShouldBeUnique, but Bob's save is still recorded in cache
+
+        (new \Statamic\Git\CommitJob(null, $alice))->handle();
+
+        $commit = $this->showLastCommit(base_path('content'));
+
+        $this->assertStringContainsString('Co-Authored-By: Alice <alice@example.com>', $commit);
+        $this->assertStringContainsString('Co-Authored-By: Bob <bob@example.com>', $commit);
+    }
+
+    #[Test]
     public function it_doesnt_push_by_default()
     {
         Git::shouldReceive('push')->never();
