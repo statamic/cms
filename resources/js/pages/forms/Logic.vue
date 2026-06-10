@@ -122,16 +122,16 @@ onUnmounted(() => {
                 <div class="flex items-start gap-4">
                     <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
                         <ToggleItem
-                            value="compressed"
-                            icon="collapse"
-                            :aria-label="__('Compressed view')"
-                            v-tooltip="__('Compressed view')"
-                        />
-                        <ToggleItem
                             value="expanded"
                             icon="expand"
                             :aria-label="__('Uncompressed view')"
                             v-tooltip="__('Uncompressed view')"
+                        />
+                        <ToggleItem
+                            value="compressed"
+                            icon="collapse"
+                            :aria-label="__('Compressed view')"
+                            v-tooltip="__('Compressed view')"
                         />
                     </ToggleGroup>
                     <ToggleGroup v-model="logicView" size="sm">
