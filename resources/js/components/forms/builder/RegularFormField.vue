@@ -21,14 +21,9 @@ const props = defineProps<{
 
 const { dirty, errors, fieldView, inspect, inspecting, inspectorType } = injectBuilderContext();
 
-const fieldtypeDefinition = computed(() => {
-    const handle = props.field.fieldtype;
+const informationFieldtypes = ['heading', 'paragraph', 'banner'];
 
-    return props.fieldtypes.find((fieldtype) => fieldtype.handle === handle)
-        ?? props.fieldtypes.find((fieldtype) => fieldtype.preview?.config?.type === handle);
-});
-
-const isInformationField = computed(() => fieldtypeDefinition.value?.categories?.includes('information') ?? false);
+const isInformationField = computed(() => informationFieldtypes.includes(props.field.fieldtype));
 
 const inspectField = () => inspect(InspectorType.Field, props.field);
 const isInspecting = computed(() => inspectorType.value === InspectorType.Field && inspecting.value?._id === props.field._id);

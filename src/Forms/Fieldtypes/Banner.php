@@ -10,11 +10,6 @@ use function Statamic\trans as __;
 class Banner extends FormFieldtype
 {
     protected static $fieldtype = 'form_banner';
-
-    public static function aliases(): array
-    {
-        return [static::$fieldtype];
-    }
     protected $description = 'A banner to highlight important information in your form.';
     protected $icon = 'banner';
     protected $categories = ['information'];

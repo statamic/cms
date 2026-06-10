@@ -19,7 +19,7 @@ class BannerTest extends TestCase
         $this->assertEquals([
             'type' => 'form_banner',
             'hide_display' => true,
-            'icon' => 'lightbulb-idea',
+            'icon' => 'info',
         ], $fieldtype->toFieldArray());
     }
 
@@ -35,7 +35,7 @@ class BannerTest extends TestCase
             'type' => 'form_banner',
             'hide_display' => true,
             'display' => 'Important Notice',
-            'icon' => 'lightbulb-idea',
+            'icon' => 'info',
         ], $fieldtype->toFieldArray());
     }
 }
