@@ -97,7 +97,7 @@ const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(page
                     <Icon
                         v-if="isConnectorDestination(pageIndex)"
                         name="chevron-right"
-                        class="size-3! shrink-0 -ms-1.5 relative -top-0.25 text-blue-400"
+                        class="size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400"
                         aria-hidden="true"
                     />
                     <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
