@@ -31,9 +31,7 @@ class Banner extends FormFieldtype
         return [
             'type' => 'form_banner',
             'hide_display' => true,
-            ...collect(Arr::except($this->config(), ['type']))
-                ->filter(fn ($value) => $value !== null)
-                ->all(),
+            ...Arr::except($this->config(), ['type']),
         ];
     }
 
