@@ -8,7 +8,8 @@
 
     Markup (LogicTree.vue):
 
-        - Each page column is a .linked-list__column (.linked-list__page-name + <ul>).
+        - Each page column is a .linked-list__column (.linked-list__page-name + .linked-list__sections).
+        - Each section is a .linked-list__section (.linked-list__section-marker + <ul>).
         - Page headers: .linked-list__page-name with anchor-name: --page-N.
         - Source fields: .linked-list__connector with --end-connection: --page-N, pointing at the target page’s anchor name.
         - Multi-column hops: add .linked-list__page-leap on the source <li> and a .linked-list__extra-leap-connector child for the bridge segment. This helps separate multi-column connectors from adjacent pages.
@@ -94,6 +95,38 @@
             @apply px-2 pt-2;
         }
 
+        .linked-list__sections {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .linked-list__section {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .linked-list__section-marker {
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            height: var(--item-height);
+            @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
+
+            &::before,
+            &::after {
+                content: '';
+                flex: 1;
+                @apply border-b border-gray-400 dark:border-gray-600 border-dashed;
+            }
+        }
+
+        .linked-list__section-marker-label {
+            @apply max-w-[8rem] shrink-0 select-none;
+        }
+
         ul {
             margin: 0;
             list-style: none;
@@ -129,41 +162,6 @@
                 background: transparent;
                 box-shadow: none;
                 gap: 0;
-            }
-
-            .linked-list__section-marker {
-                display: flex;
-                align-items: center;
-                gap: 0.375rem;
-                height: var(--item-height);
-                padding: 0 0.125rem;
-                border: 0;
-                background: transparent;
-                box-shadow: none;
-                grid-template-columns: unset;
-                @apply text-2xs font-medium text-gray-700 dark:text-gray-200 pt-10;
-
-                &::before,
-                &::after {
-                    content: '';
-                    flex: 1;
-                    height: 1px;
-                    @apply border-b border-gray-400 dark:border-gray-600 border-dashed;
-                }
-
-                &:first-child {
-                    /* Make this small because it's less important, and we can get away with changing the list item height because the connectors never go above the second list item */
-                    height: 1rem;
-                    @apply pt-0;
-                    &::before,
-                    &::after {
-                        opacity: 0;
-                    }
-                }
-            }
-
-            .linked-list__section-marker-label {
-                @apply max-w-[8rem] select-none;
             }
 
             /* GROUP LOGIC TREE / FIELDSETS (stacked cards)
