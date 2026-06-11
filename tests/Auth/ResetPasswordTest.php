@@ -15,7 +15,7 @@ use Statamic\Facades\User;
 use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Webauthn\PublicKeyCredentialSource;
+use Webauthn\CredentialRecord;
 use Webauthn\TrustPath\EmptyTrustPath;
 
 class ResetPasswordTest extends TestCase
@@ -68,7 +68,7 @@ class ResetPasswordTest extends TestCase
 
     private function addPasskey($user)
     {
-        $credential = PublicKeyCredentialSource::create(
+        $credential = CredentialRecord::create(
             publicKeyCredentialId: 'test-credential-id',
             type: 'public-key',
             transports: ['usb'],
