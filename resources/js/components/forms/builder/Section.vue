@@ -63,7 +63,7 @@ const updateFieldWidth = (field, width) => {
 const duplicateField = (field) => {
     const { section } = props;
     const index = section.fields.indexOf(field);
-    const handle = uniqid();
+    const handle = uniqid({ withoutHyphens: true });
 
     const newField = {
         ...field,

@@ -191,7 +191,7 @@ const addField = (pageId: string, sectionId: string, fieldtypeHandle: string, at
     const fieldtype = props.fieldtypes.find((f) => f.handle === fieldtypeHandle);
     if (!fieldtype) return;
 
-    const handle = uniqid();
+    const handle = uniqid({ withoutHyphens: true });
 
     const field = {
         _id: handle,
