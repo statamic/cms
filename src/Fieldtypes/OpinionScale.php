@@ -15,6 +15,13 @@ class OpinionScale extends Fieldtype
         ];
     }
 
+    public function extraRenderableFieldData(): array
+    {
+        return [
+            'scale_values' => $this->scaleValues(),
+        ];
+    }
+
     private function scaleValues(): array
     {
         return range($this->config('min'), $this->config('max'));
