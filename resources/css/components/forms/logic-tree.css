@@ -110,9 +110,12 @@
 
         .linked-list__section-marker {
             display: flex;
-            align-items: center;
+            align-items: end;
+            justify-content: center;
             padding: 0 0.5rem;
-            height: var(--item-height);
+            .linked-list__section:not(:first-child) & {
+                height: var(--item-height);
+            }
             @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
         }
 
