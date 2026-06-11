@@ -14,44 +14,15 @@ class ParagraphTest extends TestCase
     {
         $fieldtype = (new Paragraph)->setField(new FormField('intro_text', [
             'type' => 'paragraph',
+            'text' => 'Welcome to our wonderful form!',
+            'display' => 'An internal field handle',
         ]));
 
         $this->assertEquals([
-            'type' => 'html',
-            'html' => null,
+            'type' => 'form_paragraph',
+            'text' => 'Welcome to our wonderful form!',
             'hide_display' => true,
-        ], $fieldtype->toFieldArray());
-    }
-
-    #[Test]
-    public function it_parses_markdown_content_to_html()
-    {
-        $fieldtype = (new Paragraph)->setField(new FormField('intro_text', [
-            'type' => 'paragraph',
-            'content' => 'Welcome to our **form**!',
-        ]));
-
-        $this->assertEquals([
-            'type' => 'html',
-            'html' => "<p>Welcome to our <strong>form</strong>!</p>\n",
-            'hide_display' => true,
-        ], $fieldtype->toFieldArray());
-    }
-
-    #[Test]
-    public function it_passes_through_extra_config()
-    {
-        $fieldtype = (new Paragraph)->setField(new FormField('intro_text', [
-            'type' => 'paragraph',
-            'content' => 'Hello',
-            'display' => 'Introduction',
-        ]));
-
-        $this->assertEquals([
-            'type' => 'html',
-            'html' => "<p>Hello</p>\n",
-            'hide_display' => true,
-            'display' => 'Introduction',
+            'display' => 'An internal field handle',
         ], $fieldtype->toFieldArray());
     }
 }

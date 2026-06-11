@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Forms;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -166,56 +165,5 @@ class FormFieldsControllerTest extends TestCase
 
         $this->assertEquals('Favorite Color', $preview['config']['display']);
         $this->assertEquals('Enter a color', $preview['config']['placeholder']);
-    }
-
-    #[Test]
-    #[DataProvider('rankingOptionsProvider')]
-    public function it_returns_updated_ranking_options_in_preview(array $options)
-    {
-        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
-        $user = User::make()->assignRole('test')->save();
-        $form = tap(Form::make('test'))->save();
-
-        $response = $this
-            ->actingAs($user)
-            ->post(cp_route('forms.builder.fields.update', $form->handle()), [
-                'type' => 'ranking',
-                'values' => [
-                    'display' => 'Rank your favorites',
-                    'options' => $options,
-                ],
-            ]);
-
-        $response->assertSuccessful();
-
-        $preview = $response->json('preview');
-
-        $this->assertNotNull($preview);
-        $this->assertEquals([
-            'alpha' => 'Alpha',
-            'beta' => 'Beta',
-            'gamma' => 'Gamma',
-        ], $preview['config']['options']);
-        $this->assertEquals([
-            ['value' => 'alpha', 'label' => 'Alpha'],
-            ['value' => 'beta', 'label' => 'Beta'],
-            ['value' => 'gamma', 'label' => 'Gamma'],
-        ], $preview['meta']['options']);
-    }
-
-    public static function rankingOptionsProvider(): array
-    {
-        return [
-            'expanded' => [[
-                ['key' => 'alpha', 'value' => 'Alpha'],
-                ['key' => 'beta', 'value' => 'Beta'],
-                ['key' => 'gamma', 'value' => 'Gamma'],
-            ]],
-            'associative' => [[
-                'alpha' => 'Alpha',
-                'beta' => 'Beta',
-                'gamma' => 'Gamma',
-            ]],
-        ];
     }
 }

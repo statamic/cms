@@ -21,15 +21,6 @@ const props = defineProps<{
 
 const { dirty, errors, fieldView, inspect, inspecting, inspectorType } = injectBuilderContext();
 
-const fieldtypeDefinition = computed(() => {
-    const handle = props.field.fieldtype;
-
-    return props.fieldtypes.find((fieldtype) => fieldtype.handle === handle)
-        ?? props.fieldtypes.find((fieldtype) => fieldtype.preview?.config?.type === handle);
-});
-
-const isInformationField = computed(() => fieldtypeDefinition.value?.categories?.includes('information') ?? false);
-
 const inspectField = () => inspect(InspectorType.Field, props.field);
 const isInspecting = computed(() => inspectorType.value === InspectorType.Field && inspecting.value?._id === props.field._id);
 
@@ -44,21 +35,13 @@ const fieldtypeCategory = computed(() => {
     return categories[hue] ?? categories.other;
 });
 
+const isInformationField = computed(() => fieldtypeCategory.value === categories.information);
+
 const iconColorClass = computed(() => categoryColorClasses[fieldtypeCategory.value.color].icon);
 
 const hasErrors = computed(() => {
     const allErrors = errors?.value ?? {};
     return Object.keys(allErrors).some(key => key.startsWith(`${props.field._id}.`));
-});
-
-const previewKey = computed(() => {
-    const preview = props.field.preview;
-
-    if (!preview) {
-        return props.field._id;
-    }
-
-    return `${props.field._id}-${JSON.stringify(preview.meta?.options ?? preview.config?.options ?? '')}-${JSON.stringify(preview.value ?? '')}`;
 });
 </script>
 
@@ -141,7 +124,6 @@ const previewKey = computed(() => {
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                    :key="previewKey"
                     :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
@@ -178,7 +160,6 @@ const previewKey = computed(() => {
             <div v-if="field.preview" inert>
                 <component
                     :is="`${field.preview.config.component || field.preview.config.type}-fieldtype`"
-                    :key="previewKey"
                     :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"

@@ -2,11 +2,8 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
-use Statamic\Facades\Asset;
-use Statamic\Facades\AssetContainer;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -15,7 +12,7 @@ class ImageChoice extends FormFieldtype
     protected static $fieldtype = 'image_choice';
     protected $description = 'An image-based choice selector for visual options.';
     protected $icon = 'image-select';
-    protected $categories = ['choice'];
+    protected $categories = ['choice', 'media'];
     protected $order = 5;
 
     public function configFieldItems(): array
@@ -47,11 +44,13 @@ class ImageChoice extends FormFieldtype
                     [
                         'handle' => 'image',
                         'field' => [
-                            'type' => 'single_asset',
+                            'type' => 'assets',
                             'display' => __('Image'),
                             'max_files' => 1,
                             'mode' => 'grid',
                             'width' => 33,
+                            'container' => config('statamic.assets.image_choice_images.container'),
+                            'folder' => config('statamic.assets.image_choice_images.folder'),
                         ],
                     ],
                 ],
@@ -90,27 +89,15 @@ class ImageChoice extends FormFieldtype
         ];
     }
 
-    public function preload(): array
-    {
-        return [
-            'options' => $this->normalizedOptions(),
-        ];
-    }
-
     public function toFieldArray(): array
     {
-        $configured = $this->config('columns');
-        $columns = ($configured === null || $configured === '') ? 3 : (int) $configured;
-        $columns = max(1, min(4, $columns));
-
         return [
             'type' => 'image_choice',
-            'image_options' => $this->normalizedOptions(),
             'multiple' => (bool) $this->config('multiple'),
-            'columns' => $columns,
+            'columns' => max(1, min(4, (int) ($this->config('columns') ?? 3))),
             'aspect_ratio' => $this->normalizedAspectRatio(),
             'gap' => $this->normalizedGap(),
-            ...Arr::except($this->config(), ['type', 'options', 'multiple', 'columns', 'aspect_ratio', 'gap']),
+            ...Arr::except($this->config(), ['type', 'multiple', 'columns', 'aspect_ratio', 'gap']),
         ];
     }
 
@@ -145,7 +132,6 @@ class ImageChoice extends FormFieldtype
                     ],
                 ],
             ],
-            'value' => null,
         ];
     }
 
@@ -162,59 +148,5 @@ class ImageChoice extends FormFieldtype
         $ratio = $this->config('aspect_ratio') ?? '16/9';
 
         return in_array($ratio, $allowed, true) ? $ratio : '16/9';
-    }
-
-    private function normalizedOptions(): array
-    {
-        return collect($this->config('options'))
-            ->filter(fn ($option) => is_array($option))
-            ->reject(fn (array $option): bool => ($option['hidden'] ?? false) === true)
-            ->values()
-            ->map(function (array $option, int $index): ?array {
-                $key = $option['key'] ?? null;
-
-                if (blank($key)) {
-                    return null;
-                }
-
-                return [
-                    'key' => $key,
-                    'label' => $option['label'] ?? $key,
-                    'image' => $this->resolveImageUrl($option['image'] ?? null),
-                    'letter' => chr(65 + $index),
-                ];
-            })
-            ->filter()
-            ->values()
-            ->all();
-    }
-
-    private function resolveImageUrl(mixed $image): ?string
-    {
-        if (blank($image)) {
-            return null;
-        }
-
-        if (is_array($image)) {
-            $image = Arr::first($image);
-        }
-
-        if (! is_string($image)) {
-            return null;
-        }
-
-        if (filter_var($image, FILTER_VALIDATE_URL) || str_starts_with($image, '/')) {
-            return $image;
-        }
-
-        if (Str::contains($image, '::')) {
-            return Asset::find($image)?->url();
-        }
-
-        return AssetContainer::all()
-            ->map(fn ($container) => $container->asset($image))
-            ->filter()
-            ->first()
-            ?->url();
     }
 }

@@ -164,11 +164,6 @@ abstract class FormFieldtype implements Arrayable
         return null;
     }
 
-    public function preload(): array
-    {
-        return [];
-    }
-
     public function view(): string
     {
         $handle = $this->handle();

@@ -4,8 +4,7 @@ import { Heading, Subheading } from '@ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, update } = Fieldtype.use(emit, props);
-
+const { expose } = Fieldtype.use(emit, props);
 defineExpose(expose);
 </script>
 
@@ -16,6 +15,6 @@ defineExpose(expose);
             size="xl"
             class="!font-bold"
         />
-        <Subheading v-if="config.instructions" :text="__(config.instructions)" class="mt-1" />
+        <Subheading v-if="config.subheading" :text="__(config.subheading)" class="mt-1" />
     </div>
 </template>

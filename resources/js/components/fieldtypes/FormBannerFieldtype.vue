@@ -7,16 +7,12 @@ import markdown from '@/util/markdown.js';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, update } = Fieldtype.use(emit, props);
-
+const { expose } = Fieldtype.use(emit, props);
 defineExpose(expose);
 
 const text = computed(() => {
-    if (!props.config.instructions) {
-        return null;
-    }
-
-    return markdown(__(props.config.instructions), { openLinksInNewTabs: true });
+    if (!props.config.text) return null;
+    return markdown(__(props.config.text), { openLinksInNewTabs: true });
 });
 
 const hasContent = computed(() => props.config.display || text.value);

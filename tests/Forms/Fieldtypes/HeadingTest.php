@@ -14,26 +14,15 @@ class HeadingTest extends TestCase
     {
         $fieldtype = (new Heading)->setField(new FormField('section_heading', [
             'type' => 'form_heading',
+            'display' => 'This is a heading',
+            'subheading' => 'This is a subheading',
         ]));
 
         $this->assertEquals([
             'type' => 'form_heading',
+            'display' => 'This is a heading',
+            'subheading' => 'This is a subheading',
             'hide_display' => true,
-        ], $fieldtype->toFieldArray());
-    }
-
-    #[Test]
-    public function it_passes_through_extra_config()
-    {
-        $fieldtype = (new Heading)->setField(new FormField('section_heading', [
-            'type' => 'form_heading',
-            'display' => 'Contact Information',
-        ]));
-
-        $this->assertEquals([
-            'type' => 'form_heading',
-            'hide_display' => true,
-            'display' => 'Contact Information',
         ], $fieldtype->toFieldArray());
     }
 }

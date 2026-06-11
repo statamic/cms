@@ -35,17 +35,19 @@ const saveBinding = ref(null);
 const errors = ref({});
 
 const suggestableFields = computed(() => {
-    return fields.value.map(field => ({
-        handle: field.handle,
-        icon: field.icon,
-        category: field.category,
-        pageIndex: field.page_index,
-        config: {
-            type: field.fieldtype,
-            display: field.display,
-            options: field.options,
-        },
-    }));
+    return fields.value
+        .filter(field => field.category !== 'information')
+        .map(field => ({
+            handle: field.handle,
+            icon: field.icon,
+            category: field.category,
+            pageIndex: field.page_index,
+            config: {
+                type: field.fieldtype,
+                display: field.display,
+                options: field.options,
+            },
+        }));
 });
 
 const dirty = () => Statamic.$dirty.add('form-logic');

@@ -1,5 +1,34 @@
 # Release Notes
 
+## 6.20.3 (2026-06-08)
+
+### What's fixed
+- Trigger the grid table mode at lower viewports because it's more useful [#14792](https://github.com/statamic/cms/issues/14792) by @jaygeorge
+- Fix permission for Live Preview [#14791](https://github.com/statamic/cms/issues/14791) by @jasonvarga
+
+
+
+## 6.20.2 (2026-06-05)
+
+### What's fixed
+- Fix GraphiQL [#14770](https://github.com/statamic/cms/issues/14770) by @joshuablum
+- Fix TypeError when elevated_session_duration is a string [#14771](https://github.com/statamic/cms/issues/14771) by @duncanmcclean
+- Fix asset selection in Markdown fieldtype [#14715](https://github.com/statamic/cms/issues/14715) by @duncanmcclean
+- Fix configure navs permission not working properly [#14775](https://github.com/statamic/cms/issues/14775) by @joshuablum
+- Resolve Entry::descendants() N+1 query [#14773](https://github.com/statamic/cms/issues/14773) by @SteveEdson
+- Fix asset editor prev/next buttons and "Edit Image" button in Bard [#14728](https://github.com/statamic/cms/issues/14728) by @joshuablum
+- Apply regenerate handle pattern for replicator sections [#14745](https://github.com/statamic/cms/issues/14745) by @jaygeorge
+- Fix static cache invalidation stripping trailing slashes [#14713](https://github.com/statamic/cms/issues/14713) by @duncanmcclean
+- Add impersonation permission description [#14776](https://github.com/statamic/cms/issues/14776) by @jasonvarga
+- Fix field filters returning all results when filtering by 0 [#14747](https://github.com/statamic/cms/issues/14747) by @joshuablum
+- Render PDF viewer pages lazily [#14764](https://github.com/statamic/cms/issues/14764) by @daun
+- Add support for Collection in last modifier [#14778](https://github.com/statamic/cms/issues/14778) by @JonKaric
+- Fix share_errors breaking nocache regions on error responses [#14780](https://github.com/statamic/cms/issues/14780) by @joshuablum
+- Fix date picker inconsistencies [#14732](https://github.com/statamic/cms/issues/14732) by @jaygeorge
+- Avoid version inertia prop [#14783](https://github.com/statamic/cms/issues/14783) by @jasonvarga
+
+
+
 ## 6.20.1 (2026-06-02)
 
 ### What's fixed

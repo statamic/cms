@@ -11,11 +11,6 @@ use function Statamic\trans as __;
 class Paragraph extends FormFieldtype
 {
     protected static $fieldtype = 'html';
-
-    public static function aliases(): array
-    {
-        return [static::$fieldtype];
-    }
     protected $description = 'A paragraph to provide information in your form.';
     protected $icon = 'text-short';
     protected $categories = ['information'];
@@ -23,9 +18,16 @@ class Paragraph extends FormFieldtype
     protected function configFieldItems(): array
     {
         return [
-            'content' => [
-                'display' => __('Content'),
-                'instructions' => __('statamic::form-fields.paragraph.config.content'),
+            'display' => [
+                'display' => __('Label'),
+                'instructions' => __('statamic::form-fieldtypes.paragraph.config.display.instructions'),
+                'type' => 'text',
+                'focus' => true,
+                'validate' => 'required',
+            ],
+            'instructions' => ['type' => 'hidden'],
+            'text' => [
+                'display' => __('Text'),
                 'type' => 'textarea',
             ],
         ];
@@ -33,14 +35,11 @@ class Paragraph extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        $content = $this->config('content');
-        $html = $content ? Markdown::parse($content) : null;
-
         return [
-            'type' => 'html',
-            'html' => $html,
+            'type' => 'form_paragraph',
+            'text' => $this->config('text'),
+            'display' => $this->config('display'),
             'hide_display' => true,
-            ...Arr::except($this->config(), ['type', 'content']),
         ];
     }
 }

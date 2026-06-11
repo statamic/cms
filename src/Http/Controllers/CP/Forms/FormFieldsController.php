@@ -24,7 +24,7 @@ class FormFieldsController extends CpController
             'values' => 'array',
         ]);
 
-        $fieldtype = FormFieldtypeRepository::findForBuilder($request->type, $request->values ?? []);
+        $fieldtype = FormFieldtypeRepository::find($request->type);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -65,16 +65,18 @@ class FormFieldsController extends CpController
             'values' => 'required|array',
         ]);
 
-        $fieldtype = FormFieldtypeRepository::findForBuilder($request->type, $request->values ?? []);
+        $fieldtype = FormFieldtypeRepository::find($request->type);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
-        $fields = $blueprint
+        $values = $blueprint
             ->fields()
             ->addValues($request->values)
-            ->preProcess();
+            ->process()
+            ->values()
+            ->all();
 
-        $values = array_merge($request->values, $fields->values()->all());
+        $values = array_merge($request->values, $values);
 
         return [
             'values' => $values,
@@ -87,20 +89,16 @@ class FormFieldsController extends CpController
         try {
             $formField = new FormField($config['handle'] ?? 'field', ['type' => $fieldtype->handle(), ...$config]);
 
-            $fieldtype = $fieldtype instanceof Fallback
-                ? $fieldtype
-                : (clone $fieldtype)->setField($formField);
-
             $field = $fieldtype instanceof Fallback
                 ? new Field($fieldtype->toArray()['handle'], ['type' => $fieldtype->toArray()['handle'], ...$config])
-                : $fieldtype->toField();
+                : (clone $fieldtype)->setField($formField)->toField();
 
             $field->setValue($field->defaultValue());
 
             return [
                 'config' => $field->toPublishArray(),
                 'value' => $field->fieldtype()->preProcess($field->value()),
-                'meta' => $fieldtype instanceof Fallback ? $field->fieldtype()->preload() : $fieldtype->preload(),
+                'meta' => $field->fieldtype()->preload(),
             ];
         } catch (\Throwable $e) {
             return null;
@@ -114,10 +112,11 @@ class FormFieldsController extends CpController
                 'main' => [
                     'sections' => [
                         [
-                            'fields' => [
-                                ...FormField::commonFieldOptions()->items(),
-                                ...$blueprint->contents()['tabs']['main']['sections'][0]['fields'],
-                            ],
+                            'fields' => collect(FormField::commonFieldOptions()->items())
+                                ->merge($blueprint->contents()['tabs']['main']['sections'][0]['fields'])
+                                ->reverse()->unique('handle')->reverse() // Prioritize the duplicate from the fieldtype
+                                ->values()
+                                ->all(),
                         ],
                     ],
                 ],

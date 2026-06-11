@@ -58,7 +58,12 @@ const isToggleField = computed(() => selectedField.value && ['toggle', 'revealer
 const showValueToggle = computed(() => isToggleField.value && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
 
 const showValueDropdown = computed(() => {
-    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice'];
+    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking'];
+    return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
+});
+
+const showNumberInput = computed(() => {
+    const optionTypes = ['number', 'integer', 'opinion_scale', 'star_ranking'];
     return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
 });
 
@@ -133,6 +138,7 @@ const update = (key, value) => emit('update:condition', { ...props.condition, [k
             :model-value="condition.value"
             :placeholder="__('Value')"
             :size
+            :type="showNumberInput ? 'number' : 'text'"
             @update:model-value="update('value', $event)"
         />
     </li>

@@ -65,6 +65,7 @@ class FormField
                 'display' => __('Label'),
                 'type' => 'text',
                 'focus' => true,
+                'validate' => 'required',
             ],
             'instructions' => [
                 'display' => __('Help Text'),

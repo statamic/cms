@@ -107,79 +107,6 @@ const load = () => {
         });
 };
 
-function isCompleteOption(option) {
-    const { value } = option;
-
-    return value != null && value !== '' && value !== 'null';
-}
-
-function normalizeOptionsMeta(options) {
-    if (!options) {
-        return [];
-    }
-
-    if (Array.isArray(options)) {
-        return options
-            .map((row) => {
-                if (typeof row !== 'object') {
-                    return { value: row, label: row };
-                }
-
-                return {
-                    value: row.key ?? row.value,
-                    label: row.label ?? row.value ?? row.key,
-                };
-            })
-            .filter(isCompleteOption);
-    }
-
-    return Object.entries(options)
-        .map(([value, label]) => ({
-            value,
-            label: typeof label === 'string' ? label : value,
-        }))
-        .filter(isCompleteOption);
-}
-
-function syncPreviewFromValues() {
-    if (!field.value?.preview || !values.value) {
-        return;
-    }
-
-    const hasOptions = values.value.options !== undefined && values.value.options !== null;
-    const optionMeta = hasOptions ? normalizeOptionsMeta(values.value.options) : null;
-    let nextValue = field.value.preview.value;
-
-    if (hasOptions && optionMeta) {
-        const optionKeys = optionMeta.map((option) => option.value);
-        const currentValue = Array.isArray(field.value.preview.value) ? field.value.preview.value : [];
-        const validKeys = new Set(optionKeys);
-
-        nextValue = [
-            ...currentValue.filter((key) => validKeys.has(key)),
-            ...optionKeys.filter((key) => !currentValue.includes(key)),
-        ];
-
-        if (!nextValue.length) {
-            nextValue = currentValue;
-        }
-    }
-
-    field.value.preview = {
-        config: {
-            ...field.value.preview.config,
-            ...values.value,
-            handle: field.value.handle,
-            type: field.value.preview.config.type,
-        },
-        value: nextValue,
-        meta: {
-            ...field.value.preview.meta,
-            ...(optionMeta ? { options: optionMeta } : {}),
-        },
-    };
-}
-
 const updatePreview = debounce(() => {
     const fieldId = field.value._id;
 
@@ -217,6 +144,7 @@ const suggestableConditionFields = computed(() => {
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
+        .filter((f) => getFieldtypeCategory(f.config.type).handle !== 'information')
         .map((f) => ({
             handle: f.handle,
             config: {
@@ -250,7 +178,6 @@ watch(field, () => {
 
 watch(values, () => {
     dirty();
-    syncPreviewFromValues();
     updatePreview();
 }, { deep: true });
 

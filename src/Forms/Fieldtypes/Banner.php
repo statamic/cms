@@ -10,11 +10,6 @@ use function Statamic\trans as __;
 class Banner extends FormFieldtype
 {
     protected static $fieldtype = 'form_banner';
-
-    public static function aliases(): array
-    {
-        return [static::$fieldtype];
-    }
     protected $description = 'A banner to highlight important information in your form.';
     protected $icon = 'banner';
     protected $categories = ['information'];
@@ -22,6 +17,17 @@ class Banner extends FormFieldtype
     public function configFieldItems(): array
     {
         return [
+            'display' => [
+                'display' => __('Heading'),
+                'type' => 'text',
+                'focus' => true,
+                'validate' => 'required',
+            ],
+            'instructions' => ['type' => 'hidden'],
+            'text' => [
+                'display' => __('Text'),
+                'type' => 'textarea',
+            ],
             'icon' => [
                 'display' => __('Icon'),
                 'type' => 'icon',
@@ -36,9 +42,9 @@ class Banner extends FormFieldtype
         return [
             'type' => 'form_banner',
             'hide_display' => true,
-            ...collect(Arr::except($this->config(), ['type']))
-                ->filter(fn ($value) => $value !== null)
-                ->all(),
+            'display' => $this->config('display'),
+            'text' => $this->config('text'),
+            'icon' => $this->config('icon'),
         ];
     }
 

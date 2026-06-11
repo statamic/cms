@@ -29,15 +29,6 @@ class FormFieldtypeRepository
         return $this->formFieldtypes[$handle] = app($formFields->get($handle));
     }
 
-    public function findForBuilder(string $handle, array $config = []): FormFieldtype
-    {
-        if ($handle === 'fallback') {
-            $handle = $config['type'] ?? $handle;
-        }
-
-        return $this->find($handle);
-    }
-
     public function classes(): Collection
     {
         return app('statamic.form-fieldtypes');

@@ -47,6 +47,7 @@ class HandleAuthenticatedInertiaRequests
     private function alwaysProps()
     {
         return [
+            'version' => Statamic::version(),
             'isPro' => Statamic::pro(),
             'nav' => $this->nav(),
             'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
