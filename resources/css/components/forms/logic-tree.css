@@ -87,7 +87,7 @@
         .linked-list__column {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -98,7 +98,7 @@
         .linked-list__sections {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.25rem;
             min-width: 0;
         }
 
@@ -114,13 +114,6 @@
             padding: 0 0.5rem;
             height: var(--item-height);
             @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
-
-            &::before,
-            &::after {
-                content: '';
-                flex: 1;
-                @apply border-b border-gray-400 dark:border-gray-600 border-dashed;
-            }
         }
 
         .linked-list__section-marker-label {
