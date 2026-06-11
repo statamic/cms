@@ -109,6 +109,59 @@ class FormLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_marks_the_first_field_in_each_section()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                [
+                    'sections' => [
+                        [
+                            'display' => 'Contact',
+                            'fields' => [
+                                [
+                                    'handle' => 'name',
+                                    'field' => [
+                                        'type' => 'short_answer',
+                                        'display' => 'Name',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'display' => 'Details',
+                            'fields' => [
+                                [
+                                    'handle' => 'email',
+                                    'field' => [
+                                        'type' => 'short_answer',
+                                        'display' => 'Email',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->where('fields.0.section_start', true)
+                ->where('fields.0.section_display', 'Contact')
+                ->where('fields.1.section_start', true)
+                ->where('fields.1.section_display', 'Details')
+            );
+    }
+
+    #[Test]
     public function it_provides_fields_with_conditions()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);

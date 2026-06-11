@@ -131,6 +131,31 @@
                 gap: 0;
             }
 
+            .linked-list__section-marker {
+                display: flex;
+                align-items: center;
+                gap: 0.375rem;
+                height: var(--item-height);
+                padding: 0 0.125rem;
+                border: 0;
+                background: transparent;
+                box-shadow: none;
+                grid-template-columns: unset;
+                @apply text-2xs font-medium text-gray-800 dark:text-gray-200;
+
+                &::before,
+                &::after {
+                    content: '';
+                    flex: 1;
+                    height: 1px;
+                    @apply border-b border-gray-400 dark:border-gray-600 border-dashed;
+                }
+            }
+
+            .linked-list__section-marker-label {
+                @apply max-w-[8rem] select-none;
+            }
+
             /* GROUP LOGIC TREE / FIELDSETS (stacked cards)
             =================================================== */
             .linked-list__fieldset-group {

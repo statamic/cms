@@ -119,6 +119,18 @@ const fieldIconClass = (field) => {
 
     return categoryColorClasses[color]?.icon || mutedIconClass;
 };
+
+const firstFieldInGroup = (group) => (group.type === 'field' ? group.field : group.fields[0]);
+
+const isSectionMarker = (groups, groupIndex) => {
+    if (groupIndex === 0) {
+        return false;
+    }
+
+    return firstFieldInGroup(groups[groupIndex]).section_start === true;
+};
+
+const sectionMarkerTitle = (group) => firstFieldInGroup(group).section_display || __('Section');
 </script>
 
 <template>
@@ -161,7 +173,14 @@ const fieldIconClass = (field) => {
                 </div>
 
                 <ul>
-                    <template v-for="group in groups" :key="group.type === 'field' ? group.field._id : group.import">
+                    <template v-for="(group, groupIndex) in groups" :key="group.type === 'field' ? group.field._id : group.import">
+                        <li
+                            v-if="isSectionMarker(groups, groupIndex)"
+                            class="linked-list__section-marker"
+                            :aria-label="sectionMarkerTitle(group)"
+                        >
+                            <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ sectionMarkerTitle(group) }}</span>
+                        </li>
                         <li
                             v-if="group.type === 'field'"
                             :class="{

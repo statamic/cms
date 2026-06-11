@@ -66,6 +66,9 @@ class FormLogicController extends CpController
 
         foreach ($formFields->pages() as $pageIndex => $page) {
             foreach ($page['sections'] ?? [] as $section) {
+                $sectionDisplay = $section['display'] ?? __('Section');
+                $isFirstFieldInSection = true;
+
                 foreach ($section['fields'] ?? [] as $config) {
                     if (isset($config['import'])) {
                         $fieldset = FieldsetRepository::find($config['import']);
@@ -77,7 +80,11 @@ class FormLogicController extends CpController
                                 'inline',
                                 importFieldset: $config['import'],
                                 importTitle: $fieldset?->title(),
+                                sectionDisplay: $sectionDisplay,
+                                sectionStart: $isFirstFieldInSection,
                             );
+
+                            $isFirstFieldInSection = false;
                         }
 
                         continue;
@@ -94,7 +101,11 @@ class FormLogicController extends CpController
                         $pageIndex,
                         $type,
                         handle: $config['handle'],
+                        sectionDisplay: $sectionDisplay,
+                        sectionStart: $isFirstFieldInSection,
                     );
+
+                    $isFirstFieldInSection = false;
                 }
             }
         }
@@ -109,6 +120,8 @@ class FormLogicController extends CpController
         ?string $importFieldset = null,
         ?string $importTitle = null,
         ?string $handle = null,
+        ?string $sectionDisplay = null,
+        bool $sectionStart = false,
     ): array {
         $handle = $handle ?? $formField?->handle();
         $fieldConfig = $formField?->config() ?? [];
@@ -133,6 +146,11 @@ class FormLogicController extends CpController
         if ($importFieldset) {
             $result['import'] = $importFieldset;
             $result['import_title'] = $importTitle;
+        }
+
+        if ($sectionStart) {
+            $result['section_start'] = true;
+            $result['section_display'] = $sectionDisplay;
         }
 
         if (isset($fieldConfig['options'])) {
