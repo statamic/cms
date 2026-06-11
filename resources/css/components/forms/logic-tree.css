@@ -220,6 +220,12 @@
         }
     }
 
+    /* GROUP LOGIC TREE CONNECTORS / FIELDSETS
+    =================================================== */
+    .linked-list__fieldset-field {
+        @apply border-dashed border-gray-400! dark:border-gray-600!;
+    }
+
     /* GROUP LOGIC TREE CONNECTORS / LEAP BRIDGE (FIRST GAP + CORNER)
     =================================================== */
     .linked-list__extra-leap-connector {

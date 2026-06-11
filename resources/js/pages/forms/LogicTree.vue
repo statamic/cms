@@ -25,6 +25,18 @@ const isFirstInFieldset = (field, index, groups) => {
     return ! previous || previous.import !== field.import;
 };
 
+const isLastInFieldset = (field, index, groups) => {
+    if (! field.import) {
+        return false;
+    }
+
+    const next = groups[index + 1]?.field;
+
+    return ! next || next.import !== field.import;
+};
+
+const isFieldsetField = (field, index, groups) => field.import && ! isFirstInFieldset(field, index, groups);
+
 const groupPageSections = (pageFields) => {
     const groups = groupPageFields(pageFields);
 
@@ -190,6 +202,9 @@ const fieldIconClass = (field) => {
                                 :class="{
                                     'linked-list__connector': fieldConnection(group.field),
                                     'linked-list__page-leap': fieldConnection(group.field)?.leap,
+                                    'linked-list__fieldset-start': isFirstInFieldset(group.field, groupIndex, section.groups),
+                                    'linked-list__fieldset-field': isFieldsetField(group.field, groupIndex, section.groups),
+                                    'linked-list__fieldset-end': isLastInFieldset(group.field, groupIndex, section.groups),
                                 }"
                                 :style="fieldConnection(group.field) ? { '--end-connection': fieldConnection(group.field).endConnection } : null"
                             >
