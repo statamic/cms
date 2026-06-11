@@ -47,7 +47,6 @@
     .linked-list-container {
         /* Don't let max-content grid width expand ancestors — scroll inside here only */
         width: 100%;
-        min-width: 0;
         max-width: 100%;
         overflow-x: auto;
         overflow-y: visible;
@@ -88,7 +87,6 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            min-width: 0;
         }
 
         .linked-list__page-name {
@@ -99,13 +97,11 @@
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
-            min-width: 0;
         }
 
         .linked-list__section {
             display: flex;
             flex-direction: column;
-            min-width: 0;
         }
 
         .linked-list__section-marker {
