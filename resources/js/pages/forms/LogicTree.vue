@@ -122,13 +122,7 @@ const fieldIconClass = (field) => {
 
 const firstFieldInGroup = (group) => (group.type === 'field' ? group.field : group.fields[0]);
 
-const isSectionMarker = (groups, groupIndex) => {
-    if (groupIndex === 0) {
-        return false;
-    }
-
-    return firstFieldInGroup(groups[groupIndex]).section_start === true;
-};
+const isSectionMarker = (groups, groupIndex) => firstFieldInGroup(groups[groupIndex]).section_start === true;
 
 const sectionMarkerTitle = (group) => firstFieldInGroup(group).section_display || __('Section');
 </script>

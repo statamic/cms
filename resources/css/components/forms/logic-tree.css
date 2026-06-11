@@ -141,7 +141,7 @@
                 background: transparent;
                 box-shadow: none;
                 grid-template-columns: unset;
-                @apply text-2xs font-medium text-gray-800 dark:text-gray-200;
+                @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
 
                 &::before,
                 &::after {
@@ -149,6 +149,15 @@
                     flex: 1;
                     height: 1px;
                     @apply border-b border-gray-400 dark:border-gray-600 border-dashed;
+                }
+
+                &:first-child {
+                    /* Make this small because it's less important, and we can get away with changing the list item height because the connectors never go above the second list item */
+                    height: 1rem;
+                    &::before,
+                    &::after {
+                        opacity: 0;
+                    }
                 }
             }
 
