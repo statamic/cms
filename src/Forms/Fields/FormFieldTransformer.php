@@ -135,6 +135,11 @@ class FormFieldTransformer extends FieldTransformer
         $formField = new FormField($field['handle'], $mergedConfig);
         $formFieldtype = FormFieldtypeRepository::find($mergedConfig['type'])->setField($formField);
 
+        $config = array_merge(
+            $config,
+            $formFieldtype->configFields()->addValues($config)->preProcess()->values()->all()
+        );
+
         return [
             'handle' => $field['handle'],
             'type' => 'reference',
@@ -157,6 +162,11 @@ class FormFieldTransformer extends FieldTransformer
 
         $formField = new FormField($field['handle'], $config);
         $formFieldtype = FormFieldtypeRepository::find($config['type'])->setField($formField);
+
+        $config = array_merge(
+            $config,
+            $formFieldtype->configFields()->addValues($config)->preProcess()->values()->all()
+        );
 
         return [
             'handle' => $field['handle'],
