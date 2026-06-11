@@ -1,39 +1,28 @@
-{{ opinion_value = value }}
+{{ foreach:scale_values as="scale_value" }}
+    {{ middle_index = "{{ total_results | subtract:1 | divide:2 | floor }}" }}
 
-<div class="inline-flex w-fit max-w-full flex-col gap-2" data-opinion-scale id="{{ id }}">
-    <div class="flex gap-2" role="radiogroup" {{ if display }}aria-label="{{ display }}"{{ /if }}>
-        {{ scale_values }}
-            <label class="relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925{{ if value == opinion_value }} border-primary bg-primary/10 text-primary dark:bg-primary/20{{ /if }}">
-                <input
-                    type="radio"
-                    class="absolute pointer-events-none opacity-0"
-                    name="{{ name }}"
-                    value="{{ value }}"
-                    {{ if value == opinion_value }}checked{{ /if }}
-                    {{ if validate|contains:required }}required{{ /if }}
-                    {{ if js_driver }}{{ js_attributes }}{{ /if }}
-                    {{ if error }}
-                        aria-invalid="true" aria-describedby="{{ id }}-error"
-                    {{ elseif instructions }}
-                        aria-describedby="{{ id }}-instructions"
-                    {{ /if }}
-                >
-                <span class="leading-none">{{ value }}</span>
-            </label>
-        {{ /scale_values }}
-    </div>
-
-    {{ if low_label || middle_label || high_label }}
-        <div class="grid w-full grid-cols-[1fr_auto_1fr] gap-2 px-0.75 text-xs text-gray-500 dark:text-gray-400">
-            {{ if low_label }}
-                <span class="col-start-1 justify-self-start text-start">{{ low_label }}</span>
+    <label>
+        <input
+            id="{{ id }}-{{ scale_value }}-option"
+            type="radio"
+            name="{{ name }}"
+            value="{{ scale_value }}"
+            {{ if js_driver }}{{ js_attributes }}{{ /if }}
+            {{ if value == scale_value }}checked{{ /if }}
+            {{ if validate|contains:required }}required{{ /if }}
+            {{ if error }}
+                aria-invalid="true" aria-describedby="{{ id }}-error"
+            {{ elseif instructions }}
+                aria-describedby="{{ id }}-instructions"
             {{ /if }}
-            {{ if middle_label }}
-                <span class="col-start-2 justify-self-center text-center">{{ middle_label }}</span>
-            {{ /if }}
-            {{ if high_label }}
-                <span class="col-start-3 justify-self-end text-end">{{ high_label }}</span>
-            {{ /if }}
-        </div>
-    {{ /if }}
-</div>
+        >
+        {{ scale_value }}
+        {{ if first && low_label }}
+            - {{ low_label }}
+        {{ elseif index == middle_index && middle_label }}
+            - {{ middle_label }}
+        {{ elseif last && high_label }}
+            - {{ high_label }}
+        {{ /if }}
+    </label>
+{{ /foreach:scale_values }}

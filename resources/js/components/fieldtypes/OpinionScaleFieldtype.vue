@@ -20,16 +20,6 @@ const max = computed(() => props.config.max ?? 10);
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 const ariaLabel = computed(() => __(props.config.display ?? 'Opinion scale'));
 const hasLabels = computed(() => Boolean(props.config.low_label || props.config.middle_label || props.config.high_label));
-
-const scaleValues = computed(() => {
-    const values = [];
-
-    for (let i = min.value; i <= max.value; i++) {
-        values.push(i);
-    }
-
-    return values;
-});
 </script>
 
 <template>
@@ -40,7 +30,7 @@ const scaleValues = computed(() => {
             :aria-label="ariaLabel"
         >
             <label
-                v-for="scaleValue in scaleValues"
+                v-for="scaleValue in meta.scaleValues"
                 :key="scaleValue"
                 :class="[
                     optionClasses,

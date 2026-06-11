@@ -6,7 +6,7 @@ import { useSortable } from './use-drag-and-drop';
 import Section from './Section.vue';
 import { __ } from '@/bootstrap/globals';
 
-const { addSection, clearInspector, dirty, formsProInstalled, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
+const { addSection, clearInspector, dirty, fieldView, formsProInstalled, inspect, inspecting, inspectorType, pages } = injectBuilderContext();
 
 const props = defineProps<{
     page: object;
@@ -56,6 +56,7 @@ const moveField = (fromSectionId: string, toSectionId: string, oldIndex: number,
 useSortable({
     container,
     sections,
+    fieldView,
     onFieldMoved: moveField,
 });
 

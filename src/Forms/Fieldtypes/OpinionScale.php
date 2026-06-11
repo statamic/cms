@@ -21,18 +21,18 @@ class OpinionScale extends FormFieldtype
             'min' => [
                 'display' => __('Min Value'),
                 'type' => 'integer',
-                'default' => 0,
                 'min' => 0,
                 'max' => 1,
                 'width' => 50,
+                'placeholder' => 0,
             ],
             'max' => [
                 'display' => __('Max Value'),
                 'type' => 'integer',
-                'default' => 10,
                 'min' => 1,
                 'max' => 11,
                 'width' => 50,
+                'placeholder' => 10,
             ],
             'low_label' => [
                 'display' => __('Low Label'),
@@ -83,14 +83,8 @@ class OpinionScale extends FormFieldtype
 
     private function normalizedRange(): array
     {
-        $configuredMin = $this->config('min');
-        $min = ($configuredMin === null || $configuredMin === '') ? 0 : (int) $configuredMin;
-        $min = $min === 1 ? 1 : 0;
-
-        $configuredMax = $this->config('max');
-        $max = ($configuredMax === null || $configuredMax === '') ? 10 : (int) $configuredMax;
-
-        $max = max($min + 1, min($min + 10, $max));
+        $min = max(0, (int) $this->config('min', 0));
+        $max = max(10, (int) $this->config('max', 10));
 
         return [$min, $max];
     }

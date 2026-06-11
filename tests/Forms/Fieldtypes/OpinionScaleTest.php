@@ -51,22 +51,24 @@ class OpinionScaleTest extends TestCase
     }
 
     #[Test]
-    public function it_clamps_max_to_a_sensible_range()
+    public function it_clamps_min_and_max_to_a_sensible_range()
     {
         $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', [
             'type' => 'opinion_scale',
-            'min' => 0,
+            'min' => -5,
             'max' => 25,
         ]));
 
+        $this->assertEquals(0, $fieldtype->toFieldArray()['min']);
         $this->assertEquals(10, $fieldtype->toFieldArray()['max']);
 
         $fieldtype = (new OpinionScale)->setField(new FormField('satisfaction', [
             'type' => 'opinion_scale',
-            'min' => 1,
-            'max' => 1,
+            'min' => 5,
+            'max' => 10,
         ]));
 
-        $this->assertEquals(2, $fieldtype->toFieldArray()['max']);
+        $this->assertEquals(5, $fieldtype->toFieldArray()['min']);
+        $this->assertEquals(10, $fieldtype->toFieldArray()['max']);
     }
 }

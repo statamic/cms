@@ -1,17 +1,11 @@
-{{ once }}
-    <link rel="stylesheet" href="{{ config:app:url }}/vendor/statamic/forms/star-rating.css">
-{{ /once }}
 <input
     id="{{ id }}"
     type="range"
     name="{{ name }}"
-    class="star-rating-input{{ if (value ?? 0) == 0 }} star-rating-input--unrated{{ /if }}"
-    data-star-rating
     min="0"
     max="{{ max_stars }}"
     step="{{ step ?? 1 }}"
     value="{{ value ?? 0 }}"
-    style="--star-rating-max: {{ max_stars }}; --star-rating-step: {{ step ?? 1 }};"
     {{ if js_driver }}{{ js_attributes }}{{ /if }}
     {{ if validate|contains:required }}required{{ /if }}
     {{ if display }}aria-label="{{ display }}"{{ /if }}

@@ -160,7 +160,7 @@ export function useFieldtypeDraggable({ pages, onDragStart, onDrop }) {
  * Handles sorting/reordering fields within sections.
  * Should be used per-page.
  */
-export function useSortable({ container, sections, onFieldMoved }) {
+export function useSortable({ container, sections, fieldView, onFieldMoved }) {
     let sortable = null;
 
     const refresh = () => {
@@ -187,6 +187,22 @@ export function useSortable({ container, sections, onFieldMoved }) {
 
         sortable.on('drag:start', () => document.documentElement.classList.add('cursor-grabbing'));
         sortable.on('drag:stop', () => document.documentElement.classList.remove('cursor-grabbing'));
+
+        sortable.on('mirror:created', (event) => {
+            if (fieldView?.value !== 'collapsed') return;
+
+            event.mirror.querySelectorAll('[data-collapsed-field-icon]').forEach((el) => (el.style.display = 'inline-flex'));
+
+            event.mirror.querySelectorAll('[data-ui-input-group]').forEach((inputGroup) => {
+                inputGroup.querySelectorAll('[data-ui-description]').forEach((el) => (el.style.display = 'none'));
+
+                Array.from(inputGroup.children).forEach((child, index) => {
+                    if (index === 0) return;
+                    if (child.querySelector('[data-logic-attached]')) return;
+                    child.style.display = 'none';
+                });
+            });
+        });
 
         let dragStartState = null;
 
