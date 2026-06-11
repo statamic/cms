@@ -85,12 +85,11 @@ class OpinionScale extends FormFieldtype
     {
         $configuredMin = $this->config('min');
         $min = ($configuredMin === null || $configuredMin === '') ? 0 : (int) $configuredMin;
-        $min = $min === 1 ? 1 : 0;
+        $min = max(0, $min);
 
         $configuredMax = $this->config('max');
         $max = ($configuredMax === null || $configuredMax === '') ? 10 : (int) $configuredMax;
-
-        $max = max($min + 1, min($min + 10, $max));
+        $max = min(10, $max);
 
         return [$min, $max];
     }
