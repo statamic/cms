@@ -21,10 +21,6 @@ class ControlPanelExceptionHandler extends Handler
 
     protected function shouldReturnJson($request, Throwable $e)
     {
-        // The Control Panel relies on deterministic JSON (e.g. 422 validation)
-        // responses for its XHR requests. An app may register a custom
-        // shouldRenderJsonWhen() callback that Laravel applies to every handler,
-        // which would override this, so we always honor the request itself.
         return $request->expectsJson();
     }
 

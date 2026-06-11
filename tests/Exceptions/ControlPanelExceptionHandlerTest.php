@@ -16,10 +16,6 @@ class ControlPanelExceptionHandlerTest extends TestCase
     {
         $handler = app(ControlPanelExceptionHandler::class);
 
-        // Laravel applies an app's shouldRenderJsonWhen() callback (e.g. the one in the
-        // default bootstrap/app.php scaffold) to every exception handler. If the Control
-        // Panel honored it, an XHR save expecting JSON would get a redirect instead of a
-        // 422, sending axios into a redirect loop. The CP must ignore it.
         $handler->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
 
         $request = Request::create('/cp/collections/pages/entries/123', 'PATCH');
