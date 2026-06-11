@@ -87,7 +87,7 @@
         .linked-list__column {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 1rem;
             min-width: 0;
         }
 
@@ -112,15 +112,19 @@
             display: flex;
             align-items: end;
             justify-content: center;
-            padding: 0 0.5rem;
             .linked-list__section:not(:first-child) & {
                 height: var(--item-height);
             }
             @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
+            + ul {
+                @apply rounded-t-none;
+            }
         }
 
         .linked-list__section-marker-label {
-            @apply max-w-[8rem] shrink-0 select-none;
+            @apply max-w-[8rem] shrink-0 select-none pt-1.5 rounded-t-xl bg-gray-100 dark:bg-transparent;
+            max-width: unset;
+            width: 100%;
         }
 
         ul {
