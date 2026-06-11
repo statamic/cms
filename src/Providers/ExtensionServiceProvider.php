@@ -157,6 +157,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\Phone::class,
         Forms\Fieldtypes\Ranking::class,
         Forms\Fieldtypes\ShortAnswer::class,
+        Forms\Fieldtypes\Spacer::class,
         Forms\Fieldtypes\StarRating::class,
         Forms\Fieldtypes\TimePicker::class,
         Forms\Fieldtypes\Toggle::class,
