@@ -144,7 +144,7 @@ const suggestableConditionFields = computed(() => {
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
-        .filter((f) => getFieldtypeCategory(f.config.type).handle !== 'information')
+        .filter((f) => f.type === 'import' || getFieldtypeCategory(f.config.type).handle !== 'information')
         .map((f) => ({
             handle: f.handle,
             config: {
