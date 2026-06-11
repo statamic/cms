@@ -150,49 +150,6 @@
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
             }
 
-            .linked-list__fieldset-wrap {
-                display: block;
-                height: auto;
-                padding: 0;
-                border: 0;
-                background: transparent;
-                box-shadow: none;
-                gap: 0;
-            }
-
-            /* GROUP LOGIC TREE / FIELDSETS (stacked cards)
-            =================================================== */
-            .linked-list__fieldset-group {
-                display: flex;
-                flex-direction: column;
-                @apply rounded-lg shadow-ui-xs dark:shadow-none dark:ring-1 dark:ring-white/10;
-            }
-
-            .linked-list__field-row {
-                position: relative;
-                display: flex;
-                gap: 0.5rem;
-                height: var(--item-height);
-                padding-block: var(--item-padding);
-                @apply border-x border-b border-gray-300 bg-white px-3 text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200;
-
-                &:first-child {
-                    @apply rounded-t-md border-t;
-                }
-
-                &:last-child {
-                    @apply rounded-b-md;
-                }
-
-                &:only-child {
-                    @apply rounded-md;
-                }
-
-                &:not(:first-child) {
-                    @apply border-t-0;
-                }
-            }
-
             /* GROUP LOGIC TREE CONNECTORS / SOURCE
             =================================================== */
             .linked-list__connector {
