@@ -392,7 +392,7 @@ onUnmounted(() => {
                 {{ form.title }}
             </template>
             <template #actions>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2.5">
                     <FieldNumberingToggle />
                     <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
                     <ToggleItem

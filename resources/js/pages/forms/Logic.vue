@@ -125,7 +125,7 @@ onUnmounted(() => {
                 {{ form.title }}
             </template>
             <template #actions>
-                <div class="flex items-start gap-2">
+                <div class="flex items-start gap-2.5">
                     <FieldNumberingToggle />
                     <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
                         <ToggleItem
