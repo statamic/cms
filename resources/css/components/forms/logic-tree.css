@@ -133,8 +133,7 @@
 
             .linked-list__section-marker {
                 display: flex;
-                align-items: end;
-                justify-content: center;
+                align-items: center;
                 gap: 0.375rem;
                 height: var(--item-height);
                 padding: 0 0.125rem;
@@ -144,14 +143,26 @@
                 grid-template-columns: unset;
                 @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
 
+                &::before,
+                &::after {
+                    content: '';
+                    flex: 1;
+                    height: 1px;
+                    @apply border-b border-gray-400 dark:border-gray-600 border-dashed;
+                }
+
                 &:first-child {
                     /* Make this small because it's less important, and we can get away with changing the list item height because the connectors never go above the second list item */
                     height: 1rem;
+                    &::before,
+                    &::after {
+                        opacity: 0;
+                    }
                 }
             }
 
             .linked-list__section-marker-label {
-                @apply max-w-[9rem] select-none;
+                @apply max-w-[8rem] select-none;
             }
 
             /* GROUP LOGIC TREE / FIELDSETS (stacked cards)
