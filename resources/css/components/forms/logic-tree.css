@@ -101,7 +101,7 @@
             gap: 0.5rem;
             @apply p-1.5 px-1.5 bg-gray-100 rounded-lg dark:bg-gray-900/60;
 
-            > li {
+            li {
                 /* Use a grid instead of flexbox so we can force things into column 1 and 2.
                    If we use flexbox then invisible items such as .linked-list__extra-leap-connector will take up an flex child space, changing the layout of items with a leap connector. */
                 display: grid;
@@ -121,7 +121,7 @@
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
             }
 
-            > li.linked-list__fieldset-wrap {
+            .linked-list__fieldset-wrap {
                 display: block;
                 height: auto;
                 padding: 0;
