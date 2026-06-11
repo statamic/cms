@@ -124,14 +124,14 @@ onUnmounted(() => {
                         <ToggleItem
                             value="expanded"
                             icon="expand"
-                            :aria-label="__('Uncompressed view')"
-                            v-tooltip="__('Uncompressed view')"
+                            :aria-label="__('Expanded view')"
+                            v-tooltip="__('Expanded view')"
                         />
                         <ToggleItem
                             value="compressed"
                             icon="collapse"
-                            :aria-label="__('Compressed view')"
-                            v-tooltip="__('Compressed view')"
+                            :aria-label="__('Collapsed view')"
+                            v-tooltip="__('Collapsed view')"
                         />
                     </ToggleGroup>
                     <ToggleGroup v-model="logicView" size="sm">
