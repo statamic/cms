@@ -190,7 +190,9 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('statamic.forms', function (Request $request) {
-            return Limit::perMinute(10)->by($request->ip());
+            return $request->isPrecognitive()
+                ? Limit::perMinute(30)->by('precognition:'.$request->ip())
+                : Limit::perMinute(10)->by('submission:'.$request->ip());
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
