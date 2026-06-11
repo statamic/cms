@@ -3,7 +3,9 @@ import { Button, Field, Icon, Label } from '@ui';
 import { computed } from 'vue';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { categories, categoryColorClasses } from './categories';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
+import { fieldNumberFromMap } from '@/composables/forms/field-numbering';
 import { __ } from '@/bootstrap/globals';
 
 defineEmits<{
@@ -19,7 +21,15 @@ const props = defineProps<{
     isLastRow?: boolean;
 }>();
 
-const { dirty, errors, fieldView, inspect, inspecting, inspectorType } = injectBuilderContext();
+const { dirty, errors, fieldNumbers, fieldView, inspect, inspecting, inspectorType, showFieldNumbers } = injectBuilderContext();
+
+const fieldNumber = computed(() => {
+    if (! showFieldNumbers?.value) {
+        return null;
+    }
+
+    return fieldNumberFromMap(fieldNumbers?.value, props.field.handle, props.field._id);
+});
 
 const inspectField = () => inspect(InspectorType.Field, props.field);
 const isInspecting = computed(() => inspectorType.value === InspectorType.Field && inspecting.value?._id === props.field._id);
@@ -105,6 +115,7 @@ const hasErrors = computed(() => {
         >
             <template #label>
                 <Label :class="['mb-0', { 'cursor-pointer': !isInspecting }]">
+                    <FieldNumber :number="fieldNumber" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
                         v-if="field.config.if || field.config.unless"
@@ -140,6 +151,7 @@ const hasErrors = computed(() => {
         >
             <template #label>
                 <Label :class="['', { 'cursor-pointer': !isInspecting }]">
+                    <FieldNumber :number="fieldNumber" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
                         v-if="field.config.if || field.config.unless"

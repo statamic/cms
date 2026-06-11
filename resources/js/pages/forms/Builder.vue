@@ -38,8 +38,11 @@ import Page from '@/components/forms/builder/Page.vue';
 import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import SectionInspector from '@/components/forms/builder/SectionInspector.vue';
 import { useFieldtypeDraggable } from '@/components/forms/builder/use-drag-and-drop';
+import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
+import { buildFieldNumbersFromBuilderPages, useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { __, uniqid } from '@/bootstrap/globals';
 import { progress, keys } from '@api';
+import { usePage } from '@inertiajs/vue3';
 import type Binding from '@/components/keys/Binding';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
@@ -66,6 +69,8 @@ const pages = computed(() => formFields.value.pages);
 const allSections = computed(() => pages.value.flatMap(page => page.sections));
 const shouldShowViewSelector = computed(() => allSections.value.some(section => section.fields.length > 0));
 const fieldCount = computed(() => allSections.value.flatMap(section => section.fields).length);
+const { showFieldNumbers } = useFieldNumberingPreference();
+const fieldNumbers = computed(() => buildFieldNumbersFromBuilderPages(pages.value, usePage().props.fieldsets));
 
 const inspect = (type: InspectorType, data: object): void => {
     inspecting.value = data;
@@ -309,6 +314,8 @@ provideBuilderContext({
     errors,
     fieldtypes: props.fieldtypes,
     fieldView,
+    fieldNumbers,
+    showFieldNumbers,
     form: props.form,
     formsProInstalled: props.formsProInstalled,
     inspect,
@@ -385,7 +392,9 @@ onUnmounted(() => {
                 {{ form.title }}
             </template>
             <template #actions>
-                <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
+                <div class="flex items-center gap-2">
+                    <FieldNumberingToggle />
+                    <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
                     <ToggleItem
                         :value="FieldView.Expanded"
                         icon="expand"
@@ -398,7 +407,8 @@ onUnmounted(() => {
                         :aria-label="__('Collapsed view')"
                         v-tooltip="__('Collapsed view')"
                     />
-                </ToggleGroup>
+                    </ToggleGroup>
+                </div>
             </template>
         </Header>
 

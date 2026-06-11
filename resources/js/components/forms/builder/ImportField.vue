@@ -2,6 +2,8 @@
 import { Button, Description, Field, Icon, Label } from '@ui';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
+import { fieldNumberFromMap } from '@/composables/forms/field-numbering';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
 
@@ -17,7 +19,21 @@ defineEmits<{
     (e: 'remove'): void;
 }>();
 
-const { errors, inspect, inspecting, inspectorType } = injectBuilderContext();
+const { errors, fieldNumbers, inspect, inspecting, inspectorType, showFieldNumbers } = injectBuilderContext();
+
+const fieldsetFieldNumber = (fieldsetField) => {
+    if (! showFieldNumbers?.value) {
+        return null;
+    }
+
+    const prefix = props.field.prefix || '';
+
+    return fieldNumberFromMap(
+        fieldNumbers?.value,
+        `${prefix}${fieldsetField.handle}`,
+        `${props.field._id}:${fieldsetField.handle}`,
+    );
+};
 
 const fieldsets = Object.values(usePage().props.fieldsets);
 
@@ -80,6 +96,7 @@ const errorMessage = computed(() => {
                     <Field :label="__(fieldsetField.config.display)" :instructions="fieldsetField.config.instructions">
                         <template #label>
                             <Label>
+                                <FieldNumber :number="fieldsetFieldNumber(fieldsetField)" class="me-1" />
                                 <Icon
                                     :name="fieldsetField.icon || 'generic-field'"
                                     data-collapsed-field-icon

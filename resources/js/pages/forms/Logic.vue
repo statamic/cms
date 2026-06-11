@@ -3,10 +3,12 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
 import LogicTree from './LogicTree.vue';
 import Head from '@/pages/layout/Head.vue';
+import { buildFieldNumbersFromLogicFields, useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { keys, preferences } from '@api';
 import axios from 'axios';
@@ -30,6 +32,8 @@ watch(logicView, (view) => preferences.set(logicViewPreferenceKey, view));
 const treeDensityPreferenceKey = 'forms.logic.tree.density';
 const treeDensity = ref(preferences.get(treeDensityPreferenceKey, 'compressed'));
 watch(treeDensity, (density) => preferences.set(treeDensityPreferenceKey, density));
+const { showFieldNumbers } = useFieldNumberingPreference();
+const fieldNumbers = computed(() => buildFieldNumbersFromLogicFields(fields.value));
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
@@ -121,7 +125,8 @@ onUnmounted(() => {
                 {{ form.title }}
             </template>
             <template #actions>
-                <div class="flex items-start gap-4">
+                <div class="flex items-start gap-2">
+                    <FieldNumberingToggle />
                     <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
                         <ToggleItem
                             value="expanded"
@@ -157,6 +162,8 @@ onUnmounted(() => {
                 v-model:fields="fields"
                 :suggestable-fields
                 :fieldtypes
+                :show-field-numbers
+                :field-numbers
             />
         </template>
     </div>
@@ -166,6 +173,8 @@ onUnmounted(() => {
             :pages="pages"
             :fields="fields"
             :expanded="treeDensity === 'expanded'"
+            :show-field-numbers
+            :field-numbers
         />
     </div>
 </template>
