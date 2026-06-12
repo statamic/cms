@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
     appearance: {
         type: String,
@@ -12,6 +14,8 @@ const props = defineProps({
     },
 });
 
+const inline = computed(() => props.appearance === 'inline' || props.appearance === 'chips');
+
 const isRadio = props.control === 'radio';
 const chipClass = isRadio
     ? 'rounded-full px-1.5 pe-2 py-1 bg-white dark:bg-gray-850'
@@ -23,7 +27,7 @@ const chipClass = isRadio
         class="pointer-events-none select-none"
         :class="{
             'flex flex-col gap-1.5 pb-0.75': appearance === 'default',
-            'flex flex-wrap gap-1.5': appearance === 'inline' || appearance === 'chips',
+            'flex flex-wrap gap-1.5': inline,
         }"
         aria-hidden="true"
     >
