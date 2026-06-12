@@ -16,10 +16,11 @@ const props = defineProps({
 
 const inline = computed(() => props.appearance === 'inline' || props.appearance === 'chips');
 
-const isRadio = props.control === 'radio';
-const chipClass = isRadio
-    ? 'rounded-full px-1.5 pe-2 py-1 bg-white dark:bg-gray-850'
-    : 'items-center rounded-sm px-1.5 pe-2 py-1 bg-white dark:bg-gray-850';
+const isRadio = computed(() => props.control === 'radio');
+const chipClass = computed(() => isRadio.value
+    ? 'border border-gray-300 dark:border-gray-700 shadow-ui-xs rounded-full px-1.5 pe-2 py-1 bg-white dark:bg-gray-850'
+    : 'border border-gray-300 dark:border-gray-700 shadow-ui-xs items-center rounded-sm px-1.5 pe-2 py-1 bg-white dark:bg-gray-850',
+);
 </script>
 
 <template>
@@ -35,7 +36,7 @@ const chipClass = isRadio
             v-for="selected in [true, false]"
             :key="selected ? 'on' : 'off'"
             class="flex items-center gap-1"
-            :class="appearance === 'chips' ? `border border-gray-300 shadow-ui-xs dark:border-gray-700 ${chipClass}` : null"
+            :class="appearance === 'chips' ? chipClass : null"
         >
             <div
                 v-if="isRadio"
