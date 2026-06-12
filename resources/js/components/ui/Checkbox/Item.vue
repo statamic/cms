@@ -9,12 +9,6 @@ defineOptions({ inheritAttrs: false });
 const attrs = useAttrs();
 
 const props = defineProps({
-    /** Additional classes applied when the group appearance is `chips` */
-    chipsClass: {
-        type: String,
-        default:
-            'items-center gap-2 border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-3 shadow-ui-xs rounded-xl [&_button]:mt-0',
-    },
     /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
     /** Description text to display below the label */
@@ -84,7 +78,9 @@ const containerClasses = computed(() => {
         },
     })({ ...props });
 
-    return twMerge(classes, appearance.value === 'chips' ? props.chipsClass : null, attrs.class);
+    const chipsClass = 'items-center gap-2 border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-3 shadow-ui-xs rounded-xl [&_button]:mt-0';
+
+    return twMerge(classes, appearance.value === 'chips' ? chipsClass : null, attrs.class);
 });
 
 const conditionalProps = computed(() => {
