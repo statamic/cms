@@ -43,6 +43,8 @@ const blueprint = ref(null);
 const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
 const modifiedFields = ref<string[]>([]);
 
+const shouldShowValidationTab = computed(() => !['structure', 'information'].includes(getFieldtypeCategory(field.value.config.type).handle));
+
 const adjustedBlueprint = computed(() => {
     const bp = JSON.parse(JSON.stringify(blueprint.value));
 
@@ -174,6 +176,10 @@ watch(field, () => {
     updatePreview.cancel();
     loading.value = !cache.has(field.value._id);
     load();
+
+    if (activeTab.value === FieldInspectorTabs.Validation && !shouldShowValidationTab.value) {
+        activeTab.value = FieldInspectorTabs.Settings;
+    }
 });
 
 watch(values, () => {
@@ -200,7 +206,7 @@ onMounted(() => load());
             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                 <TabTrigger :name="FieldInspectorTabs.Settings" :text="__('Settings')" />
                 <TabTrigger :name="FieldInspectorTabs.Conditions" :text="__('Logic')" />
-                <TabTrigger :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
+                <TabTrigger v-if="shouldShowValidationTab" :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
             </TabList>
 
             <TabContent :name="FieldInspectorTabs.Settings">
