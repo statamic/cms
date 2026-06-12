@@ -406,12 +406,30 @@ abstract class Store
 
     public function warm()
     {
-        $this->shouldCacheFileItems = true;
+        $indexes = $this->resolveIndexes();
 
-        $this->resolveIndexes()->each->update();
+        // Partition: indexes implementing getItemValue() can be built in a single pass.
+        // Others (e.g. Terms/Associations) query their own data sources independently.
+        [$valueIndexes, $otherIndexes] = $indexes->partition(
+            fn ($index) => method_exists($index, 'getItemValue')
+        );
 
-        $this->shouldCacheFileItems = false;
-        $this->fileItems = null;
+        // Single pass: hold one item in memory at a time while feeding all value indexes.
+        $accumulated = $valueIndexes->map(fn () => [])->all();
+
+        foreach ($this->paths()->keys() as $key) {
+            $item = $this->getItem($key);
+
+            foreach ($valueIndexes as $name => $index) {
+                $accumulated[$name][$key] = $index->getItemValue($item);
+            }
+        }
+
+        $valueIndexes->each(function ($index, $name) use ($accumulated) {
+            $index->setItems($accumulated[$name])->cache();
+        });
+
+        $otherIndexes->each->update();
     }
 
     public function keys()
