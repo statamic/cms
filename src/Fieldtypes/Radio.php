@@ -3,12 +3,14 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Concerns\MigratesLegacyInlineConfig;
 
 use function Statamic\trans as __;
 
 class Radio extends Fieldtype
 {
     use HasSelectOptions;
+    use MigratesLegacyInlineConfig;
 
     protected $categories = ['controls'];
     protected $selectableInForms = true;
