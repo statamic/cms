@@ -164,7 +164,8 @@ class FormBuilderController extends CpController
 
                     $fields = $blueprint
                         ->fields()
-                        ->addValues($field['config'] ?? []);
+                        ->addValues($field['config'] ?? [])
+                        ->preProcess();
 
                     try {
                         $fields->validate();
