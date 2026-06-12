@@ -56,7 +56,6 @@ defineExpose({ focus });
             'gap-x-4': appearance === 'inline',
             'gap-x-2.5': appearance === 'chips',
         }"
-        :data-appearance="appearance !== 'default' ? appearance : undefined"
         data-ui-input
         data-ui-checkbox-group
     >
