@@ -24,7 +24,7 @@ const props = defineProps({
     required: { type: Boolean, default: false },
 });
 
-const resolvedAppearance = computed(() => {
+const appearance = computed(() => {
     if (props.appearance !== 'default') {
         return props.appearance;
     }
@@ -32,7 +32,7 @@ const resolvedAppearance = computed(() => {
     return props.inline ? 'inline' : 'default';
 });
 
-provideCheckboxContext({ appearance: resolvedAppearance });
+provideCheckboxContext({ appearance });
 
 const focus = function () {
     console.log('focusing. todo.');
@@ -50,10 +50,10 @@ defineExpose({ focus });
         :name="name"
         class="relative block w-full space-y-2"
         :class="{
-            'flex flex-wrap space-y-0 gap-x-4 gap-y-2': resolvedAppearance === 'inline' || resolvedAppearance === 'chips',
-            'gap-x-2.5!': resolvedAppearance === 'chips',
+            'flex flex-wrap space-y-0 gap-x-4 gap-y-2': appearance === 'inline' || appearance === 'chips',
+            'gap-x-2.5!': appearance === 'chips',
         }"
-        :data-appearance="resolvedAppearance !== 'default' ? resolvedAppearance : undefined"
+        :data-appearance="appearance !== 'default' ? appearance : undefined"
         data-ui-input
         data-ui-checkbox-group
     >
