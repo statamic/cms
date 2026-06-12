@@ -146,6 +146,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\Dictionary::class,
         Forms\Fieldtypes\Dropdown::class,
         Forms\Fieldtypes\Email::class,
+        Forms\Fieldtypes\Group::class,
         Forms\Fieldtypes\Heading::class,
         Forms\Fieldtypes\ImageChoice::class,
         Forms\Fieldtypes\LongAnswer::class,
