@@ -1,8 +1,9 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
-import { computed, inject, useAttrs } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
+import { injectCheckboxContext } from './Group.vue';
 
 defineOptions({ inheritAttrs: false });
 
@@ -34,7 +35,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'keydown']);
 
-const appearance = inject('checkboxAppearance', computed(() => 'default'));
+const { appearance } = injectCheckboxContext() ?? { appearance: computed(() => 'default') };
 
 const id = useId();
 

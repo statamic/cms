@@ -1,5 +1,11 @@
+<script>
+import createContext from '@/util/createContext.js';
+
+export const [injectCheckboxContext, provideCheckboxContext] = createContext('Checkbox');
+</script>
+
 <script setup>
-import { computed, provide, useId } from 'vue';
+import { computed, useId } from 'vue';
 import { CheckboxGroupRoot } from 'reka-ui';
 
 const props = defineProps({
@@ -26,7 +32,7 @@ const resolvedAppearance = computed(() => {
     return props.inline ? 'inline' : 'default';
 });
 
-provide('checkboxAppearance', resolvedAppearance);
+provideCheckboxContext({ appearance: resolvedAppearance });
 
 const focus = function () {
     console.log('focusing. todo.');

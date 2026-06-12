@@ -1,6 +1,7 @@
 <script setup>
-import { computed, inject, useId } from 'vue';
+import { computed, useId } from 'vue';
 import { RadioGroupIndicator, RadioGroupItem } from 'reka-ui';
+import { injectRadioContext } from './Group.vue';
 
 const props = defineProps({
     /** Description text to display below the label */
@@ -13,7 +14,7 @@ const props = defineProps({
     value: { type: [String, Number, Boolean], required: true },
 });
 
-const appearance = inject('radioAppearance', computed(() => 'default'));
+const { appearance } = injectRadioContext() ?? { appearance: computed(() => 'default') };
 
 const id = useId();
 </script>
