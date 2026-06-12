@@ -1,4 +1,10 @@
 @once
+    <style>
+        [data-ranking] li { cursor: grab; }
+        [data-ranking] li[data-dragging] { cursor: grabbing; opacity: 0.5; }
+        [data-ranking] li::before { content: '☰ '; opacity: 0.4; }
+    </style>
+
     <script>
         (function() {
             document.addEventListener('dragstart', (e) => {
