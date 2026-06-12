@@ -15,7 +15,7 @@ const navItems = [
 ];
 
 const currentPath = computed(() => new URL(page.url, window.location.origin).pathname);
-const isActive = (href) => currentPath.value === new URL(href, window.location.origin).pathname;
+const isActive = (href) => currentPath.value.includes(new URL(href, window.location.origin).pathname);
 
 const activeSectionLabel = computed(() => {
     return navItems.find((item) => isActive(item.href))?.label ?? navItems[0]?.label ?? '';

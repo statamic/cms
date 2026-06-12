@@ -126,6 +126,7 @@ class FormSubmissionsController extends CpController
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
         return Inertia::render('forms/Submission', [
+            'form' => $form,
             'id' => $submission->id(),
             'formTitle' => $form->title(),
             'date' => $submission->date()->toIso8601String(),
