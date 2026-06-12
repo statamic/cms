@@ -14,15 +14,15 @@
         >
             <div class="flex w-full flex-col items-start gap-2 py-0.5 text-left">
                 <span class="text-sm font-medium">{{ option.label }}</span>
-                <ControlAppearancePreview :appearance="option.value" :control="control" />
+                <Preview :appearance="option.value" :control="control" />
             </div>
         </Button>
     </ButtonGroup>
 </template>
 
 <script>
-import Fieldtype from './Fieldtype.vue';
-import ControlAppearancePreview from './ControlAppearancePreview.vue';
+import Fieldtype from '../Fieldtype.vue';
+import Preview from './Preview.vue';
 import { Button, ButtonGroup } from '@/components/ui';
 
 export default {
@@ -30,7 +30,7 @@ export default {
     components: {
         Button,
         ButtonGroup,
-        ControlAppearancePreview,
+        Preview,
     },
 
     computed: {

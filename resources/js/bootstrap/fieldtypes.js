@@ -13,7 +13,7 @@ import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButto
 import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
-import ControlAppearanceFieldtype from '../components/fieldtypes/ControlAppearanceFieldtype.vue';
+import ControlAppearanceFieldtype from '../components/fieldtypes/control-appearance/ControlAppearanceFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
