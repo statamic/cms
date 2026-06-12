@@ -15,7 +15,7 @@ class Associations extends Index
             ->flatMap(function ($collection) use ($handle) {
                 return $collection->queryEntries()
                     ->where($handle, '<>', null)
-                    ->get()
+                    ->lazy()
                     ->flatMap(function ($entry) use ($handle) {
                         return collect($entry->value($handle))
                             ->map(function ($value) use ($entry) {
