@@ -162,6 +162,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\StarRating::class,
         Forms\Fieldtypes\TimePicker::class,
         Forms\Fieldtypes\Toggle::class,
+        Forms\Fieldtypes\Upload::class,
         Forms\Fieldtypes\Website::class,
         Forms\Fieldtypes\YesNo::class,
     ];

@@ -136,6 +136,22 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
             ],
+            'upload from assets' => [
+                ['type' => 'assets', 'display' => 'Documents', 'container' => 'documents', 'folder' => 'uploads', 'max_files' => 3],
+                ['type' => 'upload', 'display' => 'Documents', 'store' => true, 'container' => 'documents', 'folder' => 'uploads', 'max_files' => 3],
+            ],
+            'upload from assets, minimal config' => [
+                ['type' => 'assets', 'display' => 'Photo', 'container' => 'images'],
+                ['type' => 'upload', 'display' => 'Photo', 'store' => true, 'container' => 'images'],
+            ],
+            'upload from files' => [
+                ['type' => 'files', 'display' => 'Attachments', 'max_files' => 5],
+                ['type' => 'upload', 'display' => 'Attachments', 'store' => false, 'max_files' => 5],
+            ],
+            'upload from files, minimal config' => [
+                ['type' => 'files', 'display' => 'Resume'],
+                ['type' => 'upload', 'display' => 'Resume', 'store' => false],
+            ],
         ];
     }
 
