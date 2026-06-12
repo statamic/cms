@@ -52,8 +52,9 @@ defineExpose({ focus });
         :name="name"
         class="relative block w-full space-y-2"
         :class="{
-            'flex flex-wrap space-y-0 gap-x-4 gap-y-2': inline,
-            'gap-x-2.5!': appearance === 'chips',
+            'flex flex-wrap space-y-0 gap-y-2': inline,
+            'gap-x-4': appearance === 'inline',
+            'gap-x-2.5': appearance === 'chips',
         }"
         :data-appearance="appearance !== 'default' ? appearance : undefined"
         data-ui-input
