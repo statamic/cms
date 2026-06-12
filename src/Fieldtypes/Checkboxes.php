@@ -40,15 +40,9 @@ class Checkboxes extends Fieldtype
                     'appearance' => [
                         'display' => __('Appearance'),
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.appearance'),
-                        'type' => 'button_group',
+                        'type' => 'control_appearance',
                         'default' => 'default',
-                        'appearance_previews' => true,
                         'control' => 'checkbox',
-                        'options' => [
-                            'default' => __('Default'),
-                            'inline' => __('Inline'),
-                            'chips' => __('Chips'),
-                        ],
                     ],
                 ],
             ],
