@@ -872,60 +872,6 @@ class FormBuilderTest extends TestCase
             );
     }
 
-    #[Test]
-    public function it_processes_field_config_values_when_saving()
-    {
-        $this->registerFieldtypeWithGridConfig();
-
-        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
-        $user = User::make()->assignRole('test')->save();
-        $form = tap(Form::make('test'))->save();
-
-        $payload = [
-            'pages' => [
-                [
-                    '_id' => 'page1',
-                    'sections' => [
-                        [
-                            '_id' => 'section1',
-                            'display' => 'Section',
-                            'fields' => [
-                                [
-                                    '_id' => 'field1',
-                                    'handle' => 'my_field',
-                                    'type' => 'inline',
-                                    'fieldtype' => 'test_grid_config',
-                                    'config' => [
-                                        'type' => 'test_grid_config',
-                                        'display' => 'My Field',
-                                        'items' => [
-                                            ['_id' => 'row1', 'key' => 'one', 'value' => 'One'],
-                                            ['_id' => 'row2', 'key' => 'two', 'value' => 'Two'],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $this
-            ->actingAs($user)
-            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
-            ->assertSuccessful();
-
-        $form = Form::find('test');
-        $savedField = $form->formFields()->pages()[0]['sections'][0]['fields'][0];
-
-        // The grid items should be processed (no _id keys)
-        $this->assertArrayHasKey('items', $savedField['field']);
-        $this->assertArrayNotHasKey('_id', $savedField['field']['items'][0]);
-        $this->assertEquals('one', $savedField['field']['items'][0]['key']);
-        $this->assertEquals('two', $savedField['field']['items'][1]['key']);
-    }
-
     private function registerFieldtypeWithRequiredConfig(): void
     {
         $formFieldtype = new class extends FormFieldtype
@@ -936,34 +882,6 @@ class FormBuilderTest extends TestCase
             {
                 return [
                     'required_option' => ['type' => 'text', 'validate' => 'required'],
-                ];
-            }
-
-            public function toFieldArray(): array
-            {
-                return ['type' => 'text'];
-            }
-        };
-
-        $formFieldtype::register();
-    }
-
-    private function registerFieldtypeWithGridConfig(): void
-    {
-        $formFieldtype = new class extends FormFieldtype
-        {
-            public static $handle = 'test_grid_config';
-
-            public function configFieldItems(): array
-            {
-                return [
-                    'items' => [
-                        'type' => 'grid',
-                        'fields' => [
-                            ['handle' => 'key', 'field' => ['type' => 'text']],
-                            ['handle' => 'value', 'field' => ['type' => 'text']],
-                        ],
-                    ],
                 ];
             }
 

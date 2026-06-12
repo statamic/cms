@@ -77,6 +77,43 @@ class FormFieldsControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_processes_field_config_on_update()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->post(cp_route('forms.builder.fields.update', $form->handle()), [
+                'type' => 'short_answer',
+                'values' => [
+                    'display' => 'My Field',
+                    'instructions' => 'Enter your answer',
+                    'placeholder' => 'Type here',
+                ],
+            ]);
+
+        $response->assertSuccessful();
+        $response->assertJsonStructure([
+            'values',
+            'preview',
+        ]);
+
+        $data = $response->json();
+
+        // Values are processed
+        $this->assertEquals('My Field', $data['values']['display']);
+        $this->assertEquals('Enter your answer', $data['values']['instructions']);
+        $this->assertEquals('Type here', $data['values']['placeholder']);
+
+        // Preview structure
+        $this->assertArrayHasKey('config', $data['preview']);
+        $this->assertArrayHasKey('value', $data['preview']);
+        $this->assertArrayHasKey('meta', $data['preview']);
+    }
+
+    #[Test]
     public function it_requires_type_parameter_for_update()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
