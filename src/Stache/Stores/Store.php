@@ -422,10 +422,18 @@ abstract class Store
      */
     public function warmValueIndexes()
     {
-        $valueIndexes = $this->resolveIndexes()->filter(
-            fn ($index) => method_exists($index, 'getItemValue')
-        );
+        $valueIndexes = $this
+            ->resolveIndexes()
+            ->filter(
+                fn ($index) => method_exists($index, 'getItemValue')
+            );
 
+        /*
+            This sets up a structure like ['fieldName' => [], 'anotherField' => []] before the loop below
+            it iterates over every item in the store. Each inner array then gets populated with $key => $value
+            pairs as items are processed, so all items are batched by index rather than writing to cache one at a time.
+            It's a performance optimization — collect everything first, then flush each index to cache in one shot on line 449.
+        */
         $accumulated = $valueIndexes->map(fn () => [])->all();
 
         foreach ($this->paths()->keys() as $key) {
