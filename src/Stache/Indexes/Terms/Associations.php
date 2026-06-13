@@ -46,11 +46,11 @@ class Associations extends Index
                             : $entriesStore->getItem($entryId)?->locale();
 
                         return collect((array) $value)->map(fn ($v) => [
-                            'value'      => $v,
-                            'slug'       => Str::slug($v),
-                            'entry'      => $entryId,
+                            'value' => $v,
+                            'slug' => Str::slug($v),
+                            'entry' => $entryId,
                             'collection' => $collectionHandle,
-                            'site'       => $site,
+                            'site' => $site,
                         ]);
                     });
                 }
@@ -63,11 +63,11 @@ class Associations extends Index
                         return collect($entry->value($handle))
                             ->map(function ($value) use ($entry) {
                                 return [
-                                    'value'      => $value,
-                                    'slug'       => Str::slug($value),
-                                    'entry'      => $entry->id(),
+                                    'value' => $value,
+                                    'slug' => Str::slug($value),
+                                    'entry' => $entry->id(),
                                     'collection' => $entry->collectionHandle(),
-                                    'site'       => $entry->locale(),
+                                    'site' => $entry->locale(),
                                 ];
                             });
                     })->all();
