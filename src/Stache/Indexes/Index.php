@@ -58,6 +58,13 @@ abstract class Index
         $this->items[] = $value;
     }
 
+    public function setItems(array $items): static
+    {
+        $this->items = $items;
+
+        return $this;
+    }
+
     public function load()
     {
         if ($this->loaded) {

@@ -410,12 +410,36 @@ abstract class Store
 
     public function warm()
     {
-        $this->shouldCacheFileItems = true;
+        $this->warmValueIndexes();
+        $this->warmOtherIndexes();
+    }
 
-        $this->resolveIndexes()->each->update();
+    public function warmValueIndexes()
+    {
+        $valueIndexes = $this->resolveIndexes()->filter(
+            fn ($index) => method_exists($index, 'getItemValue')
+        );
 
-        $this->shouldCacheFileItems = false;
-        $this->fileItems = null;
+        $accumulated = $valueIndexes->map(fn () => [])->all();
+
+        foreach ($this->paths()->keys() as $key) {
+            $item = $this->getItem($key);
+
+            foreach ($valueIndexes as $name => $index) {
+                $accumulated[$name][$key] = $index->getItemValue($item);
+            }
+        }
+
+        $valueIndexes->each(function ($index, $name) use ($accumulated) {
+            $index->setItems($accumulated[$name])->cache();
+        });
+    }
+
+    public function warmOtherIndexes()
+    {
+        $this->resolveIndexes()
+            ->filter(fn ($index) => ! method_exists($index, 'getItemValue'))
+            ->each->update();
     }
 
     public function keys()

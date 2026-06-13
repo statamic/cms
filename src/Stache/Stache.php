@@ -137,7 +137,8 @@ class Stache
         if ($this->shouldUseParallelWarming($stores)) {
             $this->warmInParallel($stores);
         } else {
-            $stores->each->warm();
+            $stores->each->warmValueIndexes();
+            $stores->each->warmOtherIndexes();
         }
 
         $this->stopTimer();

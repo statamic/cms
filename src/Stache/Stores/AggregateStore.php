@@ -94,6 +94,16 @@ abstract class AggregateStore extends Store
         $this->stores->each->resetMemoizedState();
     }
 
+    public function warmValueIndexes()
+    {
+        $this->discoverStores()->each->warmValueIndexes();
+    }
+
+    public function warmOtherIndexes()
+    {
+        $this->discoverStores()->each->warmOtherIndexes();
+    }
+
     public function paths()
     {
         return $this->discoverStores()->flatMap(function ($store) {
