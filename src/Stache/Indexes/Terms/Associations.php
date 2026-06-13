@@ -15,10 +15,10 @@ class Associations extends Index
      * This index is the reason warm() runs in two passes. Associations needs to know
      * which entries reference each term, but the only way to find that (without loading
      * every Entry from disk) is to read the entries' already-warmed taxonomy index from
-     * Redis. The 2-pass warm guarantees that index exists before this method is called.
+     * the cache. The 2-pass warm guarantees that index exists before this method is called.
      *
      * Fast path (used during stache:warm): reads the flat `[entryId => termValue]` and
-     * `[entryId => site]` arrays directly from Redis — no Entry objects are constructed.
+     * `[entryId => site]` arrays directly from the cache — no Entry objects are constructed.
      *
      * Cold path (used outside of stache:warm, e.g. on-demand index builds): queries
      * entries via Eloquent as before. Slower but always correct.
@@ -32,27 +32,29 @@ class Associations extends Index
                 $collectionHandle = $collection->handle();
 
                 $storeKey = $entriesStore->key();
-                $taxData = Stache::cacheStore()->get("stache::indexes::{$storeKey}::{$handle}");
 
-                if ($taxData !== null) {
-                    // Fast path: entries' value indexes are already in Redis (Pass 1 ran first).
-                    $taxValues = collect($taxData)->filter(fn ($v) => ! empty($v));
-                    $siteData = Stache::cacheStore()->get("stache::indexes::{$storeKey}::site");
-                    $sites = $siteData !== null ? collect($siteData) : null;
+                // array of [entry_id => [term]]
+                $taxonomyData = collect(Stache::cacheStore()->get("stache::indexes::{$storeKey}::{$handle}"));
 
-                    return $taxValues->flatMap(function ($value, $entryId) use ($collectionHandle, $entriesStore, $sites) {
-                        $site = $sites !== null
-                            ? $sites->get($entryId)
-                            : $entriesStore->getItem($entryId)?->locale();
+                if (! is_null($taxonomyData)) {
+                    // Fast path: entries' value indexes are already in the cache (Pass 1 ran first).
+                    $sites = collect(Stache::cacheStore()->get("stache::indexes::{$storeKey}::site"));
 
-                        return collect((array) $value)->map(fn ($v) => [
-                            'value' => $v,
-                            'slug' => Str::slug($v),
-                            'entry' => $entryId,
-                            'collection' => $collectionHandle,
-                            'site' => $site,
-                        ]);
-                    });
+                    return $taxonomyData
+                        ->filter(fn (?array $entryTerms) => ! empty($entryTerms))
+                        ->flatMap(function ($value, $entryId) use ($collectionHandle, $entriesStore, $sites) {
+                            $site = $sites->isNotEmpty()
+                                ? $sites->get($entryId)
+                                : $entriesStore->getItem($entryId)?->locale();
+
+                            return collect((array) $value)->map(fn ($v) => [
+                                'value' => $v,
+                                'slug' => Str::slug($v),
+                                'entry' => $entryId,
+                                'collection' => $collectionHandle,
+                                'site' => $site,
+                            ]);
+                        });
                 }
 
                 // Cold path: Redis miss — fall back to querying entries directly.
