@@ -36,20 +36,20 @@ class Associations extends Index
                 // array of [entry_id => [term]]
                 $taxonomyData = collect(Stache::cacheStore()->get("stache::indexes::{$storeKey}::{$handle}"));
 
-                if (! is_null($taxonomyData)) {
+                if ($taxonomyData->isNotEmpty()) {
                     // Fast path: entries' value indexes are already in the cache (Pass 1 ran first).
                     $sites = collect(Stache::cacheStore()->get("stache::indexes::{$storeKey}::site"));
 
                     return $taxonomyData
-                        ->filter(fn (?array $entryTerms) => ! empty($entryTerms))
-                        ->flatMap(function ($value, $entryId) use ($collectionHandle, $entriesStore, $sites) {
+                        ->filter(fn (?array $entryTerms): bool => ! empty($entryTerms))
+                        ->flatMap(function (array $terms, string|int $entryId) use ($collectionHandle, $entriesStore, $sites) {
                             $site = $sites->isNotEmpty()
                                 ? $sites->get($entryId)
                                 : $entriesStore->getItem($entryId)?->locale();
 
-                            return collect((array) $value)->map(fn ($v) => [
-                                'value' => $v,
-                                'slug' => Str::slug($v),
+                            return collect($terms)->map(fn (string $term) => [
+                                'value' => $term,
+                                'slug' => Str::slug($term),
                                 'entry' => $entryId,
                                 'collection' => $collectionHandle,
                                 'site' => $site,
