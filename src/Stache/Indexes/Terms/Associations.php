@@ -31,6 +31,7 @@ class Associations extends Index
 
                     if (empty($value)) {
                         unset($item);
+
                         continue;
                     }
 
