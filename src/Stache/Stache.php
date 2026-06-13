@@ -137,6 +137,10 @@ class Stache
         if ($this->shouldUseParallelWarming($stores)) {
             $this->warmInParallel($stores);
         } else {
+            // Two-pass warm: Pass 1 writes all Value indexes (including entries' taxonomy
+            // indexes) to Redis across every store before Pass 2 runs. This lets
+            // Terms\Associations read from Redis in Pass 2 instead of loading all Entry
+            // objects from disk, which was the main source of slow warm times.
             $stores->each->warmValueIndexes();
             $stores->each->warmOtherIndexes();
         }

@@ -414,6 +414,12 @@ abstract class Store
         $this->warmOtherIndexes();
     }
 
+    /**
+     * Pass 1 of the 2-pass warm. Loads every file once and accumulates values for
+     * all Value-based indexes in a single loop, then writes each index to Redis in
+     * one shot. This ensures entries' taxonomy indexes (e.g. `categories`) are in
+     * Redis before Pass 2 runs, so Terms\Associations can use the fast path.
+     */
     public function warmValueIndexes()
     {
         $valueIndexes = $this->resolveIndexes()->filter(
@@ -435,6 +441,11 @@ abstract class Store
         });
     }
 
+    /**
+     * Pass 2 of the 2-pass warm. Runs after all stores have completed Pass 1, so
+     * non-Value indexes (e.g. Terms\Associations) can read from Redis instead of
+     * loading Entry objects from disk.
+     */
     public function warmOtherIndexes()
     {
         $this->resolveIndexes()

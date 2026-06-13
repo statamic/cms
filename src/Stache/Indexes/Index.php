@@ -58,6 +58,10 @@ abstract class Index
         $this->items[] = $value;
     }
 
+    /**
+     * Bulk-sets the index items without going through getItems(). Used by
+     * Store::warmValueIndexes() to write pre-accumulated values in one shot.
+     */
     public function setItems(array $items): static
     {
         $this->items = $items;

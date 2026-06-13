@@ -9,6 +9,20 @@ use Statamic\Support\Str;
 
 class Associations extends Index
 {
+    /**
+     * Builds the term→entry association map for a taxonomy.
+     *
+     * This index is the reason warm() runs in two passes. Associations needs to know
+     * which entries reference each term, but the only way to find that (without loading
+     * every Entry from disk) is to read the entries' already-warmed taxonomy index from
+     * Redis. The 2-pass warm guarantees that index exists before this method is called.
+     *
+     * Fast path (used during stache:warm): reads the flat `[entryId => termValue]` and
+     * `[entryId => site]` arrays directly from Redis — no Entry objects are constructed.
+     *
+     * Cold path (used outside of stache:warm, e.g. on-demand index builds): queries
+     * entries via Eloquent as before. Slower but always correct.
+     */
     public function getItems()
     {
         return Taxonomy::findByHandle($handle = $this->store->childKey())
@@ -17,12 +31,11 @@ class Associations extends Index
                 $entriesStore = Stache::store('entries')->store($collection->handle());
                 $collectionHandle = $collection->handle();
 
-                // Fast path: warmValueIndexes() already built entries' category index in Redis.
                 $storeKey = $entriesStore->key();
-                $cacheKey = "stache::indexes::{$storeKey}::{$handle}";
-                $taxData = Stache::cacheStore()->get($cacheKey);
+                $taxData = Stache::cacheStore()->get("stache::indexes::{$storeKey}::{$handle}");
 
                 if ($taxData !== null) {
+                    // Fast path: entries' value indexes are already in Redis (Pass 1 ran first).
                     $taxValues = collect($taxData)->filter(fn ($v) => ! empty($v));
                     $siteData = Stache::cacheStore()->get("stache::indexes::{$storeKey}::site");
                     $sites = $siteData !== null ? collect($siteData) : null;
@@ -42,7 +55,7 @@ class Associations extends Index
                     });
                 }
 
-                // Cold path fallback (fires outside of a 2-pass warm, e.g. in tests or direct calls).
+                // Cold path: Redis miss — fall back to querying entries directly.
                 return $collection->queryEntries()
                     ->where($handle, '<>', null)
                     ->get()
