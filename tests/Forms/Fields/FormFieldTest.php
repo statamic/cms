@@ -5,9 +5,9 @@ namespace Tests\Forms\Fields;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
-use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fieldtypes\Fallback;
 use Tests\TestCase;
 
 class FormFieldTest extends TestCase

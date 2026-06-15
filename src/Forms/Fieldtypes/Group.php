@@ -2,9 +2,9 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
-use Statamic\Fieldtypes\Group as GroupFieldtype;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
+
 use function Statamic\trans as __;
 
 class Group extends FormFieldtype

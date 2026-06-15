@@ -2,13 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Forms\Fields\FormField;
-use Statamic\Forms\Fields\FormFieldtype;
-use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;

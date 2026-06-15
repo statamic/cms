@@ -673,14 +673,14 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_asset_field()
+    public function it_dynamically_renders_upload_field()
     {
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie">',
         ], [
             'handle' => 'cat_selfie',
             'field' => [
-                'type' => 'assets',
+                'type' => 'upload',
                 'display' => 'Cat Selfie',
                 'max_files' => 1,
             ],
@@ -688,14 +688,14 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_assets_field()
+    public function it_dynamically_renders_multiple_upload_field()
     {
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
             'handle' => 'cat_selfies',
             'field' => [
-                'type' => 'assets',
+                'type' => 'upload',
                 'display' => 'Cat Selfies',
             ],
         ]);

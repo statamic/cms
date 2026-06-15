@@ -4,9 +4,9 @@ namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
+use Statamic\Fieldtypes\ImageChoice as ImageChoiceFieldtype;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fieldtypes\ImageChoice as ImageChoiceFormFieldtype;
-use Statamic\Fieldtypes\ImageChoice as ImageChoiceFieldtype;
 use Tests\TestCase;
 
 class ImageChoiceTest extends TestCase
