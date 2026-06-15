@@ -35,7 +35,7 @@ defineExpose({ ...expose, focus });
             <template #item>
                 <Icon
                     :name="iconName(option.value, value === option.value)"
-                    class="mt-0.5 size-4 cursor-default"
+                    class="relative top-0.5 size-4 cursor-default"
                     :class="value === option.value ? 'text-ui-accent-bg' : 'text-gray-400 dark:text-gray-500'"
                 />
             </template>
