@@ -17,7 +17,8 @@ class YesNoTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'type' => 'radio',
+            'type' => 'yes_no',
+            'appearance' => 'chips',
             'options' => [
                 'yes' => 'Yes',
                 'no' => 'No',
