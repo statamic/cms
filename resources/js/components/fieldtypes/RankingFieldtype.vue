@@ -66,6 +66,36 @@ watch(
     { deep: true },
 );
 
+function moveToRank(itemValue, newRank) {
+    if (isDisabled.value) {
+        return;
+    }
+
+    const fromIndex = rankedValues.value.indexOf(itemValue);
+
+    if (fromIndex === -1) {
+        return;
+    }
+
+    const parsed = Number(newRank);
+
+    if (! Number.isFinite(parsed)) {
+        return;
+    }
+
+    let toIndex = Math.round(parsed) - 1;
+    toIndex = Math.max(0, Math.min(rankedValues.value.length - 1, toIndex));
+
+    if (fromIndex === toIndex) {
+        return;
+    }
+
+    const next = [...rankedValues.value];
+    next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, itemValue);
+    rankedValues.value = next;
+}
+
 </script>
 
 <template>
@@ -90,7 +120,19 @@ watch(
                     :class="sortableHandleClass"
                     class="cursor-grab [&_svg]:opacity-75 dark:[&_svg]:opacity-50"
                 />
+                <input
+                    v-if="!isDisabled"
+                    type="number"
+                    class="size-6 shrink-0 rounded-md border border-gray-300 bg-white px-0 text-center text-xs font-semibold text-gray-800 shadow-ui-xs focus:focus-outline dark:border-gray-700 dark:bg-gray-925 dark:text-gray-200 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    :min="1"
+                    :max="orderedRows.length"
+                    step="1"
+                    :value="row.index + 1"
+                    :aria-label="`${__('Rank')} ${__(row.label)}`"
+                    @change="moveToRank(row.value, $event.target.value)"
+                >
                 <span
+                    v-else
                     class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 dark:border-gray-700 dark:bg-gray-925 dark:text-gray-200"
                     aria-hidden="true"
                 >
