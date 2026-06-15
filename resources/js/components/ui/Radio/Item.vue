@@ -21,7 +21,7 @@ const id = useId();
 
 <template>
     <div
-        class="flex items-start gap-1.5"
+        class="relative flex items-start gap-1.5"
         :class="appearance === 'chips' ? 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full' : null"
         data-ui-radio-item
     >
@@ -29,6 +29,7 @@ const id = useId();
             :id
             :value="value"
             :disabled="readOnly || disabled"
+            :aria-describedby="description ? `${id}-description` : undefined"
             class="
                 shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
                 focus:focus-outline border border-gray-400/75 bg-white with-contrast:border-gray-100
@@ -46,11 +47,11 @@ const id = useId();
                 "
             />
         </RadioGroupItem>
-        <label class="flex flex-col" :class="{ 'opacity-50': disabled }" :for="id">
-            <span class="text-sm font-normal antialiased dark:text-gray-200">
+        <div class="flex flex-col" :class="{ 'opacity-50': disabled }">
+            <label class="text-sm font-normal antialiased dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="id">
                 <slot>{{ label || value }}</slot>
-            </span>
-            <span v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
-        </label>
+            </label>
+            <span v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
+        </div>
     </div>
 </template>
