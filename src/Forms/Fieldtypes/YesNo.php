@@ -24,7 +24,8 @@ class YesNo extends FormFieldtype
     public function toFieldArray(): array
     {
         return [
-            'type' => 'radio',
+            'type' => 'yes_no',
+            'appearance' => 'chips',
             'options' => [
                 'yes' => __('Yes'),
                 'no' => __('No'),
