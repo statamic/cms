@@ -18,12 +18,12 @@ const gap = computed(() => props.config.gap ?? 3);
 const selectedValues = ref(props.value);
 
 const cardClasses = [
-    'flex flex-col gap-2 h-full p-1 pb-2 rounded-lg border shadow-ui-xs transition-colors',
+    'flex flex-col gap-2 h-full p-1 pb-2 rounded-lg border shadow-ui-xs',
     'border-gray-300 bg-white',
     'dark:border-gray-700 dark:bg-gray-900',
     'hover:border-gray-400 dark:hover:border-gray-700',
-    'peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary',
-    'peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary',
+    'peer-checked:border-primary peer-checked:ring-[1px] peer-checked:ring-primary',
+    'peer-focus-visible:focus-outline peer-focus-visible:transition-none',
 ];
 
 const gridClass = computed(() => ({
