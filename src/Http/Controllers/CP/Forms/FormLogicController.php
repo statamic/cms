@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form;
@@ -12,6 +11,8 @@ use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class FormLogicController extends CpController
 {

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Forms;
 
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;

@@ -31,6 +31,13 @@ class ImageChoice extends Fieldtype
         return $this->config('multiple') ? $data : ($data[0] ?? null);
     }
 
+    public function extraRenderableFieldData(): array
+    {
+        return [
+            'options' => $this->normalizedOptions(),
+        ];
+    }
+
     private function normalizedOptions(): array
     {
         return collect($this->config('options'))

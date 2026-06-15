@@ -84,7 +84,7 @@ class OpinionScale extends FormFieldtype
     private function normalizedRange(): array
     {
         $min = max(0, (int) $this->config('min', 0));
-        $max = max(10, (int) $this->config('max', 10));
+        $max = min(10, (int) $this->config('max', 10));
 
         return [$min, $max];
     }

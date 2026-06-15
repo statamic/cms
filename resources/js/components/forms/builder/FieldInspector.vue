@@ -43,6 +43,8 @@ const blueprint = ref(null);
 const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
 const modifiedFields = ref<string[]>([]);
 
+const shouldShowValidationTab = computed(() => !['structure', 'information'].includes(getFieldtypeCategory(field.value.config.type).handle));
+
 const adjustedBlueprint = computed(() => {
     const bp = JSON.parse(JSON.stringify(blueprint.value));
 
@@ -144,7 +146,7 @@ const suggestableConditionFields = computed(() => {
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
-        .filter((f) => f.type === 'import' || getFieldtypeCategory(f.config.type).handle !== 'information')
+        .filter((f) => f.type === 'import' || !['structure', 'information'].includes(getFieldtypeCategory(f.config.type).handle))
         .map((f) => ({
             handle: f.handle,
             config: {
@@ -174,6 +176,10 @@ watch(field, () => {
     updatePreview.cancel();
     loading.value = !cache.has(field.value._id);
     load();
+
+    if (activeTab.value === FieldInspectorTabs.Validation && !shouldShowValidationTab.value) {
+        activeTab.value = FieldInspectorTabs.Settings;
+    }
 });
 
 watch(values, () => {
@@ -200,7 +206,7 @@ onMounted(() => load());
             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                 <TabTrigger :name="FieldInspectorTabs.Settings" :text="__('Settings')" />
                 <TabTrigger :name="FieldInspectorTabs.Conditions" :text="__('Logic')" />
-                <TabTrigger :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
+                <TabTrigger v-if="shouldShowValidationTab" :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
             </TabList>
 
             <TabContent :name="FieldInspectorTabs.Settings">

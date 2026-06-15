@@ -50,6 +50,26 @@ const blueprint = computed(() => ({
     }],
 }));
 
+const containerMeta = computed(() => {
+    const meta = {};
+
+    props.section.fields.forEach((field) => {
+        if (field.preview?.meta) meta[field.handle] = field.preview.meta;
+    });
+
+    return meta;
+});
+
+const containerValues = computed(() => {
+    const values = {};
+
+    props.section.fields.forEach((field) => {
+        if (field.preview?.value) values[field.handle] = field.preview.value;
+    });
+
+    return values;
+});
+
 const updateFieldWidth = (field, width) => {
     field.config.width = width;
 
@@ -63,7 +83,7 @@ const updateFieldWidth = (field, width) => {
 const duplicateField = (field) => {
     const { section } = props;
     const index = section.fields.indexOf(field);
-    const handle = uniqid();
+    const handle = uniqid({ withoutHyphens: true });
 
     const newField = {
         ...field,
@@ -192,6 +212,8 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                         v-else
                         :name="'form-builder-' + section._id"
                         :blueprint
+                        :meta="containerMeta"
+                        :model-value="containerValues"
                         :track-dirty-state="false"
                     >
                         <div

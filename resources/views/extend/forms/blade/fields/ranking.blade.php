@@ -1,19 +1,63 @@
-@php
-    $options = $options ?? [];
-    $ranked = is_array($value ?? null) && count($value) ? $value : array_keys($options);
+@once
+    <style>
+        [data-ranking] li { cursor: grab; }
+        [data-ranking] li[data-dragging] { cursor: grabbing; opacity: 0.5; }
+        [data-ranking] li::before { content: '☰ '; opacity: 0.4; }
+    </style>
 
-    $itemClass = 'flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-2 dark:border-gray-700 dark:bg-gray-900';
-    $rankClass = 'flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200';
-    $labelClass = 'min-w-0 flex-1 text-sm text-gray-800 dark:text-gray-200';
-@endphp
+    <script>
+        (function() {
+            document.addEventListener('dragstart', (e) => {
+                var listItem = e.target.closest('[data-ranking] li');
+                if (listItem) listItem.setAttribute('data-dragging', '');
+            });
 
-<ul class="flex flex-col gap-2" data-ranking id="{{ $id }}" role="list">
-    @foreach ($ranked as $index => $key)
-        @php($label = $options[$key] ?? $key)
-        <li class="{{ $itemClass }}">
-            <span class="{{ $rankClass }}" aria-hidden="true">{{ $index + 1 }}</span>
-            <span class="{{ $labelClass }}">{{ $label }}</span>
-            <input type="hidden" name="{{ $name }}[]" value="{{ $key }}">
-        </li>
-    @endforeach
-</ul>
+            document.addEventListener('dragend', (e) => {
+                let listItem = e.target.closest('[data-ranking] li');
+                if (listItem) listItem.removeAttribute('data-dragging');
+            });
+
+            document.addEventListener('dragover', (e) => {
+                let list = e.target.closest('[data-ranking]');
+                let listItem = e.target.closest('li');
+                let dragged = list ? list.querySelector('[data-dragging]') : null;
+
+                if (list && listItem && dragged && listItem !== dragged) {
+                    e.preventDefault();
+                    let rect = listItem.getBoundingClientRect();
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        list.insertBefore(dragged, listItem);
+                    } else {
+                        list.insertBefore(dragged, listItem.nextSibling);
+                    }
+                }
+            });
+        })();
+    </script>
+@endonce
+
+<ol
+    id="{{ $id }}"
+    data-ranking
+    @if ($error)
+        aria-invalid="true" aria-describedby="{{ $id }}-error"
+    @elseif ($instructions)
+        aria-describedby="{{ $id }}-instructions"
+    @endif
+>
+    @if (is_array($value ?? null) && count($value))
+        @foreach ($value as $val)
+            <li draggable="true">
+                {{ $options[$val] ?? $val }}
+                <input type="hidden" name="{{ $name }}[]" value="{{ $val }}">
+            </li>
+        @endforeach
+    @else
+        @foreach ($options as $option => $label)
+            <li draggable="true">
+                {{ $label ?? $option }}
+                <input type="hidden" name="{{ $name }}[]" value="{{ $option }}">
+            </li>
+        @endforeach
+    @endif
+</ol>

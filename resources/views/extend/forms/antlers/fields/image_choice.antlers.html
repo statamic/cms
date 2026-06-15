@@ -1,44 +1,25 @@
-<fieldset
-    class="grid {{ if gap == 2 }}gap-2{{ elseif gap == 4 }}gap-4{{ else }}gap-3{{ /if }} {{ if columns == 1 }}grid-cols-1{{ elseif columns == 2 }}grid-cols-2{{ elseif columns == 4 }}grid-cols-4{{ else }}grid-cols-3{{ /if }}"
-    {{ unless multiple }}role="radiogroup"{{ /unless }}
-    {{ if multiple }}role="group"{{ /if }}
->
-    {{ image_options }}
-        <label class="group cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60">
-            <input
-                class="peer sr-only"
-                id="{{ id }}-{{ key | slugify }}-option"
-                type="{{ multiple ? 'checkbox' : 'radio' }}"
-                name="{{ multiple ? '{name}[]' : name }}"
-                value="{{ key }}"
-                {{ if js_driver }}{{ js_attributes }}{{ /if }}
-                {{ if multiple }}
-                    {{ if value|in_array:key }}checked{{ /if }}
-                {{ else }}
-                    {{ if value == key }}checked{{ /if }}
-                {{ /if }}
-                {{ if validate|contains:required }}required{{ /if }}
-                {{ if error }}
-                    aria-invalid="true" aria-describedby="{{ id }}-error"
-                {{ elseif instructions }}
-                    aria-describedby="{{ id }}-instructions"
-                {{ /if }}
-            >
-            <span class="flex flex-col gap-2 h-full p-2 rounded-lg border transition-colors border-gray-300 bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-900 peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-primary">
-                <span class="flex items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800" style="aspect-ratio: {{ aspect_ratio ?? '16/9' }};">
-                    {{ if image }}
-                        <img class="block size-full object-cover" src="{{ image }}" alt="{{ label ?? key }}">
-                    {{ /if }}
-                </span>
-                {{ if label }}
-                    <span class="flex items-center justify-center gap-2">
-                        {{ if letter }}
-                            <span class="flex size-7 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ letter }}</span>
-                        {{ /if }}
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ label }}</span>
-                    </span>
-                {{ /if }}
-            </span>
-        </label>
-    {{ /image_options }}
-</fieldset>
+{{ options }}
+    <label>
+        <input
+            id="{{ id }}-{{ key | slugify }}-option"
+            type="{{ multiple ? 'checkbox' : 'radio' }}"
+            name="{{ multiple ? '{name}[]' : name }}"
+            value="{{ key }}"
+            {{ if js_driver }}{{ js_attributes }}{{ /if }}
+            {{ if multiple }}
+                {{ if value|in_array:key }}checked{{ /if }}
+            {{ else }}
+                {{ if value == key }}checked{{ /if }}
+            {{ /if }}
+            {{ if validate|contains:required }}required{{ /if }}
+            {{ if error }}
+                aria-invalid="true" aria-describedby="{{ id }}-error"
+            {{ elseif instructions }}
+                aria-describedby="{{ id }}-instructions"
+            {{ /if }}
+        >
+        <img src="{{ image }}" alt="{{ label ?? key }}" style="max-width: 200px; display: block;">
+        {{ label ?? key }}
+    </label>
+    <br>
+{{ /options }}
