@@ -146,3 +146,10 @@ function moveToRank(itemValue, newRank) {
         </ul>
     </SortableList>
 </template>
+
+<style scoped>
+.ranking-item.draggable-source--is-dragging {
+    /* Make the item slightly transparent than the default dragging opacity */
+    opacity: 0.65;
+}
+</style>
