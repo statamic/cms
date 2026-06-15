@@ -66,8 +66,8 @@ const checkboxClasses = computed(() => {
             },
             readOnly: {
                 true: [
-                    'data-readonly:border-dashed! data-readonly:border-gray-500/90 data-readonly:with-contrast:border-gray-100',
-                    'data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:bg-gray-900',
+                    'data-readonly:data-[state=unchecked]:border-dashed! data-readonly:data-[state=unchecked]:border-gray-500/90 data-readonly:data-[state=unchecked]:with-contrast:border-gray-100',
+                    'data-readonly:data-[state=unchecked]:dark:border! data-readonly:data-[state=unchecked]:dark:border-dashed! data-readonly:data-[state=unchecked]:dark:bg-gray-900',
                 ],
                 false: '',
             },
