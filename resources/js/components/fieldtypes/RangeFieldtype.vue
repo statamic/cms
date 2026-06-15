@@ -1,16 +1,24 @@
 <template>
-    <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3 with-contrast:border with-contrast:border-gray-500">
+    <div
+        class="
+            flex items-center gap-2 rounded-lg bg-gray-50 p-2 @lg:px-4 @lg:py-3 dark:bg-gray-800
+            with-contrast:border with-contrast:border-gray-500
+            data-readonly:border data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100
+            data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!
+            data-readonly:dark:bg-gray-900
+        "
+        :data-readonly="isReadOnly ? true : undefined"
+    >
         <ui-subheading size="lg" v-if="config.prepend" :text="__(config.prepend)" class="whitespace-nowrap" />
         <input
-            class="min-w-0 flex-1 w-full"
+            class="min-w-0 flex-1 w-full disabled:opacity-60"
             type="range"
             v-model="val"
-            :disabled="config.disabled"
+            :disabled="config.disabled || isReadOnly"
             :id="fieldId"
             :max="config.max"
             :min="config.min"
             :name="name"
-            :read-only="isReadOnly"
             :step="config.step"
             :width="config.width"
         />
@@ -64,6 +72,7 @@ export default {
             this.val = value;
         },
         val(value) {
+            if (this.isReadOnly) return;
             this.updateDebounced(value);
         },
     },

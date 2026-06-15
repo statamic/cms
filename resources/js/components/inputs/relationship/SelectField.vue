@@ -1,41 +1,37 @@
 <template>
-    <div>
-        <Combobox
-            searchable
-            :disabled="config.disabled"
-            :ignore-filter="typeahead"
-            :max-selections="maxSelections"
-            :model-value="items.map((item) => item.id)"
-            :multiple
-            :options
-            :placeholder="__(config.placeholder) || __('Choose...')"
-            :read-only="readOnly"
-            :taggable="isTaggable"
-            :close-on-select="isTaggable"
-            option-label="title"
-            option-value="id"
-            @update:modelValue="itemsSelected"
-            @search="search"
-        >
-            <template #option="{ title, hint, status }">
-                <div class="flex w-full text-left items-center gap-2">
-                    <StatusIndicator v-if="status" :status="status" />
-                    <div v-text="title" class="truncate grow" />
-                    <ui-badge v-if="hint" size="sm" v-text="hint" />
-                </div>
-            </template>
-            <template #no-options>
-                <div v-text="noOptionsText" />
-            </template>
-            <template #selected-option>
-                <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
-            </template>
-            <template #selected-options>
-                <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
-                <div></div>
-            </template>
-        </Combobox>
-    </div>
+    <Combobox
+        searchable
+        :disabled="config.disabled"
+        :ignore-filter="typeahead"
+        :max-selections="maxSelections"
+        :model-value="items.map((item) => item.id)"
+        :multiple
+        :options
+        :placeholder="__(config.placeholder) || __('Choose...')"
+        :read-only="readOnly"
+        :taggable="isTaggable"
+        :close-on-select="isTaggable"
+        option-label="title"
+        option-value="id"
+        @update:modelValue="itemsSelected"
+        @search="search"
+    >
+        <template #option="{ title, hint, status }">
+            <div class="flex w-full text-left items-center gap-2">
+                <StatusIndicator v-if="status" :status="status" />
+                <div v-text="title" class="truncate grow" />
+                <ui-badge v-if="hint" size="sm" v-text="hint" />
+            </div>
+        </template>
+        <template #no-options>
+            <div v-text="noOptionsText" />
+        </template>
+        <template #selected-option>
+            <span v-if="items.length === 1" v-text="items[0].title" class="truncate"></span>
+        </template>
+        <!-- Override default selected-options (badges) so RelationshipInput lists rows below -->
+        <template #selected-options></template>
+    </Combobox>
 </template>
 
 <script>

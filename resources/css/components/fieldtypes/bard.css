@@ -5,6 +5,11 @@
     .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]) {
         @apply relative rounded-lg border outline-hidden dark:border-gray-700 with-contrast:border-gray-500;
     }
+
+    /* Match ui Input / Textarea read-only: dashed outer border (same :not scope as default border). */
+    .bard-fieldtype:not(.form-group, .grid-cell, [data-ui-input-group]):has(.bard-editor.mode\:read-only) {
+        @apply border-dashed;
+    }
 }
 /* BARD / EDITOR
 =================================================== */
@@ -51,8 +56,9 @@
 /* BARD / MODES
 =================================================== */
 @layer ui {
+    /* Match ui Input / Textarea read-only: neutral surface (dashed border on .bard-fieldtype above). */
     .bard-editor.mode\:read-only .ProseMirror {
-        @apply bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-100;
+        @apply bg-white text-gray-925 dark:bg-gray-900 dark:text-gray-300;
     }
 
     .bard-editor.mode\:minimal .ProseMirror {

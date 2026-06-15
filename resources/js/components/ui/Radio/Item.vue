@@ -16,25 +16,30 @@ const props = defineProps({
 
 const { appearance } = injectRadioContext() ?? { appearance: computed(() => 'default') };
 
+const isChips = computed(() => appearance.value === 'chips');
+
 const id = useId();
 </script>
 
 <template>
     <div
         class="flex items-start gap-1.5"
-        :class="appearance === 'chips' ? 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full' : null"
+        :class="isChips ? 'mb-0 border border-gray-300 dark:border-gray-700 p-2 py-2 pe-4 shadow-ui-xs rounded-full' : null"
         data-ui-radio-item
     >
         <RadioGroupItem
             :id
             :value="value"
             :disabled="readOnly || disabled"
+            :data-readonly="readOnly ? true : undefined"
             class="
-                shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
+                shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full outline-hidden
                 focus:focus-outline border border-gray-400/75 bg-white with-contrast:border-gray-100
                 data-[state=checked]:border-ui-accent-bg data-[disabled]:opacity-50
                 dark:border-gray-700 dark:bg-gray-500
                 dark:data-[state=checked]:border-ui-accent-bg dark:data-[state=checked]:bg-ui-accent-bg
+                data-readonly:data-[state=unchecked]:border-dashed! data-readonly:data-[state=unchecked]:border-gray-500/90 data-readonly:data-[state=unchecked]:with-contrast:border-gray-100
+                data-readonly:data-[state=unchecked]:dark:border! data-readonly:data-[state=unchecked]:dark:border-dashed! data-readonly:data-[state=unchecked]:dark:bg-gray-900
             "
         >
             <RadioGroupIndicator

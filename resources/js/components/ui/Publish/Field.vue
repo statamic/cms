@@ -176,7 +176,12 @@ const isReadOnly = computed(() => {
 
     if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
-    return isLocked.value || props.config.visibility === 'read_only' || false;
+    return (
+        isLocked.value ||
+        props.config.visibility === 'read_only' ||
+        props.config.read_only === true ||
+        false
+    );
 });
 
 const lockedBy = computed(() => fieldLocks.value[handle] ?? null);
@@ -274,7 +279,13 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div :dir="direction" v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked }">
+            <div
+                :dir="direction"
+                v-if="fieldtypeComponentExists"
+                @focusin="focused"
+                @focusout="blurred"
+                :class="{ 'pointer-events-none select-none': isLocked }"
+            >
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"

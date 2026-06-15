@@ -4,7 +4,7 @@
         :color-mode="config.color_mode"
         :rulers="config.rulers"
         :disabled="config.disabled"
-        :read-only="config.read_only"
+        :read-only="isReadOnly"
         :key-map="config.key_map"
         :tab-size="config.indent_size"
         :indent-type="config.indent_type"
