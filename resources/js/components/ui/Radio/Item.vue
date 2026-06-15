@@ -48,7 +48,7 @@ const id = useId();
             />
         </RadioGroupItem>
         <div class="flex flex-col" :class="{ 'opacity-50': disabled }">
-            <label class="text-sm font-normal antialiased dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="id">
+            <label class="text-sm font-normal antialiased cursor-pointer dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="id">
                 <slot>{{ label || value }}</slot>
             </label>
             <span v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
