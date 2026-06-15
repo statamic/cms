@@ -47,5 +47,4 @@ class FallbackTest extends TestCase
 
         $this->assertEquals('text-long', $fallback->icon());
     }
-
 }
