@@ -10,6 +10,12 @@ const { expose, isReadOnly, update } = Fieldtype.use(emit, props);
 
 const options = computed(() => HasInputOptions.methods.normalizeInputOptions(props.meta.options || props.config.options));
 
+const iconName = (optionValue, selected) => {
+    const base = optionValue === 'yes' ? 'checkmark-circle' : 'delete-circle';
+
+    return selected ? `${base}-filled` : base;
+};
+
 const radio = useTemplateRef('radio');
 const focus = () => radio.value.focus();
 
@@ -28,9 +34,9 @@ defineExpose({ ...expose, focus });
         >
             <template #item>
                 <Icon
-                    :name="option.value === 'yes' ? 'checkmark-circle' : 'delete-circle'"
-                    class="mt-0.5 size-4 cursor-default text-gray-400 dark:text-gray-500"
-                    :class="{ 'text-ui-accent-bg': value === option.value }"
+                    :name="iconName(option.value, value === option.value)"
+                    class="mt-0.5 size-4 cursor-default"
+                    :class="value === option.value ? 'text-ui-accent-bg' : 'text-gray-400 dark:text-gray-500'"
                 />
             </template>
         </Radio>
