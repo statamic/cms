@@ -33,8 +33,8 @@ const itemClasses = computed(() => {
 
 <template>
     <div
-        class="flex items-start gap-1.5"
-        :class="appearance === 'chips' ? 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full bg-white dark:bg-gray-925' : null"
+        class="relative flex items-start gap-1.5"
+        :class="appearance === 'chips' ? 'mb-0 rounded-full border border-gray-300 bg-linear-to-b from-white to-white p-2 py-2 pe-4 shadow-ui-sm transition-[background] hover:bg-gray-50 hover:to-gray-50 with-contrast:border-gray-500 dark:border-gray-700/80 dark:from-gray-850 dark:to-gray-900 dark:shadow-ui-md dark:hover:bg-gray-900 dark:hover:to-gray-850 bg-white dark:bg-gray-925' : null"
         data-ui-radio-item
     >
         <RadioGroupItem
@@ -42,6 +42,7 @@ const itemClasses = computed(() => {
             :value="value"
             :disabled="readOnly || disabled"
             :class="itemClasses"
+            :aria-describedby="description ? `${id}-description` : undefined"
         >
             <slot name="item">
                 <RadioGroupIndicator
@@ -54,11 +55,11 @@ const itemClasses = computed(() => {
                 />
             </slot>
         </RadioGroupItem>
-        <label class="flex flex-col" :class="{ 'opacity-50': disabled }" :for="id">
-            <span class="text-sm font-normal antialiased dark:text-gray-200">
+        <div class="flex flex-col" :class="{ 'opacity-50': disabled }">
+            <label class="text-sm font-normal antialiased cursor-pointer dark:text-gray-200 before:absolute before:inset-0 before:content-['']" :for="id">
                 <slot>{{ label || value }}</slot>
-            </span>
-            <span v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
-        </label>
+            </label>
+            <span v-if="description" :id="`${id}-description`" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
+        </div>
     </div>
 </template>
