@@ -1,0 +1,30 @@
+name: Tripwire
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  autoload-files:
+    name: Verify autoload.files is unchanged
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Verify autoload.files matches the approved allowlist
+        run: bash scripts/check-autoload-files.sh
