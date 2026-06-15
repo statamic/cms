@@ -1,20 +1,15 @@
 <script setup>
 import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
-import { computed, inject, useAttrs } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
+import { injectCheckboxContext } from './Group.vue';
 
 defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
 
 const props = defineProps({
-    /** Additional classes applied when the group appearance is `chips` */
-    chipsClass: {
-        type: String,
-        default:
-            'items-center gap-2 border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-3 shadow-ui-xs rounded-xl [&_button]:mt-0',
-    },
     /** Controls the vertical alignment of the checkbox with its label. Options: `start`, `center` */
     align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
     /** Description text to display below the label */
@@ -40,7 +35,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'keydown']);
 
-const appearance = inject('checkboxAppearance', computed(() => 'default'));
+const { appearance } = injectCheckboxContext() ?? { appearance: computed(() => 'default') };
 
 const id = useId();
 
@@ -84,7 +79,9 @@ const containerClasses = computed(() => {
         },
     })({ ...props });
 
-    return twMerge(classes, appearance.value === 'chips' ? props.chipsClass : null, attrs.class);
+    const chipsClass = 'items-center gap-2 border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-3 shadow-ui-xs rounded-xl [&_button]:mt-0';
+
+    return twMerge(classes, appearance.value === 'chips' ? chipsClass : null, attrs.class);
 });
 
 const conditionalProps = computed(() => {

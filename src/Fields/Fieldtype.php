@@ -342,6 +342,11 @@ abstract class Fieldtype implements Arrayable
         return $this->preProcess($data);
     }
 
+    public function migrateConfig(array $values): array
+    {
+        return $values;
+    }
+
     public function preProcessIndex($data)
     {
         return $data;

@@ -1,10 +1,9 @@
 <script setup>
-import { computed, inject, useId } from 'vue';
+import { computed, useId } from 'vue';
 import { RadioGroupIndicator, RadioGroupItem } from 'reka-ui';
+import { injectRadioContext } from './Group.vue';
 
 const props = defineProps({
-    /** Additional classes applied when the group appearance is `chips` */
-    chipsClass: { type: String, default: 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full' },
     /** Description text to display below the label */
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
@@ -15,7 +14,7 @@ const props = defineProps({
     value: { type: [String, Number, Boolean], required: true },
 });
 
-const appearance = inject('radioAppearance', computed(() => 'default'));
+const { appearance } = injectRadioContext() ?? { appearance: computed(() => 'default') };
 
 const id = useId();
 </script>
@@ -23,7 +22,7 @@ const id = useId();
 <template>
     <div
         class="flex items-start gap-1.5"
-        :class="appearance === 'chips' ? chipsClass : null"
+        :class="appearance === 'chips' ? 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full' : null"
         data-ui-radio-item
     >
         <RadioGroupItem
