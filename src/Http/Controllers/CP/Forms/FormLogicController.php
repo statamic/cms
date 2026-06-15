@@ -9,6 +9,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FormLogicController extends CpController
 {
     use ManagesFormFields;
