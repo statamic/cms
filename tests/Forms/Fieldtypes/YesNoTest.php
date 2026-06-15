@@ -31,7 +31,7 @@ class YesNoTest extends TestCase
     {
         $fieldtype = (new YesNo)->setField(new FormField('recommend', [
             'type' => 'yes_no',
-            'display' => 'Would you recommend this product?'
+            'display' => 'Would you recommend this product?',
         ]));
 
         $this->assertEquals([
@@ -41,7 +41,7 @@ class YesNoTest extends TestCase
                 'yes' => 'Yes',
                 'no' => 'No',
             ],
-            'display' => 'Would you recommend this product?'
+            'display' => 'Would you recommend this product?',
         ], $fieldtype->toFieldArray());
     }
 }
