@@ -22,7 +22,7 @@ function readInitialNavOpen() {
 
 const isOpen = ref(readInitialNavOpen());
 const navRef = ref(null);
-const isMobile = ref(typeof window !== 'undefined' && window.matchMedia('(width < 1024px)').matches);
+const isMobile = ref(window.matchMedia('(width < 1024px)').matches);
 const collapsedByViewport = ref(false);
 let clickListenerActive = false;
 let navigateEventListener = null;
