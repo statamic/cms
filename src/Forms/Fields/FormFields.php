@@ -78,6 +78,8 @@ class FormFields
     {
         $tabs = $this->pages()
             ->mapWithKeys(function (array $page, int $index): array {
+                $id = $page['id'] ?? ($this->pages()->count() === 1 ? 'main' : 'page_'.($index + 1));
+
                 $sections = collect($page['sections'] ?? [])
                     ->map(function (array $section): array {
                         return [
@@ -103,7 +105,7 @@ class FormFields
                     ->all();
 
                 return [
-                    ($page['id'] ?? 'main') => [
+                    $id => [
                         ...$page,
                         'display' => $page['display'] ?? __('Page :current of :total', ['current' => $index + 1, 'total' => $this->pages()->count()]),
                         'sections' => $sections,

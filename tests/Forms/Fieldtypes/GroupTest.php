@@ -22,7 +22,6 @@ class GroupTest extends TestCase
 
         $this->assertEquals([
             'type' => 'group',
-            'hide_display' => true,
             'display' => 'My Group',
             'fields' => [
                 ['handle' => 'name', 'field' => ['type' => 'text']],
