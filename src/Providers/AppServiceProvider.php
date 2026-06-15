@@ -357,7 +357,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return Carbon::createFromTimestamp($lastElevated)
-                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
+                ->addMinutes((float) config('statamic.users.elevated_session_duration', 15))
                 ->timestamp;
         });
 

@@ -443,6 +443,8 @@ export default {
         value(value, oldValue) {
             if (!this.editor) return;
 
+            if (document.activeElement?.closest('.bard-content')) return;
+
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 

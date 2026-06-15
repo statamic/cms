@@ -3,6 +3,7 @@ import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
 import { computed, useAttrs } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
+import { injectCheckboxContext } from './Group.vue';
 
 defineOptions({ inheritAttrs: false });
 
@@ -33,6 +34,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue', 'keydown']);
+
+const { appearance } = injectCheckboxContext() ?? { appearance: computed(() => 'default') };
 
 const id = useId();
 
@@ -83,7 +86,9 @@ const containerClasses = computed(() => {
         },
     })({ ...props });
 
-    return twMerge(classes, attrs.class);
+    const chipsClass = 'items-center gap-2 border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-3 shadow-ui-xs rounded-xl [&_button]:mt-0';
+
+    return twMerge(classes, appearance.value === 'chips' ? chipsClass : null, attrs.class);
 });
 
 const conditionalProps = computed(() => {
@@ -111,7 +116,7 @@ const conditionalProps = computed(() => {
 </script>
 
 <template>
-    <div :class="containerClasses">
+    <div :class="containerClasses" data-ui-checkbox-item>
         <CheckboxRoot
             :disabled="readOnly || disabled"
             :data-readonly="readOnly ? true : undefined"

@@ -95,7 +95,7 @@ export default {
 
     computed: {
         component() {
-            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+            const isNarrow = this.fields.length > 1 && this.containerWidth < 550;
 
             return this.config.mode === 'stacked' || isNarrow ? 'GridStacked' : 'GridTable';
         },

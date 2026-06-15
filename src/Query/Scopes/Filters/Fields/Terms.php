@@ -70,7 +70,7 @@ class Terms extends FieldtypeFilter
 
     public function isComplete($values): bool
     {
-        $values = array_filter($values);
+        $values = Arr::removeNullValues($values);
 
         if (! $operator = Arr::get($values, 'operator')) {
             return false;
