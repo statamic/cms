@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -17,10 +16,10 @@ use Statamic\Forms\Fields\FormFieldTransformer;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Controllers\CP\Fields\ManagesFields;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
 use function Statamic\trans as __;
 
 class FormBuilderController extends CpController

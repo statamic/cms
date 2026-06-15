@@ -2,9 +2,7 @@
 
 namespace Tests\Forms\Fields;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldTransformer;
 use Statamic\Forms\Fields\FormFieldtype;
 use Tests\PreventSavingStacheItemsToDisk;
