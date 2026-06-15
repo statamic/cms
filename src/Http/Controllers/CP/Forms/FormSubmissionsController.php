@@ -19,6 +19,8 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class FormSubmissionsController extends CpController
 {
     use QueriesFilters, QueriesFormSubmissionSearch;
@@ -126,6 +128,7 @@ class FormSubmissionsController extends CpController
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
         return Inertia::render('forms/Submission', [
+            'form' => $form,
             'id' => $submission->id(),
             'formTitle' => $form->title(),
             'date' => $submission->date()->toIso8601String(),

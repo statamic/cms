@@ -12,7 +12,7 @@ const optionClasses = [
     'relative flex size-9 shrink-0 cursor-pointer items-center justify-center',
     'rounded-md border shadow-ui-xs text-xs font-medium transition-colors',
     'border-gray-300 bg-white text-gray-800 hover:bg-gray-50',
-    'dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-925',
+    'dark:border-gray-700 dark:bg-gray-925 dark:text-gray-200 dark:hover:bg-gray-925',
 ];
 
 const min = computed(() => props.config.min ?? 0);

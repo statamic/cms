@@ -3,11 +3,9 @@
 namespace Statamic\Forms\Fields;
 
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
 use Statamic\Fields\FieldTransformer;
-use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Support\Arr;
 
@@ -38,9 +36,7 @@ class FormFieldTransformer extends FieldTransformer
         $fields = FormField::commonFieldOptions()->all()
             ->merge($fieldtype->configFields()->all());
 
-        $config = array_merge($submitted['config'], static::processConfig($submitted['config'], $fieldtype));
-
-        $field = collect($config)
+        $field = collect($submitted['config'])
             ->reject(function ($value, $key) use ($fields) {
                 if ($key === 'icon' && ! $fields->has('icon')) {
                     return true;
@@ -70,32 +66,6 @@ class FormFieldTransformer extends FieldTransformer
             'handle' => $submitted['handle'],
             'field' => Arr::removeNullValues($field),
         ]);
-    }
-
-    private static function processConfig(array $config, FormFieldtype $fieldtype): array
-    {
-        $blueprint = Blueprint::make()->setContents([
-            'tabs' => [
-                'main' => [
-                    'sections' => [
-                        [
-                            'fields' => collect(FormField::commonFieldOptions()->items())
-                                ->merge($fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'])
-                                ->reverse()->unique('handle')->reverse()
-                                ->values()
-                                ->all(),
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-
-        return $blueprint
-            ->fields()
-            ->addValues($config)
-            ->process()
-            ->values()
-            ->all();
     }
 
     private static function referenceTabField(array $submitted)
@@ -135,11 +105,6 @@ class FormFieldTransformer extends FieldTransformer
         $formField = new FormField($field['handle'], $mergedConfig);
         $formFieldtype = FormFieldtypeRepository::find($mergedConfig['type'])->setField($formField);
 
-        $config = array_merge(
-            $config,
-            $formFieldtype->configFields()->addValues($config)->preProcess()->values()->all()
-        );
-
         return [
             'handle' => $field['handle'],
             'type' => 'reference',
@@ -162,11 +127,6 @@ class FormFieldTransformer extends FieldTransformer
 
         $formField = new FormField($field['handle'], $config);
         $formFieldtype = FormFieldtypeRepository::find($config['type'])->setField($formField);
-
-        $config = array_merge(
-            $config,
-            $formFieldtype->configFields()->addValues($config)->preProcess()->values()->all()
-        );
 
         return [
             'handle' => $field['handle'],

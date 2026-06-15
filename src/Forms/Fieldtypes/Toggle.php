@@ -5,6 +5,8 @@ namespace Statamic\Forms\Fieldtypes;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Toggle extends FormFieldtype
 {
     protected static $fieldtype = 'toggle';

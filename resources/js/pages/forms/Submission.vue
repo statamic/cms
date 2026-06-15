@@ -3,8 +3,14 @@ import { computed, provide } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { PublishForm } from '@ui';
 import { dateFormatter } from '@api';
+import Layout from '@/pages/layout/Layout.vue';
+import PanelLayout from '@/pages/layout/PanelLayout.vue';
+import FormsLayout from '@/pages/forms/Layout.vue';
+
+defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps([
+    'form',
     'id',
     'formTitle',
     'date',

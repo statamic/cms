@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Statamic\Forms\Fields\FormFieldtype;
+
 use function Statamic\trans as __;
 
 class Spacer extends FormFieldtype

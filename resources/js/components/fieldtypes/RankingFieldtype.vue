@@ -91,7 +91,7 @@ watch(
                     class="cursor-grab [&_svg]:opacity-75 dark:[&_svg]:opacity-50"
                 />
                 <span
-                    class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 shadow-ui-xs bg-white text-xs font-semibold text-gray-800 dark:border-gray-700 dark:bg-gray-925 dark:text-gray-200"
                     aria-hidden="true"
                 >
                     {{ row.index + 1 }}

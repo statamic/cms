@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
-use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FormFieldsetPreviewsController extends CpController

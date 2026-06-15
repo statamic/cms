@@ -79,6 +79,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\CollectionTitleFormats::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
+        Fieldtypes\ControlAppearance::class,
         Fieldtypes\Date::class,
         Fieldtypes\Dictionary::class,
         Fieldtypes\DictionaryFields::class,
@@ -146,6 +147,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\Dictionary::class,
         Forms\Fieldtypes\Dropdown::class,
         Forms\Fieldtypes\Email::class,
+        Forms\Fieldtypes\Group::class,
         Forms\Fieldtypes\Heading::class,
         Forms\Fieldtypes\ImageChoice::class,
         Forms\Fieldtypes\LongAnswer::class,
@@ -161,6 +163,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Forms\Fieldtypes\StarRating::class,
         Forms\Fieldtypes\TimePicker::class,
         Forms\Fieldtypes\Toggle::class,
+        Forms\Fieldtypes\Upload::class,
         Forms\Fieldtypes\Website::class,
         Forms\Fieldtypes\YesNo::class,
     ];

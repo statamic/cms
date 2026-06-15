@@ -199,6 +199,16 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             }
                         }
 
+                        if (Arr::get($field, 'field.type') === 'assets') {
+                            Arr::set($field, 'field.type', 'upload');
+                            Arr::set($field, 'field.store', true);
+                        }
+
+                        if (Arr::get($field, 'field.type') === 'files') {
+                            Arr::set($field, 'field.type', 'upload');
+                            Arr::set($field, 'field.store', false);
+                        }
+
                         return $field;
                     })->all(),
                 ];

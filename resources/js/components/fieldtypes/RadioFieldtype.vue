@@ -26,7 +26,7 @@ export default {
 
     computed: {
         appearance() {
-            if (this.config.appearance) {
+            if (this.config.appearance !== 'default') {
                 return this.config.appearance;
             }
 

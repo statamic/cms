@@ -67,9 +67,20 @@ class FormFieldsController extends CpController
 
         $fieldtype = FormFieldtypeRepository::find($request->type);
 
+        $blueprint = $this->blueprint($fieldtype->configBlueprint());
+
+        $values = $blueprint
+            ->fields()
+            ->addValues($request->values)
+            ->process()
+            ->values()
+            ->all();
+
+        $values = array_merge($request->values, $values);
+
         return [
-            'values' => $request->values,
-            'preview' => $this->fieldtypePreview($fieldtype, $request->values),
+            'values' => $values,
+            'preview' => $this->fieldtypePreview($fieldtype, $values),
         ];
     }
 

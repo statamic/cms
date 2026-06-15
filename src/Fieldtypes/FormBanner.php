@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Fields\Fieldtype;
 use Statamic\Facades\Icon;
+use Statamic\Fields\Fieldtype;
 
 class FormBanner extends Fieldtype
 {
