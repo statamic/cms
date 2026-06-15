@@ -16,22 +16,24 @@ const ariaLabel = computed(() => __(props.config.display ?? 'Star rating'));
 </script>
 
 <template>
-    <input
-        type="range"
-        class="star-rating-input"
-        :class="{ 'star-rating-input--unrated': !value }"
-        data-star-rating
-        :name="name"
-        :min="min"
-        :max="maxStars"
-        :step="step"
-        :value="value || min"
-        :disabled="isDisabled"
-        :aria-label="ariaLabel"
-        :style="{
-            '--star-rating-max': maxStars,
-            '--star-rating-step': step,
-        }"
-        @input="update(Number($event.target.value))"
-    />
+    <div class="show-focus-within w-fit rounded-xs ps-1.25 -ms-1.25" style="--focus-outline-offset: 0.1rem">
+        <input
+            type="range"
+            class="star-rating-input show-focus-within_target focus-visible:outline-hidden"
+            :class="{ 'star-rating-input--unrated': !value }"
+            data-star-rating
+            :name="name"
+            :min="min"
+            :max="maxStars"
+            :step="step"
+            :value="value || min"
+            :disabled="isDisabled"
+            :aria-label="ariaLabel"
+            :style="{
+                '--star-rating-max': maxStars,
+                '--star-rating-step': step,
+            }"
+            @input="update(Number($event.target.value))"
+        />
+    </div>
 </template>

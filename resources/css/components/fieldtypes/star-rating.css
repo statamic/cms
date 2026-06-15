@@ -55,12 +55,6 @@
         opacity: 0.6;
     }
 
-    &:focus-visible {
-        outline: 2px solid #60a5fa;
-        outline-offset: 3px;
-        border-radius: 0.25rem;
-    }
-
     &::-webkit-slider-thumb {
         appearance: none;
         -webkit-appearance: none;

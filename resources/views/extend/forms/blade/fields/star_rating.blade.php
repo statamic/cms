@@ -56,12 +56,6 @@
             opacity: 0.6;
         }
 
-        .star-rating-input:focus-visible {
-            outline: 2px solid #60a5fa;
-            outline-offset: 3px;
-            border-radius: 0.25rem;
-        }
-
         .star-rating-input::-webkit-slider-thumb {
             appearance: none;
             -webkit-appearance: none;
