@@ -22,7 +22,7 @@ const id = useId();
 <template>
     <div
         class="flex items-start gap-1.5"
-        :class="appearance === 'chips' ? 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full' : null"
+        :class="appearance === 'chips' ? 'border border-gray-300 dark:border-gray-700 mb-0 p-2 py-2 pe-4 shadow-ui-xs rounded-full bg-white dark:bg-gray-925' : null"
         data-ui-radio-item
     >
         <RadioGroupItem
