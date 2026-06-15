@@ -5,7 +5,6 @@ namespace Tests\Tags\Concerns;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
-use Statamic\Fields\Field;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\RenderableField;
 use Statamic\Support\Arr;
