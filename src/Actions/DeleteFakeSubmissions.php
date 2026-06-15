@@ -6,6 +6,9 @@ use Exception;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
+
 class DeleteFakeSubmissions extends Action
 {
     protected $dangerous = true;

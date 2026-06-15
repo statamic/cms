@@ -19,6 +19,8 @@ use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class FormSubmissionsController extends CpController
 {
     use QueriesFilters, QueriesFormSubmissionSearch;

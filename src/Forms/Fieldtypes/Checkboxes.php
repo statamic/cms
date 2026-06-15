@@ -5,6 +5,8 @@ namespace Statamic\Forms\Fieldtypes;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Checkboxes extends FormFieldtype
 {
     protected static $fieldtype = 'checkboxes';

@@ -6,6 +6,8 @@ use Statamic\Facades\Dictionary;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Currency extends FormFieldtype
 {
     protected static $fieldtype = 'integer';
