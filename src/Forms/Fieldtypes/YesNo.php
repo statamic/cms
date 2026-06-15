@@ -30,7 +30,6 @@ class YesNo extends FormFieldtype
                 'yes' => __('Yes'),
                 'no' => __('No'),
             ],
-            ...Arr::except($this->config(), ['type', 'options']),
         ];
     }
 
