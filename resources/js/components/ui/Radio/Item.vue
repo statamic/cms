@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useId } from 'vue';
+import { computed, useId, useSlots } from 'vue';
 import { RadioGroupIndicator, RadioGroupItem } from 'reka-ui';
 import { injectRadioContext } from './Group.vue';
 
@@ -17,6 +17,18 @@ const props = defineProps({
 const { appearance } = injectRadioContext() ?? { appearance: computed(() => 'default') };
 
 const id = useId();
+
+const hasItemSlot = !!useSlots().item;
+
+const itemClasses = computed(() => {
+    return hasItemSlot ? [] : [
+        'shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full',
+        'focus:focus-outline border border-gray-400/75 bg-white with-contrast:border-gray-100',
+        'data-[state=checked]:border-ui-accent-bg data-[disabled]:opacity-50',
+        'dark:border-gray-700 dark:bg-gray-500',
+        'dark:data-[state=checked]:border-ui-accent-bg dark:data-[state=checked]:bg-ui-accent-bg',
+    ];
+});
 </script>
 
 <template>
@@ -29,22 +41,18 @@ const id = useId();
             :id
             :value="value"
             :disabled="readOnly || disabled"
-            class="
-                shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full
-                focus:focus-outline border border-gray-400/75 bg-white with-contrast:border-gray-100
-                data-[state=checked]:border-ui-accent-bg data-[disabled]:opacity-50
-                dark:border-gray-700 dark:bg-gray-500
-                dark:data-[state=checked]:border-ui-accent-bg dark:data-[state=checked]:bg-ui-accent-bg
-            "
+            :class="itemClasses"
         >
-            <RadioGroupIndicator
-                class="
-                    relative flex h-full w-full items-center justify-center rounded-[50%]
-                    border border-ui-accent-bg after:block after:h-2 after:w-2 after:rounded-[50%]
-                    after:bg-ui-accent-bg after:content-['']
-                    dark:border-none dark:after:bg-white
-                "
-            />
+            <slot name="item">
+                <RadioGroupIndicator
+                    class="
+                        relative flex h-full w-full items-center justify-center rounded-[50%]
+                        border border-ui-accent-bg after:block after:h-2 after:w-2 after:rounded-[50%]
+                        after:bg-ui-accent-bg after:content-['']
+                        dark:border-none dark:after:bg-white
+                    "
+                />
+            </slot>
         </RadioGroupItem>
         <label class="flex flex-col" :class="{ 'opacity-50': disabled }" :for="id">
             <span class="text-sm font-normal antialiased dark:text-gray-200">

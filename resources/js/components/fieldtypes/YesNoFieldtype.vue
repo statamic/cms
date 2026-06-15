@@ -1,0 +1,38 @@
+<script setup>
+import { computed, useTemplateRef } from 'vue';
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { RadioGroup, Radio, Icon } from '@/components/ui';
+import HasInputOptions from '@/components/fieldtypes/HasInputOptions.js';
+
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { expose, isReadOnly, update } = Fieldtype.use(emit, props);
+
+const options = computed(() => HasInputOptions.methods.normalizeInputOptions(props.meta.options || props.config.options));
+
+const radio = useTemplateRef('radio');
+const focus = () => radio.value.focus();
+
+defineExpose({ ...expose, focus });
+</script>
+
+<template>
+    <RadioGroup appearance="chips" :model-value="value" @update:model-value="update" ref="radio">
+        <Radio
+            v-for="(option, index) in options"
+            :disabled="config.disabled"
+            :key="index"
+            :label="option.label || option.value"
+            :read-only="isReadOnly"
+            :value="option.value"
+        >
+            <template #item>
+                <Icon
+                    :name="option.value === 'yes' ? 'checkmark-circle' : 'delete-circle'"
+                    class="mt-0.5 size-4 cursor-default text-gray-400/75"
+                    :class="{ 'text-ui-accent-bg': value === option.value }"
+                />
+            </template>
+        </Radio>
+    </RadioGroup>
+</template>

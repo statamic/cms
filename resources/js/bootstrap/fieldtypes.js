@@ -68,6 +68,7 @@ import StarRatingFieldtype from '../components/fieldtypes/StarRatingFieldtype.vu
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue';
 import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
+import YesNoFieldtype from '@/components/fieldtypes/YesNoFieldtype.vue';
 
 export default function registerFieldtypes(app) {
     app.component('relationship-input', RelationshipInput);
@@ -160,4 +161,5 @@ export default function registerFieldtypes(app) {
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
     app.component('theme-fieldtype', ThemeFieldtype);
+    app.component('yes_no-fieldtype', YesNoFieldtype);
 }
