@@ -31,11 +31,12 @@ defineExpose({ ...expose, focus });
             :label="option.label || option.value"
             :read-only="isReadOnly"
             :value="option.value"
+            item-class="relative top-0.5"
         >
             <template #item>
                 <Icon
                     :name="iconName(option.value, value === option.value)"
-                    class="relative top-0.5 size-4 cursor-default"
+                    class="size-4 cursor-default"
                     :class="value === option.value ? 'text-ui-accent-bg' : 'text-gray-400 dark:text-gray-500'"
                 />
             </template>

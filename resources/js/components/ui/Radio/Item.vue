@@ -10,6 +10,8 @@ const props = defineProps({
     /** Label text to display next to the radio button */
     label: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
+    /** Classes applied to the radio control when using the item slot */
+    itemClass: { type: [String, Array, Object], default: null },
     /** Value of the radio button */
     value: { type: [String, Number, Boolean], required: true },
 });
@@ -41,7 +43,7 @@ const itemClasses = computed(() => {
             :id
             :value="value"
             :disabled="readOnly || disabled"
-            :class="itemClasses"
+            :class="[itemClasses, itemClass]"
             :aria-describedby="description ? `${id}-description` : undefined"
         >
             <slot name="item">
