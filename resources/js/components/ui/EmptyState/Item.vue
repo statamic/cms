@@ -9,10 +9,10 @@ const props = defineProps({
         type: String,
         default: null,
     },
-    /** Optionally open link in new tab */
-    openNewTab: {
-        type: Boolean,
-        default: false
+    /** When `href` is provided, this prop controls the link's `target` attribute */
+    target: {
+        type: String,
+        default: null,
     },
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: {
@@ -43,6 +43,8 @@ function isUrlWithinControlPanel(url) {
 const linkComponent = computed(() => {
     if (hasSlot) {
         return 'div';
+    } else if (props.target === '_blank') {
+        return 'a';
     } else if (isUrlWithinControlPanel(props.href)) {
         return Link;
     } else if (props.href) {
@@ -58,7 +60,7 @@ const linkComponent = computed(() => {
         <component
             :is="linkComponent"
             :href="href"
-            :target="openNewTab ? '_blank' : null"
+            :target="target"
             class="w-full flex gap-2 px-3 pt-4 pb-5.5 items-start hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md group cursor-pointer"
         >
             <Icon :name="icon" class="size-6 me-4 mt-1 text-gray-400" />
