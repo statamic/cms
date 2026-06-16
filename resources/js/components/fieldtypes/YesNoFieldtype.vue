@@ -11,9 +11,11 @@ const { expose, isReadOnly, update } = Fieldtype.use(emit, props);
 const options = computed(() => HasInputOptions.methods.normalizeInputOptions(props.meta.options || props.config.options));
 
 const iconName = (optionValue, selected) => {
-    const base = optionValue === 'yes' ? 'checkmark-circle' : 'delete-circle';
+    if (! selected) {
+        return 'circle';
+    }
 
-    return selected ? `${base}-filled` : base;
+    return optionValue === 'yes' ? 'checkmark-circle-filled' : 'delete-circle-filled';
 };
 
 const radio = useTemplateRef('radio');
