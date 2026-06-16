@@ -62,7 +62,7 @@ function moveToRank(itemValue, event) {
     }
 
     // Reset the input to the item's canonical rank. When the requested rank is
-    // clamped to the item's current position no reorder happens, so the binding
+    // clamped to the item's current position, no reorder happens, so the binding
     // wouldn't otherwise overwrite the invalid value left in the input.
     event.target.value = rankedValues.value.indexOf(itemValue) + 1;
 }
