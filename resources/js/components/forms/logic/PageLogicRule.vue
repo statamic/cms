@@ -98,10 +98,11 @@ const previewParts = computed(() => {
 
     if (parts.length === 0) return null;
 
-    parts.push({ type: 'goto', text: __('go to') });
-
     const destination = props.pageDestinationOptions.find(p => p.value === props.rule.destination);
-    parts.push({ type: 'destination', text: destination?.label || props.rule.destination || __('Select page') });
+    parts.push({
+        type: 'destination',
+        text: destination?.label || props.rule.destination || __('Select page'),
+    });
 
     return parts;
 });
@@ -168,17 +169,14 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                                 </Badge>
                                 <span v-else-if="part.type === 'field-plain'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
                                 <Badge
-                                    v-else-if="part.type === 'goto'"
+                                    v-else-if="part.type === 'destination'"
                                     pill
-                                    class="inline-block px-1.5 font-medium lowercase bg-white dark:bg-gray-800"
-                                    style="text-box: trim-start text;"
+                                    class="inline-flex items-center gap-1.25 px-1.5 font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300"
                                 >
-                                    {{ part.text }}
+                                    <Icon name="page" class="size-2.75! shrink-0" aria-hidden="true" />
+                                    <span style="text-box: trim-start text;">{{ __('Go to') }}</span>
+                                    <span style="text-box: trim-start text;">{{ part.text }}</span>
                                 </Badge>
-                                <span v-else-if="part.type === 'destination'" class="inline-flex items-center gap-0.5">
-                                    <Icon name="page" class="size-2.5 text-gray-500 dark:text-gray-400" />
-                                    <span class="text-gray-900 dark:text-gray-100">{{ part.text }}</span>
-                                </span>
                             </template>
                         </template>
                     </Subheading>
