@@ -1,4 +1,4 @@
-@once('statamic-star-rating-styles')
+@once
     <style>
         .star-rating-input {
             --s: 1.5rem;
