@@ -152,18 +152,14 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                             <template v-for="(part, index) in previewParts" :key="index">
                                 <Badge
                                     v-if="part.type === 'operator'"
-                                    pill
-                                    class="inline-block px-1.5 font-medium lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                    style="text-box: trim-start text;"
+                                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                                 >
                                     {{ part.text }}
                                 </Badge>
                                 <span v-else-if="part.type === 'value'" class="font-mono text-[0.75rem] text-gray-900 dark:text-gray-100">{{ part.text }}</span>
                                 <Badge
                                     v-else-if="part.type === 'join'"
-                                    pill
-                                    class="inline-block px-1.5 font-medium lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                    style="text-box: trim-start text;"
+                                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                                 >
                                     {{ part.text }}
                                 </Badge>
@@ -171,11 +167,11 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                                 <Badge
                                     v-else-if="part.type === 'destination'"
                                     pill
-                                    class="inline-flex items-center gap-1.25 px-1.5 font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300"
+                                    class="inline-flex items-center gap-1.25 px-1.5 py-1.25 font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300"
                                 >
                                     <Icon name="page" class="size-2.75! shrink-0" aria-hidden="true" />
-                                    <span style="text-box: trim-start text;">{{ __('Go to') }}</span>
-                                    <span style="text-box: trim-start text;">{{ part.text }}</span>
+                                    <span class="st-text-trim-cap">{{ __('Go to') }}</span>
+                                    <span class="st-text-trim-cap">{{ part.text }}</span>
                                 </Badge>
                             </template>
                         </template>
