@@ -46,26 +46,6 @@ function buildRankedValues(value) {
     return ranked;
 }
 
-watch(
-    [() => props.value, options],
-    () => rankedValues.value = buildRankedValues(props.value),
-    { deep: true, immediate: true },
-);
-
-watch(
-    rankedValues,
-    (value) => {
-        const current = Array.isArray(props.value) ? props.value : [];
-
-        if (JSON.stringify(value) === JSON.stringify(current)) {
-            return;
-        }
-
-        update([...value]);
-    },
-    { deep: true },
-);
-
 function moveToRank(itemValue, event) {
     const fromIndex = rankedValues.value.indexOf(itemValue);
     const parsed = Number(event.target.value);
@@ -87,6 +67,25 @@ function moveToRank(itemValue, event) {
     event.target.value = rankedValues.value.indexOf(itemValue) + 1;
 }
 
+watch(
+    [() => props.value, options],
+    () => rankedValues.value = buildRankedValues(props.value),
+    { deep: true, immediate: true },
+);
+
+watch(
+    rankedValues,
+    (value) => {
+        const current = Array.isArray(props.value) ? props.value : [];
+
+        if (JSON.stringify(value) === JSON.stringify(current)) {
+            return;
+        }
+
+        update([...value]);
+    },
+    { deep: true },
+);
 </script>
 
 <template>
