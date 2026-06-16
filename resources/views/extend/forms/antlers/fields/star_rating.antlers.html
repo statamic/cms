@@ -121,10 +121,15 @@
     </style>
 
     {{#
-        Star ratings are CSS-only range inputs. Range inputs require at least a value of 1 in the HTML,
-        but we want zero filled stars on first paint. We mark that state with data-unrated on the
-        input and add star-rating-input--unrated via JS (not in the template) so the control still
-        works as a normal range slider when JavaScript is disabled.
+        This is a range slider, not five separate stars. Gold is painted from the left up to
+        wherever the slider handle sits.
+
+        min=0 sounds like "no stars selected", but value=0 does not look empty — the gradient
+        and handle padding mean the fill still reaches into the first star (often partly gold).
+        There is no slider position that shows zero gold stars without hiding the colour in CSS.
+
+        So we use min=1 and hide the gold with a data attribute of data-unrated + JS-added --unrated
+        until the user interacts (see script below).
     #}}
     <script>
         (function () {
@@ -143,14 +148,57 @@
                 initUnrated();
             }
 
-            // First interaction means the user has chosen a rating; show the fill from then on.
-            document.addEventListener('input', function (e) {
+            function isUnrated(input) {
+                return input.classList.contains('star-rating-input--unrated') || input.hasAttribute('data-unrated');
+            }
+
+            function clearUnrated(input) {
+                input.classList.remove('star-rating-input--unrated');
+                input.removeAttribute('data-unrated');
+            }
+
+            // Unrated inputs use value=min (1) with hidden fill. Clicking the first star does not
+            // change the value, so input never fires — clear unrated on pointer/keyboard instead.
+            document.addEventListener('pointerdown', function (e) {
+                if (e.target.matches('[data-star-rating]')) {
+                    clearUnrated(e.target);
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
                 if (! e.target.matches('[data-star-rating]')) {
                     return;
                 }
 
-                e.target.classList.remove('star-rating-input--unrated');
-                e.target.removeAttribute('data-unrated');
+                var navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+
+                if (! navigationKeys.includes(e.key)) {
+                    return;
+                }
+
+                // Unrated inputs already sit at min in the DOM; the first arrow key would skip to min + step.
+                if (isUnrated(e.target)) {
+                    if (e.key === 'End') {
+                        clearUnrated(e.target);
+
+                        return;
+                    }
+
+                    // Thumb is already at min — stop the browser jumping to min + step.
+                    e.preventDefault();
+                    clearUnrated(e.target);
+                    e.target.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    return;
+                }
+
+                clearUnrated(e.target);
+            });
+
+            document.addEventListener('input', function (e) {
+                if (e.target.matches('[data-star-rating]')) {
+                    clearUnrated(e.target);
+                }
             });
         })();
     </script>

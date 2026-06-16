@@ -127,36 +127,83 @@
     </style>
 
     {{--
-        Star ratings are CSS-only range inputs. Inputs require at least a value of 1 in the HTML,
-        but we want zero filled stars on first paint. We mark that state with data-unrated on the
-        input and add star-rating-input--unrated via JS (not in the template) so the control still
-        works as a normal range slider when JavaScript is disabled.
+        This is a range slider, not five separate stars. Gold is painted from the left up to
+        wherever the slider handle sits.
+
+        min=0 sounds like "no stars selected", but value=0 does not look empty — the gradient
+        and handle padding mean the fill still reaches into the first star (often partly gold).
+        There is no slider position that shows zero gold stars without hiding the colour in CSS.
+
+        So we use min=1 and hide the gold with a data attribute of data-unrated + JS-added --unrated
+        until the user interacts (see script below).
     --}}
     <script>
         (function () {
-            // Hide the thumb fill for inputs that have not been rated yet.
+            // Apply --unrated on load for fields marked data-unrated in the template.
             function initUnrated() {
                 document.querySelectorAll('[data-star-rating][data-unrated]').forEach(function (input) {
                     input.classList.add('star-rating-input--unrated');
                 });
             }
 
-            // This script is output once per page and may run before later fields in the form
-            // are parsed, so wait for the full document when necessary.
+            // @once may run before later fields in the form are parsed.
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initUnrated);
             } else {
                 initUnrated();
             }
 
-            // First interaction means the user has chosen a rating; show the fill from then on.
-            document.addEventListener('input', function (e) {
+            function isUnrated(input) {
+                return input.classList.contains('star-rating-input--unrated') || input.hasAttribute('data-unrated');
+            }
+
+            function clearUnrated(input) {
+                input.classList.remove('star-rating-input--unrated');
+                input.removeAttribute('data-unrated');
+            }
+
+            // Clicking the first star leaves value at min, so input never fires.
+            document.addEventListener('pointerdown', function (e) {
+                if (e.target.matches('[data-star-rating]')) {
+                    clearUnrated(e.target);
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
                 if (! e.target.matches('[data-star-rating]')) {
                     return;
                 }
 
-                e.target.classList.remove('star-rating-input--unrated');
-                e.target.removeAttribute('data-unrated');
+                var navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+
+                if (! navigationKeys.includes(e.key)) {
+                    return;
+                }
+
+                if (isUnrated(e.target)) {
+                    if (e.key === 'End') {
+                        // Reveal fill but let the browser jump to max.
+                        clearUnrated(e.target);
+
+                        return;
+                    }
+
+                    // Thumb is already at min — stop the browser jumping to min + step.
+                    e.preventDefault();
+                    clearUnrated(e.target);
+                    e.target.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    return;
+                }
+
+                clearUnrated(e.target);
+            });
+
+            // Drag or keyboard after the value actually changes.
+            document.addEventListener('input', function (e) {
+                if (e.target.matches('[data-star-rating]')) {
+                    clearUnrated(e.target);
+                }
             });
         })();
     </script>
