@@ -8,9 +8,9 @@ const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, name } = Fieldtype.use(emit, props);
 defineExpose(expose);
 
-const step = computed(() => props.config.step ?? props.meta.step ?? 1);
-const min = computed(() => props.config.min ?? props.meta.min ?? step.value);
-const maxStars = computed(() => props.config.max_stars ?? props.meta.max_stars ?? 5);
+const step = computed(() => props.config.step ?? 1);
+const min = computed(() => props.config.min ?? step.value);
+const maxStars = computed(() => props.config.max_stars ?? 5);
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 const ariaLabel = computed(() => __(props.config.display ?? 'Star rating'));
 </script>

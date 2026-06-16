@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms\Fieldtypes;
 
-use Statamic\Fieldtypes\Concerns\HasStarRatingSettings;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
@@ -10,7 +9,6 @@ use function Statamic\trans as __;
 
 class StarRating extends FormFieldtype
 {
-    use HasStarRatingSettings;
     protected static $fieldtype = 'star_rating';
     protected $description = 'A star rating input for collecting ratings.';
     protected $icon = 'star';
@@ -42,9 +40,15 @@ class StarRating extends FormFieldtype
 
     public function toFieldArray(): array
     {
+        $allowHalfStars = (bool) $this->config('allow_half_stars');
+        $maxStars = max(1, min(10, (int) $this->config('max_stars', 5)));
+
         return [
             'type' => 'star_rating',
-            ...$this->starRatingSettings(),
+            'max_stars' => $maxStars,
+            'allow_half_stars' => $allowHalfStars,
+            'min' => $allowHalfStars ? 0.5 : 1,
+            'step' => $allowHalfStars ? 0.5 : 1,
             ...Arr::except($this->config(), ['type', 'max_stars', 'allow_half_stars']),
         ];
     }
