@@ -1,3 +1,24 @@
+<input
+    id="{{ id }}"
+    type="range"
+    name="{{ name }}"
+    class="star-rating-input{{ if (value ?? 0) == 0 }} star-rating-input--unrated{{ /if }}"
+    data-star-rating
+    min="{{ min ?? 1 }}"
+    max="{{ max_stars }}"
+    step="{{ step ?? 1 }}"
+    value="{{ if (value ?? 0) == 0 }}{{ min ?? 1 }}{{ else }}{{ value }}{{ /if }}"
+    style="--star-rating-max: {{ max_stars }}; --star-rating-step: {{ step ?? 1 }};"
+    {{ if js_driver }}{{ js_attributes }}{{ /if }}
+    {{ if validate|contains:required }}required{{ /if }}
+    {{ if display }}aria-label="{{ display }}"{{ /if }}
+    {{ if error }}
+        aria-invalid="true" aria-describedby="{{ id }}-error"
+    {{ elseif instructions }}
+        aria-describedby="{{ id }}-instructions"
+    {{ /if }}
+>
+
 {{ once }}
     <style>
         .star-rating-input {
@@ -98,23 +119,3 @@
         }
     </style>
 {{ /once }}
-<input
-    id="{{ id }}"
-    type="range"
-    name="{{ name }}"
-    class="star-rating-input{{ if (value ?? 0) == 0 }} star-rating-input--unrated{{ /if }}"
-    data-star-rating
-    min="{{ min ?? 1 }}"
-    max="{{ max_stars }}"
-    step="{{ step ?? 1 }}"
-    value="{{ if (value ?? 0) == 0 }}{{ min ?? 1 }}{{ else }}{{ value }}{{ /if }}"
-    style="--star-rating-max: {{ max_stars }}; --star-rating-step: {{ step ?? 1 }};"
-    {{ if js_driver }}{{ js_attributes }}{{ /if }}
-    {{ if validate|contains:required }}required{{ /if }}
-    {{ if display }}aria-label="{{ display }}"{{ /if }}
-    {{ if error }}
-        aria-invalid="true" aria-describedby="{{ id }}-error"
-    {{ elseif instructions }}
-        aria-describedby="{{ id }}-instructions"
-    {{ /if }}
->
