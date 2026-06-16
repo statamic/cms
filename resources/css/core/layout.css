@@ -2,12 +2,12 @@
 =================================================== */
 .nav-main {
     @apply flex flex-col gap-6 py-6 px-2 sm:px-3 text-sm antialiased select-none;
-    /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
-    @apply h-[calc(100vh-3.5rem)];
+    /* Similar to the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
+    @apply h-[calc(100dvh-3.5rem)];
     @apply overflow-y-auto fixed top-14 start-0 w-48;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
     /* Only allow a transition when we're interacting with the nav otherwise we'll see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
-    body:has([data-toggle-nav-button]:hover) & {
+    body:has([data-cp-global-nav-toggle]:hover) & {
         /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
         transition: inset 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         will-change: inset, box-shadow;
@@ -112,8 +112,9 @@
 /* Mobile nav behavior */
 @media (width < theme(--breakpoint-lg)) {
     .nav-main {
-        /* Always visible but off-screen by default */
+        /* Always visible but off-screen until opened (do not rely on JS adding .nav-closed before first paint). */
         @apply flex;
+        @apply -start-50;
         @apply bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
     }
 
@@ -126,7 +127,7 @@
 main {
     @apply ps-0 lg:ps-46;
     /* Only allow a transition when we're interacting with the nav otherwise we'll see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
-    body:has([data-toggle-nav-button]:hover) & {
+    body:has([data-cp-global-nav-toggle]:hover) & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
         transition: padding 0.3s ease-in-out;
         will-change: padding;
