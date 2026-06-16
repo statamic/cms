@@ -66,34 +66,25 @@ watch(
     { deep: true },
 );
 
-function moveToRank(itemValue, newRank) {
-    if (isDisabled.value) {
-        return;
-    }
-
+function moveToRank(itemValue, event) {
     const fromIndex = rankedValues.value.indexOf(itemValue);
+    const parsed = Number(event.target.value);
 
-    if (fromIndex === -1) {
-        return;
+    if (! isDisabled.value && fromIndex !== -1 && Number.isFinite(parsed)) {
+        const toIndex = Math.max(0, Math.min(rankedValues.value.length - 1, Math.round(parsed) - 1));
+
+        if (toIndex !== fromIndex) {
+            const next = [...rankedValues.value];
+            next.splice(fromIndex, 1);
+            next.splice(toIndex, 0, itemValue);
+            rankedValues.value = next;
+        }
     }
 
-    const parsed = Number(newRank);
-
-    if (! Number.isFinite(parsed)) {
-        return;
-    }
-
-    let toIndex = Math.round(parsed) - 1;
-    toIndex = Math.max(0, Math.min(rankedValues.value.length - 1, toIndex));
-
-    if (fromIndex === toIndex) {
-        return;
-    }
-
-    const next = [...rankedValues.value];
-    next.splice(fromIndex, 1);
-    next.splice(toIndex, 0, itemValue);
-    rankedValues.value = next;
+    // Reset the input to the item's canonical rank. When the requested rank is
+    // clamped to the item's current position no reorder happens, so the binding
+    // wouldn't otherwise overwrite the invalid value left in the input.
+    event.target.value = rankedValues.value.indexOf(itemValue) + 1;
 }
 
 </script>
@@ -129,7 +120,7 @@ function moveToRank(itemValue, newRank) {
                     step="1"
                     :value="row.index + 1"
                     :aria-label="`${__('Rank')} ${__(row.label)}`"
-                    @change="moveToRank(row.value, $event.target.value)"
+                    @change="moveToRank(row.value, $event)"
                 >
                 <span
                     v-else
