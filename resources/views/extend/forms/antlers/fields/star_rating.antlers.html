@@ -2,8 +2,9 @@
     id="{{ id }}"
     type="range"
     name="{{ name }}"
-    class="star-rating-input{{ if (value ?? 0) == 0 }} star-rating-input--unrated{{ /if }}"
+    class="star-rating-input"
     data-star-rating
+    {{ if (value ?? 0) == 0 }}data-unrated{{ /if }}
     min="{{ min ?? 1 }}"
     max="{{ max_stars }}"
     step="{{ step ?? 1 }}"
@@ -118,4 +119,39 @@
             border: none;
         }
     </style>
+
+    {{#
+        Star ratings are CSS-only range inputs. Range inputs require at least a value of 1 in the HTML,
+        but we want zero filled stars on first paint. We mark that state with data-unrated on the
+        input and add star-rating-input--unrated via JS (not in the template) so the control still
+        works as a normal range slider when JavaScript is disabled.
+    #}}
+    <script>
+        (function () {
+            // Hide the thumb fill for inputs that have not been rated yet.
+            function initUnrated() {
+                document.querySelectorAll('[data-star-rating][data-unrated]').forEach(function (input) {
+                    input.classList.add('star-rating-input--unrated');
+                });
+            }
+
+            // This script is output once per page and may run before later fields in the form
+            // are parsed, so wait for the full document when necessary.
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initUnrated);
+            } else {
+                initUnrated();
+            }
+
+            // First interaction means the user has chosen a rating; show the fill from then on.
+            document.addEventListener('input', function (e) {
+                if (! e.target.matches('[data-star-rating]')) {
+                    return;
+                }
+
+                e.target.classList.remove('star-rating-input--unrated');
+                e.target.removeAttribute('data-unrated');
+            });
+        })();
+    </script>
 {{ /once }}
