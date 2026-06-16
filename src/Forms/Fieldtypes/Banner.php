@@ -44,6 +44,7 @@ class Banner extends FormFieldtype
             'display' => $this->config('display'),
             'text' => $this->config('text'),
             'icon' => $this->config('icon'),
+            'listable' => false,
         ];
     }
 

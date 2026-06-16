@@ -23,6 +23,7 @@ class HeadingTest extends TestCase
             'display' => 'This is a heading',
             'subheading' => 'This is a subheading',
             'hide_display' => true,
+            'listable' => false,
         ], $fieldtype->toFieldArray());
     }
 }

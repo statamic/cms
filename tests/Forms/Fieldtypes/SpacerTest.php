@@ -19,6 +19,7 @@ class SpacerTest extends TestCase
         $this->assertEquals([
             'type' => 'spacer',
             'hide_display' => true,
+            'listable' => false,
         ], $fieldtype->toFieldArray());
     }
 }
