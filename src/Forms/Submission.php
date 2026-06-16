@@ -19,6 +19,7 @@ use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Asset;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
@@ -114,6 +115,30 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return Carbon::createFromTimestamp($this->id());
     }
 
+    public function isDraft(): bool
+    {
+        return (bool) $this->get('draft');
+    }
+
+    public function isSpam(): bool
+    {
+        return (bool) $this->get('spam');
+    }
+
+    public function isWithheld(): bool
+    {
+        return $this->isDraft() || $this->isSpam();
+    }
+
+    public function status(): string
+    {
+        return match (true) {
+            $this->isSpam() => 'spam',
+            $this->isDraft() => 'draft',
+            default => 'submitted',
+        };
+    }
+
     /**
      * Upload files and return asset IDs.
      *
@@ -152,6 +177,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $isNew = is_null($this->form()->submission($this->id()));
 
+        // Withheld submissions (drafts & spam) are stored but skip the
+        // Creating/Created events so listeners never see an incomplete submission.
+        $withheld = $this->isWithheld();
+
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
@@ -159,7 +188,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
-            if ($isNew && SubmissionCreating::dispatch($this) === false) {
+            if ($isNew && ! $withheld && SubmissionCreating::dispatch($this) === false) {
                 return false;
             }
 
@@ -175,12 +204,34 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($isNew) {
+            if ($isNew && ! $withheld) {
                 SubmissionCreated::dispatch($this);
             }
 
             SubmissionSaved::dispatch($this);
         }
+    }
+
+    public function complete()
+    {
+        $existed = ! is_null($this->form()->submission($this->id()));
+
+        $this->remove('draft')->remove('spam');
+
+        if ($this->form()->store()) {
+            $this->save();
+
+            // A promoted draft already existed, so save() won't fire the created
+            // event. We dispatch it here so completion always emits it once.
+            if ($existed) {
+                SubmissionCreated::dispatch($this);
+            }
+        } else {
+            SubmissionCreated::dispatch($this);
+        }
+
+        // TODO: Use $this->site() here when we add the "site" key to submissions.
+        SendEmails::dispatch($this, Site::default());
     }
 
     public function deleteQuietly()

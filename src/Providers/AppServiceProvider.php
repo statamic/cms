@@ -20,6 +20,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
+use Statamic\Jobs\DeleteDraftFormSubmissions;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Sites\Sites;
@@ -141,6 +142,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerElevatedSessionMacros();
 
         $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+        $this->app->make(Schedule::class)->job(DeleteDraftFormSubmissions::class)->daily();
     }
 
     public function register()

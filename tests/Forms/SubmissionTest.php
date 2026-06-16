@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,6 +14,8 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
+use Statamic\Facades\Site;
+use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -238,6 +241,130 @@ class SubmissionTest extends TestCase
         Event::assertNotDispatched(SubmissionDeleted::class);
 
         $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function it_determines_its_status()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submitted = $form->makeSubmission();
+        $this->assertFalse($submitted->isDraft());
+        $this->assertFalse($submitted->isSpam());
+        $this->assertFalse($submitted->isWithheld());
+        $this->assertEquals('submitted', $submitted->status());
+
+        $draft = $form->makeSubmission()->set('draft', true);
+        $this->assertTrue($draft->isDraft());
+        $this->assertFalse($draft->isSpam());
+        $this->assertTrue($draft->isWithheld());
+        $this->assertEquals('draft', $draft->status());
+
+        $spam = $form->makeSubmission()->set('spam', true);
+        $this->assertTrue($spam->isSpam());
+        $this->assertFalse($spam->isDraft());
+        $this->assertTrue($spam->isWithheld());
+        $this->assertEquals('spam', $spam->status());
+    }
+
+    #[Test]
+    #[DataProvider('withheldStatusProvider')]
+    public function it_does_not_dispatch_creation_events_when_saving_a_withheld_submission(string $status)
+    {
+        Event::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->set($status, true);
+        $submission->save();
+
+        // Creation events shouldn't be dispatched.
+        Event::assertNotDispatched(SubmissionCreating::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
+
+        // But, saving events should.
+        Event::assertDispatched(SubmissionSaving::class);
+        Event::assertDispatched(SubmissionSaved::class);
+    }
+
+    public static function withheldStatusProvider(): array
+    {
+        return [
+            'draft' => ['draft'],
+            'spam' => ['spam'],
+        ];
+    }
+
+    #[Test]
+    public function created_event_is_not_automatically_dispatched_when_removing_the_draft_key()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->set('draft', true);
+        $submission->save();
+
+        Event::fake();
+
+        // Removing the draft key turns it into a "real" submission, but because the
+        // record already exists, save() alone won't dispatch Created. This is why
+        // complete() dispatches it explicitly (covered by the test below).
+        $submission->remove('draft');
+        $submission->save();
+
+        Event::assertNotDispatched(SubmissionCreating::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionSaved::class);
+    }
+
+    #[Test]
+    public function completing_a_new_submission_dispatches_created_event_once()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class]);
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission();
+
+        $submission->complete(Site::default());
+
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
+        $this->assertNotNull($form->submission($submission->id()));
+    }
+
+    #[Test]
+    public function completing_a_withheld_submission_removes_the_status_key_and_dispatches_events()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission()->set('draft', true)->set('spam', true))->save();
+
+        Bus::fake();
+        Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
+
+        $submission->complete(Site::default());
+
+        $this->assertFalse($submission->isWithheld());
+
+        // Submission already exists, so save() won't dispatch the Created event, complete() will.
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertNotDispatched(SubmissionCreating::class);
+        Bus::assertDispatched(SendEmails::class, 1);
+    }
+
+    #[Test]
+    public function completing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class]);
+
+        $form = tap(Form::make('contact_us')->store(false))->save();
+        $submission = $form->makeSubmission();
+
+        $submission->complete(Site::default());
+
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
+        $this->assertNull($form->submission($submission->id()));
     }
 
     #[Test]

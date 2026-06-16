@@ -37,6 +37,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Draft Submissions
+    |--------------------------------------------------------------------------
+    |
+    | Partial (or draft) submissions are automatically deleted after a set number
+    | of days. Set this to null to prevent the automatic deletion of drafts.
+    |
+    */
+
+    'drafts' => [
+        'delete_after' => 7,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Exporters
     |--------------------------------------------------------------------------
     |

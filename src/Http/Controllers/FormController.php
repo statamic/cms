@@ -8,13 +8,11 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
-use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
-use Statamic\Forms\SendEmails;
 use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -70,16 +68,7 @@ class FormController extends Controller
             return $this->formSuccess($params, $submission, true);
         }
 
-        if ($form->store()) {
-            $submission->save();
-        } else {
-            // When the submission is saved, this same created event will be dispatched.
-            // We'll also fire it here if submissions are not configured to be stored
-            // so that developers may continue to listen and modify it as needed.
-            SubmissionCreated::dispatch($submission);
-        }
-
-        SendEmails::dispatch($submission, $site);
+        $submission->complete($site);
 
         return $this->formSuccess($params, $submission);
     }
