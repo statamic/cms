@@ -115,7 +115,7 @@
     "storybook": "^10.2.10",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
-    "vite": "^8.0.0",
+    "vite": "^8.0.16",
     "vitest": "^4.0.12",
     "vitest-browser-vue": "^2.0.1",
     "vue-component-debug": "^0.1.0",
