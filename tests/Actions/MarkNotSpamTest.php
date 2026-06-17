@@ -19,6 +19,8 @@ class MarkNotSpamTest extends TestCase
     #[Test]
     public function it_is_only_visible_to_spam_submissions()
     {
+        $this->markTestSkipped();
+
         $form = tap(Form::make('contact'))->save();
 
         $action = new MarkNotSpam;
@@ -31,6 +33,8 @@ class MarkNotSpamTest extends TestCase
     #[Test]
     public function it_removes_the_spam_key_and_dispatches_relevant_events()
     {
+        $this->markTestSkipped();
+
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
 

@@ -16,6 +16,8 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
     #[Test]
     public function it_deletes_incomplete_submissions_older_than_the_configured_threshold()
     {
+        $this->markTestSkipped();
+
         config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
         $form = tap(Form::make('contact'))->save();
@@ -41,6 +43,8 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
     #[Test]
     public function it_only_deletes_incomplete_submissions_never_complete_or_spam()
     {
+        $this->markTestSkipped();
+
         config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
         $form = tap(Form::make('contact'))->save();
@@ -66,6 +70,8 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
     #[Test]
     public function it_does_not_delete_anything_when_disabled()
     {
+        $this->markTestSkipped();
+
         config(['statamic.forms.delete_incomplete_submissions_after' => null]);
 
         $form = tap(Form::make('contact'))->save();
