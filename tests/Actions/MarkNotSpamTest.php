@@ -24,10 +24,9 @@ class MarkNotSpamTest extends TestCase
 
         $action = new MarkNotSpam;
 
-        $this->assertTrue($action->visibleTo($form->makeSubmission()->set('spam', true)));
         $this->assertFalse($action->visibleTo($form->makeSubmission()));
-        $this->assertFalse($action->visibleTo($form->makeSubmission()->set('draft', true)));
-        $this->assertFalse($action->visibleTo($form));
+        $this->assertFalse($action->visibleTo($form->makeSubmission()->set('incomplete', true)));
+        $this->assertTrue($action->visibleTo($form->makeSubmission()->set('spam', true)));
     }
 
     #[Test]

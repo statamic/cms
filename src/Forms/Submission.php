@@ -115,9 +115,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return Carbon::createFromTimestamp($this->id());
     }
 
-    public function isDraft(): bool
+    public function isIncomplete(): bool
     {
-        return (bool) $this->get('draft');
+        return (bool) $this->get('incomplete');
     }
 
     public function isSpam(): bool
@@ -125,17 +125,18 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return (bool) $this->get('spam');
     }
 
+    // todo: refactor or rename
     public function isWithheld(): bool
     {
-        return $this->isDraft() || $this->isSpam();
+        return $this->isIncomplete() || $this->isSpam();
     }
 
     public function status(): string
     {
         return match (true) {
             $this->isSpam() => 'spam',
-            $this->isDraft() => 'draft',
-            default => 'submitted',
+            $this->isIncomplete() => 'incomplete',
+            default => 'complete',
         };
     }
 
@@ -177,8 +178,8 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $isNew = is_null($this->form()->submission($this->id()));
 
-        // Withheld submissions (drafts & spam) are stored but skip the
-        // Creating/Created events so listeners never see an incomplete submission.
+        // Incomplete and spam submissions are stored but skip the Creating/Created
+        // events so listeners never receive an incomplete submission.
         $withheld = $this->isWithheld();
 
         $withEvents = $this->withEvents;
@@ -216,12 +217,12 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $existed = ! is_null($this->form()->submission($this->id()));
 
-        $this->remove('draft')->remove('spam');
+        $this->remove('incomplete')->remove('spam');
 
         if ($this->form()->store()) {
             $this->save();
 
-            // A promoted draft already existed, so save() won't fire the created
+            // A promoted incomplete already existed, so save() won't fire the created
             // event. We dispatch it here so completion always emits it once.
             if ($existed) {
                 SubmissionCreated::dispatch($this);

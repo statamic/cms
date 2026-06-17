@@ -5,18 +5,18 @@ namespace Tests\Forms;
 use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
-use Statamic\Jobs\DeleteDraftFormSubmissions;
+use Statamic\Jobs\DeleteIncompleteFormSubmissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class DeleteDraftFormSubmissionsTest extends TestCase
+class DeleteIncompleteFormSubmissionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
     public function it_deletes_drafts_older_than_the_configured_threshold()
     {
-        config(['statamic.forms.drafts.delete_after' => 7]);
+        config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
         $form = tap(Form::make('contact'))->save();
 
@@ -31,7 +31,7 @@ class DeleteDraftFormSubmissionsTest extends TestCase
 
         Carbon::setTestNow('2025-06-15 12:00:00');
 
-        (new DeleteDraftFormSubmissions)->handle();
+        (new DeleteIncompleteFormSubmissions)->handle();
 
         $this->assertNull($form->submission($oldDraft->id()));
         $this->assertNotNull($form->submission($recentDraft->id()));
@@ -41,7 +41,7 @@ class DeleteDraftFormSubmissionsTest extends TestCase
     #[Test]
     public function it_only_deletes_spam_submissions()
     {
-        config(['statamic.forms.drafts.delete_after' => 7]);
+        config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
         $form = tap(Form::make('contact'))->save();
 
@@ -56,7 +56,7 @@ class DeleteDraftFormSubmissionsTest extends TestCase
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
-        (new DeleteDraftFormSubmissions)->handle();
+        (new DeleteIncompleteFormSubmissions)->handle();
 
         $this->assertNull($form->submission($draft->id()));
         $this->assertNotNull($form->submission($submitted->id()));
@@ -66,7 +66,7 @@ class DeleteDraftFormSubmissionsTest extends TestCase
     #[Test]
     public function it_does_not_delete_anything_when_disabled()
     {
-        config(['statamic.forms.drafts.delete_after' => null]);
+        config(['statamic.forms.delete_incomplete_submissions_after' => null]);
 
         $form = tap(Form::make('contact'))->save();
 
@@ -75,7 +75,7 @@ class DeleteDraftFormSubmissionsTest extends TestCase
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
-        (new DeleteDraftFormSubmissions)->handle();
+        (new DeleteIncompleteFormSubmissions)->handle();
 
         $this->assertNotNull($form->submission($draft->id()));
     }

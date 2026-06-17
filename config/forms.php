@@ -45,9 +45,7 @@ return [
     |
     */
 
-    'drafts' => [
-        'delete_after' => 7,
-    ],
+    'delete_incomplete_submissions_after' => 7,
 
     /*
     |--------------------------------------------------------------------------

@@ -249,20 +249,20 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
 
         $submitted = $form->makeSubmission();
-        $this->assertFalse($submitted->isDraft());
+        $this->assertFalse($submitted->isIncomplete());
         $this->assertFalse($submitted->isSpam());
         $this->assertFalse($submitted->isWithheld());
-        $this->assertEquals('submitted', $submitted->status());
+        $this->assertEquals('complete', $submitted->status());
 
-        $draft = $form->makeSubmission()->set('draft', true);
-        $this->assertTrue($draft->isDraft());
-        $this->assertFalse($draft->isSpam());
-        $this->assertTrue($draft->isWithheld());
-        $this->assertEquals('draft', $draft->status());
+        $incomplete = $form->makeSubmission()->set('incomplete', true);
+        $this->assertTrue($incomplete->isIncomplete());
+        $this->assertFalse($incomplete->isSpam());
+        $this->assertTrue($incomplete->isWithheld());
+        $this->assertEquals('incomplete', $incomplete->status());
 
         $spam = $form->makeSubmission()->set('spam', true);
         $this->assertTrue($spam->isSpam());
-        $this->assertFalse($spam->isDraft());
+        $this->assertFalse($spam->isIncomplete());
         $this->assertTrue($spam->isWithheld());
         $this->assertEquals('spam', $spam->status());
     }
@@ -290,25 +290,25 @@ class SubmissionTest extends TestCase
     public static function withheldStatusProvider(): array
     {
         return [
-            'draft' => ['draft'],
+            'incomplete' => ['incomplete'],
             'spam' => ['spam'],
         ];
     }
 
     #[Test]
-    public function created_event_is_not_automatically_dispatched_when_removing_the_draft_key()
+    public function created_event_is_not_automatically_dispatched_when_removing_the_incomplete_key()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('draft', true);
+        $submission = $form->makeSubmission()->set('incomplete', true);
         $submission->save();
 
         Event::fake();
 
-        // Removing the draft key turns it into a "real" submission, but because the
-        // record already exists, save() alone won't dispatch Created. This is why
+        // Removing the incomplete key turns it into a "real" submission, but because
+        // the record already exists, save() alone won't dispatch Created. This is why
         // complete() dispatches it explicitly (covered by the test below).
-        $submission->remove('draft');
+        $submission->remove('incomplete');
         $submission->save();
 
         Event::assertNotDispatched(SubmissionCreating::class);
@@ -329,14 +329,15 @@ class SubmissionTest extends TestCase
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
+
         $this->assertNotNull($form->submission($submission->id()));
     }
 
     #[Test]
-    public function completing_a_withheld_submission_removes_the_status_key_and_dispatches_events()
+    public function completing_an_incomplete_or_spam_submission_removes_the_status_key_and_dispatches_events()
     {
         $form = tap(Form::make('contact_us'))->save();
-        $submission = tap($form->makeSubmission()->set('draft', true)->set('spam', true))->save();
+        $submission = tap($form->makeSubmission()->set('incomplete', true)->set('spam', true))->save();
 
         Bus::fake();
         Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
