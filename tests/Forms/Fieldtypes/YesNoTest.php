@@ -17,7 +17,8 @@ class YesNoTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'type' => 'radio',
+            'type' => 'yes_no',
+            'appearance' => 'chips',
             'options' => [
                 'yes' => 'Yes',
                 'no' => 'No',
@@ -30,18 +31,17 @@ class YesNoTest extends TestCase
     {
         $fieldtype = (new YesNo)->setField(new FormField('recommend', [
             'type' => 'yes_no',
-            'default' => 'yes',
-            'inline' => true,
+            'display' => 'Would you recommend this product?',
         ]));
 
         $this->assertEquals([
-            'type' => 'radio',
+            'type' => 'yes_no',
+            'appearance' => 'chips',
             'options' => [
                 'yes' => 'Yes',
                 'no' => 'No',
             ],
-            'default' => 'yes',
-            'inline' => true,
+            'display' => 'Would you recommend this product?',
         ], $fieldtype->toFieldArray());
     }
 }

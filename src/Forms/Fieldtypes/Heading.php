@@ -37,6 +37,7 @@ class Heading extends FormFieldtype
             'hide_display' => true,
             'display' => $this->config('display'),
             'subheading' => $this->config('subheading'),
+            'listable' => false,
         ];
     }
 }

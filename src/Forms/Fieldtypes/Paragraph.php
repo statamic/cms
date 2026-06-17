@@ -38,6 +38,7 @@ class Paragraph extends FormFieldtype
             'text' => $this->config('text'),
             'display' => $this->config('display'),
             'hide_display' => true,
+            'listable' => false,
         ];
     }
 }

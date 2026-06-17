@@ -134,10 +134,10 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                         v-if="collapsed"
                         pill
                         color="white"
-                        class="px-1.5 font-medium text-gray-800 dark:text-gray-200 gap-1.5"
+                        class="px-1.5 py-1 font-medium st-text-trim-ex-alphabetic text-gray-800 dark:text-gray-200 gap-1.5"
                     >
                         <Icon :name="prefixIcon" class="size-3.5!" aria-hidden="true" />
-                        <span>{{ prefixLabel }}</span>
+                        <span class="st-text-trim-cap">{{ prefixLabel }}</span>
                     </Badge>
                     <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap text-xs flex items-center gap-1">
                         <template v-if="collapsedSummary">
@@ -148,9 +148,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                                 <span v-if="part.type === 'field'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
                                 <Badge
                                     v-else-if="part.type === 'operator'"
-                                    pill
-                                    class="inline-block px-1.5 font-medium lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                    style="text-box: trim-start text;"
+                                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                                 >
                                     {{ part.text }}
                                 </Badge>

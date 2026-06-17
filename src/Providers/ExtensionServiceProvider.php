@@ -136,6 +136,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Width::class,
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
+        Fieldtypes\YesNo::class,
         \Statamic\Forms\Fieldtype::class,
     ];
 

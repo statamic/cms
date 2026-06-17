@@ -32,6 +32,7 @@ class Spacer extends FormFieldtype
         return [
             'type' => 'spacer',
             'hide_display' => true,
+            'listable' => false,
         ];
     }
 }

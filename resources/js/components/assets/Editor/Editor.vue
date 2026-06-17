@@ -104,7 +104,7 @@
                             </div>
 
                             <!-- Video -->
-                            <video :src="asset.url" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
+                            <video :src="asset.url" :width="asset.width" :height="asset.height" class="max-w-full max-h-full object-contain" controls v-else-if="asset.isVideo" />
 
                             <!-- Other thumbnail -->
                             <img v-else-if="asset.preview" :src="asset.preview" class="asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
