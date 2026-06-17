@@ -46,6 +46,10 @@ function buildRankedValues(value) {
     return ranked;
 }
 
+const hasCustomOrder = computed(() => {
+    return JSON.stringify(rankedValues.value) !== JSON.stringify(defaultOrder());
+});
+
 function moveToRank(itemValue, event) {
     const fromIndex = rankedValues.value.indexOf(itemValue);
     const parsed = Number(event.target.value);
@@ -107,8 +111,13 @@ watch(
             >
                 <DragHandle
                     v-if="!isDisabled"
-                    :class="sortableHandleClass"
-                    class="cursor-grab [&_svg]:opacity-75 dark:[&_svg]:opacity-50"
+                    :class="[
+                        sortableHandleClass,
+                        hasCustomOrder
+                            ? 'text-primary! [&_svg]:opacity-100'
+                            : '[&_svg]:opacity-75 dark:[&_svg]:opacity-50',
+                    ]"
+                    class="cursor-grab"
                 />
                 <input
                     v-if="!isDisabled"
