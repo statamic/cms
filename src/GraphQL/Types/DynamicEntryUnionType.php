@@ -100,7 +100,7 @@ class DynamicEntryUnionType extends UnionType
             ->all();
     }
 
-    protected static function collectionsFor(Collection $collection): IlluminateCollection
+    public static function collectionsFor(Collection $collection): IlluminateCollection
     {
         return collect([$collection])->merge(static::mountedCollections($collection));
     }

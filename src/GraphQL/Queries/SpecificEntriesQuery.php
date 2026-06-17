@@ -62,7 +62,7 @@ class SpecificEntriesQuery extends Query
     {
         $query = Entry::query();
 
-        $query->where('collection', $this->collectionHandle);
+        $query->whereIn('collection', DynamicEntryUnionType::collectionsFor(Collection::findByHandle($this->collectionHandle))->pluck('handle')->toArray());
 
         if ($site = $args['site'] ?? null) {
             $query->where('site', $site);
