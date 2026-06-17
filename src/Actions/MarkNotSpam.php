@@ -3,7 +3,6 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Facades\Site;
 
 use function Statamic\trans as __;
 use function Statamic\trans_choice;

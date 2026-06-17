@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkNotSpam;
-use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Facades\Form;
 use Statamic\Forms\SendEmails;
