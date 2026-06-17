@@ -126,7 +126,7 @@ Route::group(['prefix' => 'auth'], function () {
 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.cp.auth')->name('password.email');
-        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->middleware('throttle:statamic.cp.password-reset-form')->name('password.reset');
         Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.cp.auth')->name('password.reset.action');
 
         if (TwoFactor::enabled()) {

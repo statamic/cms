@@ -224,4 +224,23 @@ class ResetPasswordTest extends TestCase
                 ->where('emailReadonly', true)
             );
     }
+
+    #[Test]
+    #[DataProvider('resetPasswordProvider')]
+    public function it_throttles_requests_to_the_reset_form($type)
+    {
+        $user = $this->createUser();
+        $token = $this->createToken($user, $type);
+
+        $url = match ($type) {
+            'cp' => cp_route('password.reset', $token),
+            'web' => route('statamic.password.reset', $token),
+        };
+
+        foreach (range(1, 15) as $i) {
+            $this->get($url)->assertOk();
+        }
+
+        $this->get($url)->assertStatus(429);
+    }
 }
