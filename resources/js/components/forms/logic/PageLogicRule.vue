@@ -156,7 +156,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                                 >
                                     {{ part.text }}
                                 </Badge>
-                                <span v-else-if="part.type === 'value'" class="font-mono text-[0.75rem] text-gray-900 dark:text-gray-100">{{ part.text }}</span>
+                                <span v-else-if="part.type === 'value'" class="font-mono text-gray-900 dark:text-gray-100">{{ part.text }}</span>
                                 <Badge
                                     v-else-if="part.type === 'join'"
                                     class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
