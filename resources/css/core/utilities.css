@@ -79,6 +79,11 @@
 /* UTILITIES / TEXT
 =================================================== */
 /* Prefix things with `st-text-` (st for Statamic) because `text-` is a Tailwind prefix */
+@utility st-text-trim-cap {
+    /* =Jay. This is the banger you probably want */
+    text-box: cap alphabetic;
+}
+
 @utility st-text-trim-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
@@ -92,11 +97,9 @@
         text-box: unset;
     }
 }
-@utility st-text-trim-cap {
-    /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
-    text-box: cap alphabetic;
-}
+
 @utility st-text-trim-ex-alphabetic {
+    /* =Jay. More useful for all lowercase text */
     text-box: ex alphabetic;
 }
 

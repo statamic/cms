@@ -198,7 +198,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                     >
                         <div
                             data-empty-section
-                            class="flex items-center justify-center rounded-lg border border-dashed border-zinc-300"
+                            class="flex items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700"
                             :class="{ 'h-[670px]': isOnlySection, 'h-[200px]': !isOnlySection }"
                         >
                             <div>
