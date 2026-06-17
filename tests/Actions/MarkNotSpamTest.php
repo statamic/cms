@@ -1,6 +1,6 @@
 <?php
 
-namespace Actions;
+namespace Tests\Actions;
 
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
