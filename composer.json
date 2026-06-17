@@ -19,7 +19,7 @@
         "laravel/framework": "^12.40.0 || ^13.0",
         "laravel/prompts": "^0.3.0",
         "league/commonmark": "^2.2",
-        "league/csv": "^9.0",
+        "league/csv": "^9.1",
         "league/glide": "^3.0",
         "maennchen/zipstream-php": "^3.1",
         "michelf/php-smartypants": "^1.8.1",
@@ -38,7 +38,7 @@
         "symfony/yaml": "^7.0.3 || ^8.0",
         "ueberdosis/tiptap-php": "^2.0",
         "voku/portable-ascii": "^2.0.2",
-        "web-auth/webauthn-lib": "~5.2.0",
+        "web-auth/webauthn-lib": "^5.3",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {

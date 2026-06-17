@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Zmiany w kopii roboczej zostaną zastosowane do wpisu i zostanie on natychmiast opublikowany.',
     'publish_actions_schedule' => 'Zmiany w kopii roboczej zostaną zastosowane do wpisu, który będzie wyświetlany jako opublikowany od wybranej daty.',
     'publish_actions_unpublish' => 'Bieżąca rewizja zostanie cofnięta z publikacji.',
+    'relationship_item_unavailable' => 'Ten element jest niedostępny. Mógł zostać usunięty lub nie masz uprawnień, aby go wyświetlić.',
     'reset_password_notification_body' => 'Otrzymujesz ten e-mail, ponieważ otrzymaliśmy prośbę o zresetowanie hasła dla Twojego konta.',
     'reset_password_notification_no_action' => 'Jeśli nie żądałeś zresetowania hasła, nie są wymagane żadne dalsze działania.',
     'reset_password_notification_subject' => 'Powiadomienie o Zresetowaniu Hasła',

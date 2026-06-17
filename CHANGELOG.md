@@ -1,5 +1,110 @@
 # Release Notes
 
+## 6.21.0 (2026-06-10)
+
+### What's new
+- Add default sorting support for taxonomies [#14772](https://github.com/statamic/cms/issues/14772) by @finnjsmith
+- Add default initial option configuration option for Link fieldtype [#14698](https://github.com/statamic/cms/issues/14698) by @martyf
+- Add `exclude` param to stache commands [#14788](https://github.com/statamic/cms/issues/14788) by @edalzell
+
+### What's fixed
+- Fix Modify::__toString() throwing TypeError for non-string scalar values [#14674](https://github.com/statamic/cms/issues/14674) by @VerburgtJimmy
+- Speed up Stache warming for large structured collections [#14781](https://github.com/statamic/cms/issues/14781) by @o1y
+- Implement permissions cache on eloquent users [#14661](https://github.com/statamic/cms/issues/14661) by @ryanmitchell
+- Adjust listing skeleton to match configured features [#14796](https://github.com/statamic/cms/issues/14796) by @daun
+- Fix docs for `Listing` component [#14798](https://github.com/statamic/cms/issues/14798) by @duncanmcclean
+- Don't reserve space when a field's display label is hidden [#14803](https://github.com/statamic/cms/issues/14803) by @jasonvarga
+- Bump web-auth/webauthn-lib to ^5.3.0 [#14727](https://github.com/statamic/cms/issues/14727) by @sstraakenbroek
+- Prevent overlapping git commit jobs [#14672](https://github.com/statamic/cms/issues/14672) by @aerni
+- French translations [#14789](https://github.com/statamic/cms/issues/14789) by @ebeauchamps
+
+
+
+## 6.20.3 (2026-06-08)
+
+### What's fixed
+- Trigger the grid table mode at lower viewports because it's more useful [#14792](https://github.com/statamic/cms/issues/14792) by @jaygeorge
+- Fix permission for Live Preview [#14791](https://github.com/statamic/cms/issues/14791) by @jasonvarga
+
+
+
+## 6.20.2 (2026-06-05)
+
+### What's fixed
+- Fix GraphiQL [#14770](https://github.com/statamic/cms/issues/14770) by @joshuablum
+- Fix TypeError when elevated_session_duration is a string [#14771](https://github.com/statamic/cms/issues/14771) by @duncanmcclean
+- Fix asset selection in Markdown fieldtype [#14715](https://github.com/statamic/cms/issues/14715) by @duncanmcclean
+- Fix configure navs permission not working properly [#14775](https://github.com/statamic/cms/issues/14775) by @joshuablum
+- Resolve Entry::descendants() N+1 query [#14773](https://github.com/statamic/cms/issues/14773) by @SteveEdson
+- Fix asset editor prev/next buttons and "Edit Image" button in Bard [#14728](https://github.com/statamic/cms/issues/14728) by @joshuablum
+- Apply regenerate handle pattern for replicator sections [#14745](https://github.com/statamic/cms/issues/14745) by @jaygeorge
+- Fix static cache invalidation stripping trailing slashes [#14713](https://github.com/statamic/cms/issues/14713) by @duncanmcclean
+- Add impersonation permission description [#14776](https://github.com/statamic/cms/issues/14776) by @jasonvarga
+- Fix field filters returning all results when filtering by 0 [#14747](https://github.com/statamic/cms/issues/14747) by @joshuablum
+- Render PDF viewer pages lazily [#14764](https://github.com/statamic/cms/issues/14764) by @daun
+- Add support for Collection in last modifier [#14778](https://github.com/statamic/cms/issues/14778) by @JonKaric
+- Fix share_errors breaking nocache regions on error responses [#14780](https://github.com/statamic/cms/issues/14780) by @joshuablum
+- Fix date picker inconsistencies [#14732](https://github.com/statamic/cms/issues/14732) by @jaygeorge
+- Avoid version inertia prop [#14783](https://github.com/statamic/cms/issues/14783) by @jasonvarga
+
+
+
+## 6.20.1 (2026-06-02)
+
+### What's fixed
+- Avoid crop aspect ratios select being truncated [#14712](https://github.com/statamic/cms/issues/14712) by @duncanmcclean
+- Stop excessive logging of `ElevatedSessionAuthorizationException` [#14725](https://github.com/statamic/cms/issues/14725) by @joshuablum
+- Remove `pt-4` as the default padding for a Group fieldtype [#14708](https://github.com/statamic/cms/issues/14708) by @martyf
+- Fix `Cached Pages` count for multi-site setups [#14726](https://github.com/statamic/cms/issues/14726) by @joshuablum
+- Hash URL in static caching lock key [#14716](https://github.com/statamic/cms/issues/14716) by @duncanmcclean
+- Fix entry revision localizations to filter unauthorized sites [#14714](https://github.com/statamic/cms/issues/14714) by @duncanmcclean
+- Date scrollbar fix [#14730](https://github.com/statamic/cms/issues/14730) by @jaygeorge
+- Remove custom scrollbar from date fields [#14731](https://github.com/statamic/cms/issues/14731) by @jaygeorge
+- Fix form box-shadows being clipped by expanding/collapsing sections [#14736](https://github.com/statamic/cms/issues/14736) by @jaygeorge
+- Improve modal text formatting and dark mode background [#14740](https://github.com/statamic/cms/issues/14740) by @jaygeorge
+- Handle replicator handle overflow [#14746](https://github.com/statamic/cms/issues/14746) by @jaygeorge
+- More elegantly mask horizontal overflow for sets [#14753](https://github.com/statamic/cms/issues/14753) by @jaygeorge
+- Improve collapsible section trigger [#14758](https://github.com/statamic/cms/issues/14758) by @jaygeorge
+- Fix asset fieldtype icon [#14720](https://github.com/statamic/cms/issues/14720) by @jasonvarga
+- Escape formula characters in form submission CSV exports [#14760](https://github.com/statamic/cms/issues/14760) by @jasonvarga
+- Harden remote URL validation [#14761](https://github.com/statamic/cms/issues/14761) by @jasonvarga
+- Scope shared static cache errors to sites [#14763](https://github.com/statamic/cms/issues/14763) by @joshuablum
+- Fix `share_errors` breaking nocache regions on successful responses [#14729](https://github.com/statamic/cms/issues/14729) by @joshuablum
+- Truncate full measure static cache files before writing [#14755](https://github.com/statamic/cms/issues/14755) by @joshuablum
+- Fix `current` augmentation handling in users fieldtype [#14724](https://github.com/statamic/cms/issues/14724) by @joshuablum
+- Fix clipboard pasting of validation rules [#14754](https://github.com/statamic/cms/issues/14754) by @joshuablum
+- Fix Bard/Link Blink cache type collision [#14739](https://github.com/statamic/cms/issues/14739) by @simonerd
+- French translations [#14738](https://github.com/statamic/cms/issues/14738) by @ebeauchamps
+- Bump zizmorcore/zizmor-action from 0.5.3 to 0.5.6 in the github-actions group [#14722](https://github.com/statamic/cms/issues/14722) by @dependabot
+- Bump qs from 6.15.0 to 6.15.2 [#14721](https://github.com/statamic/cms/issues/14721) by @dependabot
+- Bump js-cookie from 3.0.5 to 3.0.7 [#14705](https://github.com/statamic/cms/issues/14705) by @dependabot
+- Bump league/csv [#14768](https://github.com/statamic/cms/issues/14768) by @jasonvarga
+
+
+
+## 6.20.0 (2026-05-22)
+
+### What's new
+- Date picker today shortcut [#14651](https://github.com/statamic/cms/issues/14651) by @jaygeorge
+- When enabling Pro, prompts for license key [#14686](https://github.com/statamic/cms/issues/14686) by @jackmcdade
+- Include `is_pdf` in augmented asset data [#14699](https://github.com/statamic/cms/issues/14699) by @jacksleight
+
+### What's fixed
+- Make active nav anchor position more accurate [#14675](https://github.com/statamic/cms/issues/14675) by @jaygeorge
+- Don't show unsaved changes warning when switching tabs [#14678](https://github.com/statamic/cms/issues/14678) by @jasonvarga
+- Better collapsible sections [#14679](https://github.com/statamic/cms/issues/14679) by @jaygeorge
+- Swap image dimensions when EXIF orientation indicates a 90° rotation [#14685](https://github.com/statamic/cms/issues/14685) by @jasonvarga
+- Hook up "Add Row" config for List fields [#14689](https://github.com/statamic/cms/issues/14689) by @jackmcdade
+- Harden `DataCollection` sort value resolution [#14693](https://github.com/statamic/cms/issues/14693) by @duncanmcclean
+- Fix token path traversal [#14700](https://github.com/statamic/cms/issues/14700) by @duncanmcclean
+- Authorize relationship fieldtype data [#14718](https://github.com/statamic/cms/issues/14718) by @jasonvarga
+- Relationship UI adjustments [#14719](https://github.com/statamic/cms/issues/14719) by @jasonvarga
+- Update Italian translations [#14683](https://github.com/statamic/cms/issues/14683) by @sbellesis
+- French translations [#14680](https://github.com/statamic/cms/issues/14680) by @ebeauchamps
+- Bump shivammathur/setup-php from 2.37.0 to 2.37.1 in the github-actions group [#14682](https://github.com/statamic/cms/issues/14682) by @dependabot
+
+
+
 ## 6.19.0 (2026-05-13)
 
 ### What's new

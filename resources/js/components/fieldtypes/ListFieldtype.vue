@@ -114,7 +114,7 @@ export default {
 
     computed: {
         addButton() {
-            return __(this.config.add_button || 'Add Item');
+            return __(this.config.add_row) || __(this.config.add_button) || __('Add Item');
         },
     },
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Illuminate\Support\Str;
 use Statamic\Facades\Cascade;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
 
@@ -97,7 +98,10 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         Request::macro('fakeStaticCacheStatus', function (int $status) {
-            $url = '/__shared-errors/'.$status;
+            // Namespace the shared error by the current site so that multisite
+            // installs serve a correctly localized error page per site, rather
+            // than whichever site happened to render the error first.
+            $url = '/__shared-errors/'.Site::current()->handle().'/'.$status;
             $this->pathInfo = $url;
             $this->requestUri = $url;
             app(Session::class)->setUrl($url);

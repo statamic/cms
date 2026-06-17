@@ -187,6 +187,7 @@ return [
     'publish_actions_publish' => 'Spremembe delovne kopije bodo veljale za vnos in bo takoj objavljena.',
     'publish_actions_schedule' => 'Spremembe delovne kopije bodo veljale za vnos in bo objavljena na izbrani datum.',
     'publish_actions_unpublish' => 'Trenutna revizija ne bo objavljena.',
+    'relationship_item_unavailable' => 'Ta element ni na voljo. Morda je bil izbrisan ali pa nimate dovoljenja za ogled.',
     'reset_password_notification_body' => 'To e-poštno sporočilo ste prejeli, ker smo za vaš račun prejeli zahtevo za ponastavitev gesla.',
     'reset_password_notification_no_action' => 'Če niste zahtevali ponastavitve gesla, nadaljnja dejanja niso potrebna.',
     'reset_password_notification_subject' => 'Ponastavi obvestilo o geslu',

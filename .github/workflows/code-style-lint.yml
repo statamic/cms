@@ -3,13 +3,23 @@ name: Lint code style issues
 on:
   pull_request:
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint-code-styling:
+  lint-code-styling: # zizmor: ignore[anonymous-definition]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Get changed files
         id: changed-files
@@ -20,7 +30,7 @@ jobs:
 
       - name: Check PHP code style issues
         if: steps.changed-files.outputs.any_modified == 'true'
-        uses: aglipanci/laravel-pint-action@36de00d5f5a8a4e12d443e01671daa12a18f4c79 # v2.6
+        uses: aglipanci/laravel-pint-action@36de00d5f5a8a4e12d443e01671daa12a18f4c79 # 2.6
         with:
           testMode: true
           verboseMode: true
