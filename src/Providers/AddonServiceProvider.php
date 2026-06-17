@@ -882,7 +882,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $autoloadable;
     }
 
-    private function shouldBootRootItems()
+    protected function shouldBootRootItems()
     {
         $addon = $this->getAddon();
 
