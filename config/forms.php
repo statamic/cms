@@ -37,11 +37,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Draft Submissions
+    | Incomplete Submissions
     |--------------------------------------------------------------------------
     |
-    | Partial (or draft) submissions are automatically deleted after a set number
-    | of days. Set this to null to prevent the automatic deletion of drafts.
+    | Incomplete (partial) submissions are automatically deleted after a set
+    | number of days. Set this to null to prevent their automatic deletion.
     |
     */
 

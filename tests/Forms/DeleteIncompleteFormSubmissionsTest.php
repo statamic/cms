@@ -14,42 +14,42 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
-    public function it_deletes_drafts_older_than_the_configured_threshold()
+    public function it_deletes_incomplete_submissions_older_than_the_configured_threshold()
     {
         config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $oldDraft = tap($form->makeSubmission()->set('draft', true))->save();
+        $oldIncomplete = tap($form->makeSubmission()->set('incomplete', true))->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
-        $oldSubmission = tap($form->makeSubmission())->save();
+        $oldComplete = tap($form->makeSubmission())->save();
 
         Carbon::setTestNow('2025-06-14 12:00:00');
-        $recentDraft = tap($form->makeSubmission()->set('draft', true))->save();
+        $recentIncomplete = tap($form->makeSubmission()->set('incomplete', true))->save();
 
         Carbon::setTestNow('2025-06-15 12:00:00');
 
         (new DeleteIncompleteFormSubmissions)->handle();
 
-        $this->assertNull($form->submission($oldDraft->id()));
-        $this->assertNotNull($form->submission($recentDraft->id()));
-        $this->assertNotNull($form->submission($oldSubmission->id()));
+        $this->assertNull($form->submission($oldIncomplete->id()));
+        $this->assertNotNull($form->submission($recentIncomplete->id()));
+        $this->assertNotNull($form->submission($oldComplete->id()));
     }
 
     #[Test]
-    public function it_only_deletes_spam_submissions()
+    public function it_only_deletes_incomplete_submissions_never_complete_or_spam()
     {
         config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $draft = tap($form->makeSubmission()->set('draft', true))->save();
+        $incomplete = tap($form->makeSubmission()->set('incomplete', true))->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
-        $submitted = tap($form->makeSubmission())->save();
+        $complete = tap($form->makeSubmission())->save();
 
         Carbon::setTestNow('2025-06-03 12:00:00');
         $spam = tap($form->makeSubmission()->set('spam', true))->save();
@@ -58,8 +58,8 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
 
         (new DeleteIncompleteFormSubmissions)->handle();
 
-        $this->assertNull($form->submission($draft->id()));
-        $this->assertNotNull($form->submission($submitted->id()));
+        $this->assertNull($form->submission($incomplete->id()));
+        $this->assertNotNull($form->submission($complete->id()));
         $this->assertNotNull($form->submission($spam->id()));
     }
 
@@ -71,12 +71,12 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
         $form = tap(Form::make('contact'))->save();
 
         Carbon::setTestNow('2025-06-01 12:00:00');
-        $draft = tap($form->makeSubmission()->set('draft', true))->save();
+        $incomplete = tap($form->makeSubmission()->set('incomplete', true))->save();
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
         (new DeleteIncompleteFormSubmissions)->handle();
 
-        $this->assertNotNull($form->submission($draft->id()));
+        $this->assertNotNull($form->submission($incomplete->id()));
     }
 }
