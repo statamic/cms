@@ -6,6 +6,7 @@ import { dateFormatter } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from '@/pages/forms/Layout.vue';
+import SubmissionStatusIndicator from '@/components/forms/SubmissionStatusIndicator.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -13,6 +14,7 @@ const props = defineProps([
     'form',
     'id',
     'formTitle',
+    'status',
     'date',
     'blueprint',
     'values',
@@ -30,13 +32,17 @@ provide('isFormSubmission', true);
         <Head :title="[title, formTitle, __('Forms')]" />
 
         <PublishForm
-            icon="forms"
             :title="formattedDate"
             :blueprint="blueprint"
             :initial-values="values"
             :initial-meta="meta"
             :submit-url="null"
             read-only
-        />
+        >
+            <template #title>
+                <SubmissionStatusIndicator :status="status" />
+                {{ formattedDate }}
+            </template>
+        </PublishForm>
     </div>
 </template>
