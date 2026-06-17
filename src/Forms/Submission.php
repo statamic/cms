@@ -125,12 +125,6 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return (bool) $this->get('spam');
     }
 
-    // todo: refactor or rename
-    public function isWithheld(): bool
-    {
-        return $this->isIncomplete() || $this->isSpam();
-    }
-
     public function status(): string
     {
         return match (true) {
@@ -180,7 +174,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         // Incomplete and spam submissions are stored but skip the Creating/Created
         // events so listeners never receive an incomplete submission.
-        $withheld = $this->isWithheld();
+        $isWithheld = $this->isIncomplete() || $this->isSpam();
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -189,7 +183,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
-            if ($isNew && ! $withheld && SubmissionCreating::dispatch($this) === false) {
+            if ($isNew && ! $isWithheld && SubmissionCreating::dispatch($this) === false) {
                 return false;
             }
 
@@ -205,7 +199,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($isNew && ! $withheld) {
+            if ($isNew && ! $isWithheld) {
                 SubmissionCreated::dispatch($this);
             }
 

@@ -251,19 +251,16 @@ class SubmissionTest extends TestCase
         $submitted = $form->makeSubmission();
         $this->assertFalse($submitted->isIncomplete());
         $this->assertFalse($submitted->isSpam());
-        $this->assertFalse($submitted->isWithheld());
         $this->assertEquals('complete', $submitted->status());
 
         $incomplete = $form->makeSubmission()->set('incomplete', true);
         $this->assertTrue($incomplete->isIncomplete());
         $this->assertFalse($incomplete->isSpam());
-        $this->assertTrue($incomplete->isWithheld());
         $this->assertEquals('incomplete', $incomplete->status());
 
         $spam = $form->makeSubmission()->set('spam', true);
         $this->assertTrue($spam->isSpam());
         $this->assertFalse($spam->isIncomplete());
-        $this->assertTrue($spam->isWithheld());
         $this->assertEquals('spam', $spam->status());
     }
 
@@ -344,7 +341,8 @@ class SubmissionTest extends TestCase
 
         $submission->complete(Site::default());
 
-        $this->assertFalse($submission->isWithheld());
+        $this->assertFalse($submission->isIncomplete());
+        $this->assertFalse($submission->isSpam());
 
         // Submission already exists, so save() won't dispatch the Created event, complete() will.
         Event::assertDispatched(SubmissionCreated::class, 1);
