@@ -9,6 +9,7 @@
         :sort-direction="sortDirection"
         :preferences-prefix="preferencesPrefix"
         :filters="filters"
+        push-query
     >
         <template #cell-datestamp="{ row: submission, value }">
             <Link :href="submission.url">
