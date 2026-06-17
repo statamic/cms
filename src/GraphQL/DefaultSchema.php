@@ -61,6 +61,7 @@ class DefaultSchema implements ConfigConvertible
     private function getQueries()
     {
         $queries = collect([PingQuery::class]);
+        $allowed = [];
 
         collect([
             'collections' => [CollectionsQuery::class, CollectionQuery::class, EntriesQuery::class, EntryQuery::class],
@@ -71,13 +72,18 @@ class DefaultSchema implements ConfigConvertible
             'forms' => [FormsQuery::class, FormQuery::class],
             'sites' => [SitesQuery::class],
             'users' => [UsersQuery::class, UserQuery::class],
-        ])->each(function ($qs, $resource) use (&$queries) {
-            $queries = $queries->merge(ResourceAuthorizer::isAllowed('graphql', $resource) ? $qs : []);
+        ])->each(function ($qs, $resource) use (&$queries, &$allowed) {
+            $allowed[$resource] = ResourceAuthorizer::isAllowed('graphql', $resource);
+            $queries = $queries->merge($allowed[$resource] ? $qs : []);
         });
 
-        $queries = $queries
-            ->merge($this->getSpecificEntriesQueries())
-            ->merge($this->getSpecificTermsQueries());
+        if ($allowed['collections'] ?? false) {
+            $queries = $queries->merge($this->getSpecificEntriesQueries());
+        }
+
+        if ($allowed['taxonomies'] ?? false) {
+            $queries = $queries->merge($this->getSpecificTermsQueries());
+        }
 
         return $queries
             ->merge(config('statamic.graphql.queries', []))
@@ -92,10 +98,6 @@ class DefaultSchema implements ConfigConvertible
         // The schema is rebuilt when an actual request hits the controller,
         // where the Stache is fully booted, so wildcards still expand correctly there.
         if (! app()->isBooted()) {
-            return [];
-        }
-
-        if (! ResourceAuthorizer::isAllowed('graphql', 'collections')) {
             return [];
         }
 
@@ -125,10 +127,6 @@ class DefaultSchema implements ConfigConvertible
     private function getSpecificTermsQueries(): array
     {
         if (! app()->isBooted()) {
-            return [];
-        }
-
-        if (! ResourceAuthorizer::isAllowed('graphql', 'taxonomies')) {
             return [];
         }
 
