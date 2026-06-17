@@ -246,8 +246,6 @@ class SubmissionTest extends TestCase
     #[Test]
     public function it_determines_its_status()
     {
-        $this->markTestSkipped();
-
         $form = tap(Form::make('contact_us'))->save();
 
         $submitted = $form->makeSubmission();
@@ -270,8 +268,6 @@ class SubmissionTest extends TestCase
     #[DataProvider('withheldStatusProvider')]
     public function it_does_not_dispatch_creation_events_when_saving_a_withheld_submission(string $status)
     {
-        $this->markTestSkipped();
-
         Event::fake();
 
         $form = tap(Form::make('contact_us'))->save();
@@ -299,8 +295,6 @@ class SubmissionTest extends TestCase
     #[Test]
     public function created_event_is_not_automatically_dispatched_when_removing_the_incomplete_key()
     {
-        $this->markTestSkipped();
-
         $form = tap(Form::make('contact_us'))->save();
 
         $submission = $form->makeSubmission()->set('incomplete', true);
@@ -322,8 +316,6 @@ class SubmissionTest extends TestCase
     #[Test]
     public function completing_a_new_submission_dispatches_created_event_once()
     {
-        $this->markTestSkipped();
-
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
 
@@ -341,8 +333,6 @@ class SubmissionTest extends TestCase
     #[Test]
     public function completing_an_incomplete_or_spam_submission_removes_the_status_key_and_dispatches_events()
     {
-        $this->markTestSkipped();
-
         $form = tap(Form::make('contact_us'))->save();
         $submission = tap($form->makeSubmission()->set('incomplete', true)->set('spam', true))->save();
 
@@ -363,8 +353,6 @@ class SubmissionTest extends TestCase
     #[Test]
     public function completing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
     {
-        $this->markTestSkipped();
-
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
 
