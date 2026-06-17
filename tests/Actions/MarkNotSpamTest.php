@@ -16,6 +16,13 @@ class MarkNotSpamTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+    }
+
     #[Test]
     public function it_is_only_visible_to_spam_submissions()
     {
