@@ -3,11 +3,14 @@
 namespace Tests\Feature\Assets;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
+use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
+use Statamic\Imaging\Cropper;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -181,6 +184,32 @@ class CropAssetTest extends TestCase
             ->actingAs($this->userWithReuploadPermission())
             ->crop(['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100, 'format' => 'webp', 'replace' => true])
             ->assertStatus(422);
+    }
+
+    #[Test]
+    public function it_can_crop_an_avif_image()
+    {
+        // The crop is mocked because encoding AVIF requires GD/Imagick to be
+        // built with libavif, which isn't guaranteed. This asserts the request
+        // is accepted and saved as a copy rather than rejected for its format.
+        $this->mock(Cropper::class)->shouldReceive('crop')->once()->andReturn('cropped');
+
+        // Prevent the post-upload thumbnail generation, which would try to read
+        // the mocked (non-image) output and has the same AVIF codec dependency.
+        Event::fake([AssetUploaded::class]);
+
+        Storage::disk('test')->put('path/to/photo.avif', 'source');
+        $this->container->makeAsset('path/to/photo.avif')->save();
+
+        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288, config('app.timezone')));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->postJson($this->cropRoute('path/to/photo.avif'), ['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100])
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'path/to/photo-1697379288.avif']]);
+
+        $this->assertEquals('cropped', Storage::disk('test')->get('path/to/photo-1697379288.avif'));
     }
 
     #[Test]

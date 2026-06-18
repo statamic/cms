@@ -166,7 +166,7 @@ class AssetsController extends CpController
             ? $this->authorize('reupload', $asset)
             : $this->authorize('store', [AssetContract::class, $asset->container()]);
 
-        $contents = (new Cropper)->crop(
+        $contents = app(Cropper::class)->crop(
             $asset->contents(),
             $extension,
             $request->integer('x'),
