@@ -91,8 +91,10 @@ watch(format, (value) => {
 });
 
 watch(quality, (value) => {
+    // Lowering a PNG's quality implies the user wants compression, so switch to
+    // WebP — it's lossy but, unlike JPEG, keeps the transparency.
     if (sourceFormat.value === 'png' && format.value === 'png' && value < 100) {
-        format.value = 'jpg';
+        format.value = 'webp';
     }
 });
 
