@@ -130,6 +130,15 @@ class CropAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_denies_cropping_an_asset_the_user_cannot_view()
+    {
+        $this
+            ->actingAs($this->userWithoutViewPermission())
+            ->crop(['x' => 0, 'y' => 0, 'width' => 80, 'height' => 40])
+            ->assertStatus(403);
+    }
+
+    #[Test]
     public function it_denies_replacing_without_reupload_permission()
     {
         $this
@@ -342,14 +351,21 @@ class CropAssetTest extends TestCase
 
     private function userWithPermission()
     {
-        $this->setTestRoles(['test' => ['access cp', 'upload test_container assets']]);
+        $this->setTestRoles(['test' => ['access cp', 'view test_container assets', 'upload test_container assets']]);
 
         return tap(Facades\User::make()->assignRole('test'))->save();
     }
 
     private function userWithReuploadPermission()
     {
-        $this->setTestRoles(['test' => ['access cp', 'upload test_container assets', 'edit test_container assets']]);
+        $this->setTestRoles(['test' => ['access cp', 'view test_container assets', 'upload test_container assets', 'edit test_container assets']]);
+
+        return tap(Facades\User::make()->assignRole('test'))->save();
+    }
+
+    private function userWithoutViewPermission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'upload test_container assets']]);
 
         return tap(Facades\User::make()->assignRole('test'))->save();
     }

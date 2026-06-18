@@ -142,6 +142,9 @@ class AssetsController extends CpController
         $asset = Asset::find(base64_decode($encodedAsset));
 
         abort_if(! $asset, 404);
+
+        $this->authorize('view', $asset);
+
         abort_unless($asset->isImage(), 422, __('The asset is not an image.'));
 
         $request->validate([
