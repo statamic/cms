@@ -24,6 +24,8 @@ use Statamic\Imaging\Cropper;
 use Statamic\Rules\AllowedFile;
 use Statamic\Rules\UploadableAssetPath;
 
+use function Statamic\trans as __;
+
 class AssetsController extends CpController
 {
     use RedirectsToFirstAssetContainer;
