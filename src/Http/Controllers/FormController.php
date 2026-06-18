@@ -2,82 +2,90 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Events\FormSubmitted;
 use Statamic\Exceptions\SilentFormFailureException;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Form;
-use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
-use Statamic\Http\Requests\FrontendFormRequest;
+use Statamic\Forms\SubmitForm;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 use function Statamic\trans as __;
 
 class FormController extends Controller
 {
-    /**
-     * Handle a form submission request.
-     *
-     * @return mixed
-     */
-    public function submit(FrontendFormRequest $request, $form)
+    use Hookable;
+
+    public function submit(Request $request, $form, SubmitForm $action)
     {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
-        $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = $request->all();
 
-        $values = array_merge($values, $assets = $request->assets());
-        $params = collect($request->all())->filter(function ($value, $key) {
-            return Str::startsWith($key, '_');
-        })->all();
+        $action->form($form);
 
-        $fields = $fields->addValues($values);
-
-        $submission = $form->makeSubmission();
+        $params = $this->params($request);
 
         try {
-            throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
+            // Precognition is reimplemented here now that FrontendFormRequest is gone.
+            // We validate (scoped to the requested fields) through the action and halt
+            // without persisting, mirroring Laravel's FormRequest precognition.
+            if ($request->isPrecognitive()) {
+                $action->validate($request->all(), $request->allFiles(), only: $this->precognitiveFields($request));
 
-            $uploadedAssets = $submission->uploadFiles($assets);
-
-            $values = array_merge($values, $uploadedAssets);
-
-            $submission->data(
-                $fields->addValues($values)->process()->values()
-            );
-
-            // If any event listeners return false, we'll do a silent failure.
-            // If they want to add validation errors, they can throw an exception.
-            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
-        } catch (ValidationException $e) {
-            $this->removeUploadedAssets($uploadedAssets);
-
-            return $this->formFailure($params, $e->errors(), $form->handle());
-        } catch (SilentFormFailureException $e) {
-            if (isset($uploadedAssets)) {
-                $this->removeUploadedAssets($uploadedAssets);
+                return response()->noContent(headers: ['Precognition-Success' => 'true']);
             }
 
-            return $this->formSuccess($params, $submission, true);
+            // Forms Pro uses this hook to create incomplete submissions and return
+            // non-standard responses (for multipage forms).
+            $result = $this->runHooks('submitting', [
+                'request' => $request,
+                'form' => $form,
+                'action' => $action,
+            ]);
+
+            if ($result instanceof SymfonyResponse) {
+                return $result;
+            }
+
+            $submission = $result instanceof Submission
+                ? $result
+                : $action->submit($request->all(), $request->allFiles());
+
+            return $this->formSuccess($params, $submission);
+        } catch (SilentFormFailureException $e) {
+            return $this->formSuccess($params, $e->submission(), silentFailure: true);
+        } catch (ValidationException $e) {
+            return $this->formFailure($params, $e->errors(), $form->handle());
         }
-
-        $submission->complete($site);
-
-        return $this->formSuccess($params, $submission);
     }
 
-    private function validateContentType($request, $form)
+    private function params(Request $request): array
+    {
+        return collect($request->all())
+            ->filter(fn ($value, string $key) => Str::startsWith($key, '_'))
+            ->all();
+    }
+
+    private function precognitiveFields(Request $request): ?array
+    {
+        if (! $request->headers->has('Precognition-Validate-Only')) {
+            return null;
+        }
+
+        return explode(',', $request->header('Precognition-Validate-Only'));
+    }
+
+    private function validateContentType(Request $request, $form): void
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->allFiles()) {
             throw new FileContentTypeRequiredException;
         }
     }
@@ -163,21 +171,5 @@ class FormController extends Controller
         }
 
         return $redirect;
-    }
-
-    /**
-     * Remove any uploaded assets
-     *
-     * Triggered by a validation exception or silent failure
-     */
-    private function removeUploadedAssets(array $assets)
-    {
-        collect($assets)
-            ->flatten()
-            ->each(function ($id) {
-                if ($asset = Asset::find($id)) {
-                    $asset->delete();
-                }
-            });
     }
 }
