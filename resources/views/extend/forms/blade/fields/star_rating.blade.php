@@ -103,11 +103,11 @@
             border-image: conic-gradient(at calc(50% + var(--_fill-offset)), transparent 50%, var(--_fill) 0) fill 0 // var(--s) 500px;
         }
 
-        .star-rating-input.star-rating-input--unrated::-webkit-slider-thumb {
+        .star-rating-input[data-unrated]::-webkit-slider-thumb {
             border-image: conic-gradient(transparent 0) fill 0 // var(--s) 500px;
         }
 
-        .star-rating-input.star-rating-input--unrated::-moz-range-thumb {
+        .star-rating-input[data-unrated]::-moz-range-thumb {
             border-image: conic-gradient(transparent 0) fill 0 // var(--s) 500px;
         }
 
@@ -139,26 +139,7 @@
     --}}
     <script>
         (function () {
-            // Apply --unrated on load for fields marked data-unrated in the template.
-            function initUnrated() {
-                document.querySelectorAll('[data-star-rating][data-unrated]').forEach(function (input) {
-                    input.classList.add('star-rating-input--unrated');
-                });
-            }
-
-            // @once may run before later fields in the form are parsed.
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initUnrated);
-            } else {
-                initUnrated();
-            }
-
-            function isUnrated(input) {
-                return input.classList.contains('star-rating-input--unrated') || input.hasAttribute('data-unrated');
-            }
-
             function clearUnrated(input) {
-                input.classList.remove('star-rating-input--unrated');
                 input.removeAttribute('data-unrated');
             }
 
@@ -170,36 +151,24 @@
             });
 
             document.addEventListener('keydown', function (e) {
-                if (! e.target.matches('[data-star-rating]')) {
-                    return;
-                }
+                if (! e.target.matches('[data-star-rating][data-unrated]')) return;
 
                 var navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+                if (! navigationKeys.includes(e.key)) return;
 
-                if (! navigationKeys.includes(e.key)) {
-                    return;
-                }
-
-                if (isUnrated(e.target)) {
-                    if (e.key === 'End') {
-                        // Reveal fill but let the browser jump to max.
-                        clearUnrated(e.target);
-
-                        return;
-                    }
-
-                    // Thumb is already at min — stop the browser jumping to min + step.
-                    e.preventDefault();
+                if (e.key === 'End') {
+                    // Reveal fill but let the browser jump to max.
                     clearUnrated(e.target);
-                    e.target.dispatchEvent(new Event('input', { bubbles: true }));
-
                     return;
                 }
 
+                // Thumb is already at min — stop the browser jumping to min + step.
+                e.preventDefault();
                 clearUnrated(e.target);
+                e.target.dispatchEvent(new Event('input', { bubbles: true }));
             });
 
-            // Drag or keyboard after the value actually changes.
+            // Drag or wheel after the value actually changes.
             document.addEventListener('input', function (e) {
                 if (e.target.matches('[data-star-rating]')) {
                     clearUnrated(e.target);
