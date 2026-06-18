@@ -188,8 +188,7 @@ class AssetsController extends CpController
             if ($replace) {
                 $asset->reupload(new UploadedReplacementFile($file));
             } else {
-                $folder = $asset->folder() === '.' ? '/' : $asset->folder();
-                $path = ltrim($folder.'/'.$basename, '/');
+                $path = ltrim($asset->folder().'/'.$basename, '/');
                 $asset = $asset->container()->makeAsset($path)->upload($file);
             }
         } finally {

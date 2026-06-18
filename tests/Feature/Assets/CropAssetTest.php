@@ -56,6 +56,23 @@ class CropAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_saves_a_copy_of_a_root_folder_asset()
+    {
+        Storage::disk('test')->put('root.jpg', $this->makeImage(200, 100));
+        $this->container->makeAsset('root.jpg')->save();
+
+        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288, config('app.timezone')));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->postJson($this->cropRoute('root.jpg'), ['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100])
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'root-1697379288.jpg']]);
+
+        Storage::disk('test')->assertExists('root-1697379288.jpg');
+    }
+
+    #[Test]
     public function it_crops_and_replaces_the_original()
     {
         $this
