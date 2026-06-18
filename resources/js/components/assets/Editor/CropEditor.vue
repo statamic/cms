@@ -49,7 +49,7 @@ function normalizeFormat(format) {
 const sourceFormat = computed(() => normalizeFormat(props.asset.extension));
 
 // We only offer quality/conversion controls for these source types.
-const isConvertible = computed(() => ['jpg', 'png', 'webp'].includes(sourceFormat.value));
+const isConvertible = computed(() => ['jpg', 'png', 'webp', 'avif'].includes(sourceFormat.value));
 
 // PNG is lossless so its quality starts maxed out; lowering it implies the
 // user wants to convert to a lossy format.
@@ -61,27 +61,25 @@ const background = ref('white');
 
 const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
 
+const formatLabels = { jpg: 'JPEG', png: 'PNG', webp: 'WebP', avif: 'AVIF' };
+
 const formatOptions = computed(() => {
-    const options = [
-        { value: 'jpg', label: 'JPEG' },
-        { value: 'webp', label: 'WebP' },
-    ];
-
-    // Only PNG sources can be kept (or reverted) as a lossless PNG.
-    if (sourceFormat.value === 'png') options.unshift({ value: 'png', label: 'PNG' });
-
-    return options;
+    // Lossy conversion targets, plus the source format so it can be kept as-is.
+    return [...new Set([sourceFormat.value, 'jpg', 'webp'])].map((value) => ({
+        value,
+        label: formatLabels[value] ?? value.toUpperCase(),
+    }));
 });
 
 // A quality setting only applies to lossy output formats.
-const outputUsesQuality = computed(() => ['jpg', 'webp'].includes(format.value));
+const outputUsesQuality = computed(() => ['jpg', 'webp', 'avif'].includes(format.value));
 
 const showQuality = computed(() => isConvertible.value);
 
 const showFormatSelector = computed(() => isConvertible.value);
 
 // JPEG has no alpha channel, so a potentially-transparent source needs a background colour.
-const showBackground = computed(() => format.value === 'jpg' && ['png', 'webp'].includes(sourceFormat.value));
+const showBackground = computed(() => format.value === 'jpg' && ['png', 'webp', 'avif'].includes(sourceFormat.value));
 
 // Changing the format writes a different extension, which can't overwrite the original.
 const canReplaceOutput = computed(() => props.canReplace && format.value === sourceFormat.value);

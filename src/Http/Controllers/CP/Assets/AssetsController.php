@@ -148,7 +148,7 @@ class AssetsController extends CpController
             'width' => 'required|integer|min:1',
             'height' => 'required|integer|min:1',
             'quality' => 'nullable|integer|min:1|max:100',
-            'format' => 'nullable|in:jpg,jpeg,png,webp,gif',
+            'format' => 'nullable|in:jpg,jpeg,png,webp,gif,avif',
             'background' => 'nullable|in:black,white',
             'replace' => 'boolean',
         ]);
