@@ -2,7 +2,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
-import { Button, Heading, Icon, Modal, Select, Slider, Stack } from '@ui';
+import { Button, Heading, Icon, Modal, Radio, RadioGroup, Select, Slider, Stack } from '@ui';
 import { keys, toast } from '@api';
 import wait from '@/util/wait';
 import axios from 'axios';
@@ -39,12 +39,66 @@ const uploading = ref(false);
 const pendingCrop = ref(null);
 const cropDimensions = ref(null);
 const defaultQuality = Statamic.$config.get('cropQuality') || 90;
-const quality = ref(defaultQuality);
+
+function normalizeFormat(format) {
+    format = (format || '').toLowerCase();
+    return format === 'jpeg' ? 'jpg' : format;
+}
+
+// The source image's format, normalized (e.g. jpeg -> jpg).
+const sourceFormat = computed(() => normalizeFormat(props.asset.extension));
+
+// We only offer quality/conversion controls for these source types.
+const isConvertible = computed(() => ['jpg', 'png', 'webp'].includes(sourceFormat.value));
+
+// PNG is lossless so its quality starts maxed out; lowering it implies the
+// user wants to convert to a lossy format.
+const initialQuality = () => (sourceFormat.value === 'png' ? 100 : defaultQuality);
+
+const format = ref(sourceFormat.value);
+const quality = ref(initialQuality());
+const background = ref('white');
 
 const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
 
-// Only lossy formats use a quality setting; PNG/GIF ignore it.
-const supportsQuality = computed(() => ['image/jpeg', 'image/webp'].includes(props.asset.mimeType));
+const formatOptions = computed(() => {
+    const options = [
+        { value: 'jpg', label: 'JPEG' },
+        { value: 'webp', label: 'WebP' },
+    ];
+
+    // Only PNG sources can be kept (or reverted) as a lossless PNG.
+    if (sourceFormat.value === 'png') options.unshift({ value: 'png', label: 'PNG' });
+
+    return options;
+});
+
+// A quality setting only applies to lossy output formats.
+const outputUsesQuality = computed(() => ['jpg', 'webp'].includes(format.value));
+
+const showQuality = computed(() => isConvertible.value);
+
+// For PNG sources the format selector stays hidden until the user opts into a
+// lossy conversion (which happens when they lower the quality below 100).
+const showFormatSelector = computed(() =>
+    sourceFormat.value === 'png' ? format.value !== 'png' : isConvertible.value,
+);
+
+// JPEG has no alpha channel, so a potentially-transparent source needs a background colour.
+const showBackground = computed(() => format.value === 'jpg' && ['png', 'webp'].includes(sourceFormat.value));
+
+// Changing the format writes a different extension, which can't overwrite the original.
+const canReplaceOutput = computed(() => props.canReplace && format.value === sourceFormat.value);
+
+watch(format, (value) => {
+    if (value === 'png') quality.value = 100;
+});
+
+watch(quality, (value) => {
+    if (sourceFormat.value === 'png' && format.value === 'png' && value < 100) {
+        format.value = 'jpg';
+    }
+});
 
 watch(() => props.open, (newValue) => {
     if (newValue) {
@@ -72,7 +126,9 @@ function resetState() {
     uploading.value = false;
     pendingCrop.value = null;
     cropDimensions.value = null;
-    quality.value = defaultQuality;
+    quality.value = initialQuality();
+    format.value = sourceFormat.value;
+    background.value = 'white';
 }
 
 function destroyCropper() {
@@ -369,7 +425,9 @@ async function upload(replaceOriginal) {
     try {
         const response = await axios.post(props.asset.cropUrl, {
             ...pendingCrop.value,
-            quality: supportsQuality.value ? quality.value : null,
+            format: format.value,
+            quality: outputUsesQuality.value ? quality.value : null,
+            background: showBackground.value ? background.value : null,
             replace: replaceOriginal,
         });
 
@@ -473,14 +531,43 @@ function close() {
                     <Icon name="loading" />
                 </div>
 
-                <p>{{ canReplace ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
+                <p>{{ canReplaceOutput ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
 
-                <div v-if="supportsQuality" class="mt-4">
-                    <div class="mb-2 flex items-center justify-between">
-                        <label class="text-sm font-medium" for="crop-quality">{{ __('Quality') }}</label>
-                        <span class="text-sm text-gray-500 tabular-nums">{{ quality }}</span>
+                <div v-if="showQuality" class="mt-4 space-y-4">
+                    <div>
+                        <div class="mb-2 flex items-center justify-between">
+                            <label class="text-sm font-medium" for="crop-quality">{{ __('Quality') }}</label>
+                            <span class="text-sm text-gray-500 tabular-nums">{{ outputUsesQuality ? quality : __('Lossless') }}</span>
+                        </div>
+                        <Slider id="crop-quality" v-model="quality" :min="1" :max="100" :aria-label="__('Quality')" />
                     </div>
-                    <Slider id="crop-quality" v-model="quality" :min="1" :max="100" :aria-label="__('Quality')" />
+
+                    <div v-if="showFormatSelector" class="flex items-center justify-between gap-3">
+                        <label class="text-sm font-medium" for="crop-format">{{ __('Format') }}</label>
+                        <Select
+                            id="crop-format"
+                            v-model="format"
+                            :options="formatOptions"
+                            option-label="label"
+                            option-value="value"
+                            size="sm"
+                            class="w-40"
+                            :aria-label="__('Output format')"
+                        />
+                    </div>
+
+                    <div v-if="showBackground">
+                        <label class="mb-1 block text-sm font-medium">{{ __('Background') }}</label>
+                        <p class="mb-2 text-xs text-gray-500">{{ __('messages.crop_jpeg_background_help') }}</p>
+                        <RadioGroup v-model="background" appearance="inline" :aria-label="__('Background colour')">
+                            <Radio value="white" :label="__('White')" />
+                            <Radio value="black" :label="__('Black')" />
+                        </RadioGroup>
+                    </div>
+
+                    <p v-if="canReplace && !canReplaceOutput" class="text-xs text-gray-500">
+                        {{ __('messages.crop_replace_unavailable_format') }}
+                    </p>
                 </div>
 
                 <template #footer>
@@ -492,7 +579,7 @@ function close() {
                             @click="dismissConfirmation"
                         />
                         <Button
-                            :variant="canReplace ? 'default' : 'primary'"
+                            :variant="canReplaceOutput ? 'default' : 'primary'"
                             :disabled="uploading"
                             :text="__('Save as Copy')"
                             @click="upload(false)"
@@ -500,7 +587,7 @@ function close() {
                         <Button
                             v-if="canReplace"
                             variant="primary"
-                            :disabled="uploading"
+                            :disabled="uploading || !canReplaceOutput"
                             :text="__('Replace Original')"
                             @click="upload(true)"
                         />

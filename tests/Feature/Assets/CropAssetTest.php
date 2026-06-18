@@ -144,6 +144,72 @@ class CropAssetTest extends TestCase
             ->assertStatus(422);
     }
 
+    #[Test]
+    public function it_converts_to_a_different_format_when_saving_a_copy()
+    {
+        $this
+            ->actingAs($this->userWithPermission())
+            ->crop(['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100, 'format' => 'webp'])
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'path/to/test.webp']]);
+
+        Storage::disk('test')->assertExists('path/to/test.webp');
+        $this->assertImageDimensions('path/to/test.jpg', 200, 100, 'Original should be untouched.');
+    }
+
+    #[Test]
+    public function it_cannot_change_the_format_when_replacing_the_original()
+    {
+        $this
+            ->actingAs($this->userWithReuploadPermission())
+            ->crop(['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100, 'format' => 'webp', 'replace' => true])
+            ->assertStatus(422);
+    }
+
+    #[Test]
+    public function it_validates_the_format()
+    {
+        $this
+            ->actingAs($this->userWithPermission())
+            ->crop(['x' => 0, 'y' => 0, 'width' => 80, 'height' => 40, 'format' => 'tiff'])
+            ->assertStatus(422)
+            ->assertInvalid('format');
+    }
+
+    #[Test]
+    public function it_validates_the_output_against_the_containers_allowed_file_types()
+    {
+        $this->container->validationRules(['extensions:jpg'])->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->crop(['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100, 'format' => 'webp'])
+            ->assertStatus(422);
+    }
+
+    #[Test]
+    public function it_flattens_transparency_onto_the_chosen_background_when_converting_to_jpeg()
+    {
+        Storage::disk('test')->put('path/to/black.png', $this->makeTransparentImage(200, 100));
+        Storage::disk('test')->put('path/to/white.png', $this->makeTransparentImage(200, 100));
+        $this->container->makeAsset('path/to/black.png')->save();
+        $this->container->makeAsset('path/to/white.png')->save();
+
+        $user = $this->userWithPermission();
+
+        $this->actingAs($user)
+            ->postJson($this->cropRoute('path/to/black.png'), ['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100, 'format' => 'jpg', 'background' => 'black'])
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'path/to/black.jpg']]);
+
+        $this->actingAs($user)
+            ->postJson($this->cropRoute('path/to/white.png'), ['x' => 0, 'y' => 0, 'width' => 100, 'height' => 100, 'format' => 'jpg', 'background' => 'white'])
+            ->assertOk();
+
+        $this->assertLessThan(40, $this->redChannel('path/to/black.jpg'));
+        $this->assertGreaterThan(215, $this->redChannel('path/to/white.jpg'));
+    }
+
     private function crop($payload)
     {
         return $this->postJson($this->cropRoute('path/to/test.jpg'), $payload);
@@ -157,6 +223,18 @@ class CropAssetTest extends TestCase
     private function makeImage($width, $height)
     {
         return (string) ImageManager::gd()->create($width, $height)->fill('ff0000')->encodeByExtension('jpg');
+    }
+
+    private function makeTransparentImage($width, $height)
+    {
+        return (string) ImageManager::gd()->create($width, $height)->encodeByExtension('png');
+    }
+
+    private function redChannel($path)
+    {
+        $hex = ImageManager::gd()->read(Storage::disk('test')->get($path))->pickColor(5, 5)->toHex();
+
+        return hexdec(substr($hex, 0, 2));
     }
 
     private function makeNoiseImage($width, $height)

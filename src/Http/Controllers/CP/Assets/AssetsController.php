@@ -148,10 +148,17 @@ class AssetsController extends CpController
             'width' => 'required|integer|min:1',
             'height' => 'required|integer|min:1',
             'quality' => 'nullable|integer|min:1|max:100',
+            'format' => 'nullable|in:jpg,jpeg,png,webp,gif',
+            'background' => 'nullable|in:black,white',
             'replace' => 'boolean',
         ]);
 
         $replace = $request->boolean('replace');
+        $extension = strtolower($request->input('format') ?: $asset->extension());
+
+        // Changing the format produces a different file extension, which can't
+        // overwrite the original. It can only be saved as a new copy.
+        abort_if($replace && $this->normalizeExtension($extension) !== $this->normalizeExtension($asset->extension()), 422, __('The format cannot be changed when replacing the original.'));
 
         $replace
             ? $this->authorize('reupload', $asset)
@@ -159,30 +166,56 @@ class AssetsController extends CpController
 
         $contents = (new Cropper)->crop(
             $asset->contents(),
-            $asset->extension(),
+            $extension,
             $request->integer('x'),
             $request->integer('y'),
             $request->integer('width'),
             $request->integer('height'),
             $request->filled('quality') ? $request->integer('quality') : null,
+            $request->input('background') === 'black' ? '000000' : 'ffffff',
         );
+
+        $basename = pathinfo($asset->basename(), PATHINFO_FILENAME).'.'.$extension;
 
         $tempPath = tempnam(sys_get_temp_dir(), 'statamic-crop');
         file_put_contents($tempPath, $contents);
 
-        $file = new UploadedFile($tempPath, $asset->basename(), $asset->mimeType(), test: true);
+        $file = new UploadedFile($tempPath, $basename, test: true);
 
-        if ($replace) {
-            $asset->reupload(new UploadedReplacementFile($file));
-        } else {
-            $folder = $asset->folder() === '.' ? '/' : $asset->folder();
-            $path = ltrim($folder.'/'.$asset->basename(), '/');
-            $asset = $asset->container()->makeAsset($path)->upload($file);
+        try {
+            $this->validateCroppedFile($file, $asset->container());
+
+            if ($replace) {
+                $asset->reupload(new UploadedReplacementFile($file));
+            } else {
+                $folder = $asset->folder() === '.' ? '/' : $asset->folder();
+                $path = ltrim($folder.'/'.$basename, '/');
+                $asset = $asset->container()->makeAsset($path)->upload($file);
+            }
+        } finally {
+            @unlink($tempPath);
         }
 
-        @unlink($tempPath);
-
         return new AssetResource($asset);
+    }
+
+    private function validateCroppedFile(UploadedFile $file, AssetContainerContract $container): void
+    {
+        $rules = collect($container->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
+            ->all();
+
+        Validator::make(
+            ['file' => $file],
+            ['file' => array_merge(['file', new AllowedFile], $rules)]
+        )->validate();
+    }
+
+    private function normalizeExtension($extension)
+    {
+        $extension = strtolower($extension);
+
+        return $extension === 'jpeg' ? 'jpg' : $extension;
     }
 
     public function download($asset)
