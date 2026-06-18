@@ -39,7 +39,7 @@
             --_fill-offset: calc(var(--_cell) / 2);
             --_fill: var(--color-primary, gold);
             --_empty: var(--color-gray-600, #52525b);
-            /* viewBox width = 14 + 14 * (--star-rating-gap / --s) = 17.7333; path from resources/svg/icons/star.svg */
+            /* viewBox width = 14 + 14 * (--star-rating-gap / --s) = 17.7333; path borrowed from Statamic's star icon. */
             --_star-stroke-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2017.7333%2014%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%220.75%22%20stroke-linejoin%3D%22round%22%20d%3D%22M9.26344%204.34844C8.94942%203.02262%208.45287%201.8971%207.7007%200.865168%207.34583%200.378308%206.65711%200.378311%206.302%200.864976%205.54897%201.89696%205.0506%203.02254%204.73655%204.34844c-1.27708-0.0475-2.4531%200.10502-3.61903%200.49806-0.567297%200.19124-0.797993%200.88418-0.460427%201.39727C1.35657%207.30695%202.22018%208.14266%203.33681%208.8471c-0.43299%201.2339-0.63943%202.4396-0.65185%203.7051-0.00626%200.6378%200.56948%201.0938%201.15274%200.9045%201.16232-0.3774%202.18286-0.9657%203.16091-1.8293%200.97815%200.8637%202.00043%201.452%203.16369%201.8294%200.5833%200.1892%201.159-0.2668%201.1527-0.9046-0.0124-1.2655-0.2188-2.4712-0.6518-3.7051%201.1166-0.70444%201.9802-1.54015%202.6797-2.60333%200.3376-0.51309%200.1069-1.20603-0.4604-1.39727-1.1659-0.39304-2.342-0.54556-3.61906-0.49806Z%22%2F%3E%3C%2Fsvg%3E");
             --_star-fill-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2017.7333%2014%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M9.26344%204.34844C8.94942%203.02262%208.45287%201.8971%207.7007%200.865168%207.34583%200.378308%206.65711%200.378311%206.302%200.864976%205.54897%201.89696%205.0506%203.02254%204.73655%204.34844c-1.27708-0.0475-2.4531%200.10502-3.61903%200.49806-0.567297%200.19124-0.797993%200.88418-0.460427%201.39727C1.35657%207.30695%202.22018%208.14266%203.33681%208.8471c-0.43299%201.2339-0.63943%202.4396-0.65185%203.7051-0.00626%200.6378%200.56948%201.0938%201.15274%200.9045%201.16232-0.3774%202.18286-0.9657%203.16091-1.8293%200.97815%200.8637%202.00043%201.452%203.16369%201.8294%200.5833%200.1892%201.159-0.2668%201.1527-0.9046-0.0124-1.2655-0.2188-2.4712-0.6518-3.7051%201.1166-0.70444%201.9802-1.54015%202.6797-2.60333%200.3376-0.51309%200.1069-1.20603-0.4604-1.39727-1.1659-0.39304-2.342-0.54556-3.61906-0.49806Z%22%2F%3E%3C%2Fsvg%3E");
 
@@ -127,15 +127,9 @@
     </style>
 
     {{--
-        This is a range slider, not five separate stars. Gold is painted from the left up to
-        wherever the slider handle sits.
-
-        min=0 sounds like "no stars selected", but value=0 does not look empty — the gradient
-        and handle padding mean the fill still reaches into the first star (often partly gold).
-        There is no slider position that shows zero gold stars without hiding the colour in CSS.
-
-        So we use min=1 and hide the gold with a data attribute of data-unrated + JS-added --unrated
-        until the user interacts (see script below).
+        A range slider painted gold from the left, not five separate stars. At value=0 the fill
+        still bleeds into the first star, so unrated fields render at min=1 with data-unrated to
+        hide the fill until the user interacts.
     --}}
     <script>
         (function () {
@@ -143,7 +137,7 @@
                 input.removeAttribute('data-unrated');
             }
 
-            // Clicking the first star leaves value at min, so input never fires.
+            // Clicking the first star leaves the value at min, so input never fires.
             document.addEventListener('pointerdown', function (e) {
                 if (e.target.matches('[data-star-rating]')) {
                     clearUnrated(e.target);
@@ -168,7 +162,6 @@
                 e.target.dispatchEvent(new Event('input', { bubbles: true }));
             });
 
-            // Drag or wheel after the value actually changes.
             document.addEventListener('input', function (e) {
                 if (e.target.matches('[data-star-rating]')) {
                     clearUnrated(e.target);
