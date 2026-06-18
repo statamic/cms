@@ -2,7 +2,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
-import { Button, Heading, Icon, Modal, Select, Stack } from '@ui';
+import { Button, Heading, Icon, Modal, Select, Slider, Stack } from '@ui';
 import { keys, toast } from '@api';
 import wait from '@/util/wait';
 import axios from 'axios';
@@ -36,11 +36,15 @@ const animationFrameId = ref(null);
 const imageRef = useTemplateRef('image');
 const showConfirmation = ref(false);
 const uploading = ref(false);
-const pendingBlob = ref(null);
-const pendingMimeType = ref(null);
+const pendingCrop = ref(null);
 const cropDimensions = ref(null);
+const defaultQuality = Statamic.$config.get('cropQuality') || 90;
+const quality = ref(defaultQuality);
 
 const aspectRatios = ref(Statamic.$config.get('cropAspectRatios') || []);
+
+// Only lossy formats use a quality setting; PNG/GIF ignore it.
+const supportsQuality = computed(() => ['image/jpeg', 'image/webp'].includes(props.asset.mimeType));
 
 watch(() => props.open, (newValue) => {
     if (newValue) {
@@ -66,9 +70,9 @@ function resetState() {
     initialCropBoxCenter.value = null;
     showConfirmation.value = false;
     uploading.value = false;
-    pendingBlob.value = null;
-    pendingMimeType.value = null;
+    pendingCrop.value = null;
     cropDimensions.value = null;
+    quality.value = defaultQuality;
 }
 
 function destroyCropper() {
@@ -277,41 +281,23 @@ function expandCropBoxToFill() {
 }
 
 function crop() {
-    const cropBoxData = cropper.value.getCropBoxData();
-    const imageData = cropper.value.getImageData();
+    // Crop box coordinates relative to the original image's natural dimensions.
+    // The actual cropping happens server-side from the original file.
+    const data = cropper.value.getData(true);
 
-    const scaleX = imageData.naturalWidth / imageData.width;
-    const scaleY = imageData.naturalHeight / imageData.height;
-
-    const canvas = cropper.value.getCroppedCanvas({
-        width: cropBoxData.width * scaleX,
-        height: cropBoxData.height * scaleY,
-    });
-
-    if (!canvas) {
+    if (!data || data.width < 1 || data.height < 1) {
         toast.error(__('Failed to crop image'));
         return;
     }
 
-    const outputMimeType = props.asset.mimeType;
-    const quality = outputMimeType === 'image/jpeg' || outputMimeType === 'image/webp' ? 0.95 : undefined;
+    pendingCrop.value = {
+        x: Math.max(0, data.x),
+        y: Math.max(0, data.y),
+        width: data.width,
+        height: data.height,
+    };
 
-    canvas.toBlob((blob) => {
-        if (!blob) {
-            toast.error(__('Failed to create cropped image'));
-            return;
-        }
-
-        const extensionMap = {
-            'image/jpeg': 'jpg',
-            'image/png': 'png',
-            'image/webp': 'webp',
-        };
-        const extension = extensionMap[outputMimeType] || 'png';
-        pendingBlob.value = new File([blob], `cropped-image.${extension}`, { type: outputMimeType });
-        pendingMimeType.value = outputMimeType;
-        showConfirmation.value = true;
-    }, outputMimeType, quality);
+    showConfirmation.value = true;
 }
 
 function reset() {
@@ -376,43 +362,20 @@ function unbindKeyboardShortcuts() {
 }
 
 async function upload(replaceOriginal) {
-    if (!pendingBlob.value) return;
+    if (!pendingCrop.value) return;
 
     uploading.value = true;
 
     try {
-        const [containerHandle, assetPath] = props.asset.id.split('::');
-        const pathParts = assetPath.split('/');
-        let filename = pathParts.pop();
-        const folder = pathParts.length > 0 ? pathParts.join('/') : '/';
-
-        if (!replaceOriginal && pendingMimeType.value && pendingMimeType.value !== props.asset.mimeType) {
-            const extensionMap = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
-            const newExtension = extensionMap[pendingMimeType.value];
-            if (newExtension) {
-                filename = filename.replace(/\.[^/.]+$/, '') + newExtension;
-            }
-        }
-
-        const formData = new FormData();
-        const fileToUpload = filename !== pendingBlob.value.name
-            ? new File([pendingBlob.value], filename, { type: pendingBlob.value.type })
-            : pendingBlob.value;
-        formData.append('file', fileToUpload);
-        formData.append('container', containerHandle);
-        formData.append('folder', folder);
-        formData.append('_token', Statamic.$config.get('csrfToken'));
-        formData.append('option', replaceOriginal ? 'overwrite' : 'timestamp');
-
-        const url = cp_url('assets');
-        const response = await axios.post(url, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+        const response = await axios.post(props.asset.cropUrl, {
+            ...pendingCrop.value,
+            quality: supportsQuality.value ? quality.value : null,
+            replace: replaceOriginal,
         });
 
         if (response.data?.data) {
             showConfirmation.value = false;
-            pendingBlob.value = null;
-            pendingMimeType.value = null;
+            pendingCrop.value = null;
             close();
             await wait(300); // wait for this cropper stack to close.
 
@@ -433,8 +396,7 @@ async function upload(replaceOriginal) {
 
 function dismissConfirmation() {
     showConfirmation.value = false;
-    pendingBlob.value = null;
-    pendingMimeType.value = null;
+    pendingCrop.value = null;
 }
 
 function close() {
@@ -512,6 +474,14 @@ function close() {
                 </div>
 
                 <p>{{ canReplace ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
+
+                <div v-if="supportsQuality" class="mt-4">
+                    <div class="mb-2 flex items-center justify-between">
+                        <label class="text-sm font-medium" for="crop-quality">{{ __('Quality') }}</label>
+                        <span class="text-sm text-gray-500 tabular-nums">{{ quality }}</span>
+                    </div>
+                    <Slider id="crop-quality" v-model="quality" :min="1" :max="100" :aria-label="__('Quality')" />
+                </div>
 
                 <template #footer>
                     <div class="flex items-center justify-end space-x-3 pt-3 pb-1">

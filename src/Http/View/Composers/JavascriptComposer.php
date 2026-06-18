@@ -16,6 +16,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fieldtypes\Sets;
 use Statamic\Icons\IconSet;
+use Statamic\Imaging\Cropper;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -66,6 +67,7 @@ class JavascriptComposer
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'cropAspectRatios' => CropAspectRatios::all(),
+            'cropQuality' => Cropper::defaultQuality(),
             'elevatedSessionsEnabled' => config('statamic.users.elevated_sessions_enabled'),
             'user' => $this->user($user),
             'defaultPreferences' => Preference::default()->all(),

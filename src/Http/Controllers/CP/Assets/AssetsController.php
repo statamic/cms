@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -19,6 +20,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Imaging\Cropper;
 use Statamic\Rules\AllowedFile;
 use Statamic\Rules\UploadableAssetPath;
 
@@ -129,6 +131,56 @@ class AssetsController extends CpController
         $asset = $request->option === 'overwrite'
             ? $asset->reupload(new UploadedReplacementFile($file))
             : $asset->upload($file);
+
+        return new AssetResource($asset);
+    }
+
+    public function crop(Request $request, $encodedAsset)
+    {
+        $asset = Asset::find(base64_decode($encodedAsset));
+
+        abort_if(! $asset, 404);
+        abort_unless($asset->isImage(), 422, __('The asset is not an image.'));
+
+        $request->validate([
+            'x' => 'required|integer|min:0',
+            'y' => 'required|integer|min:0',
+            'width' => 'required|integer|min:1',
+            'height' => 'required|integer|min:1',
+            'quality' => 'nullable|integer|min:1|max:100',
+            'replace' => 'boolean',
+        ]);
+
+        $replace = $request->boolean('replace');
+
+        $replace
+            ? $this->authorize('reupload', $asset)
+            : $this->authorize('store', [AssetContract::class, $asset->container()]);
+
+        $contents = (new Cropper)->crop(
+            $asset->contents(),
+            $asset->extension(),
+            $request->integer('x'),
+            $request->integer('y'),
+            $request->integer('width'),
+            $request->integer('height'),
+            $request->filled('quality') ? $request->integer('quality') : null,
+        );
+
+        $tempPath = tempnam(sys_get_temp_dir(), 'statamic-crop');
+        file_put_contents($tempPath, $contents);
+
+        $file = new UploadedFile($tempPath, $asset->basename(), $asset->mimeType(), test: true);
+
+        if ($replace) {
+            $asset->reupload(new UploadedReplacementFile($file));
+        } else {
+            $folder = $asset->folder() === '.' ? '/' : $asset->folder();
+            $path = ltrim($folder.'/'.$asset->basename(), '/');
+            $asset = $asset->container()->makeAsset($path)->upload($file);
+        }
+
+        @unlink($tempPath);
 
         return new AssetResource($asset);
     }
