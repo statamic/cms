@@ -78,11 +78,7 @@ const outputUsesQuality = computed(() => ['jpg', 'webp'].includes(format.value))
 
 const showQuality = computed(() => isConvertible.value);
 
-// For PNG sources the format selector stays hidden until the user opts into a
-// lossy conversion (which happens when they lower the quality below 100).
-const showFormatSelector = computed(() =>
-    sourceFormat.value === 'png' ? format.value !== 'png' : isConvertible.value,
-);
+const showFormatSelector = computed(() => isConvertible.value);
 
 // JPEG has no alpha channel, so a potentially-transparent source needs a background colour.
 const showBackground = computed(() => format.value === 'jpg' && ['png', 'webp'].includes(sourceFormat.value));
