@@ -158,7 +158,7 @@ class AssetsController extends CpController
 
         // Changing the format produces a different file extension, which can't
         // overwrite the original. It can only be saved as a new copy.
-        abort_if($replace && $this->normalizeExtension($extension) !== $this->normalizeExtension($asset->extension()), 422, __('The format cannot be changed when replacing the original.'));
+        abort_if($replace && $this->normalizeExtension($extension) !== $this->normalizeExtension($asset->extension()), 422, __('statamic::messages.crop_replace_unavailable_format'));
 
         $replace
             ? $this->authorize('reupload', $asset)
