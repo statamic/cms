@@ -47,7 +47,7 @@ class StarRating extends FormFieldtype
             'type' => 'star_rating',
             'max_stars' => $maxStars,
             'allow_half_stars' => $allowHalfStars,
-            'min' => 0,
+            'min' => $allowHalfStars ? 0.5 : 1,
             'step' => $allowHalfStars ? 0.5 : 1,
             ...Arr::except($this->config(), ['type', 'max_stars', 'allow_half_stars']),
         ];
