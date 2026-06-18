@@ -90,6 +90,37 @@ class CropAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_can_replace_a_jpeg_original()
+    {
+        Storage::disk('test')->put('path/to/photo.jpeg', $this->makeImage(200, 100));
+        $this->container->makeAsset('path/to/photo.jpeg')->save();
+
+        $this
+            ->actingAs($this->userWithReuploadPermission())
+            // The UI normalizes the source's "jpeg" to "jpg" and sends it as the format.
+            ->postJson($this->cropRoute('path/to/photo.jpeg'), ['x' => 50, 'y' => 20, 'width' => 80, 'height' => 40, 'format' => 'jpg', 'replace' => true])
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'path/to/photo.jpeg']]);
+
+        $this->assertImageDimensions('path/to/photo.jpeg', 80, 40);
+    }
+
+    #[Test]
+    public function it_can_replace_an_original_with_an_uppercase_extension()
+    {
+        Storage::disk('test')->put('path/to/PHOTO.JPG', $this->makeImage(200, 100));
+        $this->container->makeAsset('path/to/PHOTO.JPG')->save();
+
+        $this
+            ->actingAs($this->userWithReuploadPermission())
+            ->postJson($this->cropRoute('path/to/PHOTO.JPG'), ['x' => 50, 'y' => 20, 'width' => 80, 'height' => 40, 'format' => 'jpg', 'replace' => true])
+            ->assertOk()
+            ->assertJson(['data' => ['path' => 'path/to/PHOTO.JPG']]);
+
+        $this->assertImageDimensions('path/to/PHOTO.JPG', 80, 40);
+    }
+
+    #[Test]
     public function it_denies_saving_a_copy_without_permission()
     {
         $this

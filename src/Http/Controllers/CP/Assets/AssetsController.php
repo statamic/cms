@@ -177,7 +177,12 @@ class AssetsController extends CpController
             $request->input('background') === 'black' ? '000000' : 'ffffff',
         );
 
-        $basename = pathinfo($asset->basename(), PATHINFO_FILENAME).'.'.$extension;
+        // When replacing, reuse the original basename verbatim so the extension
+        // matches exactly (Asset::extension() isn't lowercased, and ".jpeg" stays
+        // ".jpeg"), otherwise reupload() throws a FileExtensionMismatch.
+        $basename = $replace
+            ? $asset->basename()
+            : pathinfo($asset->basename(), PATHINFO_FILENAME).'.'.$extension;
 
         $tempPath = tempnam(sys_get_temp_dir(), 'statamic-crop');
         file_put_contents($tempPath, $contents);
