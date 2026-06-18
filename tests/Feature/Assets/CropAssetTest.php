@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
+use Statamic\CP\Assets\CropProcessor;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
-use Statamic\Imaging\Cropper;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -232,7 +232,7 @@ class CropAssetTest extends TestCase
         // The crop is mocked because encoding AVIF requires GD/Imagick to be
         // built with libavif, which isn't guaranteed. This asserts the request
         // is accepted and saved as a copy rather than rejected for its format.
-        $this->mock(Cropper::class)->shouldReceive('crop')->once()->andReturn('cropped');
+        $this->mock(CropProcessor::class)->shouldReceive('crop')->once()->andReturn('cropped');
 
         // Prevent the post-upload thumbnail generation, which would try to read
         // the mocked (non-image) output and has the same AVIF codec dependency.

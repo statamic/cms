@@ -13,6 +13,7 @@ use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\CP\Assets\CropProcessor;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
@@ -20,7 +21,6 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Imaging\Cropper;
 use Statamic\Rules\AllowedFile;
 use Statamic\Rules\UploadableAssetPath;
 
@@ -169,7 +169,7 @@ class AssetsController extends CpController
             ? $this->authorize('reupload', $asset)
             : $this->authorize('store', [AssetContract::class, $asset->container()]);
 
-        $contents = app(Cropper::class)->crop(
+        $contents = app(CropProcessor::class)->crop(
             $asset->contents(),
             $extension,
             $request->integer('x'),

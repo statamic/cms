@@ -1,10 +1,13 @@
 <?php
 
-namespace Statamic\Imaging;
+namespace Statamic\CP\Assets;
 
 use Intervention\Image\ImageManager;
 
-class Cropper
+/**
+ * @internal
+ */
+class CropProcessor
 {
     public function crop(string $contents, string $extension, int $x, int $y, int $width, int $height, ?int $quality = null, ?string $background = null): string
     {
