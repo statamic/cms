@@ -2,7 +2,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
-import { Button, Heading, Icon, Modal, Radio, RadioGroup, Select, Slider, Stack } from '@ui';
+import { Button, Heading, Icon, Modal, Radio, RadioGroup, Select, Slider, Stack, Field, Subheading } from '@ui';
 import { keys, toast } from '@api';
 import wait from '@/util/wait';
 import axios from 'axios';
@@ -529,41 +529,49 @@ function close() {
 
                 <p>{{ canReplaceOutput ? __('messages.crop_save_copy_or_replace') : __('messages.crop_save_as_copy_confirm') }}</p>
 
-                <div v-if="showQuality" class="mt-4 space-y-4">
-                    <div>
-                        <div class="mb-2 flex items-center justify-between">
-                            <label class="text-sm font-medium" for="crop-quality">{{ __('Quality') }}</label>
-                            <span class="text-sm text-gray-500 tabular-nums">{{ outputUsesQuality ? quality : __('Lossless') }}</span>
-                        </div>
-                        <Slider id="crop-quality" v-model="quality" :min="1" :max="100" :aria-label="__('Quality')" />
-                    </div>
+                <div v-if="showQuality" class="mt-6 space-y-4">
+                    <div class="flex justify-between gap-4">
+                        <Field
+                            id="crop-quality"
+                            :label="__('Quality')"
+                            class="w-1/2 space-y-2"
+                        >
+                            <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3 with-contrast:border with-contrast:border-gray-500">
+                                <Slider id="crop-quality" v-model="quality" :min="1" :max="100" :aria-label="__('Quality')" />
+                                <Subheading :text="`${quality}%`" class="w-14 justify-center" />
+                            </div>
+                        </Field>
 
-                    <div v-if="showFormatSelector" class="flex items-center justify-between gap-3">
-                        <label class="text-sm font-medium" for="crop-format">{{ __('Format') }}</label>
-                        <Select
+                        <Field
+                            v-if="showFormatSelector"
+                            class="w-1/2 space-y-2"
                             id="crop-format"
-                            v-model="format"
-                            :options="formatOptions"
-                            option-label="label"
-                            option-value="value"
-                            size="sm"
-                            class="w-40"
-                            :aria-label="__('Output format')"
-                        />
+                            :label="__('Format')"
+                        >
+                            <Select
+                                id="crop-format"
+                                v-model="format"
+                                :options="formatOptions"
+                                option-label="label"
+                                option-value="value"
+                                size="sm"
+                                :aria-label="__('Output format')"
+                            />
+                        </Field>
                     </div>
 
                     <div v-if="showBackground">
-                        <label class="mb-1 block text-sm font-medium">{{ __('Background') }}</label>
-                        <p class="mb-2 text-xs text-gray-500">{{ __('messages.crop_jpeg_background_help') }}</p>
-                        <RadioGroup v-model="background" appearance="inline" :aria-label="__('Background colour')">
-                            <Radio value="white" :label="__('White')" />
-                            <Radio value="black" :label="__('Black')" />
-                        </RadioGroup>
+                        <Field
+                            id="crop-background"
+                            :label="__('Background')"
+                            :instructions="__('messages.crop_jpeg_background_help')"
+                        >
+                            <RadioGroup v-model="background" appearance="inline" :aria-label="__('Background colour')">
+                                <Radio value="white" :label="__('White')" />
+                                <Radio value="black" :label="__('Black')" />
+                            </RadioGroup>
+                        </Field>
                     </div>
-
-                    <p v-if="canReplace && !canReplaceOutput" class="text-xs text-gray-500">
-                        {{ __('messages.crop_replace_unavailable_format') }}
-                    </p>
                 </div>
 
                 <template #footer>
@@ -575,7 +583,6 @@ function close() {
                             @click="dismissConfirmation"
                         />
                         <Button
-                            :variant="canReplaceOutput ? 'default' : 'primary'"
                             :disabled="uploading"
                             :text="__('Save as Copy')"
                             @click="upload(false)"
@@ -585,6 +592,7 @@ function close() {
                             variant="primary"
                             :disabled="uploading || !canReplaceOutput"
                             :text="__('Replace Original')"
+                            v-tooltip="canReplace && !canReplaceOutput ? __('messages.crop_replace_unavailable_format') : null"
                             @click="upload(true)"
                         />
                     </div>
