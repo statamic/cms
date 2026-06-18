@@ -61,6 +61,8 @@ return [
     'collections_route_instructions' => 'The route controls the entries URL pattern. Learn more in the [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'The default sort direction.',
     'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',
+    'crop_jpeg_background_help' => 'JPEG does not support transparency — transparent areas will be filled with this color.',
+    'crop_replace_unavailable_format' => 'The original can only be replaced when keeping the same format.',
     'crop_save_as_copy_confirm' => 'Save the cropped image as a new copy?',
     'crop_save_copy_or_replace' => 'Would you like to save this as a new copy or replace the original image?',
     'dictionaries_countries_emojis_instructions' => 'Include flag emojis in country labels.',
