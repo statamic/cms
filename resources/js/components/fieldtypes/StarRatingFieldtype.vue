@@ -8,21 +8,19 @@ const props = defineProps(Fieldtype.props);
 const { expose, update, isReadOnly, name } = Fieldtype.use(emit, props);
 defineExpose(expose);
 
+// Hide fill until the user interacts; value still sits at min for correct thumb alignment.
+const hasInteracted = ref(Boolean(props.value));
+
 const step = computed(() => props.config.step ?? 1);
 const min = computed(() => props.config.min ?? step.value);
 const maxStars = computed(() => props.config.max_stars ?? 5);
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 const ariaLabel = computed(() => __(props.config.display ?? 'Star rating'));
-// Hide fill until the user interacts; value still sits at min for correct thumb alignment.
-const hasInteracted = ref(Boolean(props.value));
 const isUnrated = computed(() => ! props.value && ! hasInteracted.value);
 
 function onKeydown(event) {
     const navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
-
-    if (! navigationKeys.includes(event.key)) {
-        return;
-    }
+    if (! navigationKeys.includes(event.key)) return;
 
     if (isUnrated.value) {
         if (event.key === 'End') {
@@ -62,8 +60,8 @@ function onKeydown(event) {
                 '--star-rating-max': maxStars,
                 '--star-rating-step': step,
             }"
-            @pointerdown="hasInteracted = true"
             @keydown="onKeydown"
+            @pointerdown="hasInteracted = true"
             @input="update(Number($event.target.value))"
         />
     </div>
