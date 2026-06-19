@@ -168,16 +168,14 @@
     }
 
     [data-field-item] {
-        @apply px-4 py-2.75;
-        background: white;
-        border-radius: 0.75rem;
-        @apply shadow-ui-md;
+        @apply px-3 sm:px-5 py-2.75 bg-white dark:bg-gray-850 rounded-xl ring ring-gray-200 dark:ring-gray-700/80 shadow-ui-md;
     }
 
     ~ [data-pagination] {
-        margin-block-start: 1rem;
-        button:first-of-type {
-            border-end-start-radius: 10px;
+        @apply mt-4;
+        /* Editing a button like "Next page" and "Submit" */
+        :has(> button)::before {
+            inset: calc(0% - 1px);
         }
     }
 }
