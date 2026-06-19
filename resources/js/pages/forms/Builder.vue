@@ -358,7 +358,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head :title="[__('Edit'), form.title, __('Forms')]" />
+    <Head :title="[__('Edit'), __(form.title), __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
@@ -382,7 +382,7 @@ onUnmounted(() => {
         <Header class="mx-auto max-w-5xl">
             <template #title>
                 <StatusIndicator status="published" />
-                {{ form.title }}
+                {{ __(form.title) }}
             </template>
             <template #actions>
                 <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">

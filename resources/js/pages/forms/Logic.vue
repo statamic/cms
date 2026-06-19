@@ -97,7 +97,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head :title="[__('Logic'), form.title, __('Forms')]" />
+    <Head :title="[__('Logic'), __(form.title), __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
@@ -110,7 +110,7 @@ onUnmounted(() => {
         <Header class="mb-2">
             <template #title>
                 <StatusIndicator status="published" />
-                {{ form.title }}
+                {{ __(form.title) }}
             </template>
         </Header>
 
