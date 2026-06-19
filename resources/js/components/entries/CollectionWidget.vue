@@ -65,7 +65,7 @@ function formatDate(value) {
                 <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
                     {{ __('There are no entries in this collection') }}
                 </ui-description>
-                <div class="px-4 py-3">
+                <div class="px-4 py-3 overflow-x-auto">
                     <table class="w-full widget-table" :class="{ 'opacity-50': loading }">
                         <TableHead :sr-only="!props.showTableHeader" />
                         <TableBody>
