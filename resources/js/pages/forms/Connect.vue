@@ -234,13 +234,13 @@ watch(selectedIntegrationName, (integrationName) => {
 </script>
 
 <template>
-    <Head :title="[__('Connect'), form.title, __('Forms')]" />
+    <Head :title="[__('Connect'), __(form.title), __('Forms')]" />
 
     <div class="mx-auto max-w-5xl">
         <Header class="mb-2">
             <template #title>
                 <StatusIndicator status="published" />
-                {{ formTitle }}
+                {{ __(formTitle) }}
             </template>
             <template #actions>
                 <div class="flex items-center gap-2 sm:gap-3">

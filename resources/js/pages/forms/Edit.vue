@@ -66,7 +66,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <Head :title="[__('Configure'), initialValues.title, __('Forms')]" />
+    <Head :title="[__('Configure'), __(initialValues.title), __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
         <Button variant="primary" @click="save" :disabled="saving" :aria-label="__('Save')">
