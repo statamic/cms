@@ -664,7 +664,7 @@ export default {
             }
 
             if (this.isBase) {
-                window.history.replaceState({}, '', localization.url);
+                window.history.replaceState({}, '', localization.url + window.location.hash);
             }
         },
 
