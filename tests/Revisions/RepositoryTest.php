@@ -83,4 +83,36 @@ class RepositoryTest extends TestCase
         $this->assertInstanceOf(Collection::class, $revisions);
         $this->assertCount(0, $revisions);
     }
+
+    #[Test]
+    public function it_finds_a_working_copy_by_key()
+    {
+        $revision = $this->repo->findWorkingCopyByKey('123');
+
+        $this->assertInstanceOf(Revision::class, $revision);
+        $this->assertEquals('123', $revision->key());
+        $this->assertEquals('working', $revision->action());
+    }
+
+    #[Test]
+    public function it_returns_null_when_there_is_no_working_copy()
+    {
+        $this->assertNull($this->repo->findWorkingCopyByKey('does-not-exist'));
+    }
+
+    #[Test]
+    public function it_finds_the_working_copy_without_using_the_query_builder()
+    {
+        // Resolving a single working copy reads its file directly. It must not go
+        // through the query builder, which would force the entire revisions store
+        // to be loaded - the cause of slow Stache warming when many entries are
+        // checked for working copies.
+        $repo = \Mockery::mock(RevisionRepository::class, [$this->stache])->makePartial();
+        $repo->shouldNotReceive('query');
+
+        $revision = $repo->findWorkingCopyByKey('123');
+
+        $this->assertInstanceOf(Revision::class, $revision);
+        $this->assertEquals('working', $revision->action());
+    }
 }

@@ -29,9 +29,9 @@ function handleDelete() {
 
 <template>
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Head :title="group.title" />
+        <Head :title="__(group.title)" />
 
-        <Header :title="group.title" icon="groups">
+        <Header :title="__(group.title)" icon="groups">
             <template #actions>
                 <Dropdown v-if="group.canEdit || group.canDelete">
                     <template #trigger>
