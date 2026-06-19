@@ -125,8 +125,10 @@
     display: none;
 }
 
-/* Collapsed state */
+/* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS / COLLAPSED STATE
+=================================================== */
 [data-fields-collapsed="true"] {
+    /* Hide the inputs */
     [data-ui-input-group] {
         [data-ui-description],
         > :not(:first-child, :has([data-logic-attached])) {
@@ -137,28 +139,27 @@
             margin-bottom: 0;
         }
     }
+
     [data-editing-item] {
-        /* Tweak things optically, since the field is no longer here */
-        > *:first-child {
-            top: -0.175rem;
+        /* Tweak the actions position since the surrounding space is different */
+        [data-editing-field-actions] {
+            top: 50%;
+            transform: translateY(calc(-50% - 0.5px));
+            @apply pe-3;
         }
+
+        &[data-first-row]::before,
+        &[data-last-row]::before,
         &::before {
-            inset-block: -0.75rem;
-        }
-        &[data-first-row]::before {
-            inset-block-start: -1.25rem;
-        }
-        &[data-last-row]::before {
-            inset-block-end: -1.25rem;
+            inset: calc(0% - 1px);
         }
     }
+
     /* Field Icons */
     [data-collapsed-field-icon] {
         display: inline-flex;
     }
 
-
-    gap: 0.5rem!important;
     /* Wrapper/white background */
     [data-section-drop-zone]:has(&) {
         background: unset;
@@ -172,8 +173,12 @@
         border-radius: 0.75rem;
         @apply shadow-ui-md;
     }
-    + [id*="actions"] {
+
+    ~ [data-pagination] {
         margin-block-start: 1rem;
+        button:first-of-type {
+            border-end-start-radius: 10px;
+        }
     }
 }
 

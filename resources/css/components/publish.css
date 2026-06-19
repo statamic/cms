@@ -9,7 +9,7 @@
 
     &[data-fields-collapsed="true"] {
         /* Collapse the grid further on Forms > Someform > Edit, when we're in the collapsed view */
-        @apply gap-5;
+        @apply gap-2;
     }
 
     aside & {
