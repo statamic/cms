@@ -156,6 +156,25 @@
     [data-collapsed-field-icon] {
         display: inline-flex;
     }
+
+
+    gap: 0.5rem!important;
+    /* Wrapper/white background */
+    [data-section-drop-zone]:has(&) {
+        background: unset;
+        box-shadow: unset;
+        padding: 0;
+    }
+
+    [data-field-item] {
+        @apply px-4 py-2.75;
+        background: white;
+        border-radius: 0.75rem;
+        @apply shadow-ui-md;
+    }
+    + [id*="actions"] {
+        margin-block-start: 1rem;
+    }
 }
 
 
