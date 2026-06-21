@@ -91,7 +91,7 @@ export default {
 
 <template>
     <div>
-        <Head :title="taxonomyTitle" />
+        <Head :title="[__(taxonomyTitle), __('Taxonomies')]" />
 
         <Header :title="__(taxonomyTitle)">
             <Dropdown>
