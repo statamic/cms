@@ -29,7 +29,7 @@ const errors = computed(() => {
 
 enum FieldInspectorTabs {
     Settings = 'settings',
-    Logic = 'conditions',
+    Logic = 'logic',
     Validation = 'validation',
 }
 
