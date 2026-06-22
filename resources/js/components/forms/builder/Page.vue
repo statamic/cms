@@ -110,7 +110,7 @@ onMounted(() => {
                 @deleted="sectionDeleted"
             >
                 <template v-if="section.fields.length && sectionIndex === (sections.length - 1)" #footer>
-                    <div :id="`actions-${page._id}`" class="mt-8">
+                    <div :id="`actions-${page._id}`" data-pagination class="mt-8">
                         <div class="cursor-pointer flex gap-2.5" @click.prevent="inspectAction">
                             <Button
                                 v-if="page.previous_page_label"
