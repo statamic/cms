@@ -18,6 +18,7 @@
             @closed="closeEditor"
             @saved="assetSaved"
             @action-completed="actionCompleted"
+            @crop-copied="cropCopied"
         >
         </asset-editor>
 

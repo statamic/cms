@@ -112,6 +112,13 @@ export default {
             this.closeEditor();
         },
 
+        cropCopied(newId) {
+            if (this.editingId && newId !== this.editingId) {
+                this.$emit('id-changed', this.editingId, newId);
+            }
+            this.closeEditor();
+        },
+
         actionCompleted(successful, response) {
             if (successful === false) return;
             const id = response.ids[0] || null;
