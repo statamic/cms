@@ -8,7 +8,7 @@ const { deletePage, dirty, fieldtypes, inspecting: page, pages } = injectBuilder
 
 enum PageInspectorTabs {
     Settings = 'settings',
-    Conditions = 'conditions',
+    Logic = 'logic',
 }
 
 const confirmingDelete = ref(false);
@@ -72,7 +72,7 @@ watch(() => page.value.rules, dirty, { deep: true });
         <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">
             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                 <TabTrigger :name="PageInspectorTabs.Settings" :text="__('Settings')" />
-                <TabTrigger v-if="!isLastPage" :name="PageInspectorTabs.Conditions" :text="__('Logic')" />
+                <TabTrigger v-if="!isLastPage" :name="PageInspectorTabs.Logic" :text="__('Logic')" />
             </TabList>
 
             <TabContent :name="PageInspectorTabs.Settings">
@@ -106,7 +106,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                 </div>
             </TabContent>
 
-            <TabContent v-if="!isLastPage" :name="PageInspectorTabs.Conditions">
+            <TabContent v-if="!isLastPage" :name="PageInspectorTabs.Logic">
                 <div class="space-y-6 pt-8">
                     <div class="flex items-center gap-2.5">
                         <div class="size-4">

@@ -77,7 +77,7 @@ const previewParts = computed(() => {
 });
 
 const collapsedSummary = computed(() => {
-    if (!hasConditions.value) return __('Always show');
+    if (!hasConditions.value) return props.conditions.hidden ? __('Always hide') : __('Always show');
     if (!previewParts.value) return __('Configure conditions');
     return null;
 });
@@ -185,6 +185,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                             :suggestable-fields
                             :fieldtypes
                             :allow-custom-conditions="false"
+                            :show-always-hide-option="true"
                             :show-always-save="false"
                             size="sm"
                             @updated="onConditionsUpdated"

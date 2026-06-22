@@ -58,6 +58,7 @@ const save = () => {
         })),
         fields: fields.value.map(field => ({
             _id: field._id,
+            hidden: field.hidden,
             if: field.if,
             unless: field.unless,
             if_any: field.if_any,

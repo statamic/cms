@@ -83,6 +83,7 @@ class FormLogicController extends CpController
                         'icon' => $fieldtype?->icon() ?? 'generic-field',
                         'category' => $fieldtype->categories()[0] ?? 'other',
                         'fieldtype' => $field['type'] ?? 'short_answer',
+                        'hidden' => $field['hidden'] ?? false,
                         'if' => $field['if'] ?? null,
                         'unless' => $field['unless'] ?? null,
                         'if_any' => $field['if_any'] ?? null,
@@ -147,7 +148,11 @@ class FormLogicController extends CpController
                     $conditions = $fieldConditions->get($handle);
                     $field = $fieldConfig['field'] ?? [];
 
-                    unset($field['if'], $field['unless'], $field['if_any'], $field['unless_any'], $field['always_save']);
+                    unset($field['hidden'], $field['if'], $field['unless'], $field['if_any'], $field['unless_any'], $field['always_save']);
+
+                    if (! empty($conditions['hidden'])) {
+                        $field['hidden'] = $conditions['hidden'];
+                    }
 
                     if (! empty($conditions['if'])) {
                         $field['if'] = $conditions['if'];
