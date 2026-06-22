@@ -113,7 +113,11 @@ const getInitialConditions = () => {
 const getInitialAlwaysSaveState = () => alwaysSave.value = props.config?.always_save ?? false;
 
 watch(() => props.config.hidden, (hidden) => {
-    when.value = hidden ? 'always_hide' : 'always';
+    if (hidden) {
+        when.value = 'always_hide';
+    } else if (when.value === 'always_hide') {
+        when.value = 'always';
+    }
 
     if (initialized.value) {
         KEYS.forEach((key) => delete props.config[key]);
