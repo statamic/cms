@@ -105,11 +105,21 @@ const duplicateField = (field) => {
     setTimeout(() => document.getElementById('field_display')?.select(), 250);
 };
 
-const removeField = (field) => {
+const fieldPendingDeletion = ref(null);
+const confirmingFieldDeletion = ref(false);
+
+const confirmDeleteField = (field) => {
+    fieldPendingDeletion.value = field;
+    confirmingFieldDeletion.value = true;
+};
+
+const deleteField = () => {
     dirty();
     clearInspector();
-    props.section.fields.splice(props.section.fields.indexOf(field), 1);
-};
+    props.section.fields.splice(props.section.fields.indexOf(fieldPendingDeletion.value), 1);
+    fieldPendingDeletion.value = null;
+    confirmingFieldDeletion.value = false;
+}
 
 const confirmingDelete = ref(false);
 const confirmDelete = () => confirmingDelete.value = true;
@@ -246,7 +256,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                                     :field
                                     :is-first-row="isFieldInFirstRow(fieldIndex)"
                                     :is-last-row="isFieldInLastRow(fieldIndex)"
-                                    @remove="removeField(field)"
+                                    @remove="confirmRemoveField(field)"
                                 />
 
                                 <RegularFormField
@@ -257,7 +267,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                                     :is-last-row="isFieldInLastRow(fieldIndex)"
                                     @duplicate="duplicateField(field)"
                                     @width-changed="updateFieldWidth(field, $event)"
-                                    @remove="removeField(field)"
+                                    @remove="confirmDeleteField(field)"
                                 />
                             </template>
                         </div>
@@ -275,6 +285,15 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
             :button-text="__('Delete')"
             danger
             @confirm="deleteSection"
+        />
+
+        <ConfirmationModal
+            v-model:open="confirmingFieldDeletion"
+            :title="__('Delete Field')"
+            :body-text="__('Are you sure you want to delete this field? This action cannot be undone.')"
+            :button-text="__('Delete')"
+            danger
+            @confirm="deleteField"
         />
     </Panel>
 </template>
