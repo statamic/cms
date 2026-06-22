@@ -4,6 +4,7 @@ import AddLogicRuleButton from './AddLogicRuleButton.vue';
 import FieldLogicRule from './FieldLogicRule.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
+import { KEYS } from '@/components/field-conditions/Constants.js';
 
 const emit = defineEmits(['update:fields']);
 
@@ -17,13 +18,13 @@ const collapsed = ref([]);
 
 const fieldsWithLogic = computed(() => {
     return props.fields.filter(field => {
-        return field.if || field.unless || field.if_any || field.unless_any;
+        return field.hidden || KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
     });
 });
 
 const fieldsWithoutLogic = computed(() => {
     return props.fields.filter(field => {
-        return !field.if && !field.unless && !field.if_any && !field.unless_any;
+        return !field.hidden && !KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
     });
 });
 
@@ -63,6 +64,7 @@ const getFieldConfig = (field) => ({
 
 const getConditionsConfig = (field) => ({
     handle: field.handle,
+    hidden: field.hidden,
     if: field.if,
     unless: field.unless,
     if_any: field.if_any,
@@ -100,6 +102,7 @@ const updateConditions = (fieldId, conditions) => {
         field._id === fieldId
             ? {
                 ...field,
+                hidden: conditions.hidden ?? field.hidden,
                 if: conditions.if || null,
                 unless: conditions.unless || null,
                 if_any: conditions.if_any || null,
