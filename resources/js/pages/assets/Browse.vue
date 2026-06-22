@@ -17,6 +17,16 @@ export default {
         };
     },
 
+    computed: {
+        headTitle() {
+            const title = __(this.container.title);
+            const section = __('Assets');
+
+            // Avoid duplicating when the container is named "Assets".
+            return title === section ? section : [title, section];
+        },
+    },
+
     mounted() {
         this.bindBrowserNavigation();
     },
@@ -91,7 +101,7 @@ export default {
 
 <template>
     <div class="h-full" v-cloak>
-        <Head :title="container.title" />
+        <Head :title="headTitle" />
 
         <asset-browser
             ref="browser"

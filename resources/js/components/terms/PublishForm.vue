@@ -423,7 +423,7 @@ export default {
             }
 
             if (this.publishContainer === 'base') {
-                window.history.replaceState({}, '', localization.url);
+                window.history.replaceState({}, '', localization.url + window.location.hash);
             }
         },
 

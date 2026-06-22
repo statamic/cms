@@ -180,7 +180,7 @@ const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
-const allowsSelections = computed(() => (props.selections || hasActions.value) && !props.reorderable);
+const allowsSelections = computed(() => (props.selections || (props.allowBulkActions && hasActions.value)) && !props.reorderable);
 const allowsMultipleSelections = computed(() => props.maxSelections > 1);
 const hasReachedSelectionLimit = computed(() => selections.value.length === props.maxSelections);
 const hasActions = computed(() => !!props.actionUrl);

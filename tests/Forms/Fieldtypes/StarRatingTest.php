@@ -20,7 +20,7 @@ class StarRatingTest extends TestCase
             'type' => 'star_rating',
             'max_stars' => 5,
             'allow_half_stars' => false,
-            'min' => 0,
+            'min' => 1,
             'step' => 1,
         ], $fieldtype->toFieldArray());
     }
@@ -38,7 +38,7 @@ class StarRatingTest extends TestCase
             'type' => 'star_rating',
             'max_stars' => 3,
             'allow_half_stars' => false,
-            'min' => 0,
+            'min' => 1,
             'step' => 1,
             'display' => 'How would you rate us?',
         ], $fieldtype->toFieldArray());
@@ -74,7 +74,7 @@ class StarRatingTest extends TestCase
         $array = $fieldtype->toFieldArray();
 
         $this->assertTrue($array['allow_half_stars']);
-        $this->assertSame(0, $array['min']);
+        $this->assertSame(0.5, $array['min']);
         $this->assertSame(0.5, $array['step']);
     }
 }

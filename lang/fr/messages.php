@@ -61,6 +61,8 @@ return [
     'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées. Apprenez-en plus dans la [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Le sens de tri par défaut.',
     'collections_taxonomies_instructions' => 'Reliez les entrées de cette collection à des taxonomies. Les champs seront automatiquement ajoutés aux formulaires.',
+    'crop_jpeg_background_help' => 'Le format JPEG ne prend pas en charge la transparence ; les zones transparentes seront remplies de cette couleur.',
+    'crop_replace_unavailable_format' => 'L’original ne peut être remplacé qu’en conservant le même format.',
     'crop_save_as_copy_confirm' => 'Enregistrer l’image recadrée comme une nouvelle copie ?',
     'crop_save_copy_or_replace' => 'Souhaitez-vous enregistrer ceci comme une nouvelle copie ou remplacer l’image originale ?',
     'dictionaries_countries_emojis_instructions' => 'Inclure les émojis de drapeaux dans les étiquettes ?',
