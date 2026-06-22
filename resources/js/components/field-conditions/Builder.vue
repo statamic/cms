@@ -30,7 +30,7 @@ const whenOptions = computed(() => {
         props.showAlwaysHideOption ? { label: __('Always hide'), value: 'always_hide', icon: 'eye-closed' } : null,
         { label: __('Show when'), value: 'if', icon: 'eye' },
         { label: __('Hide when'), value: 'unless', icon: 'eye-closed' },
-    ];
+    ].filter(Boolean);
 });
 
 const joinOptions = [
