@@ -12,6 +12,7 @@ const props = defineProps({
     config: { type: Object, required: true },
     suggestableFields: { type: Array, required: true },
     allowCustomConditions: { type: Boolean, default: true },
+    showAlwaysHideOption: { type: Boolean, default: false },
     showAlwaysSave: { type: Boolean, default: true },
     size: { type: String, default: 'base' },
 });
@@ -23,11 +24,14 @@ const customMethod = ref(null);
 const conditions = ref([]);
 const alwaysSave = ref(false);
 
-const whenOptions = [
-    { label: __('Always show'), value: 'always', icon: 'eye' },
-    { label: __('Show when'), value: 'if', icon: 'eye' },
-    { label: __('Hide when'), value: 'unless', icon: 'eye-closed' },
-];
+const whenOptions = computed(() => {
+    return [
+        { label: __('Always show'), value: 'always', icon: 'eye' },
+        props.showAlwaysHideOption ? { label: __('Always hide'), value: 'always_hide', icon: 'eye-closed' } : null,
+        { label: __('Show when'), value: 'if', icon: 'eye' },
+        { label: __('Hide when'), value: 'unless', icon: 'eye-closed' },
+    ];
+});
 
 const joinOptions = [
     { label: __('All of the conditions pass'), short_label: __('And'), value: 'all' },
@@ -36,7 +40,7 @@ const joinOptions = [
 ];
 
 const isCustom = computed(() => type.value === 'custom');
-const hasConditions = computed(() => when.value !== 'always');
+const hasConditions = computed(() => when.value !== 'always' && when.value !== 'always_hide');
 
 const add = () => {
     conditions.value.push({
@@ -78,6 +82,12 @@ const prepareEditableOperator = (operator) => {
     return operator;
 };
 
+const getInitialWhenState = () => {
+    if (props.showAlwaysHideOption) {
+        when.value = props.config.hidden ? 'always_hide' : 'always';
+    }
+};
+
 const getInitialConditions = () => {
     const key = KEYS.find((k) => props.config[k]);
     const configConditions = key ? props.config[key] : null;
@@ -102,6 +112,19 @@ const getInitialConditions = () => {
 
 const getInitialAlwaysSaveState = () => alwaysSave.value = props.config?.always_save ?? false;
 
+watch(() => props.config.hidden, (hidden) => {
+    when.value = hidden ? 'always_hide' : 'always';
+
+    if (initialized.value) {
+        KEYS.forEach((key) => delete props.config[key]);
+        getInitialConditions();
+    }
+});
+
+watch(when, (value) => {
+    if (initialized.value) emit('updated', { hidden: value === 'always_hide' });
+});
+
 watch(saveableConditions, (conditions) => {
     if (initialized.value) emit('updated', conditions);
 }, { deep: true });
@@ -111,6 +134,7 @@ watch(alwaysSave, (value) => {
 });
 
 onMounted(() => {
+    getInitialWhenState();
     getInitialConditions();
     getInitialAlwaysSaveState();
     if (conditions.value.length === 0) add();

@@ -261,6 +261,7 @@ onMounted(() => load());
                         :config="field.config"
                         :suggestable-fields="suggestableConditionFields"
                         :allow-custom-conditions="false"
+                        :show-always-hide-option="true"
                         size="sm"
                         @updated="updateFieldConditions"
                     >
