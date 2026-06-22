@@ -13,7 +13,11 @@ class Installed extends Tags
      */
     public function index()
     {
-        return $this->installed($this->params->get('package'));
+        if (! $package = $this->params->get('package')) {
+            return;
+        }
+
+        return $this->installed($package);
     }
 
     /**
