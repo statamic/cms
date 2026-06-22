@@ -249,6 +249,10 @@ export default {
                 return true;
             },
         },
+        redirectToCopy: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data() {
@@ -436,6 +440,8 @@ export default {
         },
 
         handleCropCreated(newAssetId) {
+            if (!this.redirectToCopy) return;
+
             const [containerHandle, assetPath] = newAssetId.split('::');
             const editUrl = cp_url(`assets/browse/${containerHandle}/${assetPath}/edit`);
             router.get(editUrl);

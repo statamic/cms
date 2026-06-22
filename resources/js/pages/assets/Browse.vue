@@ -104,6 +104,7 @@ export default {
             :selected-assets="selectedAssets"
             :initial-columns="columns"
             :filters="filters"
+            redirect-to-copy
             @navigated="navigate"
             @selections-updated="updateSelections"
             @edit-asset="editAsset"

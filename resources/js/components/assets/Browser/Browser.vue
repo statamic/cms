@@ -174,6 +174,7 @@
         <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :redirect-to-copy="redirectToCopy"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
@@ -264,6 +265,7 @@ export default {
         initialEditingAssetId: String,
         maxFiles: Number,
         queryScopes: Array,
+        redirectToCopy: Boolean,
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
