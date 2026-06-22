@@ -290,6 +290,76 @@ class FormLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_can_update_the_hidden_state_of_a_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                [
+                    'id' => 'page1',
+                    'sections' => [
+                        [
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    'handle' => 'name',
+                                    'field' => [
+                                        'type' => 'short_answer',
+                                        'display' => 'Name',
+                                        'hidden' => true,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'email',
+                                    'field' => [
+                                        'type' => 'short_answer',
+                                        'display' => 'Email',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        // The hidden state should be provided when loading the logic page.
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->where('fields.0.hidden', true)
+                ->where('fields.1.hidden', false)
+            );
+
+        $payload = [
+            'pages' => [],
+            'fields' => [
+                ['_id' => 'name', 'hidden' => false],
+                ['_id' => 'email', 'hidden' => true],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $fields = Form::find('test')->formFields()->pages()[0]['sections'][0]['fields'];
+
+        // The now-visible field shouldn't persist `hidden` since false is the default.
+        $this->assertArrayNotHasKey('hidden', $fields[0]['field']);
+        
+        // The now-hidden field should persist `hidden: true`.
+        $this->assertTrue($fields[1]['field']['hidden']);
+    }
+
+    #[Test]
     public function it_denies_update_without_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
