@@ -56,7 +56,9 @@ const remove = (index) => conditions.value.splice(index, 1);
 const toggleCustom = () => type.value = isCustom.value ? 'all' : 'custom';
 
 const saveableConditions = computed(() => {
-    const result = {};
+    const result = Object.fromEntries(KEYS.map((key) => [key, null]));
+    if (!hasConditions.value) return result;
+
     const key = type.value === 'any' ? `${when.value}_any` : when.value;
     const filtered = conditions.value.filter((c) => c.field && c.value);
     const prepared = new Converter().toBlueprint(filtered);
@@ -117,11 +119,6 @@ watch(() => props.config.hidden, (hidden) => {
         when.value = 'always_hide';
     } else if (when.value === 'always_hide') {
         when.value = 'always';
-    }
-
-    if (initialized.value) {
-        KEYS.forEach((key) => delete props.config[key]);
-        getInitialConditions();
     }
 });
 
