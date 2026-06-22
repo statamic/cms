@@ -29,7 +29,7 @@ const errors = computed(() => {
 
 enum FieldInspectorTabs {
     Settings = 'settings',
-    Conditions = 'conditions',
+    Logic = 'conditions',
     Validation = 'validation',
 }
 
@@ -205,7 +205,7 @@ onMounted(() => load());
         <Tabs v-else v-model:modelValue="activeTab" :unmount-on-hide="false">
             <TabList class="inline-flex flex-wrap [&_button]:w-auto! mb-4 mx-0!">
                 <TabTrigger :name="FieldInspectorTabs.Settings" :text="__('Settings')" />
-                <TabTrigger :name="FieldInspectorTabs.Conditions" :text="__('Logic')" />
+                <TabTrigger :name="FieldInspectorTabs.Logic" :text="__('Logic')" />
                 <TabTrigger v-if="shouldShowValidationTab" :name="FieldInspectorTabs.Validation" :text="__('Validation')" />
             </TabList>
 
@@ -242,7 +242,7 @@ onMounted(() => load());
                 </div>
             </TabContent>
 
-            <TabContent :name="FieldInspectorTabs.Conditions">
+            <TabContent :name="FieldInspectorTabs.Logic">
                 <div class="space-y-6 pt-8">
                     <div class="flex items-center gap-2.5">
                         <div class="size-4">
