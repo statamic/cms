@@ -354,7 +354,7 @@ class FormLogicTest extends TestCase
 
         // The now-visible field shouldn't persist `hidden` since false is the default.
         $this->assertArrayNotHasKey('hidden', $fields[0]['field']);
-        
+
         // The now-hidden field should persist `hidden: true`.
         $this->assertTrue($fields[1]['field']['hidden']);
     }
