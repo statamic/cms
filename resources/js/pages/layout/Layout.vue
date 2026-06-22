@@ -47,7 +47,7 @@ function focusMain() {
                 }
 
                 if (!autofocusInput) {
-                    document.querySelector('#content-card')?.focus();
+                    document.querySelector('#content-card')?.focus({ preventScroll: true });
                 }
             }, 100);
         });
