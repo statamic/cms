@@ -24,10 +24,10 @@
                             @update:modelValue="reference = $event"
                         >
                             <template #option="option">
-                                <div class="flex items-center text-start">
+                                <div class="flex items-center text-start w-full">
                                     <span
                                         v-text="option.fieldset"
-                                        class="text-2xs line-clamp-2 text-gray-500 dark:text-gray-300 ltr:mr-2 rtl:ml-2"
+                                        class="text-2xs line-clamp-2 text-gray-500 dark:text-gray-300 ltr:mr-2 rtl:ml-2 max-w-[50%]"
                                     />
                                     <span class="text-xs line-clamp-2" v-text="option.label" />
                                 </div>
