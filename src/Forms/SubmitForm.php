@@ -73,6 +73,34 @@ class SubmitForm
         return $submission;
     }
 
+    public function saveDraft(array $data, array $files = [], ?array $only = null): Submission
+    {
+        $files = $this->normalizeFiles($files);
+        $values = array_merge($data, $files);
+
+        $this->validate($data, $files, $only);
+
+        $submission = $this->submission ?? $this->form->makeSubmission();
+
+        $uploadedAssets = $submission->uploadFiles($files);
+
+        $values = array_merge($values, $uploadedAssets);
+
+        $processedValues = $this->form->blueprint()
+            ->fields()
+            ->addValues($values)
+            ->process()
+            ->values()
+            ->only(array_keys($values));
+
+        $submission
+            ->merge($processedValues)
+            ->set('incomplete', true)
+            ->save();
+
+        return $submission;
+    }
+
     public function validate(array $data, array $files = [], ?array $only = null): void
     {
         $files = $this->normalizeFiles($files);

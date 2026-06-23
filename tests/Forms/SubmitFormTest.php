@@ -412,4 +412,117 @@ class SubmitFormTest extends TestCase
         $this->assertEmpty($this->form->submissions());
         Bus::assertNotDispatched(SendEmails::class);
     }
+
+    #[Test]
+    public function it_saves_a_draft_without_completing_the_submission()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class]);
+
+        $this->assertEmpty($this->form->submissions());
+
+        $submission = $this->action()->saveDraft(
+            data: ['email' => 'test@example.com'],
+        );
+
+        $this->assertCount(1, $this->form->submissions());
+        $this->assertTrue($this->form->submission($submission->id())->isIncomplete());
+        $this->assertEquals('test@example.com', $submission->get('email'));
+
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Bus::assertNotDispatched(SendEmails::class);
+    }
+
+    #[Test]
+    public function it_merges_into_an_existing_draft_when_saving()
+    {
+        Bus::fake();
+
+        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf'])->set('incomplete', true))->save();
+
+        $this->assertCount(1, $this->form->submissions());
+
+        $submission = $this->action()->resume($draft)->saveDraft(
+            data: ['email' => 'new@example.com'],
+        );
+
+        // The same draft is updated rather than a new submission being created.
+        $this->assertEquals($draft->id(), $submission->id());
+        $this->assertCount(1, $this->form->submissions());
+
+        $stored = $this->form->submission($draft->id());
+        $this->assertTrue($stored->isIncomplete());
+
+        // Earlier-page values are preserved while the new page's values are merged in.
+        $this->assertEquals('Olaf', $stored->get('name'));
+        $this->assertEquals('new@example.com', $stored->get('email'));
+    }
+
+    #[Test]
+    public function it_scopes_a_draft_save_to_the_given_fields()
+    {
+        Bus::fake();
+
+        // The email field is required, but scoping the draft save to "name" only
+        // means the missing email shouldn't cause a validation failure.
+        $submission = $this->action()->saveDraft(
+            data: ['name' => 'Test'],
+            only: ['name'],
+        );
+
+        $stored = $this->form->submission($submission->id());
+        $this->assertTrue($stored->isIncomplete());
+        $this->assertEquals('Test', $stored->get('name'));
+    }
+
+    #[Test]
+    public function it_completes_a_resumed_draft()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class]);
+
+        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->set('incomplete', true))->save();
+
+        $this->assertTrue($this->form->submission($draft->id())->isIncomplete());
+
+        $submission = $this->action()->resume($draft)->submit(
+            data: ['email' => 'new@example.com'],
+            only: ['name', 'email'],
+        );
+
+        // The same draft is promoted rather than a new submission being created.
+        $this->assertEquals($draft->id(), $submission->id());
+        $this->assertCount(1, $this->form->submissions());
+
+        $stored = $this->form->submission($draft->id());
+        $this->assertFalse($stored->isIncomplete());
+        $this->assertEquals('new@example.com', $stored->get('email'));
+        $this->assertEquals('Olaf', $stored->get('name'));
+
+        // The completion events fire exactly once.
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
+    }
+
+    #[Test]
+    public function it_runs_the_gate_when_completing_a_resumed_draft()
+    {
+        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->set('incomplete', true))->save();
+
+        // A listener returning false silently aborts completion, proving the gate runs.
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        try {
+            $this->action()->resume($draft)->submit(
+                data: ['email' => 'new@example.com'],
+            );
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            $this->assertNotNull($e->submission());
+        }
+
+        // The draft stays incomplete since completion was silently aborted.
+        $this->assertTrue($this->form->submission($draft->id())->isIncomplete());
+    }
 }
