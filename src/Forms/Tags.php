@@ -350,6 +350,10 @@ class Tags extends BaseTags
                     $page['previous_page_label'] = $contents['previous_page_label'] ?? null;
                 }
 
+                if ($jsDriver instanceof AbstractJsDriver) {
+                    $page = array_merge($page, $jsDriver->addToRenderablePageData($tab, $page));
+                }
+
                 return $page;
             })
             ->all();
