@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\Blade;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
@@ -48,6 +49,8 @@ abstract class FormTestCase extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
 
         $this->createForm();
         $this->clearSubmissions();
