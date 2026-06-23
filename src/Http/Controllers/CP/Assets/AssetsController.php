@@ -2,10 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Assets\CropProcessor;
@@ -17,6 +19,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\Assets\Concerns\FinalizesAssetUploads;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Rules\AllowedFile;
 
 use function Statamic\trans as __;
 
