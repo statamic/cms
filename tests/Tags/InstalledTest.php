@@ -41,4 +41,11 @@ class InstalledTest extends TestCase
         $this->assertEquals('yes', $this->tag('{{ installed package="hasselhoff/baywatch-embeds" }}yes{{ /installed }}'));
         $this->assertEquals('', $this->tag('{{ installed package="hasselhoff/lotr-embeds" }}yes{{ /installed }}'));
     }
+
+    #[Test]
+    public function it_outputs_empty_when_passing_nothing()
+    {
+        $this->assertEquals('', $this->tag('{{ installed package="" }}yes{{ /installed }}'));
+        $this->assertEquals('', $this->tag('{{ installed :package="null" }}yes{{ /installed }}'));
+    }
 }
