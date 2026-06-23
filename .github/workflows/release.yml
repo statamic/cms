@@ -4,57 +4,56 @@ on: # zizmor: ignore[concurrency-limits]
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g. v6.2.0)'
+        description: 'Release version, without the v prefix (e.g. 6.2.0)'
         required: true
         type: string
-      source-ref:
-        description: 'Branch to build and tag from'
-        required: true
-        default: '6.x'
-        type: choice
-        options:
-          - 6.x
-          - 5.x
-          - master
 
 permissions: {}
 
 jobs:
-  release: # zizmor: ignore[anonymous-definition]
+  release:
+    name: Create Release
     runs-on: ubuntu-latest
-    environment: release
+    environment: Releases
     permissions: {} # all writes go through the App token; GITHUB_TOKEN needs no scopes
     steps:
-      - name: Validate version format
+      - name: Resolve and validate version
         env:
-          VERSION: ${{ inputs.version }}
+          INPUT_VERSION: ${{ inputs.version }}
+          BRANCH: ${{ github.ref_name }}
         run: |
-          if ! printf '%s' "$VERSION" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+'; then
-            echo "::error::Version must match v#.#.# format (got: $VERSION)"
+          version="${INPUT_VERSION#v}"
+
+          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::error::Version must look like 6.2.0 (got: $INPUT_VERSION)"
             exit 1
           fi
+
+          if [ "${version%%.*}" != "${BRANCH%%.*}" ]; then
+            echo "::error::Version $version does not belong on the $BRANCH branch"
+            exit 1
+          fi
+
+          echo "TAG=v$version" >> "$GITHUB_ENV"
 
       - name: Get release bot token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ secrets.RELEASE_APP_ID }}
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
           permission-contents: write
 
-      - name: Checkout source ref
+      - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          ref: ${{ inputs.source-ref }}
           token: ${{ steps.app-token.outputs.token }}
           persist-credentials: true # zizmor: ignore[artipacked] App token is needed to push the tag
 
       - name: Assert tag does not already exist
-        env:
-          VERSION: ${{ inputs.version }}
         run: |
-          if git ls-remote --tags origin "$VERSION" | grep -q .; then
-            echo "::error::Tag $VERSION already exists on remote. Aborting."
+          if git ls-remote --tags origin "$TAG" | grep -q .; then
+            echo "::error::Tag $TAG already exists on remote. Aborting."
             exit 1
           fi
 
@@ -72,39 +71,46 @@ jobs:
 
       - name: Create the build commit
         env:
-          VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
         run: |
-          git config user.name "statamic-release-bot[bot]"
-          git config user.email "statamic-release-bot[bot]@users.noreply.github.com"
+          USER_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
           git add --force \
             resources/dist \
             resources/dist-dev \
             resources/dist-frontend \
             resources/dist-package
-          git commit -m "Build assets for $VERSION"
+          git commit -m "Build assets for $TAG"
 
       - name: Tag and push the build commit
-        env:
-          VERSION: ${{ inputs.version }}
         run: |
-          git tag "$VERSION"
-          git push origin "$VERSION"
+          git tag "$TAG"
+          git push origin "$TAG"
 
       - name: Get Changelog
         id: changelog
         uses: statamic/changelog-action@5d112d0d790cdeeb5adca3e584e37edc474ab51b # v1.0.2
         with:
-          version: ${{ inputs.version }}
+          version: ${{ env.TAG }}
 
       - name: Create release
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          RELEASE_VERSION: ${{ steps.changelog.outputs.version }}
           RELEASE_NOTES: ${{ steps.changelog.outputs.text }}
+          IS_DEFAULT_BRANCH: ${{ github.ref_name == github.event.repository.default_branch }}
         run: |
-          gh release create "$RELEASE_VERSION" \
-            --title "$RELEASE_VERSION" \
-            --notes "$RELEASE_NOTES"
+          latest="$IS_DEFAULT_BRANCH"
+          prerelease=false
+          case "$TAG" in
+            *-*) prerelease=true; latest=false ;;
+          esac
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "$RELEASE_NOTES" \
+            --latest="$latest" \
+            --prerelease="$prerelease"
 
       - name: Deploy Storybook to Forge
         continue-on-error: true
