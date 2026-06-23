@@ -24,7 +24,7 @@ jobs:
         run: |
           version="${INPUT_VERSION#v}"
 
-          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
             echo "::error::Version must look like 6.2.0 (got: $INPUT_VERSION)"
             exit 1
           fi
