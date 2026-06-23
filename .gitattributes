@@ -1,18 +1,13 @@
 * text=auto
 *.php eol=lf
-
-# Compiled CP assets — shipped in the Composer zip, but marked generated for GitHub tooling
 /resources/dist/**/* linguist-generated=true
 /resources/dist-dev/**/* linguist-generated=true
 /resources/dist-frontend/**/* linguist-generated=true
 /resources/dist-package/**/* linguist-generated=true
-
-# Source JS/CSS/TS — not needed by consumers; export-ignore keeps the Composer zip lean
+/.github export-ignore
 /resources/js export-ignore
 /resources/css export-ignore
 /packages export-ignore
-
-/.github export-ignore
 /tests export-ignore
 .babelrc export-ignore
 .gitattributes export-ignore
