@@ -149,8 +149,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
