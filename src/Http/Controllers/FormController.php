@@ -40,7 +40,7 @@ class FormController extends Controller
 
         $fields = $fields->addValues($values);
 
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->asPartial()->site($site);
 
         try {
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
@@ -52,11 +52,6 @@ class FormController extends Controller
             $submission->data(
                 $fields->addValues($values)->process()->values()
             );
-
-            // Mark the submission partial and record its site after setting the data,
-            // since data() replaces the collection. For a single-page submission the
-            // partial flag only lives in memory — finalize() strips it before the save.
-            $submission->asPartial()->site($site);
 
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.

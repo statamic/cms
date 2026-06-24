@@ -127,6 +127,33 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function setting_data_preserves_the_partial_and_site_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial()->site('fr');
+
+        $submission->data(['foo' => 'bar']);
+
+        $this->assertEquals('bar', $submission->get('foo'));
+        $this->assertTrue($submission->isPartial());
+        $this->assertEquals('fr', $submission->get('site'));
+    }
+
+    #[Test]
+    public function setting_data_with_partial_or_site_in_the_payload_overrides_them()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial()->site('fr');
+
+        $submission->data(['foo' => 'bar', 'partial' => false, 'site' => 'de']);
+
+        $this->assertFalse($submission->isPartial());
+        $this->assertEquals('de', $submission->get('site'));
+    }
+
+    #[Test]
     public function it_saves_a_submission()
     {
         Event::fake();

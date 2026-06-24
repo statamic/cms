@@ -30,7 +30,9 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements Augmentable, ContainsQueryableValues, SubmissionContract
 {
-    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations {
+        data as traitData;
+    }
 
     /**
      * @var string
@@ -57,6 +59,26 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $this->data = clone $this->data;
         $this->supplements = clone $this->supplements;
+    }
+
+    public function data($data = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->traitData();
+        }
+
+        $data = collect($data);
+
+        // A full data replacement would otherwise drop the internal lifecycle
+        // keys, so carry over the existing partial and site values unless the
+        // incoming payload provides its own.
+        foreach (['partial', 'site'] as $key) {
+            if ($this->has($key) && ! $data->has($key)) {
+                $data[$key] = $this->get($key);
+            }
+        }
+
+        return $this->traitData($data);
     }
 
     /**
