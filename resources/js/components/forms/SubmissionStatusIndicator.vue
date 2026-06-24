@@ -27,14 +27,6 @@ const label = computed(() => {
 });
 </script>
 
-<style>
-@reference "../../../css/app.css";
-
-.status-finalized {
-    @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
-}
-</style>
-
 <template>
     <span class="flex items-center gap-2">
         <span v-if="showDot" class="size-2 rounded-full" :class="statusClass" v-tooltip="label" />
