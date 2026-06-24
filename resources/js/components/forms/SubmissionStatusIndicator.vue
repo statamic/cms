@@ -6,7 +6,7 @@ const props = defineProps({
         type: String,
         required: false,
         default: 'complete',
-        validator: (value) => ['complete', 'incomplete'].includes(value),
+        validator: (value) => ['complete', 'partial'].includes(value),
     },
     showDot: { type: Boolean, default: true },
     showLabel: { type: Boolean, default: false },
@@ -15,14 +15,14 @@ const props = defineProps({
 const statusClass = computed(() => {
     return {
         complete: 'bg-green-400',
-        incomplete: 'bg-gray-300 dark:bg-gray-200',
+        partial: 'bg-gray-300 dark:bg-gray-200',
     }[props.status];
 });
 
 const label = computed(() => {
     return {
         complete: __('Complete'),
-        incomplete: __('Incomplete'),
+        partial: __('Partial'),
     }[props.status];
 });
 </script>

@@ -249,12 +249,12 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
 
         $submitted = $form->makeSubmission();
-        $this->assertFalse($submitted->isIncomplete());
+        $this->assertFalse($submitted->isPartial());
         $this->assertEquals('complete', $submitted->status());
 
-        $incomplete = $form->makeSubmission()->set('incomplete', true);
-        $this->assertTrue($incomplete->isIncomplete());
-        $this->assertEquals('incomplete', $incomplete->status());
+        $partial = $form->makeSubmission()->set('partial', true);
+        $this->assertTrue($partial->isPartial());
+        $this->assertEquals('partial', $partial->status());
     }
 
     #[Test]
@@ -280,24 +280,24 @@ class SubmissionTest extends TestCase
     public static function withheldStatusProvider(): array
     {
         return [
-            'incomplete' => ['incomplete'],
+            'partial' => ['partial'],
         ];
     }
 
     #[Test]
-    public function created_event_is_not_automatically_dispatched_when_removing_the_incomplete_key()
+    public function created_event_is_not_automatically_dispatched_when_removing_the_partial_key()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('incomplete', true);
+        $submission = $form->makeSubmission()->set('partial', true);
         $submission->save();
 
         Event::fake();
 
-        // Removing the incomplete key turns it into a "real" submission, but because
+        // Removing the partial key turns it into a "real" submission, but because
         // the record already exists, save() alone won't dispatch Created. This is why
         // complete() dispatches it explicitly (covered by the test below).
-        $submission->remove('incomplete');
+        $submission->remove('partial');
         $submission->save();
 
         Event::assertNotDispatched(SubmissionCreating::class);
@@ -323,17 +323,17 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function completing_an_incomplete_submission_removes_the_status_key_and_dispatches_events()
+    public function completing_a_partial_submission_removes_the_status_key_and_dispatches_events()
     {
         $form = tap(Form::make('contact_us'))->save();
-        $submission = tap($form->makeSubmission()->set('incomplete', true))->save();
+        $submission = tap($form->makeSubmission()->set('partial', true))->save();
 
         Bus::fake();
         Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
 
         $submission->complete(Site::default());
 
-        $this->assertFalse($submission->isIncomplete());
+        $this->assertFalse($submission->isPartial());
 
         // Submission already exists, so save() won't dispatch the Created event, complete() will.
         Event::assertDispatched(SubmissionCreated::class, 1);

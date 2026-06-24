@@ -115,15 +115,15 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return Carbon::createFromTimestamp($this->id());
     }
 
-    public function isIncomplete(): bool
+    public function isPartial(): bool
     {
-        return (bool) $this->get('incomplete');
+        return (bool) $this->get('partial');
     }
 
     public function status(): string
     {
         return match (true) {
-            $this->isIncomplete() => 'incomplete',
+            $this->isPartial() => 'partial',
             default => 'complete',
         };
     }
@@ -166,9 +166,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $isNew = is_null($this->form()->submission($this->id()));
 
-        // Incomplete submissions are stored but skip the Creating/Created
-        // events so listeners never receive an incomplete submission.
-        $isWithheld = $this->isIncomplete();
+        // Partial submissions are stored but skip the Creating/Created
+        // events so listeners never receive a partial submission.
+        $isWithheld = $this->isPartial();
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -205,12 +205,12 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $existed = ! is_null($this->form()->submission($this->id()));
 
-        $this->remove('incomplete');
+        $this->remove('partial');
 
         if ($this->form()->store()) {
             $this->save();
 
-            // A promoted incomplete already existed, so save() won't fire the created
+            // A promoted partial already existed, so save() won't fire the created
             // event. We dispatch it here so completion always emits it once.
             if ($existed) {
                 SubmissionCreated::dispatch($this);

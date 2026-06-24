@@ -33,8 +33,8 @@ class SubmissionStatus extends Filter
     public function apply($query, $values)
     {
         match ($values['status']) {
-            'incomplete' => $query->where('incomplete', true),
-            default => $query->where('incomplete', '!=', true),
+            'partial' => $query->where('partial', true),
+            default => $query->where('partial', '!=', true),
         };
     }
 
@@ -52,7 +52,7 @@ class SubmissionStatus extends Filter
     {
         return collect([
             'complete' => __('Complete'),
-            'incomplete' => __('Incomplete'),
+            'partial' => __('Partial'),
         ]);
     }
 }
