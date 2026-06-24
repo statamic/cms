@@ -73,7 +73,7 @@ class SubmitForm
         return $submission;
     }
 
-    public function saveDraft(array $data, array $files = [], ?array $only = null): Submission
+    public function saveIncomplete(array $data, array $files = [], ?array $only = null): Submission
     {
         $files = $this->normalizeFiles($files);
         $values = array_merge($data, $files);
