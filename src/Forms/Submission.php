@@ -166,10 +166,6 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         $isNew = is_null($this->form()->submission($this->id()));
 
-        // Partial submissions are stored but skip the Creating/Created
-        // events so listeners never receive a partial submission.
-        $isWithheld = $this->isPartial();
-
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
@@ -177,7 +173,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
-            if ($isNew && ! $isWithheld && SubmissionCreating::dispatch($this) === false) {
+            if ($isNew && SubmissionCreating::dispatch($this) === false) {
                 return false;
             }
 
@@ -193,7 +189,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($isNew && ! $isWithheld) {
+            if ($isNew) {
                 SubmissionCreated::dispatch($this);
             }
 
@@ -203,19 +199,14 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function finalize()
     {
-        $existed = ! is_null($this->form()->submission($this->id()));
-
         $this->remove('partial');
 
         if ($this->form()->store()) {
             $this->save();
-
-            // A promoted partial already existed, so save() won't fire the created
-            // event. We dispatch it here so finalization always emits it once.
-            if ($existed) {
-                SubmissionCreated::dispatch($this);
-            }
         } else {
+            // When stored, save() dispatches the created event. We'll also fire it
+            // here when submissions aren't stored so developers may continue to
+            // listen and modify the submission as needed.
             SubmissionCreated::dispatch($this);
         }
 

@@ -258,34 +258,24 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('withheldStatusProvider')]
-    public function it_does_not_dispatch_creation_events_when_saving_a_withheld_submission(string $status)
+    public function saving_a_partial_submission_dispatches_the_same_events_as_any_other()
     {
         Event::fake();
 
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set($status, true);
+        $submission = $form->makeSubmission()->set('partial', true);
         $submission->save();
 
-        // Creation events shouldn't be dispatched.
-        Event::assertNotDispatched(SubmissionCreating::class);
-        Event::assertNotDispatched(SubmissionCreated::class);
-
-        // But, saving events should.
+        // A partial submission is still saved and created, so its events are never withheld.
+        Event::assertDispatched(SubmissionCreating::class);
+        Event::assertDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionSaving::class);
         Event::assertDispatched(SubmissionSaved::class);
     }
 
-    public static function withheldStatusProvider(): array
-    {
-        return [
-            'partial' => ['partial'],
-        ];
-    }
-
     #[Test]
-    public function created_event_is_not_automatically_dispatched_when_removing_the_partial_key()
+    public function created_event_is_not_dispatched_again_when_removing_the_partial_key()
     {
         $form = tap(Form::make('contact_us'))->save();
 
@@ -294,9 +284,8 @@ class SubmissionTest extends TestCase
 
         Event::fake();
 
-        // Removing the partial key turns it into a "real" submission, but because
-        // the record already exists, save() alone won't dispatch Created. This is why
-        // finalize() dispatches it explicitly (covered by the test below).
+        // The created event already fired when the partial was first saved. Removing the
+        // partial key and saving again won't re-dispatch it, because the record exists.
         $submission->remove('partial');
         $submission->save();
 
@@ -325,19 +314,19 @@ class SubmissionTest extends TestCase
     #[Test]
     public function finalizing_a_partial_submission_removes_the_status_key_and_dispatches_events()
     {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class]);
+
         $form = tap(Form::make('contact_us'))->save();
         $submission = tap($form->makeSubmission()->set('partial', true))->save();
-
-        Bus::fake();
-        Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
 
         $submission->finalize(Site::default());
 
         $this->assertFalse($submission->isPartial());
 
-        // Submission already exists, so save() won't dispatch the Created event, finalize() will.
+        // The created event fired once, when the partial was first saved. Finalizing an
+        // existing submission won't dispatch it again, but it does send the emails.
         Event::assertDispatched(SubmissionCreated::class, 1);
-        Event::assertNotDispatched(SubmissionCreating::class);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
