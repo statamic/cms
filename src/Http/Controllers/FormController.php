@@ -68,7 +68,7 @@ class FormController extends Controller
             return $this->formSuccess($params, $submission, true);
         }
 
-        $submission->complete($site);
+        $submission->finalize($site);
 
         return $this->formSuccess($params, $submission);
     }

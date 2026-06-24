@@ -27,7 +27,7 @@ class SubmissionStatus extends Filter
 
     public function autoApply()
     {
-        return ['status' => 'complete'];
+        return ['status' => 'finalized'];
     }
 
     public function apply($query, $values)
@@ -51,7 +51,7 @@ class SubmissionStatus extends Filter
     protected function options()
     {
         return collect([
-            'complete' => __('Complete'),
+            'finalized' => __('Finalized'),
             'partial' => __('Partial'),
         ]);
     }

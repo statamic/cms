@@ -250,7 +250,7 @@ class SubmissionTest extends TestCase
 
         $submitted = $form->makeSubmission();
         $this->assertFalse($submitted->isPartial());
-        $this->assertEquals('complete', $submitted->status());
+        $this->assertEquals('finalized', $submitted->status());
 
         $partial = $form->makeSubmission()->set('partial', true);
         $this->assertTrue($partial->isPartial());
@@ -296,7 +296,7 @@ class SubmissionTest extends TestCase
 
         // Removing the partial key turns it into a "real" submission, but because
         // the record already exists, save() alone won't dispatch Created. This is why
-        // complete() dispatches it explicitly (covered by the test below).
+        // finalize() dispatches it explicitly (covered by the test below).
         $submission->remove('partial');
         $submission->save();
 
@@ -306,7 +306,7 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function completing_a_new_submission_dispatches_created_event_once()
+    public function finalizing_a_new_submission_dispatches_created_event_once()
     {
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
@@ -314,7 +314,7 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
         $submission = $form->makeSubmission();
 
-        $submission->complete(Site::default());
+        $submission->finalize(Site::default());
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
@@ -323,7 +323,7 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function completing_a_partial_submission_removes_the_status_key_and_dispatches_events()
+    public function finalizing_a_partial_submission_removes_the_status_key_and_dispatches_events()
     {
         $form = tap(Form::make('contact_us'))->save();
         $submission = tap($form->makeSubmission()->set('partial', true))->save();
@@ -331,18 +331,18 @@ class SubmissionTest extends TestCase
         Bus::fake();
         Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
 
-        $submission->complete(Site::default());
+        $submission->finalize(Site::default());
 
         $this->assertFalse($submission->isPartial());
 
-        // Submission already exists, so save() won't dispatch the Created event, complete() will.
+        // Submission already exists, so save() won't dispatch the Created event, finalize() will.
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertNotDispatched(SubmissionCreating::class);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]
-    public function completing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
+    public function finalizing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
     {
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
@@ -350,7 +350,7 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us')->store(false))->save();
         $submission = $form->makeSubmission();
 
-        $submission->complete(Site::default());
+        $submission->finalize(Site::default());
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);

@@ -5,8 +5,8 @@ const props = defineProps({
     status: {
         type: String,
         required: false,
-        default: 'complete',
-        validator: (value) => ['complete', 'partial'].includes(value),
+        default: 'finalized',
+        validator: (value) => ['finalized', 'partial'].includes(value),
     },
     showDot: { type: Boolean, default: true },
     showLabel: { type: Boolean, default: false },
@@ -14,14 +14,14 @@ const props = defineProps({
 
 const statusClass = computed(() => {
     return {
-        complete: 'bg-green-400',
+        finalized: 'bg-green-400',
         partial: 'bg-gray-300 dark:bg-gray-200',
     }[props.status];
 });
 
 const label = computed(() => {
     return {
-        complete: __('Complete'),
+        finalized: __('Finalized'),
         partial: __('Partial'),
     }[props.status];
 });
@@ -30,7 +30,7 @@ const label = computed(() => {
 <style>
 @reference "../../../css/app.css";
 
-.status-complete {
+.status-finalized {
     @apply bg-green-200 text-green-900 dark:bg-green-300/6 dark:text-green-300;
 }
 </style>

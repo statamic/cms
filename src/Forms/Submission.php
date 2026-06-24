@@ -124,7 +124,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     {
         return match (true) {
             $this->isPartial() => 'partial',
-            default => 'complete',
+            default => 'finalized',
         };
     }
 
@@ -201,7 +201,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
     }
 
-    public function complete()
+    public function finalize()
     {
         $existed = ! is_null($this->form()->submission($this->id()));
 
@@ -211,7 +211,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             $this->save();
 
             // A promoted partial already existed, so save() won't fire the created
-            // event. We dispatch it here so completion always emits it once.
+            // event. We dispatch it here so finalization always emits it once.
             if ($existed) {
                 SubmissionCreated::dispatch($this);
             }

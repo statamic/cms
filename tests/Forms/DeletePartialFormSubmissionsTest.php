@@ -31,7 +31,7 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $oldPartial = tap($form->makeSubmission()->set('partial', true))->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
-        $oldComplete = tap($form->makeSubmission())->save();
+        $oldFinalized = tap($form->makeSubmission())->save();
 
         Carbon::setTestNow('2025-06-14 12:00:00');
         $recentPartial = tap($form->makeSubmission()->set('partial', true))->save();
@@ -42,11 +42,11 @@ class DeletePartialFormSubmissionsTest extends TestCase
 
         $this->assertNull($form->submission($oldPartial->id()));
         $this->assertNotNull($form->submission($recentPartial->id()));
-        $this->assertNotNull($form->submission($oldComplete->id()));
+        $this->assertNotNull($form->submission($oldFinalized->id()));
     }
 
     #[Test]
-    public function it_only_deletes_partial_submissions_never_complete()
+    public function it_only_deletes_partial_submissions_never_finalized()
     {
         config(['statamic.forms.delete_partial_submissions_after' => 7]);
 
@@ -56,14 +56,14 @@ class DeletePartialFormSubmissionsTest extends TestCase
         $partial = tap($form->makeSubmission()->set('partial', true))->save();
 
         Carbon::setTestNow('2025-06-02 12:00:00');
-        $complete = tap($form->makeSubmission())->save();
+        $finalized = tap($form->makeSubmission())->save();
 
         Carbon::setTestNow('2025-06-30 12:00:00');
 
         (new DeletePartialFormSubmissions)->handle();
 
         $this->assertNull($form->submission($partial->id()));
-        $this->assertNotNull($form->submission($complete->id()));
+        $this->assertNotNull($form->submission($finalized->id()));
     }
 
     #[Test]
