@@ -47,6 +47,8 @@ import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack 
 export default {
     components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading, Stack },
 
+    emits: ['closed', 'saving', 'saved', 'failed'],
+
     props: {
         actions: Object,
         published: Boolean,
@@ -55,8 +57,6 @@ export default {
         publishContainer: String,
         canManagePublishState: Boolean,
     },
-
-    emits: ['closed', 'saving', 'saved', 'failed'],
 
     data() {
         return {
