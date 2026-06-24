@@ -20,10 +20,11 @@ use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Asset;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
-use Statamic\Facades\Site;
+use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
+use Statamic\Sites\Site;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -84,6 +85,22 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     public function form($form = null)
     {
         return $this->fluentlyGetOrSet('form')->args(func_get_args());
+    }
+
+    /**
+     * Get or set the site.
+     *
+     * @return Site|$this
+     */
+    public function site(Site|string|null $site = null): Site|static
+    {
+        if (func_num_args() === 0) {
+            return Sites::get($this->get('site')) ?? Sites::default();
+        }
+
+        $this->set('site', $site instanceof Site ? $site->handle() : $site);
+
+        return $this;
     }
 
     /**
@@ -225,7 +242,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         SubmissionFinalized::dispatch($this);
 
         // TODO: Use $this->site() here when we add the "site" key to submissions.
-        SendEmails::dispatch($this, Site::default());
+        SendEmails::dispatch($this, Sites::default());
 
         return $this;
     }

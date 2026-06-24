@@ -259,6 +259,36 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_and_sets_the_site()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr'],
+        ]);
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission();
+
+        // A missing site falls back to the default.
+        $this->assertEquals('en', $submission->site()->handle());
+
+        // It can be set by handle, storing the handle in the data.
+        $return = $submission->site('fr');
+        $this->assertSame($submission, $return);
+        $this->assertEquals('fr', $submission->get('site'));
+        $this->assertEquals('fr', $submission->site()->handle());
+
+        // It can be set with a Site instance, which also stores the handle.
+        $submission->site(Site::get('en'));
+        $this->assertEquals('en', $submission->get('site'));
+        $this->assertEquals('en', $submission->site()->handle());
+
+        // An invalid handle falls back to the default.
+        $submission->set('site', 'nonexistent');
+        $this->assertEquals('en', $submission->site()->handle());
+    }
+
+    #[Test]
     public function saving_a_partial_submission_dispatches_the_same_events_as_any_other()
     {
         Event::fake();
