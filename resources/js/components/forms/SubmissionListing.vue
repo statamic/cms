@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { Listing, DropdownItem, Badge, StatusIndicator } from '@/components/ui';
+import { Listing, DropdownItem, Badge } from '@/components/ui';
 import { Link } from '@inertiajs/vue3';
 import SubmissionStatusIndicator from '@/components/forms/SubmissionStatusIndicator.vue';
 
