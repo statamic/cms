@@ -21,6 +21,8 @@ use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
+use function Statamic\trans as __;
+
 class Tags extends BaseTags
 {
     use Concerns\GetsFormSession,
