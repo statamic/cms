@@ -56,6 +56,8 @@ export default {
         canManagePublishState: Boolean,
     },
 
+    emits: ['closed', 'saving', 'saved', 'failed'],
+
     data() {
         return {
             action: this.canManagePublishState ? 'publish' : 'revision',
