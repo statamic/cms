@@ -40,7 +40,7 @@ class FormController extends Controller
 
         $fields = $fields->addValues($values);
 
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->asPartial();
 
         try {
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);

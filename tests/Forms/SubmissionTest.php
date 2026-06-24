@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
+use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
@@ -252,7 +253,7 @@ class SubmissionTest extends TestCase
         $this->assertFalse($submitted->isPartial());
         $this->assertEquals('finalized', $submitted->status());
 
-        $partial = $form->makeSubmission()->set('partial', true);
+        $partial = $form->makeSubmission()->asPartial();
         $this->assertTrue($partial->isPartial());
         $this->assertEquals('partial', $partial->status());
     }
@@ -295,17 +296,18 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function finalizing_a_new_submission_dispatches_created_event_once()
+    public function finalizing_a_new_submission_dispatches_created_and_finalized_events_once()
     {
         Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $form = tap(Form::make('contact_us'))->save();
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->asPartial();
 
         $submission->finalize(Site::default());
 
         Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
 
         $this->assertNotNull($form->submission($submission->id()));
@@ -315,7 +317,7 @@ class SubmissionTest extends TestCase
     public function finalizing_a_partial_submission_removes_the_status_key_and_dispatches_events()
     {
         Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $form = tap(Form::make('contact_us'))->save();
         $submission = tap($form->makeSubmission()->set('partial', true))->save();
@@ -325,8 +327,9 @@ class SubmissionTest extends TestCase
         $this->assertFalse($submission->isPartial());
 
         // The created event fired once, when the partial was first saved. Finalizing an
-        // existing submission won't dispatch it again, but it does send the emails.
+        // existing submission won't dispatch it again, but it does finalize and email.
         Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
@@ -334,16 +337,34 @@ class SubmissionTest extends TestCase
     public function finalizing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
     {
         Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $form = tap(Form::make('contact_us')->store(false))->save();
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->asPartial();
 
         $submission->finalize(Site::default());
 
         Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
         $this->assertNull($form->submission($submission->id()));
+    }
+
+    #[Test]
+    public function finalizing_is_idempotent()
+    {
+        Bus::fake();
+        Event::fake([SubmissionFinalized::class]);
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission()->asPartial();
+
+        $submission->finalize(Site::default());
+        $submission->finalize(Site::default());
+
+        // The second call is a no-op because the submission is no longer partial.
+        Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]

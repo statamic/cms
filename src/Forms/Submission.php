@@ -14,6 +14,7 @@ use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
+use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Asset;
@@ -115,6 +116,13 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         return Carbon::createFromTimestamp($this->id());
     }
 
+    public function asPartial(): self
+    {
+        $this->set('partial', true);
+
+        return $this;
+    }
+
     public function isPartial(): bool
     {
         return (bool) $this->get('partial');
@@ -199,6 +207,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function finalize()
     {
+        if (! $this->isPartial()) {
+            return $this;
+        }
+
         $this->remove('partial');
 
         if ($this->form()->store()) {
@@ -210,8 +222,12 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             SubmissionCreated::dispatch($this);
         }
 
+        SubmissionFinalized::dispatch($this);
+
         // TODO: Use $this->site() here when we add the "site" key to submissions.
         SendEmails::dispatch($this, Site::default());
+
+        return $this;
     }
 
     public function deleteQuietly()
