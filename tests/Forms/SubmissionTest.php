@@ -250,18 +250,11 @@ class SubmissionTest extends TestCase
 
         $submitted = $form->makeSubmission();
         $this->assertFalse($submitted->isIncomplete());
-        $this->assertFalse($submitted->isSpam());
         $this->assertEquals('complete', $submitted->status());
 
         $incomplete = $form->makeSubmission()->set('incomplete', true);
         $this->assertTrue($incomplete->isIncomplete());
-        $this->assertFalse($incomplete->isSpam());
         $this->assertEquals('incomplete', $incomplete->status());
-
-        $spam = $form->makeSubmission()->set('spam', true);
-        $this->assertTrue($spam->isSpam());
-        $this->assertFalse($spam->isIncomplete());
-        $this->assertEquals('spam', $spam->status());
     }
 
     #[Test]
@@ -288,7 +281,6 @@ class SubmissionTest extends TestCase
     {
         return [
             'incomplete' => ['incomplete'],
-            'spam' => ['spam'],
         ];
     }
 
@@ -331,10 +323,10 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function completing_an_incomplete_or_spam_submission_removes_the_status_key_and_dispatches_events()
+    public function completing_an_incomplete_submission_removes_the_status_key_and_dispatches_events()
     {
         $form = tap(Form::make('contact_us'))->save();
-        $submission = tap($form->makeSubmission()->set('incomplete', true)->set('spam', true))->save();
+        $submission = tap($form->makeSubmission()->set('incomplete', true))->save();
 
         Bus::fake();
         Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
@@ -342,7 +334,6 @@ class SubmissionTest extends TestCase
         $submission->complete(Site::default());
 
         $this->assertFalse($submission->isIncomplete());
-        $this->assertFalse($submission->isSpam());
 
         // Submission already exists, so save() won't dispatch the Created event, complete() will.
         Event::assertDispatched(SubmissionCreated::class, 1);

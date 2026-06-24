@@ -34,8 +34,7 @@ class SubmissionStatus extends Filter
     {
         match ($values['status']) {
             'incomplete' => $query->where('incomplete', true),
-            'spam' => $query->where('spam', true),
-            default => $query->where('incomplete', '!=', true)->where('spam', '!=', true),
+            default => $query->where('incomplete', '!=', true),
         };
     }
 
@@ -54,7 +53,6 @@ class SubmissionStatus extends Filter
         return collect([
             'complete' => __('Complete'),
             'incomplete' => __('Incomplete'),
-            'spam' => __('Spam'),
         ]);
     }
 }

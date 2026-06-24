@@ -46,7 +46,7 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
     }
 
     #[Test]
-    public function it_only_deletes_incomplete_submissions_never_complete_or_spam()
+    public function it_only_deletes_incomplete_submissions_never_complete()
     {
         config(['statamic.forms.delete_incomplete_submissions_after' => 7]);
 
@@ -58,16 +58,12 @@ class DeleteIncompleteFormSubmissionsTest extends TestCase
         Carbon::setTestNow('2025-06-02 12:00:00');
         $complete = tap($form->makeSubmission())->save();
 
-        Carbon::setTestNow('2025-06-03 12:00:00');
-        $spam = tap($form->makeSubmission()->set('spam', true))->save();
-
         Carbon::setTestNow('2025-06-30 12:00:00');
 
         (new DeleteIncompleteFormSubmissions)->handle();
 
         $this->assertNull($form->submission($incomplete->id()));
         $this->assertNotNull($form->submission($complete->id()));
-        $this->assertNotNull($form->submission($spam->id()));
     }
 
     #[Test]
