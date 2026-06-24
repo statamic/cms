@@ -353,6 +353,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function getQueryableValue(string $field)
     {
+        if ($field === 'status') {
+            return null;
+        }
+
         if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }

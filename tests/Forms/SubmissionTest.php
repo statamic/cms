@@ -286,6 +286,22 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function the_status_is_not_queryable()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $partial = $form->makeSubmission()->asPartial();
+        $finalized = $form->makeSubmission();
+
+        // It's derived and display-only, so it resolves to null for query purposes.
+        $this->assertEquals('partial', $partial->status());
+        $this->assertNull($partial->getQueryableValue('status'));
+
+        $this->assertEquals('finalized', $finalized->status());
+        $this->assertNull($finalized->getQueryableValue('status'));
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_site()
     {
         $this->setSites([
