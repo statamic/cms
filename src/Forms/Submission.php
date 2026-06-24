@@ -241,8 +241,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
-        // TODO: Use $this->site() here when we add the "site" key to submissions.
-        SendEmails::dispatch($this, Sites::default());
+        SendEmails::dispatch($this, $this->site());
 
         return $this;
     }

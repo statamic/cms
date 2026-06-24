@@ -334,7 +334,7 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
         $submission = $form->makeSubmission()->asPartial();
 
-        $submission->finalize(Site::default());
+        $submission->finalize();
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
@@ -352,7 +352,7 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
         $submission = tap($form->makeSubmission()->set('partial', true))->save();
 
-        $submission->finalize(Site::default());
+        $submission->finalize();
 
         $this->assertFalse($submission->isPartial());
 
@@ -372,7 +372,7 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us')->store(false))->save();
         $submission = $form->makeSubmission()->asPartial();
 
-        $submission->finalize(Site::default());
+        $submission->finalize();
 
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
@@ -389,8 +389,8 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
         $submission = $form->makeSubmission()->asPartial();
 
-        $submission->finalize(Site::default());
-        $submission->finalize(Site::default());
+        $submission->finalize();
+        $submission->finalize();
 
         // The second call is a no-op because the submission is no longer partial.
         Event::assertDispatched(SubmissionFinalized::class, 1);
