@@ -41,7 +41,7 @@ class SubmitForm
 
         $this->validate($data, $files, $only);
 
-        $submission = $this->submission ?? $this->form->makeSubmission();
+        $submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
 
         $uploadedAssets = [];
 
@@ -68,7 +68,7 @@ class SubmitForm
             throw $e;
         }
 
-        $submission->complete();
+        $submission->finalize();
 
         return $submission;
     }
@@ -80,7 +80,7 @@ class SubmitForm
 
         $this->validate($data, $files, $only);
 
-        $submission = $this->submission ?? $this->form->makeSubmission();
+        $submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
 
         $uploadedAssets = $submission->uploadFiles($files);
 
@@ -93,10 +93,7 @@ class SubmitForm
             ->values()
             ->only(array_keys($values));
 
-        $submission
-            ->merge($processedValues)
-            ->set('incomplete', true)
-            ->save();
+        $submission->merge($processedValues)->save();
 
         return $submission;
     }

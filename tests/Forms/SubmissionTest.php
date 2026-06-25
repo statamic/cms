@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
+use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
@@ -123,6 +124,33 @@ class SubmissionTest extends TestCase
         $this->assertFalse($submission->has('hello'));
         $this->assertNull($submission->get('hello'));
         $this->assertNull($submission->hello);
+    }
+
+    #[Test]
+    public function setting_data_preserves_the_partial_and_site_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial()->site('fr');
+
+        $submission->data(['foo' => 'bar']);
+
+        $this->assertEquals('bar', $submission->get('foo'));
+        $this->assertTrue($submission->isPartial());
+        $this->assertEquals('fr', $submission->get('site'));
+    }
+
+    #[Test]
+    public function setting_data_with_partial_or_site_in_the_payload_overrides_them()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial()->site('fr');
+
+        $submission->data(['foo' => 'bar', 'partial' => false, 'site' => 'de']);
+
+        $this->assertFalse($submission->isPartial());
+        $this->assertEquals('de', $submission->get('site'));
     }
 
     #[Test]
@@ -249,121 +277,167 @@ class SubmissionTest extends TestCase
         $form = tap(Form::make('contact_us'))->save();
 
         $submitted = $form->makeSubmission();
-        $this->assertFalse($submitted->isIncomplete());
-        $this->assertFalse($submitted->isSpam());
-        $this->assertEquals('complete', $submitted->status());
+        $this->assertFalse($submitted->isPartial());
+        $this->assertEquals('finalized', $submitted->status());
 
-        $incomplete = $form->makeSubmission()->set('incomplete', true);
-        $this->assertTrue($incomplete->isIncomplete());
-        $this->assertFalse($incomplete->isSpam());
-        $this->assertEquals('incomplete', $incomplete->status());
-
-        $spam = $form->makeSubmission()->set('spam', true);
-        $this->assertTrue($spam->isSpam());
-        $this->assertFalse($spam->isIncomplete());
-        $this->assertEquals('spam', $spam->status());
+        $partial = $form->makeSubmission()->asPartial();
+        $this->assertTrue($partial->isPartial());
+        $this->assertEquals('partial', $partial->status());
     }
 
     #[Test]
-    #[DataProvider('withheldStatusProvider')]
-    public function it_does_not_dispatch_creation_events_when_saving_a_withheld_submission(string $status)
-    {
-        Event::fake();
-
-        $form = tap(Form::make('contact_us'))->save();
-
-        $submission = $form->makeSubmission()->set($status, true);
-        $submission->save();
-
-        // Creation events shouldn't be dispatched.
-        Event::assertNotDispatched(SubmissionCreating::class);
-        Event::assertNotDispatched(SubmissionCreated::class);
-
-        // But, saving events should.
-        Event::assertDispatched(SubmissionSaving::class);
-        Event::assertDispatched(SubmissionSaved::class);
-    }
-
-    public static function withheldStatusProvider(): array
-    {
-        return [
-            'incomplete' => ['incomplete'],
-            'spam' => ['spam'],
-        ];
-    }
-
-    #[Test]
-    public function created_event_is_not_automatically_dispatched_when_removing_the_incomplete_key()
+    public function the_status_is_not_queryable()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('incomplete', true);
-        $submission->save();
+        $partial = $form->makeSubmission()->asPartial();
+        $finalized = $form->makeSubmission();
 
-        Event::fake();
+        // It's derived and display-only, so it resolves to null for query purposes.
+        $this->assertEquals('partial', $partial->status());
+        $this->assertNull($partial->getQueryableValue('status'));
 
-        // Removing the incomplete key turns it into a "real" submission, but because
-        // the record already exists, save() alone won't dispatch Created. This is why
-        // complete() dispatches it explicitly (covered by the test below).
-        $submission->remove('incomplete');
-        $submission->save();
-
-        Event::assertNotDispatched(SubmissionCreating::class);
-        Event::assertNotDispatched(SubmissionCreated::class);
-        Event::assertDispatched(SubmissionSaved::class);
+        $this->assertEquals('finalized', $finalized->status());
+        $this->assertNull($finalized->getQueryableValue('status'));
     }
 
     #[Test]
-    public function completing_a_new_submission_dispatches_created_event_once()
+    public function it_gets_and_sets_the_site()
     {
-        Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr'],
+        ]);
 
         $form = tap(Form::make('contact_us'))->save();
         $submission = $form->makeSubmission();
 
-        $submission->complete(Site::default());
+        // A missing site falls back to the default.
+        $this->assertEquals('en', $submission->site()->handle());
+
+        // It can be set by handle, storing the handle in the data.
+        $return = $submission->site('fr');
+        $this->assertSame($submission, $return);
+        $this->assertEquals('fr', $submission->get('site'));
+        $this->assertEquals('fr', $submission->site()->handle());
+
+        // It can be set with a Site instance, which also stores the handle.
+        $submission->site(Site::get('en'));
+        $this->assertEquals('en', $submission->get('site'));
+        $this->assertEquals('en', $submission->site()->handle());
+
+        // An invalid handle falls back to the default.
+        $submission->set('site', 'nonexistent');
+        $this->assertEquals('en', $submission->site()->handle());
+    }
+
+    #[Test]
+    public function saving_a_partial_submission_dispatches_the_same_events_as_any_other()
+    {
+        Event::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->set('partial', true);
+        $submission->save();
+
+        // A partial submission is still saved and created, so its events are never withheld.
+        Event::assertDispatched(SubmissionCreating::class);
+        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionSaving::class);
+        Event::assertDispatched(SubmissionSaved::class);
+    }
+
+    #[Test]
+    public function created_event_is_not_dispatched_again_when_removing_the_partial_key()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->set('partial', true);
+        $submission->save();
+
+        Event::fake();
+
+        // The created event already fired when the partial was first saved. Removing the
+        // partial key and saving again won't re-dispatch it, because the record exists.
+        $submission->remove('partial');
+        $submission->save();
+
+        Event::assertNotDispatched(SubmissionCreating::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionSaved::class);
+    }
+
+    #[Test]
+    public function finalizing_a_new_submission_dispatches_created_and_finalized_events_once()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission()->asPartial();
+
+        $submission->finalize();
 
         Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
 
         $this->assertNotNull($form->submission($submission->id()));
     }
 
     #[Test]
-    public function completing_an_incomplete_or_spam_submission_removes_the_status_key_and_dispatches_events()
+    public function finalizing_a_partial_submission_removes_the_status_key_and_dispatches_events()
     {
-        $form = tap(Form::make('contact_us'))->save();
-        $submission = tap($form->makeSubmission()->set('incomplete', true)->set('spam', true))->save();
-
         Bus::fake();
-        Event::fake([SubmissionCreated::class, SubmissionCreating::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
-        $submission->complete(Site::default());
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission()->set('partial', true))->save();
 
-        $this->assertFalse($submission->isIncomplete());
-        $this->assertFalse($submission->isSpam());
+        $submission->finalize();
 
-        // Submission already exists, so save() won't dispatch the Created event, complete() will.
+        $this->assertFalse($submission->isPartial());
+
+        // The created event fired once, when the partial was first saved. Finalizing an
+        // existing submission won't dispatch it again, but it does finalize and email.
         Event::assertDispatched(SubmissionCreated::class, 1);
-        Event::assertNotDispatched(SubmissionCreating::class);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]
-    public function completing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
+    public function finalizing_a_submission_for_a_non_storing_form_still_dispatches_the_created_event()
     {
         Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $form = tap(Form::make('contact_us')->store(false))->save();
-        $submission = $form->makeSubmission();
+        $submission = $form->makeSubmission()->asPartial();
 
-        $submission->complete(Site::default());
+        $submission->finalize();
 
         Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
         $this->assertNull($form->submission($submission->id()));
+    }
+
+    #[Test]
+    public function finalizing_is_idempotent()
+    {
+        Bus::fake();
+        Event::fake([SubmissionFinalized::class]);
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission()->asPartial();
+
+        $submission->finalize();
+        $submission->finalize();
+
+        // The second call is a no-op because the submission is no longer partial.
+        Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]

@@ -27,15 +27,14 @@ class SubmissionStatus extends Filter
 
     public function autoApply()
     {
-        return ['status' => 'complete'];
+        return ['status' => 'finalized'];
     }
 
     public function apply($query, $values)
     {
         match ($values['status']) {
-            'incomplete' => $query->where('incomplete', true),
-            'spam' => $query->where('spam', true),
-            default => $query->where('incomplete', '!=', true)->where('spam', '!=', true),
+            'partial' => $query->where('partial', true),
+            default => $query->where('partial', '!=', true),
         };
     }
 
@@ -52,9 +51,8 @@ class SubmissionStatus extends Filter
     protected function options()
     {
         return collect([
-            'complete' => __('Complete'),
-            'incomplete' => __('Incomplete'),
-            'spam' => __('Spam'),
+            'finalized' => __('Finalized'),
+            'partial' => __('Partial'),
         ]);
     }
 }

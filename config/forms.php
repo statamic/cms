@@ -36,16 +36,15 @@ return [
     'send_email_job' => \Statamic\Forms\SendEmail::class,
 
     /*
-    |--------------------------------------------------------------------------
-    | Incomplete Submissions
+    | Partial Submissions
     |--------------------------------------------------------------------------
     |
-    | Incomplete (partial) submissions are automatically deleted after a set
-    | number of days. Set this to null to prevent their automatic deletion.
+    | Partial submissions are automatically deleted after a set number
+    | of days. Set this to null to prevent their automatic deletion.
     |
     */
 
-    'delete_incomplete_submissions_after' => 7,
+    'delete_partial_submissions_after' => 7,
 
     /*
     |--------------------------------------------------------------------------

@@ -33,7 +33,7 @@ const {
     desyncField,
     isTrackingOriginValues,
     originValues: containerOriginValues,
-    asConfig,
+    asConfig: containerAsConfig,
     errors: containerErrors,
     readOnly: containerReadOnly,
     setFieldPreviewValue,
@@ -52,7 +52,10 @@ const {
     fieldPathPrefix: injectedFieldPathPrefix,
     metaPathPrefix: injectedMetaPathPrefix,
     readOnly: fieldsProviderReadOnly,
+    asConfig: fieldsAsConfig,
 } = injectFieldsContext();
+
+const asConfig = computed(() => fieldsAsConfig.value ?? containerAsConfig.value ?? false);
 const fieldPathPrefix = computed(() => props.fieldPathPrefix || injectedFieldPathPrefix.value);
 const metaPathPrefix = computed(() => props.metaPathPrefix || injectedMetaPathPrefix.value);
 const handle = props.config.handle;
