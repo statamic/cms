@@ -11,6 +11,8 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Fields\Tab;
+use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
@@ -18,6 +20,8 @@ use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+
+use function Statamic\trans as __;
 
 class Tags extends BaseTags
 {
@@ -75,6 +79,8 @@ class Tags extends BaseTags
         $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
+
+        $data['pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
@@ -283,7 +289,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get sections of fields, using sections defined in blueprint.
+     * Get sections of fields across all pages, using sections defined in blueprint.
      *
      * @param  string  $sessionHandle
      * @param  JsDriver  $jsDriver
@@ -291,13 +297,66 @@ class Tags extends BaseTags
      */
     protected function getSections($sessionHandle, $jsDriver)
     {
-        return $this->form()->blueprint()->tabs()->first()->sections()
+        return $this->form()->blueprint()->tabs()
+            ->flatMap(fn ($tab) => $this->getSectionsForTab($tab, $sessionHandle, $jsDriver))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get the sections of fields for a single page (blueprint tab).
+     *
+     * @param  \Statamic\Fields\Tab  $tab
+     * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
+     * @return \Illuminate\Support\Collection
+     */
+    private function getSectionsForTab($tab, $sessionHandle, $jsDriver)
+    {
+        return $tab->sections()
             ->map(function ($section) use ($sessionHandle, $jsDriver) {
                 return [
                     'display' => $section->display(),
                     'instructions' => $section->instructions(),
                     'fields' => $this->getFields($sessionHandle, $jsDriver, $section->fields()->all()),
                 ];
+            });
+    }
+
+    /**
+     * Get pages of sections, using the tabs defined in the blueprint.
+     *
+     * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
+     * @return array
+     */
+    protected function getPages($sessionHandle, $jsDriver)
+    {
+        $tabs = $this->form()->blueprint()->tabs()->values();
+
+        return $tabs
+            ->map(function (Tab $tab, $index) use ($tabs, $sessionHandle, $jsDriver) {
+                $contents = $tab->contents();
+                $isFirstPage = $index === 0;
+                $isLastPage = $index === $tabs->count() - 1;
+
+                $page = [
+                    'id' => $tab->handle(),
+                    'display' => $tab->display(),
+                    'instructions' => $tab->instructions(),
+                    'button_label' => $contents['button_label'] ?? ($isLastPage ? __('Submit') : __('Next')),
+                    'sections' => $this->getSectionsForTab($tab, $sessionHandle, $jsDriver)->all(),
+                ];
+
+                if (! $isFirstPage) {
+                    $page['previous_page_label'] = $contents['previous_page_label'] ?? null;
+                }
+
+                if ($jsDriver instanceof AbstractJsDriver) {
+                    $page = array_merge($page, $jsDriver->addToRenderablePageData($tab, $page));
+                }
+
+                return $page;
             })
             ->all();
     }

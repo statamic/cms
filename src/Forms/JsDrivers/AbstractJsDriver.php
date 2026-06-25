@@ -77,6 +77,18 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
+     * Add to renderable page view data.
+     *
+     * @param  \Statamic\Fields\Tab  $page
+     * @param  array  $data
+     * @return array
+     */
+    public function addToRenderablePageData($page, $data)
+    {
+        return [];
+    }
+
+    /**
      * Render form html.
      *
      * @param  string  $html

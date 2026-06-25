@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -723,6 +724,73 @@ EOT
         ], [
             'custom' => 'fall back to default partial',
         ]);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_pages_array()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'display' => 'Page One',
+                    'instructions' => 'Page One Instructions',
+                    'sections' => [
+                        ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'display' => 'Page Two',
+                    'previous_page_label' => 'Back',
+                    'sections' => [
+                        ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ pages }}
+        <div class="page">{{ id }} - {{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
+    {{ /pages }}
+{{ /form:survey }}
+EOT
+        ));
+
+        // button_label should default to "Next", then "Submit" on the last page.
+        // The back button is only output when a previous_page_label is set.
+        $this->assertStringContainsString('<div class="page">page_one - Page One (Page One Instructions) - button:Next - [Section A:name,]</div>', $output);
+        $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit - [Section B:email,]</div>', $output);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_simplified_pages_array_when_forms_pro_is_not_installed()
+    {
+        // When forms-pro isn't installed, sections will be collapsed under a single page.
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $this->createForm([
+            'sections' => [
+                ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ pages }}
+        <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
+    {{ /pages }}
+    <div class="all-sections">{{ sections }}{{ display }},{{ /sections }}</div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="page">main - button:Submit - [Section A:name,][Section B:email,]</div>', $output);
     }
 
     #[Test]
