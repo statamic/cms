@@ -101,6 +101,11 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    /** When `false`, the results table is hidden so an alternate view can be shown. */
+    showResults: {
+        type: Boolean,
+        default: true,
+    },
     /** Array of checked item IDs. */
     selections: {
         type: Array,
@@ -729,21 +734,26 @@ autoApplyState();
         </slot>
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
-            <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
+            <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
                 <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>
-                <CustomizeColumns v-if="allowCustomizingColumns" />
+                <div v-if="$slots['toolbar-actions'] || allowCustomizingColumns" class="flex items-center gap-2 sm:gap-3">
+                    <slot name="toolbar-actions" />
+                    <CustomizeColumns v-if="allowCustomizingColumns" />
+                </div>
             </div>
 
+            <slot v-if="!showResults" name="results" />
+
             <div
-                v-if="!items.length"
+                v-else-if="!items.length"
                 class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500"
                 v-text="__('No results')"
             />
 
-            <Panel v-else class="relative overflow-x-auto" style="container-type: scroll-state;">
+            <Panel v-else-if="showResults" class="relative overflow-x-auto" style="container-type: scroll-state;">
                 <Table>
                     <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                         <component :is="slot" v-bind="slotProps" />

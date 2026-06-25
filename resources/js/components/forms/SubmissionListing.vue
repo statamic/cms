@@ -9,8 +9,17 @@
         :sort-direction="sortDirection"
         :preferences-prefix="preferencesPrefix"
         :filters="filters"
+        :show-results="view === 'entries'"
         push-query
     >
+        <template #toolbar-actions>
+            <slot name="toolbar-actions" />
+        </template>
+
+        <template #results>
+            <slot name="results" />
+        </template>
+
         <template #cell-datestamp="{ row: submission, value, isColumnVisible }">
             <Link class="title-index-field" :href="submission.url" @click.stop>
                 <SubmissionStatusIndicator v-if="!isColumnVisible('status')" :status="submission.status" />
@@ -41,6 +50,10 @@ export default {
         sortDirection: String,
         columns: Array,
         filters: Array,
+        view: {
+            type: String,
+            default: 'entries',
+        },
     },
 
     data() {

@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -21,6 +21,7 @@ const props = defineProps([
     'redirectUrl',
 ]);
 
+const view = ref('entries');
 const deleter = ref(null);
 const generatingFakeSubmission = ref(false);
 const deletingFakeSubmissions = ref(false);
@@ -222,13 +223,37 @@ function exportSubmissions() {
 
         <FormSubmissionListing
             ref="submissionListing"
+            :view="view"
             :form="form.handle"
             :action-url="actionUrl"
             sort-column="datestamp"
             sort-direction="desc"
             :columns="columns"
             :filters="filters"
-        />
+        >
+            <template #toolbar-actions>
+                <ToggleGroup v-model="view" size="sm">
+                    <ToggleItem
+                        value="entries"
+                        icon="layout-list"
+                        :aria-label="__('Entries')"
+                        v-tooltip="__('Entries')"
+                    />
+                    <ToggleItem
+                        value="summary"
+                        icon="scale-up"
+                        :aria-label="__('Summary')"
+                        v-tooltip="__('Summary')"
+                    />
+                </ToggleGroup>
+            </template>
+
+            <template #results>
+                <p class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500">
+                    {{ __('Summary') }}
+                </p>
+            </template>
+        </FormSubmissionListing>
 
         <Modal :open="exportModalOpen" @update:open="exportModalOpen = $event" :title="__('Export Submissions')">
             <div class="space-y-4">
