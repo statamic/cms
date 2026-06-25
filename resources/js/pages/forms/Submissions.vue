@@ -232,7 +232,7 @@ function exportSubmissions() {
             :filters="filters"
         >
             <template #toolbar-actions>
-                <ToggleGroup v-model="view" size="sm">
+                <ToggleGroup v-model="view">
                     <ToggleItem
                         value="entries"
                         icon="layout-list"

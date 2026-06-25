@@ -740,8 +740,8 @@ autoApplyState();
                     <Filters v-if="hasFilters" />
                 </div>
                 <div v-if="$slots['toolbar-actions'] || allowCustomizingColumns" class="absolute right-0 flex items-center gap-2 sm:gap-3 mask-bg mask-bg--left">
-                    <slot name="toolbar-actions" />
                     <CustomizeColumns v-if="allowCustomizingColumns" />
+                    <slot name="toolbar-actions" />
                 </div>
             </div>
 
