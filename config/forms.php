@@ -37,6 +37,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Partial Submissions
+    |--------------------------------------------------------------------------
+    |
+    | Partial submissions are automatically deleted after a set number
+    | of days. Set this to null to prevent their automatic deletion.
+    |
+    */
+
+    'delete_partial_submissions_after' => 7,
+
+    /*
+    |--------------------------------------------------------------------------
     | Exporters
     |--------------------------------------------------------------------------
     |
