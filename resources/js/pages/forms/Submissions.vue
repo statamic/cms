@@ -187,6 +187,21 @@ function exportSubmissions() {
                 </DropdownMenu>
             </Dropdown>
 
+            <ToggleGroup v-model="view">
+                <ToggleItem
+                    value="entries"
+                    icon="layout-list"
+                    :aria-label="__('Entries')"
+                    v-tooltip="__('Entries')"
+                />
+                <ToggleItem
+                    value="summary"
+                    icon="scale-up"
+                    :aria-label="__('Summary')"
+                    v-tooltip="__('Summary')"
+                />
+            </ToggleGroup>
+
             <CommandPaletteItem
                 v-if="form.canGenerateFakeSubmissions"
                 category="Actions"
@@ -231,23 +246,6 @@ function exportSubmissions() {
             :columns="columns"
             :filters="filters"
         >
-            <template #toolbar-actions>
-                <ToggleGroup v-model="view">
-                    <ToggleItem
-                        value="entries"
-                        icon="layout-list"
-                        :aria-label="__('Entries')"
-                        v-tooltip="__('Entries')"
-                    />
-                    <ToggleItem
-                        value="summary"
-                        icon="scale-up"
-                        :aria-label="__('Summary')"
-                        v-tooltip="__('Summary')"
-                    />
-                </ToggleGroup>
-            </template>
-
             <template #results>
                 <p class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500">
                     {{ __('Summary') }}
