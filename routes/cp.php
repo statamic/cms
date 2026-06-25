@@ -126,7 +126,7 @@ Route::group(['prefix' => 'auth'], function () {
 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.cp.auth')->name('password.email');
-        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->middleware('throttle:statamic.cp.password-reset-form')->name('password.reset');
         Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.cp.auth')->name('password.reset.action');
 
         if (TwoFactor::enabled()) {
@@ -256,6 +256,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
     Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
+    Route::post('assets/{encoded_asset}/crop', [AssetsController::class, 'crop'])->name('assets.crop');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
