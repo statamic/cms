@@ -99,9 +99,6 @@ class SubmitForm
             $validator->setRules($this->filterRules($validator->getRulesWithoutPlaceholders(), $only));
         }
 
-        // If this was submitted from a front-end form, we want to use the appropriate language
-        // for the translation messages. If there's no previous url, it was likely submitted
-        // directly in a headless format. In that case, we'll just use the default lang.
         $this->withLocale($this->site()?->lang(), fn () => $validator->validate());
     }
 
