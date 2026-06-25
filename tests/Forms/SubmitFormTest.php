@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionFinalized;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
@@ -233,10 +234,10 @@ class SubmitFormTest extends TestCase
     {
         Bus::fake();
 
-        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->set('incomplete', true))->save();
+        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->asPartial())->save();
 
         $this->assertCount(1, $this->form->submissions());
-        $this->assertTrue($this->form->submission($draft->id())->isIncomplete());
+        $this->assertTrue($this->form->submission($draft->id())->isPartial());
 
         $submission = $this->action()->resume($draft)->submit(
             data: ['email' => 'new@example.com'],
@@ -247,7 +248,7 @@ class SubmitFormTest extends TestCase
         $this->assertCount(1, $this->form->submissions());
 
         $stored = $this->form->submission($draft->id());
-        $this->assertFalse($stored->isIncomplete());
+        $this->assertFalse($stored->isPartial());
 
         // A field present in the request should update the existing value.
         $this->assertEquals('new@example.com', $stored->get('email'));
@@ -262,7 +263,7 @@ class SubmitFormTest extends TestCase
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
 
-        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->set('incomplete', true))->save();
+        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->asPartial())->save();
 
         $this->action()->resume($draft)->submit(
             data: ['email' => 'new@example.com'],
@@ -417,7 +418,7 @@ class SubmitFormTest extends TestCase
     public function it_saves_a_draft_without_completing_the_submission()
     {
         Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $this->assertEmpty($this->form->submissions());
 
@@ -426,10 +427,12 @@ class SubmitFormTest extends TestCase
         );
 
         $this->assertCount(1, $this->form->submissions());
-        $this->assertTrue($this->form->submission($submission->id())->isIncomplete());
+        $this->assertTrue($this->form->submission($submission->id())->isPartial());
         $this->assertEquals('test@example.com', $submission->get('email'));
 
-        Event::assertNotDispatched(SubmissionCreated::class);
+        // The partial submission record is created, but it isn't finalized.
+        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(SendEmails::class);
     }
 
@@ -438,7 +441,7 @@ class SubmitFormTest extends TestCase
     {
         Bus::fake();
 
-        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf'])->set('incomplete', true))->save();
+        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
 
         $this->assertCount(1, $this->form->submissions());
 
@@ -451,7 +454,7 @@ class SubmitFormTest extends TestCase
         $this->assertCount(1, $this->form->submissions());
 
         $stored = $this->form->submission($draft->id());
-        $this->assertTrue($stored->isIncomplete());
+        $this->assertTrue($stored->isPartial());
 
         // Earlier-page values are preserved while the new page's values are merged in.
         $this->assertEquals('Olaf', $stored->get('name'));
@@ -471,7 +474,7 @@ class SubmitFormTest extends TestCase
         );
 
         $stored = $this->form->submission($submission->id());
-        $this->assertTrue($stored->isIncomplete());
+        $this->assertTrue($stored->isPartial());
         $this->assertEquals('Test', $stored->get('name'));
     }
 
@@ -481,9 +484,9 @@ class SubmitFormTest extends TestCase
         Bus::fake();
         Event::fake([SubmissionCreated::class]);
 
-        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->set('incomplete', true))->save();
+        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->asPartial())->save();
 
-        $this->assertTrue($this->form->submission($draft->id())->isIncomplete());
+        $this->assertTrue($this->form->submission($draft->id())->isPartial());
 
         $submission = $this->action()->resume($draft)->submit(
             data: ['email' => 'new@example.com'],
@@ -495,7 +498,7 @@ class SubmitFormTest extends TestCase
         $this->assertCount(1, $this->form->submissions());
 
         $stored = $this->form->submission($draft->id());
-        $this->assertFalse($stored->isIncomplete());
+        $this->assertFalse($stored->isPartial());
         $this->assertEquals('new@example.com', $stored->get('email'));
         $this->assertEquals('Olaf', $stored->get('name'));
 
@@ -507,7 +510,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_runs_the_gate_when_completing_a_resumed_draft()
     {
-        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->set('incomplete', true))->save();
+        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->asPartial())->save();
 
         // A listener returning false silently aborts completion, proving the gate runs.
         Event::listen(FormSubmitted::class, fn () => false);
@@ -523,6 +526,6 @@ class SubmitFormTest extends TestCase
         }
 
         // The draft stays incomplete since completion was silently aborted.
-        $this->assertTrue($this->form->submission($draft->id())->isIncomplete());
+        $this->assertTrue($this->form->submission($draft->id())->isPartial());
     }
 }
