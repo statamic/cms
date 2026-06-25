@@ -196,7 +196,7 @@ function exportSubmissions() {
                 />
                 <ToggleItem
                     value="summary"
-                    icon="scale-up"
+                    icon="chart-increase"
                     :aria-label="__('Summary')"
                     v-tooltip="__('Summary')"
                 />
