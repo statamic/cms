@@ -244,6 +244,24 @@ class DateTest extends TestCase
                 ['start' => '2012-08-29', 'end' => '2013-09-27'],
                 ['start' => '2012-08-29', 'end' => '2013-09-27'],
             ],
+            'single with date and time array from cp' => [
+                'UTC',
+                [],
+                ['date' => '2012-08-29', 'time' => '13:43'],
+                '2012-08-29 13:43',
+            ],
+            'single with date array and no time' => [
+                'UTC',
+                [],
+                ['date' => '2012-08-29', 'time' => null],
+                '2012-08-29 00:00',
+            ],
+            'single with empty date array' => [
+                'UTC',
+                [],
+                ['date' => null, 'time' => null],
+                null,
+            ],
         ];
     }
 

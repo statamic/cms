@@ -228,6 +228,17 @@ class Date extends Fieldtype
             return null;
         }
 
+        // If the value is an array, the CP has submitted the date and time separately.
+        // We'll combine them into a single string before parsing, since Carbon can't
+        // parse an array. A missing date means the field was left empty.
+        if (is_array($data)) {
+            if (! ($data['date'] ?? null)) {
+                return null;
+            }
+
+            $data = $data['date'].' '.(($data['time'] ?? null) ?: '00:00');
+        }
+
         return $this->processDateTime($data);
     }
 
