@@ -34,7 +34,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\Delete::class,
         Actions\DeleteFakeSubmissions::class,
         Actions\DeleteMultisiteEntry::class,
-        Actions\MarkNotSpam::class,
         Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
         Actions\DownloadAssetFolder::class,
