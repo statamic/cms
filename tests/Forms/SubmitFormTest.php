@@ -422,7 +422,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertEmpty($this->form->submissions());
 
-        $submission = $this->action()->saveIncomplete(
+        $submission = $this->action()->asPartial()->submit(
             data: ['email' => 'test@example.com'],
         );
 
@@ -445,7 +445,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertCount(1, $this->form->submissions());
 
-        $submission = $this->action()->resume($draft)->saveIncomplete(
+        $submission = $this->action()->resume($draft)->asPartial()->submit(
             data: ['email' => 'new@example.com'],
         );
 
@@ -468,7 +468,7 @@ class SubmitFormTest extends TestCase
 
         // The email field is required, but scoping the draft save to "name" only
         // means the missing email shouldn't cause a validation failure.
-        $submission = $this->action()->saveIncomplete(
+        $submission = $this->action()->asPartial()->submit(
             data: ['name' => 'Test'],
             only: ['name'],
         );

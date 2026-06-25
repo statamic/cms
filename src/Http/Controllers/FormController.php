@@ -15,7 +15,6 @@ use Statamic\Forms\SubmitForm;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 use function Statamic\trans as __;
 
@@ -41,21 +40,14 @@ class FormController extends Controller
                 return response()->noContent(headers: ['Precognition-Success' => 'true']);
             }
 
-            // Forms Pro uses this hook to create incomplete submissions and return
-            // non-standard responses (for multipage forms).
-            $result = $this->runHooks('submitting', [
+            // Forms Pro uses this hook to resume an in-progress multi-page (partial) submission.
+            $this->runHooks('submitting', [
                 'request' => $request,
                 'form' => $form,
                 'action' => $action,
             ]);
 
-            if ($result instanceof SymfonyResponse) {
-                return $result;
-            }
-
-            $submission = $result instanceof Submission
-                ? $result
-                : $action->submit($request->all(), $request->allFiles());
+            $submission = $action->submit($request->all(), $request->allFiles());
 
             return $this->formSuccess($params, $submission);
         } catch (SilentFormFailureException $e) {

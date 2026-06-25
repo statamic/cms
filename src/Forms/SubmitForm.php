@@ -19,6 +19,7 @@ class SubmitForm
 
     protected Form $form;
     protected ?Submission $submission = null;
+    protected bool $partial = false;
 
     public function form(Form $form): static
     {
@@ -30,6 +31,13 @@ class SubmitForm
     public function resume(Submission $submission): static
     {
         $this->submission = $submission;
+
+        return $this;
+    }
+
+    public function asPartial(bool $partial = true): static
+    {
+        $this->partial = $partial;
 
         return $this;
     }
@@ -46,7 +54,9 @@ class SubmitForm
         $uploadedAssets = [];
 
         try {
-            throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($submission));
+            if (! $this->partial) {
+                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($submission));
+            }
 
             $uploadedAssets = $submission->uploadFiles($files);
 
@@ -57,43 +67,20 @@ class SubmitForm
                 ->addValues($values)
                 ->process()
                 ->values()
-                ->when($this->submission, fn ($processedValues) => $processedValues->only(array_keys($values)));
+                ->when($this->submission || $this->partial, fn ($processedValues) => $processedValues->only(array_keys($values)));
 
             $submission->merge($processedValues);
 
-            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException($submission));
+            if (! $this->partial) {
+                throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException($submission));
+            }
         } catch (ValidationException|SilentFormFailureException $e) {
             $this->removeUploadedAssets($uploadedAssets);
 
             throw $e;
         }
 
-        $submission->finalize();
-
-        return $submission;
-    }
-
-    public function saveIncomplete(array $data, array $files = [], ?array $only = null): Submission
-    {
-        $files = $this->normalizeFiles($files);
-        $values = array_merge($data, $files);
-
-        $this->validate($data, $files, $only);
-
-        $submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
-
-        $uploadedAssets = $submission->uploadFiles($files);
-
-        $values = array_merge($values, $uploadedAssets);
-
-        $processedValues = $this->form->blueprint()
-            ->fields()
-            ->addValues($values)
-            ->process()
-            ->values()
-            ->only(array_keys($values));
-
-        $submission->merge($processedValues)->save();
+        $this->partial ? $submission->save() : $submission->finalize();
 
         return $submission;
     }
