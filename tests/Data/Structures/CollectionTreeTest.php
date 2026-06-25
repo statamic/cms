@@ -5,7 +5,6 @@ namespace Tests\Data\Structures;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
-use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
