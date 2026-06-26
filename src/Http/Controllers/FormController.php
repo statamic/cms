@@ -154,7 +154,7 @@ class FormController extends Controller
             $redirect = Uri::of(url()->previous())->withoutQuery('page')->__toString();
         }
 
-        if (! \Statamic\Facades\URL::isExternal($redirect)) {
+        if (! $result->nextPage && ! \Statamic\Facades\URL::isExternal($redirect)) {
             session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
             session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
             session()->flash('submission', $submission);

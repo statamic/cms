@@ -1036,6 +1036,37 @@ EOT
     }
 
     #[Test]
+    public function it_only_outputs_the_success_message_after_the_final_page()
+    {
+        $this->createMultiPageForm();
+        Form::find('survey')->save();
+
+        $template = <<<'EOT'
+{{ form:survey }}
+    <p class="success">{{ success }}</p>
+{{ /form:survey }}
+EOT;
+
+        // Submitting a non-final page advances without outputting the success message.
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHasNoErrors();
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
+        $this->assertEmpty($success[1]);
+
+        // Submitting the final page outputs the success message.
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors();
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
+        $this->assertEquals(['Submission successful.'], $success[1]);
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
