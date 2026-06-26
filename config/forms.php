@@ -47,6 +47,8 @@ return [
 
     'delete_partial_submissions_after' => 7,
 
+    'garbage_collect_assets' => false,
+
     /*
     |--------------------------------------------------------------------------
     | Exporters
