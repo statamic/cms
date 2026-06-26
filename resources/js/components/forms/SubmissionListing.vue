@@ -13,6 +13,10 @@
         :show-results="view === 'entries'"
         push-query
     >
+        <template #toolbar-actions>
+            <slot name="toolbar-actions" />
+        </template>
+
         <template #results>
             <slot name="results" />
         </template>

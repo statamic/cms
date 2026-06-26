@@ -734,12 +734,15 @@ autoApplyState();
         </slot>
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
-            <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
+            <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
                 <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>
-                <CustomizeColumns v-if="allowCustomizingColumns" />
+                <div v-if="$slots['toolbar-actions'] || allowCustomizingColumns" class="absolute right-0 flex items-center gap-2 sm:gap-3 mask-bg mask-bg--left">
+                    <slot name="toolbar-actions" />
+                    <CustomizeColumns v-if="allowCustomizingColumns" />
+                </div>
             </div>
 
             <slot v-if="!showResults" name="results" />
