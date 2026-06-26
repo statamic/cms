@@ -1,0 +1,5 @@
+.pie-chart {
+    width: 9rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+}
