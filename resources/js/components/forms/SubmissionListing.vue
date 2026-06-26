@@ -9,7 +9,6 @@
         :sort-direction="sortDirection"
         :preferences-prefix="preferencesPrefix"
         :filters="filters"
-        :allow-customizing-columns="view === 'entries'"
         :show-results="view === 'entries'"
         push-query
     >
