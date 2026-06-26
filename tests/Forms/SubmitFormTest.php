@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -15,6 +16,7 @@ use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
 use Statamic\Forms\SendEmails;
+use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -29,13 +31,24 @@ class SubmitFormTest extends TestCase
     {
         parent::setUp();
 
+        // Page ids only exist when forms pro is installed; without it, pages are
+        // flattened into sections and lose their ids. The action keys everything
+        // (finalizing, field scoping, the next page) off page ids, so we fake it.
+        Composer::shouldReceive('isInstalled')->andReturnFalse()->byDefault();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturnTrue()->byDefault();
+
         $this->form = tap(Form::make('contact')->honeypot('winnie')->formFields([
-            'sections' => [
+            'pages' => [
                 [
-                    'fields' => [
-                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
-                        ['handle' => 'email', 'field' => ['type' => 'email', 'validate' => 'required']],
-                        ['handle' => 'message', 'field' => ['type' => 'long_answer']],
+                    'id' => 'main',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                                ['handle' => 'email', 'field' => ['type' => 'email', 'validate' => 'required']],
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -51,53 +64,142 @@ class SubmitFormTest extends TestCase
 
     private function action(): SubmitForm
     {
-        return app(SubmitForm::class)->form($this->form);
+        return app(SubmitForm::class)->form($this->form)->page('main');
+    }
+
+    private function multiPageForm()
+    {
+        return tap(Form::make('signup')->honeypot('winnie')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'sections' => [
+                        ['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]],
+                    ],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [
+                        ['fields' => [['handle' => 'email', 'field' => ['type' => 'email', 'validate' => 'required']]]],
+                    ],
+                ],
+                [
+                    'id' => 'three',
+                    'sections' => [
+                        ['fields' => [['handle' => 'message', 'field' => ['type' => 'long_answer']]]],
+                    ],
+                ],
+            ],
+        ]))->save();
     }
 
     #[Test]
     public function it_submits_a_form_successfully()
     {
-        Bus::fake();
+        Event::fake([FormSubmitted::class]);
 
-        $submission = $this->action()->submit(
-            data: ['name' => 'Test User', 'email' => 'test@example.com', 'message' => 'Hello'],
+        $result = $this->action()->submit(
+            ['name' => 'Test User', 'email' => 'test@example.com', 'message' => 'Hello'],
         );
 
-        $this->assertNotNull($submission);
-        $this->assertEquals('Test User', $submission->get('name'));
-        $this->assertEquals('test@example.com', $submission->get('email'));
-        $this->assertEquals('Hello', $submission->get('message'));
+        $this->assertInstanceOf(SubmissionResult::class, $result);
+        $this->assertTrue($result->isFinalized());
+        $this->assertNull($result->nextPage);
+        $this->assertEquals('Test User', $result->submission->get('name'));
+        $this->assertEquals('test@example.com', $result->submission->get('email'));
+        $this->assertEquals('Hello', $result->submission->get('message'));
+
+        Event::assertDispatched(FormSubmitted::class, function ($event) {
+            return $event->submission->get('email') === 'test@example.com';
+        });
     }
 
     #[Test]
     public function it_saves_submission_when_store_is_enabled()
     {
-        Bus::fake();
-
         $this->assertEmpty($this->form->submissions());
 
-        $this->action()->submit(
-            data: ['email' => 'test@example.com'],
-        );
+        $this->action()->submit(['email' => 'test@example.com']);
 
         $this->assertCount(1, $this->form->submissions());
     }
 
     #[Test]
-    public function it_dispatches_submission_created_event_when_store_is_disabled()
+    public function it_finalizes_without_storing_when_store_is_disabled()
     {
         Bus::fake();
-        Event::fake([SubmissionCreated::class]);
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $this->form->store(false);
         $this->form->save();
 
-        $this->action()->submit(
-            data: ['email' => 'test@example.com'],
-        );
+        $result = $this->action()->submit(['email' => 'test@example.com']);
 
-        Event::assertDispatched(SubmissionCreated::class);
+        $this->assertTrue($result->isFinalized());
         $this->assertEmpty($this->form->submissions());
+        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionFinalized::class);
+        Bus::assertDispatched(SendEmails::class);
+    }
+
+    #[Test]
+    public function validation_passes_with_valid_data()
+    {
+        $this->action()->validate(['email' => 'test@example.com']);
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Test]
+    public function it_throws_validation_exception_when_validation_fails()
+    {
+        $this->expectException(ValidationException::class);
+
+        $this->action()->validate(['name' => 'Test']); // missing required email
+    }
+
+    #[Test]
+    public function it_throws_validation_exception_with_field_errors()
+    {
+        try {
+            $this->action()->validate(['name' => 'Test']);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('email', $e->errors());
+        }
+    }
+
+    #[Test]
+    public function it_does_not_persist_a_submission_when_validation_fails()
+    {
+        $this->assertEmpty($this->form->submissions());
+
+        try {
+            $this->action()->submit(['name' => 'Test']); // missing required email
+        } catch (ValidationException $e) {
+            // Expected
+        }
+
+        $this->assertEmpty($this->form->submissions());
+    }
+
+    #[Test]
+    public function it_scopes_validation_to_the_given_fields()
+    {
+        // The email field is required, but scoping validation to "name" only
+        // means the missing email shouldn't cause a validation failure.
+        $this->action()->validate(['name' => 'Test'], only: ['name']);
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Test]
+    public function it_still_validates_scoped_fields()
+    {
+        $this->expectException(ValidationException::class);
+
+        $this->action()->validate(['email' => 'not-an-email'], only: ['email']);
     }
 
     #[Test]
@@ -106,23 +208,8 @@ class SubmitFormTest extends TestCase
         $this->expectException(SilentFormFailureException::class);
 
         $this->action()->submit(
-            data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+            ['email' => 'test@example.com', 'winnie' => 'the pooh'],
         );
-    }
-
-    #[Test]
-    public function it_dispatches_form_submitted_event()
-    {
-        Bus::fake();
-        Event::fake([FormSubmitted::class]);
-
-        $this->action()->submit(
-            data: ['email' => 'test@example.com'],
-        );
-
-        Event::assertDispatched(FormSubmitted::class, function ($event) {
-            return $event->submission->get('email') === 'test@example.com';
-        });
     }
 
     #[Test]
@@ -131,9 +218,7 @@ class SubmitFormTest extends TestCase
         Event::listen(FormSubmitted::class, fn () => false);
 
         try {
-            $this->action()->submit(
-                data: ['email' => 'test@example.com'],
-            );
+            $this->action()->submit(['email' => 'test@example.com']);
 
             $this->fail('Expected SilentFormFailureException was not thrown');
         } catch (SilentFormFailureException $e) {
@@ -150,151 +235,24 @@ class SubmitFormTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->action()->submit(
-            data: ['email' => 'test@example.com'],
-        );
-    }
-
-    #[Test]
-    public function it_dispatches_send_emails()
-    {
-        Bus::fake();
-
-        $this->action()->submit(
-            data: ['email' => 'test@example.com'],
-        );
-
-        Bus::assertDispatched(SendEmails::class);
-    }
-
-    #[Test]
-    public function it_throws_validation_exception_when_validation_fails()
-    {
-        $this->expectException(ValidationException::class);
-
-        $this->action()->validate(
-            data: ['name' => 'Test'], // missing required email
-        );
-    }
-
-    #[Test]
-    public function it_throws_validation_exception_with_field_errors()
-    {
-        try {
-            $this->action()->validate(data: ['name' => 'Test']);
-
-            $this->fail('Expected ValidationException was not thrown');
-        } catch (ValidationException $e) {
-            $this->assertArrayHasKey('email', $e->errors());
-        }
-    }
-
-    #[Test]
-    public function validation_passes_with_valid_data()
-    {
-        $this->action()->validate(data: ['email' => 'test@example.com']);
-
-        $this->addToAssertionCount(1);
-    }
-
-    #[Test]
-    public function it_does_not_persist_a_submission_when_validation_fails()
-    {
-        $this->assertEmpty($this->form->submissions());
-
-        try {
-            $this->action()->submit(data: ['name' => 'Test']); // missing required email
-        } catch (ValidationException $e) {
-            // Expected
-        }
-
-        $this->assertEmpty($this->form->submissions());
-    }
-
-    #[Test]
-    public function it_scopes_validation_to_the_given_fields()
-    {
-        // The email field is required, but scoping validation to "name" only
-        // means the missing email shouldn't cause a validation failure.
-        $this->action()->validate(data: ['name' => 'Test'], only: ['name']);
-
-        $this->addToAssertionCount(1);
-    }
-
-    #[Test]
-    public function it_still_validates_scoped_fields()
-    {
-        $this->expectException(ValidationException::class);
-
-        $this->action()->validate(data: ['email' => 'not-an-email'], only: ['email']);
-    }
-
-    #[Test]
-    public function it_can_resume_an_incomplete_submission()
-    {
-        Bus::fake();
-
-        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->asPartial())->save();
-
-        $this->assertCount(1, $this->form->submissions());
-        $this->assertTrue($this->form->submission($draft->id())->isPartial());
-
-        $submission = $this->action()->resume($draft)->submit(
-            data: ['email' => 'new@example.com'],
-        );
-
-        // Ensures the same submission is completed (eg. it didn't create a new one).
-        $this->assertEquals($draft->id(), $submission->id());
-        $this->assertCount(1, $this->form->submissions());
-
-        $stored = $this->form->submission($draft->id());
-        $this->assertFalse($stored->isPartial());
-
-        // A field present in the request should update the existing value.
-        $this->assertEquals('new@example.com', $stored->get('email'));
-
-        // A field _not_ present in the request should be persisted.
-        $this->assertEquals('Olaf', $stored->get('name'));
-    }
-
-    #[Test]
-    public function it_dispatches_created_event_once_when_completing_a_resumed_submission()
-    {
-        Bus::fake();
-        Event::fake([SubmissionCreated::class]);
-
-        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->asPartial())->save();
-
-        $this->action()->resume($draft)->submit(
-            data: ['email' => 'new@example.com'],
-        );
-
-        Event::assertDispatched(SubmissionCreated::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
+        $this->action()->submit(['email' => 'test@example.com']);
     }
 
     #[Test]
     public function it_uploads_files()
     {
-        Bus::fake();
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
 
-        $form = tap(Form::make('uploads')->formFields([
-            'sections' => [
-                [
-                    'fields' => [
-                        ['handle' => 'email', 'field' => ['type' => 'email', 'validate' => 'required']],
-                        ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
-                    ],
-                ],
-            ],
-        ]), fn ($f) => $f->save());
+        $form = $this->uploadForm();
 
-        $submission = app(SubmitForm::class)->form($form)->submit(
-            data: ['email' => 'test@example.com'],
-            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
-        );
+        app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
 
         Storage::disk('avatars')->assertExists('avatar.jpg');
 
@@ -307,22 +265,16 @@ class SubmitFormTest extends TestCase
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
 
-        $form = tap(Form::make('uploads')->honeypot('winnie')->formFields([
-            'sections' => [
-                [
-                    'fields' => [
-                        ['handle' => 'email', 'field' => ['type' => 'email']],
-                        ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
-                    ],
-                ],
-            ],
-        ]), fn ($f) => $f->save());
+        $form = $this->uploadForm(honeypot: true);
 
         try {
-            app(SubmitForm::class)->form($form)->submit(
-                data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
-                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
-            );
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(
+                    data: ['email' => 'test@example.com', 'winnie' => 'the pooh'],
+                    files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+                );
         } catch (SilentFormFailureException $e) {
             // Expected
         }
@@ -336,26 +288,18 @@ class SubmitFormTest extends TestCase
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
 
-        $form = tap(Form::make('uploads')->formFields([
-            'sections' => [
-                [
-                    'fields' => [
-                        ['handle' => 'email', 'field' => ['type' => 'email']],
-                        ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
-                    ],
-                ],
-            ],
-        ]), fn ($f) => $f->save());
+        $form = $this->uploadForm();
 
-        Event::listen(FormSubmitted::class, function () {
-            return false;
-        });
+        Event::listen(FormSubmitted::class, fn () => false);
 
         try {
-            app(SubmitForm::class)->form($form)->submit(
-                data: ['email' => 'test@example.com'],
-                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
-            );
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(
+                    data: ['email' => 'test@example.com'],
+                    files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+                );
         } catch (SilentFormFailureException $e) {
             // Expected
         }
@@ -369,26 +313,20 @@ class SubmitFormTest extends TestCase
         Storage::fake('avatars');
         AssetContainer::make('avatars')->disk('avatars')->save();
 
-        $form = tap(Form::make('uploads')->formFields([
-            'sections' => [
-                [
-                    'fields' => [
-                        ['handle' => 'email', 'field' => ['type' => 'email']],
-                        ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
-                    ],
-                ],
-            ],
-        ]), fn ($f) => $f->save());
+        $form = $this->uploadForm();
 
         Event::listen(FormSubmitted::class, function () {
             throw ValidationException::withMessages(['custom' => 'Error']);
         });
 
         try {
-            app(SubmitForm::class)->form($form)->submit(
-                data: ['email' => 'test@example.com'],
-                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
-            );
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(
+                    data: ['email' => 'test@example.com'],
+                    files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+                );
         } catch (ValidationException $e) {
             // Expected
         }
@@ -397,135 +335,245 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
-    public function a_precognitive_success_does_not_persist_a_submission()
+    public function it_returns_the_next_page_and_saves_a_partial_submission_when_submitting_a_non_final_page()
     {
         Bus::fake();
+        Event::fake([FormSubmitted::class, SubmissionCreated::class, SubmissionFinalized::class]);
 
-        $this->assertEmpty($this->form->submissions());
+        $form = $this->multiPageForm();
 
-        $this
-            ->withPrecognition()
-            ->withHeaders(['Precognition-Validate-Only' => 'email'])
-            ->postJson('/!/forms/contact', ['email' => 'test@example.com'])
-            ->assertNoContent()
-            ->assertHeader('Precognition-Success', 'true');
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('one')
+            ->submit(['name' => 'Olaf']);
 
-        $this->assertEmpty($this->form->submissions());
-        Bus::assertNotDispatched(SendEmails::class);
-    }
+        $this->assertInstanceOf(SubmissionResult::class, $result);
+        $this->assertEquals('two', $result->nextPage);
+        $this->assertFalse($result->isFinalized());
 
-    #[Test]
-    public function it_saves_a_draft_without_completing_the_submission()
-    {
-        Bus::fake();
-        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
+        $this->assertCount(1, $form->submissions());
+        $this->assertTrue($result->submission->isPartial());
+        $this->assertEquals('Olaf', $result->submission->get('name'));
 
-        $this->assertEmpty($this->form->submissions());
-
-        $submission = $this->action()->asPartial()->submit(
-            data: ['email' => 'test@example.com'],
-        );
-
-        $this->assertCount(1, $this->form->submissions());
-        $this->assertTrue($this->form->submission($submission->id())->isPartial());
-        $this->assertEquals('test@example.com', $submission->get('email'));
-
-        // The partial submission record is created, but it isn't finalized.
         Event::assertDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(SendEmails::class);
+
+        $form->submissions()->each->delete();
     }
 
     #[Test]
-    public function it_merges_into_an_existing_draft_when_saving()
+    public function it_scopes_stored_values_to_the_current_page()
     {
-        Bus::fake();
+        $form = $this->multiPageForm();
 
-        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        // The email belongs to a later page, so it shouldn't be stored when submitting page one.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('one')
+            ->submit(['name' => 'Olaf', 'email' => 'olaf@example.com']);
 
-        $this->assertCount(1, $this->form->submissions());
+        $this->assertEquals('Olaf', $result->submission->get('name'));
+        $this->assertNull($result->submission->get('email'));
 
-        $submission = $this->action()->resume($draft)->asPartial()->submit(
-            data: ['email' => 'new@example.com'],
-        );
-
-        // The same draft is updated rather than a new submission being created.
-        $this->assertEquals($draft->id(), $submission->id());
-        $this->assertCount(1, $this->form->submissions());
-
-        $stored = $this->form->submission($draft->id());
-        $this->assertTrue($stored->isPartial());
-
-        // Earlier-page values are preserved while the new page's values are merged in.
-        $this->assertEquals('Olaf', $stored->get('name'));
-        $this->assertEquals('new@example.com', $stored->get('email'));
+        $form->submissions()->each->delete();
     }
 
     #[Test]
-    public function it_scopes_a_draft_save_to_the_given_fields()
+    public function it_only_validates_the_current_pages_fields()
     {
-        Bus::fake();
+        $form = $this->multiPageForm();
 
-        // The email field is required, but scoping the draft save to "name" only
-        // means the missing email shouldn't cause a validation failure.
-        $submission = $this->action()->asPartial()->submit(
-            data: ['name' => 'Test'],
-            only: ['name'],
-        );
+        // Page one has no required fields, so the email being required on page two
+        // shouldn't cause a validation failure when submitting page one.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('one')
+            ->submit(['name' => 'Olaf']);
 
-        $stored = $this->form->submission($submission->id());
-        $this->assertTrue($stored->isPartial());
-        $this->assertEquals('Test', $stored->get('name'));
-    }
+        $this->assertEquals('two', $result->nextPage);
 
-    #[Test]
-    public function it_completes_a_resumed_draft()
-    {
-        Bus::fake();
-        Event::fake([SubmissionCreated::class]);
-
-        $draft = tap($this->form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'old@example.com'])->asPartial())->save();
-
-        $this->assertTrue($this->form->submission($draft->id())->isPartial());
-
-        $submission = $this->action()->resume($draft)->submit(
-            data: ['email' => 'new@example.com'],
-            only: ['name', 'email'],
-        );
-
-        // The same draft is promoted rather than a new submission being created.
-        $this->assertEquals($draft->id(), $submission->id());
-        $this->assertCount(1, $this->form->submissions());
-
-        $stored = $this->form->submission($draft->id());
-        $this->assertFalse($stored->isPartial());
-        $this->assertEquals('new@example.com', $stored->get('email'));
-        $this->assertEquals('Olaf', $stored->get('name'));
-
-        // The completion events fire exactly once.
-        Event::assertDispatched(SubmissionCreated::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
-    }
-
-    #[Test]
-    public function it_runs_the_gate_when_completing_a_resumed_draft()
-    {
-        $draft = tap($this->form->makeSubmission()->data(['email' => 'old@example.com'])->asPartial())->save();
-
-        // A listener returning false silently aborts completion, proving the gate runs.
-        Event::listen(FormSubmitted::class, fn () => false);
-
+        // Page two requires the email.
         try {
-            $this->action()->resume($draft)->submit(
-                data: ['email' => 'new@example.com'],
-            );
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('two')
+                ->resume($result->submission)
+                ->submit([]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('email', $e->errors());
+        }
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_only_runs_the_honeypot_check_on_the_final_page()
+    {
+        $form = $this->multiPageForm();
+
+        // A filled honeypot on a non-final page is ignored; the partial submission saves normally.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('one')
+            ->submit(['name' => 'Olaf', 'winnie' => 'the pooh']);
+
+        $this->assertEquals('two', $result->nextPage);
+        $this->assertTrue($result->submission->isPartial());
+
+        // On the final page the honeypot triggers a silent failure.
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('three')
+                ->resume($result->submission)
+                ->submit(['message' => 'Hello', 'winnie' => 'the pooh']);
 
             $this->fail('Expected SilentFormFailureException was not thrown');
         } catch (SilentFormFailureException $e) {
             $this->assertNotNull($e->submission());
         }
 
-        // The draft stays incomplete since completion was silently aborted.
-        $this->assertTrue($this->form->submission($draft->id())->isPartial());
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_only_dispatches_the_form_submitted_event_on_the_final_page()
+    {
+        $form = $this->multiPageForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('one')
+            ->submit(['name' => 'Olaf']);
+
+        $this->assertTrue($result->submission->isPartial());
+        $this->assertEquals('Olaf', $result->submission->get('name'));
+
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('three')
+                ->resume($result->submission)
+                ->submit(['message' => 'Hello']);
+
+            $this->fail('Expected SilentFormFailureException was not thrown');
+        } catch (SilentFormFailureException $e) {
+            $this->assertNotNull($e->submission());
+        }
+
+        // The submission stays partial since completion was silently aborted.
+        $this->assertTrue($form->submission($result->submission->id())->isPartial());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_resumes_a_partial_submission_on_a_later_page()
+    {
+        Bus::fake();
+        Event::fake([FormSubmitted::class, SubmissionFinalized::class]);
+
+        $form = $this->multiPageForm();
+
+        $first = app(SubmitForm::class)
+            ->form($form)
+            ->page('one')
+            ->submit(['name' => 'Olaf']);
+
+        // Resuming continues the same partial submission on the next page rather than starting over.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('two')
+            ->resume($first->submission)
+            ->submit(['email' => 'olaf@example.com']);
+
+        $this->assertEquals($first->submission->id(), $result->submission->id());
+        $this->assertCount(1, $form->submissions());
+        $this->assertEquals('three', $result->nextPage);
+
+        $this->assertFalse($result->isFinalized());
+        $this->assertTrue($result->submission->isPartial());
+        Event::assertNotDispatched(FormSubmitted::class);
+        Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(SendEmails::class);
+
+        // Earlier-page values are preserved while the new page's values are merged in.
+        $stored = $form->submission($result->submission->id());
+        $this->assertEquals('Olaf', $stored->get('name'));
+        $this->assertEquals('olaf@example.com', $stored->get('email'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_finalizes_the_partial_submission_on_the_final_page()
+    {
+        Bus::fake();
+
+        $form = $this->multiPageForm();
+
+        // An in-progress partial submission that has already collected the earlier pages' values.
+        $partial = tap($form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'olaf@example.com'])->asPartial())->save();
+
+        // Faked after seeding so the seeding's created event is out of scope.
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('three')
+            ->resume($partial)
+            ->submit(['message' => 'Hello']);
+
+        // The partial submission is promoted to a finalized one rather than a new one being created.
+        $this->assertEquals($partial->id(), $result->submission->id());
+        $this->assertCount(1, $form->submissions());
+        $this->assertNull($result->nextPage);
+        $this->assertTrue($result->isFinalized());
+
+        $stored = $form->submission($result->submission->id());
+        $this->assertFalse($stored->isPartial());
+
+        // Earlier pages' values are preserved while the final page's values are merged in.
+        $this->assertEquals('Olaf', $stored->get('name'));
+        $this->assertEquals('olaf@example.com', $stored->get('email'));
+        $this->assertEquals('Hello', $stored->get('message'));
+
+        // Finalizing fires the completion events once; it doesn't re-create the submission.
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
+
+        $form->submissions()->each->delete();
+    }
+
+    private function uploadForm(bool $honeypot = false)
+    {
+        $form = Form::make('uploads');
+
+        if ($honeypot) {
+            $form->honeypot('winnie');
+        }
+
+        return tap($form->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'email']],
+                                ['handle' => 'avatar', 'field' => ['type' => 'upload', 'store' => true, 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]), fn ($f) => $f->save());
     }
 }

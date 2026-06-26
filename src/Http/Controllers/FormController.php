@@ -6,52 +6,64 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Uri;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
+use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\Hookable;
 
 use function Statamic\trans as __;
 
 class FormController extends Controller
 {
-    use Hookable;
-
     public function submit(Request $request, $form, SubmitForm $action)
     {
         $this->validateContentType($request, $form);
 
         $action->form($form);
 
+        if ($form->hasMultiplePages()) {
+            $action->page($form->formFields()->pages()->first()['id']);
+
+            if ($partialSubmission = $this->getPartialSubmission($form)) {
+                $action->resume($partialSubmission);
+            }
+
+            if (
+                ($page = $request->input('_page')) &&
+                $form->formFields()->pages()->where('id', $page)->isNotEmpty()
+            ) {
+                $action->page($page);
+            }
+        }
+
         $params = $this->params($request);
 
         try {
-            // Precognition is reimplemented here now that FrontendFormRequest is gone.
             // We validate (scoped to the requested fields) through the action and halt
-            // without persisting, mirroring Laravel's FormRequest precognition.
+            // without persisting, mirroring how Precognition works in Form Requests.
             if ($request->isPrecognitive()) {
                 $action->validate($request->all(), $request->allFiles(), only: $this->precognitiveFields($request));
 
                 return response()->noContent(headers: ['Precognition-Success' => 'true']);
             }
 
-            // Forms Pro uses this hook to resume an in-progress multi-page (partial) submission.
-            $this->runHooks('submitting', [
-                'request' => $request,
-                'form' => $form,
-                'action' => $action,
-            ]);
+            $result = $action->submit($request->all(), $request->allFiles());
 
-            $submission = $action->submit($request->all(), $request->allFiles());
+            $result->isFinalized()
+                ? $this->forgetPartialSubmission($form)
+                : $this->setPartialSubmission($form, $result->submission);
 
-            return $this->formSuccess($params, $submission);
+            return $this->formSuccess($params, $result);
         } catch (SilentFormFailureException $e) {
-            return $this->formSuccess($params, $e->submission(), silentFailure: true);
+            $result = new SubmissionResult(submission: $e->submission());
+
+            return $this->formSuccess($params, $result, silentFailure: true);
         } catch (ValidationException $e) {
             return $this->formFailure($params, $e->errors(), $form->handle());
         }
@@ -85,12 +97,9 @@ class FormController extends Controller
     /**
      * The steps for a failed form submission.
      *
-     * @param  array  $params
-     * @param  array  $errors
-     * @param  string  $form
      * @return Response|RedirectResponse
      */
-    private function formFailure($params, $errors, $form)
+    private function formFailure(array $params, array $errors, string $form)
     {
         $request = request();
 
@@ -121,14 +130,15 @@ class FormController extends Controller
      *
      * Used for actual success and by honeypot.
      *
-     * @param  array  $params
-     * @param  Submission  $submission
-     * @param  bool  $silentFailure
      * @return Response
      */
-    private function formSuccess($params, $submission, $silentFailure = false)
+    private function formSuccess(array $params, SubmissionResult $result, bool $silentFailure = false)
     {
-        $redirect = $this->formSuccessRedirect($params, $submission);
+        $submission = $result->submission;
+
+        $redirect = $result->nextPage
+            ? Uri::of(url()->previous())->withQuery(['page' => $result->nextPage])->__toString()
+            : $this->formSuccessRedirect($params, $result->submission);
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
@@ -136,10 +146,13 @@ class FormController extends Controller
                 'submission_created' => ! $silentFailure,
                 'submission' => $submission->data(),
                 'redirect' => $redirect,
+                'next_page' => $result->nextPage,
             ]);
         }
 
-        $response = $redirect ? redirect($redirect) : back();
+        if (! $redirect) {
+            $redirect = Uri::of(url()->previous())->withoutQuery('page')->__toString();
+        }
 
         if (! \Statamic\Facades\URL::isExternal($redirect)) {
             session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
@@ -147,10 +160,10 @@ class FormController extends Controller
             session()->flash('submission', $submission);
         }
 
-        return $response;
+        return redirect($redirect);
     }
 
-    private function formSuccessRedirect($params, $submission)
+    private function formSuccessRedirect(array $params, $submission)
     {
         if ($redirect = Form::getSubmissionRedirect($submission)) {
             return $redirect;
@@ -163,5 +176,27 @@ class FormController extends Controller
         }
 
         return $redirect;
+    }
+
+    private function setPartialSubmission($form, $submission): void
+    {
+        session()->put("form.{$form->handle()}.partial_submission", $submission->id());
+    }
+
+    private function getPartialSubmission($form): ?Submission
+    {
+        $id = session()->get("form.{$form->handle()}.partial_submission");
+        $submission = $form->submission($id);
+
+        if ($submission && ! $submission->isPartial()) {
+            return null;
+        }
+
+        return $submission;
+    }
+
+    private function forgetPartialSubmission($form): void
+    {
+        session()->forget("form.{$form->handle()}.partial_submission");
     }
 }

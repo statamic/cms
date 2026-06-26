@@ -4,12 +4,14 @@ namespace Tests\Tags\Form;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
+use Statamic\Forms\SendEmails;
 use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
@@ -1338,6 +1340,128 @@ EOT
     }
 
     #[Test]
+    public function it_renders_the_first_pages_sections_by_default()
+    {
+        $this->createMultiPageForm();
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}<div class="section">{{ display }}:{{ fields }}{{ handle }},{{ /fields }}</div>{{ /sections }}
+{{ /form:survey }}
+EOT
+        ));
+
+        // Only the first page's section is rendered.
+        $this->assertStringContainsString('<div class="section">Section A:name,</div>', $output);
+        $this->assertStringNotContainsString('Section B', $output);
+        $this->assertStringNotContainsString('email', $output);
+    }
+
+    #[Test]
+    public function it_renders_a_specific_pages_sections_based_on_the_page_query_param()
+    {
+        $this->createMultiPageForm();
+
+        request()->merge(['page' => 'page_two']);
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}<div class="section">{{ display }}:{{ fields }}{{ handle }},{{ /fields }}</div>{{ /sections }}
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">Section B:email,</div>', $output);
+        $this->assertStringNotContainsString('Section A', $output);
+        $this->assertStringNotContainsString('>name,', $output);
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_first_page_when_the_page_query_param_is_invalid()
+    {
+        $this->createMultiPageForm();
+
+        request()->merge(['page' => 'page_nope']);
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}<div class="section">{{ display }}:{{ fields }}{{ handle }},{{ /fields }}</div>{{ /sections }}
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">Section A:name,</div>', $output);
+        $this->assertStringNotContainsString('Section B', $output);
+    }
+
+    #[Test]
+    public function it_outputs_a_hidden_page_input_for_multi_page_forms()
+    {
+        $this->createMultiPageForm();
+
+        // The current page defaults to the first.
+        $output = $this->tag('{{ form:survey }}{{ /form:survey }}');
+        $this->assertStringContainsString('<input type="hidden" name="_page" value="page_one" />', $output);
+
+        // It reflects the page query param.
+        request()->merge(['page' => 'page_two']);
+        $output = $this->tag('{{ form:survey }}{{ /form:survey }}');
+        $this->assertStringContainsString('<input type="hidden" name="_page" value="page_two" />', $output);
+    }
+
+    #[Test]
+    public function it_does_not_output_a_hidden_page_input_for_single_page_forms()
+    {
+        // The default contact form (forms-pro disabled) is a single page.
+        $output = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $this->assertStringNotContainsString('name="_page"', $output);
+    }
+
+    #[Test]
+    public function it_populates_fields_from_the_session_partial_submission()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->save();
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf', 'email' => 'olaf@example.com'])->asPartial())->save();
+
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        // The first page's field is populated with the stored value.
+        $pageOne = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
+        $this->assertStringContainsString('name=Olaf,', $pageOne);
+
+        // Navigating to the second page populates its field too.
+        request()->merge(['page' => 'page_two']);
+        $pageTwo = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
+        $this->assertStringContainsString('email=olaf@example.com,', $pageTwo);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_does_not_populate_fields_from_a_finalized_submission()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->save();
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        $submission->finalize();
+
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        $output = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
+
+        // The submission is no longer partial, so its values aren't loaded back in.
+        $this->assertStringContainsString('name=,', $output);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_renders_exceptions_thrown_during_json_requests_as_standard_laravel_errors()
     {
         Event::listen(function (\Statamic\Events\FormSubmitted $event) {
@@ -1380,6 +1504,24 @@ EOT
         $this->assertArrayHasKey('error', $json);
         $this->assertArrayHasKey('errors', $json);
         $this->assertSame($json['error'], ['some' => 'error']);
+    }
+
+    #[Test]
+    public function a_precognitive_success_does_not_persist_a_submission()
+    {
+        Bus::fake();
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->withPrecognition()
+            ->withHeaders(['Precognition-Validate-Only' => 'email'])
+            ->postJson('/!/forms/contact', ['email' => 'test@example.com'])
+            ->assertNoContent()
+            ->assertHeader('Precognition-Success', 'true');
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+        Bus::assertNotDispatched(SendEmails::class);
     }
 
     #[Test]

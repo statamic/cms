@@ -5,12 +5,13 @@ namespace Statamic\Forms;
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Uri;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
-use Statamic\Facades\URL;
 use Statamic\Fields\Tab;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -88,6 +89,13 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
+        $data['button_label'] = Arr::get($this->currentPage(), 'button_label', __($this->isFinalPage() ? 'Submit' : 'Next Page'));
+
+        if (! $this->isFirstPage()) {
+            $data['previous_page_label'] = Arr::get($this->currentPage(), 'previous_page_label');
+            $data['previous_page_url'] = $this->previousPageUrl();
+        }
+
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
             $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
@@ -123,6 +131,10 @@ class Tags extends BaseTags
 
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        if ($form->hasMultiplePages()) {
+            $params['page'] = Arr::get($this->currentPage(), 'id');
         }
 
         if (! $this->canParseContents()) {
@@ -298,6 +310,7 @@ class Tags extends BaseTags
     protected function getSections($sessionHandle, $jsDriver)
     {
         return $this->form()->blueprint()->tabs()
+            ->filter(fn ($tab) => $tab->handle() === Arr::get($this->currentPage(), 'id'))
             ->flatMap(fn ($tab) => $this->getSectionsForTab($tab, $sessionHandle, $jsDriver))
             ->values()
             ->all();
@@ -315,10 +328,16 @@ class Tags extends BaseTags
     {
         return $tab->sections()
             ->map(function ($section) use ($sessionHandle, $jsDriver) {
+                $fields = $section->fields();
+
+                if ($partialSubmission = $this->getPartialSubmission()) {
+                    $fields = $fields->addValues($partialSubmission->data()->all());
+                }
+
                 return [
                     'display' => $section->display(),
                     'instructions' => $section->instructions(),
-                    'fields' => $this->getFields($sessionHandle, $jsDriver, $section->fields()->all()),
+                    'fields' => $this->getFields($sessionHandle, $jsDriver, $fields->all()),
                 ];
             });
     }
@@ -494,11 +513,56 @@ class Tags extends BaseTags
         return $form;
     }
 
-    public function eventUrl($url, $relative = true)
+    private function isFirstPage(): bool
     {
-        return URL::prependSiteUrl(
-            config('statamic.routes.action').'/form/'.$url
-        );
+        $pages = $this->form()->formFields()->pages();
+
+        return $pages->first()['id'] === Arr::get($this->currentPage(), 'id');
+    }
+
+    // todo: take logic into account
+    private function isFinalPage(): bool
+    {
+        $pages = $this->form()->formFields()->pages();
+
+        return $pages->last()['id'] === Arr::get($this->currentPage(), 'id');
+    }
+
+    private function previousPageUrl(): ?string
+    {
+        if ($this->isFirstPage()) {
+            return null;
+        }
+
+        $pages = $this->form()->formFields()->pages();
+        $currentPageIndex = $pages->search(fn (array $page) => $page['id'] === Arr::get($this->currentPage(), 'id'));
+        $previousPage = $pages->get($currentPageIndex - 1);
+
+        return Uri::of(url()->current())->withQuery(['page' => Arr::get($previousPage, 'id')])->__toString();
+    }
+
+    private function currentPage(): array
+    {
+        $pages = $this->form()->formFields()->pages();
+        $page = $pages->first();
+
+        if (request()->has('page') && $pages->where('id', request()->get('page'))->count() > 0) {
+            $page = $pages->where('id', request()->get('page'))->first();
+        }
+
+        return $page;
+    }
+
+    private function getPartialSubmission(): ?Submission
+    {
+        $id = session()->get("form.{$this->form()->handle()}.partial_submission");
+        $submission = $this->form()->submission($id);
+
+        if ($submission && ! $submission->isPartial()) {
+            return null;
+        }
+
+        return $submission;
     }
 
     private function dottedContextFields(array $fields, $recursive = false, array &$dotted = []): Collection

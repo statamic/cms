@@ -99,6 +99,28 @@ abstract class FormTestCase extends TestCase
         Form::makePartial();
     }
 
+    protected function createMultiPageForm($handle = 'survey')
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'sections' => [
+                        ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'sections' => [
+                        ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], $handle);
+    }
+
     protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])
     {
         $handle = str_shuffle('nobodymesseswiththehoff');

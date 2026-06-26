@@ -18,12 +18,19 @@ class SubmitForm
     use Localizable;
 
     protected Form $form;
+    protected ?string $page = null;
     protected ?Submission $submission = null;
-    protected bool $partial = false;
 
     public function form(Form $form): static
     {
         $this->form = $form;
+
+        return $this;
+    }
+
+    public function page(string $page): static
+    {
+        $this->page = $page;
 
         return $this;
     }
@@ -35,30 +42,22 @@ class SubmitForm
         return $this;
     }
 
-    public function asPartial(bool $partial = true): static
-    {
-        $this->partial = $partial;
-
-        return $this;
-    }
-
-    public function submit(array $data, array $files = [], ?array $only = null): Submission
+    public function submit(array $data, array $files = []): SubmissionResult
     {
         $files = $this->normalizeFiles($files);
         $values = array_merge($data, $files);
-
-        $this->validate($data, $files, $only);
-
-        $submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
-
         $uploadedAssets = [];
 
+        $this->validate($data, $files);
+
+        $this->submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
+
         try {
-            if (! $this->partial) {
-                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($submission));
+            if ($this->shouldFinalize()) {
+                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($this->submission));
             }
 
-            $uploadedAssets = $submission->uploadFiles($files);
+            $uploadedAssets = $this->submission->uploadFiles($files);
 
             $values = array_merge($values, $uploadedAssets);
 
@@ -67,12 +66,12 @@ class SubmitForm
                 ->addValues($values)
                 ->process()
                 ->values()
-                ->when($this->submission || $this->partial, fn ($processedValues) => $processedValues->only(array_keys($values)));
+                ->when($this->page, fn ($fields) => $fields->only($this->fieldHandles($this->page)));
 
-            $submission->merge($processedValues);
+            $this->submission->merge($processedValues);
 
-            if (! $this->partial) {
-                throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException($submission));
+            if ($this->shouldFinalize()) {
+                throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException($this->submission));
             }
         } catch (ValidationException|SilentFormFailureException $e) {
             $this->removeUploadedAssets($uploadedAssets);
@@ -80,54 +79,17 @@ class SubmitForm
             throw $e;
         }
 
-        $this->partial ? $submission->save() : $submission->finalize();
+        $this->shouldFinalize() ? $this->submission->finalize() : $this->submission->save();
 
-        return $submission;
-    }
+        // todo: obviously this should depend on logic at some point
+        $pages = $this->form->formFields()->pages();
+        $currentPageIndex = $pages->where('id', $this->page)->keys()->first();
+        $nextPage = $pages->get($currentPageIndex + 1);
 
-    public function validate(array $data, array $files = [], ?array $only = null): void
-    {
-        $files = $this->normalizeFiles($files);
-        $fields = $this->form->blueprint()->fields()->addValues(array_merge($data, $files));
-
-        $validator = $fields
-            ->validator()
-            ->withRules($this->extraRules($fields))
-            ->validator();
-
-        if ($only !== null) {
-            $validator->setRules($this->filterRules($validator->getRulesWithoutPlaceholders(), $only));
-        }
-
-        $this->withLocale($this->site()?->lang(), fn () => $validator->validate());
-    }
-
-    private function extraRules($fields): array
-    {
-        return $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
-            ->mapWithKeys(fn ($field) => [$field->handle().'.*' => ['file', new AllowedFile]])
-            ->all();
-    }
-
-    private function filterRules(array $rules, array $only): array
-    {
-        return collect($rules)
-            ->filter(fn ($rule, $attribute) => $this->shouldValidate($attribute, $only))
-            ->all();
-    }
-
-    private function shouldValidate(string $attribute, array $only): bool
-    {
-        foreach ($only as $pattern) {
-            $regex = '/^'.str_replace('\*', '[^.]+', preg_quote($pattern, '/')).'$/';
-
-            if (preg_match($regex, $attribute)) {
-                return true;
-            }
-        }
-
-        return false;
+        return new SubmissionResult(
+            $this->submission,
+            $nextPage ? $nextPage['id'] : null
+        );
     }
 
     /**
@@ -151,6 +113,32 @@ class SubmitForm
         return $files;
     }
 
+    private function site()
+    {
+        $previousUrl = ($referrer = request()->header('referer'))
+            ? url()->to($referrer)
+            : session()->previousUrl();
+
+        return $previousUrl ? Site::findByUrl($previousUrl) : null;
+    }
+
+    private function shouldFinalize(): bool
+    {
+        // todo: should take logic into account (the actual last page on the form might not be the user's last page)
+        $pages = $this->form->formFields()->pages();
+
+        return Arr::get($pages->last(), 'id') === $this->page;
+    }
+
+    private function fieldHandles(string $page): array
+    {
+        return $this->form->blueprint()->tabs()
+            ->filter(fn ($tab): bool => $tab->handle() == $page)
+            ->flatMap(fn ($tab): array => $tab->sections()->flatMap(fn ($section) => $section->fields()->items()->pluck('handle'))->all())
+            ->values()
+            ->all();
+    }
+
     /**
      * Remove any uploaded assets.
      *
@@ -167,12 +155,52 @@ class SubmitForm
             });
     }
 
-    private function site()
+    public function validate(array $data, array $files = [], ?array $only = null): void
     {
-        $previousUrl = ($referrer = request()->header('referer'))
-            ? url()->to($referrer)
-            : session()->previousUrl();
+        $files = $this->normalizeFiles($files);
+        $fields = $this->form->blueprint()->fields()->addValues(array_merge($data, $files));
 
-        return $previousUrl ? Site::findByUrl($previousUrl) : null;
+        $validator = $fields
+            ->validator()
+            ->withRules($this->extraRules($fields))
+            ->validator();
+
+        if (! $only && $this->page) {
+            $only = $this->fieldHandles($this->page);
+        }
+
+        if ($only) {
+            $validator->setRules($this->filterRules($validator->getRulesWithoutPlaceholders(), $only));
+        }
+
+        $this->withLocale($this->site()?->lang(), fn () => $validator->validate());
+    }
+
+    private function extraRules($fields): array
+    {
+        return $fields->all()
+            ->filter(fn ($field): bool => $field->fieldtype()->handle() === 'assets')
+            ->mapWithKeys(fn ($field): array => [$field->handle().'.*' => ['file', new AllowedFile]])
+            ->all();
+    }
+
+    private function filterRules(array $rules, array $only): array
+    {
+        return collect($rules)
+            ->filter(fn ($rule, $attribute): bool => $this->shouldValidate($attribute, $only))
+            ->all();
+    }
+
+    private function shouldValidate(string $attribute, array $only): bool
+    {
+        foreach ($only as $pattern) {
+            $regex = '/^'.str_replace('\*', '[^.]+', preg_quote($pattern, '/')).'$/';
+
+            if (preg_match($regex, $attribute)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
