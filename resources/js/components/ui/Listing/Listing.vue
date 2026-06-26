@@ -723,27 +723,23 @@ autoApplyState();
         <slot name="initializing" v-if="shouldShowSkeleton">
             <div class="flex flex-col gap-4 justify-between mt-3 starting-style-transition starting-style-transition--delay">
                 <ui-skeleton v-if="showPresets" class="h-5 w-48" />
-                <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex gap-2 sm:gap-3">
+                <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="flex gap-2 sm:gap-3">
                     <ui-skeleton v-if="allowSearch" class="h-9 w-96" />
                     <ui-skeleton v-if="hasFilters" class="h-9 w-24" />
                     <div class="flex-1" />
-                    <ui-skeleton v-if="allowCustomizingColumns" class="size-10" />
+                    <ui-skeleton v-if="allowCustomizingColumns || $slots['toolbar-actions']" class="size-10" />
                 </div>
                 <ui-skeleton class="h-48 w-full" />
             </div>
         </slot>
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
-            <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
-                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto">
+            <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>
-                <div
-                    v-if="$slots['toolbar-actions'] || allowCustomizingColumns"
-                    data-ui-column-customizer
-                    class="absolute right-0 flex items-center gap-2 sm:gap-3 mask-bg mask-bg--left"
-                >
+                <div v-if="$slots['toolbar-actions'] || allowCustomizingColumns" class="flex shrink-0 items-center gap-2 sm:gap-3">
                     <slot name="toolbar-actions" />
                     <CustomizeColumns v-if="allowCustomizingColumns" />
                 </div>
