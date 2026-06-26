@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
@@ -51,7 +52,13 @@ class OAuthController
                 $user = $oauth->mergeUser($user, $providerUser);
             }
         } elseif (config('statamic.oauth.create_user', true)) {
-            $user = $oauth->createUser($providerUser);
+            try {
+                $user = $oauth->createUser($providerUser);
+            } catch (OAuthEmailExistsException $e) {
+                return redirect()
+                    ->to($this->unauthorizedRedirectUrl())
+                    ->with('error', __('statamic::messages.oauth_email_exists'));
+            }
         }
 
         if ($user) {

@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use Statamic\Contracts\Auth\User as StatamicUser;
+use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -73,6 +74,10 @@ class Provider
     public function createUser($socialite): StatamicUser
     {
         $user = $this->makeUser($socialite);
+
+        if (User::findByEmail($user->email())) {
+            throw new OAuthEmailExistsException($user->email());
+        }
 
         $user->save();
 
