@@ -3,6 +3,7 @@
 namespace Tests\OAuth;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\User as UserFacade;
 use Statamic\OAuth\Provider;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -124,11 +125,29 @@ class ProviderTest extends TestCase
     }
 
     #[Test]
+    public function it_throws_when_creating_a_user_whose_email_already_exists()
+    {
+        $this->user()->save();
+
+        $this->assertCount(1, UserFacade::all());
+
+        try {
+            $this->provider()->createUser($this->socialite());
+            $this->fail('Exception was not thrown.');
+        } catch (OAuthEmailExistsException $e) {
+            $this->assertEquals('foo@bar.com', $e->email);
+            $this->assertCount(1, UserFacade::all());
+            $this->assertNull($this->provider()->getUserId('foo-bar'));
+        }
+    }
+
+    #[Test]
     public function it_finds_an_existing_user_via_find_user_method()
     {
         $provider = $this->provider();
 
         $savedUser = $this->user()->save();
+        $provider->setUserProviderId($savedUser, 'foo-bar');
 
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
@@ -138,6 +157,17 @@ class ProviderTest extends TestCase
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
         $this->assertEquals($savedUser, $foundUser);
+    }
+
+    #[Test]
+    public function it_does_not_find_a_user_by_email_via_find_user_method()
+    {
+        $provider = $this->provider();
+
+        // A user exists with the same email, but is not linked to the provider.
+        $this->user()->save();
+
+        $this->assertNull($provider->findUser($this->socialite()));
     }
 
     #[Test]
@@ -161,6 +191,7 @@ class ProviderTest extends TestCase
         $provider = $this->provider();
 
         $savedUser = $this->user()->save();
+        $provider->setUserProviderId($savedUser, 'foo-bar');
 
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
@@ -182,6 +213,7 @@ class ProviderTest extends TestCase
         $provider = $this->provider();
 
         $savedUser = $this->user()->save();
+        $provider->setUserProviderId($savedUser, 'foo-bar');
 
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
