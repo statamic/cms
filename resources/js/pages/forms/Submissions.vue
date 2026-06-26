@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem } from '@ui';
@@ -21,7 +21,14 @@ const props = defineProps([
     'redirectUrl',
 ]);
 
-const view = ref('entries');
+const preferencesKey = `forms.${props.form.handle}.submissions.view`;
+const savedView = Statamic.$preferences.get(preferencesKey, 'entries');
+const view = ref(['entries', 'summary'].includes(savedView) ? savedView : 'entries');
+
+watch(view, (newView) => {
+    Statamic.$preferences.set(preferencesKey, newView);
+});
+
 const deleter = ref(null);
 const generatingFakeSubmission = ref(false);
 const deletingFakeSubmissions = ref(false);
@@ -249,9 +256,7 @@ function exportSubmissions() {
             </template>
 
             <template #results>
-                <p class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-6 text-center text-gray-500">
-                    {{ __('Summary') }}
-                </p>
+                <div class="pie"></div>
             </template>
         </FormSubmissionListing>
 
