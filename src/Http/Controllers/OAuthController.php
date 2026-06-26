@@ -104,7 +104,7 @@ class OAuthController
     {
         // Linking relies on the stateful "state" parameter to protect against
         // forced-linking CSRF, so it cannot be done with a stateless provider.
-        if (Arr::get($oauth->config(), 'stateless', false)) {
+        if ($oauth->isStateless()) {
             return redirect()
                 ->to($this->successRedirectUrl())
                 ->with('error', __('statamic::messages.oauth_link_unsupported'));

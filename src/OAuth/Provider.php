@@ -27,7 +27,7 @@ class Provider
     {
         $driver = Socialite::driver($this->name);
 
-        if (Arr::get($this->config, 'stateless', false)) {
+        if ($this->isStateless()) {
             $driver->stateless();
         }
 
@@ -188,6 +188,11 @@ class Provider
     public function isLinkedTo($user): bool
     {
         return array_key_exists($user->id(), $this->getIds());
+    }
+
+    public function isStateless(): bool
+    {
+        return (bool) Arr::get($this->config, 'stateless', false);
     }
 
     protected function storagePath()
