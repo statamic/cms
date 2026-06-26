@@ -796,6 +796,48 @@ EOT
     }
 
     #[Test]
+    public function it_outputs_the_current_page()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'display' => 'Page One',
+                    'instructions' => 'Page One Instructions',
+                    'sections' => [
+                        ['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+                [
+                    'id' => 'page_two',
+                    'display' => 'Page Two',
+                    'previous_page_label' => 'Back',
+                    'sections' => [
+                        ['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $template = <<<'EOT'
+{{ form:survey }}
+    <div class="page">{{ page:id }} - {{ page:display }}{{ if page:instructions }} ({{ page:instructions }}){{ /if }}{{ if page:previous_page_label }} - back:{{ page:previous_page_label }}{{ /if }} - button:{{ page:button_label }}</div>
+{{ /form:survey }}
+EOT;
+
+        // Defaults to the first page; its button label is "Next" and there's no back button.
+        $output = $this->normalizeHtml($this->tag($template));
+        $this->assertStringContainsString('<div class="page">page_one - Page One (Page One Instructions) - button:Next</div>', $output);
+
+        // Reflects the page query param; the last page's button label becomes "Submit".
+        request()->merge(['page' => 'page_two']);
+        $output = $this->normalizeHtml($this->tag($template));
+        $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit</div>', $output);
+    }
+
+    #[Test]
     public function it_dynamically_renders_sections_array()
     {
         $this->createForm([

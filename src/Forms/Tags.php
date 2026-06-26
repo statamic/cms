@@ -83,16 +83,18 @@ class Tags extends BaseTags
 
         $data['pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
 
+        $data['page'] = Arr::except(collect($data['pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
+
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
         $data['fields'] = collect($data['sections'])->flatMap->fields->all();
 
         $data['honeypot'] = $form->honeypot();
 
-        $data['button_label'] = Arr::get($this->currentPage(), 'button_label', __($this->isFinalPage() ? 'Submit' : 'Next Page'));
+        $data['button_label'] = Arr::get($data['page'], 'button_label');
 
         if (! $this->isFirstPage()) {
-            $data['previous_page_label'] = Arr::get($this->currentPage(), 'previous_page_label');
+            $data['previous_page_label'] = Arr::get($data['page'], 'previous_page_label');
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
