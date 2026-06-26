@@ -61,6 +61,26 @@ class OAuthCallbackTest extends TestCase
     }
 
     #[Test]
+    public function an_untrusted_provider_creates_and_logs_in_a_new_user_when_the_email_is_free()
+    {
+        config(['statamic.oauth.trusted_providers' => ['google']]); // 'evil' is untrusted
+        config(['statamic.oauth.create_user' => true]);
+
+        // No existing account owns the email, so there's nothing to overwrite — the
+        // untrusted provider should still onboard a brand new user.
+        $this->assertCount(0, UserFacade::all());
+
+        $this->fakeProvider('evil');
+
+        $this->get('/oauth/evil/callback');
+
+        $this->assertCount(1, UserFacade::all());
+        $user = UserFacade::all()->first();
+        $this->assertEquals('admin@target.tld', $user->email());
+        $this->assertAuthenticatedAs($user->fresh());
+    }
+
+    #[Test]
     public function a_trusted_provider_logs_into_the_existing_account()
     {
         config(['statamic.oauth.trusted_providers' => ['google']]);
