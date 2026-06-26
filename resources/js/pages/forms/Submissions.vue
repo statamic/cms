@@ -2,7 +2,7 @@
 import { ref, computed, watch, useId } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -257,56 +257,66 @@ function exportSubmissions() {
             </template>
 
             <template #results>
-                <figure class="grid gap-4 grid-cols-[200px_1fr]">
-                    <div
-                        class="pie-chart"
-                        style="
-                            /* These slices would be dynamic based on the data */
-                            --1: 45%;
-                            --2: 30%;
-                            --3: 15%;
-                            --4: 10%;
+                <div class="mt-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
+                    <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('Wake me up')"
+                            icon="fieldtype-radio"
+                            icon-class="size-4.5 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
+                                <div
+                                    class="pie-chart"
+                                    style="
+                                        /* These slices would be dynamic based on the data */
+                                        --1: 45%;
+                                        --2: 30%;
+                                        --3: 15%;
+                                        --4: 10%;
 
-                            --end1: var(--1);
-                            --end2: calc(var(--1) + var(--2));
-                            --end3: calc(var(--1) + var(--2) + var(--3));
-                            --end4: 100%;
+                                        --end1: var(--1);
+                                        --end2: calc(var(--1) + var(--2));
+                                        --end3: calc(var(--1) + var(--2) + var(--3));
+                                        --end4: 100%;
 
-                            background-image: conic-gradient(
-                                var(--color-indigo-500) 0% var(--end1),
-                                var(--color-gray-800) var(--end1) var(--end2),
-                                var(--color-lime-500) var(--end2) var(--end3),
-                                var(--color-indigo-200) var(--end3) var(--end4)
-                            );
-                        "
-                        role="img"
-                        :aria-labelledby="legendId"
-                    />
-                    <figcaption :id="legendId">
-                        <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2">
-                            <li class="flex items-center gap-2">
-                                <span class="font-medium">45%</span>
-                                <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" aria-hidden="true" />
-                                <span>Before you Go Go</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="font-medium">30%</span>
-                                <div class="size-2.5 shrink-0 rounded-full bg-gray-800" aria-hidden="true" />
-                                <span>Bring me Back to Life</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="font-medium">15%</span>
-                                <div class="size-2.5 shrink-0 rounded-full bg-lime-500" aria-hidden="true" />
-                                <span>When September Ends</span>
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="font-medium">10%</span>
-                                <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" aria-hidden="true" />
-                                <span>Never</span>
-                            </li>
-                        </ul>
-                    </figcaption>
-                </figure>
+                                        background-image: conic-gradient(
+                                            var(--color-indigo-500) 0% var(--end1),
+                                            var(--color-gray-800) var(--end1) var(--end2),
+                                            var(--color-lime-500) var(--end2) var(--end3),
+                                            var(--color-indigo-200) var(--end3) var(--end4)
+                                        );
+                                    "
+                                    role="img"
+                                    :aria-labelledby="legendId"
+                                />
+                                <figcaption :id="legendId" class="pt-4">
+                                    <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
+                                        <li class="flex items-center gap-2">
+                                            <span class="font-medium">45%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" aria-hidden="true" />
+                                            <span>Before you Go Go</span>
+                                        </li>
+                                        <li class="flex items-center gap-2">
+                                            <span class="font-medium">30%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" aria-hidden="true" />
+                                            <span>Bring me Back to Life</span>
+                                        </li>
+                                        <li class="flex items-center gap-2">
+                                            <span class="font-medium">15%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" aria-hidden="true" />
+                                            <span>When September Ends</span>
+                                        </li>
+                                        <li class="flex items-center gap-2">
+                                            <span class="font-medium">10%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" aria-hidden="true" />
+                                            <span>Never</span>
+                                        </li>
+                                    </ul>
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                </div>
             </template>
         </FormSubmissionListing>
 
