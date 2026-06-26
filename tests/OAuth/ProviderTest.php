@@ -258,6 +258,19 @@ class ProviderTest extends TestCase
     }
 
     #[Test]
+    public function it_determines_whether_a_user_is_linked()
+    {
+        $provider = $this->provider();
+
+        $one = UserFacade::make()->id('one')->email('one@bar.com')->save();
+        $two = UserFacade::make()->id('two')->email('two@bar.com')->save();
+        $provider->setUserProviderId($one, 'one-sub');
+
+        $this->assertTrue($provider->isLinkedTo($one));
+        $this->assertFalse($provider->isLinkedTo($two));
+    }
+
+    #[Test]
     public function it_forgets_a_user()
     {
         $provider = $this->provider();

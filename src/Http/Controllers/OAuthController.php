@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -91,6 +92,10 @@ class OAuthController
         }
 
         $oauth->forgetUser($request->user());
+
+        if ($request->wantsJson()) {
+            return new JsonResponse([], 204);
+        }
 
         return back()->with('success', __('statamic::messages.oauth_unlinked', ['provider' => $oauth->label()]));
     }

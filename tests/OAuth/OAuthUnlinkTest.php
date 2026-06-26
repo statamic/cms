@@ -45,6 +45,19 @@ class OAuthUnlinkTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_no_content_for_json_requests()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->deleteJson(route('statamic.oauth.unlink', 'test'))
+            ->assertNoContent();
+
+        $this->assertNull((new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
     public function guests_cannot_unlink()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();

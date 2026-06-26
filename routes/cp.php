@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Addons\AddonsController;
@@ -23,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
+use Statamic\Http\Controllers\CP\Auth\OAuthController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyLoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
@@ -435,6 +437,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
         Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
+
+    if (OAuth::enabled()) {
+        Route::get('oauth', [OAuthController::class, 'index'])->name('oauth');
+    }
 
     Route::get('themes', [ThemeController::class, 'index']);
     Route::get('themes/refresh', [ThemeController::class, 'refresh']);

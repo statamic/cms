@@ -185,6 +185,11 @@ class Provider
         $this->setIds($ids);
     }
 
+    public function isLinkedTo($user): bool
+    {
+        return array_key_exists($user->id(), $this->getIds());
+    }
+
     protected function storagePath()
     {
         return storage_path("statamic/oauth/{$this->name}.php");
