@@ -62,14 +62,7 @@ class Provider
      */
     public function findUser($socialite): ?StatamicUser
     {
-        if (
-            ($user = User::findByOAuthId($this, $socialite->getId())) ||
-            ($user = User::findByEmail($socialite->getEmail()))
-        ) {
-            return $user;
-        }
-
-        return null;
+        return User::findByOAuthId($this, $socialite->getId());
     }
 
     /**
