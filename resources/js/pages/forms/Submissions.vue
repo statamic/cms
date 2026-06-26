@@ -261,6 +261,7 @@ function exportSubmissions() {
                     <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Wake me up')"
+                            title-tag="h2"
                             icon="fieldtype-radio"
                             icon-class="size-4.5 text-gray-500 hidden @xs/widget:block"
                         >
