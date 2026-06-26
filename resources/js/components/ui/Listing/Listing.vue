@@ -735,7 +735,7 @@ autoApplyState();
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
             <div v-if="allowSearch || hasFilters || allowCustomizingColumns || $slots['toolbar-actions']" class="flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition">
-                <div class="flex flex-1 items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 min-w-0">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>
