@@ -62,14 +62,22 @@ class Provider
      */
     public function findUser($socialite): ?StatamicUser
     {
-        if (
-            ($user = User::findByOAuthId($this, $socialite->getId())) ||
-            ($user = User::findByEmail($socialite->getEmail()))
-        ) {
+        if ($user = User::findByOAuthId($this, $socialite->getId())) {
+            return $user;
+        }
+
+        if ($this->trustsEmails() && $user = User::findByEmail($socialite->getEmail())) {
             return $user;
         }
 
         return null;
+    }
+
+    private function trustsEmails(): bool
+    {
+        return in_array($this->name, config('statamic.oauth.trusted_providers', [
+            'google', 'github', 'apple', 'bitbucket', 'slack', 'slack-openid', 'twitter-oauth-2',
+        ]));
     }
 
     /**

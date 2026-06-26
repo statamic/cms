@@ -22,6 +22,8 @@ class ProviderTest extends TestCase
             'driver' => 'local',
             'root' => $this->tempDir = __DIR__.'/tmp',
         ]]);
+
+        config(['statamic.oauth.trusted_providers' => ['test']]);
     }
 
     public function tearDown(): void
@@ -153,6 +155,35 @@ class ProviderTest extends TestCase
         $this->assertCount(0, UserFacade::all());
         $user = UserFacade::all()->get(0);
         $this->assertNull($user);
+    }
+
+    #[Test]
+    public function it_does_not_find_an_existing_user_by_email_for_an_untrusted_provider()
+    {
+        config(['statamic.oauth.trusted_providers' => ['google']]);
+
+        $this->user()->save();
+
+        $foundUser = (new Provider('test'))->findUser($this->socialite());
+
+        $this->assertNull($foundUser);
+    }
+
+    #[Test]
+    public function it_still_finds_an_existing_user_by_oauth_id_for_an_untrusted_provider()
+    {
+        config(['statamic.oauth.trusted_providers' => ['google']]);
+
+        $provider = new Provider('test');
+        $savedUser = $this->user()->save();
+
+        // Link the account to the provider, then ensure a subsequent lookup matches
+        // on the stored OAuth id even though email matching is not trusted.
+        $provider->mergeUser($savedUser, $this->socialite());
+
+        $foundUser = $provider->findUser($this->socialite());
+
+        $this->assertEquals($savedUser, $foundUser);
     }
 
     #[Test]
