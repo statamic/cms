@@ -259,6 +259,8 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             // here when submissions aren't stored so developers may continue to
             // listen and modify the submission as needed.
             SubmissionCreated::dispatch($this);
+
+            $this->deleteQuietly();
         }
 
         SubmissionFinalized::dispatch($this);

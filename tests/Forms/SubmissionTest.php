@@ -424,6 +424,27 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function finalizing_a_submission_for_a_non_storing_form_deletes_it()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class, SubmissionDeleted::class]);
+
+        $form = tap(Form::make('contact_us')->store(false))->save();
+
+        $submission = tap($form->makeSubmission()->set('partial', true))->save();
+        $this->assertNotNull($form->submission($submission->id()));
+
+        $submission->finalize();
+
+        $this->assertNull($form->submission($submission->id()));
+
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
+        Bus::assertDispatched(SendEmails::class, 1);
+        Event::assertNotDispatched(SubmissionDeleted::class);
+    }
+
+    #[Test]
     public function finalizing_is_idempotent()
     {
         Bus::fake();
