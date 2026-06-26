@@ -257,6 +257,22 @@ class ProviderTest extends TestCase
         $this->assertEquals('foo', $provider->getUserId('foo-bar'));
     }
 
+    #[Test]
+    public function it_forgets_a_user()
+    {
+        $provider = $this->provider();
+
+        $one = UserFacade::make()->id('one')->email('one@bar.com')->save();
+        $two = UserFacade::make()->id('two')->email('two@bar.com')->save();
+        $provider->setUserProviderId($one, 'one-sub');
+        $provider->setUserProviderId($two, 'two-sub');
+
+        $provider->forgetUser($one);
+
+        $this->assertNull($provider->getUserId('one-sub'));
+        $this->assertEquals('two', $provider->getUserId('two-sub'));
+    }
+
     private function provider()
     {
         return new Provider('test');

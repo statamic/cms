@@ -193,6 +193,7 @@ return [
     'oauth_link_belongs_to_another_user' => 'This :provider account is already connected to a different user.',
     'oauth_link_unsupported' => 'This provider does not support connecting accounts.',
     'oauth_linked' => 'Connected your :provider account.',
+    'oauth_unlinked' => 'Disconnected your :provider account.',
     'outpost_error_422' => 'Error communicating with statamic.com.',
     'outpost_error_429' => 'Too many requests to statamic.com.',
     'outpost_issue_try_later' => 'There was an issue communicating with statamic.com. Please try again later.',

@@ -114,6 +114,9 @@ Route::name('statamic.')->group(function () {
         Route::match(['get', 'post'], config('statamic.oauth.routes.callback'), [OAuthController::class, 'handleProviderCallback'])
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
             ->name('oauth.callback');
+        Route::delete(config('statamic.oauth.routes.unlink'), [OAuthController::class, 'unlink'])
+            ->middleware('auth')
+            ->name('oauth.unlink');
     }
 });
 

@@ -82,6 +82,19 @@ class OAuthController
         return redirect()->to($this->unauthorizedRedirectUrl());
     }
 
+    public function unlink(Request $request, string $provider)
+    {
+        $oauth = OAuth::provider($provider);
+
+        if (! $oauth) {
+            throw new NotFoundHttpException();
+        }
+
+        $oauth->forgetUser($request->user());
+
+        return back()->with('success', __('statamic::messages.oauth_unlinked', ['provider' => $oauth->label()]));
+    }
+
     protected function linkProvider($oauth, $providerUser, $user)
     {
         // Linking relies on the stateful "state" parameter to protect against

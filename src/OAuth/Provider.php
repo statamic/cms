@@ -176,6 +176,15 @@ class Provider
         $this->setIds($ids);
     }
 
+    public function forgetUser($user)
+    {
+        $ids = $this->getIds();
+
+        unset($ids[$user->id()]);
+
+        $this->setIds($ids);
+    }
+
     protected function storagePath()
     {
         return storage_path("statamic/oauth/{$this->name}.php");
