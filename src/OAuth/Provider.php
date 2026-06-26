@@ -167,7 +167,7 @@ class Provider
         File::put($this->storagePath(), $contents);
     }
 
-    protected function setUserProviderId($user, $id)
+    public function setUserProviderId($user, $id)
     {
         $ids = $this->getIds();
 
