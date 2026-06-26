@@ -517,7 +517,7 @@ class Tags extends BaseTags
     {
         $pages = $this->form()->formFields()->pages();
 
-        return $pages->first()['id'] === Arr::get($this->currentPage(), 'id');
+        return Arr::get($pages->first(), 'id') === Arr::get($this->currentPage(), 'id');
     }
 
     // todo: take logic into account
@@ -525,7 +525,7 @@ class Tags extends BaseTags
     {
         $pages = $this->form()->formFields()->pages();
 
-        return $pages->last()['id'] === Arr::get($this->currentPage(), 'id');
+        return Arr::get($pages->last(), 'id') === Arr::get($this->currentPage(), 'id');
     }
 
     private function previousPageUrl(): ?string

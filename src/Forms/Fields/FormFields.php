@@ -35,12 +35,13 @@ class FormFields
 
     public function pages(): Collection
     {
-        if (isset($this->contents['pages'])) {
-            return collect($this->contents['pages']);
-        }
+        $pages = isset($this->contents['pages'])
+            ? collect($this->contents['pages'])
+            : collect([['sections' => $this->contents['sections'] ?? []]]);
 
-        return collect([
-            ['sections' => $this->contents['sections'] ?? []],
+        return $pages->map(fn (array $page, int $index): array => [
+            ...$page,
+            'id' => $page['id'] ?? ($pages->count() === 1 ? 'main' : 'page_'.($index + 1)),
         ]);
     }
 
@@ -78,8 +79,6 @@ class FormFields
     {
         $tabs = $this->pages()
             ->mapWithKeys(function (array $page, int $index): array {
-                $id = $page['id'] ?? ($this->pages()->count() === 1 ? 'main' : 'page_'.($index + 1));
-
                 $sections = collect($page['sections'] ?? [])
                     ->map(function (array $section): array {
                         return [
@@ -105,8 +104,8 @@ class FormFields
                     ->all();
 
                 return [
-                    $id => [
-                        ...$page,
+                    $page['id'] => [
+                        ...Arr::except($page, 'id'),
                         'display' => $page['display'] ?? __('Page :current of :total', ['current' => $index + 1, 'total' => $this->pages()->count()]),
                         'sections' => $sections,
                     ],

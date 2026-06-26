@@ -124,6 +124,10 @@ class SubmitForm
 
     private function shouldFinalize(): bool
     {
+        if (! $this->form->hasMultiplePages()) {
+            return true;
+        }
+
         // todo: should take logic into account (the actual last page on the form might not be the user's last page)
         $pages = $this->form->formFields()->pages();
 
