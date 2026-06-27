@@ -11,6 +11,8 @@ defineOptions({
     inheritAttrs: false,
 });
 
+const uiDirection = computed(() => document.documentElement.dir || 'ltr');
+
 const props = defineProps({
     /** When `true`, the field is styled as a configuration field with a two-column grid layout. */
     inline: { type: Boolean, default: false },
@@ -82,6 +84,7 @@ const hasErrors = computed(() => {
 <template>
     <div :class="[rootClasses, $attrs.class]" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null">
         <div
+            :dir="uiDirection"
             v-if="label || $slots.label || $slots.actions || (instructions && !instructionsBelow)"
             class="flex flex-col gap-1.5"
             data-ui-field-header
