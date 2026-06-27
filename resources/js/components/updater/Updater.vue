@@ -92,7 +92,7 @@ export default {
         },
 
         onLatestVersion() {
-            return this.currentVersion && this.currentVersion == this.latestVersion;
+            return this.currentVersion && !this.changelog.some((release) => release.type === 'upgrade');
         },
 
         securityUpdateAvailable() {
