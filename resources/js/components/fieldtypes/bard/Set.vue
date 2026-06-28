@@ -118,9 +118,14 @@ import {
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { watch } from 'vue';
 import { reveal } from '@api';
+import { useUiDirection } from '@/composables/ui-direction.js';
 
 export default {
     props: nodeViewProps,
+
+    setup() {
+        return useUiDirection();
+    },
 
     components: {
         Button,
@@ -146,10 +151,6 @@ export default {
     },
 
     computed: {
-        uiDirection() {
-            return document.documentElement.dir || 'ltr';
-        },
-
         fields() {
             return this.config.fields;
         },

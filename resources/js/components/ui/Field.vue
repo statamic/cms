@@ -6,12 +6,13 @@ import Label from './Label.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import markdown from '@/util/markdown.js';
 import { twMerge } from 'tailwind-merge';
+import { useUiDirection } from '@/composables/ui-direction.js';
 
 defineOptions({
     inheritAttrs: false,
 });
 
-const uiDirection = computed(() => document.documentElement.dir || 'ltr');
+const { uiDirection } = useUiDirection();
 
 const props = defineProps({
     /** When `true`, the field is styled as a configuration field with a two-column grid layout. */

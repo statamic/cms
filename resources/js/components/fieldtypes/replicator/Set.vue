@@ -1,5 +1,6 @@
 <script setup>
 import { computed, inject, ref } from 'vue';
+import { useUiDirection } from '@/composables/ui-direction.js';
 import {
     Icon,
     Switch,
@@ -120,7 +121,7 @@ function destroy() {
     emit('removed');
 }
 
-const uiDirection = computed(() => document.documentElement.dir || 'ltr');
+const { uiDirection } = useUiDirection();
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));

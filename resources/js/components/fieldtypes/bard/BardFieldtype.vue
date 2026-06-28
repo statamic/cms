@@ -177,6 +177,7 @@ import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
+import { useUiDirection } from '@/composables/ui-direction.js';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -184,6 +185,10 @@ let commandPaletteCallbackRegistered = false;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
+
+    setup() {
+        return useUiDirection();
+    },
 
     components: {
         BubbleMenu,
@@ -227,10 +232,6 @@ export default {
     },
 
     computed: {
-        uiDirection() {
-            return document.documentElement.dir || 'ltr';
-        },
-
         setFieldPathPrefix() {
             return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
         },
