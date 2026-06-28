@@ -214,4 +214,19 @@ EOT;
     {
         $this->assertThrowsParserError('{{ tag_name :$}}');
     }
+
+    public function test_mixed_pipe_and_shorthand_modifier_throws_exception()
+    {
+        $this->assertThrowsParserError('{{ active_platforms | sort="value" }}');
+    }
+
+    public function test_mixed_pipe_and_shorthand_modifier_paired_throws_exception()
+    {
+        $this->assertThrowsParserError('{{ active_platforms | sort="value" }}items{{ /active_platforms }}');
+    }
+
+    public function test_mixed_pipe_and_shorthand_with_registered_modifier_throws_exception()
+    {
+        $this->assertThrowsParserError('{{ thing | upper="value" }}');
+    }
 }
