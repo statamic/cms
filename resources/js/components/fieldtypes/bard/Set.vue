@@ -18,6 +18,7 @@
         >
             <div ref="content" hidden />
             <header
+                :dir="uiDirection"
                 class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
                 :class="{
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
@@ -145,6 +146,10 @@ export default {
     },
 
     computed: {
+        uiDirection() {
+            return document.documentElement.dir || 'ltr';
+        },
+
         fields() {
             return this.config.fields;
         },
