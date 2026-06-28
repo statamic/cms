@@ -98,7 +98,7 @@
                                 @added="addSet"
                             >
                                 <template #trigger>
-                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                    <div :dir="uiDirection" class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
                                         <ui-button
                                             icon="plus"
                                             size="sm"
@@ -227,6 +227,10 @@ export default {
     },
 
     computed: {
+        uiDirection() {
+            return document.documentElement.dir || 'ltr';
+        },
+
         setFieldPathPrefix() {
             return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
         },
