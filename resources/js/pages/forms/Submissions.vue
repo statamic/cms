@@ -2,7 +2,7 @@
 import { ref, computed, watch, useId } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -38,7 +38,27 @@ const exportFormat = ref(null);
 const exportScope = ref('all');
 const listingParameters = ref({});
 const pieLegendId = useId();
+const pieLegendPage2Id = useId();
 const rankingChartCaptionId = useId();
+
+// Mock in-widget pagination for fields with more than four response options.
+const wakeMeUpChartPage = ref(1);
+const wakeMeUpChartPerPage = 4;
+const wakeMeUpChartTotal = 8;
+
+const wakeMeUpChartMeta = computed(() => {
+    const from = (wakeMeUpChartPage.value - 1) * wakeMeUpChartPerPage + 1;
+    const to = Math.min(wakeMeUpChartPage.value * wakeMeUpChartPerPage, wakeMeUpChartTotal);
+
+    return {
+        current_page: wakeMeUpChartPage.value,
+        last_page: Math.ceil(wakeMeUpChartTotal / wakeMeUpChartPerPage),
+        per_page: wakeMeUpChartPerPage,
+        total: wakeMeUpChartTotal,
+        from,
+        to,
+    };
+});
 
 async function generateFakeSubmission(mode) {
     if (generatingFakeSubmission.value) {
@@ -302,6 +322,103 @@ function exportSubmissions() {
                                             <span class="font-medium text-[0.785rem]">10%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
                                             <span>Never</span>
+                                        </li>
+                                    </ul>
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                    <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('I love to wake up...')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="fieldtype-radio"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <template #actions>
+                                <Pagination
+                                    :resource-meta="wakeMeUpChartMeta"
+                                    :show-totals="false"
+                                    :show-page-links="false"
+                                    :show-per-page-selector="false"
+                                    :scroll-to-top="false"
+                                    @page-selected="wakeMeUpChartPage = $event"
+                                />
+                            </template>
+                            <figure v-if="wakeMeUpChartPage === 1" class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
+                                <div
+                                    class="pie-chart"
+                                    style="--1: 68; --2: 18; --3: 9; --4: 5;"
+                                    role="img"
+                                    :aria-labelledby="pieLegendId"
+                                >
+                                    <div class="pie-chart__disc" aria-hidden="true" />
+                                    <!-- aria-hidden because the labels are already in the figure caption -->
+                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">68%</span>
+                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">18%</span>
+                                    <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">9%</span>
+                                    <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">5%</span>
+                                </div>
+                                <figcaption :id="pieLegendId" class="pt-4">
+                                    <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">68%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
+                                            <span>Alarm, no mercy</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">18%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
+                                            <span>Hit snooze</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">9%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
+                                            <span>Woken by someone else</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">5%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <span>I wake up naturally</span>
+                                        </li>
+                                    </ul>
+                                </figcaption>
+                            </figure>
+                            <figure v-else-if="wakeMeUpChartPage === 2" class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
+                                <div
+                                    class="pie-chart"
+                                    style="--1: 68; --2: 18; --3: 9; --4: 5;"
+                                    role="img"
+                                    :aria-labelledby="pieLegendPage2Id"
+                                >
+                                    <div class="pie-chart__disc" aria-hidden="true" />
+                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">68%</span>
+                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">18%</span>
+                                    <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">9%</span>
+                                    <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">5%</span>
+                                </div>
+                                <figcaption :id="pieLegendPage2Id" class="pt-4">
+                                    <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">45%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
+                                            <span>Bohemian Rhapsody</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">30%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
+                                            <span>Stairway to Heaven</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">15%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
+                                            <span>Hey Jude</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">10%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <span>Wonderwall</span>
                                         </li>
                                     </ul>
                                 </figcaption>

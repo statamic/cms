@@ -58,4 +58,5 @@
 .pie-chart__label--1 { --angle: var(--angle1); background-color: var(--color-indigo-600); }
 .pie-chart__label--2 { --angle: var(--angle2); }
 .pie-chart__label--3 { --angle: var(--angle3); background-color: var(--color-lime-600); }
-.pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-indigo-400); }
+/* Kick the radius out a bit because the label segment is smaller, and it might overlap with the preceding segment. */
+.pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-indigo-400); --label-radius: 39%; }
