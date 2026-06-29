@@ -165,6 +165,13 @@ class Provider
         $contents = '<?php return '.var_export($ids, true).';';
 
         File::put($this->storagePath(), $contents);
+
+        // Bust the opcache immediately, otherwise it may take a few moments
+        // for PHP to pick up the changes to the file. Linking a provider
+        // will show unlinked momentarily and vice versa.
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($this->storagePath(), true);
+        }
     }
 
     public function setUserProviderId($user, $id)
