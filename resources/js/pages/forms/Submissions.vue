@@ -269,30 +269,18 @@ function exportSubmissions() {
                         >
                             <figure class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
                                 <div
-                                    data-pie-chart
-                                    class="w-36 aspect-square rounded-full"
-                                    style="
-                                        /* These slices would be dynamic based on the data */
-                                        --1: 45%;
-                                        --2: 30%;
-                                        --3: 15%;
-                                        --4: 10%;
-
-                                        --end1: var(--1);
-                                        --end2: calc(var(--1) + var(--2));
-                                        --end3: calc(var(--1) + var(--2) + var(--3));
-                                        --end4: 100%;
-
-                                        background-image: conic-gradient(
-                                            var(--color-indigo-500) 0% var(--end1),
-                                            var(--color-gray-800) var(--end1) var(--end2),
-                                            var(--color-lime-500) var(--end2) var(--end3),
-                                            var(--color-indigo-200) var(--end3) var(--end4)
-                                        );
-                                    "
+                                    class="pie-chart"
+                                    style="--1: 45; --2: 30; --3: 15; --4: 10;"
                                     role="img"
                                     :aria-labelledby="pieLegendId"
-                                />
+                                >
+                                    <div class="pie-chart__disc" aria-hidden="true" />
+                                    <!-- aria-hidden because the labels are already in the figure caption -->
+                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">45%</span>
+                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">30%</span>
+                                    <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">15%</span>
+                                    <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
+                                </div>
                                 <figcaption :id="pieLegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
