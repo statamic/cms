@@ -432,31 +432,31 @@ function exportSubmissions() {
                                 <ol class="m-0 list-none grid gap-2.5 p-0 pt-4">
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-1-legend" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-1" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Summer</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-chart-1-legend" />
+                                            <div class="size-2 rounded-full bg-chart-1" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">2</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-2-legend" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-2" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-chart-2-legend" />
+                                            <div class="size-2 rounded-full bg-chart-2" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">3</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-3-legend" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-3" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Spring</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-chart-3-legend" />
+                                            <div class="size-2 rounded-full bg-chart-3" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                         </div>
                                     </li>
