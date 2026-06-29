@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -71,6 +73,12 @@ class OAuthController
         }
 
         if ($user) {
+            // OAuth must not bypass two-factor. When the user has it enabled,
+            // defer the login and send them through the challenge instead.
+            if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
+                return $this->twoFactorChallenge($user);
+            }
+
             session()->put('oauth-provider', $provider);
 
             Auth::guard($guard)->login($user, config('statamic.oauth.remember_me', true));
@@ -159,19 +167,42 @@ class OAuthController
         // accessing the CP. If they were, we'll redirect them to
         // the unauthorized page in the CP. Otherwise, to home.
 
-        $default = '/';
+        return $this->isCpRequest() ? cp_route('unauthorized') : '/';
+    }
+
+    protected function twoFactorChallenge($user)
+    {
+        session()->put([
+            'login.id' => $user->getKey(),
+            'login.remember' => config('statamic.oauth.remember_me', true),
+        ]);
+
+        // Preserve the OAuth destination so the challenge sends the user
+        // there once they've passed two-factor.
+        redirect()->setIntendedUrl($this->successRedirectUrl());
+
+        TwoFactorAuthenticationChallenged::dispatch($user);
+
+        return redirect($this->twoFactorChallengeUrl());
+    }
+
+    protected function twoFactorChallengeUrl()
+    {
+        return $this->isCpRequest()
+            ? cp_route('two-factor-challenge')
+            : config('statamic.users.two_factor_challenge_url') ?? route('statamic.two-factor-challenge');
+    }
+
+    protected function isCpRequest()
+    {
         $previous = session('_previous.url');
 
         if (! $query = Arr::get(parse_url($previous), 'query')) {
-            return $default;
+            return false;
         }
 
         parse_str($query, $query);
 
-        if (! $redirect = Arr::get($query, 'redirect')) {
-            return $default;
-        }
-
-        return $redirect === '/'.config('statamic.cp.route') ? cp_route('unauthorized') : $default;
+        return Arr::get($query, 'redirect') === '/'.config('statamic.cp.route');
     }
 }

@@ -2,8 +2,13 @@
 
 namespace Tests\OAuth;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\User as UserFacade;
 use Statamic\OAuth\Provider;
@@ -178,6 +183,75 @@ class OAuthCallbackTest extends TestCase
         $this->assertCount(0, UserFacade::all());
         $this->assertNull($this->provider('test')->getUserId('sub-1'));
         $response->assertRedirect();
+    }
+
+    #[Test]
+    public function a_two_factor_enabled_user_is_challenged_instead_of_being_logged_in()
+    {
+        Event::fake();
+
+        $user = $this->userWithTwoFactorEnabled('user-1', 'existing@example.com');
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com');
+
+        $response = $this->hitCallback('test');
+
+        $this->assertGuest();
+        $response->assertRedirect(route('statamic.two-factor-challenge'));
+        $response->assertSessionHas('login.id', 'user-1');
+        Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id() === 'user-1');
+    }
+
+    #[Test]
+    public function a_two_factor_challenge_from_the_cp_redirects_to_the_cp_challenge()
+    {
+        $user = $this->userWithTwoFactorEnabled('user-1', 'existing@example.com');
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com');
+
+        $response = $this
+            ->withSession([
+                'statamic.oauth.guard' => 'web',
+                '_previous' => ['url' => 'http://localhost/oauth/test?redirect=/cp'],
+            ])
+            ->get(route('statamic.oauth.callback', 'test'));
+
+        $this->assertGuest();
+        $response->assertRedirect(cp_route('two-factor-challenge'));
+        $response->assertSessionHas('login.id', 'user-1');
+    }
+
+    #[Test]
+    public function a_two_factor_enabled_user_is_logged_in_when_two_factor_is_disabled()
+    {
+        config()->set('statamic.users.two_factor_enabled', false);
+
+        Event::fake();
+
+        $user = $this->userWithTwoFactorEnabled('user-1', 'existing@example.com');
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com');
+
+        $this->hitCallback('test');
+
+        $this->assertAuthenticatedAs(UserFacade::find('user-1'));
+        Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    private function userWithTwoFactorEnabled(string $id, string $email)
+    {
+        $user = UserFacade::make()->id($id)->email($email)->save();
+
+        $user->merge([
+            'two_factor_confirmed_at' => now()->timestamp,
+            'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, fn () => RecoveryCode::generate())->all())),
+        ])->save();
+
+        return $user;
     }
 
     private function hitCallback(string $provider)
