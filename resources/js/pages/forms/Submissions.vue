@@ -305,22 +305,22 @@ function exportSubmissions() {
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">45%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-1" />
                                             <span>Before you Go Go</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">30%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-2" />
                                             <span>Bring me Back to Life</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">15%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-3" />
                                             <span>When September Ends</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">10%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Never</span>
                                         </li>
                                     </ul>
@@ -364,22 +364,22 @@ function exportSubmissions() {
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">68%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-1" />
                                             <span>Alarm, no mercy</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">18%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-2" />
                                             <span>Hit snooze</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">9%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-3" />
                                             <span>Woken by someone else</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">5%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Other</span>
                                         </li>
                                     </ul>
@@ -402,17 +402,17 @@ function exportSubmissions() {
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">3%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Bohemian Rhapsody</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">1%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Stairway to Heaven</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">1%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Wonderwall</span>
                                         </li>
                                     </ul>
@@ -432,41 +432,41 @@ function exportSubmissions() {
                                 <ol class="m-0 list-none grid gap-2.5 p-0 pt-4">
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-indigo-500" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-1" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Summer</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-indigo-500" />
+                                            <div class="size-2 rounded-full bg-chart-1" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">2</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-gray-800" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-2" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-gray-800" />
+                                            <div class="size-2 rounded-full bg-chart-2" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">3</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-lime-500" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-3" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Spring</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-lime-500" />
+                                            <div class="size-2 rounded-full bg-chart-3" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">4</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-indigo-300" />
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-4" />
                                         <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Winter</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-indigo-300" />
+                                            <div class="size-2 rounded-full bg-chart-4" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                         </div>
                                     </li>

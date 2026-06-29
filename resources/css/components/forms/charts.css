@@ -32,10 +32,10 @@
     height: 100%;
     border-radius: 50%;
     background-image: conic-gradient(
-        var(--color-indigo-500) 0% var(--end1),
-        var(--color-gray-800) var(--end1) var(--end2),
-        var(--color-lime-500) var(--end2) var(--end3),
-        var(--color-indigo-200) var(--end3) var(--end4)
+        var(--color-chart-1) 0% var(--end1),
+        var(--color-chart-2) var(--end1) var(--end2),
+        var(--color-chart-3) var(--end2) var(--end3),
+        var(--color-chart-4) var(--end3) var(--end4)
     );
 }
 
@@ -55,11 +55,11 @@
     @apply text-xs font-medium tabular-nums text-white pointer-events-none;
 }
 
-.pie-chart__label--1 { --angle: var(--angle1); background-color: var(--color-indigo-600); }
-.pie-chart__label--2 { --angle: var(--angle2); }
-.pie-chart__label--3 { --angle: var(--angle3); background-color: var(--color-lime-600); }
+.pie-chart__label--1 { --angle: var(--angle1); background-color: var(--color-chart-1-label-bg); }
+.pie-chart__label--2 { --angle: var(--angle2); background-color: var(--color-chart-2-label-bg); }
+.pie-chart__label--3 { --angle: var(--angle3); background-color: var(--color-chart-3-label-bg); }
 /* Kick the radius out a bit because the label segment is smaller, and it might overlap with the preceding segment. */
-.pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-indigo-400); --label-radius: 39%; }
+.pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-chart-4-label-bg); --label-radius: 39%; }
 
 
 
@@ -80,10 +80,10 @@
 
     .pie-chart__disc {
         background-image: conic-gradient(
-            hsl(from var(--color-indigo-500) h s l / 0.1) 0% var(--end1),
-            hsl(from var(--color-gray-800) h s l / 0.1) var(--end1) var(--end2),
-            hsl(from var(--color-lime-500) h s l / 0.1) var(--end2) var(--end3),
-            var(--color-indigo-200) var(--end3) var(--end4)
+            hsl(from var(--color-chart-1) h s l / 0.1) 0% var(--end1),
+            hsl(from var(--color-chart-2) h s l / 0.1) var(--end1) var(--end2),
+            hsl(from var(--color-chart-3) h s l / 0.1) var(--end2) var(--end3),
+            var(--color-chart-4) var(--end3) var(--end4)
         );
     }
 }

@@ -420,6 +420,22 @@ class Color
             'ui-accent-text' => 'var(--theme-color-ui-accent-bg)',
             'dark-ui-accent-text' => self::Indigo[400],
             'switch-bg' => 'var(--theme-color-ui-accent-bg)',
+            'chart-1' => self::Indigo[500],
+            'chart-2' => self::Zinc[800],
+            'chart-3' => self::Lime[500],
+            'chart-4' => self::Indigo[200],
+            'chart-1-label-bg' => self::Indigo[600],
+            'chart-2-label-bg' => self::Transparent,
+            'chart-3-label-bg' => self::Lime[600],
+            'chart-4-label-bg' => self::Indigo[400],
+            'dark-chart-1' => self::Indigo[400],
+            'dark-chart-2' => self::Zinc[500],
+            'dark-chart-3' => self::Lime[400],
+            'dark-chart-4' => self::Indigo[300],
+            'dark-chart-1-label-bg' => self::Indigo[500],
+            'dark-chart-2-label-bg' => self::Transparent,
+            'dark-chart-3-label-bg' => self::Lime[500],
+            'dark-chart-4-label-bg' => self::Indigo[400],
         ])
             ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
