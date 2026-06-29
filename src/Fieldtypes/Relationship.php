@@ -368,7 +368,7 @@ abstract class Relationship extends Fieldtype
     {
         $handles = Arr::wrap($this->config('query_scopes'));
 
-        // Pass the active handles along (like the asset browser) so an aliased scope knows which is in effect.
+        // Pass the active handles along so an aliased scope knows which is in effect.
         $params = array_merge($params, ['queryScopes' => $handles]);
 
         collect($handles)
