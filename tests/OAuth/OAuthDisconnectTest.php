@@ -8,7 +8,7 @@ use Statamic\OAuth\Provider;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class OAuthUnlinkTest extends TestCase
+class OAuthDisconnectTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -26,7 +26,7 @@ class OAuthUnlinkTest extends TestCase
     }
 
     #[Test]
-    public function it_unlinks_a_provider_from_the_authenticated_user()
+    public function it_disconnects_a_provider_from_the_authenticated_user()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
         $other = UserFacade::make()->id('user-2')->email('two@example.com')->save();
@@ -34,13 +34,13 @@ class OAuthUnlinkTest extends TestCase
         $provider->setUserProviderId($user, 'sub-1');
         $provider->setUserProviderId($other, 'sub-2');
 
-        $response = $this->actingAs($user)->delete(route('statamic.oauth.unlink', 'test'));
+        $response = $this->actingAs($user)->delete(route('statamic.oauth.disconnect', 'test'));
 
-        $response->assertSessionHas('success', __('statamic::messages.oauth_unlinked', ['provider' => 'Test']));
+        $response->assertSessionHas('success', __('statamic::messages.oauth_disconnected', ['provider' => 'Test']));
 
         $this->assertNull((new Provider('test'))->getUserId('sub-1'));
 
-        // Another user's link to the same provider is untouched.
+        // Another user's connection to the same provider is untouched.
         $this->assertEquals('user-2', (new Provider('test'))->getUserId('sub-2'));
     }
 
@@ -51,27 +51,27 @@ class OAuthUnlinkTest extends TestCase
         (new Provider('test'))->setUserProviderId($user, 'sub-1');
 
         $this->actingAs($user)
-            ->deleteJson(route('statamic.oauth.unlink', 'test'))
+            ->deleteJson(route('statamic.oauth.disconnect', 'test'))
             ->assertNoContent();
 
         $this->assertNull((new Provider('test'))->getUserId('sub-1'));
     }
 
     #[Test]
-    public function guests_cannot_unlink()
+    public function guests_cannot_disconnect()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
         (new Provider('test'))->setUserProviderId($user, 'sub-1');
 
-        $this->deleteJson(route('statamic.oauth.unlink', 'test'))->assertUnauthorized();
+        $this->deleteJson(route('statamic.oauth.disconnect', 'test'))->assertUnauthorized();
 
         $this->assertEquals('user-1', (new Provider('test'))->getUserId('sub-1'));
     }
 
     #[Test]
-    public function the_unlink_route_requires_a_delete_request_and_authentication()
+    public function the_disconnect_route_requires_a_delete_request_and_authentication()
     {
-        $route = app('router')->getRoutes()->getByName('statamic.oauth.unlink');
+        $route = app('router')->getRoutes()->getByName('statamic.oauth.disconnect');
 
         // A non-GET, CSRF-protected verb behind the auth middleware.
         $this->assertContains('DELETE', $route->methods());

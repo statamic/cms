@@ -77,7 +77,7 @@ class OAuthTagsTest extends TestCase
     }
 
     #[Test]
-    public function the_connected_flag_reflects_the_current_users_links()
+    public function the_connected_flag_reflects_the_current_users_connections()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
         $this->provider('test')->setUserProviderId($user, 'sub-1');
@@ -90,7 +90,7 @@ class OAuthTagsTest extends TestCase
     }
 
     #[Test]
-    public function it_outputs_no_results_when_there_are_no_linkable_providers()
+    public function it_outputs_no_results_when_there_are_no_connectable_providers()
     {
         config()->set('statamic.oauth.providers', [
             'stateless' => ['stateless' => true, 'label' => 'Stateless'],
@@ -102,34 +102,34 @@ class OAuthTagsTest extends TestCase
     }
 
     #[Test]
-    public function the_unlink_form_renders_a_csrf_protected_delete_form()
+    public function the_disconnect_form_renders_a_csrf_protected_delete_form()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
         $this->actingAs($user);
 
-        $output = $this->tag('{{ oauth:unlink_form provider="test" }}<button>Disconnect</button>{{ /oauth:unlink_form }}');
+        $output = $this->tag('{{ oauth:disconnect_form provider="test" }}<button>Disconnect</button>{{ /oauth:disconnect_form }}');
 
-        $this->assertStringContainsString('<form method="POST" action="'.route('statamic.oauth.unlink', 'test').'"', $output);
+        $this->assertStringContainsString('<form method="POST" action="'.route('statamic.oauth.disconnect', 'test').'"', $output);
         $this->assertStringContainsString('name="_token"', $output);
         $this->assertStringContainsString('name="_method" value="DELETE"', $output);
         $this->assertStringContainsString('<button>Disconnect</button>', $output);
     }
 
     #[Test]
-    public function the_unlink_form_is_empty_for_a_guest()
+    public function the_disconnect_form_is_empty_for_a_guest()
     {
-        $output = $this->tag('{{ oauth:unlink_form provider="test" }}<button>Disconnect</button>{{ /oauth:unlink_form }}');
+        $output = $this->tag('{{ oauth:disconnect_form provider="test" }}<button>Disconnect</button>{{ /oauth:disconnect_form }}');
 
         $this->assertEquals('', $output);
     }
 
     #[Test]
-    public function the_unlink_form_is_empty_without_a_provider()
+    public function the_disconnect_form_is_empty_without_a_provider()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
         $this->actingAs($user);
 
-        $output = $this->tag('{{ oauth:unlink_form }}<button>Disconnect</button>{{ /oauth:unlink_form }}');
+        $output = $this->tag('{{ oauth:disconnect_form }}<button>Disconnect</button>{{ /oauth:disconnect_form }}');
 
         $this->assertEquals('', $output);
     }

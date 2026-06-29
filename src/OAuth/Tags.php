@@ -27,7 +27,7 @@ class Tags extends BaseTags
             ->map(fn (Provider $provider) => [
                 'name' => $provider->name(),
                 'label' => $provider->label(),
-                'connected' => $user ? $provider->isLinkedTo($user) : false,
+                'connected' => $user ? $provider->isConnectedTo($user) : false,
                 'url' => $this->generateLoginUrl($provider->name()),
             ])
             ->values();
@@ -64,13 +64,13 @@ class Tags extends BaseTags
     }
 
     /**
-     * Output a form to unlink a provider from the current user.
+     * Output a form to disconnect a provider from the current user.
      *
-     * Maps to {{ oauth:unlink_form }}
+     * Maps to {{ oauth:disconnect_form }}
      *
      * @return string
      */
-    public function unlinkForm()
+    public function disconnectForm()
     {
         $provider = $this->params->get(['provider', 'for']);
 
@@ -78,7 +78,7 @@ class Tags extends BaseTags
             return '';
         }
 
-        $action = route('statamic.oauth.unlink', $provider);
+        $action = route('statamic.oauth.disconnect', $provider);
         $method = 'POST';
 
         $knownParams = ['provider', 'for'];

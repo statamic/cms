@@ -164,7 +164,7 @@ class ProviderTest extends TestCase
     {
         $provider = $this->provider();
 
-        // A user exists with the same email, but is not linked to the provider.
+        // A user exists with the same email, but is not connected to the provider.
         $this->user()->save();
 
         $this->assertNull($provider->findUser($this->socialite()));
@@ -244,7 +244,7 @@ class ProviderTest extends TestCase
     }
 
     #[Test]
-    public function it_determines_whether_a_user_is_linked()
+    public function it_determines_whether_a_user_is_connected()
     {
         $provider = $this->provider();
 
@@ -252,8 +252,8 @@ class ProviderTest extends TestCase
         $two = UserFacade::make()->id('two')->email('two@bar.com')->save();
         $provider->setUserProviderId($one, 'one-sub');
 
-        $this->assertTrue($provider->isLinkedTo($one));
-        $this->assertFalse($provider->isLinkedTo($two));
+        $this->assertTrue($provider->isConnectedTo($one));
+        $this->assertFalse($provider->isConnectedTo($two));
     }
 
     #[Test]

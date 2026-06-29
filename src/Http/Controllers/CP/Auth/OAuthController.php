@@ -25,9 +25,9 @@ class OAuthController extends CpController
                     'name' => $provider->name(),
                     'label' => $provider->label(),
                     'icon' => Statamic::svg('oauth/'.$provider->name()),
-                    'connected' => $provider->isLinkedTo($user),
+                    'connected' => $provider->isConnectedTo($user),
                     'connectUrl' => $provider->loginUrl().'?redirect='.$redirect,
-                    'unlinkUrl' => route('statamic.oauth.unlink', $provider->name()),
+                    'disconnectUrl' => route('statamic.oauth.disconnect', $provider->name()),
                 ])->values(),
         ]);
     }

@@ -13,18 +13,18 @@ const columns = [
 ];
 
 function disconnect(provider) {
-    axios.delete(provider.unlinkUrl).then(() => {
-        toast.success(__('statamic::messages.oauth_unlinked', { provider: provider.label }));
+    axios.delete(provider.disconnectUrl).then(() => {
+        toast.success(__('statamic::messages.oauth_disconnected', { provider: provider.label }));
         router.reload();
     });
 }
 </script>
 
 <template>
-    <Head :title="__('OAuth')" />
+    <Head :title="__('Sign-in Providers')" />
 
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Header :title="__('OAuth')" icon="sign-in" />
+        <Header :title="__('Sign-in Providers')" icon="sign-in" />
 
         <Listing
             :items="providers"

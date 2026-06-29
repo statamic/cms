@@ -52,10 +52,10 @@ class OAuthController
 
         $guard = $request->session()->get('statamic.oauth.guard');
 
-        // When already authenticated, the callback is a request to link
+        // When already authenticated, the callback is a request to connect
         // a provider to the current account rather than to sign in.
         if (Auth::guard($guard)->check()) {
-            return $this->linkProvider($oauth, $providerUser, Auth::guard($guard)->user());
+            return $this->connectProvider($oauth, $providerUser, Auth::guard($guard)->user());
         }
 
         if ($user = $oauth->findUser($providerUser)) {
@@ -91,7 +91,7 @@ class OAuthController
         return redirect()->to($this->unauthorizedRedirectUrl());
     }
 
-    public function unlink(Request $request, string $provider)
+    public function disconnect(Request $request, string $provider)
     {
         $oauth = OAuth::provider($provider);
 
@@ -105,17 +105,17 @@ class OAuthController
             return new JsonResponse([], 204);
         }
 
-        return back()->with('success', __('statamic::messages.oauth_unlinked', ['provider' => $oauth->label()]));
+        return back()->with('success', __('statamic::messages.oauth_disconnected', ['provider' => $oauth->label()]));
     }
 
-    protected function linkProvider($oauth, $providerUser, $user)
+    protected function connectProvider($oauth, $providerUser, $user)
     {
-        // Linking relies on the stateful "state" parameter to protect against
-        // forced-linking CSRF, so it cannot be done with a stateless provider.
+        // Connecting relies on the stateful "state" parameter to protect against
+        // forced-connection CSRF, so it cannot be done with a stateless provider.
         if ($oauth->isStateless()) {
             return redirect()
                 ->to($this->successRedirectUrl())
-                ->with('error', __('statamic::messages.oauth_link_unsupported'));
+                ->with('error', __('statamic::messages.oauth_connect_unsupported'));
         }
 
         $existingUserId = $oauth->getUserId($providerUser->getId());
@@ -123,20 +123,20 @@ class OAuthController
         if ($existingUserId === $user->id()) {
             return redirect()
                 ->to($this->successRedirectUrl())
-                ->with('success', __('statamic::messages.oauth_link_already_connected', ['provider' => $oauth->label()]));
+                ->with('success', __('statamic::messages.oauth_already_connected', ['provider' => $oauth->label()]));
         }
 
         if ($existingUserId) {
             return redirect()
                 ->to($this->successRedirectUrl())
-                ->with('error', __('statamic::messages.oauth_link_belongs_to_another_user', ['provider' => $oauth->label()]));
+                ->with('error', __('statamic::messages.oauth_belongs_to_another_user', ['provider' => $oauth->label()]));
         }
 
         $oauth->setUserProviderId($user, $providerUser->getId());
 
         return redirect()
             ->to($this->successRedirectUrl())
-            ->with('success', __('statamic::messages.oauth_linked', ['provider' => $oauth->label()]));
+            ->with('success', __('statamic::messages.oauth_connected', ['provider' => $oauth->label()]));
     }
 
     protected function successRedirectUrl()

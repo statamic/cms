@@ -19,7 +19,7 @@
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
                         <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
-                        <DropdownItem v-if="oauthEnabled" :text="__('OAuth')" icon="sign-in" :href="cp_url('oauth')" />
+                        <DropdownItem v-if="oauthEnabled" :text="__('Sign-in Providers')" icon="sign-in" :href="cp_url('oauth')" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"

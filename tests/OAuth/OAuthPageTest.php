@@ -57,7 +57,7 @@ class OAuthPageTest extends TestCase
                 ->where('providers.0.name', 'test')
                 ->where('providers.0.label', 'Test')
                 ->where('providers.0.connected', true)
-                ->where('providers.0.unlinkUrl', route('statamic.oauth.unlink', 'test'))
+                ->where('providers.0.disconnectUrl', route('statamic.oauth.disconnect', 'test'))
                 ->where('providers.1.name', 'another')
                 ->where('providers.1.connected', false)
             );

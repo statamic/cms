@@ -168,8 +168,8 @@ class Provider
         File::put($this->storagePath(), $contents);
 
         // Bust the opcache immediately, otherwise it may take a few moments
-        // for PHP to pick up the changes to the file. Linking a provider
-        // will show unlinked momentarily and vice versa.
+        // for PHP to pick up the changes to the file. Connecting a provider
+        // will show disconnected momentarily and vice versa.
         if (function_exists('opcache_invalidate')) {
             opcache_invalidate($this->storagePath(), true);
         }
@@ -193,7 +193,7 @@ class Provider
         $this->setIds($ids);
     }
 
-    public function isLinkedTo($user): bool
+    public function isConnectedTo($user): bool
     {
         return array_key_exists($user->id(), $this->getIds());
     }

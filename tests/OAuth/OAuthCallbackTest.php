@@ -81,7 +81,7 @@ class OAuthCallbackTest extends TestCase
     }
 
     #[Test]
-    public function authenticated_user_links_a_provider()
+    public function authenticated_user_connects_a_provider()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
 
@@ -92,11 +92,11 @@ class OAuthCallbackTest extends TestCase
         $this->assertEquals('user-1', $this->provider('test')->getUserId('sub-1'));
         $this->assertCount(1, UserFacade::all());
         $this->assertAuthenticatedAs($user);
-        $response->assertSessionHas('success', __('statamic::messages.oauth_linked', ['provider' => 'Test']));
+        $response->assertSessionHas('success', __('statamic::messages.oauth_connected', ['provider' => 'Test']));
     }
 
     #[Test]
-    public function linking_a_provider_already_linked_to_the_user_is_idempotent()
+    public function connecting_a_provider_already_connected_to_the_user_is_idempotent()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
         $this->provider('test')->setUserProviderId($user, 'sub-1');
@@ -106,11 +106,11 @@ class OAuthCallbackTest extends TestCase
         $response = $this->actingAs($user)->hitCallback('test');
 
         $this->assertEquals('user-1', $this->provider('test')->getUserId('sub-1'));
-        $response->assertSessionHas('success', __('statamic::messages.oauth_link_already_connected', ['provider' => 'Test']));
+        $response->assertSessionHas('success', __('statamic::messages.oauth_already_connected', ['provider' => 'Test']));
     }
 
     #[Test]
-    public function it_does_not_link_a_provider_identity_owned_by_another_user()
+    public function it_does_not_connect_a_provider_identity_owned_by_another_user()
     {
         $other = UserFacade::make()->id('other')->email('other@example.com')->save();
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
@@ -122,11 +122,11 @@ class OAuthCallbackTest extends TestCase
 
         // Still belongs to the original owner.
         $this->assertEquals('other', $this->provider('test')->getUserId('sub-1'));
-        $response->assertSessionHas('error', __('statamic::messages.oauth_link_belongs_to_another_user', ['provider' => 'Test']));
+        $response->assertSessionHas('error', __('statamic::messages.oauth_belongs_to_another_user', ['provider' => 'Test']));
     }
 
     #[Test]
-    public function it_does_not_link_a_stateless_provider()
+    public function it_does_not_connect_a_stateless_provider()
     {
         $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
 
@@ -135,7 +135,7 @@ class OAuthCallbackTest extends TestCase
         $response = $this->actingAs($user)->hitCallback('stateless');
 
         $this->assertNull($this->provider('stateless')->getUserId('sub-1'));
-        $response->assertSessionHas('error', __('statamic::messages.oauth_link_unsupported'));
+        $response->assertSessionHas('error', __('statamic::messages.oauth_connect_unsupported'));
     }
 
     #[Test]
