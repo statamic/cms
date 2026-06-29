@@ -37,7 +37,8 @@ const exportModalOpen = ref(false);
 const exportFormat = ref(null);
 const exportScope = ref('all');
 const listingParameters = ref({});
-const legendId = useId();
+const pieLegendId = useId();
+const rankingChartCaptionId = useId();
 
 async function generateFakeSubmission(mode) {
     if (generatingFakeSubmission.value) {
@@ -263,7 +264,7 @@ function exportSubmissions() {
                             :title="__('Wake me up')"
                             title-tag="h2"
                             icon="fieldtype-radio"
-                            icon-class="size-4.5 text-gray-500 hidden @xs/widget:block"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
                                 <div
@@ -289,31 +290,87 @@ function exportSubmissions() {
                                         );
                                     "
                                     role="img"
-                                    :aria-labelledby="legendId"
+                                    :aria-labelledby="pieLegendId"
                                 />
-                                <figcaption :id="legendId" class="pt-4">
+                                <figcaption :id="pieLegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2">
                                             <span class="font-medium">45%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" aria-hidden="true" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
                                             <span>Before you Go Go</span>
                                         </li>
                                         <li class="flex items-center gap-2">
                                             <span class="font-medium">30%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" aria-hidden="true" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
                                             <span>Bring me Back to Life</span>
                                         </li>
                                         <li class="flex items-center gap-2">
                                             <span class="font-medium">15%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" aria-hidden="true" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
                                             <span>When September Ends</span>
                                         </li>
                                         <li class="flex items-center gap-2">
                                             <span class="font-medium">10%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" aria-hidden="true" />
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
                                             <span>Never</span>
                                         </li>
                                     </ul>
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                    <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('Rank your favourite seasons')"
+                            title-tag="h2"
+                            icon="rank"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="p-6" :aria-labelledby="rankingChartCaptionId">
+                                <ol class="m-0 flex list-none flex-col gap-5 p-0">
+                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
+                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">1</span>
+                                        <span class="size-3.5 shrink-0 rounded-md bg-indigo-500" />
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">Summer</span>
+                                        <div class="relative flex min-h-3 min-w-0 items-center">
+                                            <div class="h-px w-[45%] bg-gray-300 dark:bg-gray-600" />
+                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-indigo-500" />
+                                        </div>
+                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-indigo-500">45%</span>
+                                    </li>
+                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
+                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">2</span>
+                                        <span class="size-3.5 shrink-0 rounded-md bg-gray-800" />
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">Autumn</span>
+                                        <div class="relative flex min-h-3 min-w-0 items-center">
+                                            <div class="h-px w-[35%] bg-gray-300 dark:bg-gray-600" />
+                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-gray-800" />
+                                        </div>
+                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-gray-800">35%</span>
+                                    </li>
+                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
+                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">3</span>
+                                        <span class="size-3.5 shrink-0 rounded-md bg-lime-500" />
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">Spring</span>
+                                        <div class="relative flex min-h-3 min-w-0 items-center">
+                                            <div class="h-px w-[15%] bg-gray-300 dark:bg-gray-600" />
+                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-lime-500" />
+                                        </div>
+                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-lime-500">15%</span>
+                                    </li>
+                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
+                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">4</span>
+                                        <span class="size-3.5 shrink-0 rounded-md bg-indigo-400" />
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">Winter</span>
+                                        <div class="relative flex min-h-3 min-w-0 items-center">
+                                            <div class="h-px w-[10%] bg-gray-300 dark:bg-gray-600" />
+                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-indigo-400" />
+                                        </div>
+                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-indigo-400">10%</span>
+                                    </li>
+                                </ol>
+                                <figcaption :id="rankingChartCaptionId" class="sr-only">
+                                    {{ __('Ranked favourite seasons: Summer 45%, Autumn 35%, Spring 15%, Winter 10%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
