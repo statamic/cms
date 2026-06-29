@@ -2,6 +2,8 @@
 
 namespace Tests\OAuth;
 
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User as UserFacade;
 use Statamic\OAuth\Provider;
@@ -16,6 +18,17 @@ class OAuthDisconnectTest extends TestCase
     {
         $app['config']->set('statamic.oauth.enabled', true);
         $app['config']->set('statamic.oauth.providers', ['test' => 'Test']);
+    }
+
+    protected function publishedConfigWithoutDisconnectRoute($app)
+    {
+        // An older published config will have a `routes` array without the
+        // `disconnect` key. Config is merged shallowly, so the key won't be
+        // backfilled from ours — the route must fall back to a default.
+        $app['config']->set('statamic.oauth.routes', [
+            'login' => 'oauth/{provider}',
+            'callback' => 'oauth/{provider}/callback',
+        ]);
     }
 
     public function tearDown(): void
@@ -66,6 +79,14 @@ class OAuthDisconnectTest extends TestCase
         $this->deleteJson(route('statamic.oauth.disconnect', 'test'))->assertUnauthorized();
 
         $this->assertEquals('user-1', (new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    #[DefineEnvironment('publishedConfigWithoutDisconnectRoute')]
+    public function the_disconnect_route_falls_back_when_absent_from_a_published_config()
+    {
+        $this->assertTrue(Route::has('statamic.oauth.disconnect'));
+        $this->assertEquals(url('oauth/test/disconnect'), route('statamic.oauth.disconnect', 'test'));
     }
 
     #[Test]
