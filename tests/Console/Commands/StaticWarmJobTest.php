@@ -45,7 +45,7 @@ class StaticWarmJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $job = new StaticWarmJob(new Request('GET', '/blog'), ['handler' => $handlerStack]);
+        $job = new StaticWarmJob(new Request('GET', 'http://localhost/blog'), ['handler' => $handlerStack]);
 
         $job->handle();
 
@@ -82,7 +82,7 @@ class StaticWarmJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $job = new StaticWarmJob(new Request('GET', '/blog?page=2'), ['handler' => $handlerStack]);
+        $job = new StaticWarmJob(new Request('GET', 'http://localhost/blog?page=2'), ['handler' => $handlerStack]);
 
         $job->handle();
 
@@ -104,7 +104,7 @@ class StaticWarmJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $job = new StaticWarmJob(new Request('GET', '/blog'), ['handler' => $handlerStack]);
+        $job = new StaticWarmJob(new Request('GET', 'http://localhost/blog'), ['handler' => $handlerStack]);
 
         $job->handle();
 
