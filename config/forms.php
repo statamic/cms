@@ -40,8 +40,9 @@ return [
     | Partial Submissions
     |--------------------------------------------------------------------------
     |
-    | Partial submissions are automatically deleted after a set number
-    | of days. Set this to null to prevent their automatic deletion.
+    | Partial submissions are automatically deleted after a set number of days.
+    | Set this to null to prevent their automatic deletion. You may also enable
+    | garbage collection to delete related assets at the same time.
     |
     */
 
