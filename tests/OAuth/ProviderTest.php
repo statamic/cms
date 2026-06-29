@@ -244,20 +244,6 @@ class ProviderTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_user_by_id_after_merging_data()
-    {
-        $provider = $this->provider();
-
-        $user = UserFacade::make()->id('foo')->email('foo@bar.com')->data(['name' => 'foo', 'extra' => 'bar'])->save();
-
-        $this->assertNull($provider->getUserId('foo-bar'));
-
-        $provider->mergeUser($user, $this->socialite());
-
-        $this->assertEquals('foo', $provider->getUserId('foo-bar'));
-    }
-
-    #[Test]
     public function it_determines_whether_a_user_is_linked()
     {
         $provider = $this->provider();

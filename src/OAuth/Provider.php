@@ -45,6 +45,9 @@ class Provider
         return array_flip($this->getIds())[$id] ?? null;
     }
 
+    /**
+     * @deprecated Use findUser() and createUser() directly.
+     */
     public function findOrCreateUser($socialite): StatamicUser
     {
         if ($user = $this->findUser($socialite)) {
@@ -102,8 +105,6 @@ class Provider
         collect($this->userData($socialite, $user))->each(fn ($value, $key) => $user->set($key, $value));
 
         $user->save();
-
-        $this->setUserProviderId($user, $socialite->getId());
 
         return $user;
     }
