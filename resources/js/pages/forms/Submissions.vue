@@ -60,6 +60,12 @@ const wakeMeUpChartMeta = computed(() => {
     };
 });
 
+function selectNextChartPage() {
+    if (wakeMeUpChartPage.value < wakeMeUpChartMeta.value.last_page) {
+        wakeMeUpChartPage.value++;
+    }
+}
+
 async function generateFakeSubmission(mode) {
     if (generatingFakeSubmission.value) {
         return;
@@ -378,9 +384,15 @@ function exportSubmissions() {
                                             <span>Woken by someone else</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">5%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
-                                            <span>Other</span>
+                                            <button
+                                                type="button"
+                                                class="contents cursor-pointer text-inherit"
+                                                @click="selectNextChartPage"
+                                            >
+                                                <span class="font-medium text-[0.785rem] min-w-7 text-end">5%</span>
+                                                <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
+                                                <span>Other</span>
+                                            </button>
                                         </li>
                                     </ul>
                                 </figcaption>
