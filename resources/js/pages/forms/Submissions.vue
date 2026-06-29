@@ -279,7 +279,7 @@ function exportSubmissions() {
 
             <template #results>
                 <div class="mt-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
-                    <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Wake me up')"
                             title-tag="h2"
@@ -328,7 +328,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Pie chart pagination demo')"
                             title-tag="h2"
@@ -420,7 +420,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Rank your favourite seasons')"
                             title-tag="h2"
