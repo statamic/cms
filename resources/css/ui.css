@@ -38,6 +38,10 @@
     --color-chart-2-label-bg: var(--theme-color-chart-2-label-bg);
     --color-chart-3-label-bg: var(--theme-color-chart-3-label-bg);
     --color-chart-4-label-bg: var(--theme-color-chart-4-label-bg);
+    --color-chart-1-legend: var(--theme-color-chart-1-legend);
+    --color-chart-2-legend: var(--theme-color-chart-2-legend);
+    --color-chart-3-legend: var(--theme-color-chart-3-legend);
+    --color-chart-4-legend: var(--theme-color-chart-4-legend);
 
     /* Custom color shades for all Tailwind color families */
     --color-slate-150: oklch(0.9485 0.01 251.702);
