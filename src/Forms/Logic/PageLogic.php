@@ -4,6 +4,7 @@ namespace Statamic\Forms\Logic;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form;
+use Statamic\Support\Arr;
 
 class PageLogic
 {
@@ -11,6 +12,35 @@ class PageLogic
 
     public function __construct(private readonly Form $form)
     {
+    }
+
+    public function path(array $data): array
+    {
+        return $this->buildPath($data, null);
+    }
+
+    public function pathTo(array $data, string $page): array
+    {
+        return $this->buildPath($data, $page);
+    }
+
+    private function buildPath(array $data, ?string $until): array
+    {
+        $path = [];
+        $pageId = Arr::get($this->pages()->first(), 'id');
+
+        // The "not in path" guard stops a cyclical rule from looping forever.
+        while ($pageId !== null && ! in_array($pageId, $path, true)) {
+            $path[] = $pageId;
+
+            if ($pageId === $until) {
+                break;
+            }
+
+            $pageId = $this->nextPage($pageId, $data);
+        }
+
+        return $path;
     }
 
     public function nextPage(string $currentPageId, array $data): ?string

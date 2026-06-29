@@ -70,6 +70,10 @@ class SubmitForm
 
             $nextPage = $this->resolveNextPage();
 
+            if ($this->shouldFinalize($nextPage) && ! $this->hasCompletedEveryPage()) {
+                $nextPage = Arr::get($this->form->formFields()->pages()->first(), 'id');
+            }
+
             if ($this->shouldFinalize($nextPage)) {
                 throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($this->submission));
                 throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException($this->submission));
@@ -127,6 +131,29 @@ class SubmitForm
     private function shouldFinalize(?string $nextPage): bool
     {
         return ! $this->form->hasMultiplePages() || ! $nextPage;
+    }
+
+    private function hasCompletedEveryPage(): bool
+    {
+        if (! $this->form->hasMultiplePages()) {
+            return true;
+        }
+
+        $data = $this->submission->data()->all();
+
+        $pageHandles = collect((new PageLogic($this->form))->path($data))
+            ->flatMap(fn (string $id): array => $this->fieldHandles($id));
+
+        return $this->form->blueprint()->fields()->all()
+            ->filter(fn ($field): bool => $pageHandles->contains($field->handle()) && $field->isRequired())
+            ->every(fn ($field): bool => $this->fieldHasValue($data, $field->handle()));
+    }
+
+    private function fieldHasValue(array $data, string $handle): bool
+    {
+        $value = Arr::get($data, $handle);
+
+        return $value !== null && $value !== '' && $value !== [];
     }
 
     private function fieldHandles(string $page): array

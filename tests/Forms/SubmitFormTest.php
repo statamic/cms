@@ -495,7 +495,7 @@ class SubmitFormTest extends TestCase
     {
         $form = $this->multiPageForm();
 
-        // A filled honeypot on a non-final page is ignored; the partial submission saves normally.
+        // A filled honeypot on non-final pages is ignored; the partial submission saves normally.
         $result = app(SubmitForm::class)
             ->form($form)
             ->page('one')
@@ -503,6 +503,12 @@ class SubmitFormTest extends TestCase
 
         $this->assertEquals('two', $result->nextPage);
         $this->assertTrue($result->submission->isPartial());
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('two')
+            ->resume($result->submission)
+            ->submit(['email' => 'olaf@example.com']);
 
         // On the final page the honeypot triggers a silent failure.
         try {
@@ -534,6 +540,12 @@ class SubmitFormTest extends TestCase
 
         $this->assertTrue($result->submission->isPartial());
         $this->assertEquals('Olaf', $result->submission->get('name'));
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('two')
+            ->resume($result->submission)
+            ->submit(['email' => 'olaf@example.com']);
 
         try {
             app(SubmitForm::class)
@@ -628,6 +640,55 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(SendEmails::class, 1);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_returns_to_the_first_page_when_finalizing_without_completing_every_page()
+    {
+        Bus::fake();
+        Event::fake([FormSubmitted::class, SubmissionFinalized::class]);
+
+        $form = $this->multiPageForm();
+
+        // Jump straight to the final page without completing the earlier pages.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('three')
+            ->submit(['message' => 'Hello']);
+
+        // Rather than finalizing, the user is sent back to the first page to fill the form in properly.
+        $this->assertEquals('one', $result->nextPage);
+        $this->assertFalse($result->isFinalized());
+        $this->assertTrue($result->submission->isPartial());
+
+        Event::assertNotDispatched(FormSubmitted::class);
+        Event::assertNotDispatched(SubmissionFinalized::class);
+        Bus::assertNotDispatched(SendEmails::class);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_finalizes_when_page_logic_legitimately_skips_a_page()
+    {
+        $form = $this->multiPageFormWithLogic();
+
+        // name=skip satisfies page one's rule, routing straight to page three and skipping page two.
+        $first = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'skip']);
+        $this->assertEquals('three', $first->nextPage);
+        $this->assertFalse($first->isFinalized());
+
+        // Completing page three finalizes, because every page on the path actually taken is done.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('three')
+            ->resume($first->submission)
+            ->submit(['message' => 'Hello']);
+
+        $this->assertNull($result->nextPage);
+        $this->assertTrue($result->isFinalized());
 
         $form->submissions()->each->delete();
     }

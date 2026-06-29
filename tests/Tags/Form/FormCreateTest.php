@@ -1083,6 +1083,40 @@ EOT;
     }
 
     #[Test]
+    public function it_sends_you_back_to_the_first_page_when_jumping_straight_past_a_required_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text', 'validate' => 'required']]]]],
+                ],
+                [
+                    'id' => 'page_two',
+                    'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]],
+                ],
+            ],
+        ], 'survey');
+        Form::find('survey')->save();
+
+        // Jump straight to the final page, skipping page one's required field.
+        $this
+            ->from('/survey')
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirectContains('page=page_one');
+
+        // The submission wasn't finalized; it's still partial.
+        $submissions = Form::find('survey')->submissions();
+        $this->assertCount(1, $submissions);
+        $this->assertTrue($submissions->first()->isPartial());
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_does_not_redirect_to_an_external_url_from_the_referrer_between_pages()
     {
         $this->createMultiPageForm();

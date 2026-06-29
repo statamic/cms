@@ -46,6 +46,34 @@ class PageLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_builds_the_full_path_through_the_form()
+    {
+        $form = $this->form([
+            $this->page('one', [$this->rule('three', [$this->condition('colour', 'equals', 'blue')])]),
+            $this->page('two'),
+            $this->page('three'),
+        ]);
+
+        // No rule matches, so the path runs through every page sequentially.
+        $this->assertEquals(['one', 'two', 'three'], (new PageLogic($form))->path(['colour' => 'red']));
+
+        // The matching rule skips page two.
+        $this->assertEquals(['one', 'three'], (new PageLogic($form))->path(['colour' => 'blue']));
+    }
+
+    #[Test]
+    public function it_builds_the_path_up_to_a_given_page()
+    {
+        $form = $this->form([
+            $this->page('one'),
+            $this->page('two'),
+            $this->page('three'),
+        ]);
+
+        $this->assertEquals(['one', 'two'], (new PageLogic($form))->pathTo([], 'two'));
+    }
+
+    #[Test]
     public function it_advances_to_the_next_sequential_page_when_no_rules_match()
     {
         $form = $this->form([

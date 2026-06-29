@@ -533,7 +533,8 @@ class Tags extends BaseTags
             return null;
         }
 
-        $path = $this->pathTo($currentPageId);
+        $data = $this->getPartialSubmission()?->data()->all() ?? [];
+        $path = (new PageLogic($this->form()))->pathTo($data, $currentPageId);
         $currentIndex = array_search($currentPageId, $path, true);
 
         // The current page comes from the ?page= query param, so it may point to a
@@ -552,31 +553,6 @@ class Tags extends BaseTags
         }
 
         return Uri::of(url()->current())->withQuery(['page' => $previousPage])->__toString();
-    }
-
-    /**
-     * Rebuild the ordered list of pages leading to the current one by replaying
-     * the page logic over the data gathered so far.
-     */
-    private function pathTo(string $currentPageId): array
-    {
-        $data = $this->getPartialSubmission()?->data()->all() ?? [];
-        $logic = new PageLogic($this->form());
-
-        $path = [];
-        $pageId = Arr::get($this->form()->formFields()->pages()->first(), 'id');
-
-        while ($pageId !== null && ! in_array($pageId, $path, true)) {
-            $path[] = $pageId;
-
-            if ($pageId === $currentPageId) {
-                break;
-            }
-
-            $pageId = $logic->nextPage($pageId, $data);
-        }
-
-        return $path;
     }
 
     private function currentPage(): array
