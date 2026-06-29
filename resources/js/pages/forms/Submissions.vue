@@ -380,14 +380,14 @@ function exportSubmissions() {
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem]">5%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
-                                            <span>I wake up naturally</span>
+                                            <span>Other</span>
                                         </li>
                                     </ul>
                                 </figcaption>
                             </figure>
                             <figure v-else-if="wakeMeUpChartPage === 2" class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
                                 <div
-                                    class="pie-chart"
+                                    class="pie-chart pie-chart--other-segment"
                                     style="--1: 68; --2: 18; --3: 9; --4: 5;"
                                     role="img"
                                     :aria-labelledby="pieLegendPage2Id"
@@ -401,22 +401,17 @@ function exportSubmissions() {
                                 <figcaption :id="pieLegendPage2Id" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">45%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
+                                            <span class="font-medium text-[0.785rem]">3%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
                                             <span>Bohemian Rhapsody</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">30%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
+                                            <span class="font-medium text-[0.785rem]">1%</span>
+                                            <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
                                             <span>Stairway to Heaven</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">15%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
-                                            <span>Hey Jude</span>
-                                        </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">10%</span>
+                                            <span class="font-medium text-[0.785rem]">1%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
                                             <span>Wonderwall</span>
                                         </li>

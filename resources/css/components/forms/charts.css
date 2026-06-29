@@ -60,3 +60,30 @@
 .pie-chart__label--3 { --angle: var(--angle3); background-color: var(--color-lime-600); }
 /* Kick the radius out a bit because the label segment is smaller, and it might overlap with the preceding segment. */
 .pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-indigo-400); --label-radius: 39%; }
+
+
+
+
+/* GROUP CHARTS / PIE CHART / MODIFIERS
+=================================================== */
+.pie-chart--other-segment {
+    .pie-chart__label,
+    &.pie-chart:hover .pie-chart__label {
+        opacity: 0;
+    }
+
+    .pie-chart__label--4,
+    &.pie-chart:hover .pie-chart__label--4 {
+        opacity: 1;
+        border: 2px solid black;
+    }
+
+    .pie-chart__disc {
+        background-image: conic-gradient(
+            hsl(from var(--color-indigo-500) h s l / 0.1) 0% var(--end1),
+            hsl(from var(--color-gray-800) h s l / 0.1) var(--end1) var(--end2),
+            hsl(from var(--color-lime-500) h s l / 0.1) var(--end2) var(--end3),
+            var(--color-indigo-200) var(--end3) var(--end4)
+        );
+    }
+}
