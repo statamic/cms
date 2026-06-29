@@ -159,7 +159,7 @@ class SubmitForm
     private function fieldHandles(string $page): array
     {
         return $this->form->blueprint()->tabs()
-            ->filter(fn ($tab): bool => $tab->handle() == $page)
+            ->filter(fn ($tab): bool => $tab->handle() === $page)
             ->flatMap(fn ($tab): array => $tab->sections()->flatMap(fn ($section) => $section->fields()->items()->pluck('handle'))->all())
             ->values()
             ->all();
