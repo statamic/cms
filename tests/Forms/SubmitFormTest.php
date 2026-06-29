@@ -93,6 +93,30 @@ class SubmitFormTest extends TestCase
         ]))->save();
     }
 
+    private function multiPageFormWithLogic()
+    {
+        return tap(Form::make('signup')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'rules' => [[
+                        'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'skip']],
+                        'destination' => 'three',
+                    ]],
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]]],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'email']]]]],
+                ],
+                [
+                    'id' => 'three',
+                    'sections' => [['fields' => [['handle' => 'message', 'field' => ['type' => 'long_answer']]]]],
+                ],
+            ],
+        ]))->save();
+    }
+
     #[Test]
     public function it_submits_a_form_successfully()
     {
@@ -359,6 +383,22 @@ class SubmitFormTest extends TestCase
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(SendEmails::class);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_takes_page_logic_into_account_when_resolving_the_next_page()
+    {
+        $form = $this->multiPageFormWithLogic();
+
+        // A matching submission follows the rule past page two, straight to page three.
+        $jumped = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'skip']);
+        $this->assertEquals('three', $jumped->nextPage);
+
+        // A non-matching submission advances to the next sequential page.
+        $advanced = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
+        $this->assertEquals('two', $advanced->nextPage);
 
         $form->submissions()->each->delete();
     }

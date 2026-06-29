@@ -1067,6 +1067,72 @@ EOT;
     }
 
     #[Test]
+    public function it_follows_page_logic_to_a_rules_destination_on_submit()
+    {
+        $this->createMultiPageFormWithLogic();
+        Form::find('survey')->save();
+
+        // name=Olaf satisfies page one's rule, jumping straight to page three.
+        $this
+            ->from('/survey')
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirectContains('page=page_three');
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function the_previous_page_url_follows_the_path_taken_through_page_logic()
+    {
+        $this->createMultiPageFormWithLogic();
+
+        $form = Form::find('survey');
+        $form->save();
+
+        // The user reached page three by jumping from page one (skipping page two).
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        request()->merge(['page' => 'page_three']);
+
+        $output = $this->tag('{{ form:survey }}{{ previous_page_url }}{{ /form:survey }}');
+
+        // "Back" returns to page one — the page actually visited — not page two.
+        $this->assertStringContainsString('page=page_one', $output);
+        $this->assertStringNotContainsString('page=page_two', $output);
+
+        $form->submissions()->each->delete();
+    }
+
+    private function createMultiPageFormWithLogic($handle = 'survey')
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                [
+                    'id' => 'page_one',
+                    'rules' => [[
+                        'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Olaf']],
+                        'destination' => 'page_three',
+                    ]],
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]]],
+                ],
+                [
+                    'id' => 'page_two',
+                    'sections' => [['fields' => [['handle' => 'colour', 'field' => ['type' => 'text']]]]],
+                ],
+                [
+                    'id' => 'page_three',
+                    'previous_page_label' => 'Back',
+                    'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]],
+                ],
+            ],
+        ], $handle);
+    }
+
+    #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());

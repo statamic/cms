@@ -10,6 +10,7 @@ use Statamic\Events\FormSubmitted;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
+use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
@@ -44,19 +45,16 @@ class SubmitForm
 
     public function submit(array $data, array $files = []): SubmissionResult
     {
+        $nextPage = null;
+        $uploadedAssets = [];
         $files = $this->normalizeFiles($files);
         $values = array_merge($data, $files);
-        $uploadedAssets = [];
 
         $this->validate($data, $files);
 
         $this->submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
 
         try {
-            if ($this->shouldFinalize()) {
-                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($this->submission));
-            }
-
             $uploadedAssets = $this->submission->uploadFiles($files);
 
             $values = array_merge($values, $uploadedAssets);
@@ -70,7 +68,10 @@ class SubmitForm
 
             $this->submission->merge($processedValues);
 
-            if ($this->shouldFinalize()) {
+            $nextPage = $this->resolveNextPage();
+
+            if ($this->shouldFinalize($nextPage)) {
+                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($this->submission));
                 throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException($this->submission));
             }
         } catch (ValidationException|SilentFormFailureException $e) {
@@ -79,17 +80,9 @@ class SubmitForm
             throw $e;
         }
 
-        $this->shouldFinalize() ? $this->submission->finalize() : $this->submission->save();
+        $this->shouldFinalize($nextPage) ? $this->submission->finalize() : $this->submission->save();
 
-        // todo: obviously this should depend on logic at some point
-        $pages = $this->form->formFields()->pages();
-        $currentPageIndex = $pages->where('id', $this->page)->keys()->first();
-        $nextPage = $pages->get($currentPageIndex + 1);
-
-        return new SubmissionResult(
-            $this->submission,
-            $nextPage ? $nextPage['id'] : null
-        );
+        return new SubmissionResult($this->submission, $nextPage);
     }
 
     /**
@@ -122,16 +115,18 @@ class SubmitForm
         return $previousUrl ? Site::findByUrl($previousUrl) : null;
     }
 
-    private function shouldFinalize(): bool
+    private function resolveNextPage(): ?string
     {
         if (! $this->form->hasMultiplePages()) {
-            return true;
+            return null;
         }
 
-        // todo: should take logic into account (the actual last page on the form might not be the user's last page)
-        $pages = $this->form->formFields()->pages();
+        return (new PageLogic($this->form))->nextPage($this->page, $this->submission->data()->all());
+    }
 
-        return Arr::get($pages->last(), 'id') === $this->page;
+    private function shouldFinalize(?string $nextPage): bool
+    {
+        return ! $this->form->hasMultiplePages() || ! $nextPage;
     }
 
     private function fieldHandles(string $page): array

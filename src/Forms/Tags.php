@@ -15,6 +15,7 @@ use Statamic\Facades\Form;
 use Statamic\Fields\Tab;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Forms\JsDrivers\JsDriver;
+use Statamic\Forms\Logic\PageLogic;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -522,25 +523,60 @@ class Tags extends BaseTags
         return Arr::get($pages->first(), 'id') === Arr::get($this->currentPage(), 'id');
     }
 
-    // todo: take logic into account
-    private function isFinalPage(): bool
+    private function previousPage(): ?string
     {
         $pages = $this->form()->formFields()->pages();
+        $currentPageId = Arr::get($this->currentPage(), 'id');
+        $firstPageId = Arr::get($pages->first(), 'id');
 
-        return Arr::get($pages->last(), 'id') === Arr::get($this->currentPage(), 'id');
+        if ($currentPageId === $firstPageId) {
+            return null;
+        }
+
+        $path = $this->pathTo($currentPageId);
+        $currentIndex = array_search($currentPageId, $path, true);
+
+        // The current page comes from the ?page= query param, so it may point to a
+        // page the logic wouldn't actually route to and won't be on the path.
+        if ($currentIndex === false) {
+            return $firstPageId;
+        }
+
+        return $path[$currentIndex - 1] ?? null;
     }
 
     private function previousPageUrl(): ?string
     {
-        if ($this->isFirstPage()) {
+        if (! $previousPage = $this->previousPage()) {
             return null;
         }
 
-        $pages = $this->form()->formFields()->pages();
-        $currentPageIndex = $pages->search(fn (array $page) => $page['id'] === Arr::get($this->currentPage(), 'id'));
-        $previousPage = $pages->get($currentPageIndex - 1);
+        return Uri::of(url()->current())->withQuery(['page' => $previousPage])->__toString();
+    }
 
-        return Uri::of(url()->current())->withQuery(['page' => Arr::get($previousPage, 'id')])->__toString();
+    /**
+     * Rebuild the ordered list of pages leading to the current one by replaying
+     * the page logic over the data gathered so far.
+     */
+    private function pathTo(string $currentPageId): array
+    {
+        $data = $this->getPartialSubmission()?->data()->all() ?? [];
+        $logic = new PageLogic($this->form());
+
+        $path = [];
+        $pageId = Arr::get($this->form()->formFields()->pages()->first(), 'id');
+
+        while ($pageId !== null && ! in_array($pageId, $path, true)) {
+            $path[] = $pageId;
+
+            if ($pageId === $currentPageId) {
+                break;
+            }
+
+            $pageId = $logic->nextPage($pageId, $data);
+        }
+
+        return $path;
     }
 
     private function currentPage(): array
