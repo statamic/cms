@@ -133,6 +133,53 @@ class OAuthCallbackTest extends TestCase
         $response->assertSessionHas('error', __('statamic::messages.oauth_link_unsupported'));
     }
 
+    #[Test]
+    public function logging_in_merges_user_data_when_enabled()
+    {
+        $user = UserFacade::make()->id('user-1')->email('existing@example.com')->data(['name' => 'Old Name'])->save();
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com', 'New Name');
+
+        $this->hitCallback('test');
+
+        $this->assertAuthenticatedAs($user = UserFacade::find('user-1'));
+        $this->assertEquals('New Name', $user->get('name'));
+    }
+
+    #[Test]
+    public function logging_in_does_not_merge_user_data_when_disabled()
+    {
+        config()->set('statamic.oauth.merge_user_data', false);
+
+        $user = UserFacade::make()->id('user-1')->email('existing@example.com')->data(['name' => 'Old Name'])->save();
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com', 'New Name');
+
+        $this->hitCallback('test');
+
+        $this->assertAuthenticatedAs($user = UserFacade::find('user-1'));
+        $this->assertEquals('Old Name', $user->get('name'));
+    }
+
+    #[Test]
+    public function a_guest_with_a_new_email_is_not_created_when_user_creation_is_disabled()
+    {
+        config()->set('statamic.oauth.create_user', false);
+
+        $this->assertCount(0, UserFacade::all());
+
+        $this->fakeProvider('test', [], 'sub-1', 'new@example.com');
+
+        $response = $this->hitCallback('test');
+
+        $this->assertGuest();
+        $this->assertCount(0, UserFacade::all());
+        $this->assertNull($this->provider('test')->getUserId('sub-1'));
+        $response->assertRedirect();
+    }
+
     private function hitCallback(string $provider)
     {
         return $this
