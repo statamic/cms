@@ -304,22 +304,22 @@ function exportSubmissions() {
                                 <figcaption :id="pieLegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">45%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">45%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-1" />
                                             <span>Before you Go Go</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">30%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">30%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-2" />
                                             <span>Bring me Back to Life</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">15%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">15%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-3" />
                                             <span>When September Ends</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">10%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">10%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Never</span>
                                         </li>
@@ -330,7 +330,7 @@ function exportSubmissions() {
                     </div>
                     <div class="px-3 starting-style-transition w-full @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
-                            :title="__('I love to wake up...')"
+                            :title="__('Pie chart pagination demo')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-radio"
@@ -363,22 +363,22 @@ function exportSubmissions() {
                                 <figcaption :id="pieLegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">68%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">68%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-1" />
                                             <span>Alarm, no mercy</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">18%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">18%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-2" />
                                             <span>Hit snooze</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">9%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">9%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-3" />
                                             <span>Woken by someone else</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">5%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">5%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Other</span>
                                         </li>
@@ -401,17 +401,17 @@ function exportSubmissions() {
                                 <figcaption :id="pieLegendPage2Id" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">3%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">3%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Bohemian Rhapsody</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">1%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">1%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Stairway to Heaven</span>
                                         </li>
                                         <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem]">1%</span>
+                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">1%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-chart-4" />
                                             <span>Wonderwall</span>
                                         </li>
