@@ -1083,6 +1083,24 @@ EOT;
     }
 
     #[Test]
+    public function it_does_not_redirect_to_an_external_url_from_the_referrer_between_pages()
+    {
+        $this->createMultiPageForm();
+        Form::find('survey')->save();
+
+        // A forged referrer pointing off-site must not become the next-page redirect target.
+        $response = $this
+            ->from('https://evil.example/phishing')
+            ->post('/!/forms/survey', ['_page' => 'page_one', 'name' => 'Olaf'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertStringNotContainsString('evil.example', $response->headers->get('Location'));
+        $response->assertRedirectContains('page=page_two');
+
+        Form::find('survey')->submissions()->each->delete();
+    }
+
+    #[Test]
     public function the_previous_page_url_follows_the_path_taken_through_page_logic()
     {
         $this->createMultiPageFormWithLogic();

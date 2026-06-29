@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
+use Statamic\Facades\URL;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SubmissionResult;
 use Statamic\Forms\SubmitForm;
@@ -118,7 +119,7 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_error_redirect');
 
-        $response = $redirect && ! \Statamic\Facades\URL::isExternalToApplication($redirect)
+        $response = $redirect && ! URL::isExternalToApplication($redirect)
             ? redirect($redirect)
             : back();
 
@@ -137,7 +138,7 @@ class FormController extends Controller
         $submission = $result->submission;
 
         $redirect = $result->nextPage
-            ? Uri::of(url()->previous())->withQuery(['page' => $result->nextPage])->__toString()
+            ? Uri::of($this->previousUrl())->withQuery(['page' => $result->nextPage])->__toString()
             : $this->formSuccessRedirect($params, $result->submission);
 
         if (request()->ajax() || request()->wantsJson()) {
@@ -151,16 +152,23 @@ class FormController extends Controller
         }
 
         if (! $redirect) {
-            $redirect = Uri::of(url()->previous())->withoutQuery('page')->__toString();
+            $redirect = Uri::of($this->previousUrl())->withoutQuery('page')->__toString();
         }
 
-        if (! $result->nextPage && ! \Statamic\Facades\URL::isExternal($redirect)) {
+        if (! $result->nextPage && ! URL::isExternal($redirect)) {
             session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
             session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
             session()->flash('submission', $submission);
         }
 
         return redirect($redirect);
+    }
+
+    private function previousUrl(): string
+    {
+        $previous = url()->previous();
+
+        return URL::isExternalToApplication($previous) ? url('/') : $previous;
     }
 
     private function formSuccessRedirect(array $params, $submission)
@@ -171,7 +179,7 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_redirect');
 
-        if ($redirect && \Statamic\Facades\URL::isExternalToApplication($redirect)) {
+        if ($redirect && URL::isExternalToApplication($redirect)) {
             return null;
         }
 
