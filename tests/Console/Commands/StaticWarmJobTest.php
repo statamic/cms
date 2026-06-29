@@ -21,7 +21,7 @@ class StaticWarmJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $job = new StaticWarmJob(new Request('GET', '/about'), ['handler' => $handlerStack]);
+        $job = new StaticWarmJob(new Request('GET', 'http://localhost/about'), ['handler' => $handlerStack]);
 
         $job->handle();
 
