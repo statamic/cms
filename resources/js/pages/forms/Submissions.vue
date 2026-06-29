@@ -263,6 +263,7 @@ function exportSubmissions() {
                         <Widget
                             :title="__('Wake me up')"
                             title-tag="h2"
+                            class="h-full"
                             icon="fieldtype-radio"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
@@ -294,23 +295,23 @@ function exportSubmissions() {
                                 />
                                 <figcaption :id="pieLegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
-                                        <li class="flex items-center gap-2">
-                                            <span class="font-medium">45%</span>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">45%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-indigo-500" />
                                             <span>Before you Go Go</span>
                                         </li>
-                                        <li class="flex items-center gap-2">
-                                            <span class="font-medium">30%</span>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">30%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-gray-800" />
                                             <span>Bring me Back to Life</span>
                                         </li>
-                                        <li class="flex items-center gap-2">
-                                            <span class="font-medium">15%</span>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">15%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-lime-500" />
                                             <span>When September Ends</span>
                                         </li>
-                                        <li class="flex items-center gap-2">
-                                            <span class="font-medium">10%</span>
+                                        <li class="flex items-center gap-2.25">
+                                            <span class="font-medium text-[0.785rem]">10%</span>
                                             <div class="size-2.5 shrink-0 rounded-full bg-indigo-300" />
                                             <span>Never</span>
                                         </li>
@@ -323,50 +324,51 @@ function exportSubmissions() {
                         <Widget
                             :title="__('Rank your favourite seasons')"
                             title-tag="h2"
+                            class="h-full"
                             icon="rank"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6" :aria-labelledby="rankingChartCaptionId">
-                                <ol class="m-0 flex list-none flex-col gap-5 p-0">
-                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
-                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">1</span>
-                                        <span class="size-3.5 shrink-0 rounded-md bg-indigo-500" />
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">Summer</span>
-                                        <div class="relative flex min-h-3 min-w-0 items-center">
-                                            <div class="h-px w-[45%] bg-gray-300 dark:bg-gray-600" />
-                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-indigo-500" />
+                            <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
+                                <ol class="m-0 list-none grid gap-2.5 p-0 pt-4">
+                                    <li class="flex items-center gap-2.25">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-indigo-500" />
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Summer</span>
+                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                            <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="size-2 rounded-full bg-indigo-500" />
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         </div>
-                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-indigo-500">45%</span>
                                     </li>
-                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
-                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">2</span>
-                                        <span class="size-3.5 shrink-0 rounded-md bg-gray-800" />
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">Autumn</span>
-                                        <div class="relative flex min-h-3 min-w-0 items-center">
-                                            <div class="h-px w-[35%] bg-gray-300 dark:bg-gray-600" />
-                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-gray-800" />
+                                    <li class="flex items-center gap-2.25">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">2</span>
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-gray-800" />
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
+                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                            <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="size-2 rounded-full bg-gray-800" />
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
                                         </div>
-                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-gray-800">35%</span>
                                     </li>
-                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
-                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">3</span>
-                                        <span class="size-3.5 shrink-0 rounded-md bg-lime-500" />
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">Spring</span>
-                                        <div class="relative flex min-h-3 min-w-0 items-center">
-                                            <div class="h-px w-[15%] bg-gray-300 dark:bg-gray-600" />
-                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-lime-500" />
+                                    <li class="flex items-center gap-2.25">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">3</span>
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-lime-500" />
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Spring</span>
+                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                            <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="size-2 rounded-full bg-lime-500" />
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                         </div>
-                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-lime-500">15%</span>
                                     </li>
-                                    <li class="grid grid-cols-[1.25rem_1rem_minmax(3.5rem,auto)_1fr_auto] items-center gap-x-3 gap-y-2">
-                                        <span class="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400" aria-hidden="true">4</span>
-                                        <span class="size-3.5 shrink-0 rounded-md bg-indigo-400" />
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">Winter</span>
-                                        <div class="relative flex min-h-3 min-w-0 items-center">
-                                            <div class="h-px w-[10%] bg-gray-300 dark:bg-gray-600" />
-                                            <div class="size-3 -ms-1.5 shrink-0 rounded-full bg-indigo-400" />
+                                    <li class="flex items-center gap-2.25">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">4</span>
+                                        <span class="size-2.5 shrink-0 rounded-xs bg-indigo-300" />
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Winter</span>
+                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                            <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="size-2 rounded-full bg-indigo-300" />
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                         </div>
-                                        <span class="min-w-9 text-end text-sm font-medium tabular-nums text-indigo-400">10%</span>
                                     </li>
                                 </ol>
                                 <figcaption :id="rankingChartCaptionId" class="sr-only">
