@@ -22,7 +22,6 @@ use Stringy\StaticStringy;
 
 class Statamic
 {
-    //
     const CORE_SLUG = 'statamic';
     const PACKAGE = 'statamic/cms';
 
