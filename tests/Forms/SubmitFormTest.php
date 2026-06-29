@@ -284,6 +284,46 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_the_extension_of_uploaded_files()
+    {
+        Storage::fake('local');
+
+        // store: false makes this a temporary "files" upload rather than a stored asset.
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false]]]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        // A disallowed extension is rejected.
+        try {
+            app(SubmitForm::class)
+                ->form($form)
+                ->page('main')
+                ->submit(data: [], files: ['document' => [UploadedFile::fake()->create('virus.php', 10)]]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('document.0', $e->errors());
+        }
+
+        // An allowed extension passes.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(data: [], files: ['document' => [UploadedFile::fake()->create('resume.pdf', 10)]]);
+
+        $this->assertTrue($result->isFinalized());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function it_removes_uploaded_assets_on_silent_failure()
     {
         Storage::fake('avatars');

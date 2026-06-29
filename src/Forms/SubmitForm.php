@@ -178,7 +178,7 @@ class SubmitForm
     private function extraRules($fields): array
     {
         return $fields->all()
-            ->filter(fn ($field): bool => $field->fieldtype()->handle() === 'assets')
+            ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files']))
             ->mapWithKeys(fn ($field): array => [$field->handle().'.*' => ['file', new AllowedFile]])
             ->all();
     }
@@ -193,7 +193,8 @@ class SubmitForm
     private function shouldValidate(string $attribute, array $only): bool
     {
         foreach ($only as $pattern) {
-            $regex = '/^'.str_replace('\*', '[^.]+', preg_quote($pattern, '/')).'$/';
+            // A handle also covers its nested/array attributes, e.g. "document" matches "document.0".
+            $regex = '/^'.str_replace('\*', '[^.]+', preg_quote($pattern, '/')).'($|\..*)/';
 
             if (preg_match($regex, $attribute)) {
                 return true;
