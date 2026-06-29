@@ -267,7 +267,8 @@ function exportSubmissions() {
                         >
                             <figure class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
                                 <div
-                                    class="pie-chart"
+                                    data-pie-chart
+                                    class="w-36 aspect-square rounded-full"
                                     style="
                                         /* These slices would be dynamic based on the data */
                                         --1: 45%;
