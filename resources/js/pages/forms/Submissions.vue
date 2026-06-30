@@ -749,6 +749,36 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
+                    <!-- Example of a yes/no field type (Horizontal Bar Chart with yes/no icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('Do you fancy a pint?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="checkmark-circle"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="p-6 grid" :aria-labelledby="yesNoBarChart1CaptionId">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">I'll get my coat</span>
+                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
+                                        <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Coffee might be better</span>
+                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                    </li>
+                                </ol>
+                                <figcaption :id="yesNoBarChart1CaptionId" class="sr-only">
+                                    {{ __('Do you fancy a pint?: I\'ll get my coat 55%, Coffee might be better 45%') }}
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
                 </div>
             </template>
         </FormSubmissionListing>
