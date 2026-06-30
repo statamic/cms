@@ -588,6 +588,18 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
+                    <!-- Example of an Image Choice field type (Image Choice Bar Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('What is your spirit animal?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="image-select"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            
+                        </Widget>
+                    </div>
                 </div>
             </template>
         </FormSubmissionListing>
