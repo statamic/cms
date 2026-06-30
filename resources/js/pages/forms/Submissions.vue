@@ -638,7 +638,7 @@ function exportSubmissions() {
                         >
                             <figure class="image-pie-chart-figure">
                                 <div
-                                    class="image-pie-chart image-pie-chart--2"
+                                    class="image-pie-chart"
                                     :style="{
                                         '--1': imageChoicePieChart1Data[0].percent,
                                         '--2': imageChoicePieChart1Data[1].percent,
