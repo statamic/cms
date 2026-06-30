@@ -223,6 +223,25 @@
 .image-pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-chart-4-label-bg); --label-radius: 39%; }
 
 
+/* GROUP CHARTS / IMAGE PIE CHART / MODIFIERS
+=================================================== */
+.image-pie-chart--2 {
+    --end1: calc(var(--1) * 1%);
+    --end2: calc((var(--1) + var(--2)) * 1%);
+    --angle1: calc(var(--1) * 3.6deg / 2);
+    --angle2: calc((var(--1) + var(--2) / 2) * 3.6deg);
+
+    .image-pie-chart__disc {
+        @apply bg-gray-200 dark:bg-gray-700;
+
+        background-image: conic-gradient(
+            var(--color-chart-1) 0% var(--end1),
+            var(--color-chart-2) var(--end1) var(--end2)
+        );
+    }
+}
+
+
 /* GROUP CHARTS / PIE CHART / MODIFIERS
 =================================================== */
 .image-pie-chart--other-segment {

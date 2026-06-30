@@ -631,21 +631,19 @@ function exportSubmissions() {
                         >
                             <figure class="image-pie-chart-figure">
                                 <div
-                                    class="image-pie-chart"
-                                    style="--1: 45; --2: 30; --3: 15; --4: 10;"
+                                    class="image-pie-chart image-pie-chart--2"
+                                    style="--1: 55; --2: 35;"
                                     role="img"
                                     :aria-labelledby="ImageChoicePieChart1LegendId"
                                 >
                                     <div class="image-pie-chart__disc" aria-hidden="true" />
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span class="image-pie-chart__label | image-pie-chart__label--1" aria-hidden="true">45%</span>
-                                    <span class="image-pie-chart__label | image-pie-chart__label--2" aria-hidden="true">30%</span>
-                                    <span class="image-pie-chart__label | image-pie-chart__label--3" aria-hidden="true">15%</span>
-                                    <span class="image-pie-chart__label | image-pie-chart__label--4" aria-hidden="true">10%</span>
+                                    <span class="image-pie-chart__label | image-pie-chart__label--1" aria-hidden="true">55%</span>
+                                    <span class="image-pie-chart__label | image-pie-chart__label--2" aria-hidden="true">35%</span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
                                 <figcaption :id="ImageChoicePieChart1LegendId" class="image-pie-chart-legend">
-                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-4">
+                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-3">
                                         <li class="contents">
                                             <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
                                             <img class="size-10 shrink-0 rounded-full object-cover" src="https://picsum.photos/80/80?random=1" alt="" aria-hidden="true" />
