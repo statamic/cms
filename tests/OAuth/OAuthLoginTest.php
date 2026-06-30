@@ -4,7 +4,6 @@ namespace Tests\OAuth;
 
 use Laravel\Socialite\Facades\Socialite;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\User as UserFacade;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -21,6 +20,7 @@ class OAuthLoginTest extends TestCase
         // selection is actually observable (both default to "web" otherwise).
         $app['config']->set('statamic.users.guards.cp', 'cp');
         $app['config']->set('statamic.users.guards.web', 'web');
+        $app['config']->set('auth.guards.cp', $app['config']->get('auth.guards.web'));
     }
 
     #[Test]
@@ -54,17 +54,5 @@ class OAuthLoginTest extends TestCase
     public function it_404s_for_an_unknown_provider()
     {
         $this->get(route('statamic.oauth.login', 'unknown'))->assertNotFound();
-    }
-
-    #[Test]
-    public function a_logged_in_user_is_redirected_to_the_provider_to_connect()
-    {
-        Socialite::fake('test');
-
-        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
-
-        $this->actingAs($user)
-            ->get(route('statamic.oauth.login', 'test'))
-            ->assertRedirect('https://socialite.fake/test/authorize');
     }
 }

@@ -8,12 +8,13 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\OAuth\Provider;
+use Tests\ElevatesSessions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class OAuthDisconnectTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use ElevatesSessions, PreventSavingStacheItemsToDisk;
 
     protected function defineEnvironment($app)
     {
@@ -48,7 +49,7 @@ class OAuthDisconnectTest extends TestCase
         $provider->setUserProviderId($user, 'sub-1');
         $provider->setUserProviderId($other, 'sub-2');
 
-        $response = $this->actingAs($user)->delete(route('statamic.oauth.disconnect', 'test'));
+        $response = $this->actingAs($user)->withElevatedSession()->delete(route('statamic.oauth.disconnect', 'test'));
 
         $response->assertSessionHas('success', __('statamic::messages.oauth_disconnected', ['provider' => 'Test']));
 
@@ -65,6 +66,7 @@ class OAuthDisconnectTest extends TestCase
         (new Provider('test'))->setUserProviderId($user, 'sub-1');
 
         $this->actingAs($user)
+            ->withElevatedSession()
             ->deleteJson(route('statamic.oauth.disconnect', 'test'))
             ->assertNoContent();
 
@@ -109,6 +111,7 @@ class OAuthDisconnectTest extends TestCase
         (new Provider('test'))->setUserProviderId($user, 'sub-1');
 
         $this->actingAs($user)
+            ->withElevatedSession()
             ->delete(cp_route('oauth.disconnect', 'test'))
             ->assertRedirect();
 
@@ -124,5 +127,104 @@ class OAuthDisconnectTest extends TestCase
         $this->assertContains('DELETE', $route->methods());
         $this->assertNotContains('GET', $route->methods());
         $this->assertContains('statamic.cp.authenticated', $route->gatherMiddleware());
+    }
+
+    #[Test]
+    public function the_front_end_disconnect_requires_an_elevated_session_when_enabled()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->delete(route('statamic.oauth.disconnect', 'test'))
+            ->assertRedirect(route('statamic.elevated-session'));
+
+        // Still connected — the disconnect was blocked.
+        $this->assertEquals('user-1', (new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_front_end_disconnect_returns_a_403_for_json_when_not_elevated()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->deleteJson(route('statamic.oauth.disconnect', 'test'))
+            ->assertJson(['message' => 'Requires an elevated session.'])
+            ->assertStatus(403);
+
+        $this->assertEquals('user-1', (new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_front_end_disconnect_succeeds_with_an_elevated_session()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->withElevatedSession()
+            ->delete(route('statamic.oauth.disconnect', 'test'))
+            ->assertSessionHas('success', __('statamic::messages.oauth_disconnected', ['provider' => 'Test']));
+
+        $this->assertNull((new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_front_end_disconnect_succeeds_without_a_challenge_when_elevated_sessions_are_disabled()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->delete(route('statamic.oauth.disconnect', 'test'))
+            ->assertSessionHas('success', __('statamic::messages.oauth_disconnected', ['provider' => 'Test']));
+
+        $this->assertNull((new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_cp_disconnect_requires_an_elevated_session_when_enabled()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->makeSuper()->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->delete(cp_route('oauth.disconnect', 'test'))
+            ->assertRedirect(cp_route('confirm-password'));
+
+        $this->assertEquals('user-1', (new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_cp_disconnect_succeeds_with_an_elevated_session()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->makeSuper()->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->withElevatedSession()
+            ->delete(cp_route('oauth.disconnect', 'test'))
+            ->assertRedirect();
+
+        $this->assertNull((new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_cp_disconnect_succeeds_without_a_challenge_when_elevated_sessions_are_disabled()
+    {
+        config(['statamic.users.elevated_sessions_enabled' => false]);
+
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->makeSuper()->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->delete(cp_route('oauth.disconnect', 'test'))
+            ->assertRedirect();
+
+        $this->assertNull((new Provider('test'))->getUserId('sub-1'));
     }
 }

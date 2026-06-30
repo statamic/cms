@@ -29,13 +29,34 @@ class OAuthController
             throw new NotFoundHttpException();
         }
 
-        if (Str::startsWith(parse_url($referer)['path'], Str::ensureLeft(config('statamic.cp.route'), '/'))) {
+        $isCp = Str::startsWith(parse_url($referer)['path'], Str::ensureLeft(config('statamic.cp.route'), '/'));
+
+        if ($isCp) {
             $guard = config('statamic.users.guards.cp', 'web');
+        }
+
+        if (Auth::guard($guard)->check() && $response = $this->requireElevatedSession($request, $isCp)) {
+            return $response;
         }
 
         $request->session()->put('statamic.oauth.guard', $guard);
 
         return Socialite::driver($provider)->redirect();
+    }
+
+    private function requireElevatedSession(Request $request, bool $isCp)
+    {
+        if (! config('statamic.users.elevated_sessions_enabled') || $request->hasElevatedSession()) {
+            return null;
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => __('Requires an elevated session.')], 403);
+        }
+
+        $challenge = $isCp ? cp_route('confirm-password') : route('statamic.elevated-session');
+
+        return redirect()->setIntendedUrl($request->fullUrl())->to($challenge);
     }
 
     public function handleProviderCallback(Request $request, string $provider)

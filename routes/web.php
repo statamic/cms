@@ -115,7 +115,7 @@ Route::name('statamic.')->group(function () {
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
             ->name('oauth.callback');
         Route::delete(config('statamic.oauth.routes.disconnect', 'oauth/{provider}/disconnect'), [OAuthController::class, 'disconnect'])
-            ->middleware([AuthGuard::class, 'auth'])
+            ->middleware([AuthGuard::class, 'auth', RequireElevatedSession::class])
             ->name('oauth.disconnect');
     }
 });

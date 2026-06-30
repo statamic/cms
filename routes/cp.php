@@ -441,7 +441,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     if (OAuth::enabled()) {
         Route::get('oauth', [OAuthController::class, 'index'])->name('oauth');
-        Route::delete('oauth/{provider}/disconnect', [FrontendOAuthController::class, 'disconnect'])->name('oauth.disconnect');
+        Route::delete('oauth/{provider}/disconnect', [FrontendOAuthController::class, 'disconnect'])->middleware(RequireElevatedSession::class)->name('oauth.disconnect');
     }
 
     Route::get('themes', [ThemeController::class, 'index']);
