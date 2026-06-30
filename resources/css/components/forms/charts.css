@@ -101,7 +101,7 @@
 .vertical-bar-chart__bar {
     display: grid;
     flex: 1;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: 1fr auto;
     align-items: end;
     justify-items: center;
     gap: 0.5rem;
@@ -109,21 +109,24 @@
     height: 100%;
 }
 
-.vertical-bar-chart__value {
-    @apply text-xs font-bold tabular-nums text-gray-800 dark:text-gray-100;
+.vertical-bar-chart__plot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
 }
 
-.vertical-bar-chart__column {
-    display: flex;
-    align-items: flex-end;
-    width: 100%;
-    max-width: 2.5rem;
-    height: 100%;
+.vertical-bar-chart__value {
+    @apply mb-1 text-xs font-bold tabular-nums text-gray-800 dark:text-gray-100;
 }
 
 .vertical-bar-chart__fill {
+    flex: 0 0 calc(var(--value) / var(--max-value) * 100%);
     width: 100%;
-    height: calc(var(--value) / var(--max-value) * 100%);
+    max-width: 2.5rem;
     border-radius: 0.25rem 0.25rem 0 0;
     background-color: var(--color-chart-1);
 }

@@ -570,8 +570,8 @@ function exportSubmissions() {
                                         class="vertical-bar-chart__bar"
                                         :style="{ '--value': bar.percent }"
                                     >
-                                        <span class="vertical-bar-chart__value" aria-hidden="true">{{ bar.percent }}%</span>
-                                        <div class="vertical-bar-chart__column" aria-hidden="true">
+                                        <div class="vertical-bar-chart__plot" aria-hidden="true">
+                                            <span class="vertical-bar-chart__value">{{ bar.percent }}%</span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label" aria-hidden="true">{{ bar.label }}</span>
