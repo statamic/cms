@@ -106,6 +106,8 @@ class Code extends Fieldtype
                             'nginx' => 'Nginx',
                             'text/x-java' => 'Java',
                             'javascript' => 'JavaScript',
+                            'application/json' => 'JSON',
+                            'application/ld+json' => 'JSON-LD',
                             'jsx' => 'JSX',
                             'text/x-objectivec' => 'Objective-C',
                             'php' => 'PHP',

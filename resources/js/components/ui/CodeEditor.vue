@@ -82,6 +82,8 @@ const modes = ref([
     { value: 'nginx', label: 'Nginx' },
     { value: 'text/x-java', label: 'Java' },
     { value: 'javascript', label: 'JavaScript' },
+    { value: 'application/json', label: 'JSON' },
+    { value: 'application/ld+json', label: 'JSON-LD' },
     { value: 'jsx', label: 'JSX' },
     { value: 'text/x-objectivec', label: 'Objective-C' },
     { value: 'php', label: 'PHP' },
