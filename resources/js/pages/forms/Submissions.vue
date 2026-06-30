@@ -98,6 +98,14 @@ function selectNextChartPage() {
     }
 }
 
+const pieChart2AccessibleLabel = computed(() => {
+    if (wakeMeUpChartPage.value === 1) {
+        return __('Alarm, no mercy 68%, Hit snooze 18%, Woken by someone else 9%, Other 5%');
+    }
+
+    return __('Other breakdown: Bohemian Rhapsody 3%, Stairway to Heaven 1%, Wonderwall 1%');
+});
+
 async function generateFakeSubmission(mode) {
     if (generatingFakeSubmission.value) {
         return;
@@ -389,6 +397,7 @@ function exportSubmissions() {
                                     @page-selected="wakeMeUpChartPage = $event"
                                 />
                             </template>
+                            <p class="sr-only" aria-live="polite">{{ pieChart2AccessibleLabel }}</p>
                             <figure v-if="wakeMeUpChartPage === 1" class="pie-chart-figure">
                                 <div
                                     class="pie-chart"
@@ -479,9 +488,9 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="lollipopChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Summer</span>
                                         <div class="flex items-center gap-1">
@@ -491,7 +500,7 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">2</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
                                         <div class="flex items-center gap-1">
@@ -501,7 +510,7 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">3</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Spring</span>
                                         <div class="flex items-center gap-1">
@@ -511,7 +520,7 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">4</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
                                         <span class="size-2.5 rounded-xs bg-chart-4-legend" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Winter</span>
                                         <div class="flex items-center gap-1">
@@ -537,21 +546,21 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="horizontalBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
                                         <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                         <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">10%</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
                                         <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
@@ -572,15 +581,16 @@ function exportSubmissions() {
                             icon="scale-up"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <div class="mt-4 ms-3.5">
-                                <div class="inline-flex items-center gap-2 py-1.25 px-2 border border-gray-200 dark:border-gray-700 rounded-md">
-                                    <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-xs text-gray-500 dark:text-gray-400">Average</span>
-                                </div>
-                            </div>
                             <figure class="vertical-bar-chart-figure" :aria-labelledby="verticalBarChart1CaptionId">
+                                <div aria-hidden="true">
+                                    <div class="inline-flex items-center gap-2 py-1.25 px-2 border border-gray-200 dark:border-gray-700 rounded-md">
+                                        <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-xs text-gray-500 dark:text-gray-400">Average</span>
+                                    </div>
+                                </div>
                                 <ol
                                     class="vertical-bar-chart"
                                     :style="{ '--max-value': verticalBarChart1MaxValue }"
+                                    aria-hidden="true"
                                 >
                                     <li
                                         v-for="bar in verticalBarChart1Data"
@@ -588,15 +598,15 @@ function exportSubmissions() {
                                         class="vertical-bar-chart__bar"
                                         :style="{ '--value': bar.percent }"
                                     >
-                                        <div class="vertical-bar-chart__plot" aria-hidden="true">
+                                        <div class="vertical-bar-chart__plot">
                                             <span class="vertical-bar-chart__value">{{ bar.percent }}%</span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
-                                        <span class="vertical-bar-chart__scale-label" aria-hidden="true">{{ bar.label }}</span>
+                                        <span class="vertical-bar-chart__scale-label">{{ bar.label }}</span>
                                     </li>
                                 </ol>
                                 <figcaption :id="verticalBarChart1CaptionId" class="sr-only">
-                                    {{ __('Recommendation score distribution: 0: 2%, 1: 1%, 2: 3%, 3: 4%, 4: 6%, 5: 8%, 6: 12%, 7: 20%, 8: 35%, 9: 48%, 10: 61%') }}
+                                    {{ __('Average 8.1. Recommendation score distribution: 0: 2%, 1: 1%, 2: 3%, 3: 4%, 4: 6%, 5: 8%, 6: 12%, 7: 20%, 8: 35%, 9: 48%, 10: 61%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
@@ -611,17 +621,17 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="imageChoiceBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4">
+                                <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
-                                        <img class="rounded-full" src="https://picsum.photos/80/80?random=1" alt="" aria-hidden="true" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <img class="rounded-full" src="https://picsum.photos/80/80?random=1" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
                                         <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">45%</span>
-                                        <img class="rounded-full" src="https://picsum.photos/80/80?random=2" alt="" aria-hidden="true" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
+                                        <img class="rounded-full" src="https://picsum.photos/80/80?random=2" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                         <div class="h-2.5 rounded-full w-[45%] bg-chart-2" />

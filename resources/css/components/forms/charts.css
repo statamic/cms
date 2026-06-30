@@ -217,17 +217,19 @@
 /* GROUP CHARTS / VERTICAL BAR CHART
 =================================================== */
 .vertical-bar-chart-figure {
-    @apply p-6 px-4 pb-3;
+    display: grid;
+    height: 100%;
+    @apply py-3 px-3;
 }
 
 .vertical-bar-chart {
-    @apply m-0 list-none p-0;
-
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 0.5rem;
-    height: 7rem;
+    height: 100%;
+    list-style: none;
+    padding: 0;
 }
 
 .vertical-bar-chart__bar {
