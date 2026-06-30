@@ -444,42 +444,42 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
-                                <ol class="m-0 list-none grid gap-2.5 p-0 pt-4">
-                                    <li class="flex items-center gap-2.25">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-1" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Summer</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                        <span class="size-2.5 rounded-xs bg-chart-1" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Summer</span>
+                                        <div class="flex items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-1" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         </div>
                                     </li>
-                                    <li class="flex items-center gap-2.25">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">2</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-2" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                        <span class="size-2.5 rounded-xs bg-chart-2" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
+                                        <div class="flex items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-2" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
                                         </div>
                                     </li>
-                                    <li class="flex items-center gap-2.25">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">3</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-3" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Spring</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                        <span class="size-2.5 rounded-xs bg-chart-3" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Spring</span>
+                                        <div class="flex items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-3" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                         </div>
                                     </li>
-                                    <li class="flex items-center gap-2.25">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">4</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-4-legend" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Winter</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
+                                        <span class="size-2.5 rounded-xs bg-chart-4-legend" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Winter</span>
+                                        <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-4-legend" />
                                             <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
