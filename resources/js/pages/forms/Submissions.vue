@@ -313,7 +313,7 @@ function exportSubmissions() {
                             icon="fieldtype-radio"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
+                            <figure class="pie-chart-figure">
                                 <div
                                     class="pie-chart"
                                     style="--1: 45; --2: 30; --3: 15; --4: 10;"
@@ -328,26 +328,26 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
-                                <figcaption :id="pieChart1LegendId" class="pt-4">
-                                    <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">45%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-1-legend" />
+                                <figcaption :id="pieChart1LegendId" class="pie-chart-legend">
+                                    <ul class="pie-chart-legend__list">
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">45%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
                                             <span>Before you Go Go</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">30%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-2-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">30%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--2" />
                                             <span>Bring me Back to Life</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">15%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-3-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">15%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--3" />
                                             <span>When September Ends</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">10%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">10%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Never</span>
                                         </li>
                                     </ul>
@@ -376,7 +376,7 @@ function exportSubmissions() {
                                     @page-selected="wakeMeUpChartPage = $event"
                                 />
                             </template>
-                            <figure v-if="wakeMeUpChartPage === 1" class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
+                            <figure v-if="wakeMeUpChartPage === 1" class="pie-chart-figure">
                                 <div
                                     class="pie-chart"
                                     style="--1: 68; --2: 18; --3: 9; --4: 5;"
@@ -390,38 +390,38 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">9%</span>
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">5%</span>
                                 </div>
-                                <figcaption :id="pieChart2LegendId" class="pt-4">
-                                    <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">68%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-1-legend" />
+                                <figcaption :id="pieChart2LegendId" class="pie-chart-legend">
+                                    <ul class="pie-chart-legend__list">
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">68%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
                                             <span>Alarm, no mercy</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">18%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-2-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">18%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--2" />
                                             <span>Hit snooze</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">9%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-3-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">9%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--3" />
                                             <span>Woken by someone else</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
+                                        <li class="pie-chart-legend__item">
                                             <button
                                                 type="button"
-                                                class="contents cursor-pointer text-inherit"
+                                                class="pie-chart-legend__link"
                                                 @click="selectNextChartPage"
                                             >
-                                                <span class="font-medium text-[0.785rem] min-w-7 text-end">5%</span>
-                                                <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
+                                                <span class="pie-chart-legend__value">5%</span>
+                                                <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                                 <span>Other</span>
                                             </button>
                                         </li>
                                     </ul>
                                 </figcaption>
                             </figure>
-                            <figure v-else-if="wakeMeUpChartPage === 2" class="grid gap-4 grid-cols-[0.6fr_1fr] p-6">
+                            <figure v-else-if="wakeMeUpChartPage === 2" class="pie-chart-figure">
                                 <div
                                     class="pie-chart pie-chart--other-segment"
                                     style="--1: 68; --2: 18; --3: 9; --4: 5;"
@@ -434,21 +434,21 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">9%</span>
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">5%</span>
                                 </div>
-                                <figcaption :id="pieChart2LegendPage2Id" class="pt-4">
-                                    <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">3%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
+                                <figcaption :id="pieChart2LegendPage2Id" class="pie-chart-legend">
+                                    <ul class="pie-chart-legend__list">
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">3%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Bohemian Rhapsody</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">1%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">1%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Stairway to Heaven</span>
                                         </li>
-                                        <li class="flex items-center gap-2.25">
-                                            <span class="font-medium text-[0.785rem] min-w-7 text-end">1%</span>
-                                            <div class="size-2.5 shrink-0 rounded-full bg-chart-4-legend" />
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">1%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Wonderwall</span>
                                         </li>
                                     </ul>

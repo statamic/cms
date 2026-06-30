@@ -1,5 +1,40 @@
 /* GROUP CHARTS / PIE CHART
 =================================================== */
+.pie-chart-figure {
+    display: grid;
+    grid-template-columns: 0.6fr 1fr;
+    @apply gap-4 p-6;
+}
+
+.pie-chart-legend {
+    @apply pt-4;
+}
+
+.pie-chart-legend__list {
+    @apply grid gap-2.5 text-xs text-gray-700 dark:text-gray-50;
+}
+
+.pie-chart-legend__item {
+    @apply flex items-center gap-2.25;
+}
+
+.pie-chart-legend__value {
+    @apply min-w-7 text-end text-[0.785rem] font-medium;
+}
+
+.pie-chart-legend__swatch {
+    @apply size-2.5 shrink-0 rounded-full;
+}
+
+.pie-chart-legend__swatch--1 { @apply bg-chart-1-legend; }
+.pie-chart-legend__swatch--2 { @apply bg-chart-2-legend; }
+.pie-chart-legend__swatch--3 { @apply bg-chart-3-legend; }
+.pie-chart-legend__swatch--4 { @apply bg-chart-4-legend; }
+
+.pie-chart-legend__link {
+    @apply contents cursor-pointer text-inherit;
+}
+
 .pie-chart {
     --label-radius: 30%;
 
