@@ -920,8 +920,7 @@ function exportSubmissions() {
                             <figure v-if="dictionaryChartPage === 1" class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
                                 <!-- If there are more than 4 items, then align-center. If there are less than 4 items, then p-4 -->
                                 <ol
-                                    class="m-0 list-none grid grid-cols-[auto_max-content_1fr] gap-x-2.25"
-                                    :class="dictionaryChart1Page1Data.length > 4 ? 'items-center p-0' : 'p-4'"
+                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] grid-rows-5 gap-x-2.25"
                                     aria-hidden="true"
                                 >
                                     <li
@@ -945,8 +944,7 @@ function exportSubmissions() {
                             <figure v-else-if="dictionaryChartPage === 2" class="p-6 grid" :aria-labelledby="dictionaryChart1Page2CaptionId">
                                 <!-- If there are more than 4 items, then align-center. If there are less than 4 items, then p-4 -->
                                 <ol
-                                    class="m-0 list-none grid grid-cols-[auto_max-content_1fr] gap-x-2.25"
-                                    :class="dictionaryChart1Page2Data.length > 4 ? 'items-center pt-0' : 'pt-4'"
+                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] grid-rows-5 gap-x-2.25"
                                     aria-hidden="true"
                                 >
                                     <li
