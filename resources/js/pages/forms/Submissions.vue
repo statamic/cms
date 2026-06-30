@@ -43,6 +43,13 @@ const pieChart2LegendPage2Id = useId();
 const lollipopChart1CaptionId = useId();
 const horizontalBarChart1CaptionId = useId();
 const verticalBarChart1CaptionId = useId();
+const imageChoiceBarChart1CaptionId = useId();
+const imageChoicePieChart1LegendId = useId();
+
+const imageChoicePieChart1Data = [
+    { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/seed/spirit-animal-a/320/320' },
+    { percent: 35, badge: 'B', label: 'Nope', image: 'https://picsum.photos/seed/spirit-animal-b/320/320' },
+];
 
 const verticalBarChart1Data = [
     { label: '0', percent: 2 },
@@ -632,30 +639,40 @@ function exportSubmissions() {
                             <figure class="image-pie-chart-figure">
                                 <div
                                     class="image-pie-chart image-pie-chart--2"
-                                    style="--1: 55; --2: 35;"
+                                    :style="{
+                                        '--1': imageChoicePieChart1Data[0].percent,
+                                        '--2': imageChoicePieChart1Data[1].percent,
+                                    }"
                                     role="img"
-                                    :aria-labelledby="ImageChoicePieChart1LegendId"
+                                    :aria-labelledby="imageChoicePieChart1LegendId"
                                 >
-                                    <div class="image-pie-chart__disc" aria-hidden="true" />
+                                    <div class="image-pie-chart__disc" aria-hidden="true">
+                                        <div
+                                            v-for="(option, index) in imageChoicePieChart1Data"
+                                            :key="option.badge"
+                                            class="image-pie-chart__slice"
+                                            :class="`image-pie-chart__slice--${index + 1}`"
+                                            :style="{ '--image': `url('${option.image}')` }"
+                                        />
+                                    </div>
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span class="image-pie-chart__label | image-pie-chart__label--1" aria-hidden="true">55%</span>
-                                    <span class="image-pie-chart__label | image-pie-chart__label--2" aria-hidden="true">35%</span>
+                                    <span
+                                        v-for="(option, index) in imageChoicePieChart1Data"
+                                        :key="`label-${option.badge}`"
+                                        class="image-pie-chart__label"
+                                        :class="`image-pie-chart__label--${index + 1}`"
+                                        aria-hidden="true"
+                                    >{{ option.percent }}%</span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
-                                <figcaption :id="ImageChoicePieChart1LegendId" class="image-pie-chart-legend">
+                                <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
                                     <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-3">
-                                        <li class="contents">
-                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
-                                            <img class="size-10 shrink-0 rounded-full object-cover" src="https://picsum.photos/80/80?random=1" alt="" aria-hidden="true" />
-                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
-                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
-                                        </li>
-                                        <li class="contents">
-                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
-                                            <img class="size-10 shrink-0 rounded-full object-cover" src="https://picsum.photos/80/80?random=2" alt="" aria-hidden="true" />
-                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
-                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
-                                        </li>
+                                        <template v-for="option in imageChoicePieChart1Data" :key="option.badge">
+                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">{{ option.percent }}%</span>
+                                            <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" aria-hidden="true" />
+                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200" aria-hidden="true">{{ option.badge }}</span>
+                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100" aria-hidden="true">{{ option.label }}</span>
+                                        </template>
                                     </ol>
                                 </figcaption>
                             </figure>

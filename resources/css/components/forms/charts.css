@@ -192,12 +192,33 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background-image: conic-gradient(
-        var(--color-chart-1) 0% var(--end1),
-        var(--color-chart-2) var(--end1) var(--end2),
-        var(--color-chart-3) var(--end2) var(--end3),
-        var(--color-chart-4) var(--end3) var(--end4)
-    );
+    overflow: hidden;
+
+    @apply bg-gray-200 dark:bg-gray-700;
+}
+
+.image-pie-chart__slice {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-image: var(--image);
+    background-size: cover;
+    background-position: center;
+}
+
+.image-pie-chart__slice--1 {
+    --slice-size: calc(var(--1) * 3.6deg);
+
+    -webkit-mask-image: conic-gradient(from 0deg, #000 0deg var(--slice-size), transparent var(--slice-size));
+    mask-image: conic-gradient(from 0deg, #000 0deg var(--slice-size), transparent var(--slice-size));
+}
+
+.image-pie-chart__slice--2 {
+    --slice-start: calc(var(--1) * 3.6deg);
+    --slice-size: calc(var(--2) * 3.6deg);
+
+    -webkit-mask-image: conic-gradient(from var(--slice-start), #000 0deg var(--slice-size), transparent var(--slice-size));
+    mask-image: conic-gradient(from var(--slice-start), #000 0deg var(--slice-size), transparent var(--slice-size));
 }
 
 .image-pie-chart__label {
@@ -216,29 +237,18 @@
     @apply text-xs font-medium tabular-nums text-white pointer-events-none;
 }
 
-.image-pie-chart__label--1 { --angle: var(--angle1); background-color: var(--color-chart-1-label-bg); }
-.image-pie-chart__label--2 { --angle: var(--angle2); background-color: var(--color-chart-2-label-bg); }
-.image-pie-chart__label--3 { --angle: var(--angle3); background-color: var(--color-chart-3-label-bg); }
+.image-pie-chart__label--1 { --angle: var(--angle1); background-color: hsl(0 0% 0% / 0.55); }
+.image-pie-chart__label--2 { --angle: var(--angle2); background-color: hsl(0 0% 0% / 0.55); }
+.image-pie-chart__label--3 { --angle: var(--angle3); background-color: hsl(0 0% 0% / 0.55); }
 /* Kick the radius out a bit because the label segment is smaller, and it might overlap with the preceding segment. */
-.image-pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-chart-4-label-bg); --label-radius: 39%; }
+.image-pie-chart__label--4 { --angle: var(--angle4); background-color: hsl(0 0% 0% / 0.55); --label-radius: 39%; }
 
 
 /* GROUP CHARTS / IMAGE PIE CHART / MODIFIERS
 =================================================== */
 .image-pie-chart--2 {
-    --end1: calc(var(--1) * 1%);
-    --end2: calc((var(--1) + var(--2)) * 1%);
     --angle1: calc(var(--1) * 3.6deg / 2);
     --angle2: calc((var(--1) + var(--2) / 2) * 3.6deg);
-
-    .image-pie-chart__disc {
-        @apply bg-gray-200 dark:bg-gray-700;
-
-        background-image: conic-gradient(
-            var(--color-chart-1) 0% var(--end1),
-            var(--color-chart-2) var(--end1) var(--end2)
-        );
-    }
 }
 
 
