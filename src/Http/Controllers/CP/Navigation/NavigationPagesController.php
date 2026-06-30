@@ -18,6 +18,8 @@ class NavigationPagesController extends CpController
     {
         $nav = Nav::find($nav);
 
+        $this->authorize('view', $nav->in($request->site));
+
         $blueprint = $nav->blueprint();
 
         $page = (new Page)
@@ -27,6 +29,8 @@ class NavigationPagesController extends CpController
         [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
+            $this->authorize('view', $entry);
+
             [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
         }
 
@@ -47,6 +51,8 @@ class NavigationPagesController extends CpController
     public function edit(Request $request, $nav, $page)
     {
         $nav = Nav::find($nav);
+
+        $this->authorize('view', $nav->in($request->site));
 
         $blueprint = $nav->blueprint();
 
@@ -159,6 +165,8 @@ class NavigationPagesController extends CpController
         $request->validate(['type' => 'required|in:url,entry']);
 
         $nav = Nav::find($nav);
+
+        $this->authorize('view', $nav);
 
         $blueprint = $this->ensureFields($nav->blueprint(), $request);
 
