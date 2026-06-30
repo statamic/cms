@@ -2,7 +2,7 @@
 import { ref, computed, watch, useId } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination, Icon } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -45,6 +45,7 @@ const horizontalBarChart1CaptionId = useId();
 const verticalBarChart1CaptionId = useId();
 const imageChoiceBarChart1CaptionId = useId();
 const imageChoicePieChart1LegendId = useId();
+const checkboxesBarChart1CaptionId = useId();
 
 const imageChoicePieChart1Data = [
     { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/seed/spirit-animal-a/320/320' },
@@ -702,6 +703,42 @@ function exportSubmissions() {
                                             <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         </template>
                                     </ol>
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                    <!-- Example of a Checkboxes field type (Horizontal Bar Chart with checkbox icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('Have you seen us live before?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="fieldtype-checkboxes"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="p-6 grid" :aria-labelledby="checkboxesBarChart1CaptionId">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <Icon name="checkbox" class="size-3.5 shrink-0 text-chart-1" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
+                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
+                                        <Icon name="checkbox" class="size-3.5 shrink-0 text-chart-2" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                        <Icon name="checkbox" class="size-3.5 shrink-0 text-chart-3" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
+                                        <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
+                                    </li>
+                                </ol>
+                                <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
+                                    {{ __('Have you seen us live before?: Yep 55%, Nope 35%, Maybe 10%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
