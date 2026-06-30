@@ -62,8 +62,6 @@
 .pie-chart__label--4 { --angle: var(--angle4); background-color: var(--color-chart-4-label-bg); --label-radius: 39%; }
 
 
-
-
 /* GROUP CHARTS / PIE CHART / MODIFIERS
 =================================================== */
 .pie-chart--other-segment {
@@ -88,9 +86,18 @@
     }
 }
 
+
+
+
 /* GROUP CHARTS / VERTICAL BAR CHART
 =================================================== */
+.vertical-bar-chart-figure {
+    @apply p-6 px-4 pb-3;
+}
+
 .vertical-bar-chart {
+    @apply m-0 list-none p-0;
+
     display: flex;
     align-items: flex-end;
     justify-content: space-between;

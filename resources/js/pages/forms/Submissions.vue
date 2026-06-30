@@ -564,9 +564,9 @@ function exportSubmissions() {
                                     <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-xs text-gray-500 dark:text-gray-400">Average</span>
                                 </div>
                             </div>
-                            <figure class="p-6 px-4 pb-3" :aria-labelledby="verticalBarChart1CaptionId">
+                            <figure class="vertical-bar-chart-figure" :aria-labelledby="verticalBarChart1CaptionId">
                                 <ol
-                                    class="vertical-bar-chart m-0 list-none p-0"
+                                    class="vertical-bar-chart"
                                     :style="{ '--max-value': verticalBarChart1MaxValue }"
                                 >
                                     <li
