@@ -46,6 +46,21 @@ const verticalBarChart1CaptionId = useId();
 const imageChoiceBarChart1CaptionId = useId();
 const imageChoicePieChart1LegendId = useId();
 const checkboxesBarChart1CaptionId = useId();
+const yesNoBarChart1CaptionId = useId();
+const yesNoPieChart1LegendId = useId();
+
+const yesNoChart1Data = [
+    { percent: 55, label: 'I\'ll get my coat', icon: 'checkmark-circle-filled', chartColor: 1 },
+    { percent: 45, label: 'Coffee might be better', icon: 'delete-circle-filled', chartColor: 2 },
+];
+
+const yesNoChart1AccessibleLabel = computed(() =>
+    yesNoChart1Data
+        .map((option) => `${option.label} ${option.percent}%`)
+        .join(', '),
+);
+
+const yesNoChart1Type = ref('bar');
 
 const imageChoicePieChart1Data = [
     { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/seed/spirit-animal-a/320/320' },
@@ -749,7 +764,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of a yes/no field type (Horizontal Bar Chart with yes/no icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <!-- Example of a yes/no field type with a chart type chooser. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Do you fancy a pint?')"
@@ -758,23 +773,84 @@ function exportSubmissions() {
                             icon="checkmark-circle"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="yesNoBarChart1CaptionId">
+                            <template #actions>
+                                <ToggleGroup v-model="yesNoChart1Type" size="sm">
+                                    <ToggleItem
+                                        value="bar"
+                                        icon="charts-bar-horizontal"
+                                        :aria-label="__('Bar chart')"
+                                        v-tooltip="__('Bar chart')"
+                                    />
+                                    <ToggleItem
+                                        value="pie"
+                                        icon="money-graph-pie-chart"
+                                        :aria-label="__('Pie chart')"
+                                        v-tooltip="__('Pie chart')"
+                                    />
+                                </ToggleGroup>
+                            </template>
+                            <figure
+                                v-if="yesNoChart1Type === 'bar'"
+                                class="p-6 grid"
+                                :aria-labelledby="yesNoBarChart1CaptionId"
+                            >
                                 <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
-                                        <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">I'll get my coat</span>
-                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
-                                        <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Coffee might be better</span>
-                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                    <li
+                                        v-for="option in yesNoChart1Data"
+                                        :key="option.label"
+                                        class="contents"
+                                    >
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
+                                        <Icon
+                                            :name="option.icon"
+                                            class="size-3.5 shrink-0"
+                                            :class="option.chartColor === 2 ? 'text-chart-2-legend' : 'text-chart-1-legend'"
+                                        />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
+                                        <div
+                                            class="h-2.5 rounded-full"
+                                            :class="option.chartColor === 2 ? 'bg-chart-2' : 'bg-chart-1'"
+                                            :style="{ width: `${option.percent}%` }"
+                                        />
                                     </li>
                                 </ol>
                                 <figcaption :id="yesNoBarChart1CaptionId" class="sr-only">
-                                    {{ __('Do you fancy a pint?: I\'ll get my coat 55%, Coffee might be better 45%') }}
+                                    {{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}
+                                </figcaption>
+                            </figure>
+                            <figure v-else class="pie-chart-figure">
+                                <div
+                                    class="pie-chart"
+                                    :style="{
+                                        '--1': yesNoChart1Data[0].percent,
+                                        '--2': yesNoChart1Data[1].percent,
+                                        '--3': 0,
+                                        '--4': 0,
+                                    }"
+                                    role="img"
+                                    :aria-labelledby="yesNoPieChart1LegendId"
+                                >
+                                    <div class="pie-chart__disc" aria-hidden="true" />
+                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">{{ yesNoChart1Data[0].percent }}%</span>
+                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">{{ yesNoChart1Data[1].percent }}%</span>
+                                </div>
+                                <figcaption :id="yesNoPieChart1LegendId" class="pie-chart-legend">
+                                    <p class="sr-only">{{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}</p>
+                                    <ul class="pie-chart-legend__list" aria-hidden="true">
+                                        <li
+                                            v-for="option in yesNoChart1Data"
+                                            :key="option.label"
+                                            class="pie-chart-legend__item"
+                                        >
+                                            <span class="pie-chart-legend__value">{{ option.percent }}%</span>
+                                            <Icon
+                                                :name="option.icon"
+                                                class="size-3.5 shrink-0"
+                                                :class="option.chartColor === 2 ? 'text-chart-2-legend' : 'text-chart-1-legend'"
+                                            />
+                                            <span>{{ option.label }}</span>
+                                        </li>
+                                    </ul>
                                 </figcaption>
                             </figure>
                         </Widget>
