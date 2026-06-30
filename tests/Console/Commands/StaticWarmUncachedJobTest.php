@@ -23,7 +23,7 @@ class StaticWarmUncachedJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $job = new StaticWarmUncachedJob(new Request('GET', '/about'), ['handler' => $handlerStack]);
+        $job = new StaticWarmUncachedJob(new Request('GET', 'http://localhost/about'), ['handler' => $handlerStack]);
 
         $job->handle();
 
@@ -44,7 +44,7 @@ class StaticWarmUncachedJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $job = new StaticWarmUncachedJob(new Request('GET', '/about'), ['handler' => $handlerStack]);
+        $job = new StaticWarmUncachedJob(new Request('GET', 'http://localhost/about'), ['handler' => $handlerStack]);
 
         $job->handle();
 
