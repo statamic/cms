@@ -284,6 +284,7 @@ function exportSubmissions() {
             </template>
 
             <template #results>
+                <!-- Example of a Multiple Choice field type (Pie Chart) -->
                 <div class="mt-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
@@ -334,6 +335,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
+                    <!-- Example of a Multiple Choice field type (Pie Chart) with Pagination. The idea here is when there are _more_ than four response options, we can paginate the chart. In such a case, the fourth option shows as "Other", and the second widget shows the "other" segment broken down into the remaining response options. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Pie chart pagination demo')"
@@ -432,6 +434,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
+                    <!-- Example of a Ranking field type (Horizontal Lollipop Chart) -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Rank your favourite seasons')"
@@ -488,7 +491,9 @@ function exportSubmissions() {
                                 </figcaption>
                             </figure>
                         </Widget>
-                    </div><div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    </div>
+                    <!-- Example of a Dropdown field type (Horizontal Bar Chart Widget) -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Have you seen us live before?')"
                             title-tag="h2"
@@ -499,9 +504,9 @@ function exportSubmissions() {
                             <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
                                 <ol class="m-0 list-none grid gap-2.5 p-0 pt-4">
                                     <li class="flex items-center gap-2.25">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
                                         <span class="size-2.5 shrink-0 rounded-xs bg-chart-1" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Summer</span>
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Yep</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-1" />
@@ -509,9 +514,9 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">2</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
                                         <span class="size-2.5 shrink-0 rounded-xs bg-chart-2" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-2" />
@@ -519,23 +524,13 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="flex items-center gap-2.25">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">3</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">10%</span>
                                         <span class="size-2.5 shrink-0 rounded-xs bg-chart-3" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Spring</span>
+                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
                                         <div class="relative flex flex-grow-1 items-center gap-1">
-                                            <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-chart-3" />
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
-                                        </div>
-                                    </li>
-                                    <li class="flex items-center gap-2.25">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">4</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-4-legend" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Winter</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
-                                            <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="size-2 rounded-full bg-chart-4-legend" />
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                            <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="size-2 rounded-full bg-chart-2" />
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
                                         </div>
                                     </li>
                                 </ol>
