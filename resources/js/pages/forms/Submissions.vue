@@ -42,7 +42,23 @@ const pieChart2LegendId = useId();
 const pieChart2LegendPage2Id = useId();
 const lollipopChart1CaptionId = useId();
 const horizontalBarChart1CaptionId = useId();
-const opinionScaleChart1CaptionId = useId();
+const verticalBarChart1CaptionId = useId();
+
+const verticalBarChart1Data = [
+    { label: '0', percent: 2 },
+    { label: '1', percent: 1 },
+    { label: '2', percent: 3 },
+    { label: '3', percent: 4 },
+    { label: '4', percent: 6 },
+    { label: '5', percent: 8 },
+    { label: '6', percent: 12 },
+    { label: '7', percent: 20 },
+    { label: '8', percent: 35 },
+    { label: '9', percent: 48 },
+    { label: '10', percent: 61 },
+];
+
+const verticalBarChart1MaxValue = computed(() => Math.max(...verticalBarChart1Data.map((bar) => bar.percent), 1));
 
 // Mock in-widget pagination for fields with more than four response options.
 const wakeMeUpChartPage = ref(1);
@@ -543,29 +559,26 @@ function exportSubmissions() {
                             icon="scale-up"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="opinionScaleChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
-                                        <span class="size-2.5 rounded-xs bg-chart-1" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
-                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
-                                        <span class="size-2.5 rounded-xs bg-chart-2" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
-                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">10%</span>
-                                        <span class="size-2.5 rounded-xs bg-chart-3" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
-                                        <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
+                            <figure class="p-6" :aria-labelledby="verticalBarChart1CaptionId">
+                                <ol
+                                    class="vertical-bar-chart m-0 list-none p-0"
+                                    :style="{ '--max-value': verticalBarChart1MaxValue }"
+                                >
+                                    <li
+                                        v-for="bar in verticalBarChart1Data"
+                                        :key="bar.label"
+                                        class="vertical-bar-chart__bar"
+                                        :style="{ '--value': bar.percent }"
+                                    >
+                                        <span class="vertical-bar-chart__value" aria-hidden="true">{{ bar.percent }}%</span>
+                                        <div class="vertical-bar-chart__column" aria-hidden="true">
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label" aria-hidden="true">{{ bar.label }}</span>
                                     </li>
                                 </ol>
-                                <figcaption :id="opinionScaleChart1CaptionId" class="sr-only">
-                                    {{ __('How likely are you to recommend us?: Yep 55%, Nope 35%, Maybe 10%') }}
+                                <figcaption :id="verticalBarChart1CaptionId" class="sr-only">
+                                    {{ __('Recommendation score distribution: 0: 2%, 1: 1%, 2: 3%, 3: 4%, 4: 6%, 5: 8%, 6: 12%, 7: 20%, 8: 35%, 9: 48%, 10: 61%') }}
                                 </figcaption>
                             </figure>
                         </Widget>

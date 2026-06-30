@@ -87,3 +87,47 @@
         );
     }
 }
+
+/* GROUP CHARTS / VERTICAL BAR CHART
+=================================================== */
+.vertical-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.25rem;
+    height: 10rem;
+}
+
+.vertical-bar-chart__bar {
+    display: grid;
+    flex: 1;
+    grid-template-rows: auto 1fr auto;
+    align-items: end;
+    justify-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    height: 100%;
+}
+
+.vertical-bar-chart__value {
+    @apply text-xs font-bold tabular-nums text-gray-800 dark:text-gray-100;
+}
+
+.vertical-bar-chart__column {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 2.5rem;
+    height: 100%;
+}
+
+.vertical-bar-chart__fill {
+    width: 100%;
+    height: calc(var(--value) / var(--max-value) * 100%);
+    border-radius: 0.25rem 0.25rem 0 0;
+    background-color: var(--color-chart-1);
+}
+
+.vertical-bar-chart__scale-label {
+    @apply min-w-6 rounded-md border border-gray-200 px-1.5 py-0.5 text-center text-xs font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-400;
+}
