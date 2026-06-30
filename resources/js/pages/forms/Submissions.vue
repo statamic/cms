@@ -37,9 +37,12 @@ const exportModalOpen = ref(false);
 const exportFormat = ref(null);
 const exportScope = ref('all');
 const listingParameters = ref({});
-const pieLegendId = useId();
-const pieLegendPage2Id = useId();
-const rankingChartCaptionId = useId();
+const pieChart1LegendId = useId();
+const pieChart2LegendId = useId();
+const pieChart2LegendPage2Id = useId();
+const lollipopChart1CaptionId = useId();
+const horizontalBarChart1CaptionId = useId();
+const opinionScaleChart1CaptionId = useId();
 
 // Mock in-widget pagination for fields with more than four response options.
 const wakeMeUpChartPage = ref(1);
@@ -284,7 +287,7 @@ function exportSubmissions() {
             </template>
 
             <template #results>
-                <!-- Example of a Multiple Choice field type (Pie Chart) -->
+                <!-- Example of a Multiple Choice field type (Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                 <div class="mt-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
@@ -299,7 +302,7 @@ function exportSubmissions() {
                                     class="pie-chart"
                                     style="--1: 45; --2: 30; --3: 15; --4: 10;"
                                     role="img"
-                                    :aria-labelledby="pieLegendId"
+                                    :aria-labelledby="pieChart1LegendId"
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
                                     <!-- aria-hidden because the labels are already in the figure caption -->
@@ -308,7 +311,8 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">15%</span>
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
                                 </div>
-                                <figcaption :id="pieLegendId" class="pt-4">
+                                <!-- Pie Chart 1 Legend -->
+                                <figcaption :id="pieChart1LegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem] min-w-7 text-end">45%</span>
@@ -335,7 +339,9 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of a Multiple Choice field type (Pie Chart) with Pagination. The idea here is when there are _more_ than four response options, we can paginate the chart. In such a case, the fourth option shows as "Other", and the second widget shows the "other" segment broken down into the remaining response options. -->
+                    <!-- Example of a Multiple Choice field type (Pie Chart) with Pagination. The idea here is when there are _more_ than four response options, we can paginate the chart. In such a case, the fourth option shows as "Other", and the second widget shows the "other" segment broken down into the remaining response options.
+
+                    We should dynamically generate the ids to be unique here, so that everything remains accessible.-->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Pie chart pagination demo')"
@@ -359,7 +365,7 @@ function exportSubmissions() {
                                     class="pie-chart"
                                     style="--1: 68; --2: 18; --3: 9; --4: 5;"
                                     role="img"
-                                    :aria-labelledby="pieLegendId"
+                                    :aria-labelledby="pieChart2LegendId"
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
                                     <!-- aria-hidden because the labels are already in the figure caption -->
@@ -368,7 +374,7 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">9%</span>
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">5%</span>
                                 </div>
-                                <figcaption :id="pieLegendId" class="pt-4">
+                                <figcaption :id="pieChart2LegendId" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem] min-w-7 text-end">68%</span>
@@ -404,7 +410,7 @@ function exportSubmissions() {
                                     class="pie-chart pie-chart--other-segment"
                                     style="--1: 68; --2: 18; --3: 9; --4: 5;"
                                     role="img"
-                                    :aria-labelledby="pieLegendPage2Id"
+                                    :aria-labelledby="pieChart2LegendPage2Id"
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
                                     <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">68%</span>
@@ -412,7 +418,7 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">9%</span>
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">5%</span>
                                 </div>
-                                <figcaption :id="pieLegendPage2Id" class="pt-4">
+                                <figcaption :id="pieChart2LegendPage2Id" class="pt-4">
                                     <ul class="text-xs text-gray-700 dark:text-gray-50 grid gap-2.5">
                                         <li class="flex items-center gap-2.25">
                                             <span class="font-medium text-[0.785rem] min-w-7 text-end">3%</span>
@@ -434,7 +440,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of a Ranking field type (Horizontal Lollipop Chart) -->
+                    <!-- Example of a Ranking field type (Horizontal Lollipop Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Rank your favourite seasons')"
@@ -443,7 +449,7 @@ function exportSubmissions() {
                             icon="rank"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
+                            <figure class="p-6 grid" :aria-labelledby="lollipopChart1CaptionId">
                                 <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
@@ -486,13 +492,13 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                 </ol>
-                                <figcaption :id="rankingChartCaptionId" class="sr-only">
-                                    {{ __('Ranked favourite seasons: Summer 45%, Autumn 35%, Spring 15%, Winter 10%') }}
+                                <figcaption :id="lollipopChart1CaptionId" class="sr-only">
+                                    {{ __('Ranked favourite seasons: Summer 55%, Autumn 25%, Spring 15%, Winter 10%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of a Dropdown field type (Horizontal Bar Chart Widget) -->
+                    <!-- Example of a Dropdown field type (Horizontal Bar Chart Widget). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Have you seen us live before?')"
@@ -501,7 +507,7 @@ function exportSubmissions() {
                             icon="fieldtype-select"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
+                            <figure class="p-6 grid" :aria-labelledby="horizontalBarChart1CaptionId">
                                 <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
@@ -522,13 +528,13 @@ function exportSubmissions() {
                                         <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
                                     </li>
                                 </ol>
-                                <figcaption :id="rankingChartCaptionId" class="sr-only">
-                                    {{ __('Ranked favourite seasons: Summer 45%, Autumn 35%, Spring 15%, Winter 10%') }}
+                                <figcaption :id="horizontalBarChart1CaptionId" class="sr-only">
+                                    {{ __('Have you seen us live before?: Yep 55%, Nope 35%, Maybe 10%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of an Opinion Scale field type (Vertical Bar Chart Widget) -->
+                    <!-- Example of an Opinion Scale field type (Vertical Bar Chart Widget). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('How likely are you to recommend us?')"
@@ -537,7 +543,7 @@ function exportSubmissions() {
                             icon="scale-up"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
+                            <figure class="p-6 grid" :aria-labelledby="opinionScaleChart1CaptionId">
                                 <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
@@ -558,8 +564,8 @@ function exportSubmissions() {
                                         <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
                                     </li>
                                 </ol>
-                                <figcaption :id="rankingChartCaptionId" class="sr-only">
-                                    {{ __('Ranked favourite seasons: Summer 45%, Autumn 35%, Spring 15%, Winter 10%') }}
+                                <figcaption :id="opinionScaleChart1CaptionId" class="sr-only">
+                                    {{ __('How likely are you to recommend us?: Yep 55%, Nope 35%, Maybe 10%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
