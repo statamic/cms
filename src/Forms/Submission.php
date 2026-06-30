@@ -373,7 +373,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     private function queryableMethods(): array
     {
         return [
-            'blueprint', 'date', 'form', 'formattedDate', 'id', 'path',
+            'blueprint', 'date', 'form', 'formattedDate', 'id', 'path', 'site',
         ];
     }
 
