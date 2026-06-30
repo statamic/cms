@@ -48,7 +48,7 @@ const imageChoicePieChart1LegendId = useId();
 
 const imageChoicePieChart1Data = [
     { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/seed/spirit-animal-a/320/320' },
-    { percent: 35, badge: 'B', label: 'Nope', image: 'https://picsum.photos/seed/spirit-animal-b/320/320' },
+    { percent: 45, badge: 'B', label: 'Nope', image: 'https://picsum.photos/seed/spirit-animal-b/320/320' },
 ];
 
 const verticalBarChart1Data = [
@@ -614,15 +614,15 @@ function exportSubmissions() {
                                         <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">45%</span>
                                         <img class="rounded-full" src="https://picsum.photos/80/80?random=2" alt="" aria-hidden="true" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
-                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                        <div class="h-2.5 rounded-full w-[45%] bg-chart-2" />
                                     </li>
                                 </ol>
                                 <figcaption :id="imageChoiceBarChart1CaptionId" class="sr-only">
-                                    {{ __('Have you seen us live before?: Yep 55%, Nope 35%, Maybe 10%') }}
+                                    {{ __('What is your spirit animal?: Actually 55%, Nope 45%') }}
                                 </figcaption>
                             </figure>
                         </Widget>

@@ -217,6 +217,10 @@
     --slice-start: calc(var(--1) * 3.6deg);
     --slice-size: calc(var(--2) * 3.6deg);
 
+    background-image:
+        linear-gradient(hsl(from var(--color-chart-3) h s l / 0.4), hsl(from var(--color-chart-3) h s l / 0.4)),
+        var(--image);
+
     -webkit-mask-image: conic-gradient(from var(--slice-start), #000 0deg var(--slice-size), transparent var(--slice-size));
     mask-image: conic-gradient(from var(--slice-start), #000 0deg var(--slice-size), transparent var(--slice-size));
 }
