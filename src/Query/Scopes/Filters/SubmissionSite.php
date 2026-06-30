@@ -52,7 +52,7 @@ class SubmissionSite extends Filter
 
     public function visibleTo($key)
     {
-        return $key === 'form-submissions' $this->availableSites()->count() > 1;
+        return $key === 'form-submissions' && $this->availableSites()->count() > 1;
     }
 
     protected function options()
