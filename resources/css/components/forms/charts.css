@@ -94,7 +94,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 0.25rem;
+    gap: 0.5rem;
     height: 7rem;
 }
 
@@ -120,17 +120,17 @@
 }
 
 .vertical-bar-chart__value {
-    @apply mb-1 text-xs font-bold tabular-nums text-gray-800 dark:text-gray-100;
+    @apply mb-1 text-[0.785rem] font-bold tabular-nums text-gray-800 dark:text-gray-100;
 }
 
 .vertical-bar-chart__fill {
     flex: 0 0 calc(var(--value) / var(--max-value) * 100%);
     width: 100%;
-    max-width: 2.5rem;
+    max-width: 2rem;
     border-radius: 0.25rem 0.25rem 0 0;
     background-color: var(--color-chart-1);
 }
 
 .vertical-bar-chart__scale-label {
-    @apply min-w-6 rounded-md border border-gray-200 px-1.5 py-0.5 text-center text-xs font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-400;
+    @apply min-w-8 rounded-md border border-gray-200 shadow-ui-xs px-1.5 py-0.5 text-center text-[0.785rem] font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-400;
 }
