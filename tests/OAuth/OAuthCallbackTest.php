@@ -4,6 +4,8 @@ namespace Tests\OAuth;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -255,6 +257,26 @@ class OAuthCallbackTest extends TestCase
 
         $this->assertAuthenticatedAs(UserFacade::find('user-1'));
         Event::assertNotDispatched(TwoFactorAuthenticationChallenged::class);
+    }
+
+    #[Test]
+    public function an_invalid_oauth_state_restarts_the_sign_in()
+    {
+        Socialite::fake('test');
+
+        // The OAuth "state" mismatch (CSRF protection) surfaces as an exception
+        // from Socialite; the callback should restart the flow, not error.
+        $provider = Mockery::mock(Provider::class.'[getSocialiteUser]', ['test', []]);
+        $provider->shouldReceive('getSocialiteUser')->andThrow(new InvalidStateException);
+        OAuth::partialMock()->shouldReceive('provider')->with('test')->andReturn($provider);
+
+        $this
+            ->withSession(['statamic.oauth.guard' => 'web'])
+            ->withHeader('referer', 'http://localhost/')
+            ->get(route('statamic.oauth.callback', 'test'))
+            ->assertRedirect('https://socialite.fake/test/authorize');
+
+        $this->assertGuest();
     }
 
     private function userWithTwoFactorEnabled(string $id, string $email)
