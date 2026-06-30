@@ -626,47 +626,39 @@ function exportSubmissions() {
                             :title="__('What is your spirit animal?')"
                             title-tag="h2"
                             class="h-full"
-                            icon="fieldtype-radio"
+                            icon="image-select"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="pie-chart-figure">
+                            <figure class="image-pie-chart-figure">
                                 <div
-                                    class="pie-chart"
+                                    class="image-pie-chart"
                                     style="--1: 45; --2: 30; --3: 15; --4: 10;"
                                     role="img"
                                     :aria-labelledby="ImageChoicePieChart1LegendId"
                                 >
-                                    <div class="pie-chart__disc" aria-hidden="true" />
+                                    <div class="image-pie-chart__disc" aria-hidden="true" />
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">45%</span>
-                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">30%</span>
-                                    <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">15%</span>
-                                    <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
+                                    <span class="image-pie-chart__label | image-pie-chart__label--1" aria-hidden="true">45%</span>
+                                    <span class="image-pie-chart__label | image-pie-chart__label--2" aria-hidden="true">30%</span>
+                                    <span class="image-pie-chart__label | image-pie-chart__label--3" aria-hidden="true">15%</span>
+                                    <span class="image-pie-chart__label | image-pie-chart__label--4" aria-hidden="true">10%</span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
-                                <figcaption :id="ImageChoicePieChart1LegendId" class="pie-chart-legend">
-                                    <ul class="pie-chart-legend__list">
-                                        <li class="pie-chart-legend__item">
-                                            <span class="pie-chart-legend__value">45%</span>
-                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
-                                            <span>Before you Go Go</span>
+                                <figcaption :id="ImageChoicePieChart1LegendId" class="image-pie-chart-legend">
+                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content] items-center gap-2.25 p-0 pt-4">
+                                        <li class="contents">
+                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
+                                            <img class="rounded-full" src="https://picsum.photos/80/80?random=1" alt="" aria-hidden="true" />
+                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
+                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
                                         </li>
-                                        <li class="pie-chart-legend__item">
-                                            <span class="pie-chart-legend__value">30%</span>
-                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--2" />
-                                            <span>Bring me Back to Life</span>
+                                        <li class="contents">
+                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
+                                            <img class="rounded-full" src="https://picsum.photos/80/80?random=2" alt="" aria-hidden="true" />
+                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
+                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                         </li>
-                                        <li class="pie-chart-legend__item">
-                                            <span class="pie-chart-legend__value">15%</span>
-                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--3" />
-                                            <span>When September Ends</span>
-                                        </li>
-                                        <li class="pie-chart-legend__item">
-                                            <span class="pie-chart-legend__value">10%</span>
-                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
-                                            <span>Never</span>
-                                        </li>
-                                    </ul>
+                                    </ol>
                                 </figcaption>
                             </figure>
                         </Widget>
