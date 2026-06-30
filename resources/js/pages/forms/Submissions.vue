@@ -502,30 +502,24 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="rankingChartCaptionId">
-                                <ol class="m-0 list-none grid gap-2.5 p-0 pt-4">
-                                    <li class="flex items-center gap-2.25">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-1" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Yep</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
-                                            <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
-                                        </div>
+                                        <span class="size-2.5 rounded-xs bg-chart-1" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
+                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
                                     </li>
-                                    <li class="flex items-center gap-2.25">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-2" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Nope</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
-                                            <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
-                                        </div>
+                                        <span class="size-2.5 rounded-xs bg-chart-2" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
                                     </li>
-                                    <li class="flex items-center gap-2.25">
+                                    <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">10%</span>
-                                        <span class="size-2.5 shrink-0 rounded-xs bg-chart-3" />
-                                        <span class="w-20 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
-                                        <div class="relative flex flex-grow-1 items-center gap-1">
-                                            <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
-                                        </div>
+                                        <span class="size-2.5 rounded-xs bg-chart-3" />
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
+                                        <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
                                     </li>
                                 </ol>
                                 <figcaption :id="rankingChartCaptionId" class="sr-only">
