@@ -645,16 +645,16 @@ function exportSubmissions() {
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
                                 <figcaption :id="ImageChoicePieChart1LegendId" class="image-pie-chart-legend">
-                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content] items-center gap-2.25 p-0 pt-4">
+                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-4">
                                         <li class="contents">
                                             <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
-                                            <img class="rounded-full" src="https://picsum.photos/80/80?random=1" alt="" aria-hidden="true" />
+                                            <img class="size-10 shrink-0 rounded-full object-cover" src="https://picsum.photos/80/80?random=1" alt="" aria-hidden="true" />
                                             <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
                                             <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
                                         </li>
                                         <li class="contents">
                                             <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">35%</span>
-                                            <img class="rounded-full" src="https://picsum.photos/80/80?random=2" alt="" aria-hidden="true" />
+                                            <img class="size-10 shrink-0 rounded-full object-cover" src="https://picsum.photos/80/80?random=2" alt="" aria-hidden="true" />
                                             <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
                                             <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                         </li>
