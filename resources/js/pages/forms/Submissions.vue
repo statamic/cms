@@ -51,6 +51,12 @@ const imageChoicePieChart1Data = [
     { percent: 45, badge: 'B', label: 'Nope', image: 'https://picsum.photos/seed/spirit-animal-b/320/320' },
 ];
 
+const imageChoicePieChart1AccessibleLabel = computed(() =>
+    imageChoicePieChart1Data
+        .map((option) => `${option.label} (${option.badge}) ${option.percent}%`)
+        .join(', '),
+);
+
 const verticalBarChart1Data = [
     { label: '0', percent: 2 },
     { label: '1', percent: 1 },
@@ -666,12 +672,13 @@ function exportSubmissions() {
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
-                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-3">
+                                    <p class="sr-only">{{ imageChoicePieChart1AccessibleLabel }}</p>
+                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-3" aria-hidden="true">
                                         <template v-for="option in imageChoicePieChart1Data" :key="option.badge">
-                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">{{ option.percent }}%</span>
-                                            <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" aria-hidden="true" />
-                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200" aria-hidden="true">{{ option.badge }}</span>
-                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100" aria-hidden="true">{{ option.label }}</span>
+                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
+                                            <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" />
+                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
+                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         </template>
                                     </ol>
                                 </figcaption>
