@@ -120,7 +120,7 @@
 }
 
 .vertical-bar-chart__value {
-    @apply mb-1 text-[0.785rem] font-bold tabular-nums text-gray-800 dark:text-gray-100;
+    @apply mb-1.5 text-[0.785rem] font-medium tabular-nums text-gray-800 dark:text-gray-100;
 }
 
 .vertical-bar-chart__fill {
