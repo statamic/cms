@@ -2,9 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Illuminate\Support\Arr;
 use Statamic\Facades;
-use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
 
 use function Statamic\trans as __;
