@@ -48,6 +48,48 @@ const imageChoicePieChart1LegendId = useId();
 const checkboxesBarChart1CaptionId = useId();
 const yesNoBarChart1CaptionId = useId();
 const yesNoPieChart1LegendId = useId();
+const dictionaryChart1CaptionId = useId();
+const dictionaryChart1Page2CaptionId = useId();
+
+const dictionaryChart1Page1Data = [
+    { rank: 1, label: 'Japan', flag: '🇯🇵', percent: 40 },
+    { rank: 2, label: 'Italy', flag: '🇮🇹', percent: 35 },
+    { rank: 3, label: 'USA', flag: '🇺🇸', percent: 10 },
+    { rank: 4, label: 'UK', flag: '🇬🇧', percent: 8 },
+    { rank: 5, label: 'France', flag: '🇫🇷', percent: 3 },
+];
+
+const dictionaryChart1Page2Data = [
+    { rank: 6, label: 'Germany', flag: '🇩🇪', percent: 2 },
+    { rank: 7, label: 'Spain', flag: '🇪🇸', percent: 1 },
+    { rank: 8, label: 'Portugal', flag: '🇵🇹', percent: 1 },
+];
+
+const dictionaryChartPage = ref(1);
+const dictionaryChartPerPage = 5;
+const dictionaryChartTotal = 8;
+
+const dictionaryChartMeta = computed(() => {
+    const from = (dictionaryChartPage.value - 1) * dictionaryChartPerPage + 1;
+    const to = Math.min(dictionaryChartPage.value * dictionaryChartPerPage, dictionaryChartTotal);
+
+    return {
+        current_page: dictionaryChartPage.value,
+        last_page: Math.ceil(dictionaryChartTotal / dictionaryChartPerPage),
+        per_page: dictionaryChartPerPage,
+        total: dictionaryChartTotal,
+        from,
+        to,
+    };
+});
+
+const dictionaryChartAccessibleLabel = computed(() => {
+    if (dictionaryChartPage.value === 1) {
+        return __('Japan 40%, Italy 35%, USA 10%, UK 8%, France 3%');
+    }
+
+    return __('Germany 2%, Spain 1%, Portugal 1%');
+});
 
 const yesNoChart1Data = [
     { percent: 55, label: 'I\'ll get my coat', icon: 'checkmark-circle-filled', chartColor: 1 },
@@ -855,7 +897,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of a Dictionary field type (Horizontal Lollipop Chart with icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <!-- Example of a Dictionary field type (Horizontal Lollipop Chart with icons) with Pagination. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('What’s your favourite country?')"
@@ -864,57 +906,65 @@ function exportSubmissions() {
                             icon="fieldtype-dictionary"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
+                            <template #actions>
+                                <Pagination
+                                    :resource-meta="dictionaryChartMeta"
+                                    :show-totals="false"
+                                    :show-page-links="false"
+                                    :show-per-page-selector="false"
+                                    :scroll-to-top="false"
+                                    @page-selected="dictionaryChartPage = $event"
+                                />
+                            </template>
+                            <p class="sr-only" aria-live="polite">{{ dictionaryChartAccessibleLabel }}</p>
+                            <figure v-if="dictionaryChartPage === 1" class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
                                 <!-- If there are more than 4 items, then align-center. If there are less than 4 items, then p-4 -->
-                                <ol class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] items-center gap-x-2.25 p-0" aria-hidden="true">
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Japan</span>
+                                <ol
+                                    class="m-0 list-none grid grid-cols-[auto_max-content_1fr] gap-x-2.25"
+                                    :class="dictionaryChart1Page1Data.length > 4 ? 'items-center p-0' : 'p-4'"
+                                    aria-hidden="true"
+                                >
+                                    <li
+                                        v-for="item in dictionaryChart1Page1Data"
+                                        :key="item.label"
+                                        class="contents"
+                                    >
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.rank }}</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
                                         <div class="flex items-center gap-1">
-                                            <div class="h-px w-[40%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="text-lg">🇯🇵</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">40%</span>
-                                        </div>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Italy</span>
-                                        <div class="flex items-center gap-1">
-                                            <div class="h-px w-[35%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="text-lg">🇮🇹</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
-                                        </div>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">USA</span>
-                                        <div class="flex items-center gap-1">
-                                            <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="text-lg">🇺🇸</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
-                                        </div>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">UK</span>
-                                        <div class="flex items-center gap-1">
-                                            <div class="h-px w-[8%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="text-lg">🇬🇧</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">8%</span>
-                                        </div>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">France</span>
-                                        <div class="flex items-center gap-1">
-                                            <div class="h-px w-[3%] bg-gray-200 dark:bg-gray-600" />
-                                            <div class="text-lg">🇫🇷</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">3%</span>
+                                            <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
+                                            <div class="text-lg">{{ item.flag }}</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
                                         </div>
                                     </li>
                                 </ol>
                                 <figcaption :id="dictionaryChart1CaptionId" class="sr-only">
-                                    {{ __('Ranked favourite seasons: Summer 55%, Autumn 25%, Spring 15%, Winter 10%') }}
+                                    {{ __('What’s your favourite country?: Japan 40%, Italy 35%, USA 10%, UK 8%, France 3%') }}
+                                </figcaption>
+                            </figure>
+                            <figure v-else-if="dictionaryChartPage === 2" class="p-6 grid" :aria-labelledby="dictionaryChart1Page2CaptionId">
+                                <!-- If there are more than 4 items, then align-center. If there are less than 4 items, then p-4 -->
+                                <ol
+                                    class="m-0 list-none grid grid-cols-[auto_max-content_1fr] gap-x-2.25"
+                                    :class="dictionaryChart1Page2Data.length > 4 ? 'items-center pt-0' : 'pt-4'"
+                                    aria-hidden="true"
+                                >
+                                    <li
+                                        v-for="item in dictionaryChart1Page2Data"
+                                        :key="item.label"
+                                        class="contents"
+                                    >
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.rank }}</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
+                                            <div class="text-lg">{{ item.flag }}</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
+                                        </div>
+                                    </li>
+                                </ol>
+                                <figcaption :id="dictionaryChart1Page2CaptionId" class="sr-only">
+                                    {{ __('What’s your favourite country?: Germany 2%, Spain 1%, Portugal 1%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
