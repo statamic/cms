@@ -731,20 +731,20 @@ function exportSubmissions() {
                                         <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-3-legend" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Olivia Rodrigo</span>
-                                        <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
+                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-3" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-4-legend" />
                                         <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">The Cure</span>
-                                        <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
+                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-4-legend" />
                                     </li>
                                 </ol>
                                 <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
-                                    {{ __('Have you seen us live before?: Radiohead 55%, Death Cab for Cutie 35%, Olivia Rodrigo 10%, The Cure 10%') }}
+                                    {{ __('Have you seen us live before?: Radiohead 55%, Death Cab for Cutie 35%, Olivia Rodrigo 5%, The Cure 5%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
