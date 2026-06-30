@@ -620,6 +620,57 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
+                    <!-- Example of an Image Choice field type (Image Choice Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('What is your spirit animal?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="fieldtype-radio"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="pie-chart-figure">
+                                <div
+                                    class="pie-chart"
+                                    style="--1: 45; --2: 30; --3: 15; --4: 10;"
+                                    role="img"
+                                    :aria-labelledby="ImageChoicePieChart1LegendId"
+                                >
+                                    <div class="pie-chart__disc" aria-hidden="true" />
+                                    <!-- aria-hidden because the labels are already in the figure caption -->
+                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">45%</span>
+                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">30%</span>
+                                    <span class="pie-chart__label | pie-chart__label--3" aria-hidden="true">15%</span>
+                                    <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
+                                </div>
+                                <!-- Pie Chart 1 Legend -->
+                                <figcaption :id="ImageChoicePieChart1LegendId" class="pie-chart-legend">
+                                    <ul class="pie-chart-legend__list">
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">45%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
+                                            <span>Before you Go Go</span>
+                                        </li>
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">30%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--2" />
+                                            <span>Bring me Back to Life</span>
+                                        </li>
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">15%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--3" />
+                                            <span>When September Ends</span>
+                                        </li>
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">10%</span>
+                                            <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
+                                            <span>Never</span>
+                                        </li>
+                                    </ul>
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
                 </div>
             </template>
         </FormSubmissionListing>
