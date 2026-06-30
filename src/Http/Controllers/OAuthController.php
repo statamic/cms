@@ -16,6 +16,8 @@ use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class OAuthController
 {
     public function redirectToProvider(Request $request, string $provider)
