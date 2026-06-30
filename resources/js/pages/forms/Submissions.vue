@@ -304,7 +304,7 @@ function exportSubmissions() {
 
             <template #results>
                 <!-- Example of a Multiple Choice field type (Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                <div class="mt-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
+                <div class="mt-6 pb-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('Wake me up')"
@@ -559,7 +559,12 @@ function exportSubmissions() {
                             icon="scale-up"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6" :aria-labelledby="verticalBarChart1CaptionId">
+                            <div class="mt-4 ms-3.5">
+                                <div class="inline-flex items-center gap-2 py-1.25 px-2 border border-gray-200 dark:border-gray-700 rounded-md">
+                                    <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-xs text-gray-500 dark:text-gray-400">Average</span>
+                                </div>
+                            </div>
+                            <figure class="p-6 pb-3" :aria-labelledby="verticalBarChart1CaptionId">
                                 <ol
                                     class="vertical-bar-chart m-0 list-none p-0"
                                     :style="{ '--max-value': verticalBarChart1MaxValue }"

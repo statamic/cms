@@ -95,7 +95,7 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 0.25rem;
-    height: 10rem;
+    height: 7rem;
 }
 
 .vertical-bar-chart__bar {
