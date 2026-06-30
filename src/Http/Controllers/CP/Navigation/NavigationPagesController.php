@@ -61,6 +61,8 @@ class NavigationPagesController extends CpController
         [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
+            $this->authorize('view', $entry);
+
             [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
         }
 
