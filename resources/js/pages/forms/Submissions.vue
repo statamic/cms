@@ -491,7 +491,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="lollipopChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
@@ -549,7 +549,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="horizontalBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
@@ -644,7 +644,7 @@ function exportSubmissions() {
                                 class="p-6 grid"
                                 :aria-labelledby="imageChoiceBarChart1CaptionId"
                             >
-                                <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li
                                         v-for="(option, index) in imageChoicePieChart1Data"
                                         :key="option.badge"
@@ -695,7 +695,7 @@ function exportSubmissions() {
                                 </div>
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
                                     <p class="sr-only">{{ imageChoicePieChart1AccessibleLabel }}</p>
-                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-3" aria-hidden="true">
+                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
                                         <template v-for="option in imageChoicePieChart1Data" :key="option.badge">
                                             <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
                                             <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" />
@@ -717,7 +717,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="checkboxesBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
