@@ -12,6 +12,7 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Statamic\Console\Commands\Concerns\NormalizesPaginationHeader;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -31,6 +32,7 @@ class StaticWarm extends Command
 {
     use EnhancesCommands;
     use Hookable;
+    use NormalizesPaginationHeader;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -173,7 +175,7 @@ class StaticWarm extends Command
         $this->components->twoColumnDetail($this->getRelativeUri($this->uris()->get($index)), '<info>✓ Cached</info>');
 
         if ($response->hasHeader('X-Statamic-Pagination')) {
-            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+            [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
 
             $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
         }
