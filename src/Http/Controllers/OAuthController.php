@@ -75,13 +75,13 @@ class OAuthController
         }
 
         if ($user) {
+            session()->put('oauth-provider', $provider);
+
             // OAuth must not bypass two-factor. When the user has it enabled,
             // defer the login and send them through the challenge instead.
             if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
                 return $this->twoFactorChallenge($user);
             }
-
-            session()->put('oauth-provider', $provider);
 
             Auth::guard($guard)->login($user, config('statamic.oauth.remember_me', true));
 

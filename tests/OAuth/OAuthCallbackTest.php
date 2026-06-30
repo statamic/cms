@@ -186,6 +186,20 @@ class OAuthCallbackTest extends TestCase
     }
 
     #[Test]
+    public function it_remembers_the_oauth_provider_in_the_session_on_login()
+    {
+        $user = UserFacade::make()->id('user-1')->email('existing@example.com')->save();
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com');
+
+        $response = $this->hitCallback('test');
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertSessionHas('oauth-provider', 'test');
+    }
+
+    #[Test]
     public function a_two_factor_enabled_user_is_challenged_instead_of_being_logged_in()
     {
         Event::fake();
@@ -200,6 +214,8 @@ class OAuthCallbackTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect(route('statamic.two-factor-challenge'));
         $response->assertSessionHas('login.id', 'user-1');
+        // The provider is remembered through the challenge so re-auth-on-expiry still works.
+        $response->assertSessionHas('oauth-provider', 'test');
         Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id() === 'user-1');
     }
 
