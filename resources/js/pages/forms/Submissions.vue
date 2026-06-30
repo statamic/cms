@@ -466,7 +466,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="lollipopChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
@@ -524,7 +524,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="horizontalBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" aria-hidden="true">55%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />

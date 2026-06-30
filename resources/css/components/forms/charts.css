@@ -11,7 +11,7 @@
 }
 
 .pie-chart-legend__list {
-    @apply grid gap-2.5 text-xs text-gray-700 dark:text-gray-50;
+    @apply grid gap-2.25 text-xs text-gray-700 dark:text-gray-50;
 }
 
 .pie-chart-legend__item {
