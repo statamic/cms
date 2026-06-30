@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User as UserFacade;
+use Statamic\Http\Middleware\AuthGuard;
 use Statamic\OAuth\Provider;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -90,13 +91,38 @@ class OAuthDisconnectTest extends TestCase
     }
 
     #[Test]
-    public function the_disconnect_route_requires_a_delete_request_and_authentication()
+    public function the_front_end_disconnect_route_requires_a_delete_request_and_the_web_guard()
     {
         $route = app('router')->getRoutes()->getByName('statamic.oauth.disconnect');
 
-        // A non-GET, CSRF-protected verb behind the auth middleware.
+        // A non-GET, CSRF-protected verb authenticated against the front-end guard.
         $this->assertContains('DELETE', $route->methods());
         $this->assertNotContains('GET', $route->methods());
+        $this->assertContains(AuthGuard::class, $route->gatherMiddleware());
         $this->assertContains('auth', $route->gatherMiddleware());
+    }
+
+    #[Test]
+    public function a_control_panel_user_can_disconnect_through_the_cp_route()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->makeSuper()->save();
+        (new Provider('test'))->setUserProviderId($user, 'sub-1');
+
+        $this->actingAs($user)
+            ->delete(cp_route('oauth.disconnect', 'test'))
+            ->assertRedirect();
+
+        $this->assertNull((new Provider('test'))->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function the_cp_disconnect_route_is_a_delete_behind_control_panel_auth()
+    {
+        $route = app('router')->getRoutes()->getByName('statamic.cp.oauth.disconnect');
+
+        $this->assertNotNull($route);
+        $this->assertContains('DELETE', $route->methods());
+        $this->assertNotContains('GET', $route->methods());
+        $this->assertContains('statamic.cp.authenticated', $route->gatherMiddleware());
     }
 }

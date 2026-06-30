@@ -115,6 +115,7 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Http\Controllers\OAuthController as FrontendOAuthController;
 use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
@@ -440,6 +441,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     if (OAuth::enabled()) {
         Route::get('oauth', [OAuthController::class, 'index'])->name('oauth');
+        Route::delete('oauth/{provider}/disconnect', [FrontendOAuthController::class, 'disconnect'])->name('oauth.disconnect');
     }
 
     Route::get('themes', [ThemeController::class, 'index']);
