@@ -4,6 +4,7 @@ import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, Listing } from '@ui';
 import { toast } from '@api';
+import { requireElevatedSession } from '@/components/elevated-sessions';
 
 defineProps(['providers']);
 
@@ -13,6 +14,12 @@ const columns = [
 ];
 
 function disconnect(provider) {
+    requireElevatedSession()
+        .then(() => performDisconnect(provider))
+        .catch(() => toast.error(__('statamic::messages.elevated_session_required')));
+}
+
+function performDisconnect(provider) {
     axios.delete(provider.disconnectUrl).then(() => {
         toast.success(__('statamic::messages.oauth_disconnected', { provider: provider.label }));
         router.reload();
