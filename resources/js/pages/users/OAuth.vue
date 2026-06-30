@@ -13,6 +13,12 @@ const columns = [
     { label: '', field: 'actions' },
 ];
 
+function connect(provider) {
+    requireElevatedSession()
+        .then(() => (window.location = provider.connectUrl))
+        .catch(() => toast.error(__('statamic::messages.elevated_session_required')));
+}
+
 function disconnect(provider) {
     requireElevatedSession()
         .then(() => performDisconnect(provider))
@@ -56,10 +62,9 @@ function performDisconnect(provider) {
                     />
                     <Button
                         v-else
-                        as="a"
                         size="xs"
                         :text="__('Connect')"
-                        :href="row.connectUrl"
+                        @click="connect(row)"
                     />
                 </div>
             </template>
