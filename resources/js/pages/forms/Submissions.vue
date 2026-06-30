@@ -855,6 +855,70 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
+                    <!-- Example of a Dictionary field type (Horizontal Lollipop Chart with icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('What’s your favourite country?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="fieldtype-dictionary"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
+                                <!-- If there are more than 4 items, then align-center. If there are less than 4 items, then p-4 -->
+                                <ol class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] items-center gap-x-2.25 p-0" aria-hidden="true">
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Japan</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[40%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇯🇵</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">40%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Italy</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[35%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇮🇹</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">USA</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇺🇸</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">UK</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[8%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇬🇧</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">8%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">France</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[3%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇫🇷</div>
+                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">3%</span>
+                                        </div>
+                                    </li>
+                                </ol>
+                                <figcaption :id="dictionaryChart1CaptionId" class="sr-only">
+                                    {{ __('Ranked favourite seasons: Summer 55%, Autumn 25%, Spring 15%, Winter 10%') }}
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
                 </div>
             </template>
         </FormSubmissionListing>
