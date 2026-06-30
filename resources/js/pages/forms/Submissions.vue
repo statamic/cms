@@ -57,6 +57,8 @@ const imageChoicePieChart1AccessibleLabel = computed(() =>
         .join(', '),
 );
 
+const imageChoiceChart1Type = ref('bar');
+
 const verticalBarChart1Data = [
     { label: '0', percent: 2 },
     { label: '1', percent: 1 },
@@ -611,7 +613,7 @@ function exportSubmissions() {
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of an Image Choice field type (Image Choice Bar Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <!-- Example of an Image Choice field type with a chart type chooser. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
                             :title="__('What is your spirit animal?')"
@@ -620,39 +622,49 @@ function exportSubmissions() {
                             icon="image-select"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="imageChoiceBarChart1CaptionId">
+                            <template #actions>
+                                <ToggleGroup v-model="imageChoiceChart1Type" size="sm">
+                                    <ToggleItem
+                                        value="bar"
+                                        icon="charts-bar-horizontal"
+                                        :aria-label="__('Bar chart')"
+                                        v-tooltip="__('Bar chart')"
+                                    />
+                                    <ToggleItem
+                                        value="pie"
+                                        icon="money-graph-pie-chart"
+                                        :aria-label="__('Pie chart')"
+                                        v-tooltip="__('Pie chart')"
+                                    />
+                                </ToggleGroup>
+                            </template>
+                            <figure
+                                v-if="imageChoiceChart1Type === 'bar'"
+                                class="p-6 grid"
+                                :aria-labelledby="imageChoiceBarChart1CaptionId"
+                            >
                                 <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center gap-2.25 p-0 pt-4" aria-hidden="true">
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
-                                        <img class="rounded-full" src="https://picsum.photos/80/80?random=1" alt="" />
-                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
-                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
-                                        <img class="rounded-full" src="https://picsum.photos/80/80?random=2" alt="" />
-                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
-                                        <div class="h-2.5 rounded-full w-[45%] bg-chart-2" />
+                                    <li
+                                        v-for="(option, index) in imageChoicePieChart1Data"
+                                        :key="option.badge"
+                                        class="contents"
+                                    >
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
+                                        <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" />
+                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
+                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
+                                        <div
+                                            class="h-2.5 rounded-full"
+                                            :class="index === 1 ? 'bg-chart-2' : 'bg-chart-1'"
+                                            :style="{ width: `${option.percent}%` }"
+                                        />
                                     </li>
                                 </ol>
                                 <figcaption :id="imageChoiceBarChart1CaptionId" class="sr-only">
                                     {{ __('What is your spirit animal?: Actually 55%, Nope 45%') }}
                                 </figcaption>
                             </figure>
-                        </Widget>
-                    </div>
-                    <!-- Example of an Image Choice field type (Image Choice Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
-                        <Widget
-                            :title="__('What is your spirit animal?')"
-                            title-tag="h2"
-                            class="h-full"
-                            icon="image-select"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
-                        >
-                            <figure class="image-pie-chart-figure">
+                            <figure v-else class="image-pie-chart-figure">
                                 <div
                                     class="image-pie-chart"
                                     :style="{
@@ -680,7 +692,6 @@ function exportSubmissions() {
                                         aria-hidden="true"
                                     >{{ option.percent }}%</span>
                                 </div>
-                                <!-- Pie Chart 1 Legend -->
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
                                     <p class="sr-only">{{ imageChoicePieChart1AccessibleLabel }}</p>
                                     <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-2.25 p-0 pt-3" aria-hidden="true">
