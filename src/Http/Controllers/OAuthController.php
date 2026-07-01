@@ -13,7 +13,6 @@ use Statamic\Exceptions\OAuthEmailExistsException;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\URL;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -40,6 +39,7 @@ class OAuthController
         }
 
         $request->session()->put('statamic.oauth.guard', $guard);
+        $request->session()->put('statamic.oauth.redirect', $request->query('redirect'));
 
         return Socialite::driver($provider)->redirect();
     }
@@ -67,16 +67,21 @@ class OAuthController
             throw new NotFoundHttpException();
         }
 
+        $guard = $request->session()->get('statamic.oauth.guard');
+
+        // When already authenticated, the callback is a request to connect a provider to the current
+        // account rather than to sign in. We'll enforce an elevated session *before* the session
+        // state gets consumed so the connection can succeed after they complete re-elevation.
+        if (Auth::guard($guard)->check() && $response = $this->requireElevatedSession($request, $this->isCpRequest())) {
+            return $response;
+        }
+
         try {
             $providerUser = $oauth->getSocialiteUser();
         } catch (InvalidStateException $e) {
             return $this->redirectToProvider($request, $provider);
         }
 
-        $guard = $request->session()->get('statamic.oauth.guard');
-
-        // When already authenticated, the callback is a request to connect
-        // a provider to the current account rather than to sign in.
         if (Auth::guard($guard)->check()) {
             return $this->connectProvider($oauth, $providerUser, Auth::guard($guard)->user());
         }
@@ -164,19 +169,13 @@ class OAuthController
 
     protected function successRedirectUrl()
     {
-        $default = '/';
+        $redirect = session('statamic.oauth.redirect');
 
-        $previous = session('_previous.url');
-
-        if (! $query = Arr::get(parse_url($previous), 'query')) {
-            return $default;
+        if (! $redirect || URL::isExternalToApplication($redirect)) {
+            return '/';
         }
 
-        parse_str($query, $query);
-
-        $redirect = Arr::get($query, 'redirect', $default);
-
-        return URL::isExternalToApplication($redirect) ? $default : $redirect;
+        return $redirect;
     }
 
     protected function unauthorizedRedirectUrl()
@@ -218,14 +217,9 @@ class OAuthController
 
     protected function isCpRequest()
     {
-        $previous = session('_previous.url');
+        $redirect = (string) session('statamic.oauth.redirect');
+        $cp = '/'.config('statamic.cp.route');
 
-        if (! $query = Arr::get(parse_url($previous), 'query')) {
-            return false;
-        }
-
-        parse_str($query, $query);
-
-        return Arr::get($query, 'redirect') === '/'.config('statamic.cp.route');
+        return $redirect === $cp || Str::startsWith($redirect, $cp.'/');
     }
 }

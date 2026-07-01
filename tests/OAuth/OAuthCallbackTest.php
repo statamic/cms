@@ -14,12 +14,13 @@ use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\User as UserFacade;
 use Statamic\OAuth\Provider;
+use Tests\ElevatesSessions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class OAuthCallbackTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use ElevatesSessions, PreventSavingStacheItemsToDisk;
 
     protected function defineEnvironment($app)
     {
@@ -89,7 +90,7 @@ class OAuthCallbackTest extends TestCase
 
         $this->fakeProvider('test', [], 'sub-1', 'one@example.com');
 
-        $response = $this->actingAs($user)->hitCallback('test');
+        $response = $this->actingAs($user)->withElevatedSession()->hitCallback('test');
 
         $this->assertEquals('user-1', $this->provider('test')->getUserId('sub-1'));
         $this->assertCount(1, UserFacade::all());
@@ -105,7 +106,7 @@ class OAuthCallbackTest extends TestCase
 
         $this->fakeProvider('test', [], 'sub-1', 'one@example.com');
 
-        $response = $this->actingAs($user)->hitCallback('test');
+        $response = $this->actingAs($user)->withElevatedSession()->hitCallback('test');
 
         $this->assertEquals('user-1', $this->provider('test')->getUserId('sub-1'));
         $response->assertSessionHas('success', __('statamic::messages.oauth_already_connected', ['provider' => 'Test']));
@@ -120,7 +121,7 @@ class OAuthCallbackTest extends TestCase
 
         $this->fakeProvider('test', [], 'sub-1', 'one@example.com');
 
-        $response = $this->actingAs($user)->hitCallback('test');
+        $response = $this->actingAs($user)->withElevatedSession()->hitCallback('test');
 
         // Still belongs to the original owner.
         $this->assertEquals('other', $this->provider('test')->getUserId('sub-1'));
@@ -134,10 +135,45 @@ class OAuthCallbackTest extends TestCase
 
         $this->fakeProvider('stateless', ['stateless' => true], 'sub-1', 'one@example.com');
 
-        $response = $this->actingAs($user)->hitCallback('stateless');
+        $response = $this->actingAs($user)->withElevatedSession()->hitCallback('stateless');
 
         $this->assertNull($this->provider('stateless')->getUserId('sub-1'));
         $response->assertSessionHas('error', __('statamic::messages.oauth_connect_unsupported'));
+    }
+
+    #[Test]
+    public function an_authenticated_connect_re_checks_the_elevated_session_before_linking()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->save();
+
+        $this->fakeProvider('test', [], 'sub-1', 'one@example.com');
+
+        // Authenticated (a connect) but NOT elevated — e.g. the elevation lapsed
+        // during the provider round-trip. The callback must re-challenge rather
+        // than link, and must do so before consuming the single-use state/code.
+        $response = $this->actingAs($user)->hitCallback('test');
+
+        $this->assertNull($this->provider('test')->getUserId('sub-1'));
+        $response->assertRedirect(route('statamic.elevated-session'));
+    }
+
+    #[Test]
+    public function a_control_panel_connect_re_checks_against_the_cp_elevation_challenge()
+    {
+        $user = UserFacade::make()->id('user-1')->email('one@example.com')->makeSuper()->save();
+
+        // A connect initiated from the CP stashes redirect=/cp/oauth; a lapsed
+        // elevation must re-challenge in the CP, not bounce to the front-end.
+        $response = $this
+            ->actingAs($user)
+            ->withSession([
+                'statamic.oauth.guard' => 'web',
+                'statamic.oauth.redirect' => '/cp/oauth',
+            ])
+            ->get(route('statamic.oauth.callback', 'test'));
+
+        $this->assertNull($this->provider('test')->getUserId('sub-1'));
+        $response->assertRedirect(cp_route('confirm-password'));
     }
 
     #[Test]
@@ -232,7 +268,7 @@ class OAuthCallbackTest extends TestCase
         $response = $this
             ->withSession([
                 'statamic.oauth.guard' => 'web',
-                '_previous' => ['url' => 'http://localhost/oauth/test?redirect=/cp'],
+                'statamic.oauth.redirect' => '/cp',
             ])
             ->get(route('statamic.oauth.callback', 'test'));
 
