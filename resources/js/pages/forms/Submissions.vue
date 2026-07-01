@@ -1254,10 +1254,12 @@ function exportSubmissions() {
                                         <span class="text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-100">20%</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('of users checked the toggle') }}</span>
                                     </div>
                                 </div>
-                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 pt-3" aria-hidden="true">
                                     <li class="contents">
-                                        <Switch :model-value="true" tabindex="-1" class="pointer-events-none data-[state=checked]:!border-gray-950 data-[state=checked]:!bg-gray-950" />
-                                        <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
+                                        <Switch :model-value="true" tabindex="-1" class="pointer-events-none data-[state=checked]:border-gray-950! data-[state=checked]:bg-gray-950!" />
+                                        <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-[hsl(from_var(--color-chart-1-legend)_h_s_l/0.15)]">
+                                            <div class="h-full w-[20%] shrink-0 rounded-full bg-chart-1-legend" />
+                                        </div>
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
