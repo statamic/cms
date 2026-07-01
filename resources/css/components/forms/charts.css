@@ -123,7 +123,6 @@
 
 
 
-
 /* GROUP CHARTS / IMAGE PIE CHART
 =================================================== */
 .image-pie-chart-figure {
@@ -209,7 +208,6 @@
 
 
 
-
 /* GROUP CHARTS / VERTICAL BAR CHART
 =================================================== */
 .vertical-bar-chart-figure {
@@ -263,4 +261,43 @@
 
 .vertical-bar-chart__scale-label {
     @apply min-w-8 rounded-md border border-gray-200 shadow-ui-xs px-1.5 py-0.5 text-center text-[0.785rem] font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-400;
+}
+
+
+
+/* GROUP CHARTS / ANIMATIONS / PIE CHART
+=================================================== */
+/* These animations are triggered when switching chart types */
+@property --pie-reveal {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+@keyframes pie-chart-reveal {
+    from { --pie-reveal: 0deg; }
+    to { --pie-reveal: 360deg; }
+}
+
+.pie-chart__disc,
+.image-pie-chart__disc {
+    -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+    mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+    --pie-reveal: 360deg;
+}
+
+.content-card:has([data-submission-summary]) {
+    @media (prefers-reduced-motion: no-preference) {
+        .chart-reveal .pie-chart__disc,
+        .chart-reveal .image-pie-chart__disc {
+            animation: pie-chart-reveal 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .chart-reveal .pie-chart__disc,
+        .chart-reveal .image-pie-chart__disc {
+            --pie-reveal: 360deg;
+        }
+    }
 }

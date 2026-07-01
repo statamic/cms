@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, useId } from 'vue';
+import { ref, computed, watch, useId, nextTick } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination, Icon, Switch } from '@ui';
@@ -281,6 +281,49 @@ function exportSubmissions() {
     window.open(url, '_blank');
     exportModalOpen.value = false;
 }
+
+/*
+ * Pie chart reveal animation (see charts.css: pie-chart-reveal).
+ *
+ * Toggles the chart-reveal class briefly so the sweep animation can replay.
+ * Used when a widget’s chart type switches to pie — not on summary view enter
+ * or pagination.
+ */
+ const PIE_CHART_REVEAL_MS = 1100;
+
+function createChartReveal() {
+    const isRevealing = ref(false);
+    let timeoutId;
+
+    function trigger() {
+        clearTimeout(timeoutId);
+        isRevealing.value = false;
+
+        nextTick(() => {
+            isRevealing.value = true;
+            timeoutId = setTimeout(() => {
+                isRevealing.value = false;
+            }, PIE_CHART_REVEAL_MS);
+        });
+    }
+
+    return { isRevealing, trigger };
+}
+
+const yesNoChartReveal = createChartReveal();
+const imageChoiceChartReveal = createChartReveal();
+
+watch(yesNoChart1Type, (type, previousType) => {
+    if (type === 'pie' && previousType !== undefined) {
+        yesNoChartReveal.trigger();
+    }
+});
+
+watch(imageChoiceChart1Type, (type, previousType) => {
+    if (type === 'pie' && previousType !== undefined) {
+        imageChoiceChartReveal.trigger();
+    }
+});
 </script>
 
 <template>
@@ -416,7 +459,7 @@ function exportSubmissions() {
 
             <template #results>
                 <!-- Example of a Multiple Choice field type (Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                <div class="@container/widgets widgets flex flex-wrap mt-6 pb-8 gap-y-6 -mx-2 sm:-mx-3">
+                <div data-submission-summary class="@container/widgets widgets flex flex-wrap mt-6 pb-8 gap-y-6 -mx-2 sm:-mx-3">
                     <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Wake me up')"
@@ -440,7 +483,7 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
-                                <figcaption :id="pieChart1LegendId" class="pie-chart-legend starting-style-transition-children">
+                                <figcaption :id="pieChart1LegendId" class="pie-chart-legend">
                                     <ol class="pie-chart-legend__list">
                                         <li class="pie-chart-legend__item">
                                             <span class="pie-chart-legend__value">45%</span>
@@ -753,7 +796,7 @@ function exportSubmissions() {
                                     {{ __('What is your spirit animal?: Actually 55%, Nope 45%') }}
                                 </figcaption>
                             </figure>
-                            <figure v-else class="image-pie-chart-figure">
+                            <figure v-else class="image-pie-chart-figure" :class="{ 'chart-reveal': imageChoiceChartReveal.isRevealing }">
                                 <div
                                     class="image-pie-chart"
                                     :style="{
@@ -891,7 +934,7 @@ function exportSubmissions() {
                                     {{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}
                                 </figcaption>
                             </figure>
-                            <figure v-else class="pie-chart-figure">
+                            <figure v-else class="pie-chart-figure" :class="{ 'chart-reveal': yesNoChartReveal.isRevealing }">
                                 <div
                                     class="pie-chart"
                                     :style="{
