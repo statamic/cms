@@ -2,11 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -106,6 +108,10 @@ class FormLogicController extends CpController
                     );
 
                     $isFirstFieldInSection = false;
+
+                    $handle = $config['handle'];
+                    $field = $config['field'] ?? [];
+                    $fieldtype = FormFieldtypeRepository::find($config['field']['type']);
 
                     $result = [
                         '_id' => $handle,
