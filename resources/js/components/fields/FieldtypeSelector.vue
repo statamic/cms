@@ -53,7 +53,9 @@ import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
 import { Icon } from '@/components/ui';
 
-const loadedFieldtypes = ref(null);
+// Keyed by blueprint mode: form and regular blueprints load different fieldtype lists, so a single
+// shared value would let whichever picker opens first stick until a full page reload.
+const loadedFieldtypes = ref({});
 
 export default {
     components: {
@@ -109,14 +111,18 @@ export default {
     },
 
     computed: {
+        mode() {
+            return this.$config.get('isFormBlueprint') ? 'forms' : 'default';
+        },
+
         fieldtypes() {
             if (!this.fieldtypesLoaded) return;
 
-            return loadedFieldtypes.value;
+            return loadedFieldtypes.value[this.mode];
         },
 
         fieldtypesLoaded() {
-            return Array.isArray(loadedFieldtypes.value);
+            return Array.isArray(loadedFieldtypes.value[this.mode]);
         },
 
         allFieldtypes() {
@@ -225,12 +231,16 @@ export default {
     created() {
         if (this.fieldtypesLoaded) return;
 
+        // Capture the mode now so an in-flight request can't land under a different key if the
+        // blueprint mode changes before it resolves.
+        const mode = this.mode;
+
         let url = cp_url('fields/fieldtypes?selectable=true');
 
-        if (this.$config.get('isFormBlueprint')) url += '&forms=true';
+        if (mode === 'forms') url += '&forms=true';
 
         this.$axios.get(url)
-            .then((response) => (loadedFieldtypes.value = response.data))
+            .then((response) => (loadedFieldtypes.value[mode] = response.data))
             .catch((e) => {
                 this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 this.close();
