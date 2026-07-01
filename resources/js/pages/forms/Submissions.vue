@@ -51,6 +51,7 @@ const yesNoPieChart1LegendId = useId();
 const dictionaryChart1CaptionId = useId();
 const dictionaryChart1Page2CaptionId = useId();
 const numberBarChart1CaptionId = useId();
+const starRatingChart1CaptionId = useId();
 
 const dictionaryChart1Page1Data = [
     { rank: 1, label: 'Japan', flag: '🇯🇵', percent: 40 },
@@ -1022,7 +1023,7 @@ function exportSubmissions() {
                             icon="star"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="numberBarChart1CaptionId">
+                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="starRatingChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
@@ -1033,7 +1034,7 @@ function exportSubmissions() {
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
                                     </div>
                                 </div>
-                                <!-- 
+                                <!--
                                     Midpoint (e.g. 3 star) should be --color-chart-1-legend
                                     Higher (e.g. 4 star) should be lightness of 1 minus 0.1 increments, e.g. --color-chart-1-legend_calc(l*0.9)_c_h, then --color-chart-1-legend_calc(l*0.8)_c_h
                                     Lower (e.g. 2 star) should be lightness of 1 plus 0.2 increments, e.g. --color-chart-1-legend_calc(l*1.2)_c_h, then --color-chart-1-legend_calc(l*1.4)_c_h
@@ -1070,8 +1071,8 @@ function exportSubmissions() {
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
-                                <figcaption :id="numberBarChart1CaptionId" class="sr-only">
-                                    {{ __('How old are you?: Min–Max 4–44, Average 26.2. Age distribution: 0–9: 20%, 10–19: 15%, 20–29: 30%, 30–39: 20%, 40–49: 20%') }}
+                                <figcaption :id="starRatingChart1CaptionId" class="sr-only">
+                                    {{ __('How would you rate the hotel?: 3/5 average. Rating distribution: 5 stars 20%, 4 stars 15%, 3 stars 30%, 2 stars 20%, 1 star 20%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
