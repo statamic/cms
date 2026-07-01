@@ -918,10 +918,7 @@ function exportSubmissions() {
                             </template>
                             <p class="sr-only" aria-live="polite">{{ dictionaryChartAccessibleLabel }}</p>
                             <figure v-if="dictionaryChartPage === 1" class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
-                                <ol
-                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3"
-                                    aria-hidden="true"
-                                >
+                                <ol class="m-0 list-none grid grid-cols-[auto_max-content_1fr] items-center gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
                                     <li
                                         v-for="item in dictionaryChart1Page1Data"
                                         :key="item.label"
@@ -941,10 +938,7 @@ function exportSubmissions() {
                                 </figcaption>
                             </figure>
                             <figure v-else-if="dictionaryChartPage === 2" class="p-6 grid" :aria-labelledby="dictionaryChart1Page2CaptionId">
-                                <ol
-                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3"
-                                    aria-hidden="true"
-                                >
+                                <ol class="m-0 list-none grid grid-cols-[auto_max-content_1fr] items-center gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
                                     <li
                                         v-for="item in dictionaryChart1Page2Data"
                                         :key="item.label"
