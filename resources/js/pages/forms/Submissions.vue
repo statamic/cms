@@ -1025,10 +1025,19 @@ function exportSubmissions() {
                             <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="numberBarChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <span class="text-xs font-semibold st-text-trim-cap tabular-nums">4–44</span>
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
                                     </div>
                                 </div>
+                                <!-- 
+                                    Midpoint (e.g. 3 star) should be --color-chart-1-legend
+                                    Higher (e.g. 4 star) should be lightness of 1 minus 0.1 increments, e.g. --color-chart-1-legend_calc(l*0.9)_c_h, then --color-chart-1-legend_calc(l*0.8)_c_h
+                                    Lower (e.g. 2 star) should be lightness of 1 plus 0.2 increments, e.g. --color-chart-1-legend_calc(l*1.2)_c_h, then --color-chart-1-legend_calc(l*1.4)_c_h
+                                 -->
                                 <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
