@@ -999,8 +999,8 @@ function exportSubmissions() {
                             icon="number"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="numberBarChart1CaptionId">
-                                <div aria-hidden="true" class="flex gap-2.5 pb-5">
+                            <figure class="grid p-6 pt-3 ps-4" :aria-labelledby="numberBarChart1CaptionId">
+                                <div aria-hidden="true" class="flex gap-2.5 pb-5 -ms-1">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <span class="text-xs font-semibold st-text-trim-cap tabular-nums">4–44</span>
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('Min–Max') }}</span>
@@ -1052,9 +1052,9 @@ function exportSubmissions() {
                             icon="star"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="starRatingChart1CaptionId">
+                            <figure class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
@@ -1127,9 +1127,9 @@ function exportSubmissions() {
                                 />
                             </template>
                             <p class="sr-only" aria-live="polite">{{ starRatingChart2AccessibleLabel }}</p>
-                            <figure v-if="starRatingChart2Page === 1" class="grid p-6 pt-3 ps-3" :aria-labelledby="starRatingChart2CaptionId">
+                            <figure v-if="starRatingChart2Page === 1" class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart2CaptionId">
                                 <div aria-hidden="true" class="pb-5">
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
@@ -1248,13 +1248,13 @@ function exportSubmissions() {
                             icon="fieldtype-toggle"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="toggleBarChart1CaptionId">
+                            <figure class="grid p-6 pt-3 ps-4" :aria-labelledby="toggleBarChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
-                                    <div class="inline-flex items-center gap-2 px-2 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <div class="inline-flex items-center gap-2 px-2 -ms-1 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
                                         <span class="text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-100">20%</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('of users checked the toggle') }}</span>
                                     </div>
                                 </div>
-                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 pt-3" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 pt-2" aria-hidden="true">
                                     <li class="contents">
                                         <Switch :model-value="true" tabindex="-1" class="pointer-events-none data-[state=checked]:border-gray-950! data-[state=checked]:bg-gray-950!" />
                                         <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-[hsl(from_var(--color-chart-1-legend)_h_s_l/0.15)]">
