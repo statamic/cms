@@ -7,24 +7,36 @@
                 :url="actionUrl"
                 :actions="actions"
                 :item="handle"
-                v-slot="{ actions }"
             >
-                <Dropdown v-if="canEdit || canEditBlueprints || actions.length" placement="left-start">
-                    <DropdownMenu>
-                        <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
-                        <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
-                        <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
-                        <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
-                        <DropdownItem
-                            v-for="action in actions"
-                            :key="action.handle"
-                            :text="__(action.title)"
-                            :icon="action.icon"
-                            :variant="action.dangerous ? 'destructive' : 'default'"
-                            @click="action.run"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+	            <template #default="{ actions }">
+	                <Dropdown v-if="canEdit || canEditBlueprints || actions.length" placement="left-start">
+	                    <DropdownMenu>
+	                        <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
+	                        <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
+	                        <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
+	                        <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
+	                        <DropdownItem
+	                            v-for="action in actions"
+	                            :key="action.handle"
+	                            :text="__(action.title)"
+	                            :icon="action.icon"
+	                            :variant="action.dangerous ? 'destructive' : 'default'"
+	                            @click="action.run"
+	                        />
+	                    </DropdownMenu>
+	                </Dropdown>
+	            </template>
+
+	            <template #quick="{ actions }">
+		            <Button
+			            v-for="action in actions"
+			            :key="action.handle"
+			            :text="__(action.title)"
+			            :icon="action.icon"
+			            :variant="action.dangerous ? 'danger' : 'default'"
+			            @click="action.run"
+		            />
+	            </template>
             </ItemActions>
 
             <template v-if="view === 'tree'">

@@ -55,6 +55,17 @@
                                 <ui-button inset size="sm" @click="download" icon="download" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Download')" />
                                 <ui-button inset size="sm" v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Delete')" />
 
+                                <ui-button
+                                    v-for="action in quickActions(actions)"
+                                    inset
+                                    size="sm"
+                                    @click="action.run"
+                                    :icon="action.icon"
+                                    variant="ghost"
+                                    class="[&_svg]:!opacity-45"
+                                    :text="__(action.title)"
+                                />
+
                                 <Dropdown class="me-4" v-if="filterForActionsMenu(actions).length">
                                     <DropdownMenu>
                                         <DropdownItem
@@ -228,7 +239,7 @@ export default {
         PublishContainer,
         PublishTabs,
         Icon,
-	    Stack,
+        Stack,
     },
 
     props: {
@@ -555,7 +566,11 @@ export default {
             ];
 
             return actions.filter((action) => !buttonActions.includes(action.handle));
-        }
+        },
+
+        quickActions(actions) {
+            return actions.filter((action) => action.quick);
+        },
     },
 };
 </script>

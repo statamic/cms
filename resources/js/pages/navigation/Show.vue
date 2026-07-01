@@ -369,23 +369,34 @@ export default {
                 :item="handle"
                 @started="actionStarted"
                 @completed="actionCompleted"
-                v-slot="{ actions: preparedActions }"
             >
-                <Dropdown placement="left-start" v-if="canEdit || canEditBlueprint || hasItemActions">
-                    <DropdownMenu>
-                        <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
-                        <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
-                        <DropdownSeparator v-if="hasItemActions && (canEdit || canEditBlueprint)" />
-                        <DropdownItem
-                            v-for="action in preparedActions"
-                            :key="action.handle"
-                            :text="__(action.title)"
-                            :icon="action.icon"
-                            :variant="action.dangerous ? 'destructive' : 'default'"
-                            @click="action.run"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+	            <template #default="{ actions: preparedActions }">
+	                <Dropdown placement="left-start" v-if="canEdit || canEditBlueprint || hasItemActions">
+	                    <DropdownMenu>
+	                        <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
+	                        <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+	                        <DropdownSeparator v-if="hasItemActions && (canEdit || canEditBlueprint)" />
+	                        <DropdownItem
+	                            v-for="action in preparedActions"
+	                            :key="action.handle"
+	                            :text="__(action.title)"
+	                            :icon="action.icon"
+	                            :variant="action.dangerous ? 'destructive' : 'default'"
+	                            @click="action.run"
+	                        />
+	                    </DropdownMenu>
+	                </Dropdown>
+	            </template>
+	            <template #quick="{ actions }">
+		            <Button
+			            v-for="action in actions"
+			            :key="action.handle"
+			            :text="__(action.title)"
+			            :icon="action.icon"
+			            :variant="action.dangerous ? 'danger' : 'default'"
+			            @click="action.run"
+		            />
+	            </template>
             </ItemActions>
             <Dropdown v-else-if="canEdit || canEditBlueprint" placement="left-start">
                 <DropdownMenu>

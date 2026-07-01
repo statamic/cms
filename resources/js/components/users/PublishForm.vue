@@ -10,26 +10,38 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
-                v-slot="{ actions: itemActions }"
             >
-                <Dropdown>
-                    <template #trigger>
-                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
-                    </template>
-                    <DropdownMenu>
-                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                        <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
-                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
-                        <DropdownItem
-                            v-for="action in itemActions"
-                            :key="action.handle"
-                            :text="__(action.title)"
-                            :icon="action.icon"
-                            :variant="action.dangerous ? 'destructive' : 'default'"
-                            @click="action.run"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+	            <template #default="{ actions: itemActions }">
+	                <Dropdown>
+	                    <template #trigger>
+	                        <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+	                    </template>
+	                    <DropdownMenu>
+	                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+	                        <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
+	                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+	                        <DropdownItem
+	                            v-for="action in itemActions"
+	                            :key="action.handle"
+	                            :text="__(action.title)"
+	                            :icon="action.icon"
+	                            :variant="action.dangerous ? 'destructive' : 'default'"
+	                            @click="action.run"
+	                        />
+	                    </DropdownMenu>
+	                </Dropdown>
+	            </template>
+
+	            <template #quick="{ actions }">
+		            <Button
+			            v-for="action in actions"
+			            :key="action.handle"
+			            :text="__(action.title)"
+			            :icon="action.icon"
+			            :variant="action.dangerous ? 'danger' : 'default'"
+			            @click="action.run"
+		            />
+	            </template>
             </ItemActions>
 
             <TwoFactor v-if="twoFactor" v-bind="twoFactor" />
