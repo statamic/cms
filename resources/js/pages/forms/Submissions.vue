@@ -969,30 +969,30 @@ function exportSubmissions() {
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <figure class="grid p-6" :aria-labelledby="numberBarChart1CaptionId">
-                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-2.25 gap-y-1.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
-                                        <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
+                                        <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10–19</span>
-                                        <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                        <div class="h-2.5 w-[15%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">20–29</span>
-                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-3" />
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                        <div class="h-2.5 w-[30%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">30%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">30–39</span>
-                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
+                                        <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">40–49</span>
-                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
+                                        <div class="h-2.5 w-[10%] rounded-full bg-chart-1" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
