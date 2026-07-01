@@ -12,6 +12,14 @@ class GlideRoutePrefixTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_registers_glide_routes_without_a_double_slash_for_a_path_prefixed_site_with_trailing_slashes()
     {
