@@ -6,8 +6,8 @@ use Exception;
 
 class OAuthEmailExistsException extends Exception
 {
-    public function __construct(public readonly ?string $email = null)
+    public function __construct()
     {
-        parent::__construct("A user already exists with the email [{$email}].");
+        parent::__construct('A user already exists with the OAuth email.');
     }
 }

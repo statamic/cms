@@ -79,7 +79,7 @@ class Provider
         $user = $this->makeUser($socialite);
 
         if (User::findByEmail($user->email())) {
-            throw new OAuthEmailExistsException($user->email());
+            throw new OAuthEmailExistsException;
         }
 
         $user->save();

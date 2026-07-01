@@ -135,7 +135,6 @@ class ProviderTest extends TestCase
             $this->provider()->createUser($this->socialite());
             $this->fail('Exception was not thrown.');
         } catch (OAuthEmailExistsException $e) {
-            $this->assertEquals('foo@bar.com', $e->email);
             $this->assertCount(1, UserFacade::all());
             $this->assertNull($this->provider()->getUserId('foo-bar'));
         }
