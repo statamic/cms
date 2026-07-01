@@ -385,14 +385,14 @@ function exportSubmissions() {
 
             <template #results>
                 <!-- Example of a Multiple Choice field type (Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                <div class="mt-6 pb-6 widgets @container/widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                <div class="@container/widgets widgets flex flex-wrap mt-6 pb-6 gap-y-6 -mx-2 sm:-mx-3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Wake me up')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-radio"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <figure class="pie-chart-figure">
                                 <div
@@ -439,13 +439,13 @@ function exportSubmissions() {
                     <!-- Example of a Multiple Choice field type (Pie Chart) with Pagination. The idea here is when there are _more_ than four response options, we can paginate the chart. In such a case, the fourth option shows as "Other", and the second widget shows the "other" segment broken down into the remaining response options.
 
                     We should dynamically generate the ids to be unique here, so that everything remains accessible.-->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Pie chart pagination demo')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-radio"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <template #actions>
                                 <Pagination
@@ -539,20 +539,20 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of a Ranking field type (Horizontal Lollipop Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Rank your favourite seasons')"
                             title-tag="h2"
                             class="h-full"
                             icon="rank"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="lollipopChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                            <figure class="grid p-6" :aria-labelledby="lollipopChart1CaptionId">
+                                <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Summer</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Summer</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-1" />
@@ -562,7 +562,7 @@ function exportSubmissions() {
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-2" />
@@ -572,7 +572,7 @@ function exportSubmissions() {
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Spring</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Spring</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-3" />
@@ -582,7 +582,7 @@ function exportSubmissions() {
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
                                         <span class="size-2.5 rounded-xs bg-chart-4-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Winter</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Winter</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-4-legend" />
@@ -597,33 +597,33 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of a Dropdown field type (Horizontal Bar Chart Widget). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Have you seen us live before?')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-select"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="horizontalBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                            <figure class="grid p-6" :aria-labelledby="horizontalBarChart1CaptionId">
+                                <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
-                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
+                                        <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
-                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
-                                        <div class="h-2.5 rounded-full w-[10%] bg-chart-3" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
+                                        <div class="h-2.5 w-[10%] rounded-full bg-chart-3" />
                                     </li>
                                 </ol>
                                 <figcaption :id="horizontalBarChart1CaptionId" class="sr-only">
@@ -633,17 +633,17 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of an Opinion Scale field type (Vertical Bar Chart Widget). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('How likely are you to recommend us?')"
                             title-tag="h2"
                             class="h-full"
                             icon="scale-up"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <figure class="vertical-bar-chart-figure" :aria-labelledby="verticalBarChart1CaptionId">
                                 <div aria-hidden="true">
-                                    <div class="inline-flex items-center gap-2 py-1.25 px-2 border border-gray-200 dark:border-gray-700 rounded-md">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
                                         <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-xs text-gray-500 dark:text-gray-400">Average</span>
                                     </div>
                                 </div>
@@ -672,13 +672,13 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of an Image Choice field type with a chart type chooser. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('What is your spirit animal?')"
                             title-tag="h2"
                             class="h-full"
                             icon="image-select"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <template #actions>
                                 <ToggleGroup v-model="imageChoiceChart1Type" size="sm">
@@ -698,19 +698,19 @@ function exportSubmissions() {
                             </template>
                             <figure
                                 v-if="imageChoiceChart1Type === 'bar'"
-                                class="p-6 grid"
+                                class="grid p-6"
                                 :aria-labelledby="imageChoiceBarChart1CaptionId"
                             >
-                                <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li
                                         v-for="(option, index) in imageChoicePieChart1Data"
                                         :key="option.badge"
                                         class="contents"
                                     >
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
-                                        <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" />
+                                        <img class="size-10 shrink-0 object-cover rounded-full" :src="option.image" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         <div
                                             class="h-2.5 rounded-full"
                                             :class="index === 1 ? 'bg-chart-2' : 'bg-chart-1'"
@@ -752,12 +752,12 @@ function exportSubmissions() {
                                 </div>
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
                                     <p class="sr-only">{{ imageChoicePieChart1AccessibleLabel }}</p>
-                                    <ol class="m-0 list-none grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
+                                    <ol class="grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
                                         <template v-for="option in imageChoicePieChart1Data" :key="option.badge">
                                             <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
-                                            <img class="size-10 shrink-0 rounded-full object-cover" :src="option.image" alt="" />
+                                            <img class="size-10 shrink-0 object-cover rounded-full" :src="option.image" alt="" />
                                             <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
-                                            <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
+                                            <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         </template>
                                     </ol>
                                 </figcaption>
@@ -765,39 +765,39 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of a Checkboxes field type (Horizontal Bar Chart with checkbox icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Who have you seen live?')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-checkboxes"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="checkboxesBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                            <figure class="grid p-6" :aria-labelledby="checkboxesBarChart1CaptionId">
+                                <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Radiohead</span>
-                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Radiohead</span>
+                                        <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Death Cab for Cutie</span>
-                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Death Cab for Cutie</span>
+                                        <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-3-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">Olivia Rodrigo</span>
-                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-3" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Olivia Rodrigo</span>
+                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-3" />
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-4-legend" />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">The Cure</span>
-                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-4-legend" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">The Cure</span>
+                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
                                     </li>
                                 </ol>
                                 <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
@@ -807,13 +807,13 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of a yes/no field type with a chart type chooser. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Do you fancy a pint?')"
                             title-tag="h2"
                             class="h-full"
                             icon="checkmark-circle"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <template #actions>
                                 <ToggleGroup v-model="yesNoChart1Type" size="sm">
@@ -833,10 +833,10 @@ function exportSubmissions() {
                             </template>
                             <figure
                                 v-if="yesNoChart1Type === 'bar'"
-                                class="p-6 grid"
+                                class="grid p-6"
                                 :aria-labelledby="yesNoBarChart1CaptionId"
                             >
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li
                                         v-for="option in yesNoChart1Data"
                                         :key="option.label"
@@ -848,7 +848,7 @@ function exportSubmissions() {
                                             class="size-3.5 shrink-0"
                                             :class="option.chartColor === 2 ? 'text-chart-2-legend' : 'text-chart-1-legend'"
                                         />
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         <div
                                             class="h-2.5 rounded-full"
                                             :class="option.chartColor === 2 ? 'bg-chart-2' : 'bg-chart-1'"
@@ -898,13 +898,13 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of a Dictionary field type (Horizontal Lollipop Chart with icons) with Pagination. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('What’s your favourite country?')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-dictionary"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <template #actions>
                                 <Pagination
@@ -917,15 +917,15 @@ function exportSubmissions() {
                                 />
                             </template>
                             <p class="sr-only" aria-live="polite">{{ dictionaryChartAccessibleLabel }}</p>
-                            <figure v-if="dictionaryChartPage === 1" class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_max-content_1fr] items-center gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
+                            <figure v-if="dictionaryChartPage === 1" class="grid p-6" :aria-labelledby="dictionaryChart1CaptionId">
+                                <ol class="grid grid-cols-[auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
                                     <li
                                         v-for="item in dictionaryChart1Page1Data"
                                         :key="item.label"
                                         class="contents"
                                     >
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.rank }}</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
                                             <div class="text-lg">{{ item.flag }}</div>
@@ -937,15 +937,15 @@ function exportSubmissions() {
                                     {{ __('What’s your favourite country?: Japan 40%, Italy 35%, USA 10%, UK 8%, France 3%') }}
                                 </figcaption>
                             </figure>
-                            <figure v-else-if="dictionaryChartPage === 2" class="p-6 grid" :aria-labelledby="dictionaryChart1Page2CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_max-content_1fr] items-center gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
+                            <figure v-else-if="dictionaryChartPage === 2" class="grid p-6" :aria-labelledby="dictionaryChart1Page2CaptionId">
+                                <ol class="grid grid-cols-[auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
                                     <li
                                         v-for="item in dictionaryChart1Page2Data"
                                         :key="item.label"
                                         class="contents"
                                     >
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.rank }}</span>
-                                        <span class="truncate max-w-25 me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
                                             <div class="text-lg">{{ item.flag }}</div>
@@ -960,39 +960,39 @@ function exportSubmissions() {
                         </Widget>
                     </div>
                     <!-- Example of a Number field type (Horizontal Bar Chart with info). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('How old are you?')"
                             title-tag="h2"
                             class="h-full"
                             icon="number"
-                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="p-6 grid" :aria-labelledby="numberBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_1fr_max-content] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                            <figure class="grid p-6" :aria-labelledby="numberBarChart1CaptionId">
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
-                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
+                                        <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10–19</span>
-                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                        <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">20–29</span>
-                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-3" />
+                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-3" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">30–39</span>
-                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-4-legend" />
+                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">40–49</span>
-                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-4-legend" />
+                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
@@ -1009,14 +1009,14 @@ function exportSubmissions() {
         <Modal :open="exportModalOpen" @update:open="exportModalOpen = $event" :title="__('Export Submissions')">
             <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-medium mb-1.5 block">{{ __('Format') }}</label>
+                    <label class="block mb-1.5 text-sm font-medium">{{ __('Format') }}</label>
                     <RadioGroup v-model="exportFormat" inline>
                         <Radio v-for="format in exporters" :key="format.handle" :value="format.handle" :label="format.title" />
                     </RadioGroup>
                 </div>
 
                 <div>
-                    <label class="text-sm font-medium mb-1.5 block">{{ __('Submissions') }}</label>
+                    <label class="block mb-1.5 text-sm font-medium">{{ __('Submissions') }}</label>
                     <RadioGroup v-model="exportScope">
                         <Radio value="all" :label="__('All Submissions')" />
                         <Radio value="filtered" :label="__('Filtered Submissions')" :description="__('statamic::messages.form_export_filtered_description')" :disabled="!hasFilteredScope" />
