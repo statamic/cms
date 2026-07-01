@@ -11,7 +11,7 @@ class OAuthRedirectTest extends TestCase
     #[Test]
     public function it_redirects_to_local_url()
     {
-        session(['_previous.url' => 'http://localhost/oauth/test?redirect=/dashboard']);
+        session(['statamic.oauth.redirect' => '/dashboard']);
 
         $this->assertEquals('/dashboard', $this->getSuccessRedirectUrl());
     }
@@ -19,7 +19,7 @@ class OAuthRedirectTest extends TestCase
     #[Test]
     public function it_does_not_redirect_to_external_url()
     {
-        session(['_previous.url' => 'http://localhost/oauth/test?redirect=https://evil.com']);
+        session(['statamic.oauth.redirect' => 'https://evil.com']);
 
         $this->assertEquals('/', $this->getSuccessRedirectUrl());
     }
