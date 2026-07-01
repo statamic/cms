@@ -156,7 +156,6 @@ trait RendersForms
             'default' => $default,
             'old' => old($field->handle()),
             'value' => $value,
-            'is_informative' => in_array('information', $field->formField()?->fieldtype()?->categories() ?? []),
         ], $field->fieldtype()->extraRenderableFieldData());
 
         $data = $field
