@@ -299,7 +299,7 @@
         }
 
         .chart-reveal .summary-bar-chart__fill {
-            animation: bar-chart-reveal 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            animation: bar-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
         }
     }
 }
