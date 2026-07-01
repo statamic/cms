@@ -160,6 +160,18 @@ EOT;
             'key' => 'saveQuietly',
         ]));
         $this->assertFalse($object->savedQuietly);
+
+        // The same guard covers literal colon path syntax, which flows through
+        // the same dispatch branch.
+        $this->assertEquals('', $this->renderString('{{ object:delete }}', [
+            'object' => $object,
+        ]));
+        $this->assertFalse($object->deleted);
+
+        $this->assertEquals('', $this->renderString('{{ object:forceDelete }}', [
+            'object' => $object,
+        ]));
+        $this->assertFalse($object->forceDeleted);
     }
 
     #[Test]
