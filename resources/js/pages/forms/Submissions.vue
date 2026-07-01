@@ -386,7 +386,7 @@ function exportSubmissions() {
 
             <template #results>
                 <!-- Example of a Multiple Choice field type (Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                <div class="@container/widgets widgets flex flex-wrap mt-6 pb-6 gap-y-6 -mx-2 sm:-mx-3">
+                <div class="@container/widgets widgets flex flex-wrap mt-6 pb-8 gap-y-6 -mx-2 sm:-mx-3">
                     <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('Wake me up')"
@@ -837,7 +837,7 @@ function exportSubmissions() {
                                 class="grid p-6"
                                 :aria-labelledby="yesNoBarChart1CaptionId"
                             >
-                                <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
                                     <li
                                         v-for="option in yesNoChart1Data"
                                         :key="option.label"
@@ -1003,6 +1003,55 @@ function exportSubmissions() {
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">40–49</span>
+                                        <div class="h-2.5 w-[10%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                </ol>
+                                <figcaption :id="numberBarChart1CaptionId" class="sr-only">
+                                    {{ __('How old are you?: Min–Max 4–44, Average 26.2. Age distribution: 0–9: 20%, 10–19: 15%, 20–29: 30%, 30–39: 20%, 40–49: 20%') }}
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                    <!-- Example of a Star Rating field type (Horizontal Star Rating Bar Chart with info). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                        <Widget
+                            :title="__('How would you rate the hotel?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="star"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
+                        >
+                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="numberBarChart1CaptionId">
+                                <div aria-hidden="true" class="pb-5">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                        <span class="text-xs font-semibold st-text-trim-cap tabular-nums">4–44</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
+                                    </div>
+                                </div>
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
+                                        <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
+                                        <div class="h-2.5 w-[15%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
+                                        <div class="h-2.5 w-[30%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">30%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
+                                        <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <div class="h-2.5 w-[10%] rounded-full bg-chart-1" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
