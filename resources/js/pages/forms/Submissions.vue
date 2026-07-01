@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, useId, nextTick } from 'vue';
+import { ref, computed, watch, useId } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination, Icon, Switch } from '@ui';
@@ -8,6 +8,7 @@ import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
+import useSummaryChartType from '@/composables/use-summary-chart-type.js';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -133,8 +134,6 @@ const yesNoChart1AccessibleLabel = computed(() =>
         .join(', '),
 );
 
-const yesNoChart1Type = ref('bar');
-
 const imageChoicePieChart1Data = [
     { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/id/159/320/320' },
     { percent: 45, badge: 'B', label: 'Nope', image: 'https://picsum.photos/id/485/320/320' },
@@ -145,8 +144,6 @@ const imageChoicePieChart1AccessibleLabel = computed(() =>
         .map((option) => `${option.label} (${option.badge}) ${option.percent}%`)
         .join(', '),
 );
-
-const imageChoiceChart1Type = ref('bar');
 
 const verticalBarChart1Data = [
     { label: '0', percent: 2 },
@@ -282,48 +279,17 @@ function exportSubmissions() {
     exportModalOpen.value = false;
 }
 
-/*
- * Chart reveal animations (see charts.css: pie-chart-reveal, bar-chart-reveal).
- *
- * Toggles the chart-reveal class briefly so the animation can replay when a
- * widget’s chart type changes — pie sweep or bar grow — not on summary enter
- * or pagination.
- */
-const CHART_REVEAL_MS = 1100;
+const {
+    chartType: yesNoChart1Type,
+    isRevealing: yesNoChartIsRevealing,
+    setChartType: setYesNoChart1Type,
+} = useSummaryChartType(props.form.handle, 'yes-no-1');
 
-function createChartReveal() {
-    const isRevealing = ref(false);
-    let timeoutId;
-
-    function trigger() {
-        clearTimeout(timeoutId);
-        isRevealing.value = false;
-
-        nextTick(() => {
-            isRevealing.value = true;
-            timeoutId = setTimeout(() => {
-                isRevealing.value = false;
-            }, CHART_REVEAL_MS);
-        });
-    }
-
-    return { isRevealing, trigger };
-}
-
-const yesNoChartReveal = createChartReveal();
-const imageChoiceChartReveal = createChartReveal();
-
-watch(yesNoChart1Type, (type, previousType) => {
-    if (previousType !== undefined) {
-        yesNoChartReveal.trigger();
-    }
-});
-
-watch(imageChoiceChart1Type, (type, previousType) => {
-    if (previousType !== undefined) {
-        imageChoiceChartReveal.trigger();
-    }
-});
+const {
+    chartType: imageChoiceChart1Type,
+    isRevealing: imageChoiceChartIsRevealing,
+    setChartType: setImageChoiceChart1Type,
+} = useSummaryChartType(props.form.handle, 'image-choice-1');
 </script>
 
 <template>
@@ -755,7 +721,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <template #actions>
-                                <ToggleGroup v-model="imageChoiceChart1Type" size="sm">
+                                <ToggleGroup :model-value="imageChoiceChart1Type" @update:model-value="setImageChoiceChart1Type" size="sm">
                                     <ToggleItem
                                         value="bar"
                                         icon="charts-bar-horizontal"
@@ -773,7 +739,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                             <figure
                                 v-if="imageChoiceChart1Type === 'bar'"
                                 class="grid p-6"
-                                :class="{ 'chart-reveal': imageChoiceChartReveal.isRevealing }"
+                                :class="{ 'chart-reveal': imageChoiceChartIsRevealing }"
                                 :aria-labelledby="imageChoiceBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
@@ -797,7 +763,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                                     {{ __('What is your spirit animal?: Actually 55%, Nope 45%') }}
                                 </figcaption>
                             </figure>
-                            <figure v-else class="image-pie-chart-figure" :class="{ 'chart-reveal': imageChoiceChartReveal.isRevealing }">
+                            <figure v-else class="image-pie-chart-figure" :class="{ 'chart-reveal': imageChoiceChartIsRevealing }">
                                 <div
                                     class="image-pie-chart"
                                     :style="{
@@ -891,7 +857,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
                             <template #actions>
-                                <ToggleGroup v-model="yesNoChart1Type" size="sm">
+                                <ToggleGroup :model-value="yesNoChart1Type" @update:model-value="setYesNoChart1Type" size="sm">
                                     <ToggleItem
                                         value="bar"
                                         icon="charts-bar-horizontal"
@@ -909,7 +875,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                             <figure
                                 v-if="yesNoChart1Type === 'bar'"
                                 class="grid p-6"
-                                :class="{ 'chart-reveal': yesNoChartReveal.isRevealing }"
+                                :class="{ 'chart-reveal': yesNoChartIsRevealing }"
                                 :aria-labelledby="yesNoBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
@@ -936,7 +902,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                                     {{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}
                                 </figcaption>
                             </figure>
-                            <figure v-else class="pie-chart-figure" :class="{ 'chart-reveal': yesNoChartReveal.isRevealing }">
+                            <figure v-else class="pie-chart-figure" :class="{ 'chart-reveal': yesNoChartIsRevealing }">
                                 <div
                                     class="pie-chart"
                                     :style="{

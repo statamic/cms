@@ -285,36 +285,15 @@
         to { transform: scaleX(1); }
     }
 
-    .summary-bar-chart__fill {
-        transform-origin: left center;
-    }
-
-    .pie-chart__disc,
-    .image-pie-chart__disc {
-        -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
-        mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
-        --pie-reveal: 360deg;
-    }
-
     .content-card:has([data-submission-summary]) {
         .chart-reveal .pie-chart__disc,
         .chart-reveal .image-pie-chart__disc {
+            -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+            mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+            --pie-reveal: 0deg;
             animation: pie-chart-reveal 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
         }
 
-        .chart-reveal .summary-bar-chart__fill {
-            animation: bar-chart-reveal 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
-        }
-    }
-
-    /* GROUP CHARTS / ANIMATIONS / BAR CHART
-    =================================================== */
-    @keyframes bar-chart-reveal {
-        from { transform: scaleX(0); }
-        to { transform: scaleX(1); }
-    }
-
-    .content-card:has([data-submission-summary]) {
         .summary-bar-chart__fill {
             transform-origin: left center;
         }
