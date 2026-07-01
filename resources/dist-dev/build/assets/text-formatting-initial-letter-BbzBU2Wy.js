@@ -1,0 +1,4 @@
+//#region resources/svg/icons/text-formatting-initial-letter.svg?raw
+var text_formatting_initial_letter_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 14 14\"><g stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8.099 2.23h5.4M8.099 5.987h5.4M.5 9.743h13M.5 13.5h13M.667 5.987C.897 4.85 1.586.5 2.954.5S5.01 4.85 5.24 5.987M1.277 4.158h3.354\"/></g></svg>";
+//#endregion
+export { text_formatting_initial_letter_default as default };

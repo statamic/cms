@@ -1,0 +1,4 @@
+//#region resources/svg/icons/handles-sm.svg?raw
+var handles_sm_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 8 13\" fill=\"none\">\n  <circle cx=\"1.28214\" cy=\"6.5333\" r=\"1.26651\" fill=\"currentColor\"/>\n  <circle cx=\"1.26651\" cy=\"1.38962\" r=\"1.26651\" fill=\"currentColor\"/>\n  <circle cx=\"1.28214\" cy=\"11.6101\" r=\"1.26651\" fill=\"currentColor\"/>\n  <circle cx=\"6.11821\" cy=\"6.53343\" r=\"1.26665\" fill=\"currentColor\"/>\n  <circle cx=\"6.10258\" cy=\"1.38975\" r=\"1.26665\" fill=\"currentColor\"/>\n  <circle cx=\"6.11821\" cy=\"11.6102\" r=\"1.26665\" fill=\"currentColor\"/>\n</svg>\n";
+//#endregion
+export { handles_sm_default as default };

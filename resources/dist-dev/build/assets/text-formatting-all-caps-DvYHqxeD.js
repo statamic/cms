@@ -1,0 +1,4 @@
+//#region resources/svg/icons/text-formatting-all-caps.svg?raw
+var text_formatting_all_caps_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 14 14\"><g stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7.863 5.335v-.484c0-.48.34-.896.815-.961a14.4 14.4 0 0 1 4.006 0 .96.96 0 0 1 .816.961v.484M.5 5.335v-.484c0-.48.34-.896.816-.961a14.4 14.4 0 0 1 4.005 0 .96.96 0 0 1 .816.961v.484M10.682 3.75v6.389M3.319 3.75v6.389M9.429 10.25a7.1 7.1 0 0 1 2.505 0M2.066 10.25a7.1 7.1 0 0 1 2.505 0\"/></g></svg>";
+//#endregion
+export { text_formatting_all_caps_default as default };

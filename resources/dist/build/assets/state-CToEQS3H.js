@@ -1,0 +1,1 @@
+import{n as e}from"./chunk-QTnfLwEv.js";import{a as t,c as n,i as r,l as i,n as a,o,r as s,s as c,t as l}from"./dist-QDMyV7f4.js";var u=e({AllSelection:()=>l,EditorState:()=>a,NodeSelection:()=>s,Plugin:()=>r,PluginKey:()=>t,Selection:()=>o,SelectionRange:()=>c,TextSelection:()=>n,Transaction:()=>i});export{u as t};
