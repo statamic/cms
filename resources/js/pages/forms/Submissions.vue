@@ -548,7 +548,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="lollipopChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
@@ -606,7 +606,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="horizontalBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
@@ -767,14 +767,14 @@ function exportSubmissions() {
                     <!-- Example of a Checkboxes field type (Horizontal Bar Chart with checkbox icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
                         <Widget
-                            :title="__('Have you seen us live before?')"
+                            :title="__('Who have you seen live?')"
                             title-tag="h2"
                             class="h-full"
                             icon="fieldtype-checkboxes"
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="checkboxesBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_auto_max-content_1fr] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
@@ -801,7 +801,7 @@ function exportSubmissions() {
                                     </li>
                                 </ol>
                                 <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
-                                    {{ __('Have you seen us live before?: Radiohead 55%, Death Cab for Cutie 35%, Olivia Rodrigo 5%, The Cure 5%') }}
+                                    {{ __('Who have you seen live?: Radiohead 55%, Death Cab for Cutie 35%, Olivia Rodrigo 5%, The Cure 5%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
@@ -919,7 +919,7 @@ function exportSubmissions() {
                             <p class="sr-only" aria-live="polite">{{ dictionaryChartAccessibleLabel }}</p>
                             <figure v-if="dictionaryChartPage === 1" class="p-6 grid" :aria-labelledby="dictionaryChart1CaptionId">
                                 <ol
-                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] grid-rows-5 gap-x-2.25"
+                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3"
                                     aria-hidden="true"
                                 >
                                     <li
@@ -942,7 +942,7 @@ function exportSubmissions() {
                             </figure>
                             <figure v-else-if="dictionaryChartPage === 2" class="p-6 grid" :aria-labelledby="dictionaryChart1Page2CaptionId">
                                 <ol
-                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] grid-rows-5 gap-x-2.25"
+                                    class="m-0 list-none grid items-center grid-cols-[auto_max-content_1fr] gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3"
                                     aria-hidden="true"
                                 >
                                     <li
@@ -975,7 +975,7 @@ function exportSubmissions() {
                             icon-class="size-4 text-gray-500 hidden @xs/widget:block"
                         >
                             <figure class="p-6 grid" :aria-labelledby="numberBarChart1CaptionId">
-                                <ol class="m-0 list-none grid grid-cols-[auto_1fr_max-content] items-center gap-x-2.25 gap-y-2.5 p-0" aria-hidden="true">
+                                <ol class="m-0 list-none grid grid-cols-[auto_1fr_max-content] items-center gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
                                         <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
