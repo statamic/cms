@@ -3,9 +3,11 @@ import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, StatusIndicator } from '@ui';
+import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
 import Head from '@/pages/layout/Head.vue';
+import { buildFieldNumbersFromLogicFields, useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { keys } from '@api';
 import axios from 'axios';
@@ -22,6 +24,8 @@ const props = defineProps({
 
 const pages = ref(props.pages);
 const fields = ref(props.fields);
+const { showFieldNumbers } = useFieldNumberingPreference();
+const fieldNumbers = computed(() => buildFieldNumbersFromLogicFields(fields.value));
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
@@ -113,6 +117,9 @@ onUnmounted(() => {
                 <StatusIndicator status="published" />
                 {{ __(form.title) }}
             </template>
+            <template #actions>
+                <FieldNumberingToggle />
+            </template>
         </Header>
 
         <PageLogic
@@ -127,6 +134,8 @@ onUnmounted(() => {
             v-model:fields="fields"
             :suggestable-fields
             :fieldtypes
+            :show-field-numbers
+            :field-numbers
         />
     </div>
 </template>
