@@ -2,13 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Forms\Fields\FormField;
-use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -75,7 +73,7 @@ class FormLogicController extends CpController
                     if (isset($config['import'])) {
                         $fieldset = FieldsetRepository::find($config['import']);
 
-                        foreach ($formFields->importedFields($config) as $formField) {
+                        foreach ($formFields->getImportedFields($config) as $formField) {
                             $fields[] = $this->formFieldToVue(
                                 $formField,
                                 $pageIndex,
@@ -108,32 +106,6 @@ class FormLogicController extends CpController
                     );
 
                     $isFirstFieldInSection = false;
-
-                    $handle = $config['handle'];
-                    $field = $config['field'] ?? [];
-                    $fieldtype = FormFieldtypeRepository::find($config['field']['type']);
-
-                    $result = [
-                        '_id' => $handle,
-                        'handle' => $handle,
-                        'page_index' => $pageIndex,
-                        'display' => $field['display'] ?? $handle,
-                        'icon' => $fieldtype?->icon() ?? 'generic-field',
-                        'category' => $fieldtype->categories()[0] ?? 'other',
-                        'fieldtype' => $field['type'] ?? 'short_answer',
-                        'hidden' => $field['hidden'] ?? false,
-                        'if' => $field['if'] ?? null,
-                        'unless' => $field['unless'] ?? null,
-                        'if_any' => $field['if_any'] ?? null,
-                        'unless_any' => $field['unless_any'] ?? null,
-                        'always_save' => $field['always_save'] ?? false,
-                    ];
-
-                    if (isset($field['options'])) {
-                        $result['options'] = $field['options'];
-                    }
-
-                    $fields[] = $result;
                 }
             }
         }
@@ -164,6 +136,7 @@ class FormLogicController extends CpController
             'category' => $fieldtype->categories()[0] ?? 'other',
             'fieldtype' => $fieldConfig['type'] ?? 'short_answer',
             'type' => $type,
+            'hidden' => $fieldConfig['hidden'] ?? false,
             'if' => $fieldConfig['if'] ?? null,
             'unless' => $fieldConfig['unless'] ?? null,
             'if_any' => $fieldConfig['if_any'] ?? null,

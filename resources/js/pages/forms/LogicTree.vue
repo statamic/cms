@@ -211,6 +211,7 @@ const fieldIconClass = (field) => {
                             <li
                                 v-for="(group, groupIndex) in section.groups"
                                 :key="group.field._id"
+                                v-tooltip="group.field.import ? __('Logic can\'t be added to imported fields. Edit the fieldset instead.') : null"
                                 :class="{
                                     'linked-list__connector': fieldConnection(group.field),
                                     'linked-list__page-leap': fieldConnection(group.field)?.leap,

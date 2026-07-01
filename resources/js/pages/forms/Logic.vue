@@ -40,6 +40,7 @@ const errors = ref({});
 
 const suggestableFields = computed(() => {
     return fields.value
+        .filter(field => !field.import)
         .filter(field => !['information', 'structure'].includes(field.category))
         .map(field => ({
             handle: field.handle,

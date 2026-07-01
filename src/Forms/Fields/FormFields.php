@@ -74,11 +74,6 @@ class FormFields
         return $this->fields()->get($handle);
     }
 
-    public function importedFields(array $config): array
-    {
-        return $this->getImportedFields($config);
-    }
-
     public function toBlueprint(): Blueprint
     {
         $tabs = $this->pages()
@@ -141,7 +136,7 @@ class FormFields
     /**
      * Borrowed from \Statamic\Fields\Fields.
      */
-    private function getImportedFields(array $config): array
+    public function getImportedFields(array $config): array
     {
         $recursion = tap(app(FieldsetRecursionStack::class))->push($config['import']);
 

@@ -19,14 +19,19 @@ const props = defineProps({
 
 const collapsed = ref([]);
 
+// Imported fieldset fields can't have logic attached - their config lives in the
+// fieldset, not the form - so they're excluded from the rule editor. They still
+// appear in the tree view and remain available as conditions on other fields.
+const logicableFields = computed(() => props.fields.filter(field => !field.import));
+
 const fieldsWithLogic = computed(() => {
-    return props.fields.filter(field => {
+    return logicableFields.value.filter(field => {
         return field.hidden || KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
     });
 });
 
 const fieldsWithoutLogic = computed(() => {
-    return props.fields.filter(field => {
+    return logicableFields.value.filter(field => {
         return !field.hidden && !KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
     });
 });
