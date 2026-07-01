@@ -2,7 +2,7 @@
 import { ref, computed, watch, useId } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination, Icon } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem, ToggleGroup, ToggleItem, Widget, Pagination, Icon, Switch } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -1235,6 +1235,45 @@ function exportSubmissions() {
                                 </ol>
                                 <figcaption :id="starRatingChart2Page2CaptionId" class="sr-only">
                                     {{ __('How would you rate the restaurant?: 7/10 average. Rating distribution: 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%') }}
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                    <!-- Example of a Toggle field type (Single fillable bar chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                        <Widget
+                            :title="__('Sign up to our newsletter')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="fieldtype-toggle"
+                            icon-class="hidden @xs/widget:block size-4 text-gray-500"
+                        >
+                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="starRatingChart3CaptionId">
+                                <div aria-hidden="true" class="pb-5">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
+                                    </div>
+                                </div>
+                                <!--
+                                    Star row colors use oklch relative lightness from --color-chart-1-legend:
+                                    - Midpoint star uses chart-1-legend (3/5 in the hotel demo; 4/10 in the restaurant demo).
+                                    - 5 stars or fewer: darker stars use l*0.9, l*0.8 (−0.1 per step); lighter stars use l*1.2, l*1.4 (+0.2 per step).
+                                    - 6 stars or more: darker stars use −0.05 per step (e.g. l*0.9, l*0.85, l*0.8, l*0.75, l*0.7); lighter stars use l*1.1, l*1.2, l*1.4 (+0.1, then +0.2).
+                                 -->
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                                    <li class="contents">
+                                        <Switch :model-value="true" tabindex="-1" class="pointer-events-none data-[state=checked]:!border-gray-950 data-[state=checked]:!bg-gray-950" />
+                                        <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                </ol>
+                                <figcaption :id="starRatingChart3CaptionId" class="sr-only">
+                                    {{ __('How would you rate the hotel?: 3/5 average. Rating distribution: 5 stars 20%, 4 stars 15%, 3 stars 30%, 2 stars 20%, 1 star 20%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
