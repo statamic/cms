@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use Statamic\Events\CollectionTreeSaved;
+use Statamic\Structures\CollectionTree;
 
 class UpdateStructuredEntryOrderAndParent
 {
@@ -23,7 +24,7 @@ class UpdateStructuredEntryOrderAndParent
         $collection->updateEntryOrder($this->idsWithDescendants($tree, $moved, $ids));
     }
 
-    private function idsWithDescendants($tree, array $moved, array $ids): array
+    private function idsWithDescendants(CollectionTree $tree, array $moved, array $ids): array
     {
         return collect($moved)
             ->flatMap(function ($id) use ($tree) {
