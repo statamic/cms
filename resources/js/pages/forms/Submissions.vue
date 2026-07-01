@@ -440,7 +440,7 @@ function exportSubmissions() {
                                     <span class="pie-chart__label | pie-chart__label--4" aria-hidden="true">10%</span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
-                                <figcaption :id="pieChart1LegendId" class="pie-chart-legend">
+                                <figcaption :id="pieChart1LegendId" class="pie-chart-legend starting-style-transition-children">
                                     <ol class="pie-chart-legend__list">
                                         <li class="pie-chart-legend__item">
                                             <span class="pie-chart-legend__value">45%</span>
@@ -1072,31 +1072,31 @@ function exportSubmissions() {
                                 <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <div class="h-2.5 w-[15%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-chart-1-legend" />
                                         <div class="h-2.5 w-[30%] rounded-full bg-chart-1-legend" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">30%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <div class="h-2.5 w-[10%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
@@ -1152,31 +1152,31 @@ function exportSubmissions() {
                                 <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
                                         <div class="h-2.5 w-[18%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">18%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">9</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
                                         <div class="h-2.5 w-[16%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">16%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">8</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <div class="h-2.5 w-[14%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">14%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">7</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
                                         <div class="h-2.5 w-[12%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">12%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">6</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <div class="h-2.5 w-[10%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                     </li>
@@ -1185,9 +1185,9 @@ function exportSubmissions() {
                                     {{ __('How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%') }}
                                 </figcaption>
                             </figure>
-                            <figure v-else-if="starRatingChart2Page === 2" class="grid p-6 pt-3 ps-3" :aria-labelledby="starRatingChart2Page2CaptionId">
+                            <figure v-else-if="starRatingChart2Page === 2" class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart2Page2CaptionId">
                                 <div aria-hidden="true" class="pb-5">
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
@@ -1204,31 +1204,31 @@ function exportSubmissions() {
                                 <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <div class="h-2.5 w-[8%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">8%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-chart-1-legend" />
                                         <div class="h-2.5 w-[7%] rounded-full bg-chart-1-legend" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">7%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
                                         <div class="h-2.5 w-[6%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">6%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <div class="h-2.5 w-[5%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <div class="h-2.5 w-[4%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4%</span>
                                     </li>
