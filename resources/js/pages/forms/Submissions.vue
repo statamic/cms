@@ -54,6 +54,7 @@ const numberBarChart1CaptionId = useId();
 const starRatingChart1CaptionId = useId();
 const starRatingChart2CaptionId = useId();
 const starRatingChart2Page2CaptionId = useId();
+const starRatingChart3CaptionId = useId();
 
 const starRatingChart2Page = ref(1);
 const starRatingChart2PerPage = 5;
@@ -75,10 +76,10 @@ const starRatingChart2Meta = computed(() => {
 
 const starRatingChart2AccessibleLabel = computed(() => {
     if (starRatingChart2Page.value === 1) {
-        return __('10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%');
+        return __('How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%');
     }
 
-    return __('5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%');
+    return __('How would you rate the restaurant?: 7/10 average. Rating distribution: 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%');
 });
 
 const dictionaryChart1Page1Data = [
