@@ -34,7 +34,7 @@ class FormsController extends CpController
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
-                    'submissions' => $form->querySubmissions()->count(),
+                    'submissions' => $form->querySubmissions()->whereNull('partial')->count(),
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
