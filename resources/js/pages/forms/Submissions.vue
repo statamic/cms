@@ -283,13 +283,13 @@ function exportSubmissions() {
 }
 
 /*
- * Pie chart reveal animation (see charts.css: pie-chart-reveal).
+ * Chart reveal animations (see charts.css: pie-chart-reveal, bar-chart-reveal).
  *
- * Toggles the chart-reveal class briefly so the sweep animation can replay.
- * Used when a widget’s chart type switches to pie — not on summary view enter
+ * Toggles the chart-reveal class briefly so the animation can replay when a
+ * widget’s chart type changes — pie sweep or bar grow — not on summary enter
  * or pagination.
  */
- const PIE_CHART_REVEAL_MS = 1100;
+const CHART_REVEAL_MS = 1100;
 
 function createChartReveal() {
     const isRevealing = ref(false);
@@ -303,7 +303,7 @@ function createChartReveal() {
             isRevealing.value = true;
             timeoutId = setTimeout(() => {
                 isRevealing.value = false;
-            }, PIE_CHART_REVEAL_MS);
+            }, CHART_REVEAL_MS);
         });
     }
 
@@ -314,13 +314,13 @@ const yesNoChartReveal = createChartReveal();
 const imageChoiceChartReveal = createChartReveal();
 
 watch(yesNoChart1Type, (type, previousType) => {
-    if (type === 'pie' && previousType !== undefined) {
+    if (previousType !== undefined) {
         yesNoChartReveal.trigger();
     }
 });
 
 watch(imageChoiceChart1Type, (type, previousType) => {
-    if (type === 'pie' && previousType !== undefined) {
+    if (previousType !== undefined) {
         imageChoiceChartReveal.trigger();
     }
 });
@@ -773,6 +773,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                             <figure
                                 v-if="imageChoiceChart1Type === 'bar'"
                                 class="grid p-6"
+                                :class="{ 'chart-reveal': imageChoiceChartReveal.isRevealing }"
                                 :aria-labelledby="imageChoiceBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
@@ -786,7 +787,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         <div
-                                            class="h-2.5 rounded-full"
+                                            class="summary-bar-chart__fill h-2.5 rounded-full"
                                             :class="index === 1 ? 'bg-chart-2' : 'bg-chart-1'"
                                             :style="{ width: `${option.percent}%` }"
                                         />
@@ -908,6 +909,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                             <figure
                                 v-if="yesNoChart1Type === 'bar'"
                                 class="grid p-6"
+                                :class="{ 'chart-reveal': yesNoChartReveal.isRevealing }"
                                 :aria-labelledby="yesNoBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
@@ -924,7 +926,7 @@ watch(imageChoiceChart1Type, (type, previousType) => {
                                         />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
                                         <div
-                                            class="h-2.5 rounded-full"
+                                            class="summary-bar-chart__fill h-2.5 rounded-full"
                                             :class="option.chartColor === 2 ? 'bg-chart-2' : 'bg-chart-1'"
                                             :style="{ width: `${option.percent}%` }"
                                         />
