@@ -1029,30 +1029,35 @@ function exportSubmissions() {
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
                                     </div>
                                 </div>
-                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
-                                        <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
+                                        <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
-                                        <div class="h-2.5 w-[15%] rounded-full bg-chart-1" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
+                                        <div class="h-2.5 w-[15%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
-                                        <div class="h-2.5 w-[30%] rounded-full bg-chart-1" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <div class="h-2.5 w-[30%] rounded-full bg-chart-1-legend" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">30%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
-                                        <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
+                                        <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
-                                        <div class="h-2.5 w-[10%] rounded-full bg-chart-1" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
+                                        <div class="h-2.5 w-[10%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
