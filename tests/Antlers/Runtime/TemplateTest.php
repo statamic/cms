@@ -131,6 +131,38 @@ EOT;
     }
 
     #[Test]
+    public function dynamic_key_access_on_an_object_does_not_dispatch_destructive_methods()
+    {
+        $object = new MethodDispatchObject;
+
+        // A benign accessor method still dispatches.
+        $this->assertEquals('the title', $this->renderString('{{ object:title }}', [
+            'object' => $object,
+        ]));
+
+        // Destructive methods must not be dispatched; the expression resolves to empty.
+        $this->assertEquals('', $this->renderString('{{ object[key] }}', [
+            'object' => $object,
+            'key' => 'delete',
+        ]));
+        $this->assertFalse($object->deleted);
+
+        // Str::camel() reaches camelCase mutators too (e.g. "force-delete" => "forceDelete"),
+        // and method_exists() is case-insensitive, so these must be blocked regardless of casing.
+        $this->assertEquals('', $this->renderString('{{ object[key] }}', [
+            'object' => $object,
+            'key' => 'force-delete',
+        ]));
+        $this->assertFalse($object->forceDeleted);
+
+        $this->assertEquals('', $this->renderString('{{ object[key] }}', [
+            'object' => $object,
+            'key' => 'saveQuietly',
+        ]));
+        $this->assertFalse($object->savedQuietly);
+    }
+
+    #[Test]
     public function complex_array_variable()
     {
         $template = <<<'EOT'
@@ -2714,5 +2746,32 @@ class AugmentableObject extends ArrayableObject implements Augmentable
         return (new Blueprint)->setContents(['fields' => [
             ['handle' => 'one', 'field' => ['type' => 'test']],
         ]]);
+    }
+}
+
+class MethodDispatchObject
+{
+    public $deleted = false;
+    public $forceDeleted = false;
+    public $savedQuietly = false;
+
+    public function title()
+    {
+        return 'the title';
+    }
+
+    public function delete()
+    {
+        $this->deleted = true;
+    }
+
+    public function forceDelete()
+    {
+        $this->forceDeleted = true;
+    }
+
+    public function saveQuietly()
+    {
+        $this->savedQuietly = true;
     }
 }

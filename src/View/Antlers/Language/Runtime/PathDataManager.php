@@ -17,6 +17,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Support\MethodDenylist;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -859,12 +860,20 @@ class PathDataManager
             $this->unlockData();
         }
 
-        if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {
-            $this->reducedVar = call_user_func_array([$this->reducedVar, Str::camel($varPath)], []);
-            $this->resolvedPath[] = '{method:'.$varPath.'}';
+        if (is_object($this->reducedVar) && method_exists($this->reducedVar, $method = Str::camel($varPath))) {
+            if (MethodDenylist::blocks($method)) {
+                // The method name derives from user-influenceable data, so never
+                // dispatch to methods that mutate or destroy data. Resolve to null.
+                $this->reducedVar = null;
+                $this->didFind = false;
+                $this->doBreak = true;
+            } else {
+                $this->reducedVar = call_user_func_array([$this->reducedVar, $method], []);
+                $this->resolvedPath[] = '{method:'.$varPath.'}';
 
-            if ($doCompact) {
-                $this->compact($path->isFinal);
+                if ($doCompact) {
+                    $this->compact($path->isFinal);
+                }
             }
         } elseif (is_array($this->reducedVar)) {
             if (is_numeric($varPath) && ! Arr::isAssoc($this->reducedVar) && $varPath < count($this->reducedVar) && array_key_exists($varPath, $this->reducedVar)) {
