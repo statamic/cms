@@ -54,7 +54,7 @@ const numberBarChart1CaptionId = useId();
 const starRatingChart1CaptionId = useId();
 const starRatingChart2CaptionId = useId();
 const starRatingChart2Page2CaptionId = useId();
-const starRatingChart3CaptionId = useId();
+const toggleBarChart1CaptionId = useId();
 
 const starRatingChart2Page = ref(1);
 const starRatingChart2PerPage = 5;
@@ -1248,23 +1248,12 @@ function exportSubmissions() {
                             icon="fieldtype-toggle"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="starRatingChart3CaptionId">
+                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="toggleBarChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
+                                    <div class="inline-flex items-center gap-2 px-2 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
+                                        <span class="text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-100">20%</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('of users checked the toggle') }}</span>
                                     </div>
                                 </div>
-                                <!--
-                                    Star row colors use oklch relative lightness from --color-chart-1-legend:
-                                    - Midpoint star uses chart-1-legend (3/5 in the hotel demo; 4/10 in the restaurant demo).
-                                    - 5 stars or fewer: darker stars use l*0.9, l*0.8 (−0.1 per step); lighter stars use l*1.2, l*1.4 (+0.2 per step).
-                                    - 6 stars or more: darker stars use −0.05 per step (e.g. l*0.9, l*0.85, l*0.8, l*0.75, l*0.7); lighter stars use l*1.1, l*1.2, l*1.4 (+0.1, then +0.2).
-                                 -->
                                 <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <Switch :model-value="true" tabindex="-1" class="pointer-events-none data-[state=checked]:!border-gray-950 data-[state=checked]:!bg-gray-950" />
@@ -1272,8 +1261,8 @@ function exportSubmissions() {
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
-                                <figcaption :id="starRatingChart3CaptionId" class="sr-only">
-                                    {{ __('How would you rate the hotel?: 3/5 average. Rating distribution: 5 stars 20%, 4 stars 15%, 3 stars 30%, 2 stars 20%, 1 star 20%') }}
+                                <figcaption :id="toggleBarChart1CaptionId" class="sr-only">
+                                    {{ __('Sign up to our newsletter: 20% of users checked the toggle.') }}
                                 </figcaption>
                             </figure>
                         </Widget>
