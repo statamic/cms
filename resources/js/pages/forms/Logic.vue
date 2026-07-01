@@ -70,6 +70,7 @@ const save = () => {
         })),
         fields: fields.value.map(field => ({
             _id: field._id,
+            hidden: field.hidden,
             if: field.if,
             unless: field.unless,
             if_any: field.if_any,
@@ -109,7 +110,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head :title="[__('Logic'), form.title, __('Forms')]" />
+    <Head :title="[__('Logic'), __(form.title), __('Forms')]" />
 
     <Teleport to="#form-layout-actions">
         <Button variant="primary" :aria-label="__('Save')" :disabled="saving" @click="save">
@@ -122,7 +123,7 @@ onUnmounted(() => {
         <Header class="mb-2 md:py-9">
             <template #title>
                 <StatusIndicator status="published" />
-                {{ form.title }}
+                {{ __(form.title) }}
             </template>
             <template #actions>
                 <div class="flex items-center gap-2.5">

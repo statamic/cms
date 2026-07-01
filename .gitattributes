@@ -1,6 +1,15 @@
 * text=auto
 *.php eol=lf
+
+/resources/dist/**/* linguist-generated=true
+/resources/dist-dev/**/* linguist-generated=true
+/resources/dist-frontend/**/* linguist-generated=true
+/resources/dist-package/**/* linguist-generated=true
+
 /.github export-ignore
+/resources/js export-ignore
+/resources/css export-ignore
+/packages export-ignore
 /tests export-ignore
 .babelrc export-ignore
 .gitattributes export-ignore

@@ -10,9 +10,11 @@ defineExpose(expose);
 
 const optionClasses = [
     'relative flex size-9 shrink-0 cursor-pointer items-center justify-center',
-    'rounded-md border shadow-ui-xs text-xs font-medium transition-colors',
+    'rounded-md border shadow-ui-xs text-xs font-medium',
     'border-gray-300 bg-white text-gray-800 hover:bg-gray-50',
     'dark:border-gray-700 dark:bg-gray-925 dark:text-gray-200 dark:hover:bg-gray-925',
+    'peer-checked:border-primary peer-checked:ring-[1px] peer-checked:ring-primary',
+    'peer-focus-visible:focus-outline peer-focus-visible:transition-none',
 ];
 
 const min = computed(() => props.config.min ?? 0);
@@ -32,21 +34,20 @@ const hasLabels = computed(() => Boolean(props.config.low_label || props.config.
             <label
                 v-for="scaleValue in meta.scaleValues"
                 :key="scaleValue"
-                :class="[
-                    optionClasses,
-                    { 'border-primary bg-primary/10 text-primary dark:bg-primary/20': value == scaleValue },
-                ]"
+                class="cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60"
             >
                 <input
                     type="radio"
-                    class="absolute pointer-events-none opacity-0"
+                    class="peer sr-only"
                     :name="name"
                     :value="scaleValue"
                     :checked="value === scaleValue"
                     :disabled="isDisabled"
                     @change="update(scaleValue)"
                 >
-                <span class="leading-none">{{ scaleValue }}</span>
+                <span :class="optionClasses">
+                    <span class="leading-none">{{ scaleValue }}</span>
+                </span>
             </label>
         </div>
 

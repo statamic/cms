@@ -25,6 +25,7 @@ class BannerTest extends TestCase
             'text' => 'Please read this before submitting the form.',
             'hide_display' => true,
             'icon' => 'info',
+            'listable' => false,
         ], $fieldtype->toFieldArray());
     }
 }

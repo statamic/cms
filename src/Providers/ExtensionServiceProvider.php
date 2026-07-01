@@ -136,6 +136,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Width::class,
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
+        Fieldtypes\YesNo::class,
         \Statamic\Forms\Fieldtype::class,
     ];
 
@@ -199,6 +200,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Scopes\Filters\Fields::class,
         Scopes\Filters\Blueprint::class,
         Scopes\Filters\Status::class,
+        Scopes\Filters\SubmissionSite::class,
+        Scopes\Filters\SubmissionStatus::class,
         Scopes\Filters\Site::class,
         Scopes\Filters\UserRole::class,
         Scopes\Filters\UserGroup::class,

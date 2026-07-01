@@ -23,6 +23,7 @@ class ParagraphTest extends TestCase
             'text' => 'Welcome to our wonderful form!',
             'hide_display' => true,
             'display' => 'An internal field handle',
+            'listable' => false,
         ], $fieldtype->toFieldArray());
     }
 }

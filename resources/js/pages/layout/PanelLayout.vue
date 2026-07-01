@@ -79,6 +79,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener('resize', applyBreakpointDefaults);
+    document.getElementById('main-content')?.removeAttribute('data-panels-showing');
 });
 </script>
 

@@ -87,6 +87,9 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Header :title="title" :icon="icon">
+        <template v-if="!!$slots.title" #title>
+            <slot name="title" />
+        </template>
         <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
     </Header>
     <Container

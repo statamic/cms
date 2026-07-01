@@ -8,7 +8,6 @@ import SlugFieldtype from '../components/fieldtypes/SlugFieldtype.vue';
 import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
-import FormBannerFieldtype from '../components/fieldtypes/FormBannerFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
 import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
@@ -32,7 +31,9 @@ import Sites from '../components/globals/Sites.vue';
 import Grid from '../components/fieldtypes/grid/Grid.vue';
 import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
+import FormBannerFieldtype from '../components/fieldtypes/FormBannerFieldtype.vue';
 import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
+import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
@@ -67,7 +68,7 @@ import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import StarRatingFieldtype from '../components/fieldtypes/StarRatingFieldtype.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue';
-import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
+import YesNoFieldtype from '@/components/fieldtypes/YesNoFieldtype.vue';
 
 export default function registerFieldtypes(app) {
     app.component('relationship-input', RelationshipInput);
@@ -160,4 +161,5 @@ export default function registerFieldtypes(app) {
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
     app.component('theme-fieldtype', ThemeFieldtype);
+    app.component('yes_no-fieldtype', YesNoFieldtype);
 }

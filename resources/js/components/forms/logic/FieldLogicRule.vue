@@ -78,7 +78,7 @@ const previewParts = computed(() => {
 });
 
 const collapsedSummary = computed(() => {
-    if (!hasConditions.value) return __('Always show');
+    if (!hasConditions.value) return props.conditions.hidden ? __('Always hide') : __('Always show');
     if (!previewParts.value) return __('Configure conditions');
     return null;
 });
@@ -136,10 +136,10 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                         v-if="collapsed"
                         pill
                         color="white"
-                        class="px-1.5 font-medium text-gray-800 dark:text-gray-200 gap-1.5"
+                        class="px-1.5 py-1 font-medium st-text-trim-ex-alphabetic text-gray-800 dark:text-gray-200 gap-1.5"
                     >
                         <Icon :name="prefixIcon" class="size-3.5!" aria-hidden="true" />
-                        <span>{{ prefixLabel }}</span>
+                        <span class="st-text-trim-cap">{{ prefixLabel }}</span>
                     </Badge>
                     <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap text-xs flex items-center gap-1">
                         <template v-if="collapsedSummary">
@@ -150,9 +150,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                                 <span v-if="part.type === 'field'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
                                 <Badge
                                     v-else-if="part.type === 'operator'"
-                                    pill
-                                    class="inline-block px-1.5 font-medium lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                    style="text-box: trim-start text;"
+                                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                                 >
                                     {{ part.text }}
                                 </Badge>
@@ -189,6 +187,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                             :suggestable-fields
                             :fieldtypes
                             :allow-custom-conditions="false"
+                            :show-always-hide-option="true"
                             :show-always-save="false"
                             size="sm"
                             @updated="onConditionsUpdated"

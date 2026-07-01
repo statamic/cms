@@ -180,7 +180,7 @@ const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
-const allowsSelections = computed(() => (props.selections || hasActions.value) && !props.reorderable);
+const allowsSelections = computed(() => (props.selections || (props.allowBulkActions && hasActions.value)) && !props.reorderable);
 const allowsMultipleSelections = computed(() => props.maxSelections > 1);
 const hasReachedSelectionLimit = computed(() => selections.value.length === props.maxSelections);
 const hasActions = computed(() => !!props.actionUrl);
@@ -730,7 +730,7 @@ autoApplyState();
         <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
             <Presets v-if="showPresets" />
             <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="relative overflow-clip flex items-center gap-2 sm:gap-3 min-h-16 starting-style-transition st-overflow-clip-margin">
-                <div class="flex flex-1 items-center gap-2 sm:gap-3 w-full">
+                <div class="flex flex-1 items-center gap-2 sm:gap-3 overflow-x-auto">
                     <Search v-if="allowSearch" />
                     <Filters v-if="hasFilters" />
                 </div>

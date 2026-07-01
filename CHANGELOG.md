@@ -1,5 +1,52 @@
 # Release Notes
 
+## 6.23.0 (2026-06-23)
+
+### What's new
+- Add explicit `package` param to the `installed` tag [#14858](https://github.com/statamic/cms/issues/14858) by @daun
+
+### What's fixed
+- Prevent rare case of the container scrolling when focusing on the container [#14854](https://github.com/statamic/cms/issues/14854) by @jaygeorge
+- Handle linked field comboboxes when the text is long [#14863](https://github.com/statamic/cms/issues/14863) by @jaygeorge
+- Prevent the link field group from exceeding 50% of the container [#14864](https://github.com/statamic/cms/issues/14864) by @jaygeorge
+- Apply as-config prop to top-level container only [#14855](https://github.com/statamic/cms/issues/14855) by @daun
+- Hide "Live Preview" button while live preview is active [#14866](https://github.com/statamic/cms/issues/14866) by @duncanmcclean
+- French translations [#14856](https://github.com/statamic/cms/issues/14856) by @ebeauchamps
+
+
+
+## 6.22.0 (2026-06-19)
+
+### What's new
+- Chips [#14766](https://github.com/statamic/cms/issues/14766) by @jaygeorge
+- Crop images server-side [#14841](https://github.com/statamic/cms/issues/14841) by @jasonvarga
+
+### What's fixed
+- Give precognitive form requests a separate rate limit bucket [#14810](https://github.com/statamic/cms/issues/14810) by @jasonvarga
+- Fix nested Bard data loss when editing a set [#14808](https://github.com/statamic/cms/issues/14808) by @joshuablum
+- Always render Control Panel exceptions as JSON for XHR requests [#14812](https://github.com/statamic/cms/issues/14812) by @jasonvarga
+- Make the whole radio/checkbox item clickable [#14821](https://github.com/statamic/cms/issues/14821) by @duncanmcclean
+- Fix mobile nav button failing [#14673](https://github.com/statamic/cms/issues/14673) by @jaygeorge
+- Render asset editor video player with dimensions [#14813](https://github.com/statamic/cms/issues/14813) by @daun
+- Handle external links in empty-state component [#14814](https://github.com/statamic/cms/issues/14814) by @daun
+- Fix inconsistent dark mode text colours [#14830](https://github.com/statamic/cms/issues/14830) by @jaygeorge
+- Autopopulate email on password reset form [#14834](https://github.com/statamic/cms/issues/14834) by @jackmcdade
+- Avoid loading the revisions store when finding a working copy [#14847](https://github.com/statamic/cms/issues/14847) by @jasonvarga
+- Retain current tab hash in URL when switching localization [#14846](https://github.com/statamic/cms/issues/14846) by @duncanmcclean
+- Translate untranslated CP page titles [#14848](https://github.com/statamic/cms/issues/14848) by @jasonvarga
+- Don't show selection checkboxes when bulk actions are disabled [#14850](https://github.com/statamic/cms/issues/14850) by @jasonvarga
+- Avoid widget table overflow [#14851](https://github.com/statamic/cms/issues/14851) by @daun
+- German translations [#14818](https://github.com/statamic/cms/issues/14818) by @helloDanuk
+- Bump the github-actions group with 2 updates [#14817](https://github.com/statamic/cms/issues/14817) by @dependabot
+- Bump vite from 8.0.7 to 8.0.16 [#14824](https://github.com/statamic/cms/issues/14824) by @dependabot
+- Bump form-data from 4.0.5 to 4.0.6 [#14825](https://github.com/statamic/cms/issues/14825) by @dependabot
+- Bump markdown-it from 14.1.1 to 14.2.0 [#14827](https://github.com/statamic/cms/issues/14827) by @dependabot
+- Bump dompurify from 3.4.0 to 3.4.9 [#14826](https://github.com/statamic/cms/issues/14826) by @dependabot
+- Bump esbuild and storybook [#14828](https://github.com/statamic/cms/issues/14828) by @dependabot
+- Bump dompurify from 3.4.9 to 3.4.11 in the npm_and_yarn group across 1 directory [#14845](https://github.com/statamic/cms/issues/14845) by @dependabot
+
+
+
 ## 6.21.0 (2026-06-10)
 
 ### What's new

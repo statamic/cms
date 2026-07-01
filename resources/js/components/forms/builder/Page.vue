@@ -110,7 +110,7 @@ onMounted(() => {
                 @deleted="sectionDeleted"
             >
                 <template v-if="section.fields.length && sectionIndex === (sections.length - 1)" #footer>
-                    <div :id="`actions-${page._id}`" class="mt-8">
+                    <div :id="`actions-${page._id}`" data-pagination class="mt-8">
                         <div class="cursor-pointer flex gap-2.5" @click.prevent="inspectAction">
                             <Button
                                 v-if="page.previous_page_label"
@@ -127,7 +127,7 @@ onMounted(() => {
                                 :data-editing-item="isInspectingAction ? '' : undefined"
                                 class="border-0! dark:border-0! ring-0! shadow-none!"
                                 style="--theme-color-primary: var(--theme-color-gray-950)"
-                                :text="page.button_label ?? (isLastPage ? __('Submit') : __('Next Page'))"
+                                :text="page.button_label?.length ? page.button_label : (isLastPage ? __('Submit') : __('Next Page'))"
                             />
                         </div>
                     </div>
