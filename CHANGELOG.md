@@ -1,5 +1,16 @@
 # Release Notes
 
+## 5.74.1 (2026-07-01)
+
+### What's fixed
+- Tighten up dynamic method resolution [#14911](https://github.com/statamic/cms/issues/14911) by @jasonvarga
+- Fix nav authorization checks [#14906](https://github.com/statamic/cms/issues/14906) by @jasonvarga
+- Fix user wizard authorization check [#14905](https://github.com/statamic/cms/issues/14905) by @jasonvarga
+- Fix failing Guzzle tests [#14897](https://github.com/statamic/cms/issues/14897) by @jasonvarga
+- Fix OAuth [#14887](https://github.com/statamic/cms/issues/14887) by @jasonvarga
+
+
+
 ## 5.74.0 (2026-06-08)
 
 ### What's fixed
