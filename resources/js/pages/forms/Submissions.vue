@@ -441,7 +441,7 @@ function exportSubmissions() {
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
                                 <figcaption :id="pieChart1LegendId" class="pie-chart-legend">
-                                    <ul class="pie-chart-legend__list">
+                                    <ol class="pie-chart-legend__list">
                                         <li class="pie-chart-legend__item">
                                             <span class="pie-chart-legend__value">45%</span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
@@ -462,7 +462,7 @@ function exportSubmissions() {
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Never</span>
                                         </li>
-                                    </ul>
+                                    </ol>
                                 </figcaption>
                             </figure>
                         </Widget>
@@ -581,7 +581,7 @@ function exportSubmissions() {
                             <figure class="grid p-6" :aria-labelledby="lollipopChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Summer</span>
                                         <div class="flex items-center gap-1">
@@ -591,7 +591,7 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
                                         <div class="flex items-center gap-1">
@@ -601,7 +601,7 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Spring</span>
                                         <div class="flex items-center gap-1">
@@ -611,7 +611,7 @@ function exportSubmissions() {
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
                                         <span class="size-2.5 rounded-xs bg-chart-4-legend" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Winter</span>
                                         <div class="flex items-center gap-1">
@@ -639,19 +639,19 @@ function exportSubmissions() {
                             <figure class="grid p-6" :aria-labelledby="horizontalBarChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
                                         <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                         <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
                                         <div class="h-2.5 w-[10%] rounded-full bg-chart-3" />
@@ -738,7 +738,7 @@ function exportSubmissions() {
                                         :key="option.badge"
                                         class="contents"
                                     >
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" :src="option.image" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
@@ -785,7 +785,7 @@ function exportSubmissions() {
                                     <p class="sr-only">{{ imageChoicePieChart1AccessibleLabel }}</p>
                                     <ol class="grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
                                         <template v-for="option in imageChoicePieChart1Data" :key="option.badge">
-                                            <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
+                                            <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
                                             <img class="size-10 shrink-0 object-cover rounded-full" :src="option.image" alt="" />
                                             <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
                                             <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
@@ -807,25 +807,25 @@ function exportSubmissions() {
                             <figure class="grid p-6" :aria-labelledby="checkboxesBarChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Radiohead</span>
                                         <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Death Cab for Cutie</span>
                                         <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-3-legend" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Olivia Rodrigo</span>
                                         <div class="h-2.5 w-[5%] rounded-full bg-chart-3" />
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">5%</span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-4-legend" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">The Cure</span>
                                         <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
@@ -873,7 +873,7 @@ function exportSubmissions() {
                                         :key="option.label"
                                         class="contents"
                                     >
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
                                         <Icon
                                             :name="option.icon"
                                             class="size-3.5 shrink-0"
@@ -1010,7 +1010,7 @@ function exportSubmissions() {
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('Average') }}</span>
                                     </div>
                                 </div>
-                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4 text-end" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
                                         <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
@@ -1149,7 +1149,7 @@ function exportSubmissions() {
                                     - 5 stars or fewer: darker stars use l*0.9, l*0.8 (−0.1 per step); lighter stars use l*1.2, l*1.4 (+0.2 per step).
                                     - 6 stars or more: darker stars use −0.05 per step (e.g. l*0.9, l*0.85, l*0.8, l*0.75, l*0.7); lighter stars use l*1.1, l*1.2, l*1.4 (+0.1, then +0.2).
                                  -->
-                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
@@ -1201,7 +1201,7 @@ function exportSubmissions() {
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">7/10 Average</span>
                                     </div>
                                 </div>
-                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0" aria-hidden="true">
+                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
