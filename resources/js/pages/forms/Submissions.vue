@@ -50,6 +50,7 @@ const yesNoBarChart1CaptionId = useId();
 const yesNoPieChart1LegendId = useId();
 const dictionaryChart1CaptionId = useId();
 const dictionaryChart1Page2CaptionId = useId();
+const numberBarChart1CaptionId = useId();
 
 const dictionaryChart1Page1Data = [
     { rank: 1, label: 'Japan', flag: '🇯🇵', percent: 40 },
@@ -556,7 +557,7 @@ function exportSubmissions() {
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-1" />
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -566,7 +567,7 @@ function exportSubmissions() {
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-2" />
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">25%</span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -576,7 +577,7 @@ function exportSubmissions() {
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-3" />
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">15%</span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -586,7 +587,7 @@ function exportSubmissions() {
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-4-legend" />
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
                                         </div>
                                     </li>
                                 </ol>
@@ -644,7 +645,7 @@ function exportSubmissions() {
                             <figure class="vertical-bar-chart-figure" :aria-labelledby="verticalBarChart1CaptionId">
                                 <div aria-hidden="true">
                                     <div class="inline-flex items-center gap-2 px-2 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-xs text-gray-500 dark:text-gray-400">Average</span>
+                                        <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">Average</span>
                                     </div>
                                 </div>
                                 <ol
@@ -929,7 +930,7 @@ function exportSubmissions() {
                                         <div class="flex items-center gap-1">
                                             <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
                                             <div class="text-lg">{{ item.flag }}</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
                                         </div>
                                     </li>
                                 </ol>
@@ -949,7 +950,7 @@ function exportSubmissions() {
                                         <div class="flex items-center gap-1">
                                             <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
                                             <div class="text-lg">{{ item.flag }}</div>
-                                            <span class="min-w-8.5 text-end text-[0.785rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
                                         </div>
                                     </li>
                                 </ol>
@@ -968,8 +969,18 @@ function exportSubmissions() {
                             icon="number"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <figure class="grid p-6" :aria-labelledby="numberBarChart1CaptionId">
-                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-2.25 gap-y-1.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
+                            <figure class="grid p-6 pt-3 ps-3" :aria-labelledby="numberBarChart1CaptionId">
+                                <div aria-hidden="true" class="flex gap-2.5 pb-5">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                        <span class="text-xs font-semibold st-text-trim-cap tabular-nums">4–44</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('Min–Max') }}</span>
+                                    </div>
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+                                        <span class="text-xs font-semibold st-text-trim-cap tabular-nums">26.2</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('Average') }}</span>
+                                    </div>
+                                </div>
+                                <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
                                         <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
@@ -996,8 +1007,8 @@ function exportSubmissions() {
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
                                     </li>
                                 </ol>
-                                <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
-                                    {{ __('Have you seen us live before?: Radiohead 55%, Death Cab for Cutie 35%, Olivia Rodrigo 5%, The Cure 5%') }}
+                                <figcaption :id="numberBarChart1CaptionId" class="sr-only">
+                                    {{ __('How old are you?: Min–Max 4–44, Average 26.2. Age distribution: 0–9: 20%, 10–19: 15%, 20–29: 30%, 30–39: 20%, 40–49: 20%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
