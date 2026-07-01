@@ -4,7 +4,7 @@ namespace Statamic\Support;
 
 class MethodDenylist
 {
-    private const array METHODS = [
+    private const METHODS = [
         'delete', 'deleteFile', 'deleteQuietly',
         'destroy', 'forceDelete', 'save', 'saveQuietly',
         'truncate', 'update', 'updateQuietly', 'write', 'writeFile',
