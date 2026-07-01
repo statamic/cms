@@ -105,8 +105,8 @@ const yesNoChart1AccessibleLabel = computed(() =>
 const yesNoChart1Type = ref('bar');
 
 const imageChoicePieChart1Data = [
-    { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/seed/spirit-animal-a/320/320' },
-    { percent: 45, badge: 'B', label: 'Nope', image: 'https://picsum.photos/seed/spirit-animal-b/320/320' },
+    { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/id/159/320/320' },
+    { percent: 45, badge: 'B', label: 'Nope', image: 'https://picsum.photos/id/485/320/320' },
 ];
 
 const imageChoicePieChart1AccessibleLabel = computed(() =>
@@ -961,6 +961,49 @@ function exportSubmissions() {
                                 </ol>
                                 <figcaption :id="dictionaryChart1Page2CaptionId" class="sr-only">
                                     {{ __('What’s your favourite country?: Germany 2%, Spain 1%, Portugal 1%') }}
+                                </figcaption>
+                            </figure>
+                        </Widget>
+                    </div>
+                    <!-- Example of a Number field type (Horizontal Bar Chart with info). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <div class="px-3 starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3">
+                        <Widget
+                            :title="__('How old are you?')"
+                            title-tag="h2"
+                            class="h-full"
+                            icon="number"
+                            icon-class="size-4 text-gray-500 hidden @xs/widget:block"
+                        >
+                            <figure class="p-6 grid" :aria-labelledby="numberBarChart1CaptionId">
+                                <ol class="m-0 list-none grid grid-cols-[auto_1fr_max-content] items-center gap-x-2.25 gap-y-2.5 p-0" aria-hidden="true">
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
+                                        <div class="h-2.5 rounded-full w-[55%] bg-chart-1" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10–19</span>
+                                        <div class="h-2.5 rounded-full w-[35%] bg-chart-2" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">20–29</span>
+                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-3" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">30–39</span>
+                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-4-legend" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">40–49</span>
+                                        <div class="h-2.5 rounded-full w-[5%] bg-chart-4-legend" />
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">20%</span>
+                                    </li>
+                                </ol>
+                                <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
+                                    {{ __('Have you seen us live before?: Radiohead 55%, Death Cab for Cutie 35%, Olivia Rodrigo 5%, The Cure 5%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
