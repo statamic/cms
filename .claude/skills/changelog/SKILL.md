@@ -8,7 +8,13 @@ Generate a changelog entry for the CHANGELOG.md file by following these steps:
 
 ## 1. Get commits since last tag
 
-Run `git --no-pager log $(git describe --tags --abbrev=0)..HEAD --oneline --no-decorate --first-parent --no-merges`) to get the list of commits.
+Run the following to get the list of commits:
+
+```
+git --no-pager log $(git merge-base $(git tag --list 'v*' --sort=-v:refname | head -n1) HEAD)..HEAD --oneline --no-decorate --first-parent --no-merges
+```
+
+Note: The release workflow tags a separate "Build assets" commit that is *not* an ancestor of the branch, so the tag itself never lands on `6.x`. That means `git describe --tags` walks back to a stale tag. Instead, take the newest tag and use its `git merge-base` with `HEAD`, which resolves to the release commit that *is* on the branch.
 
 ## 2. Process each commit
 
