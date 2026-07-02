@@ -265,6 +265,16 @@
 
 
 
+/* GROUP CHARTS / DISPLAY MODE (% or count)
+=================================================== */
+.chart-metric::before {
+    content: attr(data-percent);
+}
+
+[data-submission-summary][data-chart-metric="count"] .chart-metric::before {
+    content: attr(data-count);
+}
+
 /* GROUP CHARTS / ANIMATIONS / PIE CHART
 =================================================== */
 @media (prefers-reduced-motion: no-preference) {
@@ -294,11 +304,11 @@
                 --pie-reveal: 0deg;
                 animation: pie-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
             }
-        
+
             .summary-bar-chart__fill {
                 transform-origin: left center;
             }
-        
+
             .summary-bar-chart__fill {
                 animation: bar-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
             }
