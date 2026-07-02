@@ -260,7 +260,7 @@
 }
 
 .vertical-bar-chart__scale-label {
-    @apply min-w-8 rounded-md border border-gray-200 shadow-ui-xs px-1.5 py-0.5 text-center text-[0.785rem] font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-400;
+    @apply min-w-8 rounded-md border border-gray-200 shadow-ui-xs px-1.5 py-0.5 text-center text-[0.785rem] font-medium tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300;
 }
 
 

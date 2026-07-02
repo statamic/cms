@@ -543,43 +543,43 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6" :aria-labelledby="lollipopChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50">1</span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Summer</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Summer</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-1" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="55%" data-count="136"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50">2</span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Autumn</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Autumn</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-2" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="25%" data-count="62"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="25%" data-count="62"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50">3</span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Spring</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Spring</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-3" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="15%" data-count="37"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="15%" data-count="37"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
-                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50">4</span>
                                         <span class="size-2.5 rounded-xs bg-chart-4-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Winter</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Winter</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-4-legend" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="10%" data-count="25"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
                                         </div>
                                     </li>
                                 </ol>
@@ -601,21 +601,21 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6" :aria-labelledby="horizontalBarChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Yep</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Yep</span>
                                         <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="35%" data-count="87"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Nope</span>
                                         <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="10%" data-count="25"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Maybe</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Maybe</span>
                                         <div class="h-2.5 w-[10%] rounded-full bg-chart-3" />
                                     </li>
                                 </ol>
@@ -637,7 +637,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="vertical-bar-chart-figure" :aria-labelledby="verticalBarChart1CaptionId">
                                 <div aria-hidden="true">
                                     <div class="inline-flex items-center gap-2 px-2 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">Average</span>
+                                        <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">Average</span>
                                     </div>
                                 </div>
                                 <ol class="vertical-bar-chart" style="--max-value: 61;" aria-hidden="true">
@@ -757,17 +757,17 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             >
                                 <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/159/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Actually</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="45%" data-count="112"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/485/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Nope</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[45%] rounded-full bg-chart-2" />
                                     </li>
                                 </ol>
@@ -793,14 +793,14 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
                                     <p class="sr-only">Actually (A) 55%, Nope (B) 45%</p>
                                     <ol class="grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/159/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="45%" data-count="112"></span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Actually</span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/485/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Nope</span>
                                     </ol>
                                 </figcaption>
                             </figure>
@@ -818,27 +818,27 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6" :aria-labelledby="checkboxesBarChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Radiohead</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Radiohead</span>
                                         <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="35%" data-count="87"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Death Cab for Cutie</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Death Cab for Cutie</span>
                                         <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="5%" data-count="12"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="5%" data-count="12"></span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-3-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Olivia Rodrigo</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Olivia Rodrigo</span>
                                         <div class="h-2.5 w-[5%] rounded-full bg-chart-3" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="5%" data-count="12"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="5%" data-count="12"></span>
                                         <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-4-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">The Cure</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">The Cure</span>
                                         <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
                                     </li>
                                 </ol>
@@ -880,15 +880,15 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             >
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">I’ll get my coat</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">I’ll get my coat</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="45%" data-count="112"></span>
+                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
                                         <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Coffee might be better</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Coffee might be better</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[45%] rounded-full bg-chart-2" />
                                     </li>
                                 </ol>
@@ -950,47 +950,47 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 <ol class="grid grid-cols-[auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Japan</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Japan</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[40%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇯🇵</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="40%" data-count="99"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="40%" data-count="99"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Italy</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Italy</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[35%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇮🇹</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="35%" data-count="87"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">USA</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">USA</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇺🇸</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="10%" data-count="25"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">UK</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">UK</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[8%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇬🇧</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="8%" data-count="20"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="8%" data-count="20"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">France</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">France</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[3%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇫🇷</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="3%" data-count="7"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="3%" data-count="7"></span>
                                         </div>
                                     </li>
                                 </ol>
@@ -1002,29 +1002,29 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 <ol class="grid grid-cols-[auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">6</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Germany</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Germany</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[2%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇩🇪</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="2%" data-count="5"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="2%" data-count="5"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">7</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Spain</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Spain</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[1%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇪🇸</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="1%" data-count="2"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">8</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Portugal</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Portugal</span>
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[1%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇵🇹</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="1%" data-count="2"></span>
                                         </div>
                                     </li>
                                 </ol>
@@ -1047,11 +1047,11 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 <div aria-hidden="true" class="flex gap-2.5 pb-5 -ms-1">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <span class="text-xs font-semibold st-text-trim-cap tabular-nums">4–44</span>
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('Min–Max') }}</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">{{ __('Min–Max') }}</span>
                                     </div>
                                     <div class="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <span class="text-xs font-semibold st-text-trim-cap tabular-nums">26.2</span>
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('Average') }}</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">{{ __('Average') }}</span>
                                     </div>
                                 </div>
                                 <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4 text-end" aria-hidden="true">
@@ -1104,7 +1104,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">3/5 Average</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">3/5 Average</span>
                                     </div>
                                 </div>
                                 <!--
@@ -1185,7 +1185,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">7/10 Average</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">7/10 Average</span>
                                     </div>
                                 </div>
                                 <!--
@@ -1243,7 +1243,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
                                         <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">7/10 Average</span>
+                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">7/10 Average</span>
                                     </div>
                                 </div>
                                 <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
@@ -1296,7 +1296,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6 pt-3 ps-4" :aria-labelledby="toggleBarChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 -ms-1 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <span class="chart-metric text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-100" data-percent="20%" data-count="50"></span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">{{ __('of users checked the toggle') }}</span>
+                                        <span class="chart-metric text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-50" data-percent="20%" data-count="50"></span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">{{ __('of users checked the toggle') }}</span>
                                     </div>
                                 </div>
                                 <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 pt-2" aria-hidden="true">
