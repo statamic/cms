@@ -436,8 +436,8 @@ PHP;
         });
 
         View::macro('withoutExtractions', function () {
-            if ($this->engine instanceof Engine) {
-                $this->engine->withoutExtractions();
+            if ($this->getEngine() instanceof Engine) {
+                $this->getEngine()->withoutExtractions();
             }
 
             return $this;
