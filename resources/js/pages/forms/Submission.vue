@@ -28,7 +28,7 @@ const { showFieldNumbers } = useFieldNumberingPreference();
 const formattedDate = computed(() => dateFormatter.format(props.date));
 const title = computed(() => `${__('Form Submission')} ${props.id}`);
 
-const numberedBlueprint = computed(() => {
+const blueprint = computed(() => {
     if (!showFieldNumbers.value) return props.blueprint;
 
     let number = 0;
@@ -62,7 +62,7 @@ provide('isFormSubmission', true);
         <PublishForm
             :key="showFieldNumbers ? 'numbered' : null"
             :title="formattedDate"
-            :blueprint="numberedBlueprint"
+            :blueprint="blueprint"
             :initial-values="values"
             :initial-meta="meta"
             :submit-url="null"
