@@ -90,6 +90,7 @@ const fieldConnections = computed(() => {
             connections[condition.field] = {
                 endConnection: pageAnchor(destinationPageIndex),
                 leap: destinationPageIndex - pageIndex > 1,
+                destinationPageIndex,
             };
         });
     });
@@ -110,17 +111,7 @@ const hasPageRules = (page) => (page.rules ?? []).some((rule) => {
 const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
 
 const connectorDestinationPageIndices = computed(() => {
-    const indices = new Set();
-
-    Object.values(fieldConnections.value).forEach((connection) => {
-        const pageNumber = Number(connection.endConnection.replace('--page-', ''));
-
-        if (! Number.isNaN(pageNumber)) {
-            indices.add(pageNumber - 1);
-        }
-    });
-
-    return indices;
+    return new Set(Object.values(fieldConnections.value).map((connection) => connection.destinationPageIndex));
 });
 
 const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.value.has(pageIndex);
