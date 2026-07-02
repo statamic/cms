@@ -10,6 +10,7 @@ import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import useSummaryChartType from '@/composables/use-summary-chart-type.js';
 import useSummaryChartMetric from '@/composables/use-summary-chart-metric.js';
+import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -358,8 +359,9 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
 
             <template #results>
                 <!-- Example of a Multiple Choice field type (Pie Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                <div data-submission-summary :data-chart-metric="summaryChartMetric" class="mt-2 pb-8">
-                    <div class="flex w-full items-center gap-3 mb-4">
+                <div data-submission-summary :data-chart-metric="summaryChartMetric" class="mt-3 pb-8">
+                    <div class="flex w-full items-center gap-2 mb-3">
+                        <FieldNumberingToggle />
                         <ToggleGroup v-model="summaryChartMetric" size="xs">
                             <ToggleItem
                                 value="percent"
@@ -374,7 +376,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 v-tooltip="__('Response count')"
                             />
                         </ToggleGroup>
-                        <p class="text-sm text-gray-500 dark:text-gray-500">
+                        <p class="ms-1 text-sm text-gray-500 dark:text-gray-500">
                             {{ __(':count responses', { count: $number.format(248) }) }}
                         </p>
                     </div>
