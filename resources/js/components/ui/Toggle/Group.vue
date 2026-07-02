@@ -74,7 +74,7 @@ function markUserInteraction(event) {
         :type="multiple ? 'multiple' : 'single'"
         :class="groupClasses"
         data-ui-toggle-group
-        :data-toggle-group-interacted="hasInteracted ? '' : null"
+        :data-ui-toggle-group-interacted="hasInteracted ? '' : null"
         :model-value="toggleState"
         @pointerdown="markUserInteraction"
         @keydown="markUserInteraction"

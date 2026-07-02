@@ -286,20 +286,22 @@
     }
 
     .content-card:has([data-submission-summary]) {
-        .chart-reveal .pie-chart__disc,
-        .chart-reveal .image-pie-chart__disc {
-            -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
-            mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
-            --pie-reveal: 0deg;
-            animation: pie-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
-        }
-
-        .summary-bar-chart__fill {
-            transform-origin: left center;
-        }
-
-        .chart-reveal .summary-bar-chart__fill {
-            animation: bar-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+        [data-ui-card]:has([data-ui-toggle-group-interacted]) {
+            .pie-chart__disc,
+            .image-pie-chart__disc {
+                -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+                mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
+                --pie-reveal: 0deg;
+                animation: pie-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            }
+        
+            .summary-bar-chart__fill {
+                transform-origin: left center;
+            }
+        
+            .summary-bar-chart__fill {
+                animation: bar-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            }
         }
     }
 }

@@ -281,13 +281,11 @@ function exportSubmissions() {
 
 const {
     chartType: yesNoChart1Type,
-    isRevealing: yesNoChartIsRevealing,
     setChartType: setYesNoChart1Type,
 } = useSummaryChartType(props.form.handle, 'yes-no-1');
 
 const {
     chartType: imageChoiceChart1Type,
-    isRevealing: imageChoiceChartIsRevealing,
     setChartType: setImageChoiceChart1Type,
 } = useSummaryChartType(props.form.handle, 'image-choice-1');
 </script>
@@ -739,7 +737,6 @@ const {
                             <figure
                                 v-if="imageChoiceChart1Type === 'bar'"
                                 class="grid p-6"
-                                :class="{ 'chart-reveal': imageChoiceChartIsRevealing }"
                                 :aria-labelledby="imageChoiceBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
@@ -763,7 +760,7 @@ const {
                                     {{ __('What is your spirit animal?: Actually 55%, Nope 45%') }}
                                 </figcaption>
                             </figure>
-                            <figure v-else class="image-pie-chart-figure" :class="{ 'chart-reveal': imageChoiceChartIsRevealing }">
+                            <figure v-else class="image-pie-chart-figure">
                                 <div
                                     class="image-pie-chart"
                                     :style="{
@@ -875,7 +872,6 @@ const {
                             <figure
                                 v-if="yesNoChart1Type === 'bar'"
                                 class="grid p-6"
-                                :class="{ 'chart-reveal': yesNoChartIsRevealing }"
                                 :aria-labelledby="yesNoBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
@@ -902,7 +898,7 @@ const {
                                     {{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}
                                 </figcaption>
                             </figure>
-                            <figure v-else class="pie-chart-figure" :class="{ 'chart-reveal': yesNoChartIsRevealing }">
+                            <figure v-else class="pie-chart-figure">
                                 <div
                                     class="pie-chart"
                                     :style="{
