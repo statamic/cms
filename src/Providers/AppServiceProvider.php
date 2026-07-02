@@ -97,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
+            /** @var \Illuminate\Routing\Redirector $this */
             return $this->to(cp_route($route, $parameters));
         });
 
@@ -366,6 +367,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Session::macro('elevate', function () {
+            /** @var \Illuminate\Session\Store $this */
             $this->put('statamic_elevated_session', now()->timestamp);
             $this->forget('statamic_elevated_session_verification_code');
         });
