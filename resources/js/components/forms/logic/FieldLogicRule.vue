@@ -9,6 +9,7 @@ import {
     Icon,
     Subheading,
 } from '@/components/ui';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import Converter from '@/components/field-conditions/Converter.js';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories.js';
@@ -121,6 +122,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 ps-0 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                        <FieldNumber :field-key="config?.handle" class="me-0.5" />
                         <Icon
                             v-if="config?.icon"
                             :name="config.icon"
@@ -193,6 +195,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                         >
                             <template #field-option="{ value, label }">
                                 <span class="inline-flex items-center gap-2">
+                                    <FieldNumber :field-key="value" />
                                     <Icon
                                         v-if="findSuggestableField(value)?.icon"
                                         :name="findSuggestableField(value).icon"
@@ -203,6 +206,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                             </template>
                             <template #field-selected="{ option, field: selectedField }">
                                 <span class="inline-flex items-center gap-2 truncate">
+                                    <FieldNumber :field-key="option.value" />
                                     <Icon
                                         v-if="selectedField?.icon"
                                         :name="selectedField.icon"

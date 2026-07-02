@@ -21,7 +21,7 @@ export const [injectBuilderContext, provideBuilderContext] = createContext('Form
 
 <script setup lang="ts">
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import axios from 'axios';
 import FormsLayout from './Layout.vue';
 import Head from '@/pages/layout/Head.vue';
@@ -38,8 +38,11 @@ import Page from '@/components/forms/builder/Page.vue';
 import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import SectionInspector from '@/components/forms/builder/SectionInspector.vue';
 import { useFieldtypeDraggable } from '@/components/forms/builder/use-drag-and-drop';
+import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
+import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { __, uniqid } from '@/bootstrap/globals';
 import { progress, keys } from '@api';
+import { usePage } from '@inertiajs/vue3';
 import type Binding from '@/components/keys/Binding';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
@@ -301,6 +304,41 @@ const save = () => {
         .finally(() => saving.value = false);
 };
 
+const { showFieldNumbers } = useFieldNumberingPreference();
+
+const fieldNumbers = computed(() => {
+    if (!showFieldNumbers.value) return new Map();
+
+    const fieldsets = Object.values(usePage().props.fieldsets ?? {});
+
+    const fieldKeys = pages.value
+        .flatMap((page) => page.sections || [])
+        .flatMap((section) => section.fields || [])
+        .flatMap((field) => {
+            if (field.type === 'link_fields') return [];
+
+            if (field.type === 'import') {
+                const fieldset = fieldsets.find((fieldset) => fieldset.handle === field.fieldset);
+
+                return (fieldset?.fields || [])
+                    .filter((f) => f.type !== 'import')
+                    .map((f) => [`${field._id}:${f.handle}`]);
+            }
+
+            let isInformational = props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype)?.categories?.[0] === 'information';
+
+            if (field.config?.hidden || isInformational) return [];
+
+            return [[field._id, field.handle]];
+        });
+
+    const map = new Map();
+    fieldKeys.forEach((keys, index) => keys.forEach((key) => map.set(key, index + 1)));
+    return map;
+});
+
+provide('fieldNumbers', fieldNumbers);
+
 provideBuilderContext({
     addSection,
     deletePage,
@@ -385,20 +423,23 @@ onUnmounted(() => {
                 {{ __(form.title) }}
             </template>
             <template #actions>
-                <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
-                    <ToggleItem
-                        :value="FieldView.Expanded"
-                        icon="expand"
-                        :aria-label="__('Expanded view')"
-                        v-tooltip="__('Expanded view')"
-                    />
-                    <ToggleItem
-                        :value="FieldView.Collapsed"
-                        icon="collapse"
-                        :aria-label="__('Collapsed view')"
-                        v-tooltip="__('Collapsed view')"
-                    />
-                </ToggleGroup>
+                <div class="flex items-center gap-2.5">
+                    <FieldNumberingToggle />
+                    <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
+                        <ToggleItem
+                            :value="FieldView.Expanded"
+                            icon="expand"
+                            :aria-label="__('Expanded view')"
+                            v-tooltip="__('Expanded view')"
+                        />
+                        <ToggleItem
+                            :value="FieldView.Collapsed"
+                            icon="collapse"
+                            :aria-label="__('Collapsed view')"
+                            v-tooltip="__('Collapsed view')"
+                        />
+                    </ToggleGroup>
+                </div>
             </template>
         </Header>
 

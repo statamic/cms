@@ -3,6 +3,7 @@ import { Button, Combobox, Icon } from '@ui';
 import { computed } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 import Condition from '@/components/field-conditions/Condition.vue';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from '../categories';
 
 const emit = defineEmits(['update:rule', 'remove']);
@@ -155,6 +156,7 @@ const shouldBeIndented = (index) => {
                         >
                             <template #field-option="{ value, label }">
                                 <span class="inline-flex items-center gap-2">
+                                    <FieldNumber :field-key="value" />
                                     <Icon
                                         v-if="findSuggestableField(value)?.icon"
                                         :name="findSuggestableField(value).icon"
@@ -165,6 +167,7 @@ const shouldBeIndented = (index) => {
                             </template>
                             <template #field-selected="{ option, field: selectedField }">
                                 <span class="inline-flex items-center gap-2 truncate">
+                                    <FieldNumber :field-key="option.value" />
                                     <Icon
                                         v-if="selectedField?.icon"
                                         :name="selectedField.icon"
