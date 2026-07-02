@@ -39,10 +39,14 @@ const numberedBlueprint = computed(() => {
             ...tab,
             sections: (tab.sections || []).map((section) => ({
                 ...section,
-                fields: (section.fields || []).map((field) => ({
-                    ...field,
-                    display: `${++number}. ${field.display ?? field.handle}`,
-                })),
+                fields: (section.fields || []).map((field) => {
+                    if (['form_heading', 'form_paragraph', 'form_banner'].includes(field.type)) return field;
+
+                    return {
+                        ...field,
+                        display: `${++number}. ${field.display ?? field.handle}`,
+                    };
+                }),
             })),
         })),
     };

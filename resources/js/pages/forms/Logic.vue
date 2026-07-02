@@ -32,7 +32,16 @@ const errors = ref({});
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
     if (!showFieldNumbers.value) return new Map();
-    return new Map(fields.value.map((field, index) => [field._id, index + 1]));
+
+    let number = 0;
+    const map = new Map();
+
+    fields.value.forEach((field) => {
+        if (field.hidden || field.category === 'information') return;
+        map.set(field._id, ++number);
+    });
+
+    return map;
 });
 provide('fieldNumbers', fieldNumbers);
 

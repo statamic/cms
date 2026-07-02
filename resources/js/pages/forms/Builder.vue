@@ -325,6 +325,10 @@ const fieldNumbers = computed(() => {
                     .map((f) => [`${field._id}:${f.handle}`]);
             }
 
+            let isInformational = props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype)?.categories?.[0] === 'information';
+
+            if (field.config?.hidden || isInformational) return [];
+
             return [[field._id, field.handle]];
         });
 
