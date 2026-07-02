@@ -75,28 +75,6 @@ const starRatingChart2Meta = computed(() => {
     };
 });
 
-const starRatingChart2AccessibleLabel = computed(() => {
-    if (starRatingChart2Page.value === 1) {
-        return __('How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%');
-    }
-
-    return __('How would you rate the restaurant?: 7/10 average. Rating distribution: 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%');
-});
-
-const dictionaryChart1Page1Data = [
-    { rank: 1, label: 'Japan', flag: '🇯🇵', percent: 40 },
-    { rank: 2, label: 'Italy', flag: '🇮🇹', percent: 35 },
-    { rank: 3, label: 'USA', flag: '🇺🇸', percent: 10 },
-    { rank: 4, label: 'UK', flag: '🇬🇧', percent: 8 },
-    { rank: 5, label: 'France', flag: '🇫🇷', percent: 3 },
-];
-
-const dictionaryChart1Page2Data = [
-    { rank: 6, label: 'Germany', flag: '🇩🇪', percent: 2 },
-    { rank: 7, label: 'Spain', flag: '🇪🇸', percent: 1 },
-    { rank: 8, label: 'Portugal', flag: '🇵🇹', percent: 1 },
-];
-
 const dictionaryChartPage = ref(1);
 const dictionaryChartPerPage = 5;
 const dictionaryChartTotal = 8;
@@ -114,52 +92,6 @@ const dictionaryChartMeta = computed(() => {
         to,
     };
 });
-
-const dictionaryChartAccessibleLabel = computed(() => {
-    if (dictionaryChartPage.value === 1) {
-        return __('Japan 40%, Italy 35%, USA 10%, UK 8%, France 3%');
-    }
-
-    return __('Germany 2%, Spain 1%, Portugal 1%');
-});
-
-const yesNoChart1Data = [
-    { percent: 55, label: 'I\'ll get my coat', icon: 'checkmark-circle-filled', chartColor: 1 },
-    { percent: 45, label: 'Coffee might be better', icon: 'delete-circle-filled', chartColor: 2 },
-];
-
-const yesNoChart1AccessibleLabel = computed(() =>
-    yesNoChart1Data
-        .map((option) => `${option.label} ${option.percent}%`)
-        .join(', '),
-);
-
-const imageChoicePieChart1Data = [
-    { percent: 55, badge: 'A', label: 'Actually', image: 'https://picsum.photos/id/159/320/320' },
-    { percent: 45, badge: 'B', label: 'Nope', image: 'https://picsum.photos/id/485/320/320' },
-];
-
-const imageChoicePieChart1AccessibleLabel = computed(() =>
-    imageChoicePieChart1Data
-        .map((option) => `${option.label} (${option.badge}) ${option.percent}%`)
-        .join(', '),
-);
-
-const verticalBarChart1Data = [
-    { label: '0', percent: 2 },
-    { label: '1', percent: 1 },
-    { label: '2', percent: 3 },
-    { label: '3', percent: 4 },
-    { label: '4', percent: 6 },
-    { label: '5', percent: 8 },
-    { label: '6', percent: 12 },
-    { label: '7', percent: 20 },
-    { label: '8', percent: 35 },
-    { label: '9', percent: 48 },
-    { label: '10', percent: 61 },
-];
-
-const verticalBarChart1MaxValue = computed(() => Math.max(...verticalBarChart1Data.map((bar) => bar.percent), 1));
 
 // Mock in-widget pagination for fields with more than four response options.
 const wakeMeUpChartPage = ref(1);
@@ -685,22 +617,83 @@ const {
                                         <span class="text-md font-semibold st-text-trim-cap tabular-nums text-green-600 dark:text-green-400">8.1</span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-400">Average</span>
                                     </div>
                                 </div>
-                                <ol
-                                    class="vertical-bar-chart"
-                                    :style="{ '--max-value': verticalBarChart1MaxValue }"
-                                    aria-hidden="true"
-                                >
-                                    <li
-                                        v-for="bar in verticalBarChart1Data"
-                                        :key="bar.label"
-                                        class="vertical-bar-chart__bar"
-                                        :style="{ '--value': bar.percent }"
-                                    >
+                                <ol class="vertical-bar-chart" style="--max-value: 61;" aria-hidden="true">
+                                    <li class="vertical-bar-chart__bar" style="--value: 2;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="vertical-bar-chart__value">{{ bar.percent }}%</span>
+                                            <span class="vertical-bar-chart__value">2%</span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
-                                        <span class="vertical-bar-chart__scale-label">{{ bar.label }}</span>
+                                        <span class="vertical-bar-chart__scale-label">0</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 1;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">1%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">1</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 3;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">3%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">2</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 4;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">4%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">3</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 6;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">6%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">4</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 8;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">8%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">5</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 12;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">12%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">6</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 20;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">20%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">7</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 35;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">35%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">8</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 48;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">48%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">9</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar" style="--value: 61;">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="vertical-bar-chart__value">61%</span>
+                                            <div class="vertical-bar-chart__fill" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">10</span>
                                     </li>
                                 </ol>
                                 <figcaption :id="verticalBarChart1CaptionId" class="sr-only">
@@ -740,20 +733,19 @@ const {
                                 :aria-labelledby="imageChoiceBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
-                                    <li
-                                        v-for="(option, index) in imageChoicePieChart1Data"
-                                        :key="option.badge"
-                                        class="contents"
-                                    >
-                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
-                                        <img class="size-10 shrink-0 object-cover rounded-full" :src="option.image" alt="" />
-                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
-                                        <div
-                                            class="summary-bar-chart__fill h-2.5 rounded-full"
-                                            :class="index === 1 ? 'bg-chart-2' : 'bg-chart-1'"
-                                            :style="{ width: `${option.percent}%` }"
-                                        />
+                                    <li class="contents">
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/159/320/320" alt="" />
+                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
+                                        <div class="summary-bar-chart__fill h-2.5 w-[55%] rounded-full bg-chart-1" />
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
+                                        <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/485/320/320" alt="" />
+                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
+                                        <div class="summary-bar-chart__fill h-2.5 w-[45%] rounded-full bg-chart-2" />
                                     </li>
                                 </ol>
                                 <figcaption :id="imageChoiceBarChart1CaptionId" class="sr-only">
@@ -763,40 +755,29 @@ const {
                             <figure v-else class="image-pie-chart-figure">
                                 <div
                                     class="image-pie-chart"
-                                    :style="{
-                                        '--1': imageChoicePieChart1Data[0].percent,
-                                        '--2': imageChoicePieChart1Data[1].percent,
-                                    }"
+                                    style="--1: 55; --2: 45;"
                                     role="img"
                                     :aria-labelledby="imageChoicePieChart1LegendId"
                                 >
                                     <div class="image-pie-chart__disc" aria-hidden="true">
-                                        <div
-                                            v-for="(option, index) in imageChoicePieChart1Data"
-                                            :key="option.badge"
-                                            class="image-pie-chart__slice"
-                                            :class="`image-pie-chart__slice--${index + 1}`"
-                                            :style="{ '--image': `url('${option.image}')` }"
-                                        />
+                                        <div class="image-pie-chart__slice image-pie-chart__slice--1" style="--image: url('https://picsum.photos/id/159/320/320')" />
+                                        <div class="image-pie-chart__slice image-pie-chart__slice--2" style="--image: url('https://picsum.photos/id/485/320/320')" />
                                     </div>
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span
-                                        v-for="(option, index) in imageChoicePieChart1Data"
-                                        :key="`label-${option.badge}`"
-                                        class="image-pie-chart__label"
-                                        :class="`image-pie-chart__label--${index + 1}`"
-                                        aria-hidden="true"
-                                    >{{ option.percent }}%</span>
+                                    <span class="image-pie-chart__label image-pie-chart__label--1" aria-hidden="true">55%</span>
+                                    <span class="image-pie-chart__label image-pie-chart__label--2" aria-hidden="true">45%</span>
                                 </div>
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
-                                    <p class="sr-only">{{ imageChoicePieChart1AccessibleLabel }}</p>
+                                    <p class="sr-only">Actually (A) 55%, Nope (B) 45%</p>
                                     <ol class="grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
-                                        <template v-for="option in imageChoicePieChart1Data" :key="option.badge">
-                                            <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
-                                            <img class="size-10 shrink-0 object-cover rounded-full" :src="option.image" alt="" />
-                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">{{ option.badge }}</span>
-                                            <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
-                                        </template>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/159/320/320" alt="" />
+                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Actually</span>
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
+                                        <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/485/320/320" alt="" />
+                                        <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Nope</span>
                                     </ol>
                                 </figcaption>
                             </figure>
@@ -875,60 +856,46 @@ const {
                                 :aria-labelledby="yesNoBarChart1CaptionId"
                             >
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
-                                    <li
-                                        v-for="option in yesNoChart1Data"
-                                        :key="option.label"
-                                        class="contents"
-                                    >
-                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ option.percent }}%</span>
-                                        <Icon
-                                            :name="option.icon"
-                                            class="size-3.5 shrink-0"
-                                            :class="option.chartColor === 2 ? 'text-chart-2-legend' : 'text-chart-1-legend'"
-                                        />
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ option.label }}</span>
-                                        <div
-                                            class="summary-bar-chart__fill h-2.5 rounded-full"
-                                            :class="option.chartColor === 2 ? 'bg-chart-2' : 'bg-chart-1'"
-                                            :style="{ width: `${option.percent}%` }"
-                                        />
+                                    <li class="contents">
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">55%</span>
+                                        <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">I’ll get my coat</span>
+                                        <div class="summary-bar-chart__fill h-2.5 w-[55%] rounded-full bg-chart-1" />
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-400">45%</span>
+                                        <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Coffee might be better</span>
+                                        <div class="summary-bar-chart__fill h-2.5 w-[45%] rounded-full bg-chart-2" />
                                     </li>
                                 </ol>
                                 <figcaption :id="yesNoBarChart1CaptionId" class="sr-only">
-                                    {{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}
+                                    {{ __('Do you fancy a pint?: I’ll get my coat 55%, Coffee might be better 45%') }}
                                 </figcaption>
                             </figure>
                             <figure v-else class="pie-chart-figure">
                                 <div
                                     class="pie-chart"
-                                    :style="{
-                                        '--1': yesNoChart1Data[0].percent,
-                                        '--2': yesNoChart1Data[1].percent,
-                                        '--3': 0,
-                                        '--4': 0,
-                                    }"
+                                    style="--1: 55; --2: 45; --3: 0; --4: 0;"
                                     role="img"
                                     :aria-labelledby="yesNoPieChart1LegendId"
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
-                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">{{ yesNoChart1Data[0].percent }}%</span>
-                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">{{ yesNoChart1Data[1].percent }}%</span>
+                                    <span class="pie-chart__label | pie-chart__label--1" aria-hidden="true">55%</span>
+                                    <span class="pie-chart__label | pie-chart__label--2" aria-hidden="true">45%</span>
                                 </div>
                                 <figcaption :id="yesNoPieChart1LegendId" class="pie-chart-legend">
-                                    <p class="sr-only">{{ __('Do you fancy a pint?: :summary', { summary: yesNoChart1AccessibleLabel }) }}</p>
+                                    <p class="sr-only">{{ __('Do you fancy a pint?: I’ll get my coat 55%, Coffee might be better 45%') }}</p>
                                     <ul class="pie-chart-legend__list" aria-hidden="true">
-                                        <li
-                                            v-for="option in yesNoChart1Data"
-                                            :key="option.label"
-                                            class="pie-chart-legend__item"
-                                        >
-                                            <span class="pie-chart-legend__value">{{ option.percent }}%</span>
-                                            <Icon
-                                                :name="option.icon"
-                                                class="size-3.5 shrink-0"
-                                                :class="option.chartColor === 2 ? 'text-chart-2-legend' : 'text-chart-1-legend'"
-                                            />
-                                            <span>{{ option.label }}</span>
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">55%</span>
+                                            <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                            <span>I’ll get my coat</span>
+                                        </li>
+                                        <li class="pie-chart-legend__item">
+                                            <span class="pie-chart-legend__value">45%</span>
+                                            <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
+                                            <span>Coffee might be better</span>
                                         </li>
                                     </ul>
                                 </figcaption>
@@ -954,20 +921,53 @@ const {
                                     @page-selected="dictionaryChartPage = $event"
                                 />
                             </template>
-                            <p class="sr-only" aria-live="polite">{{ dictionaryChartAccessibleLabel }}</p>
+                            <p v-if="dictionaryChartPage === 1" class="sr-only" aria-live="polite">Japan 40%, Italy 35%, USA 10%, UK 8%, France 3%</p>
+                            <p v-else class="sr-only" aria-live="polite">Germany 2%, Spain 1%, Portugal 1%</p>
                             <figure v-if="dictionaryChartPage === 1" class="grid p-6" :aria-labelledby="dictionaryChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
-                                    <li
-                                        v-for="item in dictionaryChart1Page1Data"
-                                        :key="item.label"
-                                        class="contents"
-                                    >
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.rank }}</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">1</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Japan</span>
                                         <div class="flex items-center gap-1">
-                                            <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
-                                            <div class="text-lg">{{ item.flag }}</div>
-                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
+                                            <div class="h-px w-[40%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇯🇵</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">40%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">2</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Italy</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[35%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇮🇹</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">35%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">3</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">USA</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇺🇸</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">10%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">4</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">UK</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[8%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇬🇧</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">8%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">5</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">France</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[3%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇫🇷</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">3%</span>
                                         </div>
                                     </li>
                                 </ol>
@@ -977,17 +977,31 @@ const {
                             </figure>
                             <figure v-else-if="dictionaryChartPage === 2" class="grid p-6" :aria-labelledby="dictionaryChart1Page2CaptionId">
                                 <ol class="grid grid-cols-[auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 [&:not(:has(>_:nth-child(5)))]:pt-3" aria-hidden="true">
-                                    <li
-                                        v-for="item in dictionaryChart1Page2Data"
-                                        :key="item.label"
-                                        class="contents"
-                                    >
-                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.rank }}</span>
-                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">{{ item.label }}</span>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">6</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Germany</span>
                                         <div class="flex items-center gap-1">
-                                            <div class="h-px bg-gray-200 dark:bg-gray-600" :style="{ width: `${item.percent}%` }" />
-                                            <div class="text-lg">{{ item.flag }}</div>
-                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">{{ item.percent }}%</span>
+                                            <div class="h-px w-[2%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇩🇪</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">2%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">7</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Spain</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[1%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇪🇸</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">1%</span>
+                                        </div>
+                                    </li>
+                                    <li class="contents">
+                                        <span class="text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400">8</span>
+                                        <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-100">Portugal</span>
+                                        <div class="flex items-center gap-1">
+                                            <div class="h-px w-[1%] bg-gray-200 dark:bg-gray-600" />
+                                            <div class="text-lg">🇵🇹</div>
+                                            <span class="min-w-8.5 text-end text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-400">1%</span>
                                         </div>
                                     </li>
                                 </ol>
@@ -1133,7 +1147,8 @@ const {
                                     @page-selected="starRatingChart2Page = $event"
                                 />
                             </template>
-                            <p class="sr-only" aria-live="polite">{{ starRatingChart2AccessibleLabel }}</p>
+                            <p v-if="starRatingChart2Page === 1" class="sr-only" aria-live="polite">How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%</p>
+                            <p v-else class="sr-only" aria-live="polite">How would you rate the restaurant?: 7/10 average. Rating distribution: 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%</p>
                             <figure v-if="starRatingChart2Page === 1" class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart2CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
