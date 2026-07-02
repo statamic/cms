@@ -17,54 +17,42 @@ const props = defineProps({
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
-const groupPageFields = (pageFields) => pageFields.map((field) => ({ field }));
-
-const firstFieldInGroup = (group) => group.field;
-
-const isFirstInFieldset = (field, index, groups) => {
+const isFirstInFieldset = (field, index, fields) => {
     if (! field.import) {
         return false;
     }
 
-    const previous = groups[index - 1]?.field;
+    const previous = fields[index - 1];
 
     return ! previous || previous.import !== field.import;
 };
 
-const isLastInFieldset = (field, index, groups) => {
+const isLastInFieldset = (field, index, fields) => {
     if (! field.import) {
         return false;
     }
 
-    const next = groups[index + 1]?.field;
+    const next = fields[index + 1];
 
     return ! next || next.import !== field.import;
 };
 
-const isFieldsetField = (field, index, groups) => field.import && ! isFirstInFieldset(field, index, groups);
+const isFieldsetField = (field, index, fields) => field.import && ! isFirstInFieldset(field, index, fields);
 
 const groupPageSections = (pageFields) => {
-    const groups = groupPageFields(pageFields);
-
-    if (groups.length === 0) {
-        return [];
-    }
-
     const sections = [];
     let currentSection = null;
 
-    groups.forEach((group) => {
-        const field = firstFieldInGroup(group);
-
+    pageFields.forEach((field) => {
         if (! currentSection || field.section_start) {
             currentSection = {
                 title: field.section_display || __('Section'),
-                groups: [],
+                fields: [],
             };
             sections.push(currentSection);
         }
 
-        currentSection.groups.push(group);
+        currentSection.fields.push(field);
     });
 
     return sections;
@@ -202,30 +190,30 @@ const fieldIconClass = (field) => {
                         </div>
                         <ul>
                             <li
-                                v-for="(group, groupIndex) in section.groups"
-                                :key="group.field._id"
-                                v-tooltip="group.field.import ? __('Logic can\'t be added to imported fields. Edit the fieldset instead.') : null"
+                                v-for="(field, fieldIndex) in section.fields"
+                                :key="field._id"
+                                v-tooltip="field.import ? __('Logic can\'t be added to imported fields. Edit the fieldset instead.') : null"
                                 :class="{
-                                    'linked-list__connector': fieldConnection(group.field),
-                                    'linked-list__page-leap': fieldConnection(group.field)?.leap,
-                                    'linked-list__fieldset-start': isFirstInFieldset(group.field, groupIndex, section.groups),
-                                    'linked-list__fieldset-field': isFieldsetField(group.field, groupIndex, section.groups),
-                                    'linked-list__fieldset-end': isLastInFieldset(group.field, groupIndex, section.groups),
+                                    'linked-list__connector': fieldConnection(field),
+                                    'linked-list__page-leap': fieldConnection(field)?.leap,
+                                    'linked-list__fieldset-start': isFirstInFieldset(field, fieldIndex, section.fields),
+                                    'linked-list__fieldset-field': isFieldsetField(field, fieldIndex, section.fields),
+                                    'linked-list__fieldset-end': isLastInFieldset(field, fieldIndex, section.fields),
                                 }"
-                                :style="fieldConnection(group.field) ? { '--end-connection': fieldConnection(group.field).endConnection } : null"
+                                :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
                             >
-                                <div v-if="fieldConnection(group.field)?.leap" class="linked-list__extra-leap-connector" />
+                                <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
                                 <Icon
-                                    :name="group.field.icon || 'generic-field'"
-                                    :class="['size-4 shrink-0', fieldIconClass(group.field)]"
+                                    :name="field.icon || 'generic-field'"
+                                    :class="['size-4 shrink-0', fieldIconClass(field)]"
                                     aria-hidden="true"
                                 />
                                 <span class="linked-list__field-name min-w-0 flex-1">
-                                    <FieldNumber :field-key="group.field._id" />
-                                    {{ group.field.display }}
+                                    <FieldNumber :field-key="field._id" />
+                                    {{ field.display }}
                                 </span>
                                 <span
-                                    v-if="group.field.type === 'reference'"
+                                    v-if="field.type === 'reference'"
                                     v-tooltip="__('Linked Field')"
                                     class="inline-flex size-4 shrink-0"
                                 >
@@ -236,8 +224,8 @@ const fieldIconClass = (field) => {
                                     />
                                 </span>
                                 <span
-                                    v-if="isFirstInFieldset(group.field, groupIndex, section.groups)"
-                                    v-tooltip="group.field.import_title ? __('Linked Fieldset: :title', { title: group.field.import_title }) : __('Linked Fieldset')"
+                                    v-if="isFirstInFieldset(field, fieldIndex, section.fields)"
+                                    v-tooltip="field.import_title ? __('Linked Fieldset: :title', { title: field.import_title }) : __('Linked Fieldset')"
                                     class="inline-flex size-4 shrink-0"
                                 >
                                     <Icon
