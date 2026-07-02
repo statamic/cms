@@ -1,34 +1,34 @@
 includes:
-    - vendor/larastan/larastan/extension.neon
+  - vendor/larastan/larastan/extension.neon
 
 parameters:
-    level: 0
-    paths:
-        - src
+  level: 0
+  paths:
+    - src
 
-    # Symbol-only stubs for optional runtime integrations that this package
-    # never requires as real dependencies (see .phpstan/stubs/debugbar.php).
-    scanFiles:
-        - .phpstan/stubs/debugbar.php
+  # Symbol-only stubs for optional runtime integrations that this package
+  # never requires as real dependencies (see .phpstan/stubs/debugbar.php).
+  scanFiles:
+    - .phpstan/stubs/debugbar.php
 
-    ignoreErrors:
-        -
-            identifier: class.notFound
-            message: '#^(Class|Instantiated class) Spatie\\LaravelIgnition\\Exceptions\\(ViewException|ViewExceptionWithSolution) not found\.$#'
-            path: src/View/Antlers/Language/Runtime/RuntimeParser.php
+  ignoreErrors:
+    -
+      identifier: class.notFound
+      message: '#^(Class|Instantiated class) Spatie\\LaravelIgnition\\Exceptions\\(ViewException|ViewExceptionWithSolution) not found\.$#'
+      path: src/View/Antlers/Language/Runtime/RuntimeParser.php
 
-        # composer/composer is an optional runtime integration (composer update hooks), not a real dependency.
-        -
-            identifier: class.notFound
-            message: '#^Parameter \$event of method Statamic\\Console\\Composer\\Scripts::preUpdateCmd\(\) has invalid type Composer\\Script\\Event\.$#'
-            path: src/Console/Composer/Scripts.php
+    # composer/composer is an optional runtime integration (composer update hooks), not a real dependency.
+    -
+      identifier: class.notFound
+      message: '#^Parameter \$event of method Statamic\\Console\\Composer\\Scripts::preUpdateCmd\(\) has invalid type Composer\\Script\\Event\.$#'
+      path: src/Console/Composer/Scripts.php
 
-        # barryvdh/laravel-debugbar is an optional runtime integration, guarded by class_exists()/isEnabled() checks.
-        -
-            identifier: class.notFound
-            message: '#^Caught class DebugBar\\DebugBarException not found\.$#'
-            path: src/Forms/Tags.php
-        -
-            identifier: function.notFound
-            message: '#^Function debug not found\.$#'
-            path: src/Modifiers/CoreModifiers.php
+    # barryvdh/laravel-debugbar is an optional runtime integration, guarded by class_exists()/isEnabled() checks.
+    -
+      identifier: class.notFound
+      message: '#^Caught class DebugBar\\DebugBarException not found\.$#'
+      path: src/Forms/Tags.php
+    -
+      identifier: function.notFound
+      message: '#^Function debug not found\.$#'
+      path: src/Modifiers/CoreModifiers.php
