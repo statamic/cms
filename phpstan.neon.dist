@@ -6,6 +6,11 @@ parameters:
     paths:
         - src
 
+    # Symbol-only stubs for optional runtime integrations that this package
+    # never requires as real dependencies (see .phpstan/stubs/debugbar.php).
+    scanFiles:
+        - .phpstan/stubs/debugbar.php
+
     ignoreErrors:
         -
             identifier: class.notFound
@@ -17,3 +22,13 @@ parameters:
             identifier: class.notFound
             message: '#^Parameter \$event of method Statamic\\Console\\Composer\\Scripts::preUpdateCmd\(\) has invalid type Composer\\Script\\Event\.$#'
             path: src/Console/Composer/Scripts.php
+
+        # barryvdh/laravel-debugbar is an optional runtime integration, guarded by class_exists()/isEnabled() checks.
+        -
+            identifier: class.notFound
+            message: '#^Caught class DebugBar\\DebugBarException not found\.$#'
+            path: src/Forms/Tags.php
+        -
+            identifier: function.notFound
+            message: '#^Function debug not found\.$#'
+            path: src/Modifiers/CoreModifiers.php
