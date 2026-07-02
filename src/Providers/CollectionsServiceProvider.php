@@ -7,6 +7,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Data\Augmentable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CollectionsServiceProvider extends ServiceProvider
 {
     /**

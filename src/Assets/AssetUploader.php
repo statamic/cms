@@ -9,6 +9,9 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AssetUploader extends Uploader
 {
     private $asset;
