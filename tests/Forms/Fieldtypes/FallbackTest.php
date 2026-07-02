@@ -33,7 +33,7 @@ class FallbackTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_the_blueprint_fieldtype_icon_when_there_is_no_form_fieldtype()
+    public function it_uses_icon_from_the_wrapped_fieldtype()
     {
         $fallback = (new Fallback)->wrapping(new Code);
 
