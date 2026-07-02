@@ -9,7 +9,7 @@ use Statamic\Icons\IconSet;
 
 /**
  * @method static void register(string $name, string $directory)
- * @method static Collection sets(string $name)
+ * @method static Collection sets()
  * @method static IconSet get(string $name)
  * @method static IconSet default()
  *
