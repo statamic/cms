@@ -6,8 +6,6 @@ import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
 
-const mutedIconClass = 'text-gray-600 dark:text-gray-400';
-
 const props = defineProps<{
     field: any;
     isFirstRow?: boolean;
@@ -30,8 +28,6 @@ const fieldsetFields = computed(() => {
     if (!fieldset.value) return [];
     return fieldset.value.fields.filter((f) => f.type !== 'import');
 });
-
-const fieldsetTitle = computed(() => fieldset.value?.title);
 
 const inspectFieldsetImport = () => inspect(InspectorType.FieldsetImport, props.field);
 
@@ -76,7 +72,7 @@ const errorMessage = computed(() => {
                         <span class="inline-flex" v-tooltip="__('Linked Fieldset')">
                             <Icon name="link" class="size-3.5" aria-hidden="true" />
                         </span>
-                        <span class="sr-only">{{ __('Linked Fieldset') }}</span>
+                        <span class="sr-only">{{ __('Linked Fieldset: :title', { title: __(fieldset.title) }) }}</span>
                     </span>
                     <Field :label="__(fieldsetField.config.display)" :instructions="fieldsetField.config.instructions">
                         <template #label>
@@ -85,21 +81,13 @@ const errorMessage = computed(() => {
                                 <Icon
                                     :name="fieldsetField.icon || 'generic-field'"
                                     data-collapsed-field-icon
-                                    :class="['size-3.5 mb-0.25! me-2.5', mutedIconClass]"
+                                    class="size-3.5 mb-0.25! me-2.5 text-gray-600 dark:text-gray-400"
                                     aria-hidden="true"
                                 />
                                 <span>
                                     {{ __(fieldsetField.config.display) }}
                                     <span v-if="fieldsetField.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
                                 </span>
-                                <Icon
-                                    v-if="fieldsetFieldIndex === 0"
-                                    name="link"
-                                    data-collapsed-field-icon
-                                    class="inline-block size-3! text-indigo-500 dark:text-indigo-400 mb-0.5 ms-2"
-                                    :aria-label="__('Linked Fieldset')"
-                                    v-tooltip="fieldsetTitle ? __('Linked Fieldset: :title', { title: __(fieldsetTitle) }) : __('Linked Fieldset')"
-                                />
                             </Label>
                         </template>
                         <div class="pointer-events-none" inert>
