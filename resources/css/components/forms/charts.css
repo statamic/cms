@@ -87,7 +87,7 @@
     top: calc(50% - var(--label-radius) * cos(var(--angle)));
     transform: translate(-50%, -50%);
 
-    @apply text-xs font-medium tabular-nums text-white pointer-events-none;
+    @apply text-xs font-semibold tabular-nums text-white pointer-events-none;
 }
 
 .pie-chart__label--1 { --angle: var(--angle1); background-color: var(--color-chart-1-label-bg); }
