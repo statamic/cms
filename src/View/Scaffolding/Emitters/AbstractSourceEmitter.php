@@ -16,6 +16,8 @@ use Stringable;
 abstract class AbstractSourceEmitter implements Stringable
 {
     protected static array $blueprintStack = [];
+    protected static array $variableStack = [];
+    protected static ?string $currentIterationVar = null;
     protected array $specialLoopVariables = [
         'key',
         'value',
