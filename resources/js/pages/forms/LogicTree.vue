@@ -1,13 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { Icon } from '@ui';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 import { computed } from 'vue';
 
+enum TreeDensity {
+    Compressed = 'compressed',
+    Expanded = 'expanded',
+}
+
 const props = defineProps({
     pages: { type: Array, required: true },
     fields: { type: Array, required: true },
-    expanded: { type: Boolean, default: false },
+    density: { type: String as PropType<TreeDensity>, default: TreeDensity.Compressed },
 });
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
@@ -145,12 +150,11 @@ const fieldIconClass = (field) => {
 
     return categoryColorClasses[color]?.icon || mutedIconClass;
 };
-
 </script>
 
 <template>
     <div class="linked-list-container">
-        <div class="linked-list" :class="{ 'linked-list--expanded': expanded }">
+        <div class="linked-list" :class="{ 'linked-list--expanded': density === TreeDensity.Expanded }">
             <div
                 v-for="{ page, pageIndex, sections } in fieldsByPage"
                 :key="page._id"

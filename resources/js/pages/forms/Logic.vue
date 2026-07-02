@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
@@ -12,9 +12,18 @@ import { useFieldNumberingPreference } from '@/composables/forms/field-numbering
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { keys, preferences } from '@api';
 import axios from 'axios';
-import { usePage } from '@inertiajs/vue3';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
+
+enum View {
+    List = 'list',
+    Tree = 'tree',
+}
+
+enum TreeDensity {
+    Compressed = 'compressed',
+    Expanded = 'expanded',
+}
 
 const props = defineProps({
     form: Object,
@@ -26,16 +35,11 @@ const props = defineProps({
 
 const pages = ref(props.pages);
 const fields = ref(props.fields);
-const logicViewPreferenceKey = 'forms.logic.view';
-const logicView = ref(preferences.get(logicViewPreferenceKey, 'list'));
-watch(logicView, (view) => preferences.set(logicViewPreferenceKey, view));
-
-const treeDensityPreferenceKey = 'forms.logic.tree.density';
-const treeDensity = ref(preferences.get(treeDensityPreferenceKey, 'compressed'));
-watch(treeDensity, (density) => preferences.set(treeDensityPreferenceKey, density));
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
+const view = ref<View>(preferences.get('forms.logic.view', View.List));
+const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
@@ -112,6 +116,9 @@ const save = () => {
 watch(pages, dirty, { deep: true });
 watch(fields, dirty, { deep: true });
 
+watch(view, (view: View) => preferences.set('forms.logic.view', view));
+watch(treeDensity, (density: TreeDensity) => preferences.set('forms.logic.tree.density', density));
+
 onMounted(() => {
     saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
         e.preventDefault();
@@ -144,29 +151,29 @@ onUnmounted(() => {
             <template #actions>
                 <div class="flex items-center gap-2.5">
                     <FieldNumberingToggle />
-                    <ToggleGroup v-if="logicView === 'tree'" v-model="treeDensity" size="xs">
+                    <ToggleGroup v-if="view === View.Tree" v-model="treeDensity" size="xs">
                         <ToggleItem
-                            value="expanded"
+                            :value="TreeDensity.Expanded"
                             icon="expand"
                             :aria-label="__('Expanded view')"
                             v-tooltip="__('Expanded view')"
                         />
                         <ToggleItem
-                            value="compressed"
+                            :value="TreeDensity.Compressed"
                             icon="collapse"
                             :aria-label="__('Collapsed view')"
                             v-tooltip="__('Collapsed view')"
                         />
                     </ToggleGroup>
-                    <ToggleGroup v-model="logicView" size="sm">
-                        <ToggleItem value="list" icon="layout-list" :label="__('List')" />
-                        <ToggleItem value="tree" icon="logic-tree" :label="__('Tree')" />
+                    <ToggleGroup v-model="view" size="sm">
+                        <ToggleItem :value="View.List" icon="layout-list" :label="__('List')" />
+                        <ToggleItem :value="View.Tree" icon="logic-tree" :label="__('Tree')" />
                     </ToggleGroup>
                 </div>
             </template>
         </Header>
 
-        <template v-if="logicView === 'list'">
+        <template v-if="view === View.List">
             <PageLogic
                 v-if="pages.length > 1"
                 class="mb-6"
@@ -183,11 +190,11 @@ onUnmounted(() => {
         </template>
     </div>
 
-    <div v-if="logicView === 'tree'" class="st-full-bleed-content">
+    <div v-if="view === View.Tree" class="st-full-bleed-content">
         <LogicTree
-            :pages="pages"
-            :fields="fields"
-            :expanded="treeDensity === 'expanded'"
+            :pages
+            :fields
+            :density="treeDensity"
         />
     </div>
 </template>
