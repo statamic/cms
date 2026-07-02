@@ -51,7 +51,7 @@ const props = defineProps({
     lineNumbers: { type: Boolean, default: true },
     /** When `true`, long lines will wrap */
     lineWrapping: { type: Boolean, default: true },
-    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
+    /** The syntax highlighting mode. Options: `clike`, `css`, `diff`, `go`, `haml`, `handlebars`, `htmlmixed`, `less`, `markdown`, `gfm`, `nginx`, `text/x-java`, `javascript`, `application/json`, `application/ld+json`, `jsx`, `text/x-objectivec`, `php`, `python`, `ruby`, `scss`, `shell`, `sql`, `twig`, `vue`, `xml`, `yaml-frontmatter` */
     mode: { type: String, default: 'javascript' },
     /** The controlled value of the code editor */
     modelValue: { type: String, default: '' },
