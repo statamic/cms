@@ -427,7 +427,7 @@ class Color
             'dark-chart-1' => self::Indigo[600],
             'dark-chart-2' => self::Indigo[200],
             'dark-chart-3' => self::Lime[500],
-            'dark-chart-4' => self::Zinc[950],
+            'dark-chart-4' => self::Orange[500],
             'chart-1-label-bg' => self::Indigo[600],
             'chart-2-label-bg' => self::Transparent,
             'chart-3-label-bg' => self::Lime[600],
@@ -435,7 +435,7 @@ class Color
             'dark-chart-1-label-bg' => self::Indigo[700],
             'dark-chart-2-label-bg' => self::Indigo[400],
             'dark-chart-3-label-bg' => self::Lime[600],
-            'dark-chart-4-label-bg' => self::Zinc[700],
+            'dark-chart-4-label-bg' => self::Orange[500],
             'chart-1-legend' => self::Indigo[500],
             'chart-2-legend' => self::Zinc[800],
             'chart-3-legend' => self::Lime[500],
@@ -443,7 +443,7 @@ class Color
             'dark-chart-1-legend' => self::Indigo[600],
             'dark-chart-2-legend' => self::Indigo[300],
             'dark-chart-3-legend' => self::Lime[500],
-            'dark-chart-4-legend' => self::Zinc[950],
+            'dark-chart-4-legend' => self::Orange[500],
         ])
             ->filter(fn ($color, $name) => str($name)->startsWith('dark-') ? $dark : ! $dark)
             ->all();
