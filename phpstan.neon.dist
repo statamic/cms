@@ -11,3 +11,9 @@ parameters:
             identifier: class.notFound
             message: '#^(Class|Instantiated class) Spatie\\LaravelIgnition\\Exceptions\\(ViewException|ViewExceptionWithSolution) not found\.$#'
             path: src/View/Antlers/Language/Runtime/RuntimeParser.php
+
+        # composer/composer is an optional runtime integration (composer update hooks), not a real dependency.
+        -
+            identifier: class.notFound
+            message: '#^Parameter \$event of method Statamic\\Console\\Composer\\Scripts::preUpdateCmd\(\) has invalid type Composer\\Script\\Event\.$#'
+            path: src/Console/Composer/Scripts.php
