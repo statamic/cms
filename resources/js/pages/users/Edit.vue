@@ -11,6 +11,7 @@ defineProps([
     'meta',
     'canEditPassword',
     'canEditBlueprint',
+    'oauthEnabled',
     'requiresCurrentPassword',
     'itemActions',
     'itemActionUrl',
@@ -33,6 +34,7 @@ defineProps([
             :initial-meta="meta"
             :can-edit-password="canEditPassword"
             :can-edit-blueprint="canEditBlueprint"
+            :oauth-enabled="oauthEnabled"
             :requires-current-password="requiresCurrentPassword"
             :initial-item-actions="itemActions"
             :item-action-url="itemActionUrl"
