@@ -291,7 +291,7 @@
             -webkit-mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
             mask-image: conic-gradient(from 0deg, #000 0deg, #000 var(--pie-reveal), transparent var(--pie-reveal));
             --pie-reveal: 0deg;
-            animation: pie-chart-reveal 0.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+            animation: pie-chart-reveal 0.75s cubic-bezier(0.33, 1, 0.68, 1) forwards;
         }
 
         .summary-bar-chart__fill {
