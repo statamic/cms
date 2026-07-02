@@ -1,5 +1,26 @@
 # Release Notes
 
+## 6.24.0 (2026-07-01)
+
+### What's new
+- OAuth Improvements [#14899](https://github.com/statamic/cms/issues/14899) by @jasonvarga
+- Add JSON language modes to code editor [#14904](https://github.com/statamic/cms/issues/14904) by @daun
+
+### What's fixed
+- Remove `v6.` subdomain from documentation links [#14870](https://github.com/statamic/cms/issues/14870) by @duncanmcclean
+- Define emits in `PublishActions` component [#14872](https://github.com/statamic/cms/issues/14872) by @duncanmcclean
+- Style the list of blueprints as badges instead, improving legibility [#14878](https://github.com/statamic/cms/issues/14878) by @jaygeorge
+- Prevent browser re-sort of dictionary options with integer keys [#14875](https://github.com/statamic/cms/issues/14875) by @helloiamlukas
+- Improve the customize columns button layout so it no longer clashes with overflowing filters [#14885](https://github.com/statamic/cms/issues/14885) by @jaygeorge
+- Fix kebab-cased props not binding on Blade components in Antlers [#14891](https://github.com/statamic/cms/issues/14891) by @marcorieser
+- Tolerate a folded X-Statamic-Pagination header when warming [#14882](https://github.com/statamic/cms/issues/14882) by @mynetx
+- Fix icon fieldtype error when stored icon is missing [#14881](https://github.com/statamic/cms/issues/14881) by @mynetx
+- Pass active query scope handles to relationship index scopes [#14883](https://github.com/statamic/cms/issues/14883) by @mynetx
+- Fix stale Stache entry order when reordering structured collection [#14896](https://github.com/statamic/cms/issues/14896) by @joshuablum
+- Bump actions/checkout from 6.0.3 to 7.0.0 in the github-actions group [#14894](https://github.com/statamic/cms/issues/14894) by @dependabot
+
+
+
 ## 6.23.0 (2026-06-23)
 
 ### What's new
