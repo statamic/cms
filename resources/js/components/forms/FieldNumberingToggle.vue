@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ToggleGroup, ToggleItem } from '@ui';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 
