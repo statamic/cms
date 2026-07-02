@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { ToggleGroup, ToggleItem } from '@ui';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 
-const toggleFieldNumbers = () => showFieldNumbers.value = !showFieldNumbers.value;
+const toggle = () => showFieldNumbers.value = !showFieldNumbers.value;
+const label = computed(() => showFieldNumbers.value ? __('Hide field numbers') : __('Show field numbers'));
 </script>
 
 <template>
@@ -12,9 +14,9 @@ const toggleFieldNumbers = () => showFieldNumbers.value = !showFieldNumbers.valu
         <ToggleItem
             value="on"
             icon="mail-sign-hashtag"
-            :aria-label="__('Show field numbers')"
-            v-tooltip="__('Show field numbers')"
-            @click.prevent="toggleFieldNumbers"
+            :aria-label="label"
+            v-tooltip="label"
+            @click.prevent="toggle"
         />
     </ToggleGroup>
 </template>
