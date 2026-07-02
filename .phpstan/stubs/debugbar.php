@@ -8,7 +8,7 @@
  *
  * These declarations exist solely so PHPStan can resolve the
  * extends/implements relationships in that code (see scanFiles in
- * phpstan.neon.dist) — they are never autoloaded or executed.
+ * phpstan.dist.neon) — they are never autoloaded or executed.
  *
  * Signatures mirror php-debugbar/php-debugbar ^3.8 (src/DataCollector/*).
  */
