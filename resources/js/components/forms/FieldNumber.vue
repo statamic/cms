@@ -1,7 +1,13 @@
-<script setup>
-defineProps({
-    number: { type: Number, default: null },
-});
+<script setup lang="ts">
+import { computed, inject, type ComputedRef } from 'vue';
+
+const props = defineProps<{
+    fieldKey?: string | null;
+}>();
+
+const fieldNumbers = inject<ComputedRef<Map<string, number>> | null>('fieldNumbers', null);
+
+const number = computed(() => (props.fieldKey ? fieldNumbers?.value?.get(props.fieldKey) ?? null : null));
 </script>
 
 <template>

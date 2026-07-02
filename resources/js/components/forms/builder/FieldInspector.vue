@@ -5,6 +5,7 @@ import axios from 'axios';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from './categories';
 import debounce from '@/util/debounce';
 
@@ -267,6 +268,7 @@ onMounted(() => load());
                     >
                         <template #field-option="{ value, label }">
                             <span class="inline-flex items-center gap-2">
+                                <FieldNumber :field-key="value" />
                                 <Icon
                                     v-if="findSuggestableField(value)?.icon"
                                     :name="findSuggestableField(value).icon"
@@ -277,6 +279,7 @@ onMounted(() => load());
                         </template>
                         <template #field-selected="{ option, field: selectedField }">
                             <span class="inline-flex items-center gap-2 truncate">
+                                <FieldNumber :field-key="option.value" />
                                 <Icon
                                     v-if="selectedField?.icon"
                                     :name="selectedField.icon"

@@ -2,24 +2,13 @@
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { Icon } from '@ui';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
-import { fieldNumberFromMap } from '@/composables/forms/field-numbering';
 import { computed } from 'vue';
 
 const props = defineProps({
     pages: { type: Array, required: true },
     fields: { type: Array, required: true },
     expanded: { type: Boolean, default: false },
-    showFieldNumbers: { type: Boolean, default: false },
-    fieldNumbers: { type: Map, default: () => new Map() },
 });
-
-const fieldNumber = (field) => {
-    if (! props.showFieldNumbers) {
-        return null;
-    }
-
-    return fieldNumberFromMap(props.fieldNumbers, field.handle, field._id);
-};
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
@@ -228,7 +217,7 @@ const fieldIconClass = (field) => {
                                     aria-hidden="true"
                                 />
                                 <span class="linked-list__field-name min-w-0 flex-1">
-                                    <FieldNumber :number="fieldNumber(group.field)" />
+                                    <FieldNumber :field-key="group.field._id" />
                                     {{ group.field.display }}
                                 </span>
                                 <span
