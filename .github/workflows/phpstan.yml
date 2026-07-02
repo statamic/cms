@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   phpstan:
-    name: PHPStan
+    name: Analyze
     runs-on: ubuntu-latest
     permissions:
       contents: read
