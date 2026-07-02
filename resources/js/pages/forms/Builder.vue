@@ -426,18 +426,18 @@ onUnmounted(() => {
                 <div class="flex items-center gap-2.5">
                     <FieldNumberingToggle />
                     <ToggleGroup v-if="shouldShowViewSelector" v-model="fieldView" size="xs">
-                    <ToggleItem
-                        :value="FieldView.Expanded"
-                        icon="expand"
-                        :aria-label="__('Expanded view')"
-                        v-tooltip="__('Expanded view')"
-                    />
-                    <ToggleItem
-                        :value="FieldView.Collapsed"
-                        icon="collapse"
-                        :aria-label="__('Collapsed view')"
-                        v-tooltip="__('Collapsed view')"
-                    />
+                        <ToggleItem
+                            :value="FieldView.Expanded"
+                            icon="expand"
+                            :aria-label="__('Expanded view')"
+                            v-tooltip="__('Expanded view')"
+                        />
+                        <ToggleItem
+                            :value="FieldView.Collapsed"
+                            icon="collapse"
+                            :aria-label="__('Collapsed view')"
+                            v-tooltip="__('Collapsed view')"
+                        />
                     </ToggleGroup>
                 </div>
             </template>
