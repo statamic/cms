@@ -396,31 +396,31 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="45%" data-count="112"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="30%" data-count="74"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--3" aria-hidden="true" data-percent="15%" data-count="37"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--4" aria-hidden="true" data-percent="10%" data-count="25"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="45%" data-count="112"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="30%" data-count="74"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--3" aria-hidden="true" data-percent="15%" data-count="37"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--4" aria-hidden="true" data-percent="10%" data-count="25"></span>
                                 </div>
                                 <!-- Pie Chart 1 Legend -->
                                 <figcaption :id="pieChart1LegendId" class="pie-chart-legend">
                                     <ol class="pie-chart-legend__list">
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="45%" data-count="112"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="45%" data-count="112"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
                                             <span>Before you Go Go</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="30%" data-count="74"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="30%" data-count="74"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--2" />
                                             <span>Bring me Back to Life</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="15%" data-count="37"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="15%" data-count="37"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--3" />
                                             <span>When September Ends</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="10%" data-count="25"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="10%" data-count="25"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Never</span>
                                         </li>
@@ -460,25 +460,25 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="68%" data-count="169"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="18%" data-count="45"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--3" aria-hidden="true" data-percent="9%" data-count="22"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--4" aria-hidden="true" data-percent="5%" data-count="12"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="68%" data-count="169"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="18%" data-count="45"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--3" aria-hidden="true" data-percent="9%" data-count="22"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--4" aria-hidden="true" data-percent="5%" data-count="12"></span>
                                 </div>
                                 <figcaption :id="pieChart2LegendId" class="pie-chart-legend">
                                     <ul class="pie-chart-legend__list">
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="68%" data-count="169"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="68%" data-count="169"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--1" />
                                             <span>Alarm, no mercy</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="18%" data-count="45"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="18%" data-count="45"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--2" />
                                             <span>Hit snooze</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="9%" data-count="22"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="9%" data-count="22"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--3" />
                                             <span>Woken by someone else</span>
                                         </li>
@@ -488,7 +488,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                                 class="pie-chart-legend__link"
                                                 @click="selectNextChartPage"
                                             >
-                                                <span class="chart-metric pie-chart-legend__value" data-percent="5%" data-count="12"></span>
+                                                <span class="chart-metric | pie-chart-legend__value" data-percent="5%" data-count="12"></span>
                                                 <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                                 <span>Other</span>
                                             </button>
@@ -504,25 +504,25 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                     :aria-labelledby="pieChart2LegendPage2Id"
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="68%" data-count="169"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="18%" data-count="45"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--3" aria-hidden="true" data-percent="9%" data-count="22"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--4" aria-hidden="true" data-percent="5%" data-count="12"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="68%" data-count="169"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="18%" data-count="45"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--3" aria-hidden="true" data-percent="9%" data-count="22"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--4" aria-hidden="true" data-percent="5%" data-count="12"></span>
                                 </div>
                                 <figcaption :id="pieChart2LegendPage2Id" class="pie-chart-legend">
                                     <ul class="pie-chart-legend__list">
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="3%" data-count="7"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="3%" data-count="7"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Bohemian Rhapsody</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="1%" data-count="2"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Stairway to Heaven</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="1%" data-count="2"></span>
                                             <div class="pie-chart-legend__swatch pie-chart-legend__swatch--4" />
                                             <span>Wonderwall</span>
                                         </li>
@@ -549,7 +549,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[55%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-1" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -559,7 +559,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[25%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-2" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="25%" data-count="62"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="25%" data-count="62"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -569,7 +569,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[15%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-3" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="15%" data-count="37"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="15%" data-count="37"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -579,7 +579,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="size-2 rounded-full bg-chart-4-legend" />
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
                                         </div>
                                     </li>
                                 </ol>
@@ -601,19 +601,19 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6" :aria-labelledby="horizontalBarChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <span class="size-2.5 rounded-xs bg-chart-1" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Yep</span>
                                         <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
                                         <span class="size-2.5 rounded-xs bg-chart-2" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Nope</span>
                                         <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
                                         <span class="size-2.5 rounded-xs bg-chart-3" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Maybe</span>
                                         <div class="h-2.5 w-[10%] rounded-full bg-chart-3" />
@@ -643,77 +643,77 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                 <ol class="vertical-bar-chart" style="--max-value: 61;" aria-hidden="true">
                                     <li class="vertical-bar-chart__bar" style="--value: 2;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="2%" data-count="5"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="2%" data-count="5"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">0</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 1;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="1%" data-count="2"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">1</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 3;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="3%" data-count="7"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="3%" data-count="7"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">2</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 4;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="4%" data-count="10"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="4%" data-count="10"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">3</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 6;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="6%" data-count="15"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="6%" data-count="15"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">4</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 8;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="8%" data-count="20"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="8%" data-count="20"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">5</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 12;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="12%" data-count="30"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="12%" data-count="30"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">6</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 20;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="20%" data-count="50"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="20%" data-count="50"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">7</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 35;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="35%" data-count="87"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="35%" data-count="87"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">8</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 48;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="48%" data-count="119"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="48%" data-count="119"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">9</span>
                                     </li>
                                     <li class="vertical-bar-chart__bar" style="--value: 61;">
                                         <div class="vertical-bar-chart__plot">
-                                            <span class="chart-metric vertical-bar-chart__value" data-percent="61%" data-count="151"></span>
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="61%" data-count="151"></span>
                                             <div class="vertical-bar-chart__fill" />
                                         </div>
                                         <span class="vertical-bar-chart__scale-label">10</span>
@@ -757,14 +757,14 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             >
                                 <ol class="grid grid-cols-[auto_2.5rem_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/159/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Actually</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/485/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Nope</span>
@@ -787,17 +787,17 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="image-pie-chart__slice image-pie-chart__slice--2" style="--image: url('https://picsum.photos/id/485/320/320')" />
                                     </div>
                                     <!-- aria-hidden because the labels are already in the figure caption -->
-                                    <span class="chart-metric image-pie-chart__label image-pie-chart__label--1" aria-hidden="true" data-percent="55%" data-count="136"></span>
-                                    <span class="chart-metric image-pie-chart__label image-pie-chart__label--2" aria-hidden="true" data-percent="45%" data-count="112"></span>
+                                    <span class="chart-metric | image-pie-chart__label image-pie-chart__label--1" aria-hidden="true" data-percent="55%" data-count="136"></span>
+                                    <span class="chart-metric | image-pie-chart__label image-pie-chart__label--2" aria-hidden="true" data-percent="45%" data-count="112"></span>
                                 </div>
                                 <figcaption :id="imageChoicePieChart1LegendId" class="image-pie-chart-legend">
                                     <p class="sr-only">Actually (A) 55%, Nope (B) 45%</p>
                                     <ol class="grid grid-cols-[auto_2.5rem_auto_1fr] items-center justify-items-start list-none m-0 gap-x-2.25 gap-y-2.5 p-0 pt-3" aria-hidden="true">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/159/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">A</span>
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Actually</span>
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
                                         <img class="size-10 shrink-0 object-cover rounded-full" src="https://picsum.photos/id/485/320/320" alt="" />
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">B</span>
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Nope</span>
@@ -818,28 +818,28 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6" :aria-labelledby="checkboxesBarChart1CaptionId">
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.5 p-0 [&:not(:has(>_:nth-child(5)))]:pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
-                                        <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
+                                        <Icon name="checkbox-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--1 size-3.5 shrink-0" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Radiohead</span>
                                         <div class="h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
-                                        <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
+                                        <Icon name="checkbox-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--2 size-3.5 shrink-0" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Death Cab for Cutie</span>
                                         <div class="h-2.5 w-[35%] rounded-full bg-chart-2" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="5%" data-count="12"></span>
-                                        <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-3-legend" />
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="5%" data-count="12"></span>
+                                        <Icon name="checkbox-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--3 size-3.5 shrink-0" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Olivia Rodrigo</span>
                                         <div class="h-2.5 w-[5%] rounded-full bg-chart-3" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="5%" data-count="12"></span>
-                                        <Icon name="checkbox-filled" class="size-3.5 shrink-0 text-chart-4-legend" />
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="5%" data-count="12"></span>
+                                        <Icon name="checkbox-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--4 size-3.5 shrink-0" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">The Cure</span>
-                                        <div class="h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
+                                        <div class="box-content h-2.5 w-[5%] rounded-full bg-chart-4-legend" />
                                     </li>
                                 </ol>
                                 <figcaption :id="checkboxesBarChart1CaptionId" class="sr-only">
@@ -880,14 +880,14 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             >
                                 <ol class="grid grid-cols-[auto_auto_max-content_1fr] items-center list-none m-0 gap-x-2.25 gap-y-2.75 p-0 pt-4" aria-hidden="true">
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
-                                        <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="55%" data-count="136"></span>
+                                        <Icon name="checkmark-circle-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--1 size-3.5 shrink-0" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">I’ll get my coat</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[55%] rounded-full bg-chart-1" />
                                     </li>
                                     <li class="contents">
-                                        <span class="chart-metric text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
-                                        <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
+                                        <span class="chart-metric | text-xs text-end font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="45%" data-count="112"></span>
+                                        <Icon name="delete-circle-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--2 size-3.5 shrink-0" />
                                         <span class="max-w-25 truncate me-2 text-xs text-gray-900 dark:text-gray-50">Coffee might be better</span>
                                         <div class="summary-bar-chart__fill h-2.5 w-[45%] rounded-full bg-chart-2" />
                                     </li>
@@ -904,20 +904,20 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                     :aria-labelledby="yesNoPieChart1LegendId"
                                 >
                                     <div class="pie-chart__disc" aria-hidden="true" />
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="55%" data-count="136"></span>
-                                    <span class="chart-metric pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="45%" data-count="112"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--1" aria-hidden="true" data-percent="55%" data-count="136"></span>
+                                    <span class="chart-metric | pie-chart__label | pie-chart__label--2" aria-hidden="true" data-percent="45%" data-count="112"></span>
                                 </div>
                                 <figcaption :id="yesNoPieChart1LegendId" class="pie-chart-legend">
                                     <p class="sr-only">{{ __('Do you fancy a pint?: I’ll get my coat 55%, Coffee might be better 45%') }}</p>
                                     <ul class="pie-chart-legend__list" aria-hidden="true">
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="55%" data-count="136"></span>
-                                            <Icon name="checkmark-circle-filled" class="size-3.5 shrink-0 text-chart-1-legend" />
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="55%" data-count="136"></span>
+                                            <Icon name="checkmark-circle-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--1 size-3.5 shrink-0" />
                                             <span>I’ll get my coat</span>
                                         </li>
                                         <li class="pie-chart-legend__item">
-                                            <span class="chart-metric pie-chart-legend__value" data-percent="45%" data-count="112"></span>
-                                            <Icon name="delete-circle-filled" class="size-3.5 shrink-0 text-chart-2-legend" />
+                                            <span class="chart-metric | pie-chart-legend__value" data-percent="45%" data-count="112"></span>
+                                            <Icon name="delete-circle-filled" class="summary-bar-chart__icon-stroke summary-bar-chart__icon-stroke--2 size-3.5 shrink-0" />
                                             <span>Coffee might be better</span>
                                         </li>
                                     </ul>
@@ -954,7 +954,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[40%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇯🇵</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="40%" data-count="99"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="40%" data-count="99"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -963,7 +963,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[35%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇮🇹</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="35%" data-count="87"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -972,7 +972,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[10%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇺🇸</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="10%" data-count="25"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -981,7 +981,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[8%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇬🇧</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="8%" data-count="20"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="8%" data-count="20"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -990,7 +990,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[3%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇫🇷</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="3%" data-count="7"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="3%" data-count="7"></span>
                                         </div>
                                     </li>
                                 </ol>
@@ -1006,7 +1006,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[2%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇩🇪</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="2%" data-count="5"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="2%" data-count="5"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -1015,7 +1015,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[1%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇪🇸</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="1%" data-count="2"></span>
                                         </div>
                                     </li>
                                     <li class="contents">
@@ -1024,7 +1024,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex items-center gap-1">
                                             <div class="h-px w-[1%] bg-gray-200 dark:bg-gray-600" />
                                             <div class="text-lg">🇵🇹</div>
-                                            <span class="chart-metric min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="1%" data-count="2"></span>
+                                            <span class="chart-metric | min-w-8.5 ms-1 text-[0.75rem] font-medium tabular-nums text-gray-700 dark:text-gray-50" data-percent="1%" data-count="2"></span>
                                         </div>
                                     </li>
                                 </ol>
@@ -1058,27 +1058,27 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">0–9</span>
                                         <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10–19</span>
                                         <div class="h-2.5 w-[15%] rounded-full bg-chart-1" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="15%" data-count="37"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="15%" data-count="37"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">20–29</span>
                                         <div class="h-2.5 w-[30%] rounded-full bg-chart-1" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="30%" data-count="74"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="30%" data-count="74"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">30–39</span>
                                         <div class="h-2.5 w-[20%] rounded-full bg-chart-1" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">40–49</span>
                                         <div class="h-2.5 w-[10%] rounded-full bg-chart-1" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                 </ol>
                                 <figcaption :id="numberBarChart1CaptionId" class="sr-only">
@@ -1118,31 +1118,31 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <div class="h-2.5 w-[15%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="15%" data-count="37"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="15%" data-count="37"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-chart-1-legend" />
                                         <div class="h-2.5 w-[30%] rounded-full bg-chart-1-legend" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="30%" data-count="74"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="30%" data-count="74"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <div class="h-2.5 w-[20%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <div class="h-2.5 w-[10%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                 </ol>
                                 <figcaption :id="starRatingChart1CaptionId" class="sr-only">
@@ -1199,31 +1199,31 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
                                         <div class="h-2.5 w-[18%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="18%" data-count="45"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="18%" data-count="45"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">9</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
                                         <div class="h-2.5 w-[16%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="16%" data-count="40"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="16%" data-count="40"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">8</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
                                         <div class="h-2.5 w-[14%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="14%" data-count="35"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="14%" data-count="35"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">7</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
                                         <div class="h-2.5 w-[12%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="12%" data-count="30"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="12%" data-count="30"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">6</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <div class="h-2.5 w-[10%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="10%" data-count="25"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="10%" data-count="25"></span>
                                     </li>
                                 </ol>
                                 <figcaption :id="starRatingChart2CaptionId" class="sr-only">
@@ -1251,31 +1251,31 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
                                         <div class="h-2.5 w-[8%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="8%" data-count="20"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="8%" data-count="20"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-chart-1-legend" />
                                         <div class="h-2.5 w-[7%] rounded-full bg-chart-1-legend" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="7%" data-count="17"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="7%" data-count="17"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
                                         <div class="h-2.5 w-[6%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="6%" data-count="15"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="6%" data-count="15"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
                                         <div class="h-2.5 w-[5%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="5%" data-count="12"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="5%" data-count="12"></span>
                                     </li>
                                     <li class="contents">
                                         <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
                                         <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
                                         <div class="h-2.5 w-[4%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="4%" data-count="10"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="4%" data-count="10"></span>
                                     </li>
                                 </ol>
                                 <figcaption :id="starRatingChart2Page2CaptionId" class="sr-only">
@@ -1296,7 +1296,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6 pt-3 ps-4" :aria-labelledby="toggleBarChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 -ms-1 py-1.25 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <span class="chart-metric text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-50" data-percent="20%" data-count="50"></span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">{{ __('of users checked the toggle') }}</span>
+                                        <span class="chart-metric | text-md font-semibold st-text-trim-cap tabular-nums text-gray-950 dark:text-gray-50" data-percent="20%" data-count="50"></span> <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">{{ __('of users checked the toggle') }}</span>
                                     </div>
                                 </div>
                                 <ol class="grid grid-cols-[auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 pt-2" aria-hidden="true">
@@ -1305,7 +1305,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-[hsl(from_var(--color-chart-1-legend)_h_s_l/0.15)]">
                                             <div class="h-full w-[20%] shrink-0 rounded-full bg-chart-1-legend" />
                                         </div>
-                                        <span class="chart-metric text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
+                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="20%" data-count="50"></span>
                                     </li>
                                 </ol>
                                 <figcaption :id="toggleBarChart1CaptionId" class="sr-only">

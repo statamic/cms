@@ -441,7 +441,7 @@ class Color
             'chart-3-legend' => self::Lime[500],
             'chart-4-legend' => self::Indigo[300],
             'dark-chart-1-legend' => self::Indigo[600],
-            'dark-chart-2-legend' => self::Indigo[200],
+            'dark-chart-2-legend' => self::Indigo[300],
             'dark-chart-3-legend' => self::Lime[500],
             'dark-chart-4-legend' => self::Zinc[950],
         ])

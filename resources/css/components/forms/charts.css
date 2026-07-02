@@ -265,6 +265,30 @@
 
 
 
+/* GROUP CHARTS / SUMMARY BAR CHART / ICON STROKES
+=================================================== */
+/* Note: This is used to style the checkbox icons in the summary bar chart depending on the background contrast. */
+.summary-bar-chart__icon-stroke {
+    color: var(--chart-tick-color);
+}
+
+.summary-bar-chart__icon-stroke path:not(:first-child) {
+    stroke: white;
+}
+
+@supports (color: contrast-color(red)) {
+    .dark .summary-bar-chart__icon-stroke path:not(:first-child) {
+        stroke: contrast-color(var(--chart-tick-color));
+    }
+}
+
+.summary-bar-chart__icon-stroke--1 { --chart-tick-color: var(--color-chart-1-legend); }
+.summary-bar-chart__icon-stroke--2 { --chart-tick-color: var(--color-chart-2-legend); }
+.summary-bar-chart__icon-stroke--3 { --chart-tick-color: var(--color-chart-3-legend); }
+.summary-bar-chart__icon-stroke--4 { --chart-tick-color: var(--color-chart-4-legend); }
+
+
+
 /* GROUP CHARTS / DISPLAY MODE (% or count)
 =================================================== */
 .chart-metric::before {
