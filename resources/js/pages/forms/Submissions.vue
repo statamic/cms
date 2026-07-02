@@ -1099,11 +1099,11 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart1CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">3/5 Average</span>
                                     </div>
                                 </div>
@@ -1175,16 +1175,16 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             <figure v-if="starRatingChart2Page === 1" class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart2CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
+                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">7/10 Average</span>
                                     </div>
                                 </div>
