@@ -195,6 +195,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                         >
                             <template #field-option="{ value, label }">
                                 <span class="inline-flex items-center gap-2">
+                                    <FieldNumber :field-key="value" />
                                     <Icon
                                         v-if="findSuggestableField(value)?.icon"
                                         :name="findSuggestableField(value).icon"
@@ -205,6 +206,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
                             </template>
                             <template #field-selected="{ option, field: selectedField }">
                                 <span class="inline-flex items-center gap-2 truncate">
+                                    <FieldNumber :field-key="option.value" />
                                     <Icon
                                         v-if="selectedField?.icon"
                                         :name="selectedField.icon"

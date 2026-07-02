@@ -311,7 +311,7 @@ const fieldNumbers = computed(() => {
 
     const fieldsets = Object.values(usePage().props.fieldsets ?? {});
 
-    const keys = pages.value
+    const fieldKeys = pages.value
         .flatMap((page) => page.sections || [])
         .flatMap((section) => section.fields || [])
         .flatMap((field) => {
@@ -322,13 +322,15 @@ const fieldNumbers = computed(() => {
 
                 return (fieldset?.fields || [])
                     .filter((f) => f.type !== 'import')
-                    .map((f) => `${field._id}:${f.handle}`);
+                    .map((f) => [`${field._id}:${f.handle}`]);
             }
 
-            return [field._id];
+            return [[field._id, field.handle]];
         });
 
-    return new Map(keys.map((key, index) => [key, index + 1]));
+    const map = new Map();
+    fieldKeys.forEach((keys, index) => keys.forEach((key) => map.set(key, index + 1)));
+    return map;
 });
 
 provide('fieldNumbers', fieldNumbers);
