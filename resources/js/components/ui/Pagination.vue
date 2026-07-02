@@ -166,6 +166,7 @@ function getRange(start, end) {
             <Button
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
+                :class="{ 'disabled:cursor-default': !showPageLinks }"
                 round
                 icon="chevron-left"
                 :disabled="!hasPrevious"
@@ -187,6 +188,7 @@ function getRange(start, end) {
             <Button
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
+                :class="{ 'disabled:cursor-default': !showPageLinks }"
                 round
                 icon="chevron-right"
                 :disabled="!hasNext"
