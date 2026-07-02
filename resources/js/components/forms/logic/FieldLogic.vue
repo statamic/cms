@@ -3,7 +3,6 @@ import { Button, Card, Heading, Icon, Panel, PanelHeader } from '@ui';
 import AddLogicRuleButton from './AddLogicRuleButton.vue';
 import FieldLogicRule from './FieldLogicRule.vue';
 import { computed, nextTick, ref, watch } from 'vue';
-import { fieldNumberFromMap } from '@/composables/forms/field-numbering';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 import { KEYS } from '@/components/field-conditions/Constants.js';
 
@@ -13,8 +12,6 @@ const props = defineProps({
     fields: { type: Array, required: true },
     suggestableFields: { type: Array, required: true },
     fieldtypes: Array,
-    showFieldNumbers: { type: Boolean, default: false },
-    fieldNumbers: { type: Map, default: () => new Map() },
 });
 
 const collapsed = ref([]);
@@ -49,21 +46,12 @@ const getIconClass = (category) => {
     return categoryColorClasses[color]?.icon || 'text-gray-600 dark:text-gray-400';
 };
 
-const fieldNumber = (field) => {
-    if (! props.showFieldNumbers) {
-        return null;
-    }
-
-    return fieldNumberFromMap(props.fieldNumbers, field.handle, field._id);
-};
-
 const availableFields = computed(() => {
     return fieldsWithoutLogic.value.map(field => ({
         handle: field._id,
         display: field.display,
         icon: field.icon || 'generic-field',
         iconClass: getIconClass(field.category),
-        number: fieldNumber(field),
     }));
 });
 
@@ -72,7 +60,6 @@ const getFieldConfig = (field) => ({
     display: field.display,
     icon: field.icon || 'generic-field',
     iconClass: getIconClass(field.category),
-    number: fieldNumber(field),
 });
 
 const getConditionsConfig = (field) => ({

@@ -3,6 +3,7 @@ import { Primitive } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
 import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { keys } from '@api';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 
 const emit = defineEmits(['added']);
 
@@ -140,7 +141,7 @@ onBeforeUnmount(() => unbindKeys());
                         <ui-icon :name="item.icon || 'plus'" class="size-4" :class="item.iconClass || 'text-gray-600 dark:text-gray-300'" />
                         <div class="flex-1">
                             <div class="line-clamp-1 text-sm text-gray-900 dark:text-gray-200">
-                                <span v-if="item.number" class="font-mono text-2xs text-gray-500 tabular-nums me-1 dark:text-gray-400">{{ item.number }}.</span>{{ __(item.display || item.handle) }}
+                                <FieldNumber :field-key="item.handle" class="me-1" />{{ __(item.display || item.handle) }}
                             </div>
                             <ui-description v-if="item.instructions" class="w-56 truncate text-2xs">
                                 {{ __(item.instructions) }}

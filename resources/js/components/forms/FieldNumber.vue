@@ -1,7 +1,13 @@
 <script setup>
-defineProps({
-    number: { type: Number, default: null },
+import { computed, inject } from 'vue';
+
+const props = defineProps({
+    fieldKey: { type: String, default: null },
 });
+
+const fieldNumbers = inject('fieldNumbers', null);
+
+const number = computed(() => fieldNumbers?.value?.get(props.fieldKey) ?? null);
 </script>
 
 <template>

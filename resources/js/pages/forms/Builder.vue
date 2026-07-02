@@ -21,7 +21,7 @@ export const [injectBuilderContext, provideBuilderContext] = createContext('Form
 
 <script setup lang="ts">
 import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import axios from 'axios';
 import FormsLayout from './Layout.vue';
 import Head from '@/pages/layout/Head.vue';
@@ -39,7 +39,7 @@ import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import SectionInspector from '@/components/forms/builder/SectionInspector.vue';
 import { useFieldtypeDraggable } from '@/components/forms/builder/use-drag-and-drop';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
-import { buildFieldNumbersFromBuilderPages, useFieldNumberingPreference } from '@/composables/forms/field-numbering';
+import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { __, uniqid } from '@/bootstrap/globals';
 import { progress, keys } from '@api';
 import { usePage } from '@inertiajs/vue3';
@@ -69,8 +69,6 @@ const pages = computed(() => formFields.value.pages);
 const allSections = computed(() => pages.value.flatMap(page => page.sections));
 const shouldShowViewSelector = computed(() => allSections.value.some(section => section.fields.length > 0));
 const fieldCount = computed(() => allSections.value.flatMap(section => section.fields).length);
-const { showFieldNumbers } = useFieldNumberingPreference();
-const fieldNumbers = computed(() => buildFieldNumbersFromBuilderPages(pages.value, usePage().props.fieldsets));
 
 const inspect = (type: InspectorType, data: object): void => {
     inspecting.value = data;
@@ -306,6 +304,35 @@ const save = () => {
         .finally(() => saving.value = false);
 };
 
+const { showFieldNumbers } = useFieldNumberingPreference();
+
+const fieldNumbers = computed(() => {
+    if (!showFieldNumbers.value) return new Map();
+
+    const fieldsets = Object.values(usePage().props.fieldsets ?? {});
+
+    const keys = pages.value
+        .flatMap((page) => page.sections || [])
+        .flatMap((section) => section.fields || [])
+        .flatMap((field) => {
+            if (field.type === 'link_fields') return [];
+
+            if (field.type === 'import') {
+                const fieldset = fieldsets.find((fieldset) => fieldset.handle === field.fieldset);
+
+                return (fieldset?.fields || [])
+                    .filter((f) => f.type !== 'import')
+                    .map((f) => `${field._id}:${f.handle}`);
+            }
+
+            return [field._id];
+        });
+
+    return new Map(keys.map((key, index) => [key, index + 1]));
+});
+
+provide('fieldNumbers', fieldNumbers);
+
 provideBuilderContext({
     addSection,
     deletePage,
@@ -314,8 +341,6 @@ provideBuilderContext({
     errors,
     fieldtypes: props.fieldtypes,
     fieldView,
-    fieldNumbers,
-    showFieldNumbers,
     form: props.form,
     formsProInstalled: props.formsProInstalled,
     inspect,

@@ -7,10 +7,11 @@ import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
 import Head from '@/pages/layout/Head.vue';
-import { buildFieldNumbersFromLogicFields, useFieldNumberingPreference } from '@/composables/forms/field-numbering';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { keys } from '@api';
 import axios from 'axios';
+import { usePage } from '@inertiajs/vue3';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -24,11 +25,16 @@ const props = defineProps({
 
 const pages = ref(props.pages);
 const fields = ref(props.fields);
-const { showFieldNumbers } = useFieldNumberingPreference();
-const fieldNumbers = computed(() => buildFieldNumbersFromLogicFields(fields.value));
 const saving = ref(false);
 const saveBinding = ref(null);
 const errors = ref({});
+
+const { showFieldNumbers } = useFieldNumberingPreference();
+const fieldNumbers = computed(() => {
+    if (!showFieldNumbers.value) return new Map();
+    return new Map(fields.value.map((field, index) => [field._id, index + 1]));
+});
+provide('fieldNumbers', fieldNumbers);
 
 const suggestableFields = computed(() => {
     return fields.value
@@ -134,8 +140,6 @@ onUnmounted(() => {
             v-model:fields="fields"
             :suggestable-fields
             :fieldtypes
-            :show-field-numbers
-            :field-numbers
         />
     </div>
 </template>

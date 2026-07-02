@@ -122,7 +122,7 @@ const onAlwaysSaveUpdated = (alwaysSave) => emit('update:conditions', { ...props
             >
                 <button type="button" class="show-focus-within_target flex flex-1 items-center gap-1.75 p-2 py-1.75 ps-0 min-w-0 focus:outline-none cursor-pointer" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
-                        <FieldNumber :number="config?.number" class="me-0.5" />
+                        <FieldNumber :field-key="config?.handle" class="me-0.5" />
                         <Icon
                             v-if="config?.icon"
                             :name="config.icon"

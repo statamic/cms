@@ -4,9 +4,7 @@ import { useFieldNumberingPreference } from '@/composables/forms/field-numbering
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 
-const toggleFieldNumbers = () => {
-    showFieldNumbers.value = ! showFieldNumbers.value;
-};
+const toggleFieldNumbers = () => showFieldNumbers.value = !showFieldNumbers.value;
 </script>
 
 <template>
