@@ -5,3 +5,9 @@ parameters:
     level: 0
     paths:
         - src
+
+    ignoreErrors:
+        -
+            identifier: class.notFound
+            message: '#^(Class|Instantiated class) Spatie\\LaravelIgnition\\Exceptions\\(ViewException|ViewExceptionWithSolution) not found\.$#'
+            path: src/View/Antlers/Language/Runtime/RuntimeParser.php
