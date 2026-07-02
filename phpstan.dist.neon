@@ -32,3 +32,9 @@ parameters:
       identifier: function.notFound
       message: '#^Function debug not found\.$#'
       path: src/Modifiers/CoreModifiers.php
+
+    # spatie/laravel-ignition is an optional runtime integration; ddd() is one of its helpers.
+    -
+      identifier: function.notFound
+      message: '#^Function ddd not found\.$#'
+      path: src/Modifiers/CoreModifiers.php
