@@ -229,14 +229,14 @@ useSortable({
                                 v-for="field in section.items"
                                 :key="field._id"
                                 data-field-item
-                                class="cursor-grab"
+                                class="cursor-pointer"
                                 :class="{
                                     'linked-list__fieldset': field.import,
                                     'linked-list__connector': itemConnection(field),
                                     'linked-list__page-leap': itemConnection(field)?.leap,
                                 }"
                                 :style="itemConnection(field) ? { '--end-connection': itemConnection(field).endConnection } : null"
-                                v-tooltip="field.import ? __('Logic can\'t be added to imported fields. Edit the fieldset instead.') : null"
+                                v-tooltip="field.import ? __(`Logic can't be added to imported fields. Please edit the fieldset instead.`) : null"
                             >
                                 <LogicTreeFieldset v-if="field.import" :item="field" />
 

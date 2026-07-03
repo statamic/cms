@@ -15,7 +15,6 @@ defineProps<{
     >
         <LogicTreeField :field />
         <span
-            v-if="index === 0"
             v-tooltip="item.import_title ? __('Linked Fieldset: :title', { title: item.import_title }) : __('Linked Fieldset')"
             class="inline-flex size-4 shrink-0"
         >

@@ -259,7 +259,7 @@
         gap: 0.5rem;
         height: var(--item-height, 3.2rem);
         padding-block: var(--item-padding, 1rem);
-        @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
+        @apply px-3 border-1 border-dashed border-gray-400/75! rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-600! dark:bg-gray-800 dark:text-gray-200 dark:shadow-none opacity-75;
 
         > * {
             grid-row: 1;
@@ -270,11 +270,6 @@
         .linked-list__field-name {
             grid-column: 2;
         }
-    }
-
-    /* Every row after the first reads as "linked": dimmed + dashed. */
-    .linked-list__fieldset-row:not(:first-child) {
-        @apply border-dashed border-gray-400/75! dark:border-gray-600! opacity-75;
     }
 
     /* GROUP LOGIC TREE CONNECTORS / LEAP BRIDGE (FIRST GAP + CORNER)
