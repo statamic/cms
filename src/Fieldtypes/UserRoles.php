@@ -18,7 +18,7 @@ class UserRoles extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        return User::current()->can('edit roles');
+        return User::current()->can('assign roles');
     }
 
     protected function toItemArray($id, $site = null)
@@ -47,7 +47,7 @@ class UserRoles extends Relationship
 
     public function getIndexItems($request)
     {
-        if (! User::current()->can('edit roles')) {
+        if (! User::current()->can('assign roles')) {
             return collect();
         }
 
