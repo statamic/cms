@@ -8,7 +8,6 @@ defineProps([
     'usersIndexUrl',
     'usersCreateUrl',
     'canCreateSupers',
-    'defaultSuper',
     'canAssignRoles',
     'canAssignGroups',
     'activationExpiry',
@@ -31,7 +30,6 @@ useArchitecturalBackground();
         :users-index-url="usersIndexUrl"
         :users-create-url="usersCreateUrl"
         :can-create-supers="canCreateSupers"
-        :default-super="defaultSuper"
         :can-assign-roles="canAssignRoles"
         :can-assign-groups="canAssignGroups"
         :activation-expiry="activationExpiry"

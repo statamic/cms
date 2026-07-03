@@ -178,7 +178,6 @@ class UsersController extends CpController
             'usersIndexUrl' => cp_route('users.index'),
             'usersCreateUrl' => cp_route('users.create'),
             'canCreateSupers' => User::current()->isSuper(),
-            'defaultSuper' => config('statamic.users.wizard_default_super', true),
             'canAssignRoles' => User::current()->can('assign roles'),
             'canAssignGroups' => User::current()->can('assign user groups'),
             'activationExpiry' => $expiry,

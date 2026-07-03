@@ -221,7 +221,6 @@ export default {
         usersCreateUrl: { type: String },
         usersIndexUrl: { type: String },
         canCreateSupers: { type: Boolean },
-        defaultSuper: { type: Boolean, default: true },
         canAssignRoles: { type: Boolean },
         canAssignGroups: { type: Boolean },
         activationExpiry: { type: Number },
@@ -236,7 +235,7 @@ export default {
     data() {
         return {
             user: {
-                super: this.canCreateSupers && this.defaultSuper,
+                super: false,
                 roles: [],
                 groups: [],
             },

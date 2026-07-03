@@ -103,20 +103,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | User Wizard Default Super Admin
-    |--------------------------------------------------------------------------
-    |
-    | When creating new users through the wizard in the control panel, the
-    | "Super Admin" toggle defaults to enabled for super users. Set this
-    | to false to have the toggle default to off, so that granting a
-    | new user super admin becomes an explicit, opt-in action.
-    |
-    */
-
-    'wizard_default_super' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | Password Brokers
     |--------------------------------------------------------------------------
     |
