@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import progress from 'nprogress';
 
 progress.configure({ showSpinner: false });
@@ -25,6 +25,8 @@ function stop() {
 function add(name) {
     if (progressNames.value.indexOf(name) == -1) {
         progressNames.value = [...progressNames.value, name];
+
+        if (!progressing.value) start();
     }
 }
 
@@ -36,6 +38,8 @@ function remove(name) {
 
     newValues.splice(i, 1);
     progressNames.value = newValues;
+
+    if (newValues.length === 0 && progressing.value) stop();
 }
 
 function loading(name, loading) {
@@ -47,22 +51,14 @@ function count() {
 }
 
 function isComplete() {
-    return count() === 0;
+    // Derived from the coarse `progressing` boolean rather than the length of
+    // `progressNames` so that reactive consumers (e.g. a form's "is loading"
+    // state) are only notified when loading starts and stops, not on every
+    // individual operation. Otherwise many fields loading at once (e.g. lots of
+    // relationship fields) can trigger enough updates to exceed Vue's recursive
+    // update limit. See https://github.com/statamic/cms/issues/14787
+    return !progressing.value;
 }
-
-watch(
-    names,
-    (newNames) => {
-        if (newNames.length > 0 && !progressing.value) {
-            start();
-        }
-
-        if (newNames.length === 0 && progressing.value) {
-            stop();
-        }
-    },
-    { immediate: true },
-);
 
 export default function useProgressBar() {
     return {
