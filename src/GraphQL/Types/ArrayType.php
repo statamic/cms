@@ -7,6 +7,9 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Contracts\TypeConvertible;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class ArrayType extends ScalarType implements TypeConvertible
 {
     const NAME = 'Array';

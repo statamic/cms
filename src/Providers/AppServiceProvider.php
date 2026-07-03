@@ -76,10 +76,6 @@ class AppServiceProvider extends ServiceProvider
             "{$this->root}/resources/dist-frontend" => public_path('vendor/statamic/frontend'),
         ], 'statamic-frontend');
 
-        $this->publishes([
-            "{$this->root}/resources/css/components/fieldtypes/star-rating.css" => public_path('vendor/statamic/forms/star-rating.css'),
-        ], 'statamic');
-
         $this->loadTranslationsFrom("{$this->root}/lang", 'statamic');
         $this->loadJsonTranslationsFrom("{$this->root}/lang");
 
@@ -102,6 +98,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-scaffolding');
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
+            /** @var \Illuminate\Routing\Redirector $this */
             return $this->to(cp_route($route, $parameters));
         });
 
@@ -372,6 +369,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Session::macro('elevate', function () {
+            /** @var \Illuminate\Session\Store $this */
             $this->put('statamic_elevated_session', now()->timestamp);
             $this->forget('statamic_elevated_session_verification_code');
         });

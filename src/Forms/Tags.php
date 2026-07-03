@@ -399,6 +399,8 @@ class Tags extends BaseTags
             ->each(fn ($field) => $field->setForm($form)->setFormField($form->formFields()->field($field->handle())))
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
+                    $data['is_informative'] = in_array('information', $field->formField()?->fieldtype()?->categories() ?? []);
+
                     return $jsDriver
                         ? $this->mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
                         : $data;

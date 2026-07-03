@@ -119,7 +119,8 @@
             class="hidden"
             ref="relationshipInput"
             name="link"
-            :value="[]"
+            :value="selectedEntryValue"
+            :data="selectedEntryData"
             :config="relationshipConfig"
             :item-data-url="itemDataUrl"
             :selections-url="selectionsUrl"
@@ -259,6 +260,16 @@ export default {
             if (this.config.link_noopener) rel.push('noopener');
             if (this.config.link_noreferrer) rel.push('noreferrer');
             return rel.length ? rel.join(' ') : null;
+        },
+
+        selectedEntryValue() {
+            const { type, id } = this.parseDataUrl(this.url.entry);
+
+            return type === 'entry' && id ? [id] : [];
+        },
+
+        selectedEntryData() {
+            return this.itemData.entry ? [this.itemData.entry] : [];
         },
 
         relationshipConfig() {

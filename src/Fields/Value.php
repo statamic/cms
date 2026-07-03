@@ -15,6 +15,9 @@ use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 use Statamic\View\Cascade;
 use Traversable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 {
     private $resolver;

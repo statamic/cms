@@ -3,6 +3,7 @@ import { Button, Field, Icon, Label } from '@ui';
 import { computed } from 'vue';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { categories, categoryColorClasses } from './categories';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { __ } from '@/bootstrap/globals';
 
@@ -105,6 +106,7 @@ const hasErrors = computed(() => {
         >
             <template #label>
                 <Label :class="['mb-0', { 'cursor-pointer': !isInspecting }]">
+                    <FieldNumber :field-key="field._id" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
                         v-if="field.config.if || field.config.unless"
@@ -140,6 +142,7 @@ const hasErrors = computed(() => {
         >
             <template #label>
                 <Label :class="['', { 'cursor-pointer': !isInspecting }]">
+                    <FieldNumber :field-key="field._id" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
                         v-if="field.config.if || field.config.unless"

@@ -2,6 +2,7 @@
 import { Button, Description, Field, Icon, Label } from '@ui';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
 import { categoryColorClasses } from './categories';
 import { __ } from '@/bootstrap/globals';
@@ -77,6 +78,7 @@ const errorMessage = computed(() => {
                         <template #label>
                             <Label>
                                 <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <FieldNumber :field-key="`${field._id}:${fieldsetField.handle}`" class="me-1" />
                                     <Icon name="link" data-collapsed-field-icon class="size-3.5 me-1 " :class="categoryColorClasses['fieldsets']?.icon" aria-hidden="true" />
                                     {{ __(fieldsetField.config.display) }}
                                     <span v-if="fieldsetField.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>

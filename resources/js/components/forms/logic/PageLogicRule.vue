@@ -10,6 +10,7 @@ import {
     Subheading,
 } from '@/components/ui';
 import PageRule from '@/components/forms/builder/pages/PageRule.vue';
+import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
 
 const emit = defineEmits(['collapsed', 'expanded', 'removed', 'update:rule']);
@@ -59,6 +60,7 @@ const firstFieldConfig = computed(() => {
     if (!firstCondition?.field) return null;
     const field = getFieldConfig(firstCondition.field);
     return {
+        handle: firstCondition.field,
         display: field?.config?.display || firstCondition.field,
         icon: field?.icon || 'generic-field',
         iconClass: getIconClass(field?.category),
@@ -136,6 +138,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                         {{ __('If') }}
                     </Badge>
                     <Badge v-if="collapsed && firstFieldConfig" size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                        <FieldNumber :field-key="firstFieldConfig.handle" class="me-0.5" />
                         <Icon
                             :name="firstFieldConfig.icon"
                             class="size-3.5 me-1 rounded-sm opacity-100!"
@@ -177,6 +180,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                         </template>
                     </Subheading>
                     <Badge v-if="!collapsed && firstFieldConfig" size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
+                        <FieldNumber :field-key="firstFieldConfig.handle" class="me-0.5" />
                         <Icon
                             :name="firstFieldConfig.icon"
                             class="size-3.5 me-0.5 rounded-sm opacity-100!"
