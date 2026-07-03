@@ -111,7 +111,7 @@
             .linked-list__section:not(:first-child) & {
                 height: var(--item-height);
             }
-            @apply text-2xs font-medium text-gray-700 dark:text-gray-200;
+            @apply text-2xs font-medium text-gray-800 dark:text-gray-200;
             + ul {
                 @apply rounded-t-none;
             }
@@ -209,6 +209,11 @@
     =================================================== */
     .linked-list__field-name {
         @apply line-clamp-1 select-none;
+        [data-field-number] {
+            /* Optically align */
+            position: relative;
+            top: -0.2px;
+        }
     }
 
     .linked-list--expanded {
