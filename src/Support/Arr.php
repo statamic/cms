@@ -308,7 +308,7 @@ class Arr
      */
     public static function forget(&$array, $keys)
     {
-        return IlluminateArr::forget($array, $keys);
+        IlluminateArr::forget($array, $keys);
     }
 
     /**

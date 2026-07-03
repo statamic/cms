@@ -21,6 +21,9 @@ use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Statamic
 {
     const CORE_SLUG = 'statamic';

@@ -15,8 +15,11 @@
 - Fix kebab-cased props not binding on Blade components in Antlers [#14891](https://github.com/statamic/cms/issues/14891) by @marcorieser
 - Tolerate a folded X-Statamic-Pagination header when warming [#14882](https://github.com/statamic/cms/issues/14882) by @mynetx
 - Fix icon fieldtype error when stored icon is missing [#14881](https://github.com/statamic/cms/issues/14881) by @mynetx
+- Fix user wizard authorization check [#14905](https://github.com/statamic/cms/issues/14905) by @jasonvarga
 - Pass active query scope handles to relationship index scopes [#14883](https://github.com/statamic/cms/issues/14883) by @mynetx
+- Fix nav authorization checks [#14906](https://github.com/statamic/cms/issues/14906) by @jasonvarga
 - Fix stale Stache entry order when reordering structured collection [#14896](https://github.com/statamic/cms/issues/14896) by @joshuablum
+- Tighten up dynamic method resolution [#14911](https://github.com/statamic/cms/issues/14911) by @jasonvarga
 - Bump actions/checkout from 6.0.3 to 7.0.0 in the github-actions group [#14894](https://github.com/statamic/cms/issues/14894) by @dependabot
 
 

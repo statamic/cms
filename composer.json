@@ -45,11 +45,14 @@
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
+        "larastan/larastan": "^3.10",
+        "laravel/pao": "^1.1",
         "laravel/pint": "1.16.0",
         "laravel/socialite": "^5.28",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^10.8 || ^11.0",
-        "phpunit/phpunit": "^11.5.3",
+        "phpstan/phpstan": "^2.2",
+        "phpunit/phpunit": "^12.5.23",
         "spatie/laravel-ray": "^1.43.6"
     },
     "conflict": {
