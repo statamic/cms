@@ -56,26 +56,7 @@ const dictionaryChart1Page2CaptionId = useId();
 const numberBarChart1CaptionId = useId();
 const starRatingChart1CaptionId = useId();
 const starRatingChart2CaptionId = useId();
-const starRatingChart2Page2CaptionId = useId();
 const toggleBarChart1CaptionId = useId();
-
-const starRatingChart2Page = ref(1);
-const starRatingChart2PerPage = 5;
-const starRatingChart2Total = 10;
-
-const starRatingChart2Meta = computed(() => {
-    const from = (starRatingChart2Page.value - 1) * starRatingChart2PerPage + 1;
-    const to = Math.min(starRatingChart2Page.value * starRatingChart2PerPage, starRatingChart2Total);
-
-    return {
-        current_page: starRatingChart2Page.value,
-        last_page: Math.ceil(starRatingChart2Total / starRatingChart2PerPage),
-        per_page: starRatingChart2PerPage,
-        total: starRatingChart2Total,
-        from,
-        to,
-    };
-});
 
 const dictionaryChartPage = ref(1);
 const dictionaryChartPerPage = 5;
@@ -1153,7 +1134,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             </figure>
                         </Widget>
                     </div>
-                    <!-- Example of a Star Rating field type with pagination (Horizontal Star Rating Bar Chart with info). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
+                    <!-- Example of a Star Rating field type greater than 5 stars. It should switch to a vertical bar chart when it's greater than 5 stars). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
                     <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
                         <Widget
                             :title="__('How would you rate the restaurant?')"
@@ -1162,19 +1143,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                             icon="star"
                             icon-class="hidden @xs/widget:block size-4 text-gray-500"
                         >
-                            <template #actions>
-                                <Pagination
-                                    :resource-meta="starRatingChart2Meta"
-                                    :show-totals="false"
-                                    :show-page-links="false"
-                                    :show-per-page-selector="false"
-                                    :scroll-to-top="false"
-                                    @page-selected="starRatingChart2Page = $event"
-                                />
-                            </template>
-                            <p v-if="starRatingChart2Page === 1" class="sr-only" aria-live="polite">How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%</p>
-                            <p v-else class="sr-only" aria-live="polite">How would you rate the restaurant?: 7/10 average. Rating distribution: 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%</p>
-                            <figure v-if="starRatingChart2Page === 1" class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart2CaptionId">
+                            <figure class="vertical-bar-chart-figure" :aria-labelledby="starRatingChart2CaptionId">
                                 <div aria-hidden="true" class="pb-5">
                                     <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
                                         <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950 dark:text-gray-300" />
@@ -1190,98 +1159,80 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                                         <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">7/10 Average</span>
                                     </div>
                                 </div>
-                                <!--
-                                    Star row colors use oklch relative lightness from --color-chart-1-legend:
-                                    - Midpoint star uses chart-1-legend (3/5 in the hotel demo; 4/10 in the restaurant demo).
-                                    - 5 stars or fewer: darker stars use l*0.9, l*0.8 (−0.1 per step); lighter stars use l*1.2, l*1.4 (+0.2 per step).
-                                    - 6 stars or more: darker stars use −0.05 per step (e.g. l*0.9, l*0.85, l*0.8, l*0.75, l*0.7); lighter stars use l*1.1, l*1.2, l*1.4 (+0.1, then +0.2).
-                                 -->
-                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">10</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
-                                        <div class="h-2.5 w-[18%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.7)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="18%" data-count="45"></span>
+                                <ol class="vertical-bar-chart" aria-hidden="true">
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="4%" data-count="10"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 22%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">1</span>
                                     </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">9</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
-                                        <div class="h-2.5 w-[16%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.75)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="16%" data-count="40"></span>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="5%" data-count="12"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 27%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">2</span>
                                     </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">8</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
-                                        <div class="h-2.5 w-[14%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.8)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="14%" data-count="35"></span>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="6%" data-count="15"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 33%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">3</span>
                                     </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">7</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
-                                        <div class="h-2.5 w-[12%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.85)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="12%" data-count="30"></span>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="7%" data-count="17"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 38%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">4</span>
                                     </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">6</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <div class="h-2.5 w-[10%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="10%" data-count="25"></span>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="8%" data-count="20"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 44%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">5</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="10%" data-count="25"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 56%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">6</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="12%" data-count="30"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 67%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">7</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="14%" data-count="35"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 78%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">8</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="16%" data-count="40"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 89%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">9</span>
+                                    </li>
+                                    <li class="vertical-bar-chart__bar">
+                                        <div class="vertical-bar-chart__plot">
+                                            <span class="chart-metric | vertical-bar-chart__value" data-percent="18%" data-count="45"></span>
+                                            <div class="vertical-bar-chart__fill" style="flex: 0 0 100%;" />
+                                        </div>
+                                        <span class="vertical-bar-chart__scale-label">10</span>
                                     </li>
                                 </ol>
                                 <figcaption :id="starRatingChart2CaptionId" class="sr-only">
-                                    {{ __('How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%') }}
-                                </figcaption>
-                            </figure>
-                            <figure v-else-if="starRatingChart2Page === 2" class="grid p-6 pt-3 ps-4" :aria-labelledby="starRatingChart2Page2CaptionId">
-                                <div aria-hidden="true" class="pb-5">
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 -ms-1 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <Icon name="star" class="size-3.5 shrink-0 text-gray-950" />
-                                        <span class="text-[0.75rem] text-gray-500 dark:text-gray-300">7/10 Average</span>
-                                    </div>
-                                </div>
-                                <ol class="grid grid-cols-[auto_auto_1fr_max-content] items-center list-none m-0 gap-x-3 gap-y-1 p-0 text-end" aria-hidden="true">
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">5</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <div class="h-2.5 w-[8%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*0.9)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="8%" data-count="20"></span>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">4</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-chart-1-legend" />
-                                        <div class="h-2.5 w-[7%] rounded-full bg-chart-1-legend" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="7%" data-count="17"></span>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">3</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
-                                        <div class="h-2.5 w-[6%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.1)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="6%" data-count="15"></span>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">2</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
-                                        <div class="h-2.5 w-[5%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.2)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="5%" data-count="12"></span>
-                                    </li>
-                                    <li class="contents">
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-400">1</span>
-                                        <Icon name="star-filled" class="size-3.5 shrink-0 -ms-0.75 text-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
-                                        <div class="h-2.5 w-[4%] rounded-full bg-[oklch(from_var(--color-chart-1-legend)_calc(l*1.4)_c_h)]" />
-                                        <span class="chart-metric | text-xs font-medium tabular-nums text-gray-700 dark:text-gray-400" data-percent="4%" data-count="10"></span>
-                                    </li>
-                                </ol>
-                                <figcaption :id="starRatingChart2Page2CaptionId" class="sr-only">
-                                    {{ __('How would you rate the restaurant?: 7/10 average. Rating distribution: 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%') }}
+                                    {{ __('How would you rate the restaurant?: 7/10 average. Rating distribution: 10 stars 18%, 9 stars 16%, 8 stars 14%, 7 stars 12%, 6 stars 10%, 5 stars 8%, 4 stars 7%, 3 stars 6%, 2 stars 5%, 1 star 4%') }}
                                 </figcaption>
                             </figure>
                         </Widget>
