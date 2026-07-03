@@ -74,7 +74,7 @@ class FrontendFormRequest extends FormRequest
             throw (new ValidationException($validator, $response));
         }
 
-        return parent::failedValidation($validator);
+        parent::failedValidation($validator);
     }
 
     private function extraRules($fields)
@@ -122,7 +122,7 @@ class FrontendFormRequest extends FormRequest
         // directly in a headless format. In that case, we'll just use the default lang.
         $site = ($previousUrl = $this->previousUrl()) ? Site::findByUrl($previousUrl) : null;
 
-        return $this->withLocale($site?->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site?->lang(), fn () => parent::validateResolved());
     }
 
     private function previousUrl()

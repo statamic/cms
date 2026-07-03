@@ -26,7 +26,6 @@ use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
 use Statamic\View\Interop\Stacks;
-use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -37,8 +36,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Store::class);
-
         $this->app->singleton(Cascade::class, function ($app) {
             return new Cascade($app['request'], Site::current());
         });
@@ -439,8 +436,8 @@ PHP;
         });
 
         View::macro('withoutExtractions', function () {
-            if ($this->engine instanceof Engine) {
-                $this->engine->withoutExtractions();
+            if ($this->getEngine() instanceof Engine) {
+                $this->getEngine()->withoutExtractions();
             }
 
             return $this;

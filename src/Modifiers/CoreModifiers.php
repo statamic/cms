@@ -32,6 +32,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
+use Statamic\Support\MethodDenylist;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\ChecksDumpability;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
@@ -899,13 +900,13 @@ class CoreModifiers extends Modifier
         // available data. Then grab the requested variable from there.
         $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
-        if ($arrayValue = Arr::get($array, $var)) {
-            return $arrayValue;
+        if (Arr::has($array, $var)) {
+            return Arr::get($array, $var);
         }
 
         // Finally, try to call a method on the object
         $method = Str::slug($var);
-        if (method_exists($item, $method)) {
+        if (method_exists($item, $method) && ! MethodDenylist::blocks($method)) {
             return $item->$method();
         }
 
@@ -1526,14 +1527,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
         if (is_array($value)) {
             return Arr::last($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->last();
         }
 
         return Stringy::last($value, Arr::get($params, 0));

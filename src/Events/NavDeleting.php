@@ -2,6 +2,9 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class NavDeleting extends Event
 {
     public function __construct(public $nav)

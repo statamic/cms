@@ -22,6 +22,7 @@ abstract class Fieldtype implements Arrayable
 
     protected static $title;
     protected static $binding = 'fieldtypes';
+    protected static $preloadable = null;
 
     protected $field;
     protected $localizable = true;
@@ -328,6 +329,11 @@ abstract class Fieldtype implements Arrayable
     public function preProcessConfig($data)
     {
         return $this->preProcess($data);
+    }
+
+    public function migrateConfig(array $values): array
+    {
+        return $values;
     }
 
     public function preProcessIndex($data)

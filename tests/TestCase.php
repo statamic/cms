@@ -69,6 +69,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
             \Spatie\LaravelRay\RayServiceProvider::class,
+            \Laravel\Socialite\SocialiteServiceProvider::class,
         ];
     }
 

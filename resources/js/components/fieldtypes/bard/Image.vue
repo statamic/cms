@@ -55,6 +55,7 @@
                 :id="assetId"
                 :showToolbar="false"
                 :allow-deleting="false"
+                :show-navigation="false"
                 @closed="closeEditor"
                 @saved="editorAssetSaved"
                 @actionCompleted="actionCompleted"

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Addons\AddonsController;
@@ -23,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
+use Statamic\Http\Controllers\CP\Auth\OAuthController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyController;
 use Statamic\Http\Controllers\CP\Auth\PasskeyLoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
@@ -113,6 +115,7 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Http\Controllers\OAuthController as FrontendOAuthController;
 use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
@@ -126,7 +129,7 @@ Route::group(['prefix' => 'auth'], function () {
 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:statamic.cp.auth')->name('password.email');
-        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->middleware('throttle:statamic.cp.password-reset-form')->name('password.reset');
         Route::post('password/reset', [ResetPasswordController::class, 'reset'])->middleware('throttle:statamic.cp.auth')->name('password.reset.action');
 
         if (TwoFactor::enabled()) {
@@ -256,6 +259,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
     Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
+    Route::post('assets/{encoded_asset}/crop', [AssetsController::class, 'crop'])->name('assets.crop');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
@@ -434,6 +438,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('/', [PasskeyController::class, 'store'])->name('passkeys.store');
         Route::delete('{id}', [PasskeyController::class, 'destroy'])->name('passkeys.destroy');
     });
+
+    if (OAuth::enabled()) {
+        Route::get('oauth', [OAuthController::class, 'index'])->name('oauth');
+        Route::delete('oauth/{provider}/disconnect', [FrontendOAuthController::class, 'disconnect'])->middleware(RequireElevatedSession::class)->name('oauth.disconnect');
+    }
 
     Route::get('themes', [ThemeController::class, 'index']);
     Route::get('themes/refresh', [ThemeController::class, 'refresh']);
