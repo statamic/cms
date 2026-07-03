@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.74.2 (2026-07-03)
+
+### What's fixed
+- Fix roles/groups select being empty for non-super users [#14889](https://github.com/statamic/cms/issues/14889) by @mynetx
+
+
+
 ## 5.74.1 (2026-07-01)
 
 ### What's fixed
