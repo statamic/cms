@@ -1,0 +1,2940 @@
+{
+  "resources/css/tailwind.css": {
+    "file": "assets/tailwind-a6c70b7c.css",
+    "isEntry": true,
+    "src": "resources/css/tailwind.css"
+  },
+  "resources/fonts/Inter/Inter-italic.var.woff2": {
+    "file": "assets/Inter-italic.var-d1401419.woff2",
+    "src": "resources/fonts/Inter/Inter-italic.var.woff2"
+  },
+  "resources/fonts/Inter/Inter-roman.var.woff2": {
+    "file": "assets/Inter-roman.var-17fe38ab.woff2",
+    "src": "resources/fonts/Inter/Inter-roman.var.woff2"
+  },
+  "resources/img/favicon-16x16.png": {
+    "file": "assets/favicon-16x16-a15cab2f.png",
+    "src": "resources/img/favicon-16x16.png"
+  },
+  "resources/img/favicon-32x32.png": {
+    "file": "assets/favicon-32x32-c29eba9f.png",
+    "src": "resources/img/favicon-32x32.png"
+  },
+  "resources/img/favicon.ico": {
+    "file": "assets/favicon-bbfe21cf.ico",
+    "src": "resources/img/favicon.ico"
+  },
+  "resources/js/app.css": {
+    "file": "assets/app-0b2827b1.css",
+    "src": "resources/js/app.css"
+  },
+  "resources/js/app.js": {
+    "css": [
+      "assets/app-0b2827b1.css"
+    ],
+    "dynamicImports": [
+      "resources/svg/icons/light/add-circle.svg",
+      "resources/svg/icons/light/add.svg",
+      "resources/svg/icons/light/addons.svg",
+      "resources/svg/icons/light/angle-brackets-dots.svg",
+      "resources/svg/icons/light/angle-brackets.svg",
+      "resources/svg/icons/light/arrange-letter.svg",
+      "resources/svg/icons/light/arrange-number.svg",
+      "resources/svg/icons/light/array.svg",
+      "resources/svg/icons/light/arrow-right-thin.svg",
+      "resources/svg/icons/light/assets.svg",
+      "resources/svg/icons/light/bard.svg",
+      "resources/svg/icons/light/blueprint.svg",
+      "resources/svg/icons/light/blueprints.svg",
+      "resources/svg/icons/light/book-open.svg",
+      "resources/svg/icons/light/book-pages.svg",
+      "resources/svg/icons/light/browser-com.svg",
+      "resources/svg/icons/light/burger.svg",
+      "resources/svg/icons/light/button_group.svg",
+      "resources/svg/icons/light/cache.svg",
+      "resources/svg/icons/light/calendar.svg",
+      "resources/svg/icons/light/charts.svg",
+      "resources/svg/icons/light/check.svg",
+      "resources/svg/icons/light/checkboxes.svg",
+      "resources/svg/icons/light/close.svg",
+      "resources/svg/icons/light/code.svg",
+      "resources/svg/icons/light/cog.svg",
+      "resources/svg/icons/light/collection.svg",
+      "resources/svg/icons/light/collections.svg",
+      "resources/svg/icons/light/color.svg",
+      "resources/svg/icons/light/content-writing.svg",
+      "resources/svg/icons/light/crane.svg",
+      "resources/svg/icons/light/date.svg",
+      "resources/svg/icons/light/dictionary.svg",
+      "resources/svg/icons/light/download.svg",
+      "resources/svg/icons/light/drag-dots.svg",
+      "resources/svg/icons/light/drawer-file.svg",
+      "resources/svg/icons/light/duplicate-ids.svg",
+      "resources/svg/icons/light/duplicate.svg",
+      "resources/svg/icons/light/earth.svg",
+      "resources/svg/icons/light/email-utility.svg",
+      "resources/svg/icons/light/entries.svg",
+      "resources/svg/icons/light/expand-diagonal.svg",
+      "resources/svg/icons/light/expand-vertical.svg",
+      "resources/svg/icons/light/external-link.svg",
+      "resources/svg/icons/light/eye.svg",
+      "resources/svg/icons/light/fieldsets.svg",
+      "resources/svg/icons/light/fieldtype.svg",
+      "resources/svg/icons/light/file-code.svg",
+      "resources/svg/icons/light/file-text.svg",
+      "resources/svg/icons/light/filter-lines.svg",
+      "resources/svg/icons/light/filter.svg",
+      "resources/svg/icons/light/flag.svg",
+      "resources/svg/icons/light/float.svg",
+      "resources/svg/icons/light/form.svg",
+      "resources/svg/icons/light/generic-field.svg",
+      "resources/svg/icons/light/git.svg",
+      "resources/svg/icons/light/grid.svg",
+      "resources/svg/icons/light/group.svg",
+      "resources/svg/icons/light/hammer-wrench.svg",
+      "resources/svg/icons/light/hidden.svg",
+      "resources/svg/icons/light/hierarchy-files.svg",
+      "resources/svg/icons/light/history.svg",
+      "resources/svg/icons/light/html.svg",
+      "resources/svg/icons/light/hyperlink-broken.svg",
+      "resources/svg/icons/light/hyperlink.svg",
+      "resources/svg/icons/light/icon_picker.svg",
+      "resources/svg/icons/light/integer.svg",
+      "resources/svg/icons/light/licensing.svg",
+      "resources/svg/icons/light/link.svg",
+      "resources/svg/icons/light/list-bullets.svg",
+      "resources/svg/icons/light/list.svg",
+      "resources/svg/icons/light/loading-bar.svg",
+      "resources/svg/icons/light/lock.svg",
+      "resources/svg/icons/light/magnifying-glass.svg",
+      "resources/svg/icons/light/markdown.svg",
+      "resources/svg/icons/light/nav-preferences.svg",
+      "resources/svg/icons/light/partial.svg",
+      "resources/svg/icons/light/php.svg",
+      "resources/svg/icons/light/picker.svg",
+      "resources/svg/icons/light/pin.svg",
+      "resources/svg/icons/light/playground.svg",
+      "resources/svg/icons/light/pro-ribbon.svg",
+      "resources/svg/icons/light/pull-down.svg",
+      "resources/svg/icons/light/radio.svg",
+      "resources/svg/icons/light/range.svg",
+      "resources/svg/icons/light/replicator.svg",
+      "resources/svg/icons/light/revealer.svg",
+      "resources/svg/icons/light/search-utility.svg",
+      "resources/svg/icons/light/search.svg",
+      "resources/svg/icons/light/section.svg",
+      "resources/svg/icons/light/select.svg",
+      "resources/svg/icons/light/seo-search-graph.svg",
+      "resources/svg/icons/light/settings-horizontal.svg",
+      "resources/svg/icons/light/settings-slider.svg",
+      "resources/svg/icons/light/settings.svg",
+      "resources/svg/icons/light/shield-key.svg",
+      "resources/svg/icons/light/shrink.svg",
+      "resources/svg/icons/light/sites.svg",
+      "resources/svg/icons/light/slug.svg",
+      "resources/svg/icons/light/structures.svg",
+      "resources/svg/icons/light/synchronize.svg",
+      "resources/svg/icons/light/table.svg",
+      "resources/svg/icons/light/tags.svg",
+      "resources/svg/icons/light/taxonomies.svg",
+      "resources/svg/icons/light/taxonomy.svg",
+      "resources/svg/icons/light/template.svg",
+      "resources/svg/icons/light/text.svg",
+      "resources/svg/icons/light/textarea.svg",
+      "resources/svg/icons/light/time.svg",
+      "resources/svg/icons/light/title.svg",
+      "resources/svg/icons/light/toggle.svg",
+      "resources/svg/icons/light/user-edit.svg",
+      "resources/svg/icons/light/user.svg",
+      "resources/svg/icons/light/user_groups.svg",
+      "resources/svg/icons/light/user_roles.svg",
+      "resources/svg/icons/light/users-box.svg",
+      "resources/svg/icons/light/users-multiple.svg",
+      "resources/svg/icons/light/users.svg",
+      "resources/svg/icons/light/video.svg",
+      "resources/svg/icons/light/width.svg",
+      "resources/svg/icons/light/wireframe.svg",
+      "resources/svg/icons/light/yaml.svg",
+      "resources/svg/icons/micro/add-circle.svg",
+      "resources/svg/icons/micro/arrow-go-back.svg",
+      "resources/svg/icons/micro/arrow-right.svg",
+      "resources/svg/icons/micro/chevron-down-small.svg",
+      "resources/svg/icons/micro/chevron-down-xs.svg",
+      "resources/svg/icons/micro/chevron-left.svg",
+      "resources/svg/icons/micro/chevron-right-thin.svg",
+      "resources/svg/icons/micro/chevron-right.svg",
+      "resources/svg/icons/micro/circle-help.svg",
+      "resources/svg/icons/micro/circle-with-cross.svg",
+      "resources/svg/icons/micro/folder-open.svg",
+      "resources/svg/icons/micro/folder.svg",
+      "resources/svg/icons/micro/pencil.svg",
+      "resources/svg/icons/micro/plus.svg",
+      "resources/svg/icons/micro/sharp-pencil.svg",
+      "resources/svg/icons/micro/sharp-trash.svg",
+      "resources/svg/icons/micro/trash.svg",
+      "resources/svg/icons/micro/warning.svg",
+      "resources/svg/icons/plump/addon-boxes-stack.svg",
+      "resources/svg/icons/plump/alert-alarm-bell.svg",
+      "resources/svg/icons/plump/alert-help-question.svg",
+      "resources/svg/icons/plump/alert-warning-exclamation-mark.svg",
+      "resources/svg/icons/plump/align-left.svg",
+      "resources/svg/icons/plump/align-object-bottom.svg",
+      "resources/svg/icons/plump/align-object-center.svg",
+      "resources/svg/icons/plump/align-object-top.svg",
+      "resources/svg/icons/plump/align-right.svg",
+      "resources/svg/icons/plump/arrow-left.svg",
+      "resources/svg/icons/plump/arrow-right.svg",
+      "resources/svg/icons/plump/arrow-roadmap-path-flow.svg",
+      "resources/svg/icons/plump/arrows-fit-to-height.svg",
+      "resources/svg/icons/plump/arrows-fit-to-width.svg",
+      "resources/svg/icons/plump/bookmark.svg",
+      "resources/svg/icons/plump/calendar-date.svg",
+      "resources/svg/icons/plump/computer-desktop.svg",
+      "resources/svg/icons/plump/computer-logo-communication-zoom.svg",
+      "resources/svg/icons/plump/computer-voice-mail-microphone.svg",
+      "resources/svg/icons/plump/content-book-open.svg",
+      "resources/svg/icons/plump/dashboard-layout-2.svg",
+      "resources/svg/icons/plump/dashboard-layout-3.svg",
+      "resources/svg/icons/plump/dashboard-layout.svg",
+      "resources/svg/icons/plump/direction-buttons.svg",
+      "resources/svg/icons/plump/download-arrow-down.svg",
+      "resources/svg/icons/plump/edit-design-compare-ab-testing.svg",
+      "resources/svg/icons/plump/edit-paint-palette.svg",
+      "resources/svg/icons/plump/edit-pen.svg",
+      "resources/svg/icons/plump/edit-pin.svg",
+      "resources/svg/icons/plump/favorite-award.svg",
+      "resources/svg/icons/plump/favorite-heart.svg",
+      "resources/svg/icons/plump/favorite-like.svg",
+      "resources/svg/icons/plump/favorite-star.svg",
+      "resources/svg/icons/plump/file-content-list.svg",
+      "resources/svg/icons/plump/file-zip.svg",
+      "resources/svg/icons/plump/fire-flame-burn-hot.svg",
+      "resources/svg/icons/plump/flash-bolt-lightning.svg",
+      "resources/svg/icons/plump/food-menu-book.svg",
+      "resources/svg/icons/plump/form-address-field.svg",
+      "resources/svg/icons/plump/form-date-picker.svg",
+      "resources/svg/icons/plump/form-drop-down-menu.svg",
+      "resources/svg/icons/plump/form-text-field.svg",
+      "resources/svg/icons/plump/globe-world-wide-web.svg",
+      "resources/svg/icons/plump/hierarchy-vertical-nav-flow.svg",
+      "resources/svg/icons/plump/home-house.svg",
+      "resources/svg/icons/plump/id-face-scan.svg",
+      "resources/svg/icons/plump/labs-idea-experimental-flask.svg",
+      "resources/svg/icons/plump/layout-carousel-horizontal.svg",
+      "resources/svg/icons/plump/layout-display-split-quarters.svg",
+      "resources/svg/icons/plump/layout-flip-down.svg",
+      "resources/svg/icons/plump/layout-flip-left.svg",
+      "resources/svg/icons/plump/layout-flip-right.svg",
+      "resources/svg/icons/plump/layout-flip-up.svg",
+      "resources/svg/icons/plump/layout-grid-dots.svg",
+      "resources/svg/icons/plump/layout-header-sidebar-left.svg",
+      "resources/svg/icons/plump/layout-header-sidebar-right.svg",
+      "resources/svg/icons/plump/layout-header-split.svg",
+      "resources/svg/icons/plump/layout-header.svg",
+      "resources/svg/icons/plump/layout-page-break.svg",
+      "resources/svg/icons/plump/layout-sidebar-left.svg",
+      "resources/svg/icons/plump/layout-sidebar-right.svg",
+      "resources/svg/icons/plump/layout-sidebar-split-left.svg",
+      "resources/svg/icons/plump/layout-sidebar-split-right.svg",
+      "resources/svg/icons/plump/layout-split-horizontal.svg",
+      "resources/svg/icons/plump/layout-split-right.svg",
+      "resources/svg/icons/plump/layout-split-verical.svg",
+      "resources/svg/icons/plump/layout-table-column-insert.svg",
+      "resources/svg/icons/plump/layout-table-row-insert.svg",
+      "resources/svg/icons/plump/layout-three-columns.svg",
+      "resources/svg/icons/plump/layout-two-columns.svg",
+      "resources/svg/icons/plump/link-external.svg",
+      "resources/svg/icons/plump/link.svg",
+      "resources/svg/icons/plump/login-key-2.svg",
+      "resources/svg/icons/plump/mail-chat-bubble-text.svg",
+      "resources/svg/icons/plump/mail-inbox-content.svg",
+      "resources/svg/icons/plump/mail-send-email-attachment-document.svg",
+      "resources/svg/icons/plump/mail-sign-at.svg",
+      "resources/svg/icons/plump/mail-sign-hashtag.svg",
+      "resources/svg/icons/plump/media-computer-screen-tv.svg",
+      "resources/svg/icons/plump/media-image-camera.svg",
+      "resources/svg/icons/plump/media-image-photo-focus-frame.svg",
+      "resources/svg/icons/plump/media-image-picture-gallery.svg",
+      "resources/svg/icons/plump/media-image-picture-orientation.svg",
+      "resources/svg/icons/plump/media-music-notes.svg",
+      "resources/svg/icons/plump/media-music-sound-equalizer.svg",
+      "resources/svg/icons/plump/media-news-paper.svg",
+      "resources/svg/icons/plump/media-playlist.svg",
+      "resources/svg/icons/plump/media-ticket.svg",
+      "resources/svg/icons/plump/media-webcam-video.svg",
+      "resources/svg/icons/plump/money-atm-card.svg",
+      "resources/svg/icons/plump/money-bank.svg",
+      "resources/svg/icons/plump/money-cash-bill.svg",
+      "resources/svg/icons/plump/money-cashier-bar-code.svg",
+      "resources/svg/icons/plump/money-cashier-calculator.svg",
+      "resources/svg/icons/plump/money-cashier-price-tag.svg",
+      "resources/svg/icons/plump/money-graph-bar-increase.svg",
+      "resources/svg/icons/plump/money-graph-pie-chart.svg",
+      "resources/svg/icons/plump/nature-leaf.svg",
+      "resources/svg/icons/plump/phone-contact-phonebook.svg",
+      "resources/svg/icons/plump/phone-mode-airplane-enabled.svg",
+      "resources/svg/icons/plump/phone-telephone-call.svg",
+      "resources/svg/icons/plump/presentation-board.svg",
+      "resources/svg/icons/plump/programming-module-box-cube.svg",
+      "resources/svg/icons/plump/programming-rss-feed.svg",
+      "resources/svg/icons/plump/programming-script-code-brackets.svg",
+      "resources/svg/icons/plump/programming-script-code.svg",
+      "resources/svg/icons/plump/puzzle-complete.svg",
+      "resources/svg/icons/plump/puzzle-piece.svg",
+      "resources/svg/icons/plump/search-magnifying-glass.svg",
+      "resources/svg/icons/plump/security-lock.svg",
+      "resources/svg/icons/plump/security-unlock.svg",
+      "resources/svg/icons/plump/setting-cog-gear.svg",
+      "resources/svg/icons/plump/setting-menu-horizontal-dots.svg",
+      "resources/svg/icons/plump/setting-slider-vertical.svg",
+      "resources/svg/icons/plump/share-mega-phone.svg",
+      "resources/svg/icons/plump/shopping-cart.svg",
+      "resources/svg/icons/plump/shopping-catergories-shirt.svg",
+      "resources/svg/icons/plump/shopping-jewelry-diamond-gem.svg",
+      "resources/svg/icons/plump/shopping-store-discount-percent.svg",
+      "resources/svg/icons/plump/shopping-store-signage.svg",
+      "resources/svg/icons/plump/shopping-store.svg",
+      "resources/svg/icons/plump/social-facebook.svg",
+      "resources/svg/icons/plump/social-github.svg",
+      "resources/svg/icons/plump/social-instagram.svg",
+      "resources/svg/icons/plump/social-linkedin.svg",
+      "resources/svg/icons/plump/social-mail-send-email-message.svg",
+      "resources/svg/icons/plump/social-mastodon.svg",
+      "resources/svg/icons/plump/social-pinterest.svg",
+      "resources/svg/icons/plump/social-share.svg",
+      "resources/svg/icons/plump/social-twitter.svg",
+      "resources/svg/icons/plump/social-vimeo.svg",
+      "resources/svg/icons/plump/social-youtube.svg",
+      "resources/svg/icons/plump/tag-free.svg",
+      "resources/svg/icons/plump/tag-new.svg",
+      "resources/svg/icons/plump/text-formatting-all-caps.svg",
+      "resources/svg/icons/plump/text-formatting-ampersand.svg",
+      "resources/svg/icons/plump/text-formatting-image-bottom.svg",
+      "resources/svg/icons/plump/text-formatting-image-left.svg",
+      "resources/svg/icons/plump/text-formatting-image-right.svg",
+      "resources/svg/icons/plump/text-formatting-image-top.svg",
+      "resources/svg/icons/plump/text-formatting-initial-letter.svg",
+      "resources/svg/icons/plump/text-formatting-input-signature.svg",
+      "resources/svg/icons/plump/text-formatting-layer-style.svg",
+      "resources/svg/icons/plump/text-formatting-markdown.svg",
+      "resources/svg/icons/plump/text-formatting-paragraph.svg",
+      "resources/svg/icons/plump/text-formatting-quotation.svg",
+      "resources/svg/icons/plump/text-formatting-shadow-text.svg",
+      "resources/svg/icons/plump/text-formatting-text-box-1.svg",
+      "resources/svg/icons/plump/text-formatting-type-cursor.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-around-bounding-box.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-left.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-margin-left.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-margin-right.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-right.svg",
+      "resources/svg/icons/plump/time-clock.svg",
+      "resources/svg/icons/plump/travel-map.svg",
+      "resources/svg/icons/plump/upload-arrow-up.svg",
+      "resources/svg/icons/plump/user-avatar.svg",
+      "resources/svg/icons/plump/user-multiple.svg",
+      "resources/svg/icons/plump/user-security-lock.svg",
+      "resources/svg/icons/regular/add-col-after.svg",
+      "resources/svg/icons/regular/add-col-before.svg",
+      "resources/svg/icons/regular/add-row-after.svg",
+      "resources/svg/icons/regular/add-row-before.svg",
+      "resources/svg/icons/regular/add-table.svg",
+      "resources/svg/icons/regular/add.svg",
+      "resources/svg/icons/regular/alert.svg",
+      "resources/svg/icons/regular/arrow-right.svg",
+      "resources/svg/icons/regular/arrows-horizontal-collapse.svg",
+      "resources/svg/icons/regular/arrows-horizontal-expand.svg",
+      "resources/svg/icons/regular/arrows-shrink.svg",
+      "resources/svg/icons/regular/asset-folder.svg",
+      "resources/svg/icons/regular/assets-mode-grid.svg",
+      "resources/svg/icons/regular/assets-mode-table.svg",
+      "resources/svg/icons/regular/code-block.svg",
+      "resources/svg/icons/regular/code-inline.svg",
+      "resources/svg/icons/regular/combine-cells.svg",
+      "resources/svg/icons/regular/dark-mode.svg",
+      "resources/svg/icons/regular/data-table.svg",
+      "resources/svg/icons/regular/delete-col.svg",
+      "resources/svg/icons/regular/delete-row.svg",
+      "resources/svg/icons/regular/delete-table.svg",
+      "resources/svg/icons/regular/download-desktop.svg",
+      "resources/svg/icons/regular/eraser.svg",
+      "resources/svg/icons/regular/expand-bold.svg",
+      "resources/svg/icons/regular/expand-collapse-vertical-2.svg",
+      "resources/svg/icons/regular/expand-collapse-vertical.svg",
+      "resources/svg/icons/regular/expand-vertical-bold.svg",
+      "resources/svg/icons/regular/expand.svg",
+      "resources/svg/icons/regular/filter-text.svg",
+      "resources/svg/icons/regular/flip-vertical.svg",
+      "resources/svg/icons/regular/focal-point.svg",
+      "resources/svg/icons/regular/folder-add.svg",
+      "resources/svg/icons/regular/folder-generic.svg",
+      "resources/svg/icons/regular/folder-home.svg",
+      "resources/svg/icons/regular/folder-image.svg",
+      "resources/svg/icons/regular/folder-open.svg",
+      "resources/svg/icons/regular/folder.svg",
+      "resources/svg/icons/regular/generic-field.svg",
+      "resources/svg/icons/regular/h1.svg",
+      "resources/svg/icons/regular/h2.svg",
+      "resources/svg/icons/regular/h3.svg",
+      "resources/svg/icons/regular/h4.svg",
+      "resources/svg/icons/regular/h5.svg",
+      "resources/svg/icons/regular/h6.svg",
+      "resources/svg/icons/regular/hidden.svg",
+      "resources/svg/icons/regular/home-page.svg",
+      "resources/svg/icons/regular/horizon.svg",
+      "resources/svg/icons/regular/image-file.svg",
+      "resources/svg/icons/regular/image-picture.svg",
+      "resources/svg/icons/regular/image.svg",
+      "resources/svg/icons/regular/info-circle.svg",
+      "resources/svg/icons/regular/insert-image.svg",
+      "resources/svg/icons/regular/insert-link.svg",
+      "resources/svg/icons/regular/light-mode.svg",
+      "resources/svg/icons/regular/list-ol.svg",
+      "resources/svg/icons/regular/list-ul-2.svg",
+      "resources/svg/icons/regular/list-ul.svg",
+      "resources/svg/icons/regular/markdown-icon.svg",
+      "resources/svg/icons/regular/move-file.svg",
+      "resources/svg/icons/regular/new-window.svg",
+      "resources/svg/icons/regular/nova.svg",
+      "resources/svg/icons/regular/pages.svg",
+      "resources/svg/icons/regular/paperclip.svg",
+      "resources/svg/icons/regular/paragraph-align-center.svg",
+      "resources/svg/icons/regular/paragraph-align-justified.svg",
+      "resources/svg/icons/regular/paragraph-align-left.svg",
+      "resources/svg/icons/regular/paragraph-align-right.svg",
+      "resources/svg/icons/regular/pencil.svg",
+      "resources/svg/icons/regular/performance-decrease.svg",
+      "resources/svg/icons/regular/performance-increase.svg",
+      "resources/svg/icons/regular/pulse.svg",
+      "resources/svg/icons/regular/quote.svg",
+      "resources/svg/icons/regular/radio-deselected.svg",
+      "resources/svg/icons/regular/radio-selected.svg",
+      "resources/svg/icons/regular/relationship.svg",
+      "resources/svg/icons/regular/rename-file.svg",
+      "resources/svg/icons/regular/sd-card.svg",
+      "resources/svg/icons/regular/settings-vertical.svg",
+      "resources/svg/icons/regular/show-source.svg",
+      "resources/svg/icons/regular/shrink-all.svg",
+      "resources/svg/icons/regular/shrink-vertical.svg",
+      "resources/svg/icons/regular/sort-numeric.svg",
+      "resources/svg/icons/regular/subscript.svg",
+      "resources/svg/icons/regular/subtract.svg",
+      "resources/svg/icons/regular/suggest.svg",
+      "resources/svg/icons/regular/superscript.svg",
+      "resources/svg/icons/regular/swap.svg",
+      "resources/svg/icons/regular/syringe.svg",
+      "resources/svg/icons/regular/system.svg",
+      "resources/svg/icons/regular/telescope.svg",
+      "resources/svg/icons/regular/text-bold.svg",
+      "resources/svg/icons/regular/text-italic.svg",
+      "resources/svg/icons/regular/text-small.svg",
+      "resources/svg/icons/regular/text-strike-through.svg",
+      "resources/svg/icons/regular/text-underline.svg",
+      "resources/svg/icons/regular/theme.svg",
+      "resources/svg/icons/regular/thumbprint.svg",
+      "resources/svg/icons/regular/translate.svg",
+      "resources/svg/icons/regular/trash.svg",
+      "resources/svg/icons/regular/upload-cloud.svg",
+      "resources/svg/icons/regular/upload.svg",
+      "resources/svg/icons/light/add-circle.svg",
+      "resources/svg/icons/light/add.svg",
+      "resources/svg/icons/light/addons.svg",
+      "resources/svg/icons/light/angle-brackets-dots.svg",
+      "resources/svg/icons/light/angle-brackets.svg",
+      "resources/svg/icons/light/arrange-letter.svg",
+      "resources/svg/icons/light/arrange-number.svg",
+      "resources/svg/icons/light/array.svg",
+      "resources/svg/icons/light/arrow-right-thin.svg",
+      "resources/svg/icons/light/assets.svg",
+      "resources/svg/icons/light/bard.svg",
+      "resources/svg/icons/light/blueprint.svg",
+      "resources/svg/icons/light/blueprints.svg",
+      "resources/svg/icons/light/book-open.svg",
+      "resources/svg/icons/light/book-pages.svg",
+      "resources/svg/icons/light/browser-com.svg",
+      "resources/svg/icons/light/burger.svg",
+      "resources/svg/icons/light/button_group.svg",
+      "resources/svg/icons/light/cache.svg",
+      "resources/svg/icons/light/calendar.svg",
+      "resources/svg/icons/light/charts.svg",
+      "resources/svg/icons/light/check.svg",
+      "resources/svg/icons/light/checkboxes.svg",
+      "resources/svg/icons/light/close.svg",
+      "resources/svg/icons/light/code.svg",
+      "resources/svg/icons/light/cog.svg",
+      "resources/svg/icons/light/collection.svg",
+      "resources/svg/icons/light/collections.svg",
+      "resources/svg/icons/light/color.svg",
+      "resources/svg/icons/light/content-writing.svg",
+      "resources/svg/icons/light/crane.svg",
+      "resources/svg/icons/light/date.svg",
+      "resources/svg/icons/light/dictionary.svg",
+      "resources/svg/icons/light/download.svg",
+      "resources/svg/icons/light/drag-dots.svg",
+      "resources/svg/icons/light/drawer-file.svg",
+      "resources/svg/icons/light/duplicate-ids.svg",
+      "resources/svg/icons/light/duplicate.svg",
+      "resources/svg/icons/light/earth.svg",
+      "resources/svg/icons/light/email-utility.svg",
+      "resources/svg/icons/light/entries.svg",
+      "resources/svg/icons/light/expand-diagonal.svg",
+      "resources/svg/icons/light/expand-vertical.svg",
+      "resources/svg/icons/light/external-link.svg",
+      "resources/svg/icons/light/eye.svg",
+      "resources/svg/icons/light/fieldsets.svg",
+      "resources/svg/icons/light/fieldtype.svg",
+      "resources/svg/icons/light/file-code.svg",
+      "resources/svg/icons/light/file-text.svg",
+      "resources/svg/icons/light/filter-lines.svg",
+      "resources/svg/icons/light/filter.svg",
+      "resources/svg/icons/light/flag.svg",
+      "resources/svg/icons/light/float.svg",
+      "resources/svg/icons/light/form.svg",
+      "resources/svg/icons/light/generic-field.svg",
+      "resources/svg/icons/light/git.svg",
+      "resources/svg/icons/light/grid.svg",
+      "resources/svg/icons/light/group.svg",
+      "resources/svg/icons/light/hammer-wrench.svg",
+      "resources/svg/icons/light/hidden.svg",
+      "resources/svg/icons/light/hierarchy-files.svg",
+      "resources/svg/icons/light/history.svg",
+      "resources/svg/icons/light/html.svg",
+      "resources/svg/icons/light/hyperlink-broken.svg",
+      "resources/svg/icons/light/hyperlink.svg",
+      "resources/svg/icons/light/icon_picker.svg",
+      "resources/svg/icons/light/integer.svg",
+      "resources/svg/icons/light/licensing.svg",
+      "resources/svg/icons/light/link.svg",
+      "resources/svg/icons/light/list-bullets.svg",
+      "resources/svg/icons/light/list.svg",
+      "resources/svg/icons/light/loading-bar.svg",
+      "resources/svg/icons/light/lock.svg",
+      "resources/svg/icons/light/magnifying-glass.svg",
+      "resources/svg/icons/light/markdown.svg",
+      "resources/svg/icons/light/nav-preferences.svg",
+      "resources/svg/icons/light/partial.svg",
+      "resources/svg/icons/light/php.svg",
+      "resources/svg/icons/light/picker.svg",
+      "resources/svg/icons/light/pin.svg",
+      "resources/svg/icons/light/playground.svg",
+      "resources/svg/icons/light/pro-ribbon.svg",
+      "resources/svg/icons/light/pull-down.svg",
+      "resources/svg/icons/light/radio.svg",
+      "resources/svg/icons/light/range.svg",
+      "resources/svg/icons/light/replicator.svg",
+      "resources/svg/icons/light/revealer.svg",
+      "resources/svg/icons/light/search-utility.svg",
+      "resources/svg/icons/light/search.svg",
+      "resources/svg/icons/light/section.svg",
+      "resources/svg/icons/light/select.svg",
+      "resources/svg/icons/light/seo-search-graph.svg",
+      "resources/svg/icons/light/settings-horizontal.svg",
+      "resources/svg/icons/light/settings-slider.svg",
+      "resources/svg/icons/light/settings.svg",
+      "resources/svg/icons/light/shield-key.svg",
+      "resources/svg/icons/light/shrink.svg",
+      "resources/svg/icons/light/sites.svg",
+      "resources/svg/icons/light/slug.svg",
+      "resources/svg/icons/light/structures.svg",
+      "resources/svg/icons/light/synchronize.svg",
+      "resources/svg/icons/light/table.svg",
+      "resources/svg/icons/light/tags.svg",
+      "resources/svg/icons/light/taxonomies.svg",
+      "resources/svg/icons/light/taxonomy.svg",
+      "resources/svg/icons/light/template.svg",
+      "resources/svg/icons/light/text.svg",
+      "resources/svg/icons/light/textarea.svg",
+      "resources/svg/icons/light/time.svg",
+      "resources/svg/icons/light/title.svg",
+      "resources/svg/icons/light/toggle.svg",
+      "resources/svg/icons/light/user-edit.svg",
+      "resources/svg/icons/light/user.svg",
+      "resources/svg/icons/light/user_groups.svg",
+      "resources/svg/icons/light/user_roles.svg",
+      "resources/svg/icons/light/users-box.svg",
+      "resources/svg/icons/light/users-multiple.svg",
+      "resources/svg/icons/light/users.svg",
+      "resources/svg/icons/light/video.svg",
+      "resources/svg/icons/light/width.svg",
+      "resources/svg/icons/light/wireframe.svg",
+      "resources/svg/icons/light/yaml.svg",
+      "resources/svg/icons/micro/add-circle.svg",
+      "resources/svg/icons/micro/arrow-go-back.svg",
+      "resources/svg/icons/micro/arrow-right.svg",
+      "resources/svg/icons/micro/chevron-down-small.svg",
+      "resources/svg/icons/micro/chevron-down-xs.svg",
+      "resources/svg/icons/micro/chevron-left.svg",
+      "resources/svg/icons/micro/chevron-right-thin.svg",
+      "resources/svg/icons/micro/chevron-right.svg",
+      "resources/svg/icons/micro/circle-help.svg",
+      "resources/svg/icons/micro/circle-with-cross.svg",
+      "resources/svg/icons/micro/folder-open.svg",
+      "resources/svg/icons/micro/folder.svg",
+      "resources/svg/icons/micro/pencil.svg",
+      "resources/svg/icons/micro/plus.svg",
+      "resources/svg/icons/micro/sharp-pencil.svg",
+      "resources/svg/icons/micro/sharp-trash.svg",
+      "resources/svg/icons/micro/trash.svg",
+      "resources/svg/icons/micro/warning.svg",
+      "resources/svg/icons/plump/addon-boxes-stack.svg",
+      "resources/svg/icons/plump/alert-alarm-bell.svg",
+      "resources/svg/icons/plump/alert-help-question.svg",
+      "resources/svg/icons/plump/alert-warning-exclamation-mark.svg",
+      "resources/svg/icons/plump/align-left.svg",
+      "resources/svg/icons/plump/align-object-bottom.svg",
+      "resources/svg/icons/plump/align-object-center.svg",
+      "resources/svg/icons/plump/align-object-top.svg",
+      "resources/svg/icons/plump/align-right.svg",
+      "resources/svg/icons/plump/arrow-left.svg",
+      "resources/svg/icons/plump/arrow-right.svg",
+      "resources/svg/icons/plump/arrow-roadmap-path-flow.svg",
+      "resources/svg/icons/plump/arrows-fit-to-height.svg",
+      "resources/svg/icons/plump/arrows-fit-to-width.svg",
+      "resources/svg/icons/plump/bookmark.svg",
+      "resources/svg/icons/plump/calendar-date.svg",
+      "resources/svg/icons/plump/computer-desktop.svg",
+      "resources/svg/icons/plump/computer-logo-communication-zoom.svg",
+      "resources/svg/icons/plump/computer-voice-mail-microphone.svg",
+      "resources/svg/icons/plump/content-book-open.svg",
+      "resources/svg/icons/plump/dashboard-layout-2.svg",
+      "resources/svg/icons/plump/dashboard-layout-3.svg",
+      "resources/svg/icons/plump/dashboard-layout.svg",
+      "resources/svg/icons/plump/direction-buttons.svg",
+      "resources/svg/icons/plump/download-arrow-down.svg",
+      "resources/svg/icons/plump/edit-design-compare-ab-testing.svg",
+      "resources/svg/icons/plump/edit-paint-palette.svg",
+      "resources/svg/icons/plump/edit-pen.svg",
+      "resources/svg/icons/plump/edit-pin.svg",
+      "resources/svg/icons/plump/favorite-award.svg",
+      "resources/svg/icons/plump/favorite-heart.svg",
+      "resources/svg/icons/plump/favorite-like.svg",
+      "resources/svg/icons/plump/favorite-star.svg",
+      "resources/svg/icons/plump/file-content-list.svg",
+      "resources/svg/icons/plump/file-zip.svg",
+      "resources/svg/icons/plump/fire-flame-burn-hot.svg",
+      "resources/svg/icons/plump/flash-bolt-lightning.svg",
+      "resources/svg/icons/plump/food-menu-book.svg",
+      "resources/svg/icons/plump/form-address-field.svg",
+      "resources/svg/icons/plump/form-date-picker.svg",
+      "resources/svg/icons/plump/form-drop-down-menu.svg",
+      "resources/svg/icons/plump/form-text-field.svg",
+      "resources/svg/icons/plump/globe-world-wide-web.svg",
+      "resources/svg/icons/plump/hierarchy-vertical-nav-flow.svg",
+      "resources/svg/icons/plump/home-house.svg",
+      "resources/svg/icons/plump/id-face-scan.svg",
+      "resources/svg/icons/plump/labs-idea-experimental-flask.svg",
+      "resources/svg/icons/plump/layout-carousel-horizontal.svg",
+      "resources/svg/icons/plump/layout-display-split-quarters.svg",
+      "resources/svg/icons/plump/layout-flip-down.svg",
+      "resources/svg/icons/plump/layout-flip-left.svg",
+      "resources/svg/icons/plump/layout-flip-right.svg",
+      "resources/svg/icons/plump/layout-flip-up.svg",
+      "resources/svg/icons/plump/layout-grid-dots.svg",
+      "resources/svg/icons/plump/layout-header-sidebar-left.svg",
+      "resources/svg/icons/plump/layout-header-sidebar-right.svg",
+      "resources/svg/icons/plump/layout-header-split.svg",
+      "resources/svg/icons/plump/layout-header.svg",
+      "resources/svg/icons/plump/layout-page-break.svg",
+      "resources/svg/icons/plump/layout-sidebar-left.svg",
+      "resources/svg/icons/plump/layout-sidebar-right.svg",
+      "resources/svg/icons/plump/layout-sidebar-split-left.svg",
+      "resources/svg/icons/plump/layout-sidebar-split-right.svg",
+      "resources/svg/icons/plump/layout-split-horizontal.svg",
+      "resources/svg/icons/plump/layout-split-right.svg",
+      "resources/svg/icons/plump/layout-split-verical.svg",
+      "resources/svg/icons/plump/layout-table-column-insert.svg",
+      "resources/svg/icons/plump/layout-table-row-insert.svg",
+      "resources/svg/icons/plump/layout-three-columns.svg",
+      "resources/svg/icons/plump/layout-two-columns.svg",
+      "resources/svg/icons/plump/link-external.svg",
+      "resources/svg/icons/plump/link.svg",
+      "resources/svg/icons/plump/login-key-2.svg",
+      "resources/svg/icons/plump/mail-chat-bubble-text.svg",
+      "resources/svg/icons/plump/mail-inbox-content.svg",
+      "resources/svg/icons/plump/mail-send-email-attachment-document.svg",
+      "resources/svg/icons/plump/mail-sign-at.svg",
+      "resources/svg/icons/plump/mail-sign-hashtag.svg",
+      "resources/svg/icons/plump/media-computer-screen-tv.svg",
+      "resources/svg/icons/plump/media-image-camera.svg",
+      "resources/svg/icons/plump/media-image-photo-focus-frame.svg",
+      "resources/svg/icons/plump/media-image-picture-gallery.svg",
+      "resources/svg/icons/plump/media-image-picture-orientation.svg",
+      "resources/svg/icons/plump/media-music-notes.svg",
+      "resources/svg/icons/plump/media-music-sound-equalizer.svg",
+      "resources/svg/icons/plump/media-news-paper.svg",
+      "resources/svg/icons/plump/media-playlist.svg",
+      "resources/svg/icons/plump/media-ticket.svg",
+      "resources/svg/icons/plump/media-webcam-video.svg",
+      "resources/svg/icons/plump/money-atm-card.svg",
+      "resources/svg/icons/plump/money-bank.svg",
+      "resources/svg/icons/plump/money-cash-bill.svg",
+      "resources/svg/icons/plump/money-cashier-bar-code.svg",
+      "resources/svg/icons/plump/money-cashier-calculator.svg",
+      "resources/svg/icons/plump/money-cashier-price-tag.svg",
+      "resources/svg/icons/plump/money-graph-bar-increase.svg",
+      "resources/svg/icons/plump/money-graph-pie-chart.svg",
+      "resources/svg/icons/plump/nature-leaf.svg",
+      "resources/svg/icons/plump/phone-contact-phonebook.svg",
+      "resources/svg/icons/plump/phone-mode-airplane-enabled.svg",
+      "resources/svg/icons/plump/phone-telephone-call.svg",
+      "resources/svg/icons/plump/presentation-board.svg",
+      "resources/svg/icons/plump/programming-module-box-cube.svg",
+      "resources/svg/icons/plump/programming-rss-feed.svg",
+      "resources/svg/icons/plump/programming-script-code-brackets.svg",
+      "resources/svg/icons/plump/programming-script-code.svg",
+      "resources/svg/icons/plump/puzzle-complete.svg",
+      "resources/svg/icons/plump/puzzle-piece.svg",
+      "resources/svg/icons/plump/search-magnifying-glass.svg",
+      "resources/svg/icons/plump/security-lock.svg",
+      "resources/svg/icons/plump/security-unlock.svg",
+      "resources/svg/icons/plump/setting-cog-gear.svg",
+      "resources/svg/icons/plump/setting-menu-horizontal-dots.svg",
+      "resources/svg/icons/plump/setting-slider-vertical.svg",
+      "resources/svg/icons/plump/share-mega-phone.svg",
+      "resources/svg/icons/plump/shopping-cart.svg",
+      "resources/svg/icons/plump/shopping-catergories-shirt.svg",
+      "resources/svg/icons/plump/shopping-jewelry-diamond-gem.svg",
+      "resources/svg/icons/plump/shopping-store-discount-percent.svg",
+      "resources/svg/icons/plump/shopping-store-signage.svg",
+      "resources/svg/icons/plump/shopping-store.svg",
+      "resources/svg/icons/plump/social-facebook.svg",
+      "resources/svg/icons/plump/social-github.svg",
+      "resources/svg/icons/plump/social-instagram.svg",
+      "resources/svg/icons/plump/social-linkedin.svg",
+      "resources/svg/icons/plump/social-mail-send-email-message.svg",
+      "resources/svg/icons/plump/social-mastodon.svg",
+      "resources/svg/icons/plump/social-pinterest.svg",
+      "resources/svg/icons/plump/social-share.svg",
+      "resources/svg/icons/plump/social-twitter.svg",
+      "resources/svg/icons/plump/social-vimeo.svg",
+      "resources/svg/icons/plump/social-youtube.svg",
+      "resources/svg/icons/plump/tag-free.svg",
+      "resources/svg/icons/plump/tag-new.svg",
+      "resources/svg/icons/plump/text-formatting-all-caps.svg",
+      "resources/svg/icons/plump/text-formatting-ampersand.svg",
+      "resources/svg/icons/plump/text-formatting-image-bottom.svg",
+      "resources/svg/icons/plump/text-formatting-image-left.svg",
+      "resources/svg/icons/plump/text-formatting-image-right.svg",
+      "resources/svg/icons/plump/text-formatting-image-top.svg",
+      "resources/svg/icons/plump/text-formatting-initial-letter.svg",
+      "resources/svg/icons/plump/text-formatting-input-signature.svg",
+      "resources/svg/icons/plump/text-formatting-layer-style.svg",
+      "resources/svg/icons/plump/text-formatting-markdown.svg",
+      "resources/svg/icons/plump/text-formatting-paragraph.svg",
+      "resources/svg/icons/plump/text-formatting-quotation.svg",
+      "resources/svg/icons/plump/text-formatting-shadow-text.svg",
+      "resources/svg/icons/plump/text-formatting-text-box-1.svg",
+      "resources/svg/icons/plump/text-formatting-type-cursor.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-around-bounding-box.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-left.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-margin-left.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-margin-right.svg",
+      "resources/svg/icons/plump/text-formatting-wrap-image-right.svg",
+      "resources/svg/icons/plump/time-clock.svg",
+      "resources/svg/icons/plump/travel-map.svg",
+      "resources/svg/icons/plump/upload-arrow-up.svg",
+      "resources/svg/icons/plump/user-avatar.svg",
+      "resources/svg/icons/plump/user-multiple.svg",
+      "resources/svg/icons/plump/user-security-lock.svg",
+      "resources/svg/icons/regular/add-col-after.svg",
+      "resources/svg/icons/regular/add-col-before.svg",
+      "resources/svg/icons/regular/add-row-after.svg",
+      "resources/svg/icons/regular/add-row-before.svg",
+      "resources/svg/icons/regular/add-table.svg",
+      "resources/svg/icons/regular/add.svg",
+      "resources/svg/icons/regular/alert.svg",
+      "resources/svg/icons/regular/arrow-right.svg",
+      "resources/svg/icons/regular/arrows-horizontal-collapse.svg",
+      "resources/svg/icons/regular/arrows-horizontal-expand.svg",
+      "resources/svg/icons/regular/arrows-shrink.svg",
+      "resources/svg/icons/regular/asset-folder.svg",
+      "resources/svg/icons/regular/assets-mode-grid.svg",
+      "resources/svg/icons/regular/assets-mode-table.svg",
+      "resources/svg/icons/regular/code-block.svg",
+      "resources/svg/icons/regular/code-inline.svg",
+      "resources/svg/icons/regular/combine-cells.svg",
+      "resources/svg/icons/regular/dark-mode.svg",
+      "resources/svg/icons/regular/data-table.svg",
+      "resources/svg/icons/regular/delete-col.svg",
+      "resources/svg/icons/regular/delete-row.svg",
+      "resources/svg/icons/regular/delete-table.svg",
+      "resources/svg/icons/regular/download-desktop.svg",
+      "resources/svg/icons/regular/eraser.svg",
+      "resources/svg/icons/regular/expand-bold.svg",
+      "resources/svg/icons/regular/expand-collapse-vertical-2.svg",
+      "resources/svg/icons/regular/expand-collapse-vertical.svg",
+      "resources/svg/icons/regular/expand-vertical-bold.svg",
+      "resources/svg/icons/regular/expand.svg",
+      "resources/svg/icons/regular/filter-text.svg",
+      "resources/svg/icons/regular/flip-vertical.svg",
+      "resources/svg/icons/regular/focal-point.svg",
+      "resources/svg/icons/regular/folder-add.svg",
+      "resources/svg/icons/regular/folder-generic.svg",
+      "resources/svg/icons/regular/folder-home.svg",
+      "resources/svg/icons/regular/folder-image.svg",
+      "resources/svg/icons/regular/folder-open.svg",
+      "resources/svg/icons/regular/folder.svg",
+      "resources/svg/icons/regular/generic-field.svg",
+      "resources/svg/icons/regular/h1.svg",
+      "resources/svg/icons/regular/h2.svg",
+      "resources/svg/icons/regular/h3.svg",
+      "resources/svg/icons/regular/h4.svg",
+      "resources/svg/icons/regular/h5.svg",
+      "resources/svg/icons/regular/h6.svg",
+      "resources/svg/icons/regular/hidden.svg",
+      "resources/svg/icons/regular/home-page.svg",
+      "resources/svg/icons/regular/horizon.svg",
+      "resources/svg/icons/regular/image-file.svg",
+      "resources/svg/icons/regular/image-picture.svg",
+      "resources/svg/icons/regular/image.svg",
+      "resources/svg/icons/regular/info-circle.svg",
+      "resources/svg/icons/regular/insert-image.svg",
+      "resources/svg/icons/regular/insert-link.svg",
+      "resources/svg/icons/regular/light-mode.svg",
+      "resources/svg/icons/regular/list-ol.svg",
+      "resources/svg/icons/regular/list-ul-2.svg",
+      "resources/svg/icons/regular/list-ul.svg",
+      "resources/svg/icons/regular/markdown-icon.svg",
+      "resources/svg/icons/regular/move-file.svg",
+      "resources/svg/icons/regular/new-window.svg",
+      "resources/svg/icons/regular/nova.svg",
+      "resources/svg/icons/regular/pages.svg",
+      "resources/svg/icons/regular/paperclip.svg",
+      "resources/svg/icons/regular/paragraph-align-center.svg",
+      "resources/svg/icons/regular/paragraph-align-justified.svg",
+      "resources/svg/icons/regular/paragraph-align-left.svg",
+      "resources/svg/icons/regular/paragraph-align-right.svg",
+      "resources/svg/icons/regular/pencil.svg",
+      "resources/svg/icons/regular/performance-decrease.svg",
+      "resources/svg/icons/regular/performance-increase.svg",
+      "resources/svg/icons/regular/pulse.svg",
+      "resources/svg/icons/regular/quote.svg",
+      "resources/svg/icons/regular/radio-deselected.svg",
+      "resources/svg/icons/regular/radio-selected.svg",
+      "resources/svg/icons/regular/relationship.svg",
+      "resources/svg/icons/regular/rename-file.svg",
+      "resources/svg/icons/regular/sd-card.svg",
+      "resources/svg/icons/regular/settings-vertical.svg",
+      "resources/svg/icons/regular/show-source.svg",
+      "resources/svg/icons/regular/shrink-all.svg",
+      "resources/svg/icons/regular/shrink-vertical.svg",
+      "resources/svg/icons/regular/sort-numeric.svg",
+      "resources/svg/icons/regular/subscript.svg",
+      "resources/svg/icons/regular/subtract.svg",
+      "resources/svg/icons/regular/suggest.svg",
+      "resources/svg/icons/regular/superscript.svg",
+      "resources/svg/icons/regular/swap.svg",
+      "resources/svg/icons/regular/syringe.svg",
+      "resources/svg/icons/regular/system.svg",
+      "resources/svg/icons/regular/telescope.svg",
+      "resources/svg/icons/regular/text-bold.svg",
+      "resources/svg/icons/regular/text-italic.svg",
+      "resources/svg/icons/regular/text-small.svg",
+      "resources/svg/icons/regular/text-strike-through.svg",
+      "resources/svg/icons/regular/text-underline.svg",
+      "resources/svg/icons/regular/theme.svg",
+      "resources/svg/icons/regular/thumbprint.svg",
+      "resources/svg/icons/regular/translate.svg",
+      "resources/svg/icons/regular/trash.svg",
+      "resources/svg/icons/regular/upload-cloud.svg",
+      "resources/svg/icons/regular/upload.svg",
+      "resources/svg/icons/regular/image.svg",
+      "resources/svg/filetypes/archive.svg",
+      "resources/svg/filetypes/audio.svg",
+      "resources/svg/filetypes/doc.svg",
+      "resources/svg/filetypes/excel.svg",
+      "resources/svg/filetypes/folder.svg",
+      "resources/svg/filetypes/generic.svg",
+      "resources/svg/filetypes/image.svg",
+      "resources/svg/filetypes/json.svg",
+      "resources/svg/filetypes/layered.svg",
+      "resources/svg/filetypes/pdf.svg",
+      "resources/svg/filetypes/picture.svg",
+      "resources/svg/filetypes/presentation.svg",
+      "resources/svg/filetypes/video.svg",
+      "resources/svg/filetypes/xml.svg"
+    ],
+    "file": "assets/app-fe5c3bda.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  },
+  "resources/svg/filetypes/archive.svg": {
+    "file": "assets/archive-70f1954a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/archive.svg"
+  },
+  "resources/svg/filetypes/audio.svg": {
+    "file": "assets/audio-84b44c8e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/audio.svg"
+  },
+  "resources/svg/filetypes/doc.svg": {
+    "file": "assets/doc-089d6edb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/doc.svg"
+  },
+  "resources/svg/filetypes/excel.svg": {
+    "file": "assets/excel-a7f1543d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/excel.svg"
+  },
+  "resources/svg/filetypes/folder.svg": {
+    "file": "assets/folder-ed0663b0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/folder.svg"
+  },
+  "resources/svg/filetypes/generic.svg": {
+    "file": "assets/generic-1db37107.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/generic.svg"
+  },
+  "resources/svg/filetypes/image.svg": {
+    "file": "assets/image-7ef0b0a8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/image.svg"
+  },
+  "resources/svg/filetypes/json.svg": {
+    "file": "assets/json-cf9e04eb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/json.svg"
+  },
+  "resources/svg/filetypes/layered.svg": {
+    "file": "assets/layered-df1b1c1e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/layered.svg"
+  },
+  "resources/svg/filetypes/pdf.svg": {
+    "file": "assets/pdf-abffa6b6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/pdf.svg"
+  },
+  "resources/svg/filetypes/picture.svg": {
+    "file": "assets/picture-625311ca.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/picture.svg"
+  },
+  "resources/svg/filetypes/presentation.svg": {
+    "file": "assets/presentation-79d93f05.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/presentation.svg"
+  },
+  "resources/svg/filetypes/video.svg": {
+    "file": "assets/video-7472590a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/video.svg"
+  },
+  "resources/svg/filetypes/xml.svg": {
+    "file": "assets/xml-fb41b421.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/filetypes/xml.svg"
+  },
+  "resources/svg/icons/light/add-circle.svg": {
+    "file": "assets/add-circle-4a172fe1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/add-circle.svg"
+  },
+  "resources/svg/icons/light/add.svg": {
+    "file": "assets/add-9bd64b65.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/add.svg"
+  },
+  "resources/svg/icons/light/addons.svg": {
+    "file": "assets/addons-0a4dd4d7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/addons.svg"
+  },
+  "resources/svg/icons/light/angle-brackets-dots.svg": {
+    "file": "assets/angle-brackets-dots-55f4583d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/angle-brackets-dots.svg"
+  },
+  "resources/svg/icons/light/angle-brackets.svg": {
+    "file": "assets/angle-brackets-e3b98394.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/angle-brackets.svg"
+  },
+  "resources/svg/icons/light/arrange-letter.svg": {
+    "file": "assets/arrange-letter-28c5d925.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/arrange-letter.svg"
+  },
+  "resources/svg/icons/light/arrange-number.svg": {
+    "file": "assets/arrange-number-2c6d43ac.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/arrange-number.svg"
+  },
+  "resources/svg/icons/light/array.svg": {
+    "file": "assets/array-3505d86f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/array.svg"
+  },
+  "resources/svg/icons/light/arrow-right-thin.svg": {
+    "file": "assets/arrow-right-thin-cc94456c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/arrow-right-thin.svg"
+  },
+  "resources/svg/icons/light/assets.svg": {
+    "file": "assets/assets-a10adea6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/assets.svg"
+  },
+  "resources/svg/icons/light/bard.svg": {
+    "file": "assets/bard-ae061db3.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/bard.svg"
+  },
+  "resources/svg/icons/light/blueprint.svg": {
+    "file": "assets/blueprint-007ca3ee.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/blueprint.svg"
+  },
+  "resources/svg/icons/light/blueprints.svg": {
+    "file": "assets/blueprints-6cb8a7d1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/blueprints.svg"
+  },
+  "resources/svg/icons/light/book-open.svg": {
+    "file": "assets/book-open-44934d56.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/book-open.svg"
+  },
+  "resources/svg/icons/light/book-pages.svg": {
+    "file": "assets/book-pages-52bc7119.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/book-pages.svg"
+  },
+  "resources/svg/icons/light/browser-com.svg": {
+    "file": "assets/browser-com-b7b2122e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/browser-com.svg"
+  },
+  "resources/svg/icons/light/burger.svg": {
+    "file": "assets/burger-519ad6f5.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/burger.svg"
+  },
+  "resources/svg/icons/light/button_group.svg": {
+    "file": "assets/button_group-8606443e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/button_group.svg"
+  },
+  "resources/svg/icons/light/cache.svg": {
+    "file": "assets/cache-5ce04083.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/cache.svg"
+  },
+  "resources/svg/icons/light/calendar.svg": {
+    "file": "assets/calendar-dcec1b9c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/calendar.svg"
+  },
+  "resources/svg/icons/light/charts.svg": {
+    "file": "assets/charts-87d83ff9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/charts.svg"
+  },
+  "resources/svg/icons/light/check.svg": {
+    "file": "assets/check-b06def82.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/check.svg"
+  },
+  "resources/svg/icons/light/checkboxes.svg": {
+    "file": "assets/checkboxes-c673747c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/checkboxes.svg"
+  },
+  "resources/svg/icons/light/close.svg": {
+    "file": "assets/close-ad87c2a4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/close.svg"
+  },
+  "resources/svg/icons/light/code.svg": {
+    "file": "assets/code-e487637e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/code.svg"
+  },
+  "resources/svg/icons/light/cog.svg": {
+    "file": "assets/cog-7adb88f0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/cog.svg"
+  },
+  "resources/svg/icons/light/collection.svg": {
+    "file": "assets/collection-5b99aa2c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/collection.svg"
+  },
+  "resources/svg/icons/light/collections.svg": {
+    "file": "assets/collections-6e6967ab.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/collections.svg"
+  },
+  "resources/svg/icons/light/color.svg": {
+    "file": "assets/color-8c201f9a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/color.svg"
+  },
+  "resources/svg/icons/light/content-writing.svg": {
+    "file": "assets/content-writing-0b42dd39.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/content-writing.svg"
+  },
+  "resources/svg/icons/light/crane.svg": {
+    "file": "assets/crane-01a69a63.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/crane.svg"
+  },
+  "resources/svg/icons/light/date.svg": {
+    "file": "assets/date-6fddfc69.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/date.svg"
+  },
+  "resources/svg/icons/light/dictionary.svg": {
+    "file": "assets/dictionary-b8229bb2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/dictionary.svg"
+  },
+  "resources/svg/icons/light/download.svg": {
+    "file": "assets/download-13d1cb2c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/download.svg"
+  },
+  "resources/svg/icons/light/drag-dots.svg": {
+    "file": "assets/drag-dots-5aeb4cfe.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/drag-dots.svg"
+  },
+  "resources/svg/icons/light/drawer-file.svg": {
+    "file": "assets/drawer-file-788c0365.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/drawer-file.svg"
+  },
+  "resources/svg/icons/light/duplicate-ids.svg": {
+    "file": "assets/duplicate-ids-f25f735e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/duplicate-ids.svg"
+  },
+  "resources/svg/icons/light/duplicate.svg": {
+    "file": "assets/duplicate-e06d08d8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/duplicate.svg"
+  },
+  "resources/svg/icons/light/earth.svg": {
+    "file": "assets/earth-bf12bee8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/earth.svg"
+  },
+  "resources/svg/icons/light/email-utility.svg": {
+    "file": "assets/email-utility-5c2c1e0f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/email-utility.svg"
+  },
+  "resources/svg/icons/light/entries.svg": {
+    "file": "assets/entries-7ac2388c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/entries.svg"
+  },
+  "resources/svg/icons/light/expand-diagonal.svg": {
+    "file": "assets/expand-diagonal-bcb29dce.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/expand-diagonal.svg"
+  },
+  "resources/svg/icons/light/expand-vertical.svg": {
+    "file": "assets/expand-vertical-8df9132f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/expand-vertical.svg"
+  },
+  "resources/svg/icons/light/external-link.svg": {
+    "file": "assets/external-link-0c81b049.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/external-link.svg"
+  },
+  "resources/svg/icons/light/eye.svg": {
+    "file": "assets/eye-785bfb5b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/eye.svg"
+  },
+  "resources/svg/icons/light/fieldsets.svg": {
+    "file": "assets/fieldsets-fda8f7b3.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/fieldsets.svg"
+  },
+  "resources/svg/icons/light/fieldtype.svg": {
+    "file": "assets/fieldtype-daeff2f2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/fieldtype.svg"
+  },
+  "resources/svg/icons/light/file-code.svg": {
+    "file": "assets/file-code-4397fde8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/file-code.svg"
+  },
+  "resources/svg/icons/light/file-text.svg": {
+    "file": "assets/file-text-41ad25e1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/file-text.svg"
+  },
+  "resources/svg/icons/light/filter-lines.svg": {
+    "file": "assets/filter-lines-5049d781.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/filter-lines.svg"
+  },
+  "resources/svg/icons/light/filter.svg": {
+    "file": "assets/filter-7bf78174.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/filter.svg"
+  },
+  "resources/svg/icons/light/flag.svg": {
+    "file": "assets/flag-6bb63494.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/flag.svg"
+  },
+  "resources/svg/icons/light/float.svg": {
+    "file": "assets/float-1677f349.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/float.svg"
+  },
+  "resources/svg/icons/light/form.svg": {
+    "file": "assets/form-a899a3b1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/form.svg"
+  },
+  "resources/svg/icons/light/generic-field.svg": {
+    "file": "assets/generic-field-3e7319f1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/generic-field.svg"
+  },
+  "resources/svg/icons/light/git.svg": {
+    "file": "assets/git-a0310b23.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/git.svg"
+  },
+  "resources/svg/icons/light/grid.svg": {
+    "file": "assets/grid-3e1f6818.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/grid.svg"
+  },
+  "resources/svg/icons/light/group.svg": {
+    "file": "assets/group-95d5e899.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/group.svg"
+  },
+  "resources/svg/icons/light/hammer-wrench.svg": {
+    "file": "assets/hammer-wrench-38a73504.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/hammer-wrench.svg"
+  },
+  "resources/svg/icons/light/hidden.svg": {
+    "file": "assets/hidden-bf89c1b6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/hidden.svg"
+  },
+  "resources/svg/icons/light/hierarchy-files.svg": {
+    "file": "assets/hierarchy-files-d8f8fca8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/hierarchy-files.svg"
+  },
+  "resources/svg/icons/light/history.svg": {
+    "file": "assets/history-d1491618.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/history.svg"
+  },
+  "resources/svg/icons/light/html.svg": {
+    "file": "assets/html-2e851dfc.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/html.svg"
+  },
+  "resources/svg/icons/light/hyperlink-broken.svg": {
+    "file": "assets/hyperlink-broken-3ae6e951.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/hyperlink-broken.svg"
+  },
+  "resources/svg/icons/light/hyperlink.svg": {
+    "file": "assets/hyperlink-6e336b4b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/hyperlink.svg"
+  },
+  "resources/svg/icons/light/icon_picker.svg": {
+    "file": "assets/icon_picker-8c14e4be.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/icon_picker.svg"
+  },
+  "resources/svg/icons/light/integer.svg": {
+    "file": "assets/integer-7843f18f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/integer.svg"
+  },
+  "resources/svg/icons/light/licensing.svg": {
+    "file": "assets/licensing-cc27c886.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/licensing.svg"
+  },
+  "resources/svg/icons/light/link.svg": {
+    "file": "assets/link-07bdb6d1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/link.svg"
+  },
+  "resources/svg/icons/light/list-bullets.svg": {
+    "file": "assets/list-bullets-9e07163c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/list-bullets.svg"
+  },
+  "resources/svg/icons/light/list.svg": {
+    "file": "assets/list-9e07163c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/list.svg"
+  },
+  "resources/svg/icons/light/loading-bar.svg": {
+    "file": "assets/loading-bar-58f38056.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/loading-bar.svg"
+  },
+  "resources/svg/icons/light/lock.svg": {
+    "file": "assets/lock-b225bb68.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/lock.svg"
+  },
+  "resources/svg/icons/light/magnifying-glass.svg": {
+    "file": "assets/magnifying-glass-6cfeaa30.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/magnifying-glass.svg"
+  },
+  "resources/svg/icons/light/markdown.svg": {
+    "file": "assets/markdown-1b257ee1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/markdown.svg"
+  },
+  "resources/svg/icons/light/nav-preferences.svg": {
+    "file": "assets/nav-preferences-f00d229c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/nav-preferences.svg"
+  },
+  "resources/svg/icons/light/partial.svg": {
+    "file": "assets/partial-94971ad0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/partial.svg"
+  },
+  "resources/svg/icons/light/php.svg": {
+    "file": "assets/php-16db75a9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/php.svg"
+  },
+  "resources/svg/icons/light/picker.svg": {
+    "file": "assets/picker-18ee48e1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/picker.svg"
+  },
+  "resources/svg/icons/light/pin.svg": {
+    "file": "assets/pin-b07b6d75.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/pin.svg"
+  },
+  "resources/svg/icons/light/playground.svg": {
+    "file": "assets/playground-bfd699a8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/playground.svg"
+  },
+  "resources/svg/icons/light/pro-ribbon.svg": {
+    "file": "assets/pro-ribbon-bcbf323b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/pro-ribbon.svg"
+  },
+  "resources/svg/icons/light/pull-down.svg": {
+    "file": "assets/pull-down-96f88daf.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/pull-down.svg"
+  },
+  "resources/svg/icons/light/radio.svg": {
+    "file": "assets/radio-c9ebc51b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/radio.svg"
+  },
+  "resources/svg/icons/light/range.svg": {
+    "file": "assets/range-a4272066.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/range.svg"
+  },
+  "resources/svg/icons/light/replicator.svg": {
+    "file": "assets/replicator-f4236336.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/replicator.svg"
+  },
+  "resources/svg/icons/light/revealer.svg": {
+    "file": "assets/revealer-b5fabe54.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/revealer.svg"
+  },
+  "resources/svg/icons/light/search-utility.svg": {
+    "file": "assets/search-utility-011043ba.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/search-utility.svg"
+  },
+  "resources/svg/icons/light/search.svg": {
+    "file": "assets/search-858bf202.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/search.svg"
+  },
+  "resources/svg/icons/light/section.svg": {
+    "file": "assets/section-0660cf61.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/section.svg"
+  },
+  "resources/svg/icons/light/select.svg": {
+    "file": "assets/select-ef552557.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/select.svg"
+  },
+  "resources/svg/icons/light/seo-search-graph.svg": {
+    "file": "assets/seo-search-graph-8cc1ca71.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/seo-search-graph.svg"
+  },
+  "resources/svg/icons/light/settings-horizontal.svg": {
+    "file": "assets/settings-horizontal-507fbc32.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/settings-horizontal.svg"
+  },
+  "resources/svg/icons/light/settings-slider.svg": {
+    "file": "assets/settings-slider-d0056519.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/settings-slider.svg"
+  },
+  "resources/svg/icons/light/settings.svg": {
+    "file": "assets/settings-57e1db31.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/settings.svg"
+  },
+  "resources/svg/icons/light/shield-key.svg": {
+    "file": "assets/shield-key-969a463d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/shield-key.svg"
+  },
+  "resources/svg/icons/light/shrink.svg": {
+    "file": "assets/shrink-c9676c82.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/shrink.svg"
+  },
+  "resources/svg/icons/light/sites.svg": {
+    "file": "assets/sites-3e1a937f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/sites.svg"
+  },
+  "resources/svg/icons/light/slug.svg": {
+    "file": "assets/slug-5b67b259.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/slug.svg"
+  },
+  "resources/svg/icons/light/structures.svg": {
+    "file": "assets/structures-11c546fd.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/structures.svg"
+  },
+  "resources/svg/icons/light/synchronize.svg": {
+    "file": "assets/synchronize-127de686.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/synchronize.svg"
+  },
+  "resources/svg/icons/light/table.svg": {
+    "file": "assets/table-252a03eb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/table.svg"
+  },
+  "resources/svg/icons/light/tags.svg": {
+    "file": "assets/tags-98173656.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/tags.svg"
+  },
+  "resources/svg/icons/light/taxonomies.svg": {
+    "file": "assets/taxonomies-5e5a9c10.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/taxonomies.svg"
+  },
+  "resources/svg/icons/light/taxonomy.svg": {
+    "file": "assets/taxonomy-a9ca4c2e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/taxonomy.svg"
+  },
+  "resources/svg/icons/light/template.svg": {
+    "file": "assets/template-f7258fc9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/template.svg"
+  },
+  "resources/svg/icons/light/text.svg": {
+    "file": "assets/text-d6ab75a9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/text.svg"
+  },
+  "resources/svg/icons/light/textarea.svg": {
+    "file": "assets/textarea-837f6a05.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/textarea.svg"
+  },
+  "resources/svg/icons/light/time.svg": {
+    "file": "assets/time-2e8ca427.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/time.svg"
+  },
+  "resources/svg/icons/light/title.svg": {
+    "file": "assets/title-79f169ea.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/title.svg"
+  },
+  "resources/svg/icons/light/toggle.svg": {
+    "file": "assets/toggle-3bae8661.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/toggle.svg"
+  },
+  "resources/svg/icons/light/user-edit.svg": {
+    "file": "assets/user-edit-7b9ae6e8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/user-edit.svg"
+  },
+  "resources/svg/icons/light/user.svg": {
+    "file": "assets/user-9b4bab98.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/user.svg"
+  },
+  "resources/svg/icons/light/user_groups.svg": {
+    "file": "assets/user_groups-375cd4f9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/user_groups.svg"
+  },
+  "resources/svg/icons/light/user_roles.svg": {
+    "file": "assets/user_roles-ada25224.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/user_roles.svg"
+  },
+  "resources/svg/icons/light/users-box.svg": {
+    "file": "assets/users-box-81a035ed.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/users-box.svg"
+  },
+  "resources/svg/icons/light/users-multiple.svg": {
+    "file": "assets/users-multiple-353c36c4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/users-multiple.svg"
+  },
+  "resources/svg/icons/light/users.svg": {
+    "file": "assets/users-9b84f17b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/users.svg"
+  },
+  "resources/svg/icons/light/video.svg": {
+    "file": "assets/video-d6557d2b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/video.svg"
+  },
+  "resources/svg/icons/light/width.svg": {
+    "file": "assets/width-b783c381.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/width.svg"
+  },
+  "resources/svg/icons/light/wireframe.svg": {
+    "file": "assets/wireframe-3e8da586.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/wireframe.svg"
+  },
+  "resources/svg/icons/light/yaml.svg": {
+    "file": "assets/yaml-820d08c0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/yaml.svg"
+  },
+  "resources/svg/icons/micro/add-circle.svg": {
+    "file": "assets/add-circle-6578a8b1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/add-circle.svg"
+  },
+  "resources/svg/icons/micro/arrow-go-back.svg": {
+    "file": "assets/arrow-go-back-565e2131.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/arrow-go-back.svg"
+  },
+  "resources/svg/icons/micro/arrow-right.svg": {
+    "file": "assets/arrow-right-dc7e3363.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/arrow-right.svg"
+  },
+  "resources/svg/icons/micro/chevron-down-small.svg": {
+    "file": "assets/chevron-down-small-24a46dad.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/chevron-down-small.svg"
+  },
+  "resources/svg/icons/micro/chevron-down-xs.svg": {
+    "file": "assets/chevron-down-xs-91cef22d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/chevron-down-xs.svg"
+  },
+  "resources/svg/icons/micro/chevron-left.svg": {
+    "file": "assets/chevron-left-fc1e5663.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/chevron-left.svg"
+  },
+  "resources/svg/icons/micro/chevron-right-thin.svg": {
+    "file": "assets/chevron-right-thin-10805dd1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/chevron-right-thin.svg"
+  },
+  "resources/svg/icons/micro/chevron-right.svg": {
+    "file": "assets/chevron-right-be1a36f6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/chevron-right.svg"
+  },
+  "resources/svg/icons/micro/circle-help.svg": {
+    "file": "assets/circle-help-74709df1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/circle-help.svg"
+  },
+  "resources/svg/icons/micro/circle-with-cross.svg": {
+    "file": "assets/circle-with-cross-6caf6914.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/circle-with-cross.svg"
+  },
+  "resources/svg/icons/micro/folder-open.svg": {
+    "file": "assets/folder-open-535fad9d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/folder-open.svg"
+  },
+  "resources/svg/icons/micro/folder.svg": {
+    "file": "assets/folder-53db7195.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/folder.svg"
+  },
+  "resources/svg/icons/micro/pencil.svg": {
+    "file": "assets/pencil-49c2fd68.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/pencil.svg"
+  },
+  "resources/svg/icons/micro/plus.svg": {
+    "file": "assets/plus-ce68ae64.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/plus.svg"
+  },
+  "resources/svg/icons/micro/sharp-pencil.svg": {
+    "file": "assets/sharp-pencil-29f9fe88.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/sharp-pencil.svg"
+  },
+  "resources/svg/icons/micro/sharp-trash.svg": {
+    "file": "assets/sharp-trash-7573b683.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/sharp-trash.svg"
+  },
+  "resources/svg/icons/micro/trash.svg": {
+    "file": "assets/trash-044f26dd.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/trash.svg"
+  },
+  "resources/svg/icons/micro/warning.svg": {
+    "file": "assets/warning-b7e837f6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/micro/warning.svg"
+  },
+  "resources/svg/icons/plump/addon-boxes-stack.svg": {
+    "file": "assets/addon-boxes-stack-6ce4c795.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/addon-boxes-stack.svg"
+  },
+  "resources/svg/icons/plump/alert-alarm-bell.svg": {
+    "file": "assets/alert-alarm-bell-fc1148d8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/alert-alarm-bell.svg"
+  },
+  "resources/svg/icons/plump/alert-help-question.svg": {
+    "file": "assets/alert-help-question-a231566c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/alert-help-question.svg"
+  },
+  "resources/svg/icons/plump/alert-warning-exclamation-mark.svg": {
+    "file": "assets/alert-warning-exclamation-mark-fd803ce5.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/alert-warning-exclamation-mark.svg"
+  },
+  "resources/svg/icons/plump/align-left.svg": {
+    "file": "assets/align-left-2f38b489.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/align-left.svg"
+  },
+  "resources/svg/icons/plump/align-object-bottom.svg": {
+    "file": "assets/align-object-bottom-10d9b070.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/align-object-bottom.svg"
+  },
+  "resources/svg/icons/plump/align-object-center.svg": {
+    "file": "assets/align-object-center-0f9a0b76.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/align-object-center.svg"
+  },
+  "resources/svg/icons/plump/align-object-top.svg": {
+    "file": "assets/align-object-top-5e7ec7a9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/align-object-top.svg"
+  },
+  "resources/svg/icons/plump/align-right.svg": {
+    "file": "assets/align-right-b3bd3023.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/align-right.svg"
+  },
+  "resources/svg/icons/plump/arrow-left.svg": {
+    "file": "assets/arrow-left-6789983f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/arrow-left.svg"
+  },
+  "resources/svg/icons/plump/arrow-right.svg": {
+    "file": "assets/arrow-right-98e5a177.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/arrow-right.svg"
+  },
+  "resources/svg/icons/plump/arrow-roadmap-path-flow.svg": {
+    "file": "assets/arrow-roadmap-path-flow-e0cb9f66.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/arrow-roadmap-path-flow.svg"
+  },
+  "resources/svg/icons/plump/arrows-fit-to-height.svg": {
+    "file": "assets/arrows-fit-to-height-ecc46200.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/arrows-fit-to-height.svg"
+  },
+  "resources/svg/icons/plump/arrows-fit-to-width.svg": {
+    "file": "assets/arrows-fit-to-width-dbbf7d70.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/arrows-fit-to-width.svg"
+  },
+  "resources/svg/icons/plump/bookmark.svg": {
+    "file": "assets/bookmark-73874bf7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/bookmark.svg"
+  },
+  "resources/svg/icons/plump/calendar-date.svg": {
+    "file": "assets/calendar-date-6bfb1441.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/calendar-date.svg"
+  },
+  "resources/svg/icons/plump/computer-desktop.svg": {
+    "file": "assets/computer-desktop-35dbd877.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/computer-desktop.svg"
+  },
+  "resources/svg/icons/plump/computer-logo-communication-zoom.svg": {
+    "file": "assets/computer-logo-communication-zoom-356e7a41.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/computer-logo-communication-zoom.svg"
+  },
+  "resources/svg/icons/plump/computer-voice-mail-microphone.svg": {
+    "file": "assets/computer-voice-mail-microphone-10e6eff6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/computer-voice-mail-microphone.svg"
+  },
+  "resources/svg/icons/plump/content-book-open.svg": {
+    "file": "assets/content-book-open-0b03b86d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/content-book-open.svg"
+  },
+  "resources/svg/icons/plump/dashboard-layout-2.svg": {
+    "file": "assets/dashboard-layout-2-db1753b7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/dashboard-layout-2.svg"
+  },
+  "resources/svg/icons/plump/dashboard-layout-3.svg": {
+    "file": "assets/dashboard-layout-3-9c917850.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/dashboard-layout-3.svg"
+  },
+  "resources/svg/icons/plump/dashboard-layout.svg": {
+    "file": "assets/dashboard-layout-5f55876b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/dashboard-layout.svg"
+  },
+  "resources/svg/icons/plump/direction-buttons.svg": {
+    "file": "assets/direction-buttons-62c3a471.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/direction-buttons.svg"
+  },
+  "resources/svg/icons/plump/download-arrow-down.svg": {
+    "file": "assets/download-arrow-down-79b0ec3b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/download-arrow-down.svg"
+  },
+  "resources/svg/icons/plump/edit-design-compare-ab-testing.svg": {
+    "file": "assets/edit-design-compare-ab-testing-f8a5a223.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/edit-design-compare-ab-testing.svg"
+  },
+  "resources/svg/icons/plump/edit-paint-palette.svg": {
+    "file": "assets/edit-paint-palette-93f3a989.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/edit-paint-palette.svg"
+  },
+  "resources/svg/icons/plump/edit-pen.svg": {
+    "file": "assets/edit-pen-cbf1a427.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/edit-pen.svg"
+  },
+  "resources/svg/icons/plump/edit-pin.svg": {
+    "file": "assets/edit-pin-45ecef90.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/edit-pin.svg"
+  },
+  "resources/svg/icons/plump/favorite-award.svg": {
+    "file": "assets/favorite-award-330f67e1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/favorite-award.svg"
+  },
+  "resources/svg/icons/plump/favorite-heart.svg": {
+    "file": "assets/favorite-heart-c1f8d959.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/favorite-heart.svg"
+  },
+  "resources/svg/icons/plump/favorite-like.svg": {
+    "file": "assets/favorite-like-edda77d0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/favorite-like.svg"
+  },
+  "resources/svg/icons/plump/favorite-star.svg": {
+    "file": "assets/favorite-star-7463bd8c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/favorite-star.svg"
+  },
+  "resources/svg/icons/plump/file-content-list.svg": {
+    "file": "assets/file-content-list-29b04654.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/file-content-list.svg"
+  },
+  "resources/svg/icons/plump/file-zip.svg": {
+    "file": "assets/file-zip-ef2d8268.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/file-zip.svg"
+  },
+  "resources/svg/icons/plump/fire-flame-burn-hot.svg": {
+    "file": "assets/fire-flame-burn-hot-40cd10d0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/fire-flame-burn-hot.svg"
+  },
+  "resources/svg/icons/plump/flash-bolt-lightning.svg": {
+    "file": "assets/flash-bolt-lightning-1e8cfb07.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/flash-bolt-lightning.svg"
+  },
+  "resources/svg/icons/plump/food-menu-book.svg": {
+    "file": "assets/food-menu-book-56ff22dc.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/food-menu-book.svg"
+  },
+  "resources/svg/icons/plump/form-address-field.svg": {
+    "file": "assets/form-address-field-2fcc0cf5.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/form-address-field.svg"
+  },
+  "resources/svg/icons/plump/form-date-picker.svg": {
+    "file": "assets/form-date-picker-abbc91aa.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/form-date-picker.svg"
+  },
+  "resources/svg/icons/plump/form-drop-down-menu.svg": {
+    "file": "assets/form-drop-down-menu-55a5725e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/form-drop-down-menu.svg"
+  },
+  "resources/svg/icons/plump/form-text-field.svg": {
+    "file": "assets/form-text-field-4b647b3e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/form-text-field.svg"
+  },
+  "resources/svg/icons/plump/globe-world-wide-web.svg": {
+    "file": "assets/globe-world-wide-web-087c1d38.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/globe-world-wide-web.svg"
+  },
+  "resources/svg/icons/plump/hierarchy-vertical-nav-flow.svg": {
+    "file": "assets/hierarchy-vertical-nav-flow-320d967b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/hierarchy-vertical-nav-flow.svg"
+  },
+  "resources/svg/icons/plump/home-house.svg": {
+    "file": "assets/home-house-d2939636.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/home-house.svg"
+  },
+  "resources/svg/icons/plump/id-face-scan.svg": {
+    "file": "assets/id-face-scan-e7814ced.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/id-face-scan.svg"
+  },
+  "resources/svg/icons/plump/labs-idea-experimental-flask.svg": {
+    "file": "assets/labs-idea-experimental-flask-bfd9a212.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/labs-idea-experimental-flask.svg"
+  },
+  "resources/svg/icons/plump/layout-carousel-horizontal.svg": {
+    "file": "assets/layout-carousel-horizontal-eab0bb6e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-carousel-horizontal.svg"
+  },
+  "resources/svg/icons/plump/layout-display-split-quarters.svg": {
+    "file": "assets/layout-display-split-quarters-ed52a1f9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-display-split-quarters.svg"
+  },
+  "resources/svg/icons/plump/layout-flip-down.svg": {
+    "file": "assets/layout-flip-down-5efbb12a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-flip-down.svg"
+  },
+  "resources/svg/icons/plump/layout-flip-left.svg": {
+    "file": "assets/layout-flip-left-dfbddccc.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-flip-left.svg"
+  },
+  "resources/svg/icons/plump/layout-flip-right.svg": {
+    "file": "assets/layout-flip-right-0d57afb1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-flip-right.svg"
+  },
+  "resources/svg/icons/plump/layout-flip-up.svg": {
+    "file": "assets/layout-flip-up-7b22f5fb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-flip-up.svg"
+  },
+  "resources/svg/icons/plump/layout-grid-dots.svg": {
+    "file": "assets/layout-grid-dots-41d27f32.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-grid-dots.svg"
+  },
+  "resources/svg/icons/plump/layout-header-sidebar-left.svg": {
+    "file": "assets/layout-header-sidebar-left-15190966.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-header-sidebar-left.svg"
+  },
+  "resources/svg/icons/plump/layout-header-sidebar-right.svg": {
+    "file": "assets/layout-header-sidebar-right-378c0145.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-header-sidebar-right.svg"
+  },
+  "resources/svg/icons/plump/layout-header-split.svg": {
+    "file": "assets/layout-header-split-88e5cc6f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-header-split.svg"
+  },
+  "resources/svg/icons/plump/layout-header.svg": {
+    "file": "assets/layout-header-094a6af6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-header.svg"
+  },
+  "resources/svg/icons/plump/layout-page-break.svg": {
+    "file": "assets/layout-page-break-f05d606b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-page-break.svg"
+  },
+  "resources/svg/icons/plump/layout-sidebar-left.svg": {
+    "file": "assets/layout-sidebar-left-90a52a56.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-sidebar-left.svg"
+  },
+  "resources/svg/icons/plump/layout-sidebar-right.svg": {
+    "file": "assets/layout-sidebar-right-4370128f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-sidebar-right.svg"
+  },
+  "resources/svg/icons/plump/layout-sidebar-split-left.svg": {
+    "file": "assets/layout-sidebar-split-left-c32d7fd9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-sidebar-split-left.svg"
+  },
+  "resources/svg/icons/plump/layout-sidebar-split-right.svg": {
+    "file": "assets/layout-sidebar-split-right-f495564b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-sidebar-split-right.svg"
+  },
+  "resources/svg/icons/plump/layout-split-horizontal.svg": {
+    "file": "assets/layout-split-horizontal-3fd32388.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-split-horizontal.svg"
+  },
+  "resources/svg/icons/plump/layout-split-right.svg": {
+    "file": "assets/layout-split-right-63ae8bed.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-split-right.svg"
+  },
+  "resources/svg/icons/plump/layout-split-verical.svg": {
+    "file": "assets/layout-split-verical-1d5ad158.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-split-verical.svg"
+  },
+  "resources/svg/icons/plump/layout-table-column-insert.svg": {
+    "file": "assets/layout-table-column-insert-6a022d8a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-table-column-insert.svg"
+  },
+  "resources/svg/icons/plump/layout-table-row-insert.svg": {
+    "file": "assets/layout-table-row-insert-1accb7ef.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-table-row-insert.svg"
+  },
+  "resources/svg/icons/plump/layout-three-columns.svg": {
+    "file": "assets/layout-three-columns-de4bf4bc.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-three-columns.svg"
+  },
+  "resources/svg/icons/plump/layout-two-columns.svg": {
+    "file": "assets/layout-two-columns-289edba7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/layout-two-columns.svg"
+  },
+  "resources/svg/icons/plump/link-external.svg": {
+    "file": "assets/link-external-18f49cf2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/link-external.svg"
+  },
+  "resources/svg/icons/plump/link.svg": {
+    "file": "assets/link-b5a35c50.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/link.svg"
+  },
+  "resources/svg/icons/plump/login-key-2.svg": {
+    "file": "assets/login-key-2-5b218b3a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/login-key-2.svg"
+  },
+  "resources/svg/icons/plump/mail-chat-bubble-text.svg": {
+    "file": "assets/mail-chat-bubble-text-ee6fc0a3.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/mail-chat-bubble-text.svg"
+  },
+  "resources/svg/icons/plump/mail-inbox-content.svg": {
+    "file": "assets/mail-inbox-content-67bc0376.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/mail-inbox-content.svg"
+  },
+  "resources/svg/icons/plump/mail-send-email-attachment-document.svg": {
+    "file": "assets/mail-send-email-attachment-document-acee8a1f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/mail-send-email-attachment-document.svg"
+  },
+  "resources/svg/icons/plump/mail-sign-at.svg": {
+    "file": "assets/mail-sign-at-50afa3a4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/mail-sign-at.svg"
+  },
+  "resources/svg/icons/plump/mail-sign-hashtag.svg": {
+    "file": "assets/mail-sign-hashtag-b9cf5f14.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/mail-sign-hashtag.svg"
+  },
+  "resources/svg/icons/plump/media-computer-screen-tv.svg": {
+    "file": "assets/media-computer-screen-tv-c8961765.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-computer-screen-tv.svg"
+  },
+  "resources/svg/icons/plump/media-image-camera.svg": {
+    "file": "assets/media-image-camera-d72e8ea3.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-image-camera.svg"
+  },
+  "resources/svg/icons/plump/media-image-photo-focus-frame.svg": {
+    "file": "assets/media-image-photo-focus-frame-3417a5be.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-image-photo-focus-frame.svg"
+  },
+  "resources/svg/icons/plump/media-image-picture-gallery.svg": {
+    "file": "assets/media-image-picture-gallery-af393898.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-image-picture-gallery.svg"
+  },
+  "resources/svg/icons/plump/media-image-picture-orientation.svg": {
+    "file": "assets/media-image-picture-orientation-96bc42e0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-image-picture-orientation.svg"
+  },
+  "resources/svg/icons/plump/media-music-notes.svg": {
+    "file": "assets/media-music-notes-82c7f223.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-music-notes.svg"
+  },
+  "resources/svg/icons/plump/media-music-sound-equalizer.svg": {
+    "file": "assets/media-music-sound-equalizer-3d9d7000.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-music-sound-equalizer.svg"
+  },
+  "resources/svg/icons/plump/media-news-paper.svg": {
+    "file": "assets/media-news-paper-4d32690a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-news-paper.svg"
+  },
+  "resources/svg/icons/plump/media-playlist.svg": {
+    "file": "assets/media-playlist-a56bea8e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-playlist.svg"
+  },
+  "resources/svg/icons/plump/media-ticket.svg": {
+    "file": "assets/media-ticket-70f2eee9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-ticket.svg"
+  },
+  "resources/svg/icons/plump/media-webcam-video.svg": {
+    "file": "assets/media-webcam-video-ec6c9764.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/media-webcam-video.svg"
+  },
+  "resources/svg/icons/plump/money-atm-card.svg": {
+    "file": "assets/money-atm-card-bcceab2f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-atm-card.svg"
+  },
+  "resources/svg/icons/plump/money-bank.svg": {
+    "file": "assets/money-bank-e8892e17.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-bank.svg"
+  },
+  "resources/svg/icons/plump/money-cash-bill.svg": {
+    "file": "assets/money-cash-bill-1ffb3ec5.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-cash-bill.svg"
+  },
+  "resources/svg/icons/plump/money-cashier-bar-code.svg": {
+    "file": "assets/money-cashier-bar-code-52ecd9af.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-cashier-bar-code.svg"
+  },
+  "resources/svg/icons/plump/money-cashier-calculator.svg": {
+    "file": "assets/money-cashier-calculator-71869318.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-cashier-calculator.svg"
+  },
+  "resources/svg/icons/plump/money-cashier-price-tag.svg": {
+    "file": "assets/money-cashier-price-tag-213e2d66.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-cashier-price-tag.svg"
+  },
+  "resources/svg/icons/plump/money-graph-bar-increase.svg": {
+    "file": "assets/money-graph-bar-increase-3d59b9cb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-graph-bar-increase.svg"
+  },
+  "resources/svg/icons/plump/money-graph-pie-chart.svg": {
+    "file": "assets/money-graph-pie-chart-9f49cf2a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/money-graph-pie-chart.svg"
+  },
+  "resources/svg/icons/plump/nature-leaf.svg": {
+    "file": "assets/nature-leaf-5924d163.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/nature-leaf.svg"
+  },
+  "resources/svg/icons/plump/phone-contact-phonebook.svg": {
+    "file": "assets/phone-contact-phonebook-048ee9df.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/phone-contact-phonebook.svg"
+  },
+  "resources/svg/icons/plump/phone-mode-airplane-enabled.svg": {
+    "file": "assets/phone-mode-airplane-enabled-cf5514c0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/phone-mode-airplane-enabled.svg"
+  },
+  "resources/svg/icons/plump/phone-telephone-call.svg": {
+    "file": "assets/phone-telephone-call-b2642fb1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/phone-telephone-call.svg"
+  },
+  "resources/svg/icons/plump/presentation-board.svg": {
+    "file": "assets/presentation-board-fd46ddaa.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/presentation-board.svg"
+  },
+  "resources/svg/icons/plump/programming-module-box-cube.svg": {
+    "file": "assets/programming-module-box-cube-1232e11c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/programming-module-box-cube.svg"
+  },
+  "resources/svg/icons/plump/programming-rss-feed.svg": {
+    "file": "assets/programming-rss-feed-dbb7b631.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/programming-rss-feed.svg"
+  },
+  "resources/svg/icons/plump/programming-script-code-brackets.svg": {
+    "file": "assets/programming-script-code-brackets-628f4f27.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/programming-script-code-brackets.svg"
+  },
+  "resources/svg/icons/plump/programming-script-code.svg": {
+    "file": "assets/programming-script-code-8e64c07e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/programming-script-code.svg"
+  },
+  "resources/svg/icons/plump/puzzle-complete.svg": {
+    "file": "assets/puzzle-complete-2f7d2219.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/puzzle-complete.svg"
+  },
+  "resources/svg/icons/plump/puzzle-piece.svg": {
+    "file": "assets/puzzle-piece-05281329.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/puzzle-piece.svg"
+  },
+  "resources/svg/icons/plump/search-magnifying-glass.svg": {
+    "file": "assets/search-magnifying-glass-5257ed33.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/search-magnifying-glass.svg"
+  },
+  "resources/svg/icons/plump/security-lock.svg": {
+    "file": "assets/security-lock-2dbb4545.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/security-lock.svg"
+  },
+  "resources/svg/icons/plump/security-unlock.svg": {
+    "file": "assets/security-unlock-eb163678.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/security-unlock.svg"
+  },
+  "resources/svg/icons/plump/setting-cog-gear.svg": {
+    "file": "assets/setting-cog-gear-a44f9b1c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/setting-cog-gear.svg"
+  },
+  "resources/svg/icons/plump/setting-menu-horizontal-dots.svg": {
+    "file": "assets/setting-menu-horizontal-dots-5ee49d27.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/setting-menu-horizontal-dots.svg"
+  },
+  "resources/svg/icons/plump/setting-slider-vertical.svg": {
+    "file": "assets/setting-slider-vertical-fd027f5d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/setting-slider-vertical.svg"
+  },
+  "resources/svg/icons/plump/share-mega-phone.svg": {
+    "file": "assets/share-mega-phone-f1e1c0fe.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/share-mega-phone.svg"
+  },
+  "resources/svg/icons/plump/shopping-cart.svg": {
+    "file": "assets/shopping-cart-14fc7a98.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/shopping-cart.svg"
+  },
+  "resources/svg/icons/plump/shopping-catergories-shirt.svg": {
+    "file": "assets/shopping-catergories-shirt-e891f60e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/shopping-catergories-shirt.svg"
+  },
+  "resources/svg/icons/plump/shopping-jewelry-diamond-gem.svg": {
+    "file": "assets/shopping-jewelry-diamond-gem-f4bb5f5d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/shopping-jewelry-diamond-gem.svg"
+  },
+  "resources/svg/icons/plump/shopping-store-discount-percent.svg": {
+    "file": "assets/shopping-store-discount-percent-4d01612d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/shopping-store-discount-percent.svg"
+  },
+  "resources/svg/icons/plump/shopping-store-signage.svg": {
+    "file": "assets/shopping-store-signage-e7b3111e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/shopping-store-signage.svg"
+  },
+  "resources/svg/icons/plump/shopping-store.svg": {
+    "file": "assets/shopping-store-2abf0ec1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/shopping-store.svg"
+  },
+  "resources/svg/icons/plump/social-facebook.svg": {
+    "file": "assets/social-facebook-d2d2dd7e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-facebook.svg"
+  },
+  "resources/svg/icons/plump/social-github.svg": {
+    "file": "assets/social-github-f86a3389.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-github.svg"
+  },
+  "resources/svg/icons/plump/social-instagram.svg": {
+    "file": "assets/social-instagram-c384817e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-instagram.svg"
+  },
+  "resources/svg/icons/plump/social-linkedin.svg": {
+    "file": "assets/social-linkedin-9a9063dd.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-linkedin.svg"
+  },
+  "resources/svg/icons/plump/social-mail-send-email-message.svg": {
+    "file": "assets/social-mail-send-email-message-3a494938.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-mail-send-email-message.svg"
+  },
+  "resources/svg/icons/plump/social-mastodon.svg": {
+    "file": "assets/social-mastodon-315dbc7f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-mastodon.svg"
+  },
+  "resources/svg/icons/plump/social-pinterest.svg": {
+    "file": "assets/social-pinterest-7f9c41fd.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-pinterest.svg"
+  },
+  "resources/svg/icons/plump/social-share.svg": {
+    "file": "assets/social-share-39d56370.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-share.svg"
+  },
+  "resources/svg/icons/plump/social-twitter.svg": {
+    "file": "assets/social-twitter-f506d7ee.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-twitter.svg"
+  },
+  "resources/svg/icons/plump/social-vimeo.svg": {
+    "file": "assets/social-vimeo-77481fdc.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-vimeo.svg"
+  },
+  "resources/svg/icons/plump/social-youtube.svg": {
+    "file": "assets/social-youtube-533fe0f2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/social-youtube.svg"
+  },
+  "resources/svg/icons/plump/tag-free.svg": {
+    "file": "assets/tag-free-56e0debe.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/tag-free.svg"
+  },
+  "resources/svg/icons/plump/tag-new.svg": {
+    "file": "assets/tag-new-84da2a59.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/tag-new.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-all-caps.svg": {
+    "file": "assets/text-formatting-all-caps-6c9fb305.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-all-caps.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-ampersand.svg": {
+    "file": "assets/text-formatting-ampersand-c8fb922d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-ampersand.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-image-bottom.svg": {
+    "file": "assets/text-formatting-image-bottom-19dba5bb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-image-bottom.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-image-left.svg": {
+    "file": "assets/text-formatting-image-left-7cad1aa7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-image-left.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-image-right.svg": {
+    "file": "assets/text-formatting-image-right-6f72a61f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-image-right.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-image-top.svg": {
+    "file": "assets/text-formatting-image-top-4f8444ac.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-image-top.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-initial-letter.svg": {
+    "file": "assets/text-formatting-initial-letter-94ec98a6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-initial-letter.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-input-signature.svg": {
+    "file": "assets/text-formatting-input-signature-dad94fe2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-input-signature.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-layer-style.svg": {
+    "file": "assets/text-formatting-layer-style-f6ad993a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-layer-style.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-markdown.svg": {
+    "file": "assets/text-formatting-markdown-1e7f2a11.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-markdown.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-paragraph.svg": {
+    "file": "assets/text-formatting-paragraph-e31cf013.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-paragraph.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-quotation.svg": {
+    "file": "assets/text-formatting-quotation-f9d244c4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-quotation.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-shadow-text.svg": {
+    "file": "assets/text-formatting-shadow-text-59c4b543.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-shadow-text.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-text-box-1.svg": {
+    "file": "assets/text-formatting-text-box-1-a1ee8607.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-text-box-1.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-type-cursor.svg": {
+    "file": "assets/text-formatting-type-cursor-779e1918.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-type-cursor.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-wrap-around-bounding-box.svg": {
+    "file": "assets/text-formatting-wrap-around-bounding-box-30967217.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-wrap-around-bounding-box.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-wrap-image-left.svg": {
+    "file": "assets/text-formatting-wrap-image-left-af281461.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-wrap-image-left.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-wrap-image-margin-left.svg": {
+    "file": "assets/text-formatting-wrap-image-margin-left-ab899ff1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-wrap-image-margin-left.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-wrap-image-margin-right.svg": {
+    "file": "assets/text-formatting-wrap-image-margin-right-583fa74a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-wrap-image-margin-right.svg"
+  },
+  "resources/svg/icons/plump/text-formatting-wrap-image-right.svg": {
+    "file": "assets/text-formatting-wrap-image-right-85ff9d70.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/text-formatting-wrap-image-right.svg"
+  },
+  "resources/svg/icons/plump/time-clock.svg": {
+    "file": "assets/time-clock-1a09e6c2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/time-clock.svg"
+  },
+  "resources/svg/icons/plump/travel-map.svg": {
+    "file": "assets/travel-map-d7edbe34.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/travel-map.svg"
+  },
+  "resources/svg/icons/plump/upload-arrow-up.svg": {
+    "file": "assets/upload-arrow-up-ddaad6df.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/upload-arrow-up.svg"
+  },
+  "resources/svg/icons/plump/user-avatar.svg": {
+    "file": "assets/user-avatar-3a439844.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/user-avatar.svg"
+  },
+  "resources/svg/icons/plump/user-multiple.svg": {
+    "file": "assets/user-multiple-c10883e6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/user-multiple.svg"
+  },
+  "resources/svg/icons/plump/user-security-lock.svg": {
+    "file": "assets/user-security-lock-628f35df.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/plump/user-security-lock.svg"
+  },
+  "resources/svg/icons/regular/add-col-after.svg": {
+    "file": "assets/add-col-after-ef55e804.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/add-col-after.svg"
+  },
+  "resources/svg/icons/regular/add-col-before.svg": {
+    "file": "assets/add-col-before-3e0604fa.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/add-col-before.svg"
+  },
+  "resources/svg/icons/regular/add-row-after.svg": {
+    "file": "assets/add-row-after-79fb5bd4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/add-row-after.svg"
+  },
+  "resources/svg/icons/regular/add-row-before.svg": {
+    "file": "assets/add-row-before-ae1c572a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/add-row-before.svg"
+  },
+  "resources/svg/icons/regular/add-table.svg": {
+    "file": "assets/add-table-4500973b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/add-table.svg"
+  },
+  "resources/svg/icons/regular/add.svg": {
+    "file": "assets/add-62d8d9ba.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/add.svg"
+  },
+  "resources/svg/icons/regular/alert.svg": {
+    "file": "assets/alert-1a8dd5c5.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/alert.svg"
+  },
+  "resources/svg/icons/regular/arrow-right.svg": {
+    "file": "assets/arrow-right-a8901ad9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/arrow-right.svg"
+  },
+  "resources/svg/icons/regular/arrows-horizontal-collapse.svg": {
+    "file": "assets/arrows-horizontal-collapse-40d5fe10.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/arrows-horizontal-collapse.svg"
+  },
+  "resources/svg/icons/regular/arrows-horizontal-expand.svg": {
+    "file": "assets/arrows-horizontal-expand-48fbc52d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/arrows-horizontal-expand.svg"
+  },
+  "resources/svg/icons/regular/arrows-shrink.svg": {
+    "file": "assets/arrows-shrink-9620cfb7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/arrows-shrink.svg"
+  },
+  "resources/svg/icons/regular/asset-folder.svg": {
+    "file": "assets/asset-folder-5e5084a4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/asset-folder.svg"
+  },
+  "resources/svg/icons/regular/assets-mode-grid.svg": {
+    "file": "assets/assets-mode-grid-61de1550.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/assets-mode-grid.svg"
+  },
+  "resources/svg/icons/regular/assets-mode-table.svg": {
+    "file": "assets/assets-mode-table-367a696d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/assets-mode-table.svg"
+  },
+  "resources/svg/icons/regular/code-block.svg": {
+    "file": "assets/code-block-ba017171.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/code-block.svg"
+  },
+  "resources/svg/icons/regular/code-inline.svg": {
+    "file": "assets/code-inline-d10f54ae.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/code-inline.svg"
+  },
+  "resources/svg/icons/regular/combine-cells.svg": {
+    "file": "assets/combine-cells-715a38a4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/combine-cells.svg"
+  },
+  "resources/svg/icons/regular/dark-mode.svg": {
+    "file": "assets/dark-mode-23b1473a.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/dark-mode.svg"
+  },
+  "resources/svg/icons/regular/data-table.svg": {
+    "file": "assets/data-table-84739f8b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/data-table.svg"
+  },
+  "resources/svg/icons/regular/delete-col.svg": {
+    "file": "assets/delete-col-5e8bea80.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/delete-col.svg"
+  },
+  "resources/svg/icons/regular/delete-row.svg": {
+    "file": "assets/delete-row-4351f211.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/delete-row.svg"
+  },
+  "resources/svg/icons/regular/delete-table.svg": {
+    "file": "assets/delete-table-e4db6584.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/delete-table.svg"
+  },
+  "resources/svg/icons/regular/download-desktop.svg": {
+    "file": "assets/download-desktop-881a331b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/download-desktop.svg"
+  },
+  "resources/svg/icons/regular/eraser.svg": {
+    "file": "assets/eraser-0302515e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/eraser.svg"
+  },
+  "resources/svg/icons/regular/expand-bold.svg": {
+    "file": "assets/expand-bold-9d6e3af4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/expand-bold.svg"
+  },
+  "resources/svg/icons/regular/expand-collapse-vertical-2.svg": {
+    "file": "assets/expand-collapse-vertical-2-d4378588.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/expand-collapse-vertical-2.svg"
+  },
+  "resources/svg/icons/regular/expand-collapse-vertical.svg": {
+    "file": "assets/expand-collapse-vertical-718171d9.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/expand-collapse-vertical.svg"
+  },
+  "resources/svg/icons/regular/expand-vertical-bold.svg": {
+    "file": "assets/expand-vertical-bold-00aaa8a8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/expand-vertical-bold.svg"
+  },
+  "resources/svg/icons/regular/expand.svg": {
+    "file": "assets/expand-b75b6bd4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/expand.svg"
+  },
+  "resources/svg/icons/regular/filter-text.svg": {
+    "file": "assets/filter-text-ec6181ba.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/filter-text.svg"
+  },
+  "resources/svg/icons/regular/flip-vertical.svg": {
+    "file": "assets/flip-vertical-be984c15.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/flip-vertical.svg"
+  },
+  "resources/svg/icons/regular/focal-point.svg": {
+    "file": "assets/focal-point-70338ac3.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/focal-point.svg"
+  },
+  "resources/svg/icons/regular/folder-add.svg": {
+    "file": "assets/folder-add-fc763287.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/folder-add.svg"
+  },
+  "resources/svg/icons/regular/folder-generic.svg": {
+    "file": "assets/folder-generic-d613d736.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/folder-generic.svg"
+  },
+  "resources/svg/icons/regular/folder-home.svg": {
+    "file": "assets/folder-home-cce39b8e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/folder-home.svg"
+  },
+  "resources/svg/icons/regular/folder-image.svg": {
+    "file": "assets/folder-image-5fc121fe.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/folder-image.svg"
+  },
+  "resources/svg/icons/regular/folder-open.svg": {
+    "file": "assets/folder-open-45bce860.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/folder-open.svg"
+  },
+  "resources/svg/icons/regular/folder.svg": {
+    "file": "assets/folder-65681b32.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/folder.svg"
+  },
+  "resources/svg/icons/regular/generic-field.svg": {
+    "file": "assets/generic-field-e69e9265.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/generic-field.svg"
+  },
+  "resources/svg/icons/regular/h1.svg": {
+    "file": "assets/h1-a0b63968.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/h1.svg"
+  },
+  "resources/svg/icons/regular/h2.svg": {
+    "file": "assets/h2-bd303b0d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/h2.svg"
+  },
+  "resources/svg/icons/regular/h3.svg": {
+    "file": "assets/h3-55450d58.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/h3.svg"
+  },
+  "resources/svg/icons/regular/h4.svg": {
+    "file": "assets/h4-d09559c2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/h4.svg"
+  },
+  "resources/svg/icons/regular/h5.svg": {
+    "file": "assets/h5-33b13867.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/h5.svg"
+  },
+  "resources/svg/icons/regular/h6.svg": {
+    "file": "assets/h6-0730417d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/h6.svg"
+  },
+  "resources/svg/icons/regular/hidden.svg": {
+    "file": "assets/hidden-cbd0ab43.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/hidden.svg"
+  },
+  "resources/svg/icons/regular/home-page.svg": {
+    "file": "assets/home-page-827fa2af.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/home-page.svg"
+  },
+  "resources/svg/icons/regular/horizon.svg": {
+    "file": "assets/horizon-0f7b4082.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/horizon.svg"
+  },
+  "resources/svg/icons/regular/image-file.svg": {
+    "file": "assets/image-file-9258e288.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/image-file.svg"
+  },
+  "resources/svg/icons/regular/image-picture.svg": {
+    "file": "assets/image-picture-d0e9a371.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/image-picture.svg"
+  },
+  "resources/svg/icons/regular/image.svg": {
+    "file": "assets/image-7e103d75.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/image.svg"
+  },
+  "resources/svg/icons/regular/info-circle.svg": {
+    "file": "assets/info-circle-6b19cac0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/info-circle.svg"
+  },
+  "resources/svg/icons/regular/insert-image.svg": {
+    "file": "assets/insert-image-d0e9a371.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/insert-image.svg"
+  },
+  "resources/svg/icons/regular/insert-link.svg": {
+    "file": "assets/insert-link-158aa1a4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/insert-link.svg"
+  },
+  "resources/svg/icons/regular/light-mode.svg": {
+    "file": "assets/light-mode-db4e6a04.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/light-mode.svg"
+  },
+  "resources/svg/icons/regular/list-ol.svg": {
+    "file": "assets/list-ol-c88bac13.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/list-ol.svg"
+  },
+  "resources/svg/icons/regular/list-ul-2.svg": {
+    "file": "assets/list-ul-2-3079492f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/list-ul-2.svg"
+  },
+  "resources/svg/icons/regular/list-ul.svg": {
+    "file": "assets/list-ul-5b0a6720.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/list-ul.svg"
+  },
+  "resources/svg/icons/regular/markdown-icon.svg": {
+    "file": "assets/markdown-icon-fb3c3cbf.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/markdown-icon.svg"
+  },
+  "resources/svg/icons/regular/move-file.svg": {
+    "file": "assets/move-file-2ec513c0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/move-file.svg"
+  },
+  "resources/svg/icons/regular/new-window.svg": {
+    "file": "assets/new-window-58699c80.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/new-window.svg"
+  },
+  "resources/svg/icons/regular/nova.svg": {
+    "file": "assets/nova-a13a1c24.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/nova.svg"
+  },
+  "resources/svg/icons/regular/pages.svg": {
+    "file": "assets/pages-9a7c5ae2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/pages.svg"
+  },
+  "resources/svg/icons/regular/paperclip.svg": {
+    "file": "assets/paperclip-2e70da2c.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/paperclip.svg"
+  },
+  "resources/svg/icons/regular/paragraph-align-center.svg": {
+    "file": "assets/paragraph-align-center-608b0756.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/paragraph-align-center.svg"
+  },
+  "resources/svg/icons/regular/paragraph-align-justified.svg": {
+    "file": "assets/paragraph-align-justified-edb480cc.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/paragraph-align-justified.svg"
+  },
+  "resources/svg/icons/regular/paragraph-align-left.svg": {
+    "file": "assets/paragraph-align-left-21ff72c8.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/paragraph-align-left.svg"
+  },
+  "resources/svg/icons/regular/paragraph-align-right.svg": {
+    "file": "assets/paragraph-align-right-8422a6d6.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/paragraph-align-right.svg"
+  },
+  "resources/svg/icons/regular/pencil.svg": {
+    "file": "assets/pencil-8c2b4c0f.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/pencil.svg"
+  },
+  "resources/svg/icons/regular/performance-decrease.svg": {
+    "file": "assets/performance-decrease-d3091d15.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/performance-decrease.svg"
+  },
+  "resources/svg/icons/regular/performance-increase.svg": {
+    "file": "assets/performance-increase-93126e96.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/performance-increase.svg"
+  },
+  "resources/svg/icons/regular/pulse.svg": {
+    "file": "assets/pulse-fe14689b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/pulse.svg"
+  },
+  "resources/svg/icons/regular/quote.svg": {
+    "file": "assets/quote-42c6ac19.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/quote.svg"
+  },
+  "resources/svg/icons/regular/radio-deselected.svg": {
+    "file": "assets/radio-deselected-4c748b55.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/radio-deselected.svg"
+  },
+  "resources/svg/icons/regular/radio-selected.svg": {
+    "file": "assets/radio-selected-9639aafa.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/radio-selected.svg"
+  },
+  "resources/svg/icons/regular/relationship.svg": {
+    "file": "assets/relationship-6143ceff.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/relationship.svg"
+  },
+  "resources/svg/icons/regular/rename-file.svg": {
+    "file": "assets/rename-file-40c0fedb.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/rename-file.svg"
+  },
+  "resources/svg/icons/regular/sd-card.svg": {
+    "file": "assets/sd-card-fa5c533b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/sd-card.svg"
+  },
+  "resources/svg/icons/regular/settings-vertical.svg": {
+    "file": "assets/settings-vertical-a526ec11.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/settings-vertical.svg"
+  },
+  "resources/svg/icons/regular/show-source.svg": {
+    "file": "assets/show-source-31355249.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/show-source.svg"
+  },
+  "resources/svg/icons/regular/shrink-all.svg": {
+    "file": "assets/shrink-all-e6ce9365.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/shrink-all.svg"
+  },
+  "resources/svg/icons/regular/shrink-vertical.svg": {
+    "file": "assets/shrink-vertical-546198f7.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/shrink-vertical.svg"
+  },
+  "resources/svg/icons/regular/sort-numeric.svg": {
+    "file": "assets/sort-numeric-2729de20.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/sort-numeric.svg"
+  },
+  "resources/svg/icons/regular/subscript.svg": {
+    "file": "assets/subscript-cb1a9069.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/subscript.svg"
+  },
+  "resources/svg/icons/regular/subtract.svg": {
+    "file": "assets/subtract-629e074e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/subtract.svg"
+  },
+  "resources/svg/icons/regular/suggest.svg": {
+    "file": "assets/suggest-cc137454.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/suggest.svg"
+  },
+  "resources/svg/icons/regular/superscript.svg": {
+    "file": "assets/superscript-89e7f98d.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/superscript.svg"
+  },
+  "resources/svg/icons/regular/swap.svg": {
+    "file": "assets/swap-8620179e.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/swap.svg"
+  },
+  "resources/svg/icons/regular/syringe.svg": {
+    "file": "assets/syringe-39cac2b4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/syringe.svg"
+  },
+  "resources/svg/icons/regular/system.svg": {
+    "file": "assets/system-267f57ce.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/system.svg"
+  },
+  "resources/svg/icons/regular/telescope.svg": {
+    "file": "assets/telescope-3e0f8434.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/telescope.svg"
+  },
+  "resources/svg/icons/regular/text-bold.svg": {
+    "file": "assets/text-bold-e973ff83.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/text-bold.svg"
+  },
+  "resources/svg/icons/regular/text-italic.svg": {
+    "file": "assets/text-italic-e29bac95.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/text-italic.svg"
+  },
+  "resources/svg/icons/regular/text-small.svg": {
+    "file": "assets/text-small-1fd0b180.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/text-small.svg"
+  },
+  "resources/svg/icons/regular/text-strike-through.svg": {
+    "file": "assets/text-strike-through-20a184cd.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/text-strike-through.svg"
+  },
+  "resources/svg/icons/regular/text-underline.svg": {
+    "file": "assets/text-underline-c1eebeaf.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/text-underline.svg"
+  },
+  "resources/svg/icons/regular/theme.svg": {
+    "file": "assets/theme-52bbae73.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/theme.svg"
+  },
+  "resources/svg/icons/regular/thumbprint.svg": {
+    "file": "assets/thumbprint-b56383b1.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/thumbprint.svg"
+  },
+  "resources/svg/icons/regular/translate.svg": {
+    "file": "assets/translate-1bb18ed0.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/translate.svg"
+  },
+  "resources/svg/icons/regular/trash.svg": {
+    "file": "assets/trash-95a383df.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/trash.svg"
+  },
+  "resources/svg/icons/regular/upload-cloud.svg": {
+    "file": "assets/upload-cloud-f1a7a3b4.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/upload-cloud.svg"
+  },
+  "resources/svg/icons/regular/upload.svg": {
+    "file": "assets/upload-f32156ee.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/upload.svg"
+  }
+}
