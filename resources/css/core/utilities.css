@@ -315,6 +315,7 @@
 */
 @utility bg-architectural-lines {
     &:not(:has(.page-tree-branch)) {
+        position: relative;
         &::before {
             content: '';
             pointer-events: none;
