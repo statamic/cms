@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import FieldNumber from '@/components/forms/FieldNumber.vue';
+import LogicTreeField from './LogicTreeField.vue';
+import LogicTreeFieldset from './LogicTreeFieldset.vue';
 import { Icon } from '@ui';
-import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
-import { computed } from 'vue';
+import { useSortable } from '@/components/forms/builder/use-drag-and-drop';
+import { computed, ref, useTemplateRef } from 'vue';
+import type { PropType } from 'vue';
 
 enum TreeDensity {
     Compressed = 'compressed',
     Expanded = 'expanded',
 }
+
+const emit = defineEmits(['update:fields']);
 
 const props = defineProps({
     pages: { type: Array, required: true },
@@ -17,54 +21,52 @@ const props = defineProps({
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
-const isFirstInFieldset = (field, index, fields) => {
-    if (! field.import) {
-        return false;
-    }
-
-    const previous = fields[index - 1];
-
-    return ! previous || previous.import !== field.import;
-};
-
-const isLastInFieldset = (field, index, fields) => {
-    if (! field.import) {
-        return false;
-    }
-
-    const next = fields[index + 1];
-
-    return ! next || next.import !== field.import;
-};
-
-const isFieldsetField = (field, index, fields) => field.import && ! isFirstInFieldset(field, index, fields);
-
-const groupPageSections = (pageFields) => {
+// Group a page's fields into sections, and each section's fields into items. A
+// fieldset import becomes one item - a group holding its fields; every other
+// field is just the field itself. So the tree renders and drags at the item level.
+const buildSections = (pageFields) => {
     const sections = [];
-    let currentSection = null;
+    let section = null;
 
     pageFields.forEach((field) => {
-        if (! currentSection || field.section_start) {
-            currentSection = {
-                title: field.section_display || __('Section'),
-                fields: [],
-            };
-            sections.push(currentSection);
+        if (! section || field.section_start) {
+            section = { display: field.section_display || __('Section'), items: [] };
+            sections.push(section);
         }
 
-        currentSection.fields.push(field);
+        if (! field.import) {
+            section.items.push(field);
+            return;
+        }
+
+        const last = section.items.at(-1);
+
+        if (last?.import === field.import) {
+            last.fields.push(field);
+        } else {
+            section.items.push({
+                _id: field._id,
+                import: field.import,
+                import_title: field.import_title ?? null,
+                fields: [field],
+            });
+        }
     });
 
     return sections;
 };
 
-const fieldsByPage = computed(() => {
-    return props.pages.map((page, pageIndex) => ({
+// The tree's working structure (pages -> sections -> items). It's stateful
+// rather than re-derived from props so that dragging the last field out of a
+// section keeps the (now empty) section around, and so drag can move items
+// between sections directly.
+const columns = ref(
+    props.pages.map((page, pageIndex) => ({
         page,
         pageIndex,
-        sections: groupPageSections(props.fields.filter((field) => field.page_index === pageIndex)),
-    }));
-});
+        sections: buildSections(props.fields.filter((field) => field.page_index === pageIndex)),
+    })),
+);
 
 const fieldConnections = computed(() => {
     const connections = {};
@@ -108,7 +110,11 @@ const hasPageRules = (page) => (page.rules ?? []).some((rule) => {
     return (rule.conditions ?? []).some((condition) => condition.field && condition.value !== null && condition.value !== '');
 });
 
-const fieldConnection = (field) => fieldConnections.value[field.handle] ?? null;
+// Only single fields can be logic sources - imported fields can't be conditions.
+const itemConnection = (item) => (item.import ? null : fieldConnections.value[item.handle] ?? null);
+
+// A single-field item is the field itself; a fieldset item is a group of fields.
+const itemFields = (item) => (item.import ? item.fields : [item]);
 
 const connectorDestinationPageIndices = computed(() => {
     return new Set(Object.values(fieldConnections.value).map((connection) => connection.destinationPageIndex));
@@ -118,24 +124,60 @@ const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.va
 
 const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
 
-const mutedIconClass = 'text-gray-600 dark:text-gray-400';
+// Drag & drop. Each item (single field or whole fieldset) moves as one unit.
+const tree = useTemplateRef('tree');
+const allSections = computed(() =>
+    columns.value.flatMap((column) => column.sections.map((section) => ({
+        fields: section.items.flatMap(itemFields),
+    }))),
+);
 
-const fieldIconClass = (field) => {
-    if (field.type === 'reference' || field.import) {
-        return mutedIconClass;
-    }
+const moveField = (from, to, oldIndex, newIndex) => {
+    const [fromPage, fromSection] = from.split(':').map(Number);
+    const [toPage, toSection] = to.split(':').map(Number);
 
-    const color = categories[field.category]?.color || 'gray';
+    const [item] = columns.value[fromPage].sections[fromSection].items.splice(oldIndex, 1);
+    if (! item) return;
 
-    return categoryColorClasses[color]?.icon || mutedIconClass;
+    columns.value[toPage].sections[toSection].items.splice(newIndex, 0, item);
+
+    // Flatten back to fields, re-tagging page + section so numbering stays correct.
+    const fields = columns.value.flatMap((column, pageIndex) =>
+        column.sections.flatMap((section) =>
+            section.items
+                .flatMap(itemFields)
+                .map((field, index) => ({
+                    ...field,
+                    page_index: pageIndex,
+                    section_start: index === 0,
+                    section_display: section.display,
+                })),
+        ),
+    );
+
+    emit('update:fields', fields);
 };
+
+// The mirror is a clone of the dragged <li> - which now already contains a whole
+// fieldset's rows - appended to <body>, outside the scoped tree styles.
+const onMirrorCreated = ({ source, mirror }) => {
+    mirror.style.width = `${source.offsetWidth}px`;
+    mirror.classList.add('linked-list__mirror');
+};
+
+useSortable({
+    container: tree,
+    sections: allSections,
+    onFieldMoved: moveField,
+    onMirrorCreated,
+});
 </script>
 
 <template>
-    <div class="linked-list-container">
+    <div ref="tree" class="linked-list-container">
         <div class="linked-list" :class="{ 'linked-list--expanded': density === TreeDensity.Expanded }">
             <div
-                v-for="{ page, pageIndex, sections } in fieldsByPage"
+                v-for="{ page, pageIndex, sections } in columns"
                 :key="page._id"
                 class="linked-list__column"
             >
@@ -176,55 +218,32 @@ const fieldIconClass = (field) => {
                         :key="`${page._id}-section-${sectionIndex}`"
                         class="linked-list__section"
                     >
-                        <div class="linked-list__section-marker" :aria-label="section.title">
-                            <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ section.title }}</span>
+                        <div class="linked-list__section-marker" :aria-label="section.display">
+                            <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ section.display }}</span>
                         </div>
-                        <ul>
+                        <ul class="field-sort-container" :data-sort-section="`${pageIndex}:${sectionIndex}`">
+                            <div v-if="! section.items.length" class="linked-list__empty-section">
+                                {{ __('No fields') }}
+                            </div>
                             <li
-                                v-for="(field, fieldIndex) in section.fields"
+                                v-for="field in section.items"
                                 :key="field._id"
-                                v-tooltip="field.import ? __('Logic can\'t be added to imported fields. Edit the fieldset instead.') : null"
+                                data-field-item
+                                class="cursor-grab"
                                 :class="{
-                                    'linked-list__connector': fieldConnection(field),
-                                    'linked-list__page-leap': fieldConnection(field)?.leap,
-                                    'linked-list__fieldset-start': isFirstInFieldset(field, fieldIndex, section.fields),
-                                    'linked-list__fieldset-field': isFieldsetField(field, fieldIndex, section.fields),
-                                    'linked-list__fieldset-end': isLastInFieldset(field, fieldIndex, section.fields),
+                                    'linked-list__fieldset': field.import,
+                                    'linked-list__connector': itemConnection(field),
+                                    'linked-list__page-leap': itemConnection(field)?.leap,
                                 }"
-                                :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
+                                :style="itemConnection(field) ? { '--end-connection': itemConnection(field).endConnection } : null"
+                                v-tooltip="field.import ? __('Logic can\'t be added to imported fields. Edit the fieldset instead.') : null"
                             >
-                                <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                                <Icon
-                                    :name="field.icon || 'generic-field'"
-                                    :class="['size-4 shrink-0', fieldIconClass(field)]"
-                                    aria-hidden="true"
-                                />
-                                <span class="linked-list__field-name min-w-0 flex-1">
-                                    <FieldNumber :field-key="field._id" />
-                                    {{ field.display }}
-                                </span>
-                                <span
-                                    v-if="field.type === 'reference'"
-                                    v-tooltip="__('Linked Field')"
-                                    class="inline-flex size-4 shrink-0"
-                                >
-                                    <Icon
-                                        name="link"
-                                        class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
-                                        aria-hidden="true"
-                                    />
-                                </span>
-                                <span
-                                    v-if="isFirstInFieldset(field, fieldIndex, section.fields)"
-                                    v-tooltip="field.import_title ? __('Linked Fieldset: :title', { title: field.import_title }) : __('Linked Fieldset')"
-                                    class="inline-flex size-4 shrink-0"
-                                >
-                                    <Icon
-                                        name="link"
-                                        class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400"
-                                        aria-hidden="true"
-                                    />
-                                </span>
+                                <LogicTreeFieldset v-if="field.import" :item="field" />
+
+                                <template v-else>
+                                    <div v-if="itemConnection(field)?.leap" class="linked-list__extra-leap-connector" />
+                                    <LogicTreeField :field="field" />
+                                </template>
                             </li>
                         </ul>
                     </div>

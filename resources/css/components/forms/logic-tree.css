@@ -150,6 +150,15 @@
                 @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
             }
 
+            /* A fieldset import <li> is a plain column; its rows carry the chrome. */
+            li.linked-list__fieldset {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+                padding: 0;
+                @apply border-0! bg-transparent! shadow-none!;
+            }
+
             /* GROUP LOGIC TREE CONNECTORS / SOURCE
             =================================================== */
             .linked-list__connector {
@@ -225,9 +234,46 @@
         }
     }
 
+    /* GROUP LOGIC TREE / EMPTY SECTION
+    =================================================== */
+    /* Shown when a section has no fields (e.g. its last field was dragged out) so
+       the section sticks around as a drop target. */
+    .linked-list__empty-section {
+        @apply flex items-center justify-center rounded-md border border-dashed border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 text-2xs text-gray-500 dark:text-gray-400 select-none;
+        height: var(--item-height, 3.2rem);
+    }
+
+    /* While an item is dragged over the section, Sortable inserts it here - hide the placeholder. */
+    .field-sort-container:has([data-field-item]) .linked-list__empty-section {
+        display: none;
+    }
+
     /* GROUP LOGIC TREE CONNECTORS / FIELDSETS
     =================================================== */
-    .linked-list__fieldset-field {
+    /* A fieldset import is one entry (one <li>) holding a row per field. Each row
+       mirrors a normal field chip. The var fallbacks let the drag mirror - which
+       is cloned outside the tree - keep the right height. */
+    .linked-list__fieldset-row {
+        display: grid;
+        grid-template-columns: 1rem 1fr;
+        gap: 0.5rem;
+        height: var(--item-height, 3.2rem);
+        padding-block: var(--item-padding, 1rem);
+        @apply px-3 border-1 border-gray-300 rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:shadow-none;
+
+        > * {
+            grid-row: 1;
+        }
+        & > svg {
+            grid-column: 1;
+        }
+        .linked-list__field-name {
+            grid-column: 2;
+        }
+    }
+
+    /* Every row after the first reads as "linked": dimmed + dashed. */
+    .linked-list__fieldset-row:not(:first-child) {
         @apply border-dashed border-gray-400/75! dark:border-gray-600! opacity-75;
     }
 
@@ -262,5 +308,38 @@
             position: absolute;
             pointer-events: none;
         }
+    }
+
+    /* GROUP LOGIC TREE CONNECTORS / DRAG MIRROR
+    =================================================== */
+    /* The drag mirror is cloned into <body>, outside the scoped tree styles, so it
+       needs its own look. A single field mirrors a normal chip. */
+    .linked-list__mirror {
+        display: grid;
+        grid-template-columns: 1rem 1fr;
+        gap: 0.5rem;
+        height: var(--item-height, 3.2rem);
+        padding-block: var(--item-padding, 1rem);
+        @apply px-3 border border-gray-300 rounded-md bg-white shadow-lg text-xs text-gray-850 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-grabbing;
+
+        > * {
+            grid-row: 1;
+        }
+        & > svg {
+            grid-column: 1;
+        }
+        .linked-list__field-name {
+            grid-column: 2;
+        }
+    }
+
+    /* A fieldset mirror is a plain column; its .linked-list__fieldset-row children keep their own chrome. */
+    .linked-list__mirror.linked-list__fieldset {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+        padding: 0;
+        @apply border-0! bg-transparent! shadow-none!;
     }
 }

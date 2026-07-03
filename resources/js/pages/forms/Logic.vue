@@ -193,7 +193,7 @@ onUnmounted(() => {
     <div v-if="view === View.Tree" class="st-full-bleed-content">
         <LogicTree
             :pages
-            :fields
+            v-model:fields="fields"
             :density="treeDensity"
         />
     </div>
