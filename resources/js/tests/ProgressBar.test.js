@@ -21,13 +21,6 @@ test('loading is reported while operations are in flight', () => {
     expect(progress.count()).toBe(0);
 });
 
-// Regression test for https://github.com/statamic/cms/issues/14787
-// Many fields loading at once (e.g. lots of relationship fields) used to notify
-// reactive consumers of the loading state once per operation. With enough
-// operations in a single tick this exceeded Vue's recursive update limit and
-// crashed the publish form. Consumers should only be notified when loading
-// transitions between "idle" and "in progress", regardless of how many
-// individual operations are added or removed.
 test('reactive consumers are only notified on start and stop transitions', async () => {
     let runs = 0;
     let lastComplete;

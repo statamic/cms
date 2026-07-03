@@ -51,12 +51,6 @@ function count() {
 }
 
 function isComplete() {
-    // Derived from the coarse `progressing` boolean rather than the length of
-    // `progressNames` so that reactive consumers (e.g. a form's "is loading"
-    // state) are only notified when loading starts and stops, not on every
-    // individual operation. Otherwise many fields loading at once (e.g. lots of
-    // relationship fields) can trigger enough updates to exceed Vue's recursive
-    // update limit. See https://github.com/statamic/cms/issues/14787
     return !progressing.value;
 }
 
