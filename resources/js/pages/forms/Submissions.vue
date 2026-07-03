@@ -362,7 +362,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </p>
                     </div>
                     <div class="@container/widgets widgets flex flex-wrap gap-y-6 -mx-2 sm:-mx-3">
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Wake me up')"
                             title-tag="h2"
@@ -415,7 +415,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                     <!-- Example of a Multiple Choice field type (Pie Chart) with Pagination. The idea here is when there are _more_ than four response options, we can paginate the chart. In such a case, the fourth option shows as "Other", and the second widget shows the "other" segment broken down into the remaining response options.
 
                     We should dynamically generate the ids to be unique here, so that everything remains accessible.-->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Pie chart pagination demo')"
                             title-tag="h2"
@@ -515,7 +515,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Ranking field type (Horizontal Lollipop Chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Rank your favourite seasons')"
                             title-tag="h2"
@@ -573,7 +573,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Dropdown field type (Horizontal Bar Chart Widget). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Have you seen us live before?')"
                             title-tag="h2"
@@ -609,7 +609,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of an Opinion Scale field type (Vertical Bar Chart Widget). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('How likely are you to recommend us?')"
                             title-tag="h2"
@@ -709,7 +709,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of an Image Choice field type with a chart type chooser. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('What is your spirit animal?')"
                             title-tag="h2"
@@ -790,7 +790,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Checkboxes field type (Horizontal Bar Chart with checkbox icons). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Who have you seen live?')"
                             title-tag="h2"
@@ -832,7 +832,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a yes/no field type with a chart type chooser. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Do you fancy a pint?')"
                             title-tag="h2"
@@ -909,7 +909,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Dictionary field type (Horizontal Lollipop Chart with icons) with Pagination. We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('What’s your favourite country?')"
                             title-tag="h2"
@@ -1018,7 +1018,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Number field type (Horizontal Bar Chart with info). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('How old are you?')"
                             title-tag="h2"
@@ -1071,7 +1071,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Star Rating field type (Horizontal Star Rating Bar Chart with info). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('How would you rate the hotel?')"
                             title-tag="h2"
@@ -1135,7 +1135,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Star Rating field type greater than 5 stars. It should switch to a vertical bar chart when it's greater than 5 stars). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('How would you rate the restaurant?')"
                             title-tag="h2"
@@ -1238,7 +1238,7 @@ const { metric: summaryChartMetric } = useSummaryChartMetric(props.form.handle);
                         </Widget>
                     </div>
                     <!-- Example of a Toggle field type (Single fillable bar chart). We should dynamically generate the ids to be unique here, so that everything remains accessible. -->
-                    <div class="starting-style-transition w-full min-h-61 @2xl:w-1/2 @4xl:w-1/2 @7xl:w-1/3 px-3">
+                    <div class="starting-style-transition w-full min-h-61 min-[1100px]:w-1/2 px-3">
                         <Widget
                             :title="__('Sign up to our newsletter')"
                             title-tag="h2"
