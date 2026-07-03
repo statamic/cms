@@ -16,6 +16,9 @@ use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Revision implements Arrayable, ContainsQueryableValues, Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;

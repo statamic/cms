@@ -30,7 +30,7 @@ class UserRegisterRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return parent::failedValidation($validator);
+            parent::failedValidation($validator);
         }
 
         if ($this->ajax()) {
@@ -82,7 +82,7 @@ class UserRegisterRequest extends FormRequest
     {
         $site = Site::findByUrl(LaravelURL::previous()) ?? Site::default();
 
-        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 
     private function valuesWithoutAssetFields($fields)

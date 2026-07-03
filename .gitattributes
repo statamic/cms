@@ -17,6 +17,7 @@
 .travis.yml export-ignore
 CONTRIBUTING.md export-ignore
 jest.config.js export-ignore
+phpstan.dist.neon export-ignore
 phpunit.bat export-ignore
 phpunit.xml.dist export-ignore
 SECURITY.md export-ignore

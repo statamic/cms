@@ -9,6 +9,9 @@ use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 use Statamic\Facades\Path;
 use Statamic\UpdateScripts\UpdateScript;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Lock
 {
     protected $files;
