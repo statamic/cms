@@ -232,6 +232,7 @@ useSortable({
                                 class="cursor-pointer"
                                 :class="{
                                     'linked-list__fieldset': field.import,
+                                    'linked-list__hidden-field': field.hidden,
                                     'linked-list__connector': itemConnection(field),
                                     'linked-list__page-leap': itemConnection(field)?.leap,
                                 }"

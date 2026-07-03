@@ -272,6 +272,10 @@
         }
     }
 
+    .linked-list__hidden-field {
+        @apply opacity-75;
+    }
+
     /* GROUP LOGIC TREE CONNECTORS / LEAP BRIDGE (FIRST GAP + CORNER)
     =================================================== */
     .linked-list__extra-leap-connector {
