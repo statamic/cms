@@ -14,7 +14,6 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
-use Statamic\Query\Concerns\NormalizesDateValues;
 use Statamic\Query\Concerns\QueriesRelationships;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
@@ -22,7 +21,7 @@ use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use AppliesScopes, FakesQueries, NormalizesDateValues, QueriesRelationships;
+    use AppliesScopes, FakesQueries, QueriesRelationships;
 
     protected $columns;
     protected $limit;
@@ -138,8 +137,6 @@ abstract class Builder implements Contract
         if ($this->invalidOperator($operator)) {
             [$value, $operator] = [$operator, '='];
         }
-
-        $value = $this->normalizeWhereDateValue($value);
 
         $type = 'Basic';
         $this->wheres[] = compact('type', 'column', 'value', 'operator', 'boolean');
@@ -396,8 +393,6 @@ abstract class Builder implements Contract
             throw new InvalidArgumentException('Values should be an array of length 2');
         }
 
-        $values = array_map(fn ($v) => $this->normalizeWhereDateValue($v), $values);
-
         $this->wheres[] = [
             'type' => ($not ? 'Not' : '').'Between',
             'column' => $column,
@@ -433,9 +428,9 @@ abstract class Builder implements Contract
             throw new InvalidArgumentException('Illegal operator for date comparison');
         }
 
-        $value = $value instanceof DateTimeInterface
-            ? $this->normalizeWhereDateValue($value)
-            : Carbon::parse($value);
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
 
         $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
 
@@ -559,9 +554,9 @@ abstract class Builder implements Contract
             throw new InvalidArgumentException('Illegal operator for date comparison');
         }
 
-        $value = $value instanceof DateTimeInterface
-            ? $this->normalizeWhereDateValue($value)
-            : Carbon::parse($value);
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
 
         $value = $value->format('H:i:s'); // we only care about the time part
 

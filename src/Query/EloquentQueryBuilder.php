@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
-use Statamic\Query\Concerns\NormalizesDateValues;
 use Statamic\Query\Concerns\QueriesRelationships;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
@@ -20,7 +19,7 @@ use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
-    use AppliesScopes, NormalizesDateValues, QueriesRelationships;
+    use AppliesScopes, QueriesRelationships;
 
     protected $builder;
     protected $columns;
@@ -318,8 +317,6 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function whereBetween($column, $values, $boolean = 'and', $not = false)
     {
-        $values = array_map(fn ($v) => $this->normalizeWhereDateValue($v), $values);
-
         $this->builder->whereBetween($this->column($column), $values, $boolean, $not);
 
         return $this;
@@ -346,9 +343,9 @@ abstract class EloquentQueryBuilder implements Builder
             $value, $operator, func_num_args() === 2
         );
 
-        $value = $value instanceof DateTimeInterface
-            ? $this->normalizeWhereDateValue($value)
-            : Carbon::parse($value, config('app.timezone'));
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
 
         $this->builder->whereDate($this->column($column), $operator, $value, $boolean);
 
@@ -413,8 +410,6 @@ abstract class EloquentQueryBuilder implements Builder
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
-
-        $value = $this->normalizeWhereDateValue($value);
 
         $this->builder->whereTime($this->column($column), $operator, $value, $boolean);
 

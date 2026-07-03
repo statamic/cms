@@ -259,7 +259,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $value->copy()->setTimezone(config('app.timezone'))->startOfDay()->$method($where['value']);
+            return $value->copy()->startOfDay()->$method($where['value']);
         });
     }
 
@@ -319,7 +319,6 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            $value = $value->copy()->setTimezone(config('app.timezone'));
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 
             return $value->$method($compareValue);
