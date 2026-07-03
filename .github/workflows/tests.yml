@@ -55,7 +55,7 @@ jobs:
             src/**
             tests/**
             composer.json
-            phpunit.xml.dist
+            phpunit.dist.xml
             .github/workflows/tests.yml
             **.php
 

@@ -63,7 +63,7 @@ class FlatCamp extends Command
 
     public function handle()
     {
-        return $this->comment(collect($this->quotes)
+        $this->comment(collect($this->quotes)
             ->map(fn ($quote) => $this->formatForConsole($quote))
             ->random());
     }
