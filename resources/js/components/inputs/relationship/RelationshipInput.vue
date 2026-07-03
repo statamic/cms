@@ -234,6 +234,16 @@ export default {
         itemData(data, olddata) {
             if (this.initializing) return;
             this.$emit('item-data-updated', data);
+        },
+
+        value(value) {
+            if (this.initializing || this.loading) return;
+
+            // Values set from outside (e.g. from a save response, where a new term's id gets
+            // normalized) may reference items we have no data for, which would display raw ids.
+            if (value?.some(selection => !_.find(this.data, (item) => item.id == selection))) {
+                this.getDataForSelections(value);
+            }
         }
 
     },
