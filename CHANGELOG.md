@@ -1,5 +1,21 @@
 # Release Notes
 
+## 6.24.1 (2026-07-03)
+
+### What's fixed
+- Do not show a disabled cursor for start/end of pagination [#14921](https://github.com/statamic/cms/issues/14921) by @jaygeorge
+- Fix Bard link entry selector not showing pre-selected entry [#14917](https://github.com/statamic/cms/issues/14917) by @duncanmcclean
+- Fix required validation on empty code fields [#14918](https://github.com/statamic/cms/issues/14918) by @duncanmcclean
+- Fix fieldtype picker showing wrong list after switching blueprint modes [#14919](https://github.com/statamic/cms/issues/14919) by @duncanmcclean
+- Fix roles/groups select being empty for non-super users [#14889](https://github.com/statamic/cms/issues/14889) by @mynetx
+- Fix Glide route double slash for path-prefixed sites [#14908](https://github.com/statamic/cms/issues/14908) by @lwekuiper
+- Fix amber and default badge button hover background shade [#14924](https://github.com/statamic/cms/issues/14924) by @lazerg
+- Default the create user wizard super toggle to false [#14927](https://github.com/statamic/cms/issues/14927) by @stoffelio
+- Fix progress bar triggering excessive recursion [#14931](https://github.com/statamic/cms/issues/14931) by @jasonvarga
+- French translations [#14926](https://github.com/statamic/cms/issues/14926) by @ebeauchamps
+
+
+
 ## 6.24.0 (2026-07-01)
 
 ### What's new
