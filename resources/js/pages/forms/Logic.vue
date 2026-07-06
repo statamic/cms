@@ -36,17 +36,9 @@ const saving = ref(false);
 const saveBinding = ref(null);
 const escBinding = ref(null);
 const errors = ref({});
+const selected = ref<{type: SelectionType, id: string}>(null);
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
-const selected = ref(null); // { type: SelectionType, id }
-
-const selectedField = computed(() =>
-    selected.value?.type === SelectionType.Field ? fields.value.find((field) => field._id === selected.value.id) ?? null : null,
-);
-
-const selectedPage = computed(() =>
-    selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null,
-);
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
@@ -80,6 +72,9 @@ const suggestableFields = computed(() => {
             },
         }));
 });
+
+const selectedPage = computed(() => selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null);
+const selectedField = computed(() => selected.value?.type === SelectionType.Field ? fields.value.find((field) => field._id === selected.value.id) ?? null : null);
 
 const dirty = () => Statamic.$dirty.add('form-logic');
 const clearDirtyState = () => Statamic.$dirty.remove('form-logic');
@@ -127,7 +122,6 @@ const save = () => {
 
 watch(pages, dirty, { deep: true });
 watch(fields, dirty, { deep: true });
-
 watch(view, (view: View) => preferences.set('forms.logic.view', view));
 watch(treeDensity, (density: TreeDensity) => preferences.set('forms.logic.tree.density', density));
 
