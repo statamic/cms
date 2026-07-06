@@ -45,7 +45,7 @@ const iconClass = computed(() => {
     <span
         v-if="field.type === 'reference'"
         class="inline-flex size-4 shrink-0"
-        v-tooltip="__('Linked Field')"
+        v-tooltip="__('Linked Field: :reference', { reference: field.field_reference })"
     >
         <Icon name="link" class="size-4 shrink-0 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
     </span>

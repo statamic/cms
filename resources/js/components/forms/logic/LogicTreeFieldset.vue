@@ -8,8 +8,6 @@ const props = defineProps<{
     field: any;
 }>();
 
-const fieldtypes = inject<any[]>('fieldtypes', []);
-
 const fieldsetTitle = computed(() => {
     const fieldsets = Object.values(usePage().props.fieldsets ?? {});
 
