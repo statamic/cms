@@ -123,6 +123,7 @@ useSortable({
             <div
                 v-for="(page, pageIndex) in pages"
                 :key="page._id"
+                :data-form-page="page._id"
                 class="linked-list__column"
             >
                 <div
