@@ -6,8 +6,9 @@ import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandl
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
-import LogicTree, { TreeDensity } from '../../components/forms/logic/LogicTree.vue';
-import LogicPanel from '../../components/forms/logic/LogicPanel.vue';
+import LogicTree, { TreeDensity, SelectionType } from '../../components/forms/logic/LogicTree.vue';
+import FieldLogicPanel from '../../components/forms/logic/FieldLogicPanel.vue';
+import PageLogicPanel from '../../components/forms/logic/PageLogicPanel.vue';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
@@ -38,6 +39,14 @@ const errors = ref({});
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
 const selected = ref(null); // { type: SelectionType, id }
+
+const selectedField = computed(() =>
+    selected.value?.type === SelectionType.Field ? fields.value.find((field) => field._id === selected.value.id) ?? null : null,
+);
+
+const selectedPage = computed(() =>
+    selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null,
+);
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
@@ -221,13 +230,23 @@ onUnmounted(() => {
                         class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
                     >
                         <div class="h-full overflow-y-auto">
-                            <LogicPanel
-                                :selection="selected"
-                                v-model:fields="fields"
-                                v-model:pages="pages"
-                                :suggestable-fields="suggestableFields"
-                                :fieldtypes
-                            />
+                            <div class="mx-auto max-w-3xl p-6">
+                                <FieldLogicPanel
+                                    v-if="selectedField"
+                                    :field="selectedField"
+                                    v-model:fields="fields"
+                                    :suggestable-fields="suggestableFields"
+                                    :fieldtypes
+                                />
+
+                                <PageLogicPanel
+                                    v-else-if="selectedPage"
+                                    :page="selectedPage"
+                                    v-model:pages="pages"
+                                    :suggestable-fields="suggestableFields"
+                                    :fieldtypes
+                                />
+                            </div>
                         </div>
                     </SplitterPanel>
                 </template>
