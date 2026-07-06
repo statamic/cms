@@ -24,14 +24,14 @@ enum View {
 
 const props = defineProps({
     form: Object,
-    pages: Array,
-    fields: Array,
+    formFields: Object,
     action: String,
     fieldtypes: Array,
 });
 
-const pages = ref(props.pages);
-const fields = ref(props.fields);
+const LOGIC_KEYS = ['hidden', 'if', 'unless', 'if_any', 'unless_any', 'always_save'];
+
+const formFields = ref(props.formFields);
 const saving = ref(false);
 const saveBinding = ref(null);
 const escBinding = ref(null);
@@ -40,6 +40,28 @@ const selected = ref<{type: SelectionType, id: string}>(null);
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
 
+provide('fieldtypes', props.fieldtypes);
+
+const pages = computed({
+    get: () => formFields.value.pages,
+    set: (pages) => (formFields.value.pages = pages),
+});
+
+const fieldCategory = (field) => props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype)?.categories?.[0] ?? 'other';
+
+const allFields = () => pages.value.flatMap((page) => page.sections).flatMap((section) => section.fields);
+const findField = (id) => allFields().find((field) => field._id === id) ?? null;
+const findFieldByHandle = (handle) => allFields().find((field) => field.handle === handle) ?? null;
+
+// The tree and save work off the nested structure directly, but the list view,
+// numbering and suggestable list want a flat projection of the editable fields.
+const flatFields = computed(() => pages.value.flatMap((page, pageIndex) =>
+    page.sections.flatMap((section) => section.fields
+        .filter((field) => field.type !== 'import')
+        .map((field) => ({ field, pageIndex })),
+    ),
+));
+
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
     if (!showFieldNumbers.value) return new Map();
@@ -47,34 +69,98 @@ const fieldNumbers = computed(() => {
     let number = 0;
     const map = new Map();
 
-    fields.value.forEach((field) => {
-        if (field.hidden || field.category === 'information') return;
-        map.set(field._id, ++number);
-    });
+    pages.value.forEach((page) => page.sections.forEach((section) => section.fields.forEach((field) => {
+        if (field.type === 'import') {
+            Object.keys(field.previews ?? {}).forEach((handle) => map.set(`${field._id}:${handle}`, ++number));
+
+            return;
+        }
+
+        if (field.config?.hidden || fieldCategory(field) === 'information') return;
+
+        map.set(field.handle, ++number);
+    })));
 
     return map;
 });
 provide('fieldNumbers', fieldNumbers);
 
-const suggestableFields = computed(() => {
-    return fields.value
-        .filter(field => !field.import)
-        .filter(field => !['information', 'structure'].includes(field.category))
-        .map(field => ({
-            handle: field.handle,
-            icon: field.icon,
-            category: field.category,
-            pageIndex: field.page_index,
-            config: {
-                type: field.fieldtype,
-                display: field.display,
-                options: field.options,
-            },
-        }));
+const suggestableFields = computed(() => flatFields.value
+    .filter(({ field }) => !['information', 'structure'].includes(fieldCategory(field)))
+    .map(({ field, pageIndex }) => ({
+        handle: field.handle,
+        icon: field.icon,
+        category: fieldCategory(field),
+        pageIndex,
+        config: {
+            type: field.fieldtype,
+            display: field.config?.display,
+            options: field.config?.options,
+        },
+    })),
+);
+
+// Write a field's logic conditions into its config, keeping reference fields'
+// `config_overrides` in sync so the transformer persists them.
+const writeConditions = (field, conditions) => {
+    const config = { ...field.config };
+
+    // hidden + always_save are booleans that may be absent from a partial update,
+    // so fall back to the existing value; the rest are replaced outright.
+    const merged = {
+        hidden: conditions.hidden ?? config.hidden ?? false,
+        if: conditions.if || null,
+        unless: conditions.unless || null,
+        if_any: conditions.if_any || null,
+        unless_any: conditions.unless_any || null,
+        always_save: conditions.always_save ?? config.always_save ?? false,
+    };
+
+    LOGIC_KEYS.forEach((key) => {
+        if (merged[key]) {
+            config[key] = merged[key];
+        } else {
+            delete config[key];
+        }
+    });
+
+    field.config = config;
+
+    if (field.type === 'reference') {
+        const overrides = new Set((field.config_overrides ?? []).filter((key) => !LOGIC_KEYS.includes(key)));
+        LOGIC_KEYS.forEach((key) => key in config && overrides.add(key));
+        field.config_overrides = [...overrides];
+    }
+};
+
+// The list view edits a flat array of fields; sync any condition changes back
+// onto the matching nested field.
+const fields = computed({
+    get: () => flatFields.value.map(({ field, pageIndex }) => ({
+        _id: field.handle,
+        handle: field.handle,
+        display: field.config?.display ?? field.handle,
+        icon: field.icon,
+        category: fieldCategory(field),
+        fieldtype: field.fieldtype,
+        page_index: pageIndex,
+        hidden: field.config?.hidden ?? false,
+        if: field.config?.if ?? null,
+        unless: field.config?.unless ?? null,
+        if_any: field.config?.if_any ?? null,
+        unless_any: field.config?.unless_any ?? null,
+        always_save: field.config?.always_save ?? false,
+        options: field.config?.options,
+    })),
+    set: (fields) => fields.forEach((field) => {
+        const node = findFieldByHandle(field.handle);
+        if (node) writeConditions(node, field);
+    }),
 });
 
 const selectedPage = computed(() => selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null);
-const selectedField = computed(() => selected.value?.type === SelectionType.Field ? fields.value.find((field) => field._id === selected.value.id) ?? null : null);
+const selectedField = computed(() => selected.value?.type === SelectionType.Field ? findField(selected.value.id) : null);
+const selectedFieldPageIndex = computed(() => flatFields.value.find(({ field }) => field._id === selected.value?.id)?.pageIndex ?? 0);
 
 const dirty = () => Statamic.$dirty.add('form-logic');
 const clearDirtyState = () => Statamic.$dirty.remove('form-logic');
@@ -85,26 +171,7 @@ const save = () => {
     errors.value = {};
     saving.value = true;
 
-    axios.patch(props.action, {
-        pages: pages.value.map(page => ({
-            _id: page._id,
-            rules: page.rules || [],
-        })),
-        fields: fields.value.map(field => ({
-            _id: field._id,
-            handle: field.handle,
-            import: field.import ?? null,
-            page_index: field.page_index,
-            section_start: field.section_start ?? false,
-            section_display: field.section_display ?? null,
-            hidden: field.hidden,
-            if: field.if,
-            unless: field.unless,
-            if_any: field.if_any,
-            unless_any: field.unless_any,
-            always_save: field.always_save || false,
-        })),
-    })
+    axios.patch(props.action, { pages: pages.value })
         .then((response) => {
             clearDirtyState();
             Statamic.$toast.success(__('Saved'));
@@ -120,8 +187,7 @@ const save = () => {
         .finally(() => saving.value = false);
 };
 
-watch(pages, dirty, { deep: true });
-watch(fields, dirty, { deep: true });
+watch(formFields, dirty, { deep: true });
 watch(view, (view: View) => preferences.set('forms.logic.view', view));
 watch(treeDensity, (density: TreeDensity) => preferences.set('forms.logic.tree.density', density));
 
@@ -205,8 +271,7 @@ onUnmounted(() => {
                 <SplitterPanel>
                     <div class="h-full overflow-y-auto">
                         <LogicTree
-                            :pages
-                            v-model:fields="fields"
+                            v-model:pages="pages"
                             :density="treeDensity"
                             :selected
                             @select="selected = $event"
@@ -228,9 +293,10 @@ onUnmounted(() => {
                                 <FieldLogicPanel
                                     v-if="selectedField"
                                     :field="selectedField"
-                                    v-model:fields="fields"
+                                    :page-index="selectedFieldPageIndex"
                                     :suggestable-fields="suggestableFields"
                                     :fieldtypes
+                                    @update:conditions="writeConditions(selectedField, $event)"
                                 />
 
                                 <PageLogicPanel

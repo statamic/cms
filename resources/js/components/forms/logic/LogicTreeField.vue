@@ -2,20 +2,24 @@
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { Icon } from '@ui';
 import { categories, categoryColorClasses } from '@/components/forms/builder/categories';
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 
 const props = defineProps<{
     field: any;
 }>();
 
+const fieldtypes = inject<any[]>('fieldtypes', []);
+
 const mutedIconClass = 'text-gray-600 dark:text-gray-400';
 
+const category = computed(() => fieldtypes.find((fieldtype) => fieldtype.handle === props.field.fieldtype)?.categories?.[0] ?? 'other');
+
 const iconClass = computed(() => {
-    if (props.field.type === 'reference' || props.field.import) {
+    if (props.field.type === 'reference') {
         return mutedIconClass;
     }
 
-    const color = categories[props.field.category]?.color || 'gray';
+    const color = categories[category.value]?.color || 'gray';
 
     return categoryColorClasses[color]?.icon || mutedIconClass;
 });
@@ -28,11 +32,11 @@ const iconClass = computed(() => {
         aria-hidden="true"
     />
     <span class="linked-list__field-name min-w-0 flex-1">
-        <FieldNumber :field-key="field._id" />
-        {{ field.display }}
+        <FieldNumber :field-key="field.handle" />
+        {{ field.config?.display ?? field.handle }}
     </span>
     <span
-        v-if="field.hidden"
+        v-if="field.config?.hidden"
         class="inline-flex size-4 shrink-0"
         v-tooltip="__('Hidden')"
     >

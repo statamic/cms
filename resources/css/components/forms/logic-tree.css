@@ -254,22 +254,12 @@
        mirrors a normal field chip. The var fallbacks let the drag mirror - which
        is cloned outside the tree - keep the right height. */
     .linked-list__fieldset-row {
-        display: grid;
-        grid-template-columns: 1rem 1fr;
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
         height: var(--item-height, 3.2rem);
         padding-block: var(--item-padding, 1rem);
         @apply px-3 border-1 border-dashed border-gray-400/75! rounded-md bg-white shadow-ui-xs text-xs text-gray-850 dark:border-gray-600! dark:bg-gray-800 dark:text-gray-200 dark:shadow-none opacity-75;
-
-        > * {
-            grid-row: 1;
-        }
-        & > svg {
-            grid-column: 1;
-        }
-        .linked-list__field-name {
-            grid-column: 2;
-        }
     }
 
     .linked-list__hidden-field {
