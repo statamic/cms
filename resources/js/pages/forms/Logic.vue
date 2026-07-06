@@ -6,8 +6,8 @@ import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandl
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
-import LogicTree, { TreeDensity } from './LogicTree.vue';
-import LogicPanel from './LogicPanel.vue';
+import LogicTree, { TreeDensity } from '../../components/forms/logic/LogicTree.vue';
+import LogicPanel from '../../components/forms/logic/LogicPanel.vue';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
