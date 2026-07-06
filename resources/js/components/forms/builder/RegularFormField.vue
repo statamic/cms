@@ -6,6 +6,7 @@ import { categories, categoryColorClasses } from './categories';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { __ } from '@/bootstrap/globals';
+import { KEYS } from '@/components/field-conditions/Constants';
 
 defineEmits<{
     (e: 'duplicate'): void;
@@ -39,6 +40,8 @@ const fieldtypeCategory = computed(() => {
 const isInformationField = computed(() => fieldtypeCategory.value === categories.information);
 
 const iconColorClass = computed(() => categoryColorClasses[fieldtypeCategory.value.color].icon);
+
+const hasLogic = computed(() => KEYS.some(key => props.field.config[key] && Object.keys(props.field.config[key]).length > 0));
 
 const hasErrors = computed(() => {
     const allErrors = errors?.value ?? {};
@@ -109,7 +112,7 @@ const hasErrors = computed(() => {
                     <FieldNumber :field-key="field._id" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
-                        v-if="field.config.if || field.config.unless"
+                        v-if="hasLogic"
                         data-logic-attached
                         name="logic-tree"
                         class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
@@ -145,7 +148,7 @@ const hasErrors = computed(() => {
                     <FieldNumber :field-key="field._id" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
-                        v-if="field.config.if || field.config.unless"
+                        v-if="hasLogic"
                         data-logic-attached
                         name="logic-tree"
                         class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
