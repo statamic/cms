@@ -4,13 +4,13 @@ import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandle, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
-import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
-import PageLogic from '@/components/forms/logic/PageLogic.vue';
-import LogicTree, { TreeDensity, SelectionType } from '../../components/forms/logic/LogicTree.vue';
-import FieldLogicPanel from '../../components/forms/logic/FieldLogicPanel.vue';
-import PageLogicPanel from '../../components/forms/logic/PageLogicPanel.vue';
+import LogicList from '@/components/forms/logic/LogicList.vue';
+import LogicTree, { TreeDensity, SelectionType, type Selection } from '@/components/forms/logic/LogicTree.vue';
+import FieldLogicPanel from '@/components/forms/logic/FieldLogicPanel.vue';
+import PageLogicPanel from '@/components/forms/logic/PageLogicPanel.vue';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
+import { writeFieldConditions } from '@/composables/forms/field-conditions';
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { keys, preferences } from '@api';
 import axios from 'axios';
@@ -29,14 +29,12 @@ const props = defineProps({
     fieldtypes: Array,
 });
 
-const LOGIC_KEYS = ['hidden', 'if', 'unless', 'if_any', 'unless_any', 'always_save'];
-
-const formFields = ref(props.formFields);
+const errors = ref({});
 const saving = ref(false);
 const saveBinding = ref(null);
 const escBinding = ref(null);
-const errors = ref({});
-const selected = ref<{type: SelectionType, id: string}>(null);
+const formFields = ref(props.formFields);
+const selected = ref<Selection>(null);
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
 
@@ -49,18 +47,21 @@ const pages = computed({
 
 const fieldCategory = (field) => props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype)?.categories?.[0] ?? 'other';
 
-const allFields = () => pages.value.flatMap((page) => page.sections).flatMap((section) => section.fields);
-const findField = (id) => allFields().find((field) => field._id === id) ?? null;
-const findFieldByHandle = (handle) => allFields().find((field) => field.handle === handle) ?? null;
+const findField = (id) => pages.value
+    .flatMap((page) => page.sections)
+    .flatMap((section) => section.fields)
+    .find((field) => field._id === id) ?? null;
 
-// The tree and save work off the nested structure directly, but the list view,
-// numbering and suggestable list want a flat projection of the editable fields.
-const flatFields = computed(() => pages.value.flatMap((page, pageIndex) =>
+const flattenedFields = computed(() => pages.value.flatMap((page, pageIndex) =>
     page.sections.flatMap((section) => section.fields
         .filter((field) => field.type !== 'import')
         .map((field) => ({ field, pageIndex })),
     ),
 ));
+
+const selectedPage = computed(() => selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null);
+const selectedField = computed(() => selected.value?.type === SelectionType.Field ? findField(selected.value.id) : null);
+const selectedFieldPageIndex = computed(() => flattenedFields.value.find(({ field }) => field._id === selected.value?.id)?.pageIndex ?? 0);
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
@@ -85,7 +86,7 @@ const fieldNumbers = computed(() => {
 });
 provide('fieldNumbers', fieldNumbers);
 
-const suggestableFields = computed(() => flatFields.value
+const suggestableFields = computed(() => flattenedFields.value
     .filter(({ field }) => !['information', 'structure'].includes(fieldCategory(field)))
     .map(({ field, pageIndex }) => ({
         handle: field.handle,
@@ -99,68 +100,6 @@ const suggestableFields = computed(() => flatFields.value
         },
     })),
 );
-
-// Write a field's logic conditions into its config, keeping reference fields'
-// `config_overrides` in sync so the transformer persists them.
-const writeConditions = (field, conditions) => {
-    const config = { ...field.config };
-
-    // hidden + always_save are booleans that may be absent from a partial update,
-    // so fall back to the existing value; the rest are replaced outright.
-    const merged = {
-        hidden: conditions.hidden ?? config.hidden ?? false,
-        if: conditions.if || null,
-        unless: conditions.unless || null,
-        if_any: conditions.if_any || null,
-        unless_any: conditions.unless_any || null,
-        always_save: conditions.always_save ?? config.always_save ?? false,
-    };
-
-    LOGIC_KEYS.forEach((key) => {
-        if (merged[key]) {
-            config[key] = merged[key];
-        } else {
-            delete config[key];
-        }
-    });
-
-    field.config = config;
-
-    if (field.type === 'reference') {
-        const overrides = new Set((field.config_overrides ?? []).filter((key) => !LOGIC_KEYS.includes(key)));
-        LOGIC_KEYS.forEach((key) => key in config && overrides.add(key));
-        field.config_overrides = [...overrides];
-    }
-};
-
-// The list view edits a flat array of fields; sync any condition changes back
-// onto the matching nested field.
-const fields = computed({
-    get: () => flatFields.value.map(({ field, pageIndex }) => ({
-        _id: field.handle,
-        handle: field.handle,
-        display: field.config?.display ?? field.handle,
-        icon: field.icon,
-        category: fieldCategory(field),
-        fieldtype: field.fieldtype,
-        page_index: pageIndex,
-        hidden: field.config?.hidden ?? false,
-        if: field.config?.if ?? null,
-        unless: field.config?.unless ?? null,
-        if_any: field.config?.if_any ?? null,
-        unless_any: field.config?.unless_any ?? null,
-        always_save: field.config?.always_save ?? false,
-        options: field.config?.options,
-    })),
-    set: (fields) => fields.forEach((field) => {
-        const node = findFieldByHandle(field.handle);
-        if (node) writeConditions(node, field);
-    }),
-});
-
-const selectedPage = computed(() => selected.value?.type === SelectionType.Page ? pages.value.find((page) => page._id === selected.value.id) ?? null : null);
-const selectedField = computed(() => selected.value?.type === SelectionType.Field ? findField(selected.value.id) : null);
-const selectedFieldPageIndex = computed(() => flatFields.value.find(({ field }) => field._id === selected.value?.id)?.pageIndex ?? 0);
 
 const dirty = () => Statamic.$dirty.add('form-logic');
 const clearDirtyState = () => Statamic.$dirty.remove('form-logic');
@@ -248,21 +187,12 @@ onUnmounted(() => {
             </template>
         </Header>
 
-        <template v-if="view === View.List">
-            <PageLogic
-                v-if="pages.length > 1"
-                class="mb-6"
-                v-model:pages="pages"
-                :suggestable-fields
-                :fieldtypes
-            />
-
-            <FieldLogic
-                v-model:fields="fields"
-                :suggestable-fields
-                :fieldtypes
-            />
-        </template>
+        <LogicList
+            v-if="view === View.List"
+            v-model:pages="pages"
+            :suggestable-fields
+            :fieldtypes
+        />
     </div>
 
     <div v-if="view === View.Tree" class="st-full-bleed-content flex flex-col flex-1 min-h-0">
@@ -290,21 +220,21 @@ onUnmounted(() => {
                     >
                         <div class="h-full overflow-y-auto">
                             <div class="mx-auto max-w-3xl p-6">
-                                <FieldLogicPanel
-                                    v-if="selectedField"
-                                    :field="selectedField"
-                                    :page-index="selectedFieldPageIndex"
-                                    :suggestable-fields="suggestableFields"
-                                    :fieldtypes
-                                    @update:conditions="writeConditions(selectedField, $event)"
-                                />
-
                                 <PageLogicPanel
-                                    v-else-if="selectedPage"
+                                    v-if="selectedPage"
                                     :page="selectedPage"
                                     v-model:pages="pages"
-                                    :suggestable-fields="suggestableFields"
+                                    :suggestable-fields
                                     :fieldtypes
+                                />
+
+                                <FieldLogicPanel
+                                    v-else-if="selectedField"
+                                    :field="selectedField"
+                                    :page-index="selectedFieldPageIndex"
+                                    :suggestable-fields
+                                    :fieldtypes
+                                    @update:conditions="writeFieldConditions(selectedField, $event)"
                                 />
                             </div>
                         </div>

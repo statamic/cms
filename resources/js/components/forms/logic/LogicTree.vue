@@ -8,6 +8,11 @@ export enum SelectionType {
     Field = 'field',
     Page = 'page',
 }
+
+export type Selection = {
+    type: SelectionType;
+    id: string;
+};
 </script>
 
 <script setup lang="ts">
@@ -23,8 +28,10 @@ const emit = defineEmits(['update:pages', 'select']);
 const props = defineProps({
     pages: { type: Array, required: true },
     density: { type: String as PropType<TreeDensity>, default: TreeDensity.Compressed },
-    selected: { type: Object, default: null }, // { type: SelectionType, id }
+    selected: { type: Object as PropType<Selection>, default: null },
 });
+
+const tree = useTemplateRef('tree');
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
@@ -33,21 +40,13 @@ const fieldConnections = computed(() => {
 
     props.pages.forEach((page, pageIndex) => {
         (page.rules ?? []).forEach((rule) => {
-            if (! rule.destination) {
-                return;
-            }
+            if (! rule.destination) return;
 
-            const destinationPageIndex = props.pages.findIndex((p) => p._id === rule.destination);
+            const destinationPageIndex = props.pages.findIndex((page) => page._id === rule.destination);
+            if (destinationPageIndex <= pageIndex) return;
 
-            if (destinationPageIndex <= pageIndex) {
-                return;
-            }
-
-            const condition = (rule.conditions ?? []).find((c) => c.field && c.value !== null && c.value !== '');
-
-            if (! condition?.field) {
-                return;
-            }
+            const condition = (rule.conditions ?? []).find((condition) => condition.field && condition.value !== null && condition.value !== '');
+            if (! condition?.field) return;
 
             connections[condition.field] = {
                 endConnection: pageAnchor(destinationPageIndex),
@@ -62,6 +61,13 @@ const fieldConnections = computed(() => {
 
 const pageTitle = (page, pageIndex) => page.display || __('Page :number', { number: pageIndex + 1 });
 
+const fieldConnection = (field) => (field.type === 'import' ? null : fieldConnections.value[field.handle] ?? null);
+const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.value.has(pageIndex);
+
+const connectorDestinationPageIndices = computed(() => {
+    return new Set(Object.values(fieldConnections.value).map((connection) => connection.destinationPageIndex));
+});
+
 const hasPageRules = (page) => (page.rules ?? []).some((rule) => {
     if (! rule.destination) {
         return false;
@@ -70,42 +76,30 @@ const hasPageRules = (page) => (page.rules ?? []).some((rule) => {
     return (rule.conditions ?? []).some((condition) => condition.field && condition.value !== null && condition.value !== '');
 });
 
-// Only single fields can be logic sources - imported fields can't be conditions.
-const fieldConnection = (field) => (field.type === 'import' ? null : fieldConnections.value[field.handle] ?? null);
-
-const connectorDestinationPageIndices = computed(() => {
-    return new Set(Object.values(fieldConnections.value).map((connection) => connection.destinationPageIndex));
-});
-
-const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.value.has(pageIndex);
-
-const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
-
-// Selection - clicking a field or page opens its logic in the panel below. Imported
-// fields can't hold logic, and the final page has nowhere to route to.
 const isLastPage = (pageIndex) => pageIndex === props.pages.length - 1;
+const hasPageIndicators = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
 const selectField = (field) => field.type === 'import' || emit('select', { type: SelectionType.Field, id: field._id });
 const selectPage = (page, pageIndex) => isLastPage(pageIndex) || emit('select', { type: SelectionType.Page, id: page._id });
 const isFieldSelected = (field) => props.selected?.type === SelectionType.Field && props.selected.id === field._id;
 const isPageSelected = (page) => props.selected?.type === SelectionType.Page && props.selected.id === page._id;
 
-// Drag & drop. A field (or whole fieldset import) moves as one node between sections.
-const tree = useTemplateRef('tree');
-const allSections = computed(() => props.pages.flatMap((page) => page.sections.map((section) => ({ fields: section.fields }))));
+const allSections = computed(() => props.pages.flatMap((page) => page.sections));
 
-const moveField = (from, to, oldIndex, newIndex) => {
-    const [fromPage, fromSection] = from.split(':').map(Number);
-    const [toPage, toSection] = to.split(':').map(Number);
-
+const moveField = (fromSectionId: string, toSectionId: string, oldIndex: number, newIndex: number) => {
     const pages = props.pages.map((page) => ({
         ...page,
         sections: page.sections.map((section) => ({ ...section, fields: [...section.fields] })),
     }));
 
-    const [field] = pages[fromPage].sections[fromSection].fields.splice(oldIndex, 1);
+    const sections = pages.flatMap((page) => page.sections);
+    const fromSection = sections.find((section) => section._id === fromSectionId);
+    const toSection = sections.find((section) => section._id === toSectionId);
+    if (! fromSection || ! toSection) return;
+
+    const [field] = fromSection.fields.splice(oldIndex, 1);
     if (! field) return;
 
-    pages[toPage].sections[toSection].fields.splice(newIndex, 0, field);
+    toSection.fields.splice(newIndex, 0, field);
 
     emit('update:pages', pages);
 };
@@ -140,7 +134,7 @@ useSortable({
                 >
                     <div
                         class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
-                        :class="{ '-ms-1.5': hasPageNameLeadingIcons(page, pageIndex) }"
+                        :class="{ '-ms-1.5': hasPageIndicators(page, pageIndex) }"
                     >
                         <Icon
                             v-if="isConnectorDestination(pageIndex)"
@@ -158,7 +152,7 @@ useSortable({
                         <div
                             class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
                             :class="{
-                                'w-[85%]!': hasPageNameLeadingIcons(page, pageIndex),
+                                'w-[85%]!': hasPageIndicators(page, pageIndex),
                                 'ring-1 ring-blue-500 border-transparent': isPageSelected(page),
                             }"
                         >
@@ -170,14 +164,14 @@ useSortable({
 
                 <div class="linked-list__sections">
                     <div
-                        v-for="(section, sectionIndex) in page.sections"
+                        v-for="section in page.sections"
                         :key="section._id"
                         class="linked-list__section"
                     >
                         <div class="linked-list__section-marker" :aria-label="section.display">
                             <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ section.display }}</span>
                         </div>
-                        <ul class="field-sort-container" :data-sort-section="`${pageIndex}:${sectionIndex}`">
+                        <ul class="field-sort-container" :data-sort-section="section._id">
                             <div v-if="! section.fields.length" class="linked-list__empty-section">
                                 {{ __('No fields') }}
                             </div>
