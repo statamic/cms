@@ -62,6 +62,12 @@ const pageDestinationOptions = computed(() => {
         });
 });
 
+watch(page, () => {
+    if (activeTab.value === PageInspectorTabs.Logic && isLastPage.value) {
+        activeTab.value = PageInspectorTabs.Settings;
+    }
+});
+
 watch(() => page.value.display, dirty);
 watch(() => page.value.instructions, dirty);
 watch(() => page.value.rules, dirty, { deep: true });
