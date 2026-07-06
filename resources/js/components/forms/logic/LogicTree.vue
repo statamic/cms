@@ -14,7 +14,7 @@ export enum SelectionType {
 import LogicTreeField from './LogicTreeField.vue';
 import LogicTreeFieldset from './LogicTreeFieldset.vue';
 import { Icon } from '@ui';
-import { useSortable } from '@/components/forms/builder/use-drag-and-drop';
+import { useSortable } from '@/composables/forms/use-drag-and-drop';
 import { computed, ref, useTemplateRef } from 'vue';
 import type { PropType } from 'vue';
 

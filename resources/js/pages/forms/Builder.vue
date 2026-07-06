@@ -37,7 +37,7 @@ import LinkFieldsInspector from '@/components/forms/builder/LinkFieldsInspector.
 import Page from '@/components/forms/builder/Page.vue';
 import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import SectionInspector from '@/components/forms/builder/SectionInspector.vue';
-import { useFieldtypeDraggable } from '@/components/forms/builder/use-drag-and-drop';
+import { useFieldtypeDraggable } from '@/composables/forms/use-drag-and-drop';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { __, uniqid } from '@/bootstrap/globals';

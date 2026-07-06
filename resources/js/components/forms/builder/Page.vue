@@ -2,7 +2,7 @@
 import { Button, Icon } from '@ui';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import { injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
-import { useSortable } from './use-drag-and-drop';
+import { useSortable } from '../../../composables/forms/use-drag-and-drop';
 import Section from './Section.vue';
 import { __ } from '@/bootstrap/globals';
 
