@@ -60,6 +60,9 @@
             border-radius: 10px;
             @apply bg-blue-50;
         }
+        :where(.dark) &::before {
+            @apply bg-blue-950 border-blue-500/75;
+        }
     }
 }
 
