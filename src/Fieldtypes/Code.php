@@ -168,6 +168,15 @@ class Code extends Fieldtype
         return $value;
     }
 
+    public function preProcessValidatable($value)
+    {
+        if (is_array($value)) {
+            return $value['code'] ?? null;
+        }
+
+        return $value;
+    }
+
     public function process($value)
     {
         if (! $value) {

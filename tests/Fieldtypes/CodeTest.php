@@ -49,6 +49,46 @@ class CodeTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('preProcessValidatableValuesProvider')]
+    public function it_preprocesses_validatable_values($value, $expected)
+    {
+        $field = (new Code)->setField(new Field('test', ['type' => 'code']));
+
+        $this->assertEquals($expected, $field->preProcessValidatable($value));
+    }
+
+    public static function preProcessValidatableValuesProvider()
+    {
+        return [
+            'string' => ['bar', 'bar'],
+            'null' => [null, null],
+            'array with code' => [['code' => 'bar', 'mode' => 'htmlmixed'], 'bar'],
+            'array without code' => [['code' => null, 'mode' => 'htmlmixed'], null],
+        ];
+    }
+
+    #[Test]
+    public function required_rule_fails_on_an_empty_code_field()
+    {
+        $fields = (new \Statamic\Fields\Fields)->setItems([[
+            'handle' => 'test',
+            'field' => ['type' => 'code', 'validate' => ['required']],
+        ]]);
+
+        $empty = (new \Statamic\Fields\Validator)->fields(
+            $fields->addValues(['test' => ['code' => null, 'mode' => 'application/ld+json']])
+        );
+
+        $this->assertFalse($empty->validator()->passes());
+
+        $filled = (new \Statamic\Fields\Validator)->fields(
+            $fields->addValues(['test' => ['code' => 'bar', 'mode' => 'application/ld+json']])
+        );
+
+        $this->assertTrue($filled->validator()->passes());
+    }
+
+    #[Test]
     public function it_doesnt_do_any_preprocessing_for_config()
     {
         $field = (new Code)->setField(new Field('test', ['type' => 'code']));

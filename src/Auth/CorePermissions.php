@@ -267,6 +267,6 @@ class CorePermissions
 
     protected function group($name, $callback)
     {
-        return Permission::group($name, __('statamic::permissions.group_'.$name), $callback);
+        Permission::group($name, __('statamic::permissions.group_'.$name), $callback);
     }
 }

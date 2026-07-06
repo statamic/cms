@@ -16,6 +16,9 @@ use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Field implements Arrayable
 {
     protected $handle;
