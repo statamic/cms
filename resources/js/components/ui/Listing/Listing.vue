@@ -686,6 +686,10 @@ watch(parameters, (newParams, oldParams) => {
     pushState();
 });
 
+// When the URL changes (e.g. the asset browser swaps between its folder and
+// search endpoints as filters are toggled), re-request so the results reflect it.
+watch(() => props.url, () => request());
+
 watch(loading, (loading) => Statamic.$progress.loading(id, loading));
 
 onMounted(() => {
