@@ -93,6 +93,11 @@ const save = () => {
         })),
         fields: fields.value.map(field => ({
             _id: field._id,
+            handle: field.handle,
+            import: field.import ?? null,
+            page_index: field.page_index,
+            section_start: field.section_start ?? false,
+            section_display: field.section_display ?? null,
             hidden: field.hidden,
             if: field.if,
             unless: field.unless,
@@ -212,7 +217,7 @@ onUnmounted(() => {
                 </SplitterPanel>
 
                 <template v-if="selected">
-                    <SplitterResizeHandle class="mx-auto my-1.5 h-1.5 w-16 shrink-0 rounded-full bg-gray-300 transition-colors hover:bg-blue-400 dark:bg-gray-700 dark:hover:bg-blue-500" />
+                    <SplitterResizeHandle class="mx-auto my-1.5 h-1.5 w-16 shrink-0 rounded-full bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
 
                     <SplitterPanel
                         :default-size="35"

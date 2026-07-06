@@ -182,59 +182,115 @@ class FormLogicController extends CpController
                     ->all();
             });
 
-        $fieldConditions = collect($request->input('fields', []))->keyBy('_id');
+        [$fieldConfigs, $importConfigs] = $this->existingConfigs($form->formFields()->pages());
 
-        $pages = $form->formFields()->pages()->map(function (array $page) use ($pageRules): array {
+        $fieldsByPage = collect($request->input('fields', []))->groupBy('page_index');
+
+        $pages = $form->formFields()->pages()->map(function (array $page, int $pageIndex) use ($pageRules, $fieldsByPage, $fieldConfigs, $importConfigs): array {
             $pageId = $page['id'] ?? null;
 
             if ($pageId && $pageRules->has($pageId)) {
                 $page['rules'] = $pageRules->get($pageId);
             }
 
-            return $page;
-        });
-
-        $pages = $pages->map(function (array $page) use ($fieldConditions): array {
-            $page['sections'] = collect($page['sections'] ?? [])->map(function (array $section) use ($fieldConditions): array {
-                $section['fields'] = collect($section['fields'] ?? [])->map(function (array $fieldConfig) use ($fieldConditions): array {
-                    $handle = $fieldConfig['handle'] ?? null;
-
-                    if (! $handle || ! $fieldConditions->has($handle)) {
-                        return $fieldConfig;
-                    }
-
-                    $conditions = $fieldConditions->get($handle);
-
-                    // Inline fields store logic inside `field`; reference fields (where
-                    // `field` is a string handle) store it as overrides under `config`.
-                    $key = is_array($fieldConfig['field'] ?? null) ? 'field' : 'config';
-                    $target = $fieldConfig[$key] ?? [];
-
-                    $logicKeys = ['hidden', 'if', 'unless', 'if_any', 'unless_any', 'always_save'];
-
-                    unset($target['hidden'], $target['if'], $target['unless'], $target['if_any'], $target['unless_any'], $target['always_save']);
-
-                    foreach ($logicKeys as $logicKey) {
-                        if (! empty($conditions[$logicKey])) {
-                            $target[$logicKey] = $conditions[$logicKey];
-                        }
-                    }
-
-                    if ($key === 'config' && empty($target)) {
-                        unset($fieldConfig['config']);
-                    } else {
-                        $fieldConfig[$key] = $target;
-                    }
-
-                    return $fieldConfig;
-                })->all();
-
-                return $section;
-            })->all();
+            $page['sections'] = $this->rebuildSections(
+                $fieldsByPage->get($pageIndex, collect()),
+                $page['sections'] ?? [],
+                $fieldConfigs,
+                $importConfigs,
+            );
 
             return $page;
         })->all();
 
         $form->formFields(['pages' => $pages]);
+    }
+
+    private function existingConfigs($pages): array
+    {
+        $fields = [];
+        $imports = [];
+
+        foreach ($pages as $page) {
+            foreach ($page['sections'] ?? [] as $section) {
+                foreach ($section['fields'] ?? [] as $fieldConfig) {
+                    if (isset($fieldConfig['import'])) {
+                        $imports[$fieldConfig['import']] = $fieldConfig;
+                    } elseif (isset($fieldConfig['handle'])) {
+                        $fields[$fieldConfig['handle']] = $fieldConfig;
+                    }
+                }
+            }
+        }
+
+        return [$fields, $imports];
+    }
+
+    // Rebuild a page's sections from the (reordered) fields sent by the tree, reusing
+    // the existing field/import/section configs so only order and logic conditions change.
+    private function rebuildSections($fields, array $existingSections, array $fieldConfigs, array $importConfigs): array
+    {
+        $sections = [];
+        $sectionIndex = -1;
+        $lastImport = null;
+
+        foreach ($fields as $field) {
+            if (($field['section_start'] ?? false) || empty($sections)) {
+                $sectionIndex++;
+
+                $section = $existingSections[$sectionIndex] ?? [];
+                $section['display'] = $field['section_display'] ?? ($section['display'] ?? __('Section'));
+                $section['fields'] = [];
+
+                $sections[] = $section;
+                $lastImport = null;
+            }
+
+            $current = count($sections) - 1;
+
+            // A fieldset import expands into several fields; collapse them back into
+            // the single import entry it came from.
+            if ($import = ($field['import'] ?? null)) {
+                if ($import !== $lastImport && isset($importConfigs[$import])) {
+                    $sections[$current]['fields'][] = $importConfigs[$import];
+                }
+
+                $lastImport = $import;
+
+                continue;
+            }
+
+            $lastImport = null;
+
+            if ($config = $fieldConfigs[$field['handle'] ?? null] ?? null) {
+                $sections[$current]['fields'][] = $this->applyFieldConditions($config, $field);
+            }
+        }
+
+        return $sections;
+    }
+
+    private function applyFieldConditions(array $fieldConfig, array $conditions): array
+    {
+        // Inline fields store logic inside `field`; reference fields (where `field`
+        // is a string handle) store it as overrides under `config`.
+        $key = is_array($fieldConfig['field'] ?? null) ? 'field' : 'config';
+        $target = $fieldConfig[$key] ?? [];
+
+        unset($target['hidden'], $target['if'], $target['unless'], $target['if_any'], $target['unless_any'], $target['always_save']);
+
+        foreach (['hidden', 'if', 'unless', 'if_any', 'unless_any', 'always_save'] as $logicKey) {
+            if (! empty($conditions[$logicKey])) {
+                $target[$logicKey] = $conditions[$logicKey];
+            }
+        }
+
+        if ($key === 'config' && empty($target)) {
+            unset($fieldConfig['config']);
+        } else {
+            $fieldConfig[$key] = $target;
+        }
+
+        return $fieldConfig;
     }
 }

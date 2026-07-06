@@ -218,7 +218,7 @@ useSortable({
                             class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
                             :class="{
                                 'w-[85%]!': hasPageNameLeadingIcons(page, pageIndex),
-                                'ring-2 ring-blue-500 border-transparent': isPageSelected(page),
+                                'ring-1 ring-blue-500 border-transparent': isPageSelected(page),
                             }"
                         >
                             <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
@@ -250,7 +250,7 @@ useSortable({
                                     'linked-list__hidden-field': field.hidden,
                                     'linked-list__connector': itemConnection(field),
                                     'linked-list__page-leap': itemConnection(field)?.leap,
-                                    'ring-2 ring-blue-500': isFieldSelected(field),
+                                    'ring-1 ring-blue-500': isFieldSelected(field),
                                 }"
                                 :style="itemConnection(field) ? { '--end-connection': itemConnection(field).endConnection } : null"
                                 v-tooltip="field.import ? __(`Logic can't be added to imported fields. Please edit the fieldset instead.`) : null"
