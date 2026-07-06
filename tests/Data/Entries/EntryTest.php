@@ -1186,6 +1186,32 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_order_from_the_collections_structure_when_the_tree_contains_a_null_item()
+    {
+        $collection = tap(Collection::make('ordered'))->save();
+
+        $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
+        $two = tap((new Entry)->locale('en')->id('two')->collection($collection))->save();
+        $three = tap((new Entry)->locale('en')->id('three')->collection($collection))->save();
+
+        $collection->structureContents([
+            'max_depth' => 3,
+        ])->save();
+        $collection->structure()->in('en')->tree(
+            [
+                ['entry' => 'three'],
+                null,
+                ['entry' => 'one'],
+                ['entry' => 'two'],
+            ]
+        )->save();
+
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(3, $two->order());
+        $this->assertEquals(1, $three->order());
+    }
+
+    #[Test]
     public function it_gets_the_order_from_the_data_if_not_structured()
     {
         $collection = tap(Collection::make('test'))->save();
