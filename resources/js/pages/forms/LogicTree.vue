@@ -11,12 +11,13 @@ enum TreeDensity {
     Expanded = 'expanded',
 }
 
-const emit = defineEmits(['update:fields']);
+const emit = defineEmits(['update:fields', 'select']);
 
 const props = defineProps({
     pages: { type: Array, required: true },
     fields: { type: Array, required: true },
     density: { type: String as PropType<TreeDensity>, default: TreeDensity.Compressed },
+    selected: { type: Object, default: null }, // { type: 'field' | 'page', id }
 });
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
@@ -124,6 +125,14 @@ const isConnectorDestination = (pageIndex) => connectorDestinationPageIndices.va
 
 const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
 
+// Selection - clicking a field or page opens its logic in the panel below.
+// Imported fields can't hold logic, so they aren't selectable.
+const isLastPage = (pageIndex) => pageIndex === props.pages.length - 1;
+const selectField = (item) => item.import || emit('select', { type: 'field', id: item._id });
+const selectPage = (page, pageIndex) => isLastPage(pageIndex) || emit('select', { type: 'page', id: page._id });
+const isFieldSelected = (item) => props.selected?.type === 'field' && props.selected.id === item._id;
+const isPageSelected = (page) => props.selected?.type === 'page' && props.selected.id === page._id;
+
 // Drag & drop. Each item (single field or whole fieldset) moves as one unit.
 const tree = useTemplateRef('tree');
 const allSections = computed(() =>
@@ -183,7 +192,10 @@ useSortable({
             >
                 <div
                     class="linked-list__page-name"
+                    :class="isLastPage(pageIndex) ? 'cursor-not-allowed' : 'cursor-pointer'"
                     :style="{ 'anchor-name': pageAnchor(pageIndex) }"
+                    v-tooltip="isLastPage(pageIndex) ? __(`Logic can't be added to the final page.`) : null"
+                    @click="selectPage(page, pageIndex)"
                 >
                     <div
                         class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
@@ -204,7 +216,10 @@ useSortable({
                         </span>
                         <div
                             class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
-                            :class="{ 'w-[85%]!': hasPageNameLeadingIcons(page, pageIndex) }"
+                            :class="{
+                                'w-[85%]!': hasPageNameLeadingIcons(page, pageIndex),
+                                'ring-2 ring-blue-500 border-transparent': isPageSelected(page),
+                            }"
                         >
                             <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                             <span class="line-clamp-1">{{ pageTitle(page, pageIndex) }}</span>
@@ -235,9 +250,11 @@ useSortable({
                                     'linked-list__hidden-field': field.hidden,
                                     'linked-list__connector': itemConnection(field),
                                     'linked-list__page-leap': itemConnection(field)?.leap,
+                                    'ring-2 ring-blue-500': isFieldSelected(field),
                                 }"
                                 :style="itemConnection(field) ? { '--end-connection': itemConnection(field).endConnection } : null"
                                 v-tooltip="field.import ? __(`Logic can't be added to imported fields. Please edit the fieldset instead.`) : null"
+                                @click="selectField(field)"
                             >
                                 <LogicTreeFieldset v-if="field.import" :item="field" />
 

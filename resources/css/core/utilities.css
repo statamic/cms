@@ -91,12 +91,32 @@
         @apply px-2 sm:px-6 md:px-12 min-w-0 pb-6;
     }
 }
+/*
+    When a page renders full-height, full-bleed content (e.g. the forms logic
+    tree), build a definite-height flex chain from the scroll container down so
+    the region fills the viewport exactly and only its inner panels scroll,
+    rather than the page itself.
+*/
+#content-card:has(.st-full-bleed-content) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
 .content-card:has(.st-full-bleed-content) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     min-width: 0;
     overflow-x: clip;
     padding-bottom: 0;
 }
 [data-max-width-wrapper]:has(.st-full-bleed-content) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 0;
     max-width: none !important;
 }
 

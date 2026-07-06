@@ -2,11 +2,12 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandle, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
 import LogicTree from './LogicTree.vue';
+import LogicPanel from './LogicPanel.vue';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
@@ -37,9 +38,11 @@ const pages = ref(props.pages);
 const fields = ref(props.fields);
 const saving = ref(false);
 const saveBinding = ref(null);
+const escBinding = ref(null);
 const errors = ref({});
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
+const selected = ref(null); // { type: 'field' | 'page', id }
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {
@@ -124,11 +127,14 @@ onMounted(() => {
         e.preventDefault();
         save();
     });
+
+    escBinding.value = keys.bindGlobal(['esc'], () => (selected.value = null));
 });
 
 onUnmounted(() => {
     clearDirtyState();
     saveBinding.value?.destroy();
+    escBinding.value?.destroy();
 });
 </script>
 
@@ -142,7 +148,7 @@ onUnmounted(() => {
         </Button>
     </Teleport>
 
-    <div class="mx-auto max-w-5xl min-w-0">
+    <div class="mx-auto w-full max-w-5xl min-w-0 shrink-0">
         <Header class="mb-2 md:py-9">
             <template #title>
                 <StatusIndicator status="published" />
@@ -190,11 +196,42 @@ onUnmounted(() => {
         </template>
     </div>
 
-    <div v-if="view === View.Tree" class="st-full-bleed-content">
-        <LogicTree
-            :pages
-            v-model:fields="fields"
-            :density="treeDensity"
-        />
+    <div v-if="view === View.Tree" class="st-full-bleed-content flex flex-col flex-1 min-h-0">
+        <div class="flex-1 min-h-0 overflow-hidden pb-2!">
+            <SplitterGroup direction="vertical">
+                <SplitterPanel>
+                    <div class="h-full overflow-y-auto">
+                        <LogicTree
+                            :pages
+                            v-model:fields="fields"
+                            :density="treeDensity"
+                            :selected
+                            @select="selected = $event"
+                        />
+                    </div>
+                </SplitterPanel>
+
+                <template v-if="selected">
+                    <SplitterResizeHandle class="mx-auto my-1.5 h-1.5 w-16 shrink-0 rounded-full bg-gray-300 transition-colors hover:bg-blue-400 dark:bg-gray-700 dark:hover:bg-blue-500" />
+
+                    <SplitterPanel
+                        :default-size="35"
+                        :min-size="20"
+                        collapsible
+                        class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+                    >
+                        <div class="h-full overflow-y-auto">
+                            <LogicPanel
+                                :selection="selected"
+                                v-model:fields="fields"
+                                v-model:pages="pages"
+                                :suggestable-fields="suggestableFields"
+                                :fieldtypes
+                            />
+                        </div>
+                    </SplitterPanel>
+                </template>
+            </SplitterGroup>
+        </div>
     </div>
 </template>
