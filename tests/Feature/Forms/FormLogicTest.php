@@ -22,25 +22,15 @@ class FormLogicTest extends TestCase
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
     }
 
-    private function actingAsFormEditor()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
-
-        return $this->actingAs(User::make()->assignRole('test')->save());
-    }
-
-    private function enableFormsPro(): void
-    {
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
-    }
-
     #[Test]
     public function it_shows_the_logic_page_if_you_have_permission()
     {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
         $this
-            ->actingAsFormEditor()
+            ->actingAs($user)
             ->get(cp_route('forms.logic.edit', $form->handle()))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
@@ -69,7 +59,10 @@ class FormLogicTest extends TestCase
     #[Test]
     public function it_provides_the_nested_form_fields_structure()
     {
-        $this->enableFormsPro();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $form = tap(Form::make('test')->formFields([
             'pages' => [
@@ -100,7 +93,7 @@ class FormLogicTest extends TestCase
         ]))->save();
 
         $this
-            ->actingAsFormEditor()
+            ->actingAs($user)
             ->get(cp_route('forms.logic.edit', $form->handle()))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
@@ -119,7 +112,8 @@ class FormLogicTest extends TestCase
     #[Test]
     public function it_can_update_field_conditions()
     {
-        $this->enableFormsPro();
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $form = tap(Form::make('test')->formFields([
             'pages' => [
@@ -156,7 +150,7 @@ class FormLogicTest extends TestCase
         ];
 
         $this
-            ->actingAsFormEditor()
+            ->actingAs($user)
             ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
             ->assertSuccessful();
 
@@ -170,7 +164,8 @@ class FormLogicTest extends TestCase
     #[Test]
     public function it_persists_field_reordering()
     {
-        $this->enableFormsPro();
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $form = tap(Form::make('test')->formFields([
             'pages' => [
@@ -204,7 +199,7 @@ class FormLogicTest extends TestCase
         ];
 
         $this
-            ->actingAsFormEditor()
+            ->actingAs($user)
             ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
             ->assertSuccessful();
 
@@ -216,11 +211,11 @@ class FormLogicTest extends TestCase
     #[Test]
     public function it_can_update_conditions_on_a_referenced_field()
     {
-        $this->enableFormsPro();
-
         // A referenced field stores its `field` as a string handle, so its logic
         // conditions are saved as overrides under `config` rather than inside `field`.
-        // @see https://github.com/statamic/cms/pull/14811
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
         $form = tap(Form::make('test')->formFields([
             'pages' => [
                 [
@@ -256,7 +251,7 @@ class FormLogicTest extends TestCase
         ];
 
         $this
-            ->actingAsFormEditor()
+            ->actingAs($user)
             ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
             ->assertSuccessful();
 
@@ -269,7 +264,10 @@ class FormLogicTest extends TestCase
     #[Test]
     public function it_can_update_page_rules()
     {
-        $this->enableFormsPro();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $form = tap(Form::make('test')->formFields([
             'pages' => [
@@ -296,7 +294,7 @@ class FormLogicTest extends TestCase
         ];
 
         $this
-            ->actingAsFormEditor()
+            ->actingAs($user)
             ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
             ->assertSuccessful();
 
@@ -307,6 +305,49 @@ class FormLogicTest extends TestCase
         $this->assertEquals('favorite_color', $rules[0]['conditions'][0]['field']);
         $this->assertArrayNotHasKey('_id', $rules[0]);
         $this->assertArrayNotHasKey('_id', $rules[0]['conditions'][0]);
+    }
+
+    #[Test]
+    public function it_saves_page_rule_conditions_with_a_false_value()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                ['id' => 'page1', 'sections' => [['display' => 'Section', 'fields' => []]]],
+                ['id' => 'page2', 'sections' => [['display' => 'Section', 'fields' => []]]],
+            ],
+        ]))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'rules' => [
+                        [
+                            '_id' => 'rule1',
+                            'conditions' => [['_id' => 'cond1', 'field' => 'subscribed', 'operator' => 'equals', 'value' => false]],
+                            'destination' => 'page2',
+                        ],
+                    ],
+                    'sections' => [['display' => 'Section', 'fields' => []]],
+                ],
+                ['_id' => 'page2', 'sections' => [['display' => 'Section', 'fields' => []]]],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $conditions = Form::find('test')->formFields()->pages()[0]['rules'][0]['conditions'];
+
+        $this->assertCount(1, $conditions);
+        $this->assertFalse($conditions[0]['value']);
     }
 
     #[Test]

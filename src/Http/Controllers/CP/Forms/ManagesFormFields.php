@@ -124,7 +124,7 @@ trait ManagesFormFields
                     ->map(function (array $rule) {
                         $rule['conditions'] = collect($rule['conditions'] ?? [])
                             ->map(fn (array $condition) => Arr::only($condition, ['join', 'field', 'operator', 'value']))
-                            ->filter(fn (array $condition) => $condition['field'] && $condition['value'])
+                            ->filter(fn (array $condition) => $condition['field'] && $condition['value'] !== null && $condition['value'] !== '')
                             ->values()
                             ->all();
 
