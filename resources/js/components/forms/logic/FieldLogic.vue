@@ -73,7 +73,7 @@ const getConditionsConfig = (field) => ({
 });
 
 const getSuggestableFieldsForField = (field) => {
-    return props.suggestableFields.filter(f => f.pageIndex <= field.page_index && f.handle !== field.handle);
+    return props.suggestableFields.filter(f => f.pageIndex <= field.pageIndex && f.handle !== field.handle);
 };
 
 const addCondition = (fieldId) => {

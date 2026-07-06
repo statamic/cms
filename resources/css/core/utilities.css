@@ -14,6 +14,10 @@
     display: none;
 }
 
+@utility max-h-screen-px {
+    max-height: calc(100vh - 1px) !important;
+}
+
 .z-max {
     z-index: var(--z-index-max);
 }
@@ -118,10 +122,6 @@
     min-height: 0;
     margin-bottom: 0;
     max-width: none !important;
-}
-
-@utility max-h-screen-px {
-    max-height: calc(100vh - 1px) !important;
 }
 
 /* UTILITIES / TEXT

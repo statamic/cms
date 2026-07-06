@@ -24,7 +24,7 @@ const fields = computed({
             icon: field.icon,
             category: fieldCategory(field),
             fieldtype: field.fieldtype,
-            page_index: pageIndex,
+            pageIndex,
             hidden: field.config?.hidden ?? false,
             if: field.config?.if ?? null,
             unless: field.config?.unless ?? null,

@@ -280,7 +280,6 @@
         }
 
         &::after {
-            /* display: none; */
             top: calc(anchor(center --start-connection) - var(--buffer-top-pull) - var(--join-stroke));
             bottom: calc(anchor(center --start-connection) + var(--buffer-top-pull) / 2  + var(--join-stroke));
             width: calc(var(--buffer-left-pull) + var(--join-stroke) * 2);
