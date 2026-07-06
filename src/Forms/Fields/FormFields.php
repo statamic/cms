@@ -136,7 +136,7 @@ class FormFields
     /**
      * Borrowed from \Statamic\Fields\Fields.
      */
-    public function getImportedFields(array $config): array
+    private function getImportedFields(array $config): array
     {
         $recursion = tap(app(FieldsetRecursionStack::class))->push($config['import']);
 
