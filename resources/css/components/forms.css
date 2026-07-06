@@ -163,6 +163,11 @@
         display: inline-flex;
     }
 
+    /* Compress spacing for fieldsets when the fields are collapsed */
+    [data-fieldset-group] {
+        @apply space-y-5;
+    }
+
     /* Wrapper/white background */
     [data-section-drop-zone]:has(&) {
         background: unset;

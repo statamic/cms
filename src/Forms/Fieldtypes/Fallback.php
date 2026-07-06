@@ -38,6 +38,19 @@ class Fallback extends FormFieldtype
         return $this->wrappedFieldtype?->title() ?? parent::title();
     }
 
+    public function icon(): string
+    {
+        if (! $this->wrappedFieldtype) {
+            return parent::icon();
+        }
+
+        if ($equivalent = $this->equivalentFormFieldtype()) {
+            return $equivalent->icon();
+        }
+
+        return $this->wrappedFieldtype->icon();
+    }
+
     public function toArray(): array
     {
         if (! $this->wrappedFieldtype) {
