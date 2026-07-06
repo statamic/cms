@@ -204,31 +204,27 @@ class FormLogicController extends CpController
                     }
 
                     $conditions = $fieldConditions->get($handle);
-                    $field = $fieldConfig['field'] ?? [];
 
-                    unset($field['hidden'], $field['if'], $field['unless'], $field['if_any'], $field['unless_any'], $field['always_save']);
+                    // Inline fields store logic inside `field`; reference fields (where
+                    // `field` is a string handle) store it as overrides under `config`.
+                    $key = is_array($fieldConfig['field'] ?? null) ? 'field' : 'config';
+                    $target = $fieldConfig[$key] ?? [];
 
-                    if (! empty($conditions['hidden'])) {
-                        $field['hidden'] = $conditions['hidden'];
-                    }
+                    $logicKeys = ['hidden', 'if', 'unless', 'if_any', 'unless_any', 'always_save'];
 
-                    if (! empty($conditions['if'])) {
-                        $field['if'] = $conditions['if'];
-                    }
-                    if (! empty($conditions['unless'])) {
-                        $field['unless'] = $conditions['unless'];
-                    }
-                    if (! empty($conditions['if_any'])) {
-                        $field['if_any'] = $conditions['if_any'];
-                    }
-                    if (! empty($conditions['unless_any'])) {
-                        $field['unless_any'] = $conditions['unless_any'];
-                    }
-                    if (! empty($conditions['always_save'])) {
-                        $field['always_save'] = $conditions['always_save'];
+                    unset($target['hidden'], $target['if'], $target['unless'], $target['if_any'], $target['unless_any'], $target['always_save']);
+
+                    foreach ($logicKeys as $logicKey) {
+                        if (! empty($conditions[$logicKey])) {
+                            $target[$logicKey] = $conditions[$logicKey];
+                        }
                     }
 
-                    $fieldConfig['field'] = $field;
+                    if ($key === 'config' && empty($target)) {
+                        unset($fieldConfig['config']);
+                    } else {
+                        $fieldConfig[$key] = $target;
+                    }
 
                     return $fieldConfig;
                 })->all();
