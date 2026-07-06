@@ -320,8 +320,13 @@ class FormLogicTest extends TestCase
         $payload = [
             'pages' => [],
             'fields' => [
+                ['_id' => 'name', 'handle' => 'name', 'page_index' => 0, 'section_start' => true, 'section_display' => 'Section'],
                 [
                     '_id' => 'email',
+                    'handle' => 'email',
+                    'page_index' => 0,
+                    'section_start' => false,
+                    'section_display' => 'Section',
                     'if' => ['name' => 'not empty'],
                     'always_save' => true,
                 ],
@@ -340,6 +345,99 @@ class FormLogicTest extends TestCase
         $this->assertArrayNotHasKey('if', $fields[0]['field']);
         $this->assertEquals(['name' => 'not empty'], $fields[1]['field']['if']);
         $this->assertTrue($fields[1]['field']['always_save']);
+    }
+
+    #[Test]
+    public function it_persists_field_reordering()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                [
+                    'id' => 'page1',
+                    'sections' => [
+                        [
+                            'display' => 'Section',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                                ['handle' => 'email', 'field' => ['type' => 'short_answer', 'display' => 'Email']],
+                                ['handle' => 'phone', 'field' => ['type' => 'short_answer', 'display' => 'Phone']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $payload = [
+            'pages' => [],
+            'fields' => [
+                ['_id' => 'phone', 'handle' => 'phone', 'page_index' => 0, 'section_start' => true, 'section_display' => 'Section'],
+                ['_id' => 'name', 'handle' => 'name', 'page_index' => 0, 'section_start' => false, 'section_display' => 'Section'],
+                ['_id' => 'email', 'handle' => 'email', 'page_index' => 0, 'section_start' => false, 'section_display' => 'Section'],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $fields = Form::find('test')->formFields()->pages()[0]['sections'][0]['fields'];
+
+        $this->assertSame(['phone', 'name', 'email'], array_column($fields, 'handle'));
+        $this->assertEquals(['type' => 'short_answer', 'display' => 'Phone'], $fields[0]['field']);
+    }
+
+    #[Test]
+    public function it_can_update_conditions_on_a_referenced_field()
+    {
+        // A referenced field stores its `field` as a string handle, so its logic
+        // conditions are saved as overrides under `config` rather than inside `field`.
+        // @see https://github.com/statamic/cms/pull/14811
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'pages' => [
+                [
+                    'id' => 'page1',
+                    'sections' => [
+                        [
+                            'display' => 'Section',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                                ['handle' => 'message', 'field' => 'testing.message'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $payload = [
+            'pages' => [],
+            'fields' => [
+                ['_id' => 'name', 'handle' => 'name', 'page_index' => 0, 'section_start' => true, 'section_display' => 'Section'],
+                ['_id' => 'message', 'handle' => 'message', 'page_index' => 0, 'section_start' => false, 'section_display' => 'Section', 'if' => ['name' => 'not empty']],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $fields = Form::find('test')->formFields()->pages()[0]['sections'][0]['fields'];
+
+        $this->assertSame('testing.message', $fields[1]['field']);
+        $this->assertEquals(['name' => 'not empty'], $fields[1]['config']['if']);
     }
 
     #[Test]
@@ -393,8 +491,8 @@ class FormLogicTest extends TestCase
         $payload = [
             'pages' => [],
             'fields' => [
-                ['_id' => 'name', 'hidden' => false],
-                ['_id' => 'email', 'hidden' => true],
+                ['_id' => 'name', 'handle' => 'name', 'page_index' => 0, 'section_start' => true, 'section_display' => 'Section', 'hidden' => false],
+                ['_id' => 'email', 'handle' => 'email', 'page_index' => 0, 'section_start' => false, 'section_display' => 'Section', 'hidden' => true],
             ],
         ];
 

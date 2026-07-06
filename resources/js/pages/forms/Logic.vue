@@ -6,7 +6,7 @@ import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandl
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import FieldLogic from '@/components/forms/logic/FieldLogic.vue';
 import PageLogic from '@/components/forms/logic/PageLogic.vue';
-import LogicTree from './LogicTree.vue';
+import LogicTree, { TreeDensity } from './LogicTree.vue';
 import LogicPanel from './LogicPanel.vue';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
@@ -19,11 +19,6 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 enum View {
     List = 'list',
     Tree = 'tree',
-}
-
-enum TreeDensity {
-    Compressed = 'compressed',
-    Expanded = 'expanded',
 }
 
 const props = defineProps({
@@ -42,7 +37,7 @@ const escBinding = ref(null);
 const errors = ref({});
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
-const selected = ref(null); // { type: 'field' | 'page', id }
+const selected = ref(null); // { type: SelectionType, id }
 
 const { showFieldNumbers } = useFieldNumberingPreference();
 const fieldNumbers = computed(() => {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FieldConditions from '@/components/forms/logic/FieldConditions.vue';
 import PageRule from '@/components/forms/builder/pages/PageRule.vue';
+import { SelectionType } from './LogicTree.vue';
 import { Button } from '@ui';
 import { computed } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
@@ -8,7 +9,7 @@ import { nanoid as uniqid } from 'nanoid';
 const emit = defineEmits(['update:fields', 'update:pages']);
 
 const props = defineProps({
-    selection: { type: Object, default: null }, // { type: 'field' | 'page', id }
+    selection: { type: Object, default: null }, // { type: SelectionType, id }
     fields: { type: Array, required: true },
     pages: { type: Array, required: true },
     suggestableFields: { type: Array, required: true },
@@ -17,7 +18,7 @@ const props = defineProps({
 
 // A field's own show/hide logic.
 const selectedField = computed(() =>
-    props.selection?.type === 'field' ? props.fields.find((field) => field._id === props.selection.id) ?? null : null,
+    props.selection?.type === SelectionType.Field ? props.fields.find((field) => field._id === props.selection.id) ?? null : null,
 );
 
 const fieldConditions = computed(() => {
@@ -62,7 +63,7 @@ const updateConditions = (conditions) => {
 
 // A page's routing rules (if this page's fields match, go to another page).
 const selectedPage = computed(() =>
-    props.selection?.type === 'page' ? props.pages.find((page) => page._id === props.selection.id) ?? null : null,
+    props.selection?.type === SelectionType.Page ? props.pages.find((page) => page._id === props.selection.id) ?? null : null,
 );
 
 const selectedPageIndex = computed(() =>

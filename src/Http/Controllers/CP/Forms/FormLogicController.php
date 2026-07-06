@@ -182,11 +182,13 @@ class FormLogicController extends CpController
                     ->all();
             });
 
-        [$fieldConfigs, $importConfigs] = $this->existingConfigs($form->formFields()->pages());
+        $existingPages = $form->formFields()->pages();
+
+        [$fieldConfigs, $importConfigs] = $this->existingConfigs($existingPages);
 
         $fieldsByPage = collect($request->input('fields', []))->groupBy('page_index');
 
-        $pages = $form->formFields()->pages()->map(function (array $page, int $pageIndex) use ($pageRules, $fieldsByPage, $fieldConfigs, $importConfigs): array {
+        $pages = $existingPages->map(function (array $page, int $pageIndex) use ($pageRules, $fieldsByPage, $fieldConfigs, $importConfigs): array {
             $pageId = $page['id'] ?? null;
 
             if ($pageId && $pageRules->has($pageId)) {

@@ -1,3 +1,15 @@
+<script lang="ts">
+export enum TreeDensity {
+    Compressed = 'compressed',
+    Expanded = 'expanded',
+}
+
+export enum SelectionType {
+    Field = 'field',
+    Page = 'page',
+}
+</script>
+
 <script setup lang="ts">
 import LogicTreeField from './LogicTreeField.vue';
 import LogicTreeFieldset from './LogicTreeFieldset.vue';
@@ -6,18 +18,13 @@ import { useSortable } from '@/components/forms/builder/use-drag-and-drop';
 import { computed, ref, useTemplateRef } from 'vue';
 import type { PropType } from 'vue';
 
-enum TreeDensity {
-    Compressed = 'compressed',
-    Expanded = 'expanded',
-}
-
 const emit = defineEmits(['update:fields', 'select']);
 
 const props = defineProps({
     pages: { type: Array, required: true },
     fields: { type: Array, required: true },
     density: { type: String as PropType<TreeDensity>, default: TreeDensity.Compressed },
-    selected: { type: Object, default: null }, // { type: 'field' | 'page', id }
+    selected: { type: Object, default: null }, // { type: SelectionType, id }
 });
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
@@ -128,10 +135,10 @@ const hasPageNameLeadingIcons = (page, pageIndex) => isConnectorDestination(page
 // Selection - clicking a field or page opens its logic in the panel below.
 // Imported fields can't hold logic, so they aren't selectable.
 const isLastPage = (pageIndex) => pageIndex === props.pages.length - 1;
-const selectField = (item) => item.import || emit('select', { type: 'field', id: item._id });
-const selectPage = (page, pageIndex) => isLastPage(pageIndex) || emit('select', { type: 'page', id: page._id });
-const isFieldSelected = (item) => props.selected?.type === 'field' && props.selected.id === item._id;
-const isPageSelected = (page) => props.selected?.type === 'page' && props.selected.id === page._id;
+const selectField = (item) => item.import || emit('select', { type: SelectionType.Field, id: item._id });
+const selectPage = (page, pageIndex) => isLastPage(pageIndex) || emit('select', { type: SelectionType.Page, id: page._id });
+const isFieldSelected = (item) => props.selected?.type === SelectionType.Field && props.selected.id === item._id;
+const isPageSelected = (page) => props.selected?.type === SelectionType.Page && props.selected.id === page._id;
 
 // Drag & drop. Each item (single field or whole fieldset) moves as one unit.
 const tree = useTemplateRef('tree');
