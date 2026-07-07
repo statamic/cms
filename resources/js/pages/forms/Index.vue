@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Button, Badge, CommandPaletteItem, EmptyStateMenu, EmptyStateItem, DocsCallout, Icon, Listing, DropdownItem } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import useStatamicPageProps from '@/composables/page-props.js';
 import { Link, router } from '@inertiajs/vue3';
 
@@ -67,7 +68,10 @@ const reloadPage = () => router.reload();
 
             <Listing :items="forms" :columns="initialColumns" :action-url="actionUrl" @refreshing="reloadPage">
                 <template #cell-title="{ row: form }">
-                    <Link :href="form.show_url">{{ form.title }}</Link>
+                    <div class="flex items-center gap-2">
+                        <FormStatusIndicator :status="form.status" />
+                        <Link :href="form.show_url">{{ form.title }}</Link>
+                    </div>
                 </template>
                 <template #cell-submissions="{ row: form, value: submissions }">
                     <Badge

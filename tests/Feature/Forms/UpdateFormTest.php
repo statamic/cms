@@ -60,6 +60,28 @@ class UpdateFormTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_restrictions()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, [
+                'submission_limit' => 5,
+                'submission_limit_period' => 'day',
+                'closed_message' => 'Sorry, we are isClosed.',
+                'require_login' => true,
+            ])
+            ->assertOk();
+
+        $updated = Form::all()->first();
+        $this->assertEquals(5, $updated->get('submission_limit'));
+        $this->assertEquals('day', $updated->get('submission_limit_period'));
+        $this->assertEquals('Sorry, we are isClosed.', $updated->get('closed_message'));
+        $this->assertTrue($updated->get('require_login'));
+    }
+
+    #[Test]
     public function it_updates_emails()
     {
         $form = tap(Form::make('test'))->save();

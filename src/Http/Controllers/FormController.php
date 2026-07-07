@@ -38,6 +38,10 @@ class FormController extends Controller
             return Str::startsWith($key, '_');
         })->all();
 
+        if (($restrictions = $form->restrictions())->restricted()) {
+            return $this->formFailure($params, ['*' => [$restrictions->message()]], $form->handle());
+        }
+
         $fields = $fields->addValues($values);
 
         $submission = $form->makeSubmission()->asPartial()->site($site);

@@ -76,6 +76,20 @@ interface Form extends Arrayable
     public function email($email = null);
 
     /**
+     * Get the form's restrictions.
+     *
+     * @return \Statamic\Forms\Restrictions
+     */
+    //     public function restrictions();
+
+    /**
+     * Get the form's status.
+     *
+     * @return string
+     */
+    //     public function status();
+
+    /**
      * Save the form.
      *
      * @return void

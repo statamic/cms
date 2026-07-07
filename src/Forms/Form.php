@@ -491,6 +491,24 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return FormSubmission::query()->where('form', $this->handle());
     }
 
+    public function restrictions(): Restrictions
+    {
+        return new Restrictions($this);
+    }
+
+    public function status(): string
+    {
+        return Blink::once('form-status-'.$this->handle(), function () {
+            $restrictions = $this->restrictions();
+
+            return match (true) {
+                $restrictions->closingDateHasPassed() => 'closed',
+                $restrictions->limitReached() => 'limit_reached',
+                default => 'open',
+            };
+        });
+    }
+
     /**
      * Get a submission.
      *
@@ -609,6 +627,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     public function getQueryableValue(string $field)
     {
+        if ($field === 'status') {
+            return null;
+        }
+
         if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
