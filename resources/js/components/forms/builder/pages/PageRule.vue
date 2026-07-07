@@ -133,15 +133,17 @@ const shouldBeIndented = (index) => {
                                     </template>
                                 </Combobox>
                             </div>
-                            <Button
-                                size="sm"
-                                inset
-                                variant="subtle"
-                                class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px]"
-                                :text="'&times;'"
-                                :aria-label="__('Remove condition')"
-                                @click="removeCondition(index)"
-                            />
+                            <div class="ms-0.5 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/rule:opacity-100 group-hover/rule:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto">
+                                <Button
+                                    size="sm"
+                                    inset
+                                    variant="subtle"
+                                    class="mt-[0.5px] p-2.5 size-6 rounded-full [&_div]:-translate-y-[1px]"
+                                    :text="'&times;'"
+                                    :aria-label="__('Remove condition')"
+                                    @click="removeCondition(index)"
+                                />
+                            </div>
                         </div>
                     </template>
 
