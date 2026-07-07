@@ -432,7 +432,7 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
-        $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
+        $value = Carbon::instance($value)->setTimezone(config('app.timezone'))->startOfDay(); // we only care about the date part
 
         $this->wheres[] = [
             'type' => 'Date',
@@ -558,7 +558,7 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
-        $value = $value->format('H:i:s'); // we only care about the time part
+        $value = Carbon::instance($value)->setTimezone(config('app.timezone'))->format('H:i:s'); // we only care about the time part
 
         $this->wheres[] = [
             'type' => 'Time',

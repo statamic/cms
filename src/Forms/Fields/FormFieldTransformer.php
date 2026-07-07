@@ -183,7 +183,10 @@ class FormFieldTransformer extends FieldTransformer
         }
 
         return collect($fieldset->fields()->all())
-            ->mapWithKeys(fn (Field $field) => [$field->handle() => static::fieldPreview($field)])
+            ->mapWithKeys(fn (Field $field) => [$field->handle() => [
+                ...static::fieldPreview($field),
+                'icon' => $field->fieldtype()->icon(),
+            ]])
             ->all();
     }
 

@@ -11,7 +11,9 @@ use function Statamic\trans as __;
 
 class HandleInertiaRequests extends Middleware
 {
-    protected $rootView = 'statamic::layout';
+    public const ROOT_VIEW = 'statamic::layout';
+
+    protected $rootView = self::ROOT_VIEW;
 
     public function version(Request $request): ?string
     {

@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -23,6 +24,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
+use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exporters\Exporter;
@@ -31,6 +33,8 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Statamic\trans as __;
 
 class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContract
 {
@@ -498,6 +502,72 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function querySubmissions(): SubmissionQueryBuilder
     {
         return FormSubmission::query()->where('form', $this->handle());
+    }
+
+    public function status(): string
+    {
+        return Blink::once('form-status-'.$this->handle(), fn () => match (true) {
+            $this->closingDateHasPassed() => 'closed',
+            $this->submissionLimitReached() => 'limit_reached',
+            default => 'open',
+        });
+    }
+
+    public function restricted(): bool
+    {
+        return $this->restrictionMessage() !== null;
+    }
+
+    public function restrictionMessage(): ?string
+    {
+        if ($this->closingDateHasPassed() || $this->submissionLimitReached()) {
+            return ($msg = $this->get('closed_message')) ? __($msg) : __('statamic::messages.form_closed_message');
+        }
+
+        if ($this->get('require_login') && ! User::current()) {
+            return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
+        }
+
+        return null;
+    }
+
+    private function closingDateHasPassed(): bool
+    {
+        if (! $date = $this->get('close_date')) {
+            return false;
+        }
+
+        return Carbon::parse($date, config('app.timezone'))->isPast();
+    }
+
+    private function submissionLimitReached(): bool
+    {
+        if (! $limit = (int) $this->get('submission_limit')) {
+            return false;
+        }
+
+        return $this->submissionCount() >= $limit;
+    }
+
+    private function submissionCount(): int
+    {
+        $query = $this->querySubmissions()->whereNull('partial');
+
+        if ($start = $this->submissionLimitPeriodStart()) {
+            $query->where('date', '>=', $start);
+        }
+
+        return $query->count();
+    }
+
+    private function submissionLimitPeriodStart(): ?Carbon
+    {
+        return match ($this->get('submission_limit_period', 'total')) {
+            'day' => now()->startOfDay(),
+            'week' => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            default => null,
+        };
     }
 
     /**

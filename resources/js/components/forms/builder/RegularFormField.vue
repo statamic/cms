@@ -6,6 +6,7 @@ import { categories, categoryColorClasses } from './categories';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import WidthSelector from '@/components/fields/WidthSelector.vue';
 import { __ } from '@/bootstrap/globals';
+import { KEYS } from '@/components/field-conditions/Constants';
 
 defineEmits<{
     (e: 'duplicate'): void;
@@ -39,6 +40,8 @@ const fieldtypeCategory = computed(() => {
 const isInformationField = computed(() => fieldtypeCategory.value === categories.information);
 
 const iconColorClass = computed(() => categoryColorClasses[fieldtypeCategory.value.color].icon);
+
+const hasLogic = computed(() => KEYS.some(key => props.field.config[key] && Object.keys(props.field.config[key]).length > 0));
 
 const hasErrors = computed(() => {
     const allErrors = errors?.value ?? {};
@@ -109,7 +112,7 @@ const hasErrors = computed(() => {
                     <FieldNumber :field-key="field._id" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
-                        v-if="field.config.if || field.config.unless"
+                        v-if="hasLogic"
                         data-logic-attached
                         name="logic-tree"
                         class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
@@ -145,7 +148,7 @@ const hasErrors = computed(() => {
                     <FieldNumber :field-key="field._id" class="me-1" />
                     <Icon :name="field.icon" data-collapsed-field-icon :class="['size-3.5 mb-0.25! me-2.5', iconColorClass]" aria-hidden="true" />
                     <Icon
-                        v-if="field.config.if || field.config.unless"
+                        v-if="hasLogic"
                         data-logic-attached
                         name="logic-tree"
                         class="size-3.5! inline-block text-gray-400 dark:text-gray-500 me-2.5 mb-0.5"
@@ -156,8 +159,20 @@ const hasErrors = computed(() => {
                         {{ __(field.config.display) }}
                         <span v-if="field.config.validate?.includes('required')" class="relative -top-px ms-0.5 text-red-600">*</span>
                     </span>
-                    <Icon v-if="field.type === 'reference'" name="link" class="inline-block size-3! text-indigo-500 dark:text-indigo-400 mb-0.5 ms-2" :aria-label="__('Linked Field')" v-tooltip="__('Linked Field')" />
-                    <Icon v-if="field.config.hidden" name="eye-closed" class="inline-block size-3.5! text-gray-400 dark:text-gray-500 mb-0.5 ms-2" :aria-label="__('Hidden')" v-tooltip="__('Hidden')" />
+                    <Icon
+                        v-if="field.type === 'reference'"
+                        name="link"
+                        class="inline-block size-3! text-indigo-500 dark:text-indigo-400 mb-0.5 ms-2"
+                        :aria-label="__('Linked Field: :reference', { reference: field.field_reference })"
+                        v-tooltip="__('Linked Field: :reference', { reference: field.field_reference })"
+                    />
+                    <Icon
+                        v-if="field.config.hidden"
+                        name="eye-closed"
+                        class="inline-block size-3.5! text-gray-400 dark:text-gray-500 mb-0.5 ms-2"
+                        :aria-label="__('Hidden')"
+                        v-tooltip="__('Hidden')"
+                    />
                 </Label>
             </template>
             <div v-if="field.preview" inert>

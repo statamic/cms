@@ -26,6 +26,8 @@ class FormController extends Controller
     {
         $this->validateContentType($request, $form);
 
+        $params = $this->params($request);
+
         $action->form($form);
 
         if ($form->hasMultiplePages()) {
@@ -43,8 +45,6 @@ class FormController extends Controller
             }
         }
 
-        $params = $this->params($request);
-
         try {
             // We validate (scoped to the requested fields) through the action and halt
             // without persisting, mirroring how Precognition works in Form Requests.
@@ -52,6 +52,10 @@ class FormController extends Controller
                 $action->validate($request->all(), $request->allFiles(), only: $this->precognitiveFields($request));
 
                 return response()->noContent(headers: ['Precognition-Success' => 'true']);
+            }
+
+            if ($form->restricted()) {
+                return $this->formFailure($params, ['*' => [$form->restrictionMessage()]], $form->handle());
             }
 
             $result = $action->submit($request->all(), $request->allFiles());

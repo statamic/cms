@@ -46,6 +46,7 @@ class FormSubmissionsController extends CpController
             'form' => [
                 'title' => __($form->title()),
                 'handle' => $form->handle(),
+                'status' => $form->status(),
                 'editUrl' => $form->editUrl(),
                 'deleteUrl' => $form->deleteUrl(),
                 'canEdit' => User::current()->can('edit', $form),
