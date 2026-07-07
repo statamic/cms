@@ -633,15 +633,21 @@ export default {
         },
 
         expandSet(id) {
-            if (this.config.collapse === 'accordion') {
-                this.collapsed = Object.keys(this.meta.existing).filter((v) => v !== id);
-                return;
-            }
+            // Defer the reveal by one frame so the nested Bard editor is shown
+            // after the click, not during it. Revealing a ProseMirror editor in
+            // the same trusted click as a pending rich-text copy crashes the tab
+            // on Chrome/Edge >= 148 (a renderer CFI abort). See statamic/cms#14946.
+            requestAnimationFrame(() => {
+                if (this.config.collapse === 'accordion') {
+                    this.collapsed = Object.keys(this.meta.existing).filter((v) => v !== id);
+                    return;
+                }
 
-            if (this.collapsed.includes(id)) {
-                var index = this.collapsed.indexOf(id);
-                this.collapsed.splice(index, 1);
-            }
+                if (this.collapsed.includes(id)) {
+                    var index = this.collapsed.indexOf(id);
+                    this.collapsed.splice(index, 1);
+                }
+            });
         },
 
         collapseAll() {
@@ -649,7 +655,10 @@ export default {
         },
 
         expandAll() {
-            this.collapsed = [];
+            // Defer the reveal one frame — same reason as expandSet() (statamic/cms#14946).
+            requestAnimationFrame(() => {
+                this.collapsed = [];
+            });
         },
 
         toggleCollapseSets() {
