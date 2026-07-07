@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import axios from 'axios';
 import Head from '@/pages/layout/Head.vue';
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
 import Layout from '@/pages/layout/Layout.vue';
@@ -120,7 +121,12 @@ function exportSubmissions() {
     <Head :title="[__('Results'), __(form.title), __('Forms')]" />
 
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Header :title="__(form.title)" icon="forms">
+        <Header>
+            <template #title>
+                <FormStatusIndicator :status="form.status" />
+                {{ __(form.title) }}
+            </template>
+
             <Dropdown v-if="form.canEdit || form.canDelete" placement="left-start" class="me-2">
                 <DropdownMenu>
                     <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />

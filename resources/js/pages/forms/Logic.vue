@@ -2,7 +2,8 @@
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
 import FormsLayout from './Layout.vue';
-import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandle, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { Button, Header, Icon, SplitterGroup, SplitterPanel, SplitterResizeHandle, ToggleGroup, ToggleItem } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import LogicList from '@/components/forms/logic/LogicList.vue';
 import LogicTree, { TreeDensity, SelectionType, type Selection } from '@/components/forms/logic/LogicTree.vue';
@@ -159,7 +160,7 @@ onUnmounted(() => {
     <div class="mx-auto w-full max-w-5xl min-w-0 shrink-0">
         <Header class="mb-2 md:py-9">
             <template #title>
-                <StatusIndicator status="published" />
+                <FormStatusIndicator :status="form.status" />
                 {{ __(form.title) }}
             </template>
             <template #actions>

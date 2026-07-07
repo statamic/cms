@@ -35,6 +35,7 @@ class FormsController extends CpController
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
+                    'status' => $form->status(),
                     'submissions' => $form->querySubmissions()->whereNull('partial')->count(),
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
@@ -201,6 +202,59 @@ class FormsController extends CpController
                         'type' => 'toggle',
                         'default' => true,
                         'instructions' => __('statamic::messages.form_configure_generate_fake_submissions_instructions'),
+                    ],
+                ],
+            ],
+            'access' => [
+                'display' => __('Access'),
+                'fields' => [
+                    'close_date' => [
+                        'display' => __('Close Date'),
+                        'type' => 'date',
+                        'time_enabled' => true,
+                        'instructions' => __('statamic::messages.form_configure_close_date_instructions'),
+                    ],
+                    'submission_limit' => [
+                        'display' => __('Submission Limit'),
+                        'type' => 'integer',
+                        'instructions' => __('statamic::messages.form_configure_submission_limit_instructions'),
+                    ],
+                    'submission_limit_period' => [
+                        'display' => __('Submission Limit Period'),
+                        'type' => 'button_group',
+                        'default' => 'total',
+                        'options' => [
+                            'total' => __('Total'),
+                            'day' => __('Per Day'),
+                            'week' => __('Per Week'),
+                            'month' => __('Per Month'),
+                        ],
+                        'if' => [
+                            'submission_limit' => 'not empty',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_submission_limit_period_instructions'),
+                    ],
+                    'closed_message' => [
+                        'display' => __('Closed Message'),
+                        'type' => 'textarea',
+                        'if_any' => [
+                            'close_date' => 'not empty',
+                            'submission_limit' => 'not empty',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_closed_message_instructions'),
+                    ],
+                    'require_login' => [
+                        'display' => __('Require Login'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.form_configure_require_login_instructions'),
+                    ],
+                    'require_login_message' => [
+                        'display' => __('Require Login Message'),
+                        'type' => 'textarea',
+                        'if' => [
+                            'require_login' => 'equals true',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_require_login_message_instructions'),
                     ],
                 ],
             ],

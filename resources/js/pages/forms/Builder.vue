@@ -20,7 +20,8 @@ export const [injectBuilderContext, provideBuilderContext] = createContext('Form
 </script>
 
 <script setup lang="ts">
-import { Button, Header, Icon, StatusIndicator, ToggleGroup, ToggleItem } from '@ui';
+import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
+import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import axios from 'axios';
 import FormsLayout from './Layout.vue';
@@ -419,7 +420,7 @@ onUnmounted(() => {
     <div class="col-span-full row-start-1 max-[1000px]:pt-14">
         <Header class="mx-auto max-w-5xl">
             <template #title>
-                <StatusIndicator status="published" />
+                <FormStatusIndicator :status="form.status" />
                 {{ __(form.title) }}
             </template>
             <template #actions>
