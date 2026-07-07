@@ -9,6 +9,7 @@ use Statamic\Support\Str;
 abstract class Index
 {
     protected $name;
+    protected $handle;
     protected $locale;
     protected $config;
     protected static ?Closure $nameCallback = null;
@@ -25,6 +26,8 @@ abstract class Index
 
     public function __construct($name, array $config, ?string $locale = null)
     {
+        $this->handle = $name;
+
         $this->name = static::$nameCallback
             ? call_user_func(static::$nameCallback, $name, $locale)
             : ($locale ? $name.'_'.$locale : $name);
@@ -91,7 +94,7 @@ abstract class Index
         $documents
             ->chunk(config('statamic.search.chunk_size'))
             ->each(fn ($documents) => InsertMultipleJob::dispatch(
-                name: $this->locale ? Str::before($this->name, "_{$this->locale}") : $this->name,
+                name: $this->handle,
                 locale: $this->locale,
                 documents: $documents
             ));
