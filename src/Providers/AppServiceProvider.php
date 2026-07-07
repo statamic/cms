@@ -179,6 +179,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
+                ->setRepository('globals', \Statamic\Contracts\Globals\GlobalVariablesRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
