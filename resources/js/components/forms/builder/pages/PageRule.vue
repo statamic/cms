@@ -138,7 +138,7 @@ const shouldBeIndented = (index) => {
                                     size="sm"
                                     inset
                                     variant="subtle"
-                                    class="mt-[0.5px] p-2.5 size-6 rounded-full [&_div]:-translate-y-[1px]"
+                                    class="size-7 rounded-full [&_div]:opacity-75 [&_div]:-translate-y-px"
                                     :text="'&times;'"
                                     :aria-label="__('Remove condition')"
                                     @click="removeCondition(index)"
