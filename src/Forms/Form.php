@@ -512,11 +512,11 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function restrictionMessage(): ?string
     {
         if ($this->closingDateHasPassed() || $this->submissionLimitReached()) {
-            return __($this->get('closed_message') ?? 'This form is no longer accepting submissions.');
+            return __($this->get('closed_message') ?? 'statamic::messages.form_closed_message');
         }
 
         if ($this->get('require_login') && ! User::current()) {
-            return __($this->get('require_login_message') ?? 'You must be logged in to submit this form.');
+            return __($this->get('require_login_message') ?? 'statamic::messages.form_require_login_message');
         }
 
         return null;

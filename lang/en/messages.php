@@ -145,6 +145,8 @@ return [
     'form_configure_closed_message_instructions' => 'Shown when the form is closed or the submission limit has been reached. Leave blank to use the default message.',
     'form_configure_require_login_instructions' => 'Only allow logged in users to submit this form.',
     'form_configure_require_login_message_instructions' => 'Shown when a logged out visitor tries to submit the form. Leave blank to use the default message.',
+    'form_closed_message' => 'This form is no longer accepting submissions.',
+    'form_require_login_message' => 'You must be logged in to submit this form.',
     'form_create_description' => 'Get started by creating your first form.',
     'form_builder' => 'Form Builder',
     'form_export_filtered_description' => 'Exports submissions with current filters and visible columns.',
