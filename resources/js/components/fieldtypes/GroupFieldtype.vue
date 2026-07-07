@@ -106,7 +106,16 @@ export default {
         },
 
         toggleCollapsed() {
-            this.isCollapsed = !this.isCollapsed;
+            if (! this.isCollapsed) {
+                this.isCollapsed = true;
+                return;
+            }
+
+            // Expanding: defer the reveal by one frame so the nested Bard editor is
+            // shown after the click, not during it. Revealing a ProseMirror editor in
+            // the same trusted click as a pending rich-text copy crashes the tab on
+            // Chrome/Edge >= 148 (a renderer CFI abort). See statamic/cms#14946.
+            requestAnimationFrame(() => (this.isCollapsed = false));
         },
 
         toggleFullScreen() {
