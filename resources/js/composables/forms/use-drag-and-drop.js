@@ -160,24 +160,34 @@ export function useFieldtypeDraggable({ pages, onDragStart, onDrop }) {
  * Handles sorting/reordering fields within sections.
  * Should be used per-page.
  */
-export function useSortable({ container, sections, fieldView, onFieldMoved }) {
-    let sortable = null;
+export function useSortable({ container, sections, fieldView, onFieldMoved, onMirrorCreated }) {
+    let sortables = [];
 
     const refresh = () => {
-        sortable?.destroy();
+        destroy();
         init();
     };
 
+    const destroy = () => {
+        sortables.forEach((sortable) => sortable.destroy());
+        sortables = [];
+    };
+
     const init = () => {
-        sortable?.destroy();
+        destroy();
 
         const el = container.value;
         if (!el) return;
 
-        const containers = el.querySelectorAll(SORT_CONTAINER_SELECTOR);
+        const containers = [...el.querySelectorAll(SORT_CONTAINER_SELECTOR)];
         if (containers.length === 0) return;
 
-        sortable = new Sortable(containers, {
+        // One Sortable per page so fields can only be dragged within their own page.
+        groupContainersByPage(containers).forEach((group) => sortables.push(createSortable(group)));
+    };
+
+    const createSortable = (containers) => {
+        const sortable = new Sortable(containers, {
             draggable: '[data-field-item]',
             handle: '[data-field-item]',
             distance: 5,
@@ -189,6 +199,8 @@ export function useSortable({ container, sections, fieldView, onFieldMoved }) {
         sortable.on('drag:stop', () => document.documentElement.classList.remove('cursor-grabbing'));
 
         sortable.on('mirror:created', (event) => {
+            onMirrorCreated?.(event);
+
             if (fieldView?.value !== 'collapsed') return;
 
             event.mirror.querySelectorAll('[data-collapsed-field-icon]').forEach((el) => (el.style.display = 'inline-flex'));
@@ -247,6 +259,8 @@ export function useSortable({ container, sections, fieldView, onFieldMoved }) {
 
             onFieldMoved(from, to, oldIndex, newIndex);
         });
+
+        return sortable;
     };
 
     onMounted(async () => {
@@ -255,14 +269,24 @@ export function useSortable({ container, sections, fieldView, onFieldMoved }) {
         init();
     });
 
-    onUnmounted(() => {
-        sortable?.destroy();
-    });
+    onUnmounted(destroy);
 
     watch(
         () => sections.value.map((s) => s.fields.length).join(','),
         () => nextTick(refresh),
     );
+}
+
+function groupContainersByPage(containers) {
+    const groups = new Map();
+
+    containers.forEach((container) => {
+        const page = container.closest('[data-form-page]') ?? 'ungrouped';
+        if (!groups.has(page)) groups.set(page, []);
+        groups.get(page).push(container);
+    });
+
+    return [...groups.values()];
 }
 
 function createDropTarget() {

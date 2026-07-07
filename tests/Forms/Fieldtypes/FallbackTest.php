@@ -4,6 +4,7 @@ namespace Tests\Forms\Fieldtypes;
 
 use Illuminate\Support\Facades\View;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fieldtypes\Code;
 use Statamic\Fieldtypes\Text;
 use Statamic\Fieldtypes\Textarea;
 use Statamic\Forms\Fieldtypes\Fallback;
@@ -29,5 +30,21 @@ class FallbackTest extends TestCase
         $fallback = (new Fallback)->wrapping(new Textarea);
 
         $this->assertEquals('statamic::forms.antlers.fields.long_answer', $fallback->view());
+    }
+
+    #[Test]
+    public function it_uses_icon_from_the_wrapped_fieldtype()
+    {
+        $fallback = (new Fallback)->wrapping(new Code);
+
+        $this->assertEquals('fieldtype-code', $fallback->icon());
+    }
+
+    #[Test]
+    public function it_uses_the_equivalent_form_fieldtype_icon_when_one_exists()
+    {
+        $fallback = (new Fallback)->wrapping(new Textarea);
+
+        $this->assertEquals('text-long', $fallback->icon());
     }
 }

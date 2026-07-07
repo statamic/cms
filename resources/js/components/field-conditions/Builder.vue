@@ -145,7 +145,7 @@ onMounted(() => {
 
 <template>
     <div class="w-full">
-        <div data-logic-text class="logic-text">
+        <div data-logic-text class="logic-text group/rule">
             <ol>
                 <li v-for="(condition, index) in conditions" :key="condition._id">
                     <template v-if="index === 0">
@@ -197,15 +197,17 @@ onMounted(() => {
                                     </template>
                                 </Combobox>
                             </div>
-                            <Button
-                                :size
-                                inset
-                                variant="subtle"
-                                class="mb-2.5 mt-[0.5px] p-2.5 size-6 ms-0.25 rounded-full [&_div]:-translate-y-[1px]"
-                                :text="'×'"
-                                :aria-label="__('Remove condition')"
-                                @click="remove(index)"
-                            />
+                            <div class="ms-0.5 mb-2.5 inline-flex items-center gap-1.5 opacity-0 pointer-events-none transition-opacity group-hover/rule:opacity-100 group-hover/rule:pointer-events-auto [@media(any-hover:none)]:opacity-100 [@media(any-hover:none)]:pointer-events-auto">
+                                <Button
+                                    :size
+                                    inset
+                                    variant="subtle"
+                                    class="size-7 rounded-full [&_div]:opacity-75 [&_div]:-translate-y-px"
+                                    :text="'&times;'"
+                                    :aria-label="__('Remove condition')"
+                                    @click="remove(index)"
+                                />
+                            </div>
                         </div>
                     </template>
 

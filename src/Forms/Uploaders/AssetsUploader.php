@@ -9,6 +9,9 @@ use Statamic\Facades\Path;
 use Statamic\Fieldtypes\Assets\UndefinedContainerException;
 use Statamic\Support\Arr;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AssetsUploader
 {
     protected $config;

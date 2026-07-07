@@ -170,7 +170,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                                 <Badge
                                     v-else-if="part.type === 'destination'"
                                     pill
-                                    class="inline-flex items-center gap-1.25 px-1.5 py-1.25 font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300"
+                                    class="inline-flex items-center gap-1.25 px-1.5 py-1.25 dark:py-1.25 font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300"
                                 >
                                     <Icon name="page" class="size-2.75! shrink-0" aria-hidden="true" />
                                     <span class="st-text-trim-cap">{{ __('Go to') }}</span>
