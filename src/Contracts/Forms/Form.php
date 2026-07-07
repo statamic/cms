@@ -75,11 +75,6 @@ interface Form extends Arrayable
      */
     public function email($email = null);
 
-    // TODO: Add to the contract in v7.
-    // public function restricted(): bool;
-    // public function restrictionMessage(): ?string;
-    // public function status(): string;
-
     /**
      * Save the form.
      *
