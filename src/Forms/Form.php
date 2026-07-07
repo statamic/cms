@@ -679,10 +679,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     public function getQueryableValue(string $field)
     {
-        if ($field === 'status') {
-            return null;
-        }
-
         if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
