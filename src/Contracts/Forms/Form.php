@@ -75,19 +75,10 @@ interface Form extends Arrayable
      */
     public function email($email = null);
 
-    /**
-     * Get the form's restrictions.
-     *
-     * @return \Statamic\Forms\Restrictions
-     */
-    //     public function restrictions();
-
-    /**
-     * Get the form's status.
-     *
-     * @return string
-     */
-    //     public function status();
+    // TODO: Add to the contract in v7.
+    // public function restricted(): bool;
+    // public function restrictionMessage(): ?string;
+    // public function status(): string;
 
     /**
      * Save the form.

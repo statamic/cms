@@ -11,7 +11,7 @@ use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class RestrictionsTest extends TestCase
+class AccessTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -63,27 +63,27 @@ class RestrictionsTest extends TestCase
     #[Test]
     public function a_form_with_no_restrictions_is_not_restricted()
     {
-        $restrictions = $this->makeForm()->restrictions();
+        $form = $this->makeForm();
 
-        $this->assertFalse($restrictions->restricted());
-        $this->assertNull($restrictions->message());
+        $this->assertFalse($form->restricted());
+        $this->assertNull($form->restrictionMessage());
     }
 
     #[Test]
     public function it_is_restricted_after_the_close_date()
     {
-        $restrictions = $this->makeForm(['close_date' => '2026-07-01 09:00'])->restrictions();
+        $form = $this->makeForm(['close_date' => '2026-07-01 09:00']);
 
-        $this->assertTrue($restrictions->restricted());
-        $this->assertEquals('This form is no longer accepting submissions.', $restrictions->message());
+        $this->assertTrue($form->restricted());
+        $this->assertEquals('This form is no longer accepting submissions.', $form->restrictionMessage());
     }
 
     #[Test]
     public function it_is_not_restricted_before_the_close_date()
     {
-        $restrictions = $this->makeForm(['close_date' => '2026-07-10 09:00'])->restrictions();
+        $form = $this->makeForm(['close_date' => '2026-07-10 09:00']);
 
-        $this->assertFalse($restrictions->restricted());
+        $this->assertFalse($form->restricted());
     }
 
     #[Test]
@@ -92,11 +92,11 @@ class RestrictionsTest extends TestCase
         $form = $this->makeForm(['submission_limit' => 2]);
 
         $this->submit($form, 1);
-        $this->assertFalse($form->restrictions()->restricted());
+        $this->assertFalse($form->restricted());
 
         $this->submit($form, 1);
-        $this->assertTrue($form->restrictions()->restricted());
-        $this->assertEquals('This form is no longer accepting submissions.', $form->restrictions()->message());
+        $this->assertTrue($form->restricted());
+        $this->assertEquals('This form is no longer accepting submissions.', $form->restrictionMessage());
     }
 
     #[Test]
@@ -107,7 +107,7 @@ class RestrictionsTest extends TestCase
         $this->submit($form, 5, partial: true);
         $this->submit($form, 1);
 
-        $this->assertFalse($form->restrictions()->restricted());
+        $this->assertFalse($form->restricted());
     }
 
     #[Test]
@@ -117,10 +117,10 @@ class RestrictionsTest extends TestCase
 
         Carbon::setTestNow('2026-07-05 23:00:00');
         $this->submit($form, 2);
-        $this->assertTrue($form->restrictions()->restricted());
+        $this->assertTrue($form->restricted());
 
         Carbon::setTestNow('2026-07-06 00:30:00');
-        $this->assertFalse($form->restrictions()->restricted());
+        $this->assertFalse($form->restricted());
     }
 
     #[Test]
@@ -128,8 +128,8 @@ class RestrictionsTest extends TestCase
     {
         $form = $this->makeForm(['require_login' => true]);
 
-        $this->assertTrue($form->restrictions()->restricted());
-        $this->assertEquals('You must be logged in to submit this form.', $form->restrictions()->message());
+        $this->assertTrue($form->restricted());
+        $this->assertEquals('You must be logged in to submit this form.', $form->restrictionMessage());
     }
 
     #[Test]
@@ -139,7 +139,7 @@ class RestrictionsTest extends TestCase
 
         $this->actingAs(User::make()->save());
 
-        $this->assertFalse($form->restrictions()->restricted());
+        $this->assertFalse($form->restricted());
     }
 
     #[Test]
@@ -152,7 +152,7 @@ class RestrictionsTest extends TestCase
 
         $this->submit($form, 1);
 
-        $this->assertEquals('This form is no longer accepting submissions.', $form->restrictions()->message());
+        $this->assertEquals('This form is no longer accepting submissions.', $form->restrictionMessage());
     }
 
     #[Test]
@@ -163,7 +163,7 @@ class RestrictionsTest extends TestCase
             'closed_message' => 'Sorry, we are closed.',
         ]);
 
-        $this->assertEquals('Sorry, we are closed.', $form->restrictions()->message());
+        $this->assertEquals('Sorry, we are closed.', $form->restrictionMessage());
     }
 
     #[Test]

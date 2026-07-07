@@ -197,8 +197,8 @@ class FormsController extends CpController
                     ],
                 ],
             ],
-            'restrictions' => [
-                'display' => __('Restrictions'),
+            'access' => [
+                'display' => __('Access'),
                 'fields' => [
                     'close_date' => [
                         'display' => __('Close Date'),

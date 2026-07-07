@@ -82,9 +82,8 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
-        $restrictions = $form->restrictions();
-        $data['restricted'] = $restrictions->restricted();
-        $data['restriction_message'] = $restrictions->message();
+        $data['restricted'] = $form->restricted();
+        $data['restriction_message'] = $form->restrictionMessage();
         $data['status'] = $form->status();
 
         if ($jsDriver) {
