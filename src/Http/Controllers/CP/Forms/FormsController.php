@@ -11,6 +11,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -49,7 +50,7 @@ class FormsController extends CpController
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
-            'canCreate' => User::current()->can('create', FormContract::class),
+            'canCreate' => User::current()->can('create', FormContract::class) && $this->canCreateAdditionalForms(),
             'createUrl' => cp_route('forms.create'),
             'configureEmailUrl' => cp_route('utilities.email'),
         ]);
@@ -66,7 +67,7 @@ class FormsController extends CpController
 
     public function create()
     {
-        $this->authorizeProIf(Form::all()->count() >= 1);
+        $this->authorizeProIf(! $this->canCreateAdditionalForms());
 
         $this->authorize('create', FormContract::class);
 
@@ -77,7 +78,7 @@ class FormsController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorizeProIf(Form::all()->count() >= 1);
+        $this->authorizeProIf(! $this->canCreateAdditionalForms());
 
         $this->authorize('create', FormContract::class, __('You are not authorized to create forms.'));
 
@@ -157,6 +158,13 @@ class FormsController extends CpController
         $this->authorize('delete', $form, 'You are not authorized to delete this form.');
 
         $form->delete();
+    }
+
+    private function canCreateAdditionalForms(): bool
+    {
+        return Form::all()->isEmpty()
+            || Statamic::pro()
+            || Statamic::formsProInstalled();
     }
 
     protected function editFormBlueprint($form)
