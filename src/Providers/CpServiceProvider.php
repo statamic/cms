@@ -6,7 +6,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
 use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
@@ -21,8 +20,6 @@ class CpServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Inertia::setRootView('statamic::layout');
-
         View::composer('statamic::*', function ($view) {
             $view->with('user', User::current());
         });

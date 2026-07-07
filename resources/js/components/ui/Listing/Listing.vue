@@ -686,6 +686,8 @@ watch(parameters, (newParams, oldParams) => {
     pushState();
 });
 
+watch(() => props.url, () => request());
+
 watch(loading, (loading) => Statamic.$progress.loading(id, loading));
 
 onMounted(() => {
