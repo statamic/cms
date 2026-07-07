@@ -85,6 +85,8 @@ class UpdateProductController extends CpController
         return [
             'changelog' => $paginated['data'],
             'currentVersion' => $changelog->currentVersion(),
+            'onLatestVersion' => $changelog->availableUpdatesCount() === 0,
+            'securityUpdateAvailable' => $changelog->hasSecurityUpdate(),
             'meta' => $paginated['meta'],
         ];
     }

@@ -419,7 +419,7 @@ final class Addon
         $version = $versionParser->normalize($this->version);
         $latestVersion = $versionParser->normalize($this->latestVersion());
 
-        return version_compare($version, $latestVersion, '=');
+        return version_compare($version, $latestVersion, '>=');
     }
 
     public function license()
