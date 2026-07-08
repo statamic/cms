@@ -43,7 +43,7 @@ const closeMobileNavPopover = () => {
                     :text="activeSectionLabel"
                     icon-append="chevron-down"
                 />
-                <nav id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
+                <nav v-if="navItems.length > 1" id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
                     <ul>
                         <li v-for="navItem in navItems" :key="`m-${navItem.href}`">
                             <Link
@@ -59,7 +59,7 @@ const closeMobileNavPopover = () => {
                 </nav>
             </div>
 
-            <nav class="global-header-nav hidden lg:block" :aria-label="__('form_navigation')">
+            <nav v-if="navItems.length > 1" class="global-header-nav hidden lg:block" :aria-label="__('form_navigation')">
                 <ul>
                     <li v-for="navItem in navItems" :key="navItem.href">
                         <Link
