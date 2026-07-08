@@ -1277,6 +1277,24 @@ EOT
     }
 
     #[Test]
+    public function it_will_render_fake_success_when_a_listener_throws_a_bare_silent_failure_exception()
+    {
+        Event::listen(\Statamic\Events\FormSubmitted::class, function () {
+            throw new \Statamic\Exceptions\SilentFormFailureException;
+        });
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertCount(0, Form::find('contact')->submissions());
+    }
+
+    #[Test]
     public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());

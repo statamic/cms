@@ -65,7 +65,7 @@ class FormController extends Controller
         } catch (FormRestrictedException $e) {
             return $this->formFailure($params, ['*' => [$e->getMessage()]], $form->handle());
         } catch (SilentFormFailureException $e) {
-            $result = new SubmissionResult(submission: $e->submission());
+            $result = new SubmissionResult(submission: $action->submission());
 
             return $this->formSuccess($params, $result, silentFailure: true);
         } catch (ValidationException $e) {

@@ -262,12 +262,14 @@ class SubmitFormTest extends TestCase
     {
         Event::listen(FormSubmitted::class, fn () => false);
 
+        $action = $this->action();
+
         try {
-            $this->action()->submit(['email' => 'test@example.com']);
+            $action->submit(['email' => 'test@example.com']);
 
             $this->fail('Expected SilentFormFailureException was not thrown');
         } catch (SilentFormFailureException $e) {
-            $this->assertNotNull($e->submission());
+            $this->assertNotNull($action->submission());
         }
     }
 
@@ -532,16 +534,17 @@ class SubmitFormTest extends TestCase
             ->submit(['email' => 'olaf@example.com']);
 
         // On the final page the honeypot triggers a silent failure.
+        $action = app(SubmitForm::class)
+            ->form($form)
+            ->page('three')
+            ->resume($result->submission);
+
         try {
-            app(SubmitForm::class)
-                ->form($form)
-                ->page('three')
-                ->resume($result->submission)
-                ->submit(['message' => 'Hello', 'winnie' => 'the pooh']);
+            $action->submit(['message' => 'Hello', 'winnie' => 'the pooh']);
 
             $this->fail('Expected SilentFormFailureException was not thrown');
         } catch (SilentFormFailureException $e) {
-            $this->assertNotNull($e->submission());
+            $this->assertNotNull($action->submission());
         }
 
         $form->submissions()->each->delete();
@@ -568,16 +571,17 @@ class SubmitFormTest extends TestCase
             ->resume($result->submission)
             ->submit(['email' => 'olaf@example.com']);
 
+        $action = app(SubmitForm::class)
+            ->form($form)
+            ->page('three')
+            ->resume($result->submission);
+
         try {
-            app(SubmitForm::class)
-                ->form($form)
-                ->page('three')
-                ->resume($result->submission)
-                ->submit(['message' => 'Hello']);
+            $action->submit(['message' => 'Hello']);
 
             $this->fail('Expected SilentFormFailureException was not thrown');
         } catch (SilentFormFailureException $e) {
-            $this->assertNotNull($e->submission());
+            $this->assertNotNull($action->submission());
         }
 
         // The submission stays partial since completion was silently aborted.

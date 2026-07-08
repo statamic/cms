@@ -44,6 +44,11 @@ class SubmitForm
         return $this;
     }
 
+    public function submission(): ?Submission
+    {
+        return $this->submission;
+    }
+
     public function submit(array $data, array $files = []): SubmissionResult
     {
         throw_if($this->form->restricted(), new FormRestrictedException($this->form));
@@ -78,8 +83,8 @@ class SubmitForm
             }
 
             if ($this->shouldFinalize($nextPage)) {
-                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException($this->submission));
-                throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException($this->submission));
+                throw_if(Arr::get($values, $this->form->honeypot()), new SilentFormFailureException);
+                throw_if(FormSubmitted::dispatch($this->submission) === false, new SilentFormFailureException);
             }
         } catch (ValidationException|SilentFormFailureException $e) {
             $this->removeUploadedAssets($uploadedAssets);
