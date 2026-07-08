@@ -222,6 +222,15 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return ['sections' => $sections];
     }
 
+    public function hasMultiplePages(): bool
+    {
+        if (! Statamic::formsProInstalled()) {
+            return false;
+        }
+
+        return $this->formFields()->pages()->count() > 1;
+    }
+
     /**
      * Get the blueprint.
      *

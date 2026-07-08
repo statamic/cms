@@ -3,6 +3,7 @@
 namespace Statamic\Forms\JsDrivers;
 
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\Form;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -77,6 +78,18 @@ abstract class AbstractJsDriver implements JsDriver
     }
 
     /**
+     * Add to renderable page view data.
+     *
+     * @param  \Statamic\Fields\Tab  $page
+     * @param  array  $data
+     * @return array
+     */
+    public function addToRenderablePageData($page, $data)
+    {
+        return [];
+    }
+
+    /**
      * Render form html.
      *
      * @param  string  $html
@@ -128,14 +141,32 @@ abstract class AbstractJsDriver implements JsDriver
      */
     protected function getInitialFormData(): array
     {
+        $values = [];
+
+        if ($partialSubmission = $this->getPartialSubmission()) {
+            $values = $partialSubmission->data()->all();
+        }
+
         return $this->form
             ->blueprint()
             ->fields()
-            ->addValues(old() ?? [])
+            ->addValues([...$values, ...old() ?? []])
             ->preProcess()
             ->values()
             ->when($this->form->honeypot(), fn ($fields, $honeypot) => $fields->merge([$honeypot => null]))
             ->all();
+    }
+
+    private function getPartialSubmission(): ?Submission
+    {
+        $id = session()->get("form.{$this->form->handle()}.partial_submission");
+        $submission = $this->form->submission($id);
+
+        if ($submission && ! $submission->isPartial()) {
+            return null;
+        }
+
+        return $submission;
     }
 
     /**

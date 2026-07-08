@@ -255,10 +255,14 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         if ($this->form()->store()) {
             $this->save();
         } else {
-            // When stored, save() dispatches the created event. We'll also fire it
-            // here when submissions aren't stored so developers may continue to
-            // listen and modify the submission as needed.
-            SubmissionCreated::dispatch($this);
+            // Fire the created event here for submissions that were never saved.
+            // The event might have been dispatched when the submission persisted,
+            // so we don't want to fire it again.
+            if (is_null($this->form()->submission($this->id()))) {
+                SubmissionCreated::dispatch($this);
+            }
+
+            $this->deleteQuietly();
         }
 
         SubmissionFinalized::dispatch($this);
