@@ -7,13 +7,13 @@
             {{ value }}{{ permalink }}{{ if !last }}, {{ /if }}{{ /value }}
 
         {{ elseif fieldtype == "select" && !config:multiple }}
-            {{ value:label | sanitize ?? value | sanitize }}
+            {{ (value:label ?? value) | sanitize }}
 
         {{ elseif fieldtype == "radio" }}
-            {{ value:label | sanitize ?? value | sanitize }}
+            {{ (value:label ?? value) | sanitize }}
 
         {{ elseif fieldtype == "select" || fieldtype == "checkboxes" || fieldtype == "dictionary" }}
-            {{ value }}{{ label | sanitize ?? value | sanitize }}{{ if !last }}, {{ /if }}{{ /value }}
+            {{ value }}{{ (label ?? value) | sanitize }}{{ if !last }}, {{ /if }}{{ /value }}
 
         {{ elseif value|is_iterable }}
             {{ value | json | sanitize }}
