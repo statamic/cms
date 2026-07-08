@@ -1,0 +1,1 @@
+var t=function(){var e=this,r=e._self._c;return r("svg",{staticClass:"align-middle",attrs:{viewBox:"0 0 24 24"}},[r("path",{attrs:{fill:"currentColor","fill-rule":"evenodd",d:"m10.414 7.05 4.95 4.95-4.95 4.95L9 15.534 12.536 12 9 8.464z"}})])};const n={render:t};export{n as default};
