@@ -342,6 +342,11 @@ class AddonTest extends TestCase
             ['2.0.0', '2.0.0', true],
             ['1.0', '1.0.0', true],
             ['1.0', '1.0.1', false],
+
+            // Installed version is newer than the marketplace's indexed latest version
+            ['1.0.2', '1.0.1', true],
+            ['2.0.0', '1.0.0', true],
+            ['7.12.1', '7.12.0', true],
         ];
     }
 
