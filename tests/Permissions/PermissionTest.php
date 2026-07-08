@@ -20,6 +20,7 @@ class PermissionTest extends TestCase
                 'label' => 'one',
                 'description' => null,
                 'group' => null,
+                'superseded_by' => null,
                 'children' => [],
             ],
         ], $permission->toTree());
@@ -42,12 +43,14 @@ class PermissionTest extends TestCase
                 'label' => 'parent',
                 'description' => null,
                 'group' => 'foo',
+                'superseded_by' => null,
                 'children' => [
                     [
                         'value' => 'child',
                         'label' => 'Child!',
                         'description' => null,
                         'group' => 'foo',
+                        'superseded_by' => null,
                         'children' => [],
                     ],
                 ],
@@ -136,6 +139,38 @@ class PermissionTest extends TestCase
     }
 
     #[Test]
+    public function it_adds_a_superseding_permission()
+    {
+        $permission = (new Permission)->value('test');
+        $this->assertNull($permission->supersededBy());
+        $this->assertNull($permission->toTree()[0]['superseded_by']);
+
+        $return = $permission->supersededBy('other');
+
+        $this->assertEquals($permission, $return);
+        $this->assertEquals('other', $permission->supersededBy());
+        $this->assertEquals('other', $permission->toTree()[0]['superseded_by']);
+    }
+
+    #[Test]
+    public function it_keeps_the_superseding_permission_when_replacements_are_defined()
+    {
+        $permission = (new Permission)
+            ->value('edit {handle} form')
+            ->supersededBy('edit forms')
+            ->replacements('handle', function () {
+                return [
+                    ['value' => 'first', 'label' => 'FIRST'],
+                    ['value' => 'second', 'label' => 'SECOND'],
+                ];
+            });
+
+        $this->assertEquals(['edit forms', 'edit forms'], $permission->permissions()->map->supersededBy()->all());
+        $this->assertEquals('edit forms', $permission->toTree()[0]['superseded_by']);
+        $this->assertEquals('edit forms', $permission->toTree()[1]['superseded_by']);
+    }
+
+    #[Test]
     public function it_gets_its_permissions_when_replacements_are_not_defined()
     {
         $permission = (new Permission)->value('test');
@@ -217,18 +252,21 @@ class PermissionTest extends TestCase
                 'label' => 'view FIRST entries',
                 'description' => null,
                 'group' => 'test-group',
+                'superseded_by' => null,
                 'children' => [
                     [
                         'value' => 'edit first entries',
                         'label' => 'edit FIRST entries',
                         'description' => null,
                         'group' => 'test-group',
+                        'superseded_by' => null,
                         'children' => [
                             [
                                 'value' => 'delete first entries',
                                 'label' => 'delete FIRST entries',
                                 'description' => null,
                                 'group' => 'test-group',
+                                'superseded_by' => null,
                                 'children' => [],
                             ],
                         ],
@@ -238,6 +276,7 @@ class PermissionTest extends TestCase
                         'label' => 'publish FIRST entries',
                         'description' => null,
                         'group' => 'test-group',
+                        'superseded_by' => null,
                         'children' => [],
                     ],
                 ],
@@ -247,18 +286,21 @@ class PermissionTest extends TestCase
                 'label' => 'view SECOND entries',
                 'description' => null,
                 'group' => 'test-group',
+                'superseded_by' => null,
                 'children' => [
                     [
                         'value' => 'edit second entries',
                         'label' => 'edit SECOND entries',
                         'description' => null,
                         'group' => 'test-group',
+                        'superseded_by' => null,
                         'children' => [
                             [
                                 'value' => 'delete second entries',
                                 'label' => 'delete SECOND entries',
                                 'description' => null,
                                 'group' => 'test-group',
+                                'superseded_by' => null,
                                 'children' => [],
                             ],
                         ],
@@ -268,6 +310,7 @@ class PermissionTest extends TestCase
                         'label' => 'publish SECOND entries',
                         'description' => null,
                         'group' => 'test-group',
+                        'superseded_by' => null,
                         'children' => [],
                     ],
                 ],

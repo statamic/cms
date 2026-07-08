@@ -19,6 +19,7 @@ class Permission
     protected $label;
     protected $description;
     protected $group;
+    protected $supersededBy;
 
     /**
      * @return ($value is null ? string|string[] : static)
@@ -103,7 +104,8 @@ class Permission
                 ->placeholder($this->placeholder)
                 ->placeholderLabel($replacement['label'])
                 ->placeholderValue($replacement['value'])
-                ->group($this->group());
+                ->group($this->group())
+                ->supersededBy($this->supersededBy());
 
             if ($this->children()) {
                 $replaced->children($this->children()->all());
@@ -205,6 +207,7 @@ class Permission
                 'label' => $permission->label(),
                 'description' => $permission->description(),
                 'group' => $permission->group(),
+                'superseded_by' => $permission->supersededBy(),
                 'children' => $children->flatMap->toTree()->all(),
             ];
         })->all();
@@ -218,5 +221,10 @@ class Permission
     public function description()
     {
         return $this->fluentlyGetOrSet('description')->args(func_get_args());
+    }
+
+    public function supersededBy(?string $permission = null)
+    {
+        return $this->fluentlyGetOrSet('supersededBy')->args(func_get_args());
     }
 }

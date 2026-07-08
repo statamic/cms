@@ -171,18 +171,21 @@ class PermissionsTest extends TestCase
                         'label' => 'two',
                         'description' => null,
                         'group' => 'test',
+                        'superseded_by' => null,
                         'children' => [
                             [
                                 'value' => 'child-three',
                                 'label' => 'child-three',
                                 'description' => null,
                                 'group' => 'test',
+                                'superseded_by' => null,
                                 'children' => [
                                     [
                                         'value' => 'nested-child',
                                         'label' => 'nested-child',
                                         'description' => null,
                                         'group' => 'test',
+                                        'superseded_by' => null,
                                         'children' => [],
                                     ],
                                 ],
@@ -200,18 +203,21 @@ class PermissionsTest extends TestCase
                         'label' => 'four FIRST',
                         'description' => null,
                         'group' => 'group-with-replacements',
+                        'superseded_by' => null,
                         'children' => [
                             [
                                 'value' => 'replaced child first',
                                 'label' => 'Replaced FIRST',
                                 'description' => null,
                                 'group' => 'group-with-replacements',
+                                'superseded_by' => null,
                                 'children' => [
                                     [
                                         'value' => 'replaced nested child first',
                                         'label' => 'Replaced Nested FIRST',
                                         'description' => null,
                                         'group' => 'group-with-replacements',
+                                        'superseded_by' => null,
                                         'children' => [],
                                     ],
                                 ],
@@ -223,18 +229,21 @@ class PermissionsTest extends TestCase
                         'label' => 'four SECOND',
                         'description' => null,
                         'group' => 'group-with-replacements',
+                        'superseded_by' => null,
                         'children' => [
                             [
                                 'value' => 'replaced child second',
                                 'label' => 'Replaced SECOND',
                                 'description' => null,
                                 'group' => 'group-with-replacements',
+                                'superseded_by' => null,
                                 'children' => [
                                     [
                                         'value' => 'replaced nested child second',
                                         'label' => 'Replaced Nested SECOND',
                                         'description' => null,
                                         'group' => 'group-with-replacements',
+                                        'superseded_by' => null,
                                         'children' => [],
                                     ],
                                 ],
@@ -252,12 +261,14 @@ class PermissionsTest extends TestCase
                         'label' => 'one',
                         'description' => null,
                         'group' => null,
+                        'superseded_by' => null,
                         'children' => [
                             [
                                 'value' => 'child-one',
                                 'label' => 'child-one',
                                 'description' => null,
                                 'group' => null,
+                                'superseded_by' => null,
                                 'children' => [],
                             ],
                             [
@@ -265,6 +276,7 @@ class PermissionsTest extends TestCase
                                 'label' => 'child-two',
                                 'description' => null,
                                 'group' => null,
+                                'superseded_by' => null,
                                 'children' => [],
                             ],
                         ],
@@ -274,6 +286,7 @@ class PermissionsTest extends TestCase
                         'label' => 'three',
                         'description' => null,
                         'group' => null,
+                        'superseded_by' => null,
                         'children' => [],
                     ],
                 ],
