@@ -9,9 +9,9 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class FormFieldsetPreviewsController extends CpController
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, $form)
     {
-        // todo: add authorization
+        $this->authorize('editFields', $form);
 
         $request->validate([
             'fieldset' => 'required|string',

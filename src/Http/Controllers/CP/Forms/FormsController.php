@@ -10,6 +10,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -18,19 +19,21 @@ use function Statamic\trans as __;
 
 class FormsController extends CpController
 {
+    use ProvidesFormAbilities;
+
     public function index(Request $request)
     {
         $this->authorize('index', FormContract::class);
 
-        $columns = [
-            Column::make('title')->label(__('Title')),
-            Column::make('submissions')->label(__('Submissions')),
-        ];
+        $columns = [Column::make('title')->label(__('Title'))];
 
-        $forms = Form::all()
-            ->filter(function ($form) {
-                return User::current()->can('view', $form);
-            })
+        $forms = Form::all()->filter(fn ($form) => User::current()->can('view', $form));
+
+        if ($forms->contains(fn ($form) => User::current()->can('viewSubmissions', $form))) {
+            $columns[] = Column::make('submissions')->label(__('Submissions'));
+        }
+
+        $forms = $forms
             ->map(function ($form) {
                 return [
                     'id' => $form->handle(),
@@ -41,7 +44,7 @@ class FormsController extends CpController
                     'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
                     'can_edit' => User::current()->can('edit', $form),
-                    'can_edit_blueprint' => User::current()->can('configure form fields', $form),
+                    'can_view_submissions' => User::current()->can('viewSubmissions', $form),
                 ];
             })
             ->values();
@@ -58,7 +61,14 @@ class FormsController extends CpController
 
     public function show($form)
     {
-        if ($form->querySubmissions()->count() === 0) {
+        $this->authorize('view', $form);
+
+        $user = User::current();
+
+        if (
+            $user->can('editFields', $form)
+            && ($user->cant('viewSubmissions', $form) || $form->querySubmissions()->count() === 0)
+        ) {
             return redirect()->route('statamic.cp.forms.builder.edit', $form->handle());
         }
 
@@ -126,6 +136,7 @@ class FormsController extends CpController
             'initialValues' => $fields->values(),
             'initialMeta' => $fields->meta(),
             'action' => cp_route('forms.update', $form->handle()),
+            'can' => $this->formAbilities($form),
         ]);
     }
 

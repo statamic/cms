@@ -41,12 +41,8 @@ class DeleteFakeSubmissions extends Action
 
         $fakeSubmissions = $form->submissions()->filter(fn ($submission) => (bool) $submission->get('_fake'));
         $currentUser = request()->user() ? User::fromUser(request()->user()) : null;
-        $requiredPermission = "delete {$form->handle()} form submissions";
-        $isSuper = $currentUser && method_exists($currentUser, 'isSuper') && $currentUser->isSuper();
-        $canConfigureForms = $currentUser && method_exists($currentUser, 'hasPermission') && $currentUser->hasPermission('configure forms');
-        $canDeleteSubmissions = $currentUser && method_exists($currentUser, 'hasPermission') && $currentUser->hasPermission($requiredPermission);
 
-        if (! $isSuper && ! $canConfigureForms && ! $canDeleteSubmissions) {
+        if (! $currentUser || $currentUser->cant('deleteSubmissions', $form)) {
             throw new Exception(__('You are not authorized to run this action.'));
         }
 

@@ -15,7 +15,7 @@ class FormExportController extends CpController
 
     public function export(FilteredRequest $request, $form, $type)
     {
-        $this->authorize('view', $form);
+        $this->authorize('viewSubmissions', $form);
 
         if (! $exporter = $form->exporter($type)) {
             throw new NotFoundHttpException;

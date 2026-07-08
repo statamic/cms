@@ -42,9 +42,66 @@ class FormLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_shows_the_logic_page_with_the_edit_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Logic'));
+    }
+
+    #[Test]
+    public function it_shows_the_logic_page_with_the_edit_form_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Logic'));
+    }
+
+    #[Test]
+    public function it_shows_the_logic_page_with_the_configure_form_fields_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure form fields']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Logic'));
+    }
+
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function it_denies_access_with_only_submission_permissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions', 'view test form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 

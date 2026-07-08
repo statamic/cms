@@ -35,9 +35,35 @@ class CreateFormTest extends TestCase
     }
 
     #[Test]
+    public function it_shows_the_create_page_with_the_create_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.create'))
+            ->assertSuccessful();
+    }
+
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.create'))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function it_denies_access_with_only_the_edit_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
 
         $this

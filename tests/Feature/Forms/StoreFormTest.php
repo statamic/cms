@@ -34,6 +34,20 @@ class StoreFormTest extends TestCase
     }
 
     #[Test]
+    public function it_denies_access_with_only_the_edit_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->post(cp_route('forms.store'))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error', 'You are not authorized to create forms.');
+    }
+
+    #[Test]
     public function it_stores_a_form()
     {
         $this->assertCount(0, Form::all());
@@ -48,6 +62,21 @@ class StoreFormTest extends TestCase
         $form = Form::all()->first();
         $this->assertEquals('test', $form->handle());
         $this->assertEquals('Test Form', $form->title());
+    }
+
+    #[Test]
+    public function it_stores_a_form_with_the_create_forms_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.store'), $this->validParams())
+            ->assertJson(['redirect' => cp_route('forms.show', 'test')])
+            ->assertSessionHas('success');
+
+        $this->assertCount(1, Form::all());
     }
 
     #[Test]
