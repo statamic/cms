@@ -73,6 +73,7 @@ const reloadPage = () => router.reload();
                 </template>
                 <template #cell-submissions="{ row: form, value: submissions }">
                     <Badge
+                        v-if="form.can_view_submissions"
                         :href="form.submissions_url"
                         :append="String(submissions)"
                         :text="__('Results')"

@@ -6,19 +6,23 @@ import { Button } from '@ui';
 const page = usePage();
 const form = computed(() => page.props.form);
 
-const navItems = [
-    { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/builder`) },
-    { label: __('Logic'), href: cp_url(`forms/${form.value.handle}/logic`) },
-    { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
-    { label: __('Results'), href: cp_url(`forms/${form.value.handle}/submissions`) },
-    { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
-];
+const can = (ability) => page.props.can?.[ability] ?? true;
+
+const navItems = computed(() =>
+    [
+        can('editFields') && { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/builder`) },
+        can('editFields') && { label: __('Logic'), href: cp_url(`forms/${form.value.handle}/logic`) },
+        can('edit') && { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
+        can('viewSubmissions') && { label: __('Results'), href: cp_url(`forms/${form.value.handle}/submissions`) },
+        can('edit') && { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
+    ].filter(Boolean),
+);
 
 const currentPath = computed(() => new URL(page.url, window.location.origin).pathname);
 const isActive = (href) => currentPath.value.includes(new URL(href, window.location.origin).pathname);
 
 const activeSectionLabel = computed(() => {
-    return navItems.find((item) => isActive(item.href))?.label ?? navItems[0]?.label ?? '';
+    return navItems.value.find((item) => isActive(item.href))?.label ?? navItems.value[0]?.label ?? '';
 });
 
 const closeMobileNavPopover = () => {
