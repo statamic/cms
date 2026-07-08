@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.74.3 (2026-07-08)
+
+### What's fixed
+- Escape submitted values in automagic email [#14959](https://github.com/statamic/cms/issues/14959) by @jasonvarga
+- Tighten front-end form upload validation [#14958](https://github.com/statamic/cms/issues/14958) by @jasonvarga
+
+
+
 ## 5.74.2 (2026-07-03)
 
 ### What's fixed
