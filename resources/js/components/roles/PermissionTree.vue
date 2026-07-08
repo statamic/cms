@@ -1,6 +1,6 @@
 <template>
     <div :style="`padding-inline-start: ${12 * depth - 12}px`">
-        <template v-for="permission in permissions" :key="permission.value">
+        <template v-for="permission in visiblePermissions" :key="permission.value">
             <ui-checkbox
                 :class="[
                     permission.description
@@ -30,10 +30,21 @@ export default {
         depth: Number,
     },
 
+    inject: ['checkedPermissionValues'],
+
     data() {
         return {
             permissions: this.initialPermissions,
         };
+    },
+
+    computed: {
+        visiblePermissions() {
+            return this.permissions.filter(
+                (permission) =>
+                    !permission.superseded_by || !this.checkedPermissionValues.includes(permission.superseded_by)
+            );
+        },
     },
 
     watch: {
