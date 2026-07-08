@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionFinalized;
+use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
@@ -224,6 +225,26 @@ class SubmitFormTest extends TestCase
         $this->expectException(ValidationException::class);
 
         $this->action()->validate(['email' => 'not-an-email'], only: ['email']);
+    }
+
+    #[Test]
+    public function it_throws_a_form_restricted_exception_when_the_form_is_restricted()
+    {
+        $this->form->data(['require_login' => true])->save();
+
+        $this->expectException(FormRestrictedException::class);
+
+        $this->action()->submit(['email' => 'test@example.com']);
+    }
+
+    #[Test]
+    public function it_does_not_throw_when_validating_a_restricted_form()
+    {
+        $this->form->data(['require_login' => true])->save();
+
+        $this->action()->validate(['email' => 'test@example.com']);
+
+        $this->addToAssertionCount(1);
     }
 
     #[Test]

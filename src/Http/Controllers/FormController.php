@@ -9,6 +9,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Uri;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
@@ -54,10 +55,6 @@ class FormController extends Controller
                 return response()->noContent(headers: ['Precognition-Success' => 'true']);
             }
 
-            if ($form->restricted()) {
-                return $this->formFailure($params, ['*' => [$form->restrictionMessage()]], $form->handle());
-            }
-
             $result = $action->submit($request->all(), $request->allFiles());
 
             $result->isFinalized()
@@ -65,6 +62,8 @@ class FormController extends Controller
                 : $this->setPartialSubmission($form, $result->submission);
 
             return $this->formSuccess($params, $result);
+        } catch (FormRestrictedException $e) {
+            return $this->formFailure($params, ['*' => [$e->getMessage()]], $form->handle());
         } catch (SilentFormFailureException $e) {
             $result = new SubmissionResult(submission: $e->submission());
 

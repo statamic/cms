@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
+use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
@@ -45,6 +46,8 @@ class SubmitForm
 
     public function submit(array $data, array $files = []): SubmissionResult
     {
+        throw_if($this->form->restricted(), new FormRestrictedException($this->form));
+
         $nextPage = null;
         $uploadedAssets = [];
         $files = $this->normalizeFiles($files);
