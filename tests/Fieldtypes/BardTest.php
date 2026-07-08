@@ -632,6 +632,36 @@ class BardTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_remove_sets_when_trimming_empty_nodes()
+    {
+        $content = [
+            ['type' => 'paragraph'],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'test-set',
+                    'values' => [
+                        'type' => 'one',
+                    ],
+                ],
+            ],
+            ['type' => 'paragraph'],
+        ];
+
+        $this->assertEquals([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'test-set',
+                    'values' => [
+                        'type' => 'one',
+                    ],
+                ],
+            ],
+        ], $this->bard(['remove_empty_nodes' => 'trim'])->process($content));
+    }
+
+    #[Test]
     #[DataProvider('groupedSetsProvider')]
     public function it_preloads($areSetsGrouped)
     {
