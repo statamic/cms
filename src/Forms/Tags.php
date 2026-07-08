@@ -308,7 +308,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get sections of fields across all pages, using sections defined in blueprint.
+     * Get sections of fields for the current page, using sections defined in blueprint.
      *
      * @param  string  $sessionHandle
      * @param  JsDriver  $jsDriver
