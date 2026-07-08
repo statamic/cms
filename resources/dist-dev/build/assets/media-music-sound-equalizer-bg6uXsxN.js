@@ -1,0 +1,4 @@
+//#region resources/svg/icons/media-music-sound-equalizer.svg?raw
+var media_music_sound_equalizer_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 14 14\"><g stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M.748 5.558v2.884M3.874 3.154v7.692M7 .75v12.5M10.126 3.154v7.692M13.252 5.558v2.884\"/></g></svg>";
+//#endregion
+export { media_music_sound_equalizer_default as default };

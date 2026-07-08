@@ -1,0 +1,118 @@
+/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
+[data-ui-button-group][data-measuring] {
+  flex-direction: row !important;
+  display: flex !important;
+}
+
+@keyframes pop-15e572af {
+0%,
+    100% {
+        transform: scale(1);
+}
+50% {
+        transform: scale(1.2);
+}
+}
+.animate-pop[data-v-15e572af] {
+    animation: pop-15e572af 0.275s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@supports(text-box: ex alphabetic) {
+[data-ui-badge][data-v-d636277a] {
+            padding-block: 0.65rem;
+}
+}
+
+[data-ui-hover-card-content] {
+    max-height: var(--reka-hover-card-content-available-height);
+    transform-origin: var(--reka-hover-card-content-transform-origin);
+}
+
+.dotted-line[data-v-471045b0]::before,
+.dotted-line[data-v-471045b0]::after {
+    background: linear-gradient(90deg, var(--color-gray-400) 1.5px, transparent 1.5px) 50% 50% / 8px 1.5px repeat-x;
+    height: 1.5px;
+}
+.dark .dotted-line[data-v-471045b0]::before,
+.dark .dotted-line[data-v-471045b0]::after {
+    background: linear-gradient(90deg, var(--color-gray-600) 1.5px, transparent 1.5px) 50% 50% / 8px 1.5px repeat-x;
+    height: 1.5px;
+}
+
+.lock-avatar-pop-enter-active[data-v-d1a5b552],
+.lock-avatar-pop-leave-active[data-v-d1a5b552] {
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+.lock-avatar-pop-enter-from[data-v-d1a5b552],
+.lock-avatar-pop-leave-to[data-v-d1a5b552] {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.85);
+}
+
+.publish-section-collapsible {
+&[data-v-04905f09] {
+    --timing: ease;
+    /* No animation on load; enable once the user has toggled this section. */
+    --speed: 0ms;
+
+    /* Only setting the animation speed when the section is interacted with. Prevents the animation triggering on page load. */
+}
+&.publish-section-collapsible--interacted[data-v-04905f09] {
+        --speed: 250ms;
+}
+@media (prefers-reduced-motion: reduce) {
+&[data-v-04905f09] {
+        --speed: 0ms;
+}
+}
+}
+.publish-section-collapsible--expanded {
+&[data-v-04905f09] {
+    /* We can animate collapse/expand using grid rows */
+    animation: expand-rows-04905f09 var(--speed) var(--timing) forwards;
+}
+.publish-section-collapsible__inner[data-v-04905f09] {
+        animation: calc(var(--speed) * 2) var(--timing) section-fade-in-04905f09 both;
+        overflow: clip;
+        /* We need to increase the clip margin here vs regular collapsible sections because we have things appearing outside the section such as the logic indicator icon. */
+        overflow-clip-margin: 2.5rem;
+}
+}
+.publish-section-collapsible--collapsed {
+&[data-v-04905f09] {
+    animation: collapse-rows-04905f09 var(--speed) var(--timing) forwards;
+}
+.publish-section-collapsible__inner[data-v-04905f09] {
+        animation:
+            clip-overflow-04905f09 0ms var(--speed) forwards,make-invisible-04905f09 0ms var(--speed) forwards;
+        overflow: clip;
+}
+}
+@keyframes section-fade-in-04905f09 {
+from { opacity: 0%;
+}
+to { opacity: 100%;
+}
+}
+@keyframes make-invisible-04905f09 {
+from { visibility: visible;
+}
+to { visibility: hidden;
+}
+}
+@keyframes collapse-rows-04905f09  {
+from { grid-template-rows: 1fr;
+}
+to { grid-template-rows: 0fr;
+}
+}
+@keyframes expand-rows-04905f09    {
+from { grid-template-rows: 0fr;
+}
+to { grid-template-rows: 1fr;
+}
+}
+@keyframes clip-overflow-04905f09  {
+to { overflow: clip;
+}
+}

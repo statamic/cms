@@ -1,0 +1,4 @@
+//#region resources/svg/icons/programming-script-code-brackets.svg?raw
+var programming_script_code_brackets_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 14 14\"><g stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5.5 11.5 3-9M3.456 3.74c-1.242.847-1.964 1.529-2.79 2.726a.94.94 0 0 0 0 1.068c.826 1.197 1.548 1.879 2.79 2.727M10.544 3.74c1.242.847 1.964 1.529 2.79 2.726a.94.94 0 0 1 0 1.068c-.826 1.197-1.548 1.879-2.79 2.727\"/></g></svg>";
+//#endregion
+export { programming_script_code_brackets_default as default };
