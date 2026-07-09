@@ -92,8 +92,7 @@ YAML;
 
         $this->runUpdateScript(UpdateGlobalVariables::class);
 
-        // Simulates an addon update script saving variables after the migration,
-        // like Peak SEO's AddRobots script does.
+        // Simulates an addon update script saving variables after the migration
         $variables = GlobalSet::findByHandle('test')->inDefaultSite();
         $variables->set('baz', 'Qux');
         $variables->save();
