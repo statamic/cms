@@ -27,11 +27,13 @@ const suggestableFieldsForField = computed(() =>
 </script>
 
 <template>
-    <FieldConditions
-        :key="field._id"
-        :conditions="conditions"
-        :suggestable-fields="suggestableFieldsForField"
-        :fieldtypes
-        @update:conditions="emit('update:conditions', $event)"
-    />
+    <div class="@container w-full isolate">
+        <FieldConditions
+            :key="field._id"
+            :conditions="conditions"
+            :suggestable-fields="suggestableFieldsForField"
+            :fieldtypes
+            @update:conditions="emit('update:conditions', $event)"
+        />
+    </div>
 </template>

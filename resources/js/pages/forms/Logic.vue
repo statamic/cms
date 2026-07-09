@@ -196,8 +196,8 @@ onUnmounted(() => {
         />
     </div>
 
-    <div v-if="view === View.Tree" class="st-full-bleed-content flex flex-col flex-1 min-h-0">
-        <div class="flex-1 min-h-0 overflow-hidden pb-2!">
+    <div v-if="view === View.Tree" class="st-full-bleed-content st-separator-on-scroll flex flex-col flex-1 min-h-0">
+        <div class="flex-1 min-h-0 overflow-hidden pb-0!">
             <SplitterGroup direction="vertical">
                 <SplitterPanel>
                     <div class="h-full overflow-y-auto">
@@ -217,10 +217,10 @@ onUnmounted(() => {
                         :default-size="35"
                         :min-size="20"
                         collapsible
-                        class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+                        class="mx-3 dark:me-1.5 mb-3 dark:mb-1.5 rounded-lg border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-925"
                     >
                         <div class="h-full overflow-y-auto">
-                            <div class="mx-auto max-w-3xl p-6">
+                            <div class="mx-auto max-w-5xl py-6">
                                 <PageLogicPanel
                                     v-if="selectedPage"
                                     :page="selectedPage"

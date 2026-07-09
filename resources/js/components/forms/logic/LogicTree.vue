@@ -140,7 +140,7 @@ useSortable({
                         <Icon
                             v-if="isConnectorDestination(pageIndex)"
                             name="chevron-right"
-                            class="size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400 dark:text-blue-500"
+                            class="logic-arrow size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400 dark:text-blue-500"
                             aria-hidden="true"
                         />
                         <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
@@ -180,6 +180,7 @@ useSortable({
                                 v-for="field in section.fields"
                                 :key="field._id"
                                 data-field-item
+                                :data-field-item-selected="isFieldSelected(field) ? '' : undefined"
                                 class="cursor-pointer"
                                 :class="{
                                     'linked-list__fieldset': field.type === 'import',

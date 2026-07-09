@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Carbon\Carbon;
+use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
@@ -29,6 +30,8 @@ class AccessTest extends TestCase
         parent::setUp();
 
         Carbon::setTestNow('2026-07-06 12:00:00');
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
     }
 
     protected function makeForm(array $data = [])

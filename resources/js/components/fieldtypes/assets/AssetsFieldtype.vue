@@ -627,7 +627,7 @@ export default {
 
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.handle}::${path}`;
+            const id = `${this.container.id}::${path}`;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 
