@@ -314,6 +314,14 @@
     
     .linked-list:has([data-field-item-selected]) {
         --_border-color: var(--color-blue-100);
+
+        /* When an item is selected, get all columns that don't have an end connection */
+        .linked-list__column:not(.linked-list__column--has-end-connection) {
+            /* and dim their end connection arrow too */
+            .linked-list__page-name .logic-arrow {
+                color: var(--_border-color)!important;
+            }
+        }
     }
 
     .linked-list:has([data-field-item-selected].linked-list__connector) {
