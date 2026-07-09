@@ -56,7 +56,7 @@ const removeRule = (ruleId) => updateRules(rules.value.filter((rule) => rule._id
                 class="my-6 border-t border-dashed border-gray-400 dark:border-gray-700"
             />
 
-            <div class="@container w-full">
+            <div class="@container w-full isolate">
                 <PageRule
                     :rule="rule"
                     :suggestable-fields="suggestableFieldsForPage"

@@ -27,7 +27,7 @@ const suggestableFieldsForField = computed(() =>
 </script>
 
 <template>
-    <div class="@container w-full">
+    <div class="@container w-full isolate">
         <FieldConditions
             :key="field._id"
             :conditions="conditions"
