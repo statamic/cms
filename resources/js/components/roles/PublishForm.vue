@@ -82,6 +82,7 @@
 import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
+import { allVisibleChecked, checkVisible, uncheckAll, visible } from '@/components/roles/permissions.js';
 import { router } from '@inertiajs/vue3';
 
 const checked = function (permissions) {
@@ -163,46 +164,39 @@ export default {
 
     methods: {
         areAllChecked(group) {
-            const checkAll = (permissions) => {
-                return permissions.every(permission => {
-                    const childrenChecked = permission.children && permission.children.length
-                        ? checkAll(permission.children)
-                        : true;
-                    return permission.checked && childrenChecked;
-                });
-            };
-            return checkAll(group.permissions);
+            const checkedPermissions = this.checkedPermissions;
+            const shown = visible(group.permissions, checkedPermissions);
+
+            return shown.length > 0 && allVisibleChecked(shown, checkedPermissions);
         },
 
         areAllCheckedInAllGroups() {
             return this.permissions.every(group => this.areAllChecked(group));
         },
 
+        // Checking only affects what the user can see, but unchecking clears the group
+        // outright. Unchecking a broader permission reveals the ones it was hiding, so
+        // leaving those checked would need a second click to empty the group.
         toggleAllInGroup(group) {
-            const allChecked = this.areAllChecked(group);
-            const toggle = (permissions, checked) => {
-                permissions.forEach(permission => {
-                    permission.checked = checked;
-                    if (permission.children && permission.children.length) {
-                        toggle(permission.children, checked);
-                    }
-                });
-            };
-            toggle(group.permissions, !allChecked);
+            const checkedPermissions = this.checkedPermissions;
+
+            if (this.areAllChecked(group)) {
+                uncheckAll(group.permissions);
+            } else {
+                checkVisible(group.permissions, checkedPermissions);
+            }
         },
 
         toggleAllInAllGroups() {
+            const checkedPermissions = this.checkedPermissions;
             const allChecked = this.areAllCheckedInAllGroups();
-            this.permissions.forEach(group => {
-                const toggle = (permissions, checked) => {
-                    permissions.forEach(permission => {
-                        permission.checked = checked;
-                        if (permission.children && permission.children.length) {
-                            toggle(permission.children, checked);
-                        }
-                    });
-                };
-                toggle(group.permissions, !allChecked);
+
+            this.permissions.forEach((group) => {
+                if (allChecked) {
+                    uncheckAll(group.permissions);
+                } else {
+                    checkVisible(group.permissions, checkedPermissions);
+                }
             });
         },
 
