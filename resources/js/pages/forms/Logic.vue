@@ -220,7 +220,7 @@ onUnmounted(() => {
                         class="mx-3 dark:me-1.5 mb-3 dark:mb-1.5 rounded-lg border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-925"
                     >
                         <div class="h-full overflow-y-auto">
-                            <div class="mx-auto max-w-3xl p-6">
+                            <div class="mx-auto max-w-5xl py-6">
                                 <PageLogicPanel
                                     v-if="selectedPage"
                                     :page="selectedPage"
