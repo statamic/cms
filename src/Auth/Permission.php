@@ -193,7 +193,8 @@ class Permission
                         ->placeholder($permission->placeholder())
                         ->placeholderLabel($permission->placeholderLabel())
                         ->placeholderValue($permission->placeholderValue())
-                        ->group($permission->group());
+                        ->group($permission->group())
+                        ->hiddenBy($child->hiddenBy());
 
                     if ($children = $child->children()) {
                         $replaced->children($children->all());

@@ -182,6 +182,26 @@ class PermissionTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_hiding_permissions_of_children_when_replacements_are_defined()
+    {
+        $permission = (new Permission)
+            ->value('view {handle} entries')
+            ->children([
+                (new Permission)
+                    ->value('publish {handle} entries')
+                    ->hiddenBy('configure collections'),
+            ])
+            ->replacements('handle', function () {
+                return [['value' => 'first', 'label' => 'FIRST']];
+            });
+
+        $child = $permission->toTree()[0]['children'][0];
+
+        $this->assertEquals('publish first entries', $child['value']);
+        $this->assertEquals(['configure collections'], $child['hidden_by']);
+    }
+
+    #[Test]
     public function it_gets_its_permissions_when_replacements_are_not_defined()
     {
         $permission = (new Permission)->value('test');
