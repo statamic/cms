@@ -196,7 +196,7 @@ onUnmounted(() => {
         />
     </div>
 
-    <div v-if="view === View.Tree" class="st-full-bleed-content flex flex-col flex-1 min-h-0">
+    <div v-if="view === View.Tree" class="st-full-bleed-content st-separator-on-scroll flex flex-col flex-1 min-h-0">
         <div class="flex-1 min-h-0 overflow-hidden pb-0!">
             <SplitterGroup direction="vertical">
                 <SplitterPanel>
