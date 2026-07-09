@@ -170,7 +170,7 @@ class SubmitForm
     {
         return $this->form->blueprint()->tabs()
             ->filter(fn ($tab): bool => $tab->handle() === $page)
-            ->flatMap(fn ($tab): array => $tab->sections()->flatMap(fn ($section) => $section->fields()->items()->pluck('handle'))->all())
+            ->flatMap(fn ($tab): array => $tab->sections()->flatMap(fn ($section) => $section->fields()->all()->keys())->all())
             ->values()
             ->all();
     }

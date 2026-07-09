@@ -15,6 +15,7 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Statamic\Forms\SendEmails;
 use Statamic\Forms\SubmissionResult;
@@ -479,6 +480,45 @@ class SubmitFormTest extends TestCase
 
         $this->assertEquals('Olaf', $result->submission->get('name'));
         $this->assertNull($result->submission->get('email'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function it_scopes_stored_values_to_the_current_page_when_the_page_imports_a_fieldset()
+    {
+        $fieldset = Fieldset::make('address')->setContents([
+            'fields' => [
+                ['handle' => 'city', 'field' => ['type' => 'text']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('address')->andReturn($fieldset);
+
+        $form = tap(Form::make('signup')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]]],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [['fields' => [['import' => 'address', 'prefix' => 'shipping_']]]],
+                ],
+                [
+                    'id' => 'three',
+                    'sections' => [['fields' => [['handle' => 'message', 'field' => ['type' => 'long_answer']]]]],
+                ],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('two')
+            ->submit(['shipping_city' => 'Glasgow', 'message' => 'Hello']);
+
+        $this->assertEquals('three', $result->nextPage);
+        $this->assertEquals('Glasgow', $result->submission->get('shipping_city'));
+        $this->assertNull($result->submission->get('message'));
 
         $form->submissions()->each->delete();
     }
