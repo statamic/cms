@@ -448,7 +448,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent();
+                this.editor.commands.clearContent(false);
                 this.editor.commands.setContent(content, true);
             }
         },
