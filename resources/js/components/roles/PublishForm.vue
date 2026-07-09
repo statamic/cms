@@ -67,7 +67,11 @@
                     </Button>
                 </template>
                 <Card>
-                    <PermissionTree :depth="1" :initial-permissions="group.permissions" />
+                    <PermissionTree
+                        :depth="1"
+                        :initial-permissions="group.permissions"
+                        :checked-permissions="checkedPermissions"
+                    />
                 </Card>
             </Panel>
         </div>
@@ -75,7 +79,6 @@
 </template>
 
 <script>
-import { computed } from 'vue';
 import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input, CommandPaletteItem } from '@/components/ui';
 import { requireElevatedSession } from '@/components/elevated-sessions';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
@@ -101,12 +104,6 @@ export default {
         Field,
         Input,
         CommandPaletteItem,
-    },
-
-    provide() {
-        return {
-            checkedPermissionValues: computed(() => this.checkedPermissions),
-        };
     },
 
     props: {

@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
-import { ref } from 'vue';
 import PermissionTree from '@/components/roles/PermissionTree.vue';
 
 const permission = (value, overrides = {}) => ({
@@ -13,11 +12,10 @@ const permission = (value, overrides = {}) => ({
     ...overrides,
 });
 
-const mountTree = (permissions, checkedPermissionValues = []) =>
+const mountTree = (permissions, checkedPermissions = []) =>
     mount(PermissionTree, {
-        props: { depth: 1, initialPermissions: permissions },
+        props: { depth: 1, initialPermissions: permissions, checkedPermissions },
         global: {
-            provide: { checkedPermissionValues: ref(checkedPermissionValues) },
             stubs: {
                 'ui-checkbox': {
                     props: ['value'],
@@ -76,6 +74,34 @@ test('it only hides permissions hidden by a checked permission', () => {
     );
 
     expect(renderedPermissions(wrapper)).toEqual(['configure asset containers', 'view blog entries']);
+});
+
+test('it hides a nested permission when the permission hiding it is checked', () => {
+    const wrapper = mountTree(
+        [
+            permission('configure collections', { checked: true }),
+            permission('view blog entries', {
+                children: [permission('publish blog entries', { hidden_by: ['configure collections'] })],
+            }),
+        ],
+        ['configure collections'],
+    );
+
+    expect(renderedPermissions(wrapper)).toEqual(['configure collections', 'view blog entries']);
+});
+
+test('it shows everything when no checked permissions are given', () => {
+    const wrapper = mount(PermissionTree, {
+        props: {
+            depth: 1,
+            initialPermissions: [permission('view images assets', { hidden_by: ['configure asset containers'] })],
+        },
+        global: {
+            stubs: { 'ui-checkbox': { props: ['value'], template: '<div class="permission">{{ value }}</div>' } },
+        },
+    });
+
+    expect(renderedPermissions(wrapper)).toEqual(['view images assets']);
 });
 
 test('it hides a permission when any of the permissions hiding it are checked', () => {
