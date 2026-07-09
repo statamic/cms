@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Statamic\trans as __;
@@ -19,7 +20,7 @@ class Permission
     protected $label;
     protected $description;
     protected $group;
-    protected $supersededBy;
+    protected $hiddenBy;
 
     /**
      * @return ($value is null ? string|string[] : static)
@@ -105,7 +106,7 @@ class Permission
                 ->placeholderLabel($replacement['label'])
                 ->placeholderValue($replacement['value'])
                 ->group($this->group())
-                ->supersededBy($this->supersededBy());
+                ->hiddenBy($this->hiddenBy());
 
             if ($this->children()) {
                 $replaced->children($this->children()->all());
@@ -207,7 +208,7 @@ class Permission
                 'label' => $permission->label(),
                 'description' => $permission->description(),
                 'group' => $permission->group(),
-                'superseded_by' => $permission->supersededBy(),
+                'hidden_by' => $permission->hiddenBy(),
                 'children' => $children->flatMap->toTree()->all(),
             ];
         })->all();
@@ -223,8 +224,12 @@ class Permission
         return $this->fluentlyGetOrSet('description')->args(func_get_args());
     }
 
-    public function supersededBy(?string $permission = null)
+    public function hiddenBy(string|array|null $permissions = null)
     {
-        return $this->fluentlyGetOrSet('supersededBy')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('hiddenBy')
+            ->getter(fn ($permissions) => $permissions ?? [])
+            ->setter(fn ($permissions) => Arr::wrap($permissions))
+            ->args(func_get_args());
     }
 }

@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class CorePermissionsTest extends TestCase
 {
-    public static function supersededPermissionProvider()
+    public static function hiddenPermissionProvider()
     {
         return [
             'entries' => ['view {collection} entries', 'configure collections'],
@@ -22,27 +22,27 @@ class CorePermissionsTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('supersededPermissionProvider')]
-    public function configure_permissions_supersede_their_per_item_permissions($permission, $superseder)
+    #[DataProvider('hiddenPermissionProvider')]
+    public function configure_permissions_hide_their_per_item_permissions($permission, $hider)
     {
-        $this->assertEquals($superseder, Permission::boot()->get($permission)->supersededBy());
+        $this->assertEquals([$hider], Permission::boot()->get($permission)->hiddenBy());
     }
 
     #[Test]
-    public function child_permissions_are_not_superseded_since_their_parents_are()
+    public function child_permissions_are_not_hidden_since_their_parents_are()
     {
-        $this->assertNull(Permission::boot()->get('edit {collection} entries')->supersededBy());
-        $this->assertNull(Permission::boot()->get('delete {container} assets')->supersededBy());
+        $this->assertEquals([], Permission::boot()->get('edit {collection} entries')->hiddenBy());
+        $this->assertEquals([], Permission::boot()->get('delete {container} assets')->hiddenBy());
     }
 
     #[Test]
-    public function site_access_is_not_superseded_by_configuring_sites()
+    public function site_access_is_not_hidden_by_configuring_sites()
     {
         $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR', 'name' => 'French'],
         ]);
 
-        $this->assertNull(Permission::boot()->get('access {site} site')->supersededBy());
+        $this->assertEquals([], Permission::boot()->get('access {site} site')->hiddenBy());
     }
 }

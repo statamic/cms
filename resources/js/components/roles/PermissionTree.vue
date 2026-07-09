@@ -41,8 +41,7 @@ export default {
     computed: {
         visiblePermissions() {
             return this.permissions.filter(
-                (permission) =>
-                    !permission.superseded_by || !this.checkedPermissionValues.includes(permission.superseded_by)
+                (permission) => !permission.hidden_by.some((value) => this.checkedPermissionValues.includes(value))
             );
         },
     },

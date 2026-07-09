@@ -7,8 +7,8 @@ const permission = (value, overrides = {}) => ({
     value,
     label: value,
     description: null,
-    superseded_by: null,
     checked: false,
+    hidden_by: [],
     children: [],
     ...overrides,
 });
@@ -29,20 +29,20 @@ const mountTree = (permissions, checkedPermissionValues = []) =>
 
 const renderedPermissions = (wrapper) => wrapper.findAll('.permission').map((el) => el.text());
 
-test('it shows superseded permissions when the superseding permission is unchecked', () => {
+test('it shows a permission when the permission hiding it is unchecked', () => {
     const wrapper = mountTree([
         permission('configure asset containers'),
-        permission('view images assets', { superseded_by: 'configure asset containers' }),
+        permission('view images assets', { hidden_by: ['configure asset containers'] }),
     ]);
 
     expect(renderedPermissions(wrapper)).toEqual(['configure asset containers', 'view images assets']);
 });
 
-test('it hides superseded permissions when the superseding permission is checked', () => {
+test('it hides a permission when the permission hiding it is checked', () => {
     const wrapper = mountTree(
         [
             permission('configure asset containers', { checked: true }),
-            permission('view images assets', { superseded_by: 'configure asset containers' }),
+            permission('view images assets', { hidden_by: ['configure asset containers'] }),
         ],
         ['configure asset containers'],
     );
@@ -50,12 +50,12 @@ test('it hides superseded permissions when the superseding permission is checked
     expect(renderedPermissions(wrapper)).toEqual(['configure asset containers']);
 });
 
-test('it hides the children of a superseded permission', () => {
+test('it hides the children of a hidden permission', () => {
     const wrapper = mountTree(
         [
             permission('configure asset containers', { checked: true }),
             permission('view images assets', {
-                superseded_by: 'configure asset containers',
+                hidden_by: ['configure asset containers'],
                 children: [permission('delete images assets')],
             }),
         ],
@@ -65,15 +65,36 @@ test('it hides the children of a superseded permission', () => {
     expect(renderedPermissions(wrapper)).toEqual(['configure asset containers']);
 });
 
-test('it only hides permissions superseded by a checked permission', () => {
+test('it only hides permissions hidden by a checked permission', () => {
     const wrapper = mountTree(
         [
             permission('configure asset containers', { checked: true }),
-            permission('view images assets', { superseded_by: 'configure asset containers' }),
-            permission('view blog entries', { superseded_by: 'configure collections' }),
+            permission('view images assets', { hidden_by: ['configure asset containers'] }),
+            permission('view blog entries', { hidden_by: ['configure collections'] }),
         ],
         ['configure asset containers'],
     );
 
     expect(renderedPermissions(wrapper)).toEqual(['configure asset containers', 'view blog entries']);
+});
+
+test('it hides a permission when any of the permissions hiding it are checked', () => {
+    const permissions = () => [
+        permission('configure forms'),
+        permission('edit forms'),
+        permission('edit contact form', { hidden_by: ['configure forms', 'edit forms'] }),
+    ];
+
+    expect(renderedPermissions(mountTree(permissions(), ['configure forms']))).toEqual([
+        'configure forms',
+        'edit forms',
+    ]);
+
+    expect(renderedPermissions(mountTree(permissions(), ['edit forms']))).toEqual(['configure forms', 'edit forms']);
+
+    expect(renderedPermissions(mountTree(permissions(), []))).toEqual([
+        'configure forms',
+        'edit forms',
+        'edit contact form',
+    ]);
 });
