@@ -174,25 +174,23 @@ class EmailTest extends TestCase
     #[Test]
     public function it_escapes_submitted_values_in_the_automagic_email()
     {
-        $formBlueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text'],
-            'message' => ['type' => 'textarea'],
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'message', 'field' => ['type' => 'long_answer']],
 
-            // The select/radio/checkboxes branches emit `label ?? value`, and the label
-            // falls back to the raw value when there's no matching option. The raw value
-            // is attacker-controlled, so it must be escaped. The option label is author
-            // controlled (it lives in the blueprint), so it's not really exploitable, but
-            // we escape it too for consistency. Both situations are asserted below.
-            'select_labelled' => ['type' => 'select', 'options' => ['a' => '<script>select-label</script>']],
-            'select_raw' => ['type' => 'select'],
-            'radio_labelled' => ['type' => 'radio', 'options' => ['b' => '<script>radio-label</script>']],
-            'radio_raw' => ['type' => 'radio'],
-            'checkboxes' => ['type' => 'checkboxes', 'options' => ['c' => '<script>checkbox-label</script>']],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
-
-        $form = tap(Form::make('test'))->save();
+                // The select/radio/checkboxes branches emit `label ?? value`, and the label
+                // falls back to the raw value when there's no matching option. The raw value
+                // is attacker-controlled, so it must be escaped. The option label is author
+                // controlled (it lives in the form), so it's not really exploitable, but
+                // we escape it too for consistency. Both situations are asserted below.
+                ['handle' => 'select_labelled', 'field' => ['type' => 'dropdown', 'options' => ['a' => '<script>select-label</script>']]],
+                ['handle' => 'select_raw', 'field' => ['type' => 'dropdown']],
+                ['handle' => 'radio_labelled', 'field' => ['type' => 'multi_choice', 'options' => ['b' => '<script>radio-label</script>']]],
+                ['handle' => 'radio_raw', 'field' => ['type' => 'multi_choice']],
+                ['handle' => 'checkboxes', 'field' => ['type' => 'checkboxes', 'options' => ['c' => '<script>checkbox-label</script>']]],
+            ],
+        ]))->save();
 
         $submission = $form->makeSubmission()->data([
             'name' => '<img src=x onerror=alert(1)>',
