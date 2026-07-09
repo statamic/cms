@@ -229,8 +229,7 @@ class CorePermissions
             ->each(function ($addon) {
                 Permission::register("edit {$addon->package()} settings", function ($permission) use ($addon) {
                     return $permission
-                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]))
-                        ->hiddenBy('configure addons');
+                        ->label(__('statamic::permissions.edit_addon_settings', ['addon' => __($addon->name())]));
                 });
             });
     }
