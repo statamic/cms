@@ -209,20 +209,20 @@ class CorePermissions
         $this->register('configure forms');
 
         $this->register('edit forms', function ($permission) {
-            $this->permission($permission)->children([
+            $this->permission($permission)->hiddenBy('configure forms')->children([
                 $this->permission('create forms'),
                 $this->permission('delete forms'),
             ]);
         });
 
         $this->register('view form submissions', function ($permission) {
-            $this->permission($permission)->children([
+            $this->permission($permission)->hiddenBy('configure forms')->children([
                 $this->permission('delete form submissions'),
             ]);
         });
 
         $this->register('edit {form} form', function ($permission) {
-            $this->permission($permission)->hiddenBy('edit forms')->replacements('form', function () {
+            $this->permission($permission)->hiddenBy(['configure forms', 'edit forms'])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
                     return ['value' => $form->handle(), 'label' => __($form->title())];
                 });

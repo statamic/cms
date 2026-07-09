@@ -40,6 +40,15 @@ class CorePermissionsTest extends TestCase
     }
 
     #[Test]
+    public function configure_forms_hides_all_the_other_forms_permissions()
+    {
+        $this->assertEquals(['configure forms'], Permission::boot()->get('edit forms')->hiddenBy());
+        $this->assertEquals(['configure forms'], Permission::boot()->get('view form submissions')->hiddenBy());
+        $this->assertEquals(['configure forms', 'edit forms'], Permission::boot()->get('edit {form} form')->hiddenBy());
+        $this->assertEquals(['configure forms', 'view form submissions'], Permission::boot()->get('view {form} form submissions')->hiddenBy());
+    }
+
+    #[Test]
     public function replaced_child_permissions_keep_their_descriptions()
     {
         Collection::make('blog')->save();
