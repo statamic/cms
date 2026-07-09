@@ -6,7 +6,7 @@ import { Button } from '@ui';
 const page = usePage();
 const form = computed(() => page.props.form);
 
-const can = (ability) => page.props.can?.[ability] ?? true;
+const can = (ability) => page.props.can?.[ability] ?? false;
 
 const navItems = computed(() =>
     [
