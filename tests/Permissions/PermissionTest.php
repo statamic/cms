@@ -20,7 +20,7 @@ class PermissionTest extends TestCase
                 'label' => 'one',
                 'description' => null,
                 'group' => null,
-                'superseded_by' => null,
+                'hidden_by' => [],
                 'children' => [],
             ],
         ], $permission->toTree());
@@ -43,14 +43,14 @@ class PermissionTest extends TestCase
                 'label' => 'parent',
                 'description' => null,
                 'group' => 'foo',
-                'superseded_by' => null,
+                'hidden_by' => [],
                 'children' => [
                     [
                         'value' => 'child',
                         'label' => 'Child!',
                         'description' => null,
                         'group' => 'foo',
-                        'superseded_by' => null,
+                        'hidden_by' => [],
                         'children' => [],
                     ],
                 ],
@@ -139,25 +139,34 @@ class PermissionTest extends TestCase
     }
 
     #[Test]
-    public function it_adds_a_superseding_permission()
+    public function it_adds_a_hiding_permission()
     {
         $permission = (new Permission)->value('test');
-        $this->assertNull($permission->supersededBy());
-        $this->assertNull($permission->toTree()[0]['superseded_by']);
+        $this->assertEquals([], $permission->hiddenBy());
+        $this->assertEquals([], $permission->toTree()[0]['hidden_by']);
 
-        $return = $permission->supersededBy('other');
+        $return = $permission->hiddenBy('other');
 
         $this->assertEquals($permission, $return);
-        $this->assertEquals('other', $permission->supersededBy());
-        $this->assertEquals('other', $permission->toTree()[0]['superseded_by']);
+        $this->assertEquals(['other'], $permission->hiddenBy());
+        $this->assertEquals(['other'], $permission->toTree()[0]['hidden_by']);
     }
 
     #[Test]
-    public function it_keeps_the_superseding_permission_when_replacements_are_defined()
+    public function it_adds_multiple_hiding_permissions()
+    {
+        $permission = (new Permission)->value('test')->hiddenBy(['one', 'two']);
+
+        $this->assertEquals(['one', 'two'], $permission->hiddenBy());
+        $this->assertEquals(['one', 'two'], $permission->toTree()[0]['hidden_by']);
+    }
+
+    #[Test]
+    public function it_keeps_the_hiding_permissions_when_replacements_are_defined()
     {
         $permission = (new Permission)
             ->value('edit {handle} form')
-            ->supersededBy('edit forms')
+            ->hiddenBy(['configure forms', 'edit forms'])
             ->replacements('handle', function () {
                 return [
                     ['value' => 'first', 'label' => 'FIRST'],
@@ -165,9 +174,52 @@ class PermissionTest extends TestCase
                 ];
             });
 
-        $this->assertEquals(['edit forms', 'edit forms'], $permission->permissions()->map->supersededBy()->all());
-        $this->assertEquals('edit forms', $permission->toTree()[0]['superseded_by']);
-        $this->assertEquals('edit forms', $permission->toTree()[1]['superseded_by']);
+        $expected = ['configure forms', 'edit forms'];
+
+        $this->assertEquals([$expected, $expected], $permission->permissions()->map->hiddenBy()->all());
+        $this->assertEquals($expected, $permission->toTree()[0]['hidden_by']);
+        $this->assertEquals($expected, $permission->toTree()[1]['hidden_by']);
+    }
+
+    #[Test]
+    public function it_keeps_the_hiding_permissions_of_children_when_replacements_are_defined()
+    {
+        $permission = (new Permission)
+            ->value('view {handle} entries')
+            ->children([
+                (new Permission)
+                    ->value('publish {handle} entries')
+                    ->hiddenBy('configure collections'),
+            ])
+            ->replacements('handle', function () {
+                return [['value' => 'first', 'label' => 'FIRST']];
+            });
+
+        $child = $permission->toTree()[0]['children'][0];
+
+        $this->assertEquals('publish first entries', $child['value']);
+        $this->assertEquals(['configure collections'], $child['hidden_by']);
+    }
+
+    #[Test]
+    public function it_keeps_the_descriptions_when_replacements_are_defined()
+    {
+        $permission = (new Permission)
+            ->value('view {handle} entries')
+            ->description('View the entries')
+            ->children([
+                (new Permission)
+                    ->value('publish {handle} entries')
+                    ->description('Change the publish state'),
+            ])
+            ->replacements('handle', function () {
+                return [['value' => 'first', 'label' => 'FIRST']];
+            });
+
+        $parent = $permission->toTree()[0];
+
+        $this->assertEquals('View the entries', $parent['description']);
+        $this->assertEquals('Change the publish state', $parent['children'][0]['description']);
     }
 
     #[Test]
@@ -252,21 +304,21 @@ class PermissionTest extends TestCase
                 'label' => 'view FIRST entries',
                 'description' => null,
                 'group' => 'test-group',
-                'superseded_by' => null,
+                'hidden_by' => [],
                 'children' => [
                     [
                         'value' => 'edit first entries',
                         'label' => 'edit FIRST entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'superseded_by' => null,
+                        'hidden_by' => [],
                         'children' => [
                             [
                                 'value' => 'delete first entries',
                                 'label' => 'delete FIRST entries',
                                 'description' => null,
                                 'group' => 'test-group',
-                                'superseded_by' => null,
+                                'hidden_by' => [],
                                 'children' => [],
                             ],
                         ],
@@ -276,7 +328,7 @@ class PermissionTest extends TestCase
                         'label' => 'publish FIRST entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'superseded_by' => null,
+                        'hidden_by' => [],
                         'children' => [],
                     ],
                 ],
@@ -286,21 +338,21 @@ class PermissionTest extends TestCase
                 'label' => 'view SECOND entries',
                 'description' => null,
                 'group' => 'test-group',
-                'superseded_by' => null,
+                'hidden_by' => [],
                 'children' => [
                     [
                         'value' => 'edit second entries',
                         'label' => 'edit SECOND entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'superseded_by' => null,
+                        'hidden_by' => [],
                         'children' => [
                             [
                                 'value' => 'delete second entries',
                                 'label' => 'delete SECOND entries',
                                 'description' => null,
                                 'group' => 'test-group',
-                                'superseded_by' => null,
+                                'hidden_by' => [],
                                 'children' => [],
                             ],
                         ],
@@ -310,7 +362,7 @@ class PermissionTest extends TestCase
                         'label' => 'publish SECOND entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'superseded_by' => null,
+                        'hidden_by' => [],
                         'children' => [],
                     ],
                 ],

@@ -83,6 +83,26 @@ const selectPage = (page, pageIndex) => isLastPage(pageIndex) || emit('select', 
 const isFieldSelected = (field) => props.selected?.type === SelectionType.Field && props.selected.id === field._id;
 const isPageSelected = (page) => props.selected?.type === SelectionType.Page && props.selected.id === page._id;
 
+const selectedFieldEndConnectionPageIndex = computed(() => {
+    if (props.selected?.type !== SelectionType.Field) {
+        return null;
+    }
+
+    for (const page of props.pages) {
+        for (const section of page.sections) {
+            const field = section.fields.find((f) => f._id === props.selected.id);
+
+            if (field) {
+                return fieldConnection(field)?.destinationPageIndex ?? null;
+            }
+        }
+    }
+
+    return null;
+});
+
+const isEndConnectionColumn = (pageIndex) => selectedFieldEndConnectionPageIndex.value === pageIndex;
+
 const allSections = computed(() => props.pages.flatMap((page) => page.sections));
 
 const moveField = (fromSectionId: string, toSectionId: string, oldIndex: number, newIndex: number) => {
@@ -125,6 +145,7 @@ useSortable({
                 :key="page._id"
                 :data-form-page="page._id"
                 class="linked-list__column"
+                :class="{ 'linked-list__column--has-end-connection': isEndConnectionColumn(pageIndex) }"
             >
                 <div
                     class="linked-list__page-name"

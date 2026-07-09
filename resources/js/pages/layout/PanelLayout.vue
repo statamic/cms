@@ -11,6 +11,7 @@ const left = {
     active: ref(false),
     edge: 'right',
     defaults: [minWidth, 262, 320],
+    storageKey: 'statamic.panels.left-width',
 };
 
 const right = {
@@ -18,6 +19,7 @@ const right = {
     active: ref(false),
     edge: 'left',
     defaults: [300, 290, 320],
+    storageKey: 'statamic.panels.right-width',
 };
 
 provide('leftPanelActive', left.active);
@@ -38,6 +40,7 @@ const { makeResizable } = useResizable();
         minWidth,
         maxWidth,
         defaultWidth: () => getDefaultWidth(panel),
+        storageKey: panel.storageKey,
     });
 
     // Pre-compute the set of pixel strings we treat as "unmodified by the user"
@@ -47,6 +50,7 @@ const { makeResizable } = useResizable();
 function applyBreakpointDefaults() {
     [left, right].forEach((panel) => {
         if (!panel.active.value) return;
+        if (localStorage.getItem(panel.storageKey)) return;
 
         const el = panel.ref.value;
         if (!el) return;

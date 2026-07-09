@@ -18,19 +18,24 @@
                 v-if="permission.children.length"
                 :depth="depth + 1"
                 :initial-permissions="permission.children"
+                :checked-permissions="checkedPermissions"
             />
         </template>
     </div>
 </template>
 
 <script>
+import { visible } from '@/components/roles/permissions.js';
+
 export default {
     props: {
         initialPermissions: Array,
         depth: Number,
+        checkedPermissions: {
+            type: Array,
+            default: () => [],
+        },
     },
-
-    inject: ['checkedPermissionValues'],
 
     data() {
         return {
@@ -40,10 +45,7 @@ export default {
 
     computed: {
         visiblePermissions() {
-            return this.permissions.filter(
-                (permission) =>
-                    !permission.superseded_by || !this.checkedPermissionValues.includes(permission.superseded_by)
-            );
+            return visible(this.permissions, this.checkedPermissions);
         },
     },
 
