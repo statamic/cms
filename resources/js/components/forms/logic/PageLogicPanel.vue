@@ -50,16 +50,16 @@ const removeRule = (ruleId) => updateRules(rules.value.filter((rule) => rule._id
 
 <template>
     <div class="space-y-6">
-        <PageRule
-            v-for="rule in rules"
-            :key="rule._id"
-            :rule="rule"
-            :suggestable-fields="suggestableFieldsForPage"
-            :page-destination-options="destinationOptions"
-            :fieldtypes
-            @update:rule="updateRule(rule._id, $event)"
-            @remove="removeRule(rule._id)"
-        />
+        <div v-for="rule in rules" :key="rule._id" class="@container w-full">
+            <PageRule
+                :rule="rule"
+                :suggestable-fields="suggestableFieldsForPage"
+                :page-destination-options="destinationOptions"
+                :fieldtypes
+                @update:rule="updateRule(rule._id, $event)"
+                @remove="removeRule(rule._id)"
+            />
+        </div>
 
         <Button v-if="canAddRule" :text="__('Add Rule')" icon="plus" size="sm" @click="addRule" />
     </div>
