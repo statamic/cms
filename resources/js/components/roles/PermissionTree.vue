@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { visible } from '@/components/roles/permissions.js';
+
 export default {
     props: {
         initialPermissions: Array,
@@ -43,9 +45,7 @@ export default {
 
     computed: {
         visiblePermissions() {
-            return this.permissions.filter(
-                (permission) => !permission.hidden_by.some((value) => this.checkedPermissions.includes(value))
-            );
+            return visible(this.permissions, this.checkedPermissions);
         },
     },
 
