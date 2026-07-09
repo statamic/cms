@@ -82,6 +82,7 @@
         width: max-content;
         margin-inline: auto;
         gap: var(--gap);
+        @apply px-2 sm:px-6 md:px-12 pb-12;
 
         .linked-list__column {
             display: flex;

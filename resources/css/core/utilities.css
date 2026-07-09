@@ -92,7 +92,7 @@
     @apply -mx-2 sm:-mx-6 md:-mx-12 min-w-0;
 
     & > * {
-        @apply px-2 sm:px-6 md:px-12 min-w-0 pb-6;
+        @apply min-w-0 pb-6;
     }
 }
 /*
