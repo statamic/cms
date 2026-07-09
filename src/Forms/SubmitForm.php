@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Form;
@@ -10,6 +11,7 @@ use Statamic\Events\FormSubmitted;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
 use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
@@ -214,7 +216,26 @@ class SubmitForm
     {
         return $fields->all()
             ->filter(fn ($field): bool => in_array($field->fieldtype()->handle(), ['assets', 'files']))
-            ->mapWithKeys(fn ($field): array => [$field->handle().'.*' => ['file', new AllowedFile]])
+            ->mapWithKeys(function ($field): array {
+                $rules = $field->fieldtype()->handle() === 'assets'
+                    ? array_merge(['file', new AllowedFile], $this->assetContainerRules($field))
+                    : ['file', new AllowedFile($field->fieldtype()->config('allowed_extensions'))];
+
+                return [$field->handle().'.*' => $rules];
+            })
+            ->all();
+    }
+
+    private function assetContainerRules($field): array
+    {
+        $configured = $field->fieldtype()->config('container');
+
+        $container = $configured
+            ? AssetContainer::find($configured)
+            : (($containers = AssetContainer::all())->count() === 1 ? $containers->first() : null);
+
+        return collect($container?->validationRules())
+            ->map(fn ($rule) => FieldValidator::parse($rule))
             ->all();
     }
 
