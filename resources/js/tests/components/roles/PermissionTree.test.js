@@ -104,6 +104,21 @@ test('it shows everything when no checked permissions are given', () => {
     expect(renderedPermissions(wrapper)).toEqual(['view images assets']);
 });
 
+test('unhiding a permission brings back its checked state', async () => {
+    const permissions = [
+        permission('configure asset containers', { checked: true }),
+        permission('view images assets', { checked: true, hidden_by: ['configure asset containers'] }),
+    ];
+
+    const wrapper = mountTree(permissions, ['configure asset containers']);
+    expect(renderedPermissions(wrapper)).toEqual(['configure asset containers']);
+
+    await wrapper.setProps({ checkedPermissions: [] });
+
+    expect(renderedPermissions(wrapper)).toEqual(['configure asset containers', 'view images assets']);
+    expect(permissions[1].checked).toBe(true);
+});
+
 test('it hides a permission when any of the permissions hiding it are checked', () => {
     const permissions = () => [
         permission('configure forms'),
