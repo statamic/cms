@@ -217,7 +217,7 @@ onUnmounted(() => {
                         :default-size="35"
                         :min-size="20"
                         collapsible
-                        class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+                        class="mx-3 dark:me-1.5 mb-3 dark:mb-1.5 rounded-lg border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-925"
                     >
                         <div class="h-full overflow-y-auto">
                             <div class="mx-auto max-w-3xl p-6">
