@@ -4,11 +4,15 @@ namespace Tests\Permissions;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Permission;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CorePermissionsTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public static function hiddenPermissionProvider()
     {
         return [
@@ -33,6 +37,19 @@ class CorePermissionsTest extends TestCase
     {
         $this->assertEquals([], Permission::boot()->get('edit {collection} entries')->hiddenBy());
         $this->assertEquals([], Permission::boot()->get('delete {container} assets')->hiddenBy());
+    }
+
+    #[Test]
+    public function replaced_child_permissions_keep_their_descriptions()
+    {
+        Collection::make('blog')->save();
+
+        $group = Permission::boot()->tree()->firstWhere('handle', 'collections');
+        $view = collect($group['permissions'])->firstWhere('value', 'view blog entries');
+        $edit = collect($view['children'])->firstWhere('value', 'edit blog entries');
+        $publish = collect($edit['children'])->firstWhere('value', 'publish blog entries');
+
+        $this->assertEquals(__('statamic::permissions.publish_{collection}_entries_desc'), $publish['description']);
     }
 
     #[Test]

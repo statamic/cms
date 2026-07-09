@@ -202,6 +202,27 @@ class PermissionTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_descriptions_when_replacements_are_defined()
+    {
+        $permission = (new Permission)
+            ->value('view {handle} entries')
+            ->description('View the entries')
+            ->children([
+                (new Permission)
+                    ->value('publish {handle} entries')
+                    ->description('Change the publish state'),
+            ])
+            ->replacements('handle', function () {
+                return [['value' => 'first', 'label' => 'FIRST']];
+            });
+
+        $parent = $permission->toTree()[0];
+
+        $this->assertEquals('View the entries', $parent['description']);
+        $this->assertEquals('Change the publish state', $parent['children'][0]['description']);
+    }
+
+    #[Test]
     public function it_gets_its_permissions_when_replacements_are_not_defined()
     {
         $permission = (new Permission)->value('test');
