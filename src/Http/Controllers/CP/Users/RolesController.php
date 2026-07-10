@@ -190,11 +190,7 @@ class RolesController extends CpController
 
     protected function registeredPermissions()
     {
-        $flatten = function ($permissions) use (&$flatten) {
-            return collect($permissions)->flatMap(fn ($permission) => [$permission['value'], ...$flatten($permission['children'])]);
-        };
-
-        return Permission::boot()->tree()->flatMap(fn ($group) => $flatten($group['permissions']));
+        return Permission::boot()->flattened()->map->value();
     }
 
     protected function updateTree($tree, $role = null)
