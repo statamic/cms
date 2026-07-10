@@ -18,9 +18,12 @@ export type Selection = {
 <script setup lang="ts">
 import LogicTreeField from './LogicTreeField.vue';
 import LogicTreeFieldset from './LogicTreeFieldset.vue';
-import { Icon } from '@ui';
+import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
+import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
+import PageInspector from '@/components/forms/builder/PageInspector.vue';
+import { Button, Icon } from '@ui';
 import { useSortable } from '@/composables/forms/use-drag-and-drop';
-import { computed, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { PropType } from 'vue';
 
 const emit = defineEmits(['update:pages', 'select']);
@@ -32,6 +35,7 @@ const props = defineProps({
 });
 
 const tree = useTemplateRef('tree');
+const isInspectorOpen = ref(false);
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
@@ -135,96 +139,121 @@ useSortable({
     onFieldMoved: moveField,
     onMirrorCreated,
 });
+
+watch(() => props.selected, () => isInspectorOpen.value = false);
 </script>
 
 <template>
-    <div ref="tree" class="linked-list-container">
-        <div class="linked-list" :class="{ 'linked-list--expanded': density === TreeDensity.Expanded }">
-            <div
-                v-for="(page, pageIndex) in pages"
-                :key="page._id"
-                :data-form-page="page._id"
-                class="linked-list__column"
-                :class="{ 'linked-list__column--has-end-connection': isEndConnectionColumn(pageIndex) }"
-            >
-                <div
-                    class="linked-list__page-name"
-                    :class="isLastPage(pageIndex) ? 'cursor-not-allowed' : 'cursor-pointer'"
-                    :style="{ 'anchor-name': pageAnchor(pageIndex) }"
-                    v-tooltip="isLastPage(pageIndex) ? __(`Logic can't be added to the final page.`) : null"
-                    @click="selectPage(page, pageIndex)"
-                >
+    <div class="st-full-bleed-content st-separator-on-scroll col-span-full flex flex-col flex-1 min-h-0">
+        <div class="flex-1 min-h-0 overflow-y-auto">
+            <div ref="tree" class="linked-list-container">
+                <div class="linked-list" :class="{ 'linked-list--expanded': density === TreeDensity.Expanded }">
                     <div
-                        class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
-                        :class="{ '-ms-1.5': hasPageIndicators(page, pageIndex) }"
+                        v-for="(page, pageIndex) in pages"
+                        :key="page._id"
+                        :data-form-page="page._id"
+                        class="linked-list__column"
+                        :class="{ 'linked-list__column--has-end-connection': isEndConnectionColumn(pageIndex) }"
                     >
-                        <Icon
-                            v-if="isConnectorDestination(pageIndex)"
-                            name="chevron-right"
-                            class="logic-arrow size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400 dark:text-blue-500"
-                            aria-hidden="true"
-                        />
-                        <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
-                            <Icon
-                                name="logic-tree"
-                                class="size-3.5! text-gray-400 dark:text-gray-500"
-                                aria-hidden="true"
-                            />
-                        </span>
                         <div
-                            class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
-                            :class="{
-                                'w-[85%]!': hasPageIndicators(page, pageIndex),
-                                'ring-1 ring-blue-500 border-transparent': isPageSelected(page),
-                            }"
+                            class="linked-list__page-name"
+                            :class="isLastPage(pageIndex) ? 'cursor-not-allowed' : 'cursor-pointer'"
+                            :style="{ 'anchor-name': pageAnchor(pageIndex) }"
+                            v-tooltip="isLastPage(pageIndex) ? __(`Logic can't be added to the final page.`) : null"
+                            @click="selectPage(page, pageIndex)"
                         >
-                            <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                            <span class="line-clamp-1">{{ pageTitle(page, pageIndex) }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="linked-list__sections">
-                    <div
-                        v-for="section in page.sections"
-                        :key="section._id"
-                        class="linked-list__section"
-                    >
-                        <div class="linked-list__section-marker" :aria-label="section.display">
-                            <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ section.display }}</span>
-                        </div>
-                        <ul class="field-sort-container" :data-sort-section="section._id">
-                            <div v-if="! section.fields.length" class="linked-list__empty-section">
-                                {{ __('No fields') }}
-                            </div>
-                            <li
-                                v-for="field in section.fields"
-                                :key="field._id"
-                                data-field-item
-                                :data-field-item-selected="isFieldSelected(field) ? '' : undefined"
-                                class="cursor-pointer"
-                                :class="{
-                                    'linked-list__fieldset': field.type === 'import',
-                                    'linked-list__hidden-field': field.config?.hidden,
-                                    'linked-list__connector': fieldConnection(field),
-                                    'linked-list__page-leap': fieldConnection(field)?.leap,
-                                    'ring-1 ring-blue-500': isFieldSelected(field),
-                                }"
-                                :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
-                                v-tooltip="field.type === 'import' ? __(`Logic can't be added to imported fields. Please edit the fieldset instead.`) : null"
-                                @click="selectField(field)"
+                            <div
+                                class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
+                                :class="{ '-ms-1.5': hasPageIndicators(page, pageIndex) }"
                             >
-                                <LogicTreeFieldset v-if="field.type === 'import'" :field="field" />
+                                <Icon
+                                    v-if="isConnectorDestination(pageIndex)"
+                                    name="chevron-right"
+                                    class="logic-arrow size-3! shrink-0 -ms-2.5 relative -top-0.25 text-blue-400 dark:text-blue-500"
+                                    aria-hidden="true"
+                                />
+                                <span v-if="hasPageRules(page)" v-tooltip="__('Logic attached')" class="inline-flex shrink-0">
+                                    <Icon
+                                        name="logic-tree"
+                                        class="size-3.5! text-gray-400 dark:text-gray-500"
+                                        aria-hidden="true"
+                                    />
+                                </span>
+                                <div
+                                    class="mx-auto flex w-full shrink-0 justify-center items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-850 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                                    :class="{
+                                        'w-[85%]!': hasPageIndicators(page, pageIndex),
+                                        'ring-1 ring-blue-500 border-transparent': isPageSelected(page),
+                                    }"
+                                >
+                                    <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                                    <span class="line-clamp-1">{{ pageTitle(page, pageIndex) }}</span>
+                                </div>
+                            </div>
+                        </div>
 
-                                <template v-else>
-                                    <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
-                                    <LogicTreeField :field="field" />
-                                </template>
-                            </li>
-                        </ul>
+                        <div class="linked-list__sections">
+                            <div
+                                v-for="section in page.sections"
+                                :key="section._id"
+                                class="linked-list__section"
+                            >
+                                <div class="linked-list__section-marker" :aria-label="section.display">
+                                    <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ section.display }}</span>
+                                </div>
+                                <ul class="field-sort-container" :data-sort-section="section._id">
+                                    <div v-if="! section.fields.length" class="linked-list__empty-section">
+                                        {{ __('No fields') }}
+                                    </div>
+                                    <li
+                                        v-for="field in section.fields"
+                                        :key="field._id"
+                                        data-field-item
+                                        :data-field-item-selected="isFieldSelected(field) ? '' : undefined"
+                                        class="cursor-pointer"
+                                        :class="{
+                                            'linked-list__fieldset': field.type === 'import',
+                                            'linked-list__hidden-field': field.config?.hidden,
+                                            'linked-list__connector': fieldConnection(field),
+                                            'linked-list__page-leap': fieldConnection(field)?.leap,
+                                            'ring-1 ring-blue-500': isFieldSelected(field),
+                                        }"
+                                        :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
+                                        v-tooltip="field.type === 'import' ? __(`Logic can't be added to imported fields. Please edit the fieldset instead.`) : null"
+                                        @click="selectField(field)"
+                                    >
+                                        <LogicTreeFieldset v-if="field.type === 'import'" :field="field" />
+
+                                        <template v-else>
+                                            <div v-if="fieldConnection(field)?.leap" class="linked-list__extra-leap-connector" />
+                                            <LogicTreeField :field="field" />
+                                        </template>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <Button
+        v-if="selected"
+        class="min-[1000px]:hidden sticky top-3 z-(--z-index-above) sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
+        :text="__('Settings')"
+        icon="cog"
+        @click="isInspectorOpen = !isInspectorOpen"
+    />
+
+    <LayoutPanel v-if="selected" side="right" :mobile-open="isInspectorOpen">
+        <PageInspector v-if="selected.type === SelectionType.Page" />
+        <FieldInspector v-else-if="selected.type === SelectionType.Field" />
+    </LayoutPanel>
+
+    <div
+        class="mobile-panel-backdrop"
+        :data-visible="isInspectorOpen"
+        @click="isInspectorOpen = false"
+    />
 </template>

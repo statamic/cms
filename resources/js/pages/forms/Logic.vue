@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import Layout from '@/pages/layout/Layout.vue';
 import PanelLayout from '@/pages/layout/PanelLayout.vue';
-import LayoutPanel from '@/pages/layout/LayoutPanel.vue';
 import FormsLayout from './Layout.vue';
 import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import FieldNumberingToggle from '@/components/forms/FieldNumberingToggle.vue';
 import LogicList from '@/components/forms/logic/LogicList.vue';
 import LogicTree, { TreeDensity, SelectionType, type Selection } from '@/components/forms/logic/LogicTree.vue';
-import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
-import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import { provideBuilderContext } from '@/pages/forms/Builder.vue';
 import Head from '@/pages/layout/Head.vue';
 import { useFieldNumberingPreference } from '@/composables/forms/field-numbering';
@@ -39,7 +36,6 @@ const formFields = ref(props.formFields);
 const selected = ref<Selection>(null);
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
 const treeDensity = ref<TreeDensity>(preferences.get('forms.logic.tree.density', TreeDensity.Compressed));
-const isRightPanelOpen = ref(false);
 
 provide('fieldtypes', props.fieldtypes);
 
@@ -168,13 +164,7 @@ watch(formFields, dirty, { deep: true });
 watch(view, (view: View) => {
     preferences.set('forms.logic.view', view);
 
-    if (view !== View.Tree) {
-        selected.value = null;
-        isRightPanelOpen.value = false;
-    }
-});
-watch(selected, () => {
-    isRightPanelOpen.value = false;
+    if (view !== View.Tree) selected.value = null;
 });
 watch(treeDensity, (density: TreeDensity) => preferences.set('forms.logic.tree.density', density));
 
@@ -243,34 +233,11 @@ onUnmounted(() => {
         />
     </div>
 
-    <div v-if="view === View.Tree" class="st-full-bleed-content st-separator-on-scroll col-span-full flex flex-col flex-1 min-h-0">
-        <div class="flex-1 min-h-0 overflow-y-auto">
-            <LogicTree
-                v-model:pages="pages"
-                :density="treeDensity"
-                :selected
-                @select="selected = $event"
-            />
-        </div>
-    </div>
-
-    <Button
-        v-if="view === View.Tree && selected"
-        class="min-[1000px]:hidden sticky top-3 z-(--z-index-above) sm:translate-x-3 md:translate-x-9 mb-5 col-start-3 row-start-1"
-        :text="__('Settings')"
-        icon="cog"
-        @click="isRightPanelOpen = !isRightPanelOpen"
-    />
-
-    <LayoutPanel v-if="view === View.Tree && selected" side="right" :mobile-open="isRightPanelOpen">
-        <PageInspector v-if="selectedPage" />
-        <FieldInspector v-else-if="selectedField" />
-    </LayoutPanel>
-
-    <div
+    <LogicTree
         v-if="view === View.Tree"
-        class="mobile-panel-backdrop"
-        :data-visible="isRightPanelOpen"
-        @click="isRightPanelOpen = false"
+        v-model:pages="pages"
+        :density="treeDensity"
+        :selected
+        @select="selected = $event"
     />
 </template>
