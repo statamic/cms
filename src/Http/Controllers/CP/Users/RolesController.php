@@ -179,18 +179,15 @@ class RolesController extends CpController
         return response('', 204);
     }
 
-    protected function preserveUnregisteredPermissions($role, $permissions)
+    private function preserveUnregisteredPermissions($role, $permissions)
     {
+        $registered = Permission::boot()->flattened()->map->value();
+
         $unregistered = $role->permissions()
-            ->diff($this->registeredPermissions())
+            ->diff($registered)
             ->reject(fn ($permission) => $permission === 'super');
 
         return collect($permissions)->merge($unregistered)->unique()->values()->all();
-    }
-
-    protected function registeredPermissions()
-    {
-        return Permission::boot()->flattened()->map->value();
     }
 
     protected function updateTree($tree, $role = null)
