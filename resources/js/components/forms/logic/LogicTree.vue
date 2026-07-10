@@ -80,10 +80,9 @@ const hasPageRules = (page) => (page.rules ?? []).some((rule) => {
     return (rule.conditions ?? []).some((condition) => condition.field && condition.value !== null && condition.value !== '');
 });
 
-const isLastPage = (pageIndex) => pageIndex === props.pages.length - 1;
 const hasPageIndicators = (page, pageIndex) => isConnectorDestination(pageIndex) || hasPageRules(page);
 const selectField = (field) => field.type === 'import' || emit('select', { type: SelectionType.Field, id: field._id });
-const selectPage = (page, pageIndex) => isLastPage(pageIndex) || emit('select', { type: SelectionType.Page, id: page._id });
+const selectPage = (page) => emit('select', { type: SelectionType.Page, id: page._id });
 const isFieldSelected = (field) => props.selected?.type === SelectionType.Field && props.selected.id === field._id;
 const isPageSelected = (page) => props.selected?.type === SelectionType.Page && props.selected.id === page._id;
 
@@ -156,11 +155,9 @@ watch(() => props.selected, () => isInspectorOpen.value = false);
                         :class="{ 'linked-list__column--has-end-connection': isEndConnectionColumn(pageIndex) }"
                     >
                         <div
-                            class="linked-list__page-name"
-                            :class="isLastPage(pageIndex) ? 'cursor-not-allowed' : 'cursor-pointer'"
+                            class="linked-list__page-name cursor-pointer"
                             :style="{ 'anchor-name': pageAnchor(pageIndex) }"
-                            v-tooltip="isLastPage(pageIndex) ? __(`Logic can't be added to the final page.`) : null"
-                            @click="selectPage(page, pageIndex)"
+                            @click="selectPage(page)"
                         >
                             <div
                                 class="flex w-full min-w-0 flex-nowrap items-center justify-center gap-1.5"
