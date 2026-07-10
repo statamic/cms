@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
@@ -218,6 +220,12 @@ class User extends BaseUser
 
     public function permissions()
     {
+        $cache = app(PermissionCache::class);
+
+        if ($cached = $cache->get($this->id())) {
+            return $cached;
+        }
+
         $permissions = $this->groups()->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions();
@@ -225,6 +233,10 @@ class User extends BaseUser
         if ($this->get('super', false)) {
             $permissions[] = 'super';
         }
+
+        $permissions = $permissions->unique()->values();
+
+        $cache->put($this->id(), $permissions);
 
         return $permissions;
     }
@@ -302,7 +314,11 @@ class User extends BaseUser
 
     public function merge($data)
     {
-        $this->data($this->data()->merge(collect($data)->filter(fn ($v) => $v !== null)->all()));
+        $merged = $this->data()
+            ->except(['roles', 'groups'])
+            ->merge(collect($data)->filter(fn ($v) => $v !== null)->all());
+
+        $this->data($merged->all());
 
         return $this;
     }
@@ -401,5 +417,13 @@ class User extends BaseUser
         return array_merge([
             'email' => $this->email(),
         ], $this->model()->attributesToArray());
+    }
+
+    public function passkeys(): Collection
+    {
+        return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
+            ->get()
+            ->map(fn ($model) => app(Passkey::class)->setModel($model))
+            ->keyBy(fn ($passkey) => $passkey->id());
     }
 }

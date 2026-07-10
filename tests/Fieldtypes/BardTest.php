@@ -632,6 +632,36 @@ class BardTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_remove_sets_when_trimming_empty_nodes()
+    {
+        $content = [
+            ['type' => 'paragraph'],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'test-set',
+                    'values' => [
+                        'type' => 'one',
+                    ],
+                ],
+            ],
+            ['type' => 'paragraph'],
+        ];
+
+        $this->assertEquals([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'test-set',
+                    'values' => [
+                        'type' => 'one',
+                    ],
+                ],
+            ],
+        ], $this->bard(['remove_empty_nodes' => 'trim'])->process($content));
+    }
+
+    #[Test]
     #[DataProvider('groupedSetsProvider')]
     public function it_preloads($areSetsGrouped)
     {
@@ -747,39 +777,6 @@ class BardTest extends TestCase
             '_' => '_', // An empty key to enforce an object in JavaScript.
             // The "foo" key doesn't appear here since there's no corresponding "nope" set config.
         ], $meta['existing']['random-string-4']);
-
-        // Assert about the "defaults" sub-array.
-        // These are the initial values used for subfields when a new set is added.
-        $this->assertCount(1, $meta['defaults']);
-        $this->assertArrayHasKey('main', $meta['defaults']);
-        $this->assertEquals([
-            'a_text_field' => 'the default',
-            'a_grid_field' => [
-                ['_id' => 'random-string-5', 'one' => 'default in nested'],
-                ['_id' => 'random-string-6', 'one' => 'default in nested'],
-            ],
-        ], $meta['defaults']['main']);
-
-        // Assert about the "new" sub-array.
-        // This is meta data for subfields when a new set is added.
-        $this->assertCount(1, $meta['new']);
-        $this->assertArrayHasKey('main', $meta['new']);
-        $this->assertEquals([
-            '_' => '_', // An empty key to enforce an object in JavaScript.
-            'a_text_field' => null, // the text field doesn't have meta data.
-            'a_grid_field' => [ // this array is the preloaded meta for the grid field
-                'defaults' => [
-                    'one' => 'default in nested', // default value for the text field
-                ],
-                'new' => [
-                    'one' => null, // meta for the text field
-                ],
-                'existing' => [
-                    'random-string-5' => ['one' => null],
-                    'random-string-6' => ['one' => null],
-                ],
-            ],
-        ], $meta['new']['main']);
     }
 
     #[Test]
@@ -1258,8 +1255,6 @@ EOT;
         $value = $field->fieldtype()->preload();
         $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
         $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
-        $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
-        $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
     #[Test]
@@ -1336,6 +1331,164 @@ EOT;
         $this->assertArrayHasKey('customData', $bard->preload($data));
         $this->assertArrayHasKey('custom_field', $bard->extraRules($data));
         $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes($data));
+    }
+
+    #[Test]
+    public function it_localizes_when_select_across_sites_setting_is_disabled()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('fr');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One', 'test' => ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => false])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="/fr/blog/one-fr">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_doesnt_localize_when_select_across_sites_setting_is_enabled()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('en');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One', 'test' => ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => true])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="http://localhost/fr/blog/one-fr">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_query_params_on_entry_links()
+    {
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123?foo=bar']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="/blog/my-post?foo=bar">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_anchors_on_entry_links()
+    {
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123#section']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="/blog/my-post#section">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_query_params_and_anchors_on_entry_links()
+    {
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::collection('blog')->id('123')->slug('my-post')->data(['title' => 'My Post'])->create();
+
+        $field = (new Bard)->setField(new Field('test', ['type' => 'bard']));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123?foo=bar#section']]], 'text' => 'Link'],
+        ]);
+
+        $this->assertEquals('<a href="/blog/my-post?foo=bar#section">Link</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_appends_on_localized_entry_links()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('fr');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => false])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr?foo=bar#section']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="/fr/blog/one-fr?foo=bar#section">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_preserves_appends_on_entry_links_with_select_across_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Facades\Site::setCurrent('en');
+
+        tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('parent')->collection('blog')->slug('theparent')->id(123)->locale('en')->create();
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->create();
+
+        $field = (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], ['select_across_sites' => true])));
+
+        $augmented = $field->augment([
+            ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::123-fr?foo=bar#section']]], 'text' => 'The One'],
+        ]);
+
+        $this->assertEquals('<a href="http://localhost/fr/blog/one-fr?foo=bar#section">The One</a>', $augmented);
+    }
+
+    #[Test]
+    public function it_gets_link_data_with_appends()
+    {
+        tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
+        EntryFactory::collection('pages')->id('1')->slug('about')->data(['title' => 'About'])->create();
+
+        $bard = $this->bard(['save_html' => true, 'sets' => null]);
+
+        $html = '<p><a href="statamic://entry::1?foo=bar#section">Link with appends</a></p>';
+
+        $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
+
+        $this->assertEquals([
+            'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
+        ], $bard->getLinkData($prosemirror));
     }
 
     private function bard($config = [])

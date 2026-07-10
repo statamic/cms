@@ -5,6 +5,8 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Lists extends Fieldtype
 {
     protected $categories = ['structured'];
@@ -17,6 +19,12 @@ class Lists extends Fieldtype
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'list',
+            ],
+            'add_row' => [
+                'display' => __('Add Row Label'),
+                'instructions' => __('statamic::fieldtypes.list.config.add_row'),
+                'type' => 'text',
+                'placeholder' => __('Add Item'),
             ],
         ];
     }
@@ -38,6 +46,10 @@ class Lists extends Fieldtype
 
         return collect($data)->reject(function ($item) {
             return in_array($item, [null, ''], true);
+        })->map(function ($item) {
+            return is_numeric($item)
+                ? (str_contains($item, '.') ? (float) $item : (int) $item)
+                : $item;
         })->values()->all();
     }
 

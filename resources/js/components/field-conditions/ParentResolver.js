@@ -12,9 +12,7 @@ export default class {
             fieldPath = this.removeOneParentKeyword(fieldPath);
         }
 
-        let resolved = parentPath
-            ? `${parentPath}.${fieldPath}`
-            : fieldPath;
+        let resolved = parentPath ? `${parentPath}.${fieldPath}` : fieldPath;
 
         return `$root.${resolved}`;
     }
@@ -26,9 +24,7 @@ export default class {
             dottedFieldPath = dottedFieldPath.replace(regex, '$1');
         }
 
-        return dottedFieldPath.includes('.')
-            ? dottedFieldPath.replace(regex, '$1$2')
-            : '';
+        return dottedFieldPath.includes('.') ? dottedFieldPath.replace(regex, '$1$2') : '';
     }
 
     isAtSetLevel(dottedFieldPath) {
@@ -38,5 +34,4 @@ export default class {
     removeOneParentKeyword(dottedFieldPath) {
         return dottedFieldPath.replace(new RegExp('^\\$parent.'), '');
     }
-
 }

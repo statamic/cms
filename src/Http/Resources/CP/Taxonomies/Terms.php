@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Terms extends ResourceCollection
@@ -29,21 +28,9 @@ class Terms extends ResourceCollection
         return $this;
     }
 
-    private function setColumns()
+    protected function setColumns()
     {
         $columns = $this->blueprint->columns();
-
-        $columns->push(
-            Column::make()
-                ->field('taxonomy')
-                ->fieldtype('term')
-                ->label(__('Taxonomy'))
-                ->listable(true)
-                ->defaultVisibility(true)
-                ->visible(true)
-                ->sortable(true)
-                ->defaultOrder($columns->count() + 1)
-        );
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);

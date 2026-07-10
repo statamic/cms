@@ -2,20 +2,36 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Auth\Passwords\PasswordBrokerManager;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
+use Statamic\Auth\WebAuthn\Serializer;
 use Statamic\Contracts\Auth\RoleRepository;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as TwoFactorAuthenticationProviderContract;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
+use Statamic\Facades\Permission;
 use Statamic\Facades\User;
 use Statamic\Policies;
+use Webauthn\AttestationStatement\AttestationStatementSupportManager;
+use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
+use Webauthn\AuthenticatorAssertionResponseValidator;
+use Webauthn\AuthenticatorAttestationResponseValidator;
+use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
+use Webauthn\Denormalizer\WebauthnSerializerFactory;
+use Webauthn\PublicKeyCredentialRpEntity;
+
+use function Statamic\trans_choice;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -29,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Globals\GlobalSet::class => Policies\GlobalSetPolicy::class,
         \Statamic\Contracts\Globals\Variables::class => Policies\GlobalSetVariablesPolicy::class,
         \Statamic\Contracts\Auth\User::class => Policies\UserPolicy::class,
+        \Statamic\Contracts\Auth\UserGroup::class => Policies\UserGroupPolicy::class,
         \Statamic\Contracts\Forms\Form::class => Policies\FormPolicy::class,
         \Statamic\Contracts\Forms\Submission::class => Policies\FormSubmissionPolicy::class,
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
@@ -36,6 +53,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
         \Statamic\Fields\Fieldset::class => Policies\FieldsetPolicy::class,
         \Statamic\Sites\Site::class => Policies\SitePolicy::class,
+        \Statamic\Addons\Addon::class => Policies\AddonPolicy::class,
     ];
 
     public function register()
@@ -75,6 +93,51 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(PermissionCache::class, function ($app) {
             return new PermissionCache;
         });
+
+        $this->app->singleton(TwoFactorAuthenticationProviderContract::class, TwoFactorAuthenticationProvider::class);
+
+        $this->registerWebauthnBindings();
+    }
+
+    private function registerWebAuthnBindings()
+    {
+        $this->app->singleton(AttestationStatementSupportManager::class, function () {
+            $manager = AttestationStatementSupportManager::create();
+            $manager->add(NoneAttestationStatementSupport::create());
+
+            return $manager;
+        });
+
+        $this->app->singleton(
+            Serializer::class,
+            fn ($app) => new Serializer(
+                (new WebauthnSerializerFactory($app[AttestationStatementSupportManager::class]))->create()
+            )
+        );
+
+        $this->app->bind(
+            PublicKeyCredentialRpEntity::class,
+            fn ($app) => new PublicKeyCredentialRpEntity(
+                name: $app['config']->get('app.name'),
+                id: $app->make('request')->host(),
+            )
+        );
+
+        $this->app->singleton(CeremonyStepManagerFactory::class, fn () => new CeremonyStepManagerFactory);
+
+        $this->app->bind(
+            AuthenticatorAssertionResponseValidator::class,
+            fn ($app) => AuthenticatorAssertionResponseValidator::create(
+                $app[CeremonyStepManagerFactory::class]->requestCeremony()
+            )
+        );
+
+        $this->app->bind(
+            AuthenticatorAttestationResponseValidator::class,
+            fn ($app) => AuthenticatorAttestationResponseValidator::create(
+                $app[CeremonyStepManagerFactory::class]->creationCeremony()
+            )
+        );
     }
 
     public function boot()
@@ -83,12 +146,21 @@ class AuthServiceProvider extends ServiceProvider
             return new UserProvider;
         });
 
-        Gate::before(function ($user, $ability) {
-            return optional(User::fromUser($user))->isSuper() ? true : null;
-        });
-
         Gate::after(function ($user, $ability) {
-            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
+            // If the ability isn't a Statamic permission, we don't want to get involved. 🙈
+            if (! Permission::boot()->flattened()->map->value()->contains($ability)) {
+                return null;
+            }
+
+            $user = User::fromUser($user);
+
+            if ($user->isSuper()) {
+                return true;
+            }
+
+            if ($user->hasPermission($ability)) {
+                return true;
+            }
         });
 
         foreach ($this->policies as $key => $policy) {
@@ -99,6 +171,48 @@ class AuthServiceProvider extends ServiceProvider
             return ($app['auth']->getProvider() instanceof UserProvider)
                 ? new PasswordBrokerManager($app)
                 : $broker;
+        });
+
+        RateLimiter::for('statamic.auth', function (Request $request) {
+            return Limit::perMinute(4)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.cp.auth', function (Request $request) {
+            return RateLimiter::limiter('statamic.auth')($request);
+        });
+
+        RateLimiter::for('statamic.password-reset-form', function (Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.cp.password-reset-form', function (Request $request) {
+            return RateLimiter::limiter('statamic.password-reset-form')($request);
+        });
+
+        RateLimiter::for('statamic.passkeys', function (Request $request) {
+            return Limit::perMinute(30)->by($request->ip());
+        });
+
+        RateLimiter::for('statamic.cp.passkeys', function (Request $request) {
+            return RateLimiter::limiter('statamic.passkeys')($request);
+        });
+
+        RateLimiter::for('statamic.forms', function (Request $request) {
+            return $request->isPrecognitive()
+                ? Limit::perMinute(30)->by('precognition:'.$request->ip())
+                : Limit::perMinute(10)->by('submission:'.$request->ip());
+        });
+
+        RateLimiter::for('two-factor', function (Request $request) {
+            return Limit::perMinute(5)->by($request->session()->get('login.id'));
+        });
+
+        RateLimiter::for('send-elevated-session-code', function () {
+            return Limit::perMinute(1)->response(function (Request $request) {
+                $message = trans_choice('statamic::messages.try_again_in_minutes', 1);
+
+                return $request->wantsJson() ? response(['error' => $message], 429) : back()->with('error', $message);
+            });
         });
     }
 }

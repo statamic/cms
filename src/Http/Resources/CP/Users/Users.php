@@ -9,6 +9,8 @@ use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Users extends ResourceCollection
 {
     use HasRequestedColumns;
@@ -56,6 +58,13 @@ class Users extends ResourceCollection
             Column::make('last_login')
                 ->label(__('Last Login'))
                 ->defaultOrder($columns->max('defaultOrder') + 1)
+        );
+
+        $columns->put('two_factor',
+            Column::make('two_factor')
+                ->label(__('2FA'))
+                ->defaultOrder($columns->max('defaultOrder') + 1)
+                ->visible(false)
         );
 
         // Normalize default visibility for when user blueprint file exists in app

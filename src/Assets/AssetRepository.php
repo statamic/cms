@@ -93,6 +93,7 @@ class AssetRepository implements Contract
     public function findById(string $id)
     {
         [$container_id, $path] = explode('::', $id);
+        $path = str_replace('\\', '/', $path);
 
         // If a container can't be found, we'll assume there's no asset.
         if (! $container = AssetContainer::find($container_id)) {

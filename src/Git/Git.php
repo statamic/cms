@@ -3,12 +3,17 @@
 namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Git
 {
@@ -88,6 +93,10 @@ class Git
             $delayInMinutes = now()->addMinutes((int) $delay);
             $message = null;
         }
+
+        $saves = Cache::get('statamic-git-pending-saves', []);
+        $saves[] = ['name' => $this->gitUserName(), 'email' => $this->gitUserEmail()];
+        Cache::put('statamic-git-pending-saves', $saves);
 
         CommitJob::dispatch($message, $this->authenticatedUser())
             ->onConnection(config('statamic.git.queue_connection'))
@@ -240,7 +249,7 @@ class Git
         $context = $this->getCommandContext($paths, $message);
 
         return collect(config('statamic.git.commands'))->map(function ($command) use ($context) {
-            return Antlers::parse($command, $context);
+            return Antlers::parse(Parse::config($command), $context);
         });
     }
 
@@ -255,7 +264,7 @@ class Git
     {
         return [
             'git' => config('statamic.git.binary'),
-            'paths' => collect($paths)->implode(' '),
+            'paths' => $this->shellQuotePaths($paths),
             'message' => $this->shellEscape($message),
             'name' => $this->shellEscape($this->gitUserName()),
             'email' => $this->shellEscape($this->gitUserEmail()),
@@ -279,7 +288,20 @@ class Git
     {
         $string = str_replace('"', '', $string);
         $string = str_replace("'", '', $string);
+        $string = str_replace('\\', '\\\\', $string);
+        $string = str_replace('$', '\\$', $string);
+        $string = str_replace('`', '\\`', $string);
 
-        return escapeshellcmd($string);
+        return $string;
+    }
+
+    /**
+     * Shell quote paths to a string for use in git commands.
+     */
+    protected function shellQuotePaths(Collection $paths): string
+    {
+        return collect($paths)
+            ->map(fn ($path) => '"'.$path.'"')
+            ->implode(' ');
     }
 }

@@ -47,6 +47,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Blueprints Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your blueprint YAML files are stored.
+    |
+    */
+
+    'blueprints_path' => resource_path('blueprints'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fieldsets Path
+    |--------------------------------------------------------------------------
+    |
+    | Where your fieldset YAML files are stored.
+    |
+    */
+
+    'fieldsets_path' => resource_path('fieldsets'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Send the Powered-By Header
     |--------------------------------------------------------------------------
     |
@@ -63,8 +85,8 @@ return [
     | Date Format
     |--------------------------------------------------------------------------
     |
-    | Whenever a Carbon date is cast to a string on front-end routes, it will
-    | use this format. On CP routes, the format defined in cp.php is used.
+    | This format will be used whenever a Carbon date is cast to a string on
+    | front-end routes. It doesn't affect how dates are formatted in the CP.
     | You can customize this format using PHP's date string constants.
     | Setting this value to null will use Carbon's default format.
     |
@@ -73,6 +95,35 @@ return [
     */
 
     'date_format' => 'F jS, Y',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this timezone when displaying dates on the front-end.
+    | You can use any timezone supported by PHP. When set to null it will
+    | fall back to the timezone defined in your `app.php` config file.
+    |
+    | https://www.php.net/manual/en/timezones.php
+    |
+    */
+
+    'display_timezone' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Localize Dates in Modifiers
+    |--------------------------------------------------------------------------
+    |
+    | When using date-related modifiers, Carbon instances will be in UTC.
+    | Enabling this setting will ensure that dates get localized into
+    | the timezone defined in `display_timezone`. Otherwise you'll
+    | need to manually localize dates in all of your templates.
+    |
+    */
+
+    'localize_dates_in_modifiers' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -217,5 +268,22 @@ return [
     */
 
     'layout' => env('STATAMIC_LAYOUT', 'layout'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blueprint Templates
+    |--------------------------------------------------------------------------
+    |
+    | When an entry's template is set to `@blueprint`, Statamic will look for
+    | a view named `{collection}.{blueprint}`. You may override this logic
+    | on a per-collection basis here.
+    |
+    | https://statamic.dev/content-modeling/collections#templates
+    |
+    */
+
+    'blueprint_templates' => [
+        //
+    ],
 
 ];

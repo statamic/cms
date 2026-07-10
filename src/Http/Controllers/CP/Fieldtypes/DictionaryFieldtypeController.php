@@ -11,10 +11,16 @@ class DictionaryFieldtypeController extends CpController
 {
     public function __invoke(Request $request, string $dictionary)
     {
-        $fieldtype = $this->fieldtype($request);
+        $options = $this->fieldtype($request)->dictionary()->options($request->search);
 
+        // Return an ordered list of key/value pairs rather than a value-keyed object.
+        // When the values are integers, the browser would re-sort the object's keys ascending,
+        // discarding the dictionary's own order.
         return [
-            'data' => $fieldtype->dictionary()->options($request->search),
+            'data' => collect($options)
+                ->map(fn ($label, $key) => ['key' => (string) $key, 'value' => $label])
+                ->values()
+                ->all(),
         ];
     }
 

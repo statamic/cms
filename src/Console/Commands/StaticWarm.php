@@ -12,6 +12,7 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Statamic\Console\Commands\Concerns\NormalizesPaginationHeader;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -21,6 +22,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\StaticCaching\RecacheToken;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -30,6 +32,7 @@ class StaticWarm extends Command
 {
     use EnhancesCommands;
     use Hookable;
+    use NormalizesPaginationHeader;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -83,8 +86,6 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client($this->clientConfig());
-
         $this->output->newLine();
         $this->line('Compiling URLs...');
 
@@ -108,7 +109,7 @@ class StaticWarm extends Command
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
 
-            $pool = new Pool($client, $requests, [
+            $pool = new Pool($this->client(), $requests, [
                 'concurrency' => $this->concurrency(),
                 'fulfilled' => [$this, 'outputSuccessLine'],
                 'rejected' => [$this, 'outputFailureLine'],
@@ -120,11 +121,43 @@ class StaticWarm extends Command
         }
     }
 
+    private function warmPaginatedPages(string $url, int $currentPage, int $totalPages, string $pageName): void
+    {
+        $urls = collect(range($currentPage, $totalPages))->map(function ($page) use ($url, $pageName) {
+            $url = "{$url}?{$pageName}={$page}";
+
+            if (config('statamic.static_caching.background_recache', false)) {
+                $url = RecacheToken::addToUrl($url);
+            }
+
+            return $url;
+        });
+
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();
+
+        $pool = new Pool($this->client(), $requests, [
+            'concurrency' => $this->concurrency(),
+            'fulfilled' => function (Response $response, $index) use ($urls) {
+                $this->components->twoColumnDetail($this->getRelativeUri($urls->get($index)), '<info>✓ Cached</info>');
+            },
+            'rejected' => [$this, 'outputFailureLine'],
+        ]);
+
+        $promise = $pool->promise();
+
+        $promise->wait();
+    }
+
     private function concurrency(): int
     {
         $strategy = config('statamic.static_caching.strategy');
 
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
+    }
+
+    private function client(): Client
+    {
+        return new Client($this->clientConfig());
     }
 
     private function clientConfig(): array
@@ -139,12 +172,18 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->components->twoColumnDetail($this->getRelativeUri($index), '<info>✓ Cached</info>');
+        $this->components->twoColumnDetail($this->getRelativeUri($this->uris()->get($index)), '<info>✓ Cached</info>');
+
+        if ($response->hasHeader('X-Statamic-Pagination')) {
+            [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
+
+            $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
+        }
     }
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($index);
+        $uri = $this->getRelativeUri($this->uris()->get($index));
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();
@@ -161,9 +200,9 @@ class StaticWarm extends Command
         $this->components->twoColumnDetail($uri, "<fg=cyan>$message</fg=cyan>");
     }
 
-    private function getRelativeUri(int $index): string
+    private function getRelativeUri(string $uri): string
     {
-        return Str::start(Str::after($this->uris()->get($index), config('app.url')), '/');
+        return Str::start(Str::after($uri, config('app.url')), '/');
     }
 
     private function requests()
@@ -171,6 +210,14 @@ class StaticWarm extends Command
         $headers = $this->parseHeaders($this->option('header'));
 
         return $this->uris()->map(function ($uri) use ($headers) {
+            if (config('statamic.static_caching.background_recache', false)) {
+                if (substr_count($uri, '/') == 2) {
+                    $uri .= '/';
+                }
+
+                $uri = RecacheToken::addToUrl($uri);
+            }
+
             return new Request('GET', $uri, $headers);
         })->all();
     }
@@ -233,13 +280,9 @@ class StaticWarm extends Command
     {
         $uri = URL::makeRelative($uri);
 
-        if (Str::endsWith($pattern, '*')) {
-            $prefix = Str::removeRight($pattern, '*');
-
-            if (Str::startsWith($uri, $prefix) && ! (Str::endsWith($prefix, '/') && $uri === $prefix)) {
-                return true;
-            }
-        } elseif (Str::removeRight($uri, '/') === Str::removeRight($pattern, '/')) {
+        if (Str::endsWith($pattern, '*') && Str::startsWith($uri, Str::removeRight($pattern, '*'))) {
+            return true;
+        } elseif (URL::tidy($uri, '/') === URL::tidy($pattern, '/')) {
             return true;
         }
 
@@ -257,7 +300,7 @@ class StaticWarm extends Command
 
     private function shouldVerifySsl(): bool
     {
-        if ($this->option('insecure')) {
+        if ($this->option('insecure') || config('statamic.static_caching.warm_insecure')) {
             return false;
         }
 

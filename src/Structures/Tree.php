@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasDirtyState;
@@ -10,9 +11,10 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-abstract class Tree implements Contract, Localization
+abstract class Tree implements ContainsQueryableValues, Contract, Localization
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState;
 
@@ -20,6 +22,9 @@ abstract class Tree implements Contract, Localization
     protected $locale;
     protected $tree = [];
     protected $cachedFlattenedPages;
+    protected $cachedFlattenedPagesById;
+    protected $cachedFlattenedPagesByReference;
+    protected $cachedFlattenedPageOrder;
     protected $withEntries = false;
     protected $uriCacheEnabled = true;
 
@@ -50,7 +55,25 @@ abstract class Tree implements Contract, Localization
                     return $this->structure()->validateTree($tree, $this->locale());
                 });
             })
+            ->setter(function ($tree) {
+                return $this->removeNullItems($tree);
+            })
             ->args(func_get_args());
+    }
+
+    protected function removeNullItems($tree)
+    {
+        return collect($tree)
+            ->reject(fn ($item) => is_null($item))
+            ->map(function ($item) {
+                if (isset($item['children'])) {
+                    $item['children'] = $this->removeNullItems($item['children']);
+                }
+
+                return $item;
+            })
+            ->values()
+            ->all();
     }
 
     public function root()
@@ -141,17 +164,17 @@ abstract class Tree implements Contract, Localization
 
     public function find($id): ?Page
     {
-        return $this->flattenedPages()
-            ->keyBy->id()
-            ->get($id);
+        return ($this->cachedFlattenedPagesById ??= $this->flattenedPages()->keyBy->id())->get($id);
     }
 
     public function findByEntry($id)
     {
-        return $this->flattenedPages()
-            ->filter->reference()
-            ->keyBy->reference()
-            ->get($id);
+        return ($this->cachedFlattenedPagesByReference ??= $this->flattenedPages()->filter->reference()->keyBy->reference())->get($id);
+    }
+
+    public function entryOrder($reference)
+    {
+        return ($this->cachedFlattenedPageOrder ??= $this->flattenedPages()->map->reference()->flip())->get($reference);
     }
 
     public function save()
@@ -161,8 +184,10 @@ abstract class Tree implements Contract, Localization
         }
 
         $this->cachedFlattenedPages = null;
+        $this->cachedFlattenedPagesById = null;
+        $this->cachedFlattenedPagesByReference = null;
+        $this->cachedFlattenedPageOrder = null;
 
-        Blink::forget('collection-structure-flattened-pages-collection*');
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->save($this);
@@ -310,7 +335,7 @@ abstract class Tree implements Contract, Localization
     {
         $parent = optional($this->find($entry)->parent());
 
-        if ($parent->id() === $target || $parent->isRoot() && is_null($target)) {
+        if ($parent->id() == $target || $parent->isRoot() && is_null($target)) {
             return $this;
         }
 
@@ -386,6 +411,22 @@ abstract class Tree implements Contract, Localization
         $this->withEntries = true;
 
         return $this;
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'editUrl', 'handle', 'locale', 'path', 'route', 'showUrl', 'site',
+        ];
     }
 
     public function getCurrentDirtyStateAttributes(): array

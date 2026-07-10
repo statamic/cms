@@ -24,7 +24,7 @@ class ViewBlueprintListingTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('blueprints.index'))
             ->assertOk()
-            ->assertViewIs('statamic::blueprints.index');
+            ->assertInertia(fn ($page) => $page->component('blueprints/Index'));
     }
 
     #[Test]
@@ -53,9 +53,9 @@ class ViewBlueprintListingTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('blueprints.edit', [$namespace, $handle]))
+            ->get(cp_route('blueprints.additional.edit', [$namespace, $handle]))
             ->assertOk()
-            ->assertViewIs('statamic::blueprints.edit');
+            ->assertInertia(fn ($page) => $page->component('blueprints/Edit'));
     }
 
     private function createBlueprint($handle)

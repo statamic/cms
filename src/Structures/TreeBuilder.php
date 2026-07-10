@@ -89,7 +89,7 @@ class TreeBuilder
     {
         return collect($tree)->map(function ($item) {
             $page = $item['page'];
-            $collection = $page->collection();
+            $collection = $page->mountedCollection();
             $referenceExists = $page->referenceExists();
 
             return [

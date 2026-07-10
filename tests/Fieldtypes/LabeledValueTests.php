@@ -223,14 +223,13 @@ trait LabeledValueTests
             'options' => [
                 'true' => 'Yup',
                 'false' => 'Nope',
-                'null' => 'Dunno',
             ],
         ]);
 
         $augmented = $field->augment(null);
         $this->assertInstanceOf(LabeledValue::class, $augmented);
         $this->assertNull($augmented->value());
-        $this->assertEquals('Dunno', $augmented->label());
+        $this->assertNull($augmented->label());
 
         $augmented = $field->augment(false);
         $this->assertInstanceOf(LabeledValue::class, $augmented);

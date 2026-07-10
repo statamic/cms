@@ -10,6 +10,7 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Query\Builder;
+use Statamic\View\Antlers\AntlersString;
 use Tests\TestCase;
 
 class ValueTest extends TestCase
@@ -386,6 +387,43 @@ class ValueTest extends TestCase
 
         $this->assertEquals('foo', $value->bar);
         $this->assertEquals('nope', $value->baz ?? 'nope');
+    }
+
+    #[Test]
+    public function it_parses_from_raw_string()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function augment($data)
+            {
+                // if we are being asked to augment an already parsed antlers string
+                // then we return the correct value
+                if ($data instanceof AntlersString) {
+                    return 'augmented_value';
+                }
+
+                return 'not_augmented_value';
+            }
+
+            public function config(?string $key = null, $fallback = null)
+            {
+                if ($key == 'antlers') {
+                    return true;
+                }
+
+                return parent::config($key, $fallback);
+            }
+
+            public function shouldParseAntlersFromRawString(): bool
+            {
+                return true;
+            }
+        };
+
+        $value = new Value('raw_value', null, $fieldtype);
+        $value = $value->antlersValue(app(\Statamic\Contracts\View\Antlers\Parser::class), []);
+
+        $this->assertEquals('augmented_value', (string) $value);
     }
 }
 

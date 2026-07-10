@@ -2,6 +2,7 @@
 
 namespace Statamic\Jobs;
 
+use Carbon\CarbonInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,6 +15,17 @@ class HandleEntrySchedule implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
+    protected CarbonInterface $minute;
+
+    public function __construct()
+    {
+        // We want to target the PREVIOUS minute because we can be sure that any entries that
+        // were scheduled for then would now be considered published. If we were targeting
+        // the current minute and the entry has defined a time with seconds later in the
+        // same minute, it may still be considered scheduled when it gets dispatched.
+        $this->minute = now()->subMinute();
+    }
+
     public function handle()
     {
         $this->entries()->each(fn ($entry) => EntryScheduleReached::dispatch($entry));
@@ -21,12 +33,6 @@ class HandleEntrySchedule implements ShouldQueue
 
     private function entries(): Collection
     {
-        // We want to target the PREVIOUS minute because we can be sure that any entries that
-        // were scheduled for then would now be considered published. If we were targeting
-        // the current minute and the entry has defined a time with seconds later in the
-        // same minute, it may still be considered scheduled when it gets dispatched.
-        $minute = now()->subMinute();
-
-        return (new MinuteEntries($minute))();
+        return (new MinuteEntries($this->minute))();
     }
 }

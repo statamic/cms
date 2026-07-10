@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Field as Fields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -294,6 +295,7 @@ class FieldTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'example';
+
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
                     'a_config_field_without_pre_processing' => ['type' => 'without_processing'],
@@ -338,12 +340,12 @@ class FieldTest extends TestCase
             'instructions' => 'Test instructions',
             'instructions_position' => 'below',
             'listable' => 'hidden',
-            'sortable' => true,
             'visibility' => 'visible',
+            'sortable' => true,
             'replicator_preview' => true,
             'duplicate' => true,
+            'actions' => true,
             'type' => 'example',
-            'validate' => 'required',
             'foo' => 'bar',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
@@ -475,6 +477,31 @@ class FieldTest extends TestCase
     }
 
     #[Test]
+    public function preprocessing_a_field_with_no_value_and_computed_default_value_will_use_the_computed_function()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype
+            {
+                public function preProcess($data)
+                {
+                    return $data.' preprocessed';
+                }
+
+                public function defaultValue()
+                {
+                    return 'fieldtype defined default';
+                }
+            });
+
+        Fields::computedDefault('computed-value', fn () => 'computed defined default');
+
+        $field = (new Field('test', ['default' => 'computed:computed-value', 'type' => 'fieldtype']));
+
+        $this->assertEquals('computed defined default preprocessed', $field->preProcess()->value());
+    }
+
+    #[Test]
     public function converting_to_an_array_will_inline_the_handle()
     {
         $field = new Field('the_handle', ['foo' => 'bar']);
@@ -603,6 +630,31 @@ class FieldTest extends TestCase
         $this->assertIsArray($type);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type['type']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']->getWrappedType());
+    }
+
+    #[Test]
+    #[Group('graphql')]
+    public function it_keeps_the_graphql_type_nullable_if_its_sometimes_required()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function toGqlType()
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype', 'validate' => 'required|sometimes']);
+
+        $type = $field->toGql();
+
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
     }
 
     #[Test]

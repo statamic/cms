@@ -8,117 +8,117 @@ export default [
     // },
     {
         label: 'Accepted',
-        value: 'accepted'
+        value: 'accepted',
     },
     {
         label: 'Accepted If',
         value: 'accepted_if:',
-        example: 'accepted_if:anotherfield,value,...'
+        example: 'accepted_if:anotherfield,value,...',
     },
     {
         label: 'Active URL',
-        value: 'active_url'
+        value: 'active_url',
     },
     {
         label: 'After (Date)',
         value: 'after:',
-        example: 'after:date'
+        example: 'after:date',
     },
     {
         label: 'After Or Equal (Date)',
         value: 'after_or_equal:',
-        example: 'after_or_equal:date'
+        example: 'after_or_equal:date',
     },
     {
         label: 'Alpha',
-        value: 'alpha'
+        value: 'alpha',
     },
     {
         label: 'Alpha Dash',
-        value: 'alpha_dash'
+        value: 'alpha_dash',
     },
     {
         label: 'Alpha Numeric',
-        value: 'alpha_num'
+        value: 'alpha_num',
     },
     {
         label: 'Array',
-        value: 'array'
+        value: 'array',
     },
     {
         label: 'Bail',
-        value: 'bail'
+        value: 'bail',
     },
     {
         label: 'Before (Date)',
         value: 'before:',
-        example: 'before:date'
+        example: 'before:date',
     },
     {
         label: 'Before Or Equal (Date)',
         value: 'before_or_equal:',
-        example: 'before_or_equal:date'
+        example: 'before_or_equal:date',
     },
     {
         label: 'Between',
         value: 'between:',
-        example: 'between:min,max'
+        example: 'between:min,max',
     },
     {
         label: 'Boolean',
-        value: 'boolean'
+        value: 'boolean',
     },
     {
         label: 'Confirmed',
-        value: 'confirmed'
+        value: 'confirmed',
     },
     {
         label: 'Date',
-        value: 'date'
+        value: 'date',
     },
     {
         label: 'Date Equals',
         value: 'date_equals:',
-        example: 'date_equals:date'
+        example: 'date_equals:date',
     },
     {
         label: 'Date Format',
         value: 'date_format:',
-        example: 'date_format:date'
+        example: 'date_format:date',
     },
     {
         label: 'Different',
         value: 'different:',
-        example: 'different:field'
+        example: 'different:field',
     },
     {
         label: 'Digits',
         value: 'digits:',
-        example: 'digits:value'
+        example: 'digits:value',
     },
     {
         label: 'Digits Between',
         value: 'digits_between:',
-        example: 'digits_between:min,max'
+        example: 'digits_between:min,max',
     },
     {
         label: 'Dimensions (Image Files)',
         value: 'dimensions:',
-        example: 'dimensions:min_width=100,min_height=200'
+        example: 'dimensions:min_width=100,min_height=200',
     },
     {
         label: 'Distinct',
-        value: 'distinct'
+        value: 'distinct',
     },
     {
         label: 'E-Mail',
-        value: 'email'
+        value: 'email',
     },
     {
         label: 'Ends With',
         value: 'ends_with:',
         example: 'ends_with:foo,bar,...',
-        minVersion: '5.8.17'
+        minVersion: '5.8.17',
     },
     // {
     //     label: 'Exists (Database)',
@@ -127,65 +127,65 @@ export default [
     // },
     {
         label: 'File',
-        value: 'file'
+        value: 'file',
     },
     {
         label: 'Filled',
-        value: 'filled'
+        value: 'filled',
     },
     {
         label: 'Greater Than',
         value: 'gt:',
-        example: 'gt:field'
+        example: 'gt:field',
     },
     {
         label: 'Greater Than Or Equal',
         value: 'gte:',
-        example: 'gte:field'
+        example: 'gte:field',
     },
     {
         label: 'Image (File)',
-        value: 'image'
+        value: 'image',
     },
     {
         label: 'In',
         value: 'in:',
-        example: 'in:foo,bar,...'
+        example: 'in:foo,bar,...',
     },
     {
         label: 'In Array',
         value: 'in_array:',
-        example: 'in_array:anotherfield'
+        example: 'in_array:anotherfield',
     },
     {
         label: 'Integer',
-        value: 'integer'
+        value: 'integer',
     },
     {
         label: 'IP Address',
-        value: 'ip'
+        value: 'ip',
     },
     {
         label: 'IP Address (ipv4)',
-        value: 'ipv4'
+        value: 'ipv4',
     },
     {
         label: 'IP Address (ipv6)',
-        value: 'ipv6'
+        value: 'ipv6',
     },
     {
         label: 'JSON',
-        value: 'json'
+        value: 'json',
     },
     {
         label: 'Less Than',
         value: 'lt:',
-        example: 'lt:field'
+        example: 'lt:field',
     },
     {
         label: 'Less Than Or Equal',
         value: 'lte:',
-        example: 'lte:field'
+        example: 'lte:field',
     },
     {
         label: 'Max',
@@ -200,17 +200,17 @@ export default [
     {
         label: 'MIME Types',
         value: 'mimetypes:',
-        example: 'mimetypes:text/plain,...'
+        example: 'mimetypes:text/plain,...',
     },
     {
         label: 'MIME Type By File Extension',
         value: 'mimes:',
-        example: 'mimes:foo,bar,...'
+        example: 'mimes:foo,bar,...',
     },
     {
         label: 'Min',
         value: 'min:',
-        example: 'min:value'
+        example: 'min:value',
     },
     {
         label: 'Min Filesize (KB)',
@@ -220,73 +220,73 @@ export default [
     {
         label: 'Not In',
         value: 'not_in:',
-        example: 'not_in:foo,bar,...'
+        example: 'not_in:foo,bar,...',
     },
     {
         label: 'Not Regular Expression',
         value: 'not_regex:',
-        example: 'not_regex:pattern'
+        example: 'not_regex:pattern',
     },
     {
         label: 'Nullable',
-        value: 'nullable'
+        value: 'nullable',
     },
     {
         label: 'Numeric',
-        value: 'numeric'
+        value: 'numeric',
     },
     {
         label: 'Present',
-        value: 'present'
+        value: 'present',
     },
     {
         label: 'Regular Expression',
         value: 'regex:',
-        example: 'regex:pattern'
+        example: 'regex:pattern',
     },
     {
         label: 'Required',
-        value: 'required'
+        value: 'required',
     },
     {
         label: 'Required If',
         value: 'required_if:',
-        example: 'required_if:anotherfield,value,...'
+        example: 'required_if:anotherfield,value,...',
     },
     {
         label: 'Required Unless',
         value: 'required_unless:',
-        example: 'required_unless:anotherfield,value,...'
+        example: 'required_unless:anotherfield,value,...',
     },
     {
         label: 'Required With',
         value: 'required_with:',
-        example: 'required_with:foo,bar,...'
+        example: 'required_with:foo,bar,...',
     },
     {
         label: 'Required With All',
         value: 'required_with_all:',
-        example: 'required_with_all:foo,bar,...'
+        example: 'required_with_all:foo,bar,...',
     },
     {
         label: 'Required Without',
         value: 'required_without:',
-        example: 'required_without:foo,bar,...'
+        example: 'required_without:foo,bar,...',
     },
     {
         label: 'Required Without All',
         value: 'required_without_all:',
-        example: 'required_without_all:foo,bar,...'
+        example: 'required_without_all:foo,bar,...',
     },
     {
         label: 'Same',
         value: 'same:',
-        example: 'same:field'
+        example: 'same:field',
     },
     {
         label: 'Size',
         value: 'size:',
-        example: 'size:value'
+        example: 'size:value',
     },
     {
         label: 'Sometimes',
@@ -296,15 +296,15 @@ export default [
         label: 'Starts With',
         value: 'starts_with:',
         example: 'starts_with:foo,bar,...',
-        minVersion: '5.7.15'
+        minVersion: '5.7.15',
     },
     {
         label: 'String',
-        value: 'string'
+        value: 'string',
     },
     {
         label: 'Timezone',
-        value: 'timezone'
+        value: 'timezone',
     },
     // {
     //     label: 'Unique (Database)',
@@ -325,11 +325,11 @@ export default [
     },
     {
         label: 'URL',
-        value: 'url'
+        value: 'url',
     },
     {
         label: 'UUID',
         value: 'uuid',
-        minVersion: '5.7.10'
-    }
+        minVersion: '5.7.10',
+    },
 ];

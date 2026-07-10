@@ -9,54 +9,53 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   php-tests:
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    permissions:
+      contents: read
 
     strategy:
       matrix:
-        php: [8.1, 8.2, 8.3, 8.4]
-        laravel: [10.*, 11.*, 12.*]
+        php: [8.3, 8.4, 8.5]
+        laravel: [12.*, 13.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
           - os: windows-latest
-            php: 8.3
-            laravel: 10.*
-            stability: prefer-stable
-          - os: windows-latest
-            php: 8.3
-            laravel: 11.*
-            stability: prefer-stable
-        exclude:
-          - php: 8.1
-            laravel: 11.*
-          - php: 8.1
+            php: 8.5
             laravel: 12.*
-          - php: 8.4
-            laravel: 10.*
+            stability: prefer-stable
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
-            config
-            resources/lang
-            resources/users
-            resources/views
-            routes
-            src
-            tests
+            config/**
+            lang/**
+            resources/users/**
+            resources/views/**
+            routes/**
+            src/**
+            tests/**
             composer.json
-            phpunit.xml.dist
+            phpunit.dist.xml
             .github/workflows/tests.yml
             **.php
 
@@ -78,7 +77,7 @@ jobs:
         run: sudo apt-get install language-pack-fr
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
@@ -87,7 +86,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v3
+        uses: nick-invision/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           timeout_minutes: 5
@@ -107,16 +106,20 @@ jobs:
   js-tests:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    permissions:
+      contents: read
 
     name: JavaScript tests
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             **/*.{js,vue,ts}
@@ -130,37 +133,48 @@ jobs:
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
 
-      - name: Use Node.js 16.13.0
-        uses: actions/setup-node@v4
-        with:
-          node-version: 16.13.0
-
-      - name: Install required npm version
-        if: steps.should-run-tests.outputs.result == 'true'
-        run: npm -g install npm@8.5.5
+      - name: Use Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
 
       - name: Install dependencies
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm ci
 
+      - name: Install Playwright browsers
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npx playwright install chromium
+
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm run test
+        env:
+          CI: true
+          LARAVEL_BYPASS_ENV_CHECK: 1
+          LANG: en_US.UTF-8
+
+      - name: Verify build succeeds
+        if: steps.should-run-tests.outputs.result == 'true'
+        run: npm run build
 
   slack:
     name: Slack Notification
     runs-on: ubuntu-latest
     needs: [php-tests, js-tests]
+    permissions:
+      actions: read # required by workflow-conclusion-action to determine overall workflow status
     if: always()
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
+      - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3.0.3
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
-          status: failure
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-          author_name: ${{ github.actor }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: ":x: *${{ github.repository }}* tests failed"
+            blocks:
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ":x: *${{ github.repository }}* tests failed\n*Ref:* ${{ github.ref }}\n*Author:* ${{ github.actor }}\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"

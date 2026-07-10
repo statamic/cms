@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Sites;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -22,10 +23,11 @@ class SitesController extends CpController
             ->addValues($this->values())
             ->preProcess();
 
-        return view('statamic::sites.configure', [
+        return Inertia::render('sites/Edit', [
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
+            'initialValues' => $fields->values(),
             'meta' => $fields->meta(),
+            'updateUrl' => cp_route('sites.update'),
         ]);
     }
 

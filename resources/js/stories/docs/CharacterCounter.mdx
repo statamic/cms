@@ -1,0 +1,29 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as CharacterCounterStories from '../CharacterCounter.stories';
+
+<Meta of={CharacterCounterStories} />
+
+# CharacterCounter
+A visual character counter that displays as a circular progress indicator. The counter changes color based on how close you are to the limit and shows a countdown when nearing the maximum. Typically used with text inputs and textareas.
+<Canvas of={CharacterCounterStories._DocsIntro} sourceState={'shown'} />
+
+## With Input
+The CharacterCounter is automatically displayed when you set a `limit` prop on Input or Textarea components. No need to manually add the CharacterCounter component.
+<Canvas of={CharacterCounterStories._WithInput} sourceState={'shown'} />
+
+## States
+The counter provides visual feedback with different colors based on character usage:
+- **Green**: Under 70% of the limit
+- **Amber**: Between 70-90% of the limit  
+- **Red**: Between 90-100% of the limit
+- **Red with strike**: Over the limit
+
+Hover over the counter to see the exact character count.
+<Canvas of={CharacterCounterStories._States} sourceState={'shown'} />
+
+## Danger Zone
+Use the `danger-zone` prop to control when the remaining character countdown appears. By default, it shows when 20 or fewer characters remain.
+<Canvas of={CharacterCounterStories._DangerZone} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={CharacterCounterStories} />

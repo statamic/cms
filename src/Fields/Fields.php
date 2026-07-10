@@ -10,6 +10,9 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Fields
 {
     protected $items;

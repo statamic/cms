@@ -1,9 +1,8 @@
 import AssetEditor from '../../assets/Editor/Editor.vue';
 
 export default {
-
     components: {
-        AssetEditor
+        AssetEditor,
     },
 
     props: {
@@ -11,22 +10,29 @@ export default {
         readOnly: Boolean,
         showFilename: {
             type: Boolean,
-            default: true
+            default: true,
         },
         showSetAlt: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
+        siblings: {
+            type: Array,
+            default: () => [],
+        },
     },
 
     data() {
         return {
-            editing: false
-        }
+            editing: false,
+            editingId: null,
+        };
     },
 
-
     computed: {
+        isViewable() {
+            return this.asset.isViewable;
+        },
 
         isImage() {
             return this.asset.isImage;
@@ -37,15 +43,11 @@ export default {
         },
 
         container() {
-            return this.asset.id.substr(0, this.asset.id.indexOf('::'))
+            return this.asset.id.substr(0, this.asset.id.indexOf('::'));
         },
 
         canBeTransparent() {
-            return ['png', 'svg', 'webp', 'avif'].includes(this.asset.extension)
-        },
-
-        canDownload() {
-            return Statamic.$permissions.has(`view ${this.container} assets`);
+            return ['png', 'svg', 'webp', 'avif'].includes(this.asset.extension);
         },
 
         thumbnail() {
@@ -53,21 +55,33 @@ export default {
         },
 
         label() {
-            return this.asset.basename;
+            return this.asset.invalid ? this.asset.id : this.asset.basename;
         },
 
         needsAlt() {
+            if (this.asset.invalid) return false;
+
             return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
-        }
+        },
+
+        invalidLabel() {
+            return __('messages.relationship_item_unavailable');
+        },
     },
 
-
     methods: {
+        editOrOpen() {
+            if (!this.isViewable) return;
+
+            return this.readOnly ? this.open() : this.edit();
+        },
 
         edit() {
             if (this.readOnly) return;
+            if (this.asset?.invalid) return;
 
             this.editing = true;
+            this.editingId = this.asset?.id ?? null;
         },
 
         remove() {
@@ -77,7 +91,7 @@ export default {
         },
 
         open() {
-            if (! this.asset.url) {
+            if (!this.asset.url) {
                 return this.download();
             }
 
@@ -90,6 +104,7 @@ export default {
 
         closeEditor() {
             this.editing = false;
+            this.editingId = null;
         },
 
         assetSaved(asset) {
@@ -100,12 +115,28 @@ export default {
         actionCompleted(successful, response) {
             if (successful === false) return;
             const id = response.ids[0] || null;
-            if (id && id !== this.asset.id) {
-                this.$emit('id-changed', id);
+            if (id && id !== this.editingId) {
+                this.$emit('id-changed', this.editingId, id);
             }
             this.closeEditor();
         },
 
-    }
+        navigateToPrevious() {
+            const index = this.siblings.findIndex((asset) => asset.id === this.editingId);
+            if (index <= 0) return;
 
-}
+            const previousId = this.siblings[index - 1].id;
+            this.editingId = null;
+            this.$nextTick(() => (this.editingId = previousId));
+        },
+
+        navigateToNext() {
+            const index = this.siblings.findIndex((asset) => asset.id === this.editingId);
+            if (index === -1 || index >= this.siblings.length - 1) return;
+
+            const nextId = this.siblings[index + 1].id;
+            this.editingId = null;
+            this.$nextTick(() => (this.editingId = nextId));
+        },
+    },
+};

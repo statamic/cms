@@ -17,6 +17,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Support\MethodDenylist;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -658,7 +659,7 @@ class PathDataManager
 
                         continue;
                     } else {
-                        if ($this->cascade != null) {
+                        if (GlobalRuntimeState::$isCascadeEnabled && $this->cascade != null) {
                             // Attempt to locate the data in the cascade.
                             $cascadeData = $this->cascade->get($pathItem->name);
 
@@ -699,6 +700,8 @@ class PathDataManager
                 }
 
                 if ($this->reducedVar instanceof Model) {
+                    $this->reducedVar = $this->reducedVar->{$pathItem->name};
+                } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $pathItem->name) && (new \ReflectionProperty($this->reducedVar, $pathItem->name))->isPublic()) {
                     $this->reducedVar = $this->reducedVar->{$pathItem->name};
                 } else {
                     $this->reduceVar($pathItem, $data);
@@ -859,9 +862,32 @@ class PathDataManager
             $this->unlockData();
         }
 
-        if (is_object($this->reducedVar) && method_exists($this->reducedVar, Str::camel($varPath))) {
-            $this->reducedVar = call_user_func_array([$this->reducedVar, Str::camel($varPath)], []);
-            $this->resolvedPath[] = '{method:'.$varPath.'}';
+        if (is_object($this->reducedVar) && method_exists($this->reducedVar, $method = Str::camel($varPath)) && (new \ReflectionMethod($this->reducedVar, $method))->isPublic()) {
+            if (MethodDenylist::blocks($method)) {
+                // The method name derives from user-influenceable data, so never
+                // dispatch to methods that mutate or destroy data. Resolve to null.
+                $this->reducedVar = null;
+                $this->didFind = false;
+                $this->doBreak = true;
+            } else {
+                $this->reducedVar = call_user_func_array([$this->reducedVar, $method], []);
+                $this->resolvedPath[] = '{method:'.$varPath.'}';
+
+                if ($doCompact) {
+                    $this->compact($path->isFinal);
+                }
+            }
+        } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, $camelVar = Str::camel($varPath)) && (new \ReflectionProperty($this->reducedVar, $camelVar))->isPublic()) {
+            $this->reducedVar = $this->reducedVar->{$camelVar};
+            $this->resolvedPath[] = '{property:'.$varPath.'}';
+
+            if ($doCompact) {
+                $this->compact($path->isFinal);
+            }
+        } elseif (is_object($this->reducedVar)) {
+            $this->reducedVar = null;
+            $this->didFind = false;
+            $this->doBreak = true;
 
             if ($doCompact) {
                 $this->compact($path->isFinal);
@@ -983,12 +1009,14 @@ class PathDataManager
             $reductionValue = array_pop($reductionStack);
 
             if ($reductionValue instanceof Value) {
+                $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingUserData = true;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $augmented = RuntimeValues::getValue($reductionValue);
                 $augmented = self::guardRuntimeReturnValue($augmented);
-                GlobalRuntimeState::$isEvaluatingUserData = false;
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 if (! $isPair) {
                     return $augmented;
@@ -998,32 +1026,37 @@ class PathDataManager
 
                 continue;
             } elseif ($reductionValue instanceof Values) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             } elseif ($reductionValue instanceof \Statamic\Entries\Collection) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = RuntimeValues::resolveWithRuntimeIsolation($reductionValue);
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             } elseif ($reductionValue instanceof ArrayableString) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             } elseif ($reductionValue instanceof Augmentable) {
                 // Avoids resolving augmented data "too early".
                 if ($reduceBuildersAndAugmentables) {
+                    $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+                    $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                     GlobalRuntimeState::$isEvaluatingUserData = true;
                     GlobalRuntimeState::$isEvaluatingData = true;
                     $augmented = RuntimeValues::resolveWithRuntimeIsolation($reductionValue);
                     $augmented = self::guardRuntimeReturnValue($augmented);
-                    GlobalRuntimeState::$isEvaluatingUserData = false;
-                    GlobalRuntimeState::$isEvaluatingData = false;
+                    GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+                    GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
                     $reductionStack[] = $augmented;
                 } else {
                     return $reductionValue;
@@ -1031,12 +1064,14 @@ class PathDataManager
 
                 continue;
             } elseif ($reductionValue instanceof Collection) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->all();
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             } elseif ($reductionValue instanceof Model) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $data = $reductionValue->toArray();
 
@@ -1053,19 +1088,21 @@ class PathDataManager
                 }
 
                 $reductionStack[] = $data;
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             } elseif ($reductionValue instanceof Arrayable) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             } elseif ($reductionValue instanceof Builder && $reduceBuildersAndAugmentables) {
+                $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->get();
-                GlobalRuntimeState::$isEvaluatingData = false;
+                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
                 continue;
             }
@@ -1087,10 +1124,15 @@ class PathDataManager
      */
     public static function reduceForAntlers($value, Parser $parser, $data, $isPair = true)
     {
+        $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+        $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
         GlobalRuntimeState::$isEvaluatingData = true;
 
         if ($value instanceof Model) {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+
             return $value;
         }
 
@@ -1099,20 +1141,14 @@ class PathDataManager
         }
 
         if ($value instanceof Value) {
-            GlobalRuntimeState::$isEvaluatingUserData = true;
-
             if (! $isPair) {
                 $returnValue = $value->antlersValue($parser, $data);
             } else {
                 $returnValue = self::reduce($value->antlersValue($parser, $data));
             }
             $returnValue = self::guardRuntimeReturnValue($returnValue);
-
-            GlobalRuntimeState::$isEvaluatingUserData = false;
         } elseif ($value instanceof Values) {
-            GlobalRuntimeState::$isEvaluatingUserData = true;
             $returnValue = $value->toArray();
-            GlobalRuntimeState::$isEvaluatingUserData = false;
         } else {
             if (! $isPair) {
                 if (is_array($value)) {
@@ -1127,8 +1163,8 @@ class PathDataManager
             }
         }
 
-        GlobalRuntimeState::$isEvaluatingUserData = false;
-        GlobalRuntimeState::$isEvaluatingData = false;
+        GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+        GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
 
         return $returnValue;
     }

@@ -3,8 +3,11 @@
 namespace Tests\Auth\Protect;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
+use Facades\Statamic\CP\LivePreview;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Entry;
 
 class PasswordProtectionTest extends PageProtectionTestCase
 {
@@ -123,5 +126,45 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->get('/password-entry')
             ->assertOk()
             ->assertSee('Password form template');
+    }
+
+    #[Test]
+    public function live_preview_token_bypasses_password_protection()
+    {
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'allowed' => ['test'],
+        ]]);
+
+        $this->createPage('test', ['data' => ['protect' => 'password-scheme']]);
+
+        $entry = Entry::find('test');
+
+        LivePreview::tokenize('test-token', $entry);
+
+        $this
+            ->get('/test?token=test-token')
+            ->assertOk();
+    }
+
+    #[Test]
+    public function live_preview_token_for_different_entry_doesnt_bypass_password_protection()
+    {
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'allowed' => ['test'],
+        ]]);
+
+        $this->createPage('test', ['data' => ['protect' => 'password-scheme']]);
+
+        $other = EntryFactory::slug('other')->id('other')->collection('pages')->create();
+
+        LivePreview::tokenize('test-token', $other);
+
+        Token::shouldReceive('generate')->andReturn('pw-token');
+
+        $this
+            ->get('/test?token=test-token')
+            ->assertRedirect();
     }
 }

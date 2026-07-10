@@ -12,6 +12,7 @@ use Statamic\CP\Navigation\NavBuilder;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -33,6 +34,13 @@ class ActiveNavItemTest extends TestCase
 
         // TODO: Other tests are leaving behind forms without titles that are causing failures here?
         Facades\Form::shouldReceive('all')->andReturn(collect());
+    }
+
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+
+        parent::tearDown();
     }
 
     protected function resolveApplicationConfiguration($app)
@@ -110,17 +118,9 @@ class ActiveNavItemTest extends TestCase
         // Now let's create a new collection
         Facades\Collection::make('products')->title('Products')->save();
 
-        // Simply building the nav should change what is cached
-        $collectionsChildrenUrls = [
-            'http://localhost/cp/collections/articles',
-            'http://localhost/cp/collections/pages',
-        ];
-        $this->assertEquals($collectionsChildrenUrls, Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
-        $this->assertEquals($collectionsChildrenUrls, Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
-        collect($collectionsChildrenUrls)->each(function ($url) {
-            $this->assertTrue(Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
-            $this->assertTrue(Blink::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
-        });
+        // The InvalidateNavCache subscriber will clear the URLs cache.
+        $this->assertNull(Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertNull(Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
 
         // But if we build the nav again by hitting collections url to resolve its' children, the caches should get updated
         $this
@@ -241,8 +241,8 @@ class ActiveNavItemTest extends TestCase
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -266,8 +266,8 @@ class ActiveNavItemTest extends TestCase
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -291,8 +291,8 @@ class ActiveNavItemTest extends TestCase
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -317,9 +317,9 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/')->can('view seo reports'),
-                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults')->can('edit seo site defaults'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/'),
+                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -343,8 +343,8 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -370,8 +370,8 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -397,8 +397,8 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -414,6 +414,34 @@ class ActiveNavItemTest extends TestCase
         $this->assertInstanceOf(Collection::class, $seoPro->children());
         $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
         $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    #[Test]
+    public function it_properly_handles_is_active_checks_when_trailing_slashes_are_enforced()
+    {
+        URL::enforceTrailingSlashes();
+
+        Nav::clearCachedUrls();
+
+        $parent = Nav::create('parent')
+            ->section('test')
+            ->url('http://localhost/cp/parent')
+            ->children([
+                $hello = Nav::create('hello')->url('http://localhost/cp/hello'),
+                $world = Nav::create('world')->url('http://localhost/cp/world'),
+            ]);
+
+        // Test active status with trailing slash in request URL
+        Request::swap(Request::create('http://localhost/cp/hello/'));
+        $this->assertTrue($parent->isActive());
+        $this->assertTrue($hello->isActive());
+        $this->assertFalse($world->isActive());
+
+        // Test active status on descendant with trailing slash
+        Request::swap(Request::create('http://localhost/cp/hello/nested/path/'));
+        $this->assertTrue($parent->isActive());
+        $this->assertTrue($hello->isActive());
+        $this->assertFalse($world->isActive());
     }
 
     #[Test]
@@ -534,6 +562,25 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
         $this->assertFalse($externalSecure->isActive());
+    }
+
+    #[Test]
+    public function active_nav_descendant_url_still_functions_properly_when_parent_item_has_no_children()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('Schopify')->url('/cp/totally-custom-url');
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/totally-custom-url/deeper/descendant')
+            ->assertStatus(200);
+
+        $toolsItems = $this->build()->get('Tools');
+
+        $this->assertTrue($this->getItemByDisplay($toolsItems, 'Schopify')->isActive());
+        $this->assertFalse($this->getItemByDisplay($toolsItems, 'Addons')->isActive());
+        $this->assertFalse($this->getItemByDisplay($toolsItems, 'Utilities')->isActive());
     }
 
     #[Test]

@@ -9,6 +9,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MaxRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
+use Statamic\Fieldtypes\Assets\MimetypesRule;
+use Statamic\Fieldtypes\Assets\MinRule;
+use Statamic\Fieldtypes\Files;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -86,5 +94,96 @@ class FilesTest extends TestCase
             'non-image with container with no preset' => ['without_preset', false, '1671484636/test.txt', null, null],
             'non-image with container with preset' => ['with_preset', false, '1671484636/test.txt', null, null],
         ];
+    }
+
+    #[Test]
+    public function it_replaces_dimensions_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['dimensions:width=180,height=180']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(DimensionsRule::class, $replaced[0]);
+    }
+
+    #[Test]
+    public function it_replaces_image_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['image']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(ImageRule::class, $replaced[0]);
+    }
+
+    #[Test]
+    public function it_replaces_mimes_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['mimes:jpg,png']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MimesRule::class, $replaced[0]);
+    }
+
+    #[Test]
+    public function it_replaces_mimetypes_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['mimetypes:image/jpg,image/png']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MimetypesRule::class, $replaced[0]);
+    }
+
+    #[Test]
+    public function it_replaces_min_filesize_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['min_filesize:100']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MinRule::class, $replaced[0]);
+    }
+
+    #[Test]
+    public function it_replaces_max_filesize_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['max_filesize:100']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertInstanceOf(MaxRule::class, $replaced[0]);
+    }
+
+    #[Test]
+    public function it_doesnt_replace_non_file_related_rule()
+    {
+        $replaced = $this->fieldtype(['validate' => ['required']])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertEquals('required', $replaced[0]);
+    }
+
+    #[Test]
+    public function it_passes_through_closure_rules()
+    {
+        $closure = function ($attribute, $value, $fail) {
+            // custom validation
+        };
+
+        $replaced = $this->fieldtype(['validate' => [$closure]])->fieldRules();
+
+        $this->assertIsArray($replaced);
+        $this->assertCount(1, $replaced);
+        $this->assertSame($closure, $replaced[0]);
+    }
+
+    private function fieldtype($config = [])
+    {
+        return (new Files)->setField(new Field('test', array_merge([
+            'type' => 'files',
+        ], $config)));
     }
 }

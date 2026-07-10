@@ -9,10 +9,12 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Psr\Http\Message\ResponseInterface;
+use Statamic\Console\Commands\Concerns\NormalizesPaginationHeader;
 
 class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable;
+    use Dispatchable, InteractsWithQueue, NormalizesPaginationHeader, Queueable;
 
     public $uniqueId;
     public $tries = 1;
@@ -24,6 +26,36 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 
     public function handle()
     {
-        (new Client($this->clientConfig))->send($this->request);
+        $response = (new Client($this->clientConfig))->send($this->request);
+
+        if ($this->shouldWarmPaginatedPages($response)) {
+            [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
+
+            collect(range($currentPage, $totalPages))
+                ->map(function (int $page) use ($pageName): string {
+                    $url = $this->request->getUri();
+
+                    return implode('', [
+                        $url,
+                        str_contains($url, '?') ? '&' : '?',
+                        "{$pageName}={$page}",
+                    ]);
+                })
+                ->each(fn (string $uri) => StaticWarmJob::dispatch(
+                    new Request('GET', $uri),
+                    $this->clientConfig
+                ));
+        }
+    }
+
+    private function shouldWarmPaginatedPages(ResponseInterface $response): bool
+    {
+        if (! $response->hasHeader('X-Statamic-Pagination')) {
+            return false;
+        }
+
+        [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
+
+        return ! str_contains($this->request->getUri()->getQuery(), "{$pageName}=");
     }
 }

@@ -10,5 +10,6 @@ class ServiceProvider extends LaravelServiceProvider
     public function boot()
     {
         Preference::preventMergingChildren('nav');
+        Preference::preventMergingChildren('theme');
     }
 }

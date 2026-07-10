@@ -36,7 +36,7 @@ class AssetRepositoryTest extends TestCase
 
         $disk->assertExists($path = 'foo/.meta/image.jpg.yaml');
         $contents = <<<EOT
-data: {  }
+data: {}
 size: 723
 last_modified: $timestamp
 width: 30
@@ -45,7 +45,7 @@ mime_type: image/jpeg
 duration: null
 
 EOT;
-        $this->assertEquals($contents, $disk->get($path));
+        $this->assertEquals($contents, $this->normalizeYaml($disk->get($path)));
     }
 
     #[Test]
@@ -76,11 +76,11 @@ EOT;
 
         $foundAssetShortUrl = Asset::findByUrl($assetShortUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetShortUrl);
-        $this->assertEquals('test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
+        $this->assertEquals('/test/foo/image_in_short.jpg', $foundAssetShortUrl->url());
 
         $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
-        $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
+        $this->assertEquals('/test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
     }
 
     #[Test]
@@ -104,6 +104,21 @@ EOT;
 
         $this->assertInstanceOf(AssetContract::class, $asset);
         $this->assertEquals($assetShortUrl->id(), $asset->id());
+    }
+
+    #[Test]
+    public function it_finds_assets_by_id_when_the_path_contains_windows_separators()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/bar.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/bar.jpg'))->save();
+
+        $found = (new AssetRepository)->find('test_container::foo\\bar.jpg');
+
+        $this->assertInstanceOf(AssetContract::class, $found);
+        $this->assertEquals($asset->id(), $found->id());
     }
 
     #[Test]

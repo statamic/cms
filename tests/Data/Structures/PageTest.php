@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Entries\Entry;
+use Statamic\Facades\Collection as Collections;
 use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\Page;
@@ -528,8 +529,35 @@ class PageTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $page->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value, $page[$key]));
 
-        $this->assertEquals($page->collection()->toArray(), $arr['collection']);
+        $this->assertEquals($page->collection->toArray(), $arr['collection']);
         $this->assertEquals($page->blueprint->toArray(), $arr['blueprint']);
+    }
+
+    #[Test]
+    public function it_gets_collection_and_mounted_collection()
+    {
+        Collections::make('pages')->save();
+        Collections::make('blog')->mount('blog-page')->save();
+        Collections::make('events')->save();
+
+        $blogPageEntry = EntryFactory::id('blog-page')->collection('pages')->create();
+        $blogPostEntry = EntryFactory::id('blog-post-one')->collection('blog')->create();
+        $eventEntry = EntryFactory::id('event-one')->collection('events')->create();
+
+        $tree = $this->mock(Tree::class);
+        $tree->shouldReceive('entry')->with('blog-page')->andReturn($blogPageEntry);
+        $tree->shouldReceive('structure')->andReturnNull(); // just make the blueprint method quiet for now.
+
+        $page = new Page;
+        $page->setTree($tree);
+        $page->setEntry($blogPageEntry);
+        $page->setId($blogPageEntry->id()); // In reality the tree would set this.
+        $this->assertEquals('blog', $page->mountedCollection()->handle());
+        $this->assertEquals('pages', $page->collection->handle());
+
+        // This should be "pages" but cannot be fixed without being a breaking change.
+        // This will change in v6.
+        $this->assertEquals('blog', $page->collection()->handle());
     }
 
     protected function newTree()

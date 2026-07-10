@@ -15,6 +15,10 @@ class LivePreview
     {
         $item = Facade::item($token);
 
+        if (! $item) {
+            return $next($request);
+        }
+
         $item->repository()->substitute($item);
 
         $response = $next($request);

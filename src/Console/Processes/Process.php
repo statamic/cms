@@ -12,6 +12,9 @@ use Statamic\Support\Str;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Process
 {
     const CACHE_EXPIRY_MINUTES = 10;
@@ -453,5 +456,15 @@ class Process
         $that->basePath = Str::finish(Path::resolve($this->basePath.'/../'), '/');
 
         return $that;
+    }
+
+    protected function isWindows()
+    {
+        return PHP_OS_FAMILY === 'Windows';
+    }
+
+    protected function isMac()
+    {
+        return PHP_OS_FAMILY === 'Darwin';
     }
 }

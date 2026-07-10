@@ -22,6 +22,6 @@ class AuthenticationException extends Exception implements Responsable
                 : abort(401);
         }
 
-        return redirect()->route('statamic.cp.login');
+        return redirect()->guest(route('statamic.cp.login'));
     }
 }

@@ -9,6 +9,8 @@ use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
+use function Statamic\trans as __;
+
 abstract class ActionController extends CpController
 {
     public function run(Request $request)
@@ -35,6 +37,10 @@ abstract class ActionController extends CpController
 
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
+        if ($action->requiresElevatedSession()) {
+            $this->requireElevatedSession();
+        }
+
         $values = $action->fields()->addValues($request->all())->process()->values()->all();
         $successful = true;
 
@@ -49,6 +55,7 @@ abstract class ActionController extends CpController
             return [
                 'redirect' => $redirect,
                 'bypassesDirtyWarning' => $action->bypassesDirtyWarning(),
+                'triggersFullPageRefresh' => $action->triggersFullPageRefresh(),
             ];
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);

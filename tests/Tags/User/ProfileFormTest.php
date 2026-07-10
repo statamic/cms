@@ -16,7 +16,7 @@ class ProfileFormTest extends TestCase
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, trusted: true);
     }
 
     #[Test]
@@ -71,13 +71,92 @@ class ProfileFormTest extends TestCase
 EOT
         ));
 
-        preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
+        preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
             '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
             '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
         ];
 
+        $this->assertEquals($expected, $actual[0]);
+    }
+
+    #[Test]
+    public function it_renders_form_with_tabs_array_and_custom_blueprint()
+    {
+        $this->useCustomBlueprint();
+
+        $this->actingAs(User::make()
+            ->email('test@example.com')
+            ->data(['name' => 'Test User', 'phone' => '12345'])
+            ->save());
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ user:profile_form }}
+    {{ tabs }}
+        <h2 class="tab">{{ display }}</h2>
+        {{ sections }}
+            <h3 class="section">{{ display }}</h3>
+            {{ fields }}
+                <label>{{ display }}</label>{{ field }}
+            {{ /fields }}
+        {{ /sections }}
+    {{ /tabs }}
+{{ /user:profile_form }}
+EOT
+        ));
+
+        preg_match_all($this->regex(), $output, $actual);
+
+        $expected = [
+            '<h2 class="tab">Main</h2>',
+            '<h3 class="section">Account</h3>',
+            '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<h3 class="section">About you</h3>',
+            '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
+            '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
+            '<h2 class="tab">Options</h2>',
+            '<h3 class="section">Communication</h3>',
+            '<label>Newsletter</label><label><input type="hidden" name="newsletter" value="0"><input id="userprofile-form-newsletter-field" type="checkbox" name="newsletter" value="1" checked></label>',
+        ];
+        $this->assertEquals($expected, $actual[0]);
+    }
+
+    #[Test]
+    public function it_renders_form_with_sections_array_and_custom_blueprint()
+    {
+        $this->useCustomBlueprint();
+
+        $this->actingAs(User::make()
+            ->email('test@example.com')
+            ->data(['name' => 'Test User', 'phone' => '12345'])
+            ->save());
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ user:profile_form }}
+    {{ sections }}
+        <h3 class="section">{{ display }}</h3>
+        {{ fields }}
+            <label>{{ display }}</label>{{ field }}
+        {{ /fields }}
+    {{ /sections }}
+{{ /user:profile_form }}
+EOT
+        ));
+
+        preg_match_all($this->regex(), $output, $actual);
+
+        $expected = [
+            '<h3 class="section">Account</h3>',
+            '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<h3 class="section">About you</h3>',
+            '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
+            '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
+            '<h3 class="section">Communication</h3>',
+            '<label>Newsletter</label><label><input type="hidden" name="newsletter" value="0"><input id="userprofile-form-newsletter-field" type="checkbox" name="newsletter" value="1" checked></label>',
+        ];
         $this->assertEquals($expected, $actual[0]);
     }
 
@@ -100,13 +179,14 @@ EOT
 EOT
         ));
 
-        preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
+        preg_match_all($this->regex(), $output, $actual);
 
         $expected = [
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
             '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
+            '<label>Newsletter</label><label><input type="hidden" name="newsletter" value="0"><input id="userprofile-form-newsletter-field" type="checkbox" name="newsletter" value="1" checked></label>',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -157,10 +237,12 @@ EOT
         $this->actingAs(User::make()->save());
 
         $this
+            ->from('/profile-form')
             ->post('/!/auth/profile', [
                 'email' => 'san@holo.com',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/profile-form');
 
         $output = $this->tag(<<<'EOT'
 {{ user:profile_form }}
@@ -251,6 +333,19 @@ EOT
     }
 
     #[Test]
+    public function it_wont_follow_redirect_to_external_url()
+    {
+        $this->actingAs(User::make()->id('1')->email('san@holo.com')->save());
+
+        $this
+            ->post('/!/auth/profile', [
+                'email' => 'san@holo.com',
+                '_redirect' => 'https://evil.com',
+            ])
+            ->assertLocation('/');
+    }
+
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=profile-successful&error_redirect=registration-failure');
@@ -272,40 +367,78 @@ EOT
     private function useCustomBlueprint()
     {
         $blueprint = Blueprint::make()->setContents([
-            'fields' => [
+            'tabs' => [
                 [
-                    'handle' => 'name', // Field already exists, but we're defining custom display string.
-                    'field' => [
-                        'type' => 'text',
-                        'display' => 'Full Name',
+                    'handle' => 'main', // Default tab
+                    'display' => 'Main',
+                    'sections' => [
+                        [
+                            'handle' => 'account', // Basic information is grouped in a section
+                            'display' => 'Account',
+                            'fields' => [
+                                [
+                                    'handle' => 'name', // Field already exists, but we're defining custom display string.
+                                    'field' => [
+                                        'type' => 'text',
+                                        'display' => 'Full Name',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'email', // Field is included by default, but we're just implying field order here.
+                                    'field' => [],
+                                ],
+                                [
+                                    'handle' => 'password', // Field already exists, but we're defining custom validation rules.
+                                    'field' => [
+                                        'type' => 'text',
+                                        'input_type' => 'password',
+                                        'display' => 'Password',
+                                        'validate' => 'min:8',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'handle' => 'about-you', // Extra fields are grouped in another section
+                            'display' => 'About you',
+                            'fields' => [
+                                [
+                                    'handle' => 'phone', // Adding custom phone field.
+                                    'field' => [
+                                        'type' => 'text',
+                                        'display' => 'Phone Number',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'age', // Adding custom age field.
+                                    'field' => [
+                                        'type' => 'text',
+                                        'display' => 'Over 18 years of age?',
+                                        'validate' => 'required',
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 [
-                    'handle' => 'email', // Field is included by default, but we're just implying field order here.
-                    'field' => [],
-                ],
-                [
-                    'handle' => 'password', // Field already exists, but we're defining custom validation rules.
-                    'field' => [
-                        'type' => 'text',
-                        'input_type' => 'password',
-                        'display' => 'Password',
-                        'validate' => 'min:8',
-                    ],
-                ],
-                [
-                    'handle' => 'phone', // Adding custom phone field.
-                    'field' => [
-                        'type' => 'text',
-                        'display' => 'Phone Number',
-                    ],
-                ],
-                [
-                    'handle' => 'age', // Adding custom age field.
-                    'field' => [
-                        'type' => 'text',
-                        'display' => 'Over 18 years of age?',
-                        'validate' => 'required',
+                    'handle' => 'options', // Adding an extra tab
+                    'display' => 'Options',
+                    'sections' => [
+                        [
+                            'handle' => 'communication', // Last test section in the blueprint
+                            'display' => 'Communication',
+                            'fields' => [
+                                [
+                                    'handle' => 'newsletter', // Adding custom newsletter field.
+                                    'field' => [
+                                        'type' => 'toggle',
+                                        'display' => 'Newsletter',
+                                        'default' => 1,
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -332,5 +465,10 @@ EOT
             ]);
 
         $response->assertStatus(422);
+    }
+
+    private function regex(): string
+    {
+        return '/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U';
     }
 }

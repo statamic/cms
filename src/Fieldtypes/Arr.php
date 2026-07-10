@@ -8,6 +8,8 @@ use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
 use Statamic\Support\Arr as SupportArr;
 
+use function Statamic\trans as __;
+
 class Arr extends Fieldtype
 {
     protected $categories = ['structured'];
@@ -17,7 +19,7 @@ class Arr extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
@@ -30,6 +32,21 @@ class Arr extends Fieldtype
                             'single' => __('Single'),
                         ],
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'expand' => [
+                        'type' => 'toggle',
+                        'display' => __('Expanded format'),
+                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Selection & Options'),
+                'fields' => [
                     'keys' => [
                         'display' => __('Keys'),
                         'instructions' => __('statamic::fieldtypes.array.config.keys'),
@@ -41,11 +58,6 @@ class Arr extends Fieldtype
                         'unless' => [
                             'mode' => 'dynamic',
                         ],
-                    ],
-                    'expand' => [
-                        'type' => 'toggle',
-                        'display' => __('Expand'),
-                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
                     ],
                 ],
             ],
@@ -108,14 +120,14 @@ class Arr extends Fieldtype
 
         if ($this->config('expand')) {
             return collect($data)
-                ->when($this->isKeyed(), fn ($items) => $items->filter())
+                ->when($this->isKeyed(), fn ($items) => $items->reject(fn ($value) => is_null($value)))
                 ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
                 ->values()
                 ->all();
         }
 
         if ($this->isKeyed()) {
-            return collect($data)->filter()->all();
+            return collect($data)->reject(fn ($value) => is_null($value))->all();
         }
 
         return $data;

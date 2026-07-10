@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
@@ -13,7 +14,10 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class Users extends Relationship
 {
@@ -35,14 +39,23 @@ class Users extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'type' => 'integer',
-                        'min' => 1,
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.any.config.mode'),
@@ -54,20 +67,26 @@ class Users extends Relationship
                         ],
                         'default' => 'select',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
                     'default' => [
                         'display' => __('Default'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
-                    ],
-                    'query_scopes' => [
-                        'display' => __('Query Scopes'),
-                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
-                        'type' => 'taggable',
-                        'options' => Scope::all()
-                            ->reject(fn ($scope) => $scope instanceof Filter)
-                            ->map->handle()
-                            ->values()
-                            ->all(),
                     ],
                 ],
             ],
@@ -83,11 +102,18 @@ class Users extends Relationship
         return parent::preProcess($data);
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(User::find($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($user = User::find($id)) {
+            $canViewUsers = $this->canViewUser($user);
+
             return [
-                'title' => $user->name(),
+                'title' => $this->userTitle($user, $canViewUsers),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
                 'editable' => User::current()->can('edit', $user),
@@ -99,6 +125,12 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
+        // Don't reveal existence to a user who can't view the listing; return an empty
+        // result set instead of throwing, matching the picker's filter-to-viewable behavior.
+        if (! User::current()->can('index', UserContract::class)) {
+            return collect();
+        }
+
         $query = User::query();
 
         if ($search = $request->search) {
@@ -107,7 +139,9 @@ class Users extends Relationship
             } else {
                 $query->where(function ($query) use ($search) {
                     $query
-                        ->where('email', 'like', '%'.$search.'%')
+                        ->when($this->canViewUsers(), function ($query) use ($search) {
+                            $query->where('email', 'like', '%'.$search.'%');
+                        })
                         ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
                             foreach (explode(' ', $search) as $word) {
                                 $query
@@ -132,15 +166,22 @@ class Users extends Relationship
                 $user = $user->getSearchable();
             }
 
-            return [
+            $canViewUsers = $this->canViewUser($user);
+
+            $fields = [
                 'id' => $user->id(),
-                'title' => $user->name(),
-                'email' => $user->email(),
+                'title' => $this->userTitle($user, $canViewUsers),
             ];
+
+            if ($canViewUsers) {
+                $fields['email'] = $user->email();
+            }
+
+            return $fields;
         };
 
         if ($request->boolean('paginate', true)) {
-            $users = $query->paginate();
+            $users = $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15);
 
             $users->getCollection()->transform($userFields);
 
@@ -152,22 +193,52 @@ class Users extends Relationship
 
     protected function getColumns()
     {
-        return [
+        $columns = [
             Column::make('title')->label('Name'),
-            Column::make('email'),
         ];
+
+        if ($this->canViewUsers()) {
+            $columns[] = Column::make('email');
+        }
+
+        return $columns;
     }
 
     public function preProcessIndex($data)
     {
-        return $this->getItemsForPreProcessIndex($data)->map(function ($user) {
+        $canViewUsers = $this->canViewUsers();
+
+        return $this->getItemsForPreProcessIndex($data)->map(function ($user) use ($canViewUsers) {
             return [
                 'id' => $user->id(),
-                'title' => $user->name(),
+                'title' => $this->userTitle($user, $canViewUsers),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
         })->filter()->values();
+    }
+
+    private function userTitle($user, bool $canViewUsers): ?string
+    {
+        return $user->name() ?? ($canViewUsers ? $user->email() : $user->id());
+    }
+
+    private function canViewUsers(): bool
+    {
+        if (! $current = User::current()) {
+            return false;
+        }
+
+        return $current->can('index', UserContract::class);
+    }
+
+    private function canViewUser($user): bool
+    {
+        if (! $current = User::current()) {
+            return false;
+        }
+
+        return $current->can('view', $user);
     }
 
     protected function getItemsForPreProcessIndex($values): Collection
@@ -183,7 +254,11 @@ class Users extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        $ids = Arr::wrap($values);
+        $ids = collect(Arr::wrap($values))
+            ->map(fn ($id) => $id === 'current' ? User::current()?->id() : $id)
+            ->filter()
+            ->values()
+            ->all();
 
         $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
 
@@ -228,5 +303,10 @@ class Users extends Relationship
     public function filter()
     {
         return new UserFilter($this);
+    }
+
+    public function relationshipQueryBuilder()
+    {
+        return User::query();
     }
 }

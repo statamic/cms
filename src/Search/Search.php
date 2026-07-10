@@ -39,6 +39,16 @@ class Search
         app(Providers::class)->register($class);
     }
 
+    public function addCpSearchable($searchable)
+    {
+        Searchables::addCpSearchable($searchable);
+    }
+
+    public function addContentSearchable($searchable)
+    {
+        Searchables::addContentSearchable($searchable);
+    }
+
     public function __call($method, $parameters)
     {
         return $this->index()->$method(...$parameters);
@@ -51,7 +61,7 @@ class Search
             $exists = $index->exists();
 
             if ($shouldIndex && $exists) {
-                $index->insert($searchable);
+                $index->insert($searchable->getSearchReference());
             } elseif ($shouldIndex && ! $exists) {
                 $index->update();
             } elseif ($exists) {

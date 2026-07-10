@@ -7,7 +7,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\OrderBy;
+
+use function Statamic\trans as __;
 
 abstract class Relationship extends Fieldtype
 {
@@ -32,14 +36,8 @@ abstract class Relationship extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Appearance'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
@@ -50,6 +48,17 @@ abstract class Relationship extends Fieldtype
                             'select' => __('Select Dropdown'),
                             'typeahead' => __('Typeahead Field'),
                         ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
                     ],
                 ],
             ],
@@ -75,7 +84,7 @@ abstract class Relationship extends Fieldtype
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $this->statusIcons() ? $item->published() : null,
+                'status' => $this->statusIcons() ? $item->status() : null,
             ];
         });
     }
@@ -234,8 +243,22 @@ abstract class Relationship extends Fieldtype
     public function getItemData($values)
     {
         return collect($values)->map(function ($id) {
-            return $this->toItemArray($id);
+            return $this->authorizeItemData($id)
+                ? $this->toItemArray($id)
+                : $this->invalidItemArray($id);
         })->values();
+    }
+
+    protected function authorizeItemData($id): bool
+    {
+        // Fail-open so that we don't introduce a breaking change.
+        // Will change in an upcoming release.
+        return true;
+    }
+
+    protected function authorizeViewable($item): bool
+    {
+        return $item && User::current()->can('view', $item);
     }
 
     public function getItemHint($item): ?string
@@ -307,7 +330,7 @@ abstract class Relationship extends Fieldtype
 
     public function getSortColumn($request)
     {
-        return $request->get('sort');
+        return OrderBy::column($request->get('sort'));
     }
 
     public function getSortDirection($request)
@@ -343,7 +366,12 @@ abstract class Relationship extends Fieldtype
 
     protected function applyIndexQueryScopes($query, $params)
     {
-        collect(Arr::wrap($this->config('query_scopes')))
+        $handles = Arr::wrap($this->config('query_scopes'));
+
+        // Pass the active handles along so an aliased scope knows which is in effect.
+        $params = array_merge($params, ['queryScopes' => $handles]);
+
+        collect($handles)
             ->map(fn ($handle) => Scope::find($handle))
             ->filter()
             ->each(fn ($scope) => $scope->apply($query, $params));

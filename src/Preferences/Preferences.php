@@ -7,6 +7,8 @@ use Facades\Statamic\Preferences\CorePreferences;
 use Illuminate\Support\Arr;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class Preferences
 {
     protected $dotted = [];
@@ -43,14 +45,15 @@ class Preferences
      */
     public function all()
     {
-        if (auth()->guest()) {
-            return [];
+        $this->resetState();
+
+        if (User::current()) {
+            $this
+                ->mergeDottedUserPreferences()
+                ->mergeDottedRolePreferences();
         }
 
         return $this
-            ->resetState()
-            ->mergeDottedUserPreferences()
-            ->mergeDottedRolePreferences()
             ->mergeDottedDefaultPreferences()
             ->getMultiDimensionalPreferences();
     }
@@ -132,10 +135,8 @@ class Preferences
         $preserve = [];
 
         foreach ($this->preventMergingChildren as $dottedKey) {
-            $childData = Arr::pull($array, $dottedKey);
-
-            if (! is_null($childData)) {
-                $preserve[$dottedKey] = $childData;
+            if (Arr::has($array, $dottedKey)) {
+                $preserve[$dottedKey] = Arr::pull($array, $dottedKey);
             }
         }
 

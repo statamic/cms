@@ -112,7 +112,7 @@ class UpdateEntryTest extends TestCase
             ->update($entry, [
                 'title' => 'Updated Entry',
                 'slug' => 'updated-entry',
-                'date' => ['date' => '2021-02-02'],
+                'date' => '2021-02-02T00:00:00.000Z',
                 '_localized' => [], // empty to show that date doesn't need to be in here.
             ])
             ->assertOk();
@@ -151,7 +151,7 @@ class UpdateEntryTest extends TestCase
             ->update($localized, [
                 'title' => 'Updated Entry',
                 'slug' => 'updated-entry',
-                'date' => ['date' => '2021-02-02'],
+                'date' => '2021-02-02T00:00:00.000Z',
                 '_localized' => $shouldBeInArray ? ['date'] : [],
             ])
             ->assertOk();
@@ -438,38 +438,6 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
-    public function validates_max_depth()
-    {
-        [$user, $collection] = $this->seedUserAndCollection();
-
-        $structure = (new CollectionStructure)->maxDepth(2)->expectsRoot(true);
-        $collection->structure($structure)->save();
-
-        EntryFactory::collection('test')->id('home')->slug('home')->data(['title' => 'Home', 'foo' => 'bar'])->create();
-        EntryFactory::collection('test')->id('about')->slug('about')->data(['title' => 'About', 'foo' => 'baz'])->create();
-        EntryFactory::collection('test')->id('team')->slug('team')->data(['title' => 'Team'])->create();
-
-        $entry = EntryFactory::collection($collection)
-            ->id('existing-entry')
-            ->slug('existing-entry')
-            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
-            ->create();
-
-        $collection->structure()->in('en')->tree([
-            ['entry' => 'home'],
-            ['entry' => 'about', 'children' => [
-                ['entry' => 'team'],
-            ]],
-            ['entry' => 'existing-entry'],
-        ])->save();
-
-        $this
-            ->actingAs($user)
-            ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // This would make it 3 levels deep, so it should fail.
-            ->assertUnprocessable();
-    }
-
-    #[Test]
     public function does_not_validate_max_depth_when_collection_max_depth_is_null()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -499,6 +467,41 @@ class UpdateEntryTest extends TestCase
             ->actingAs($user)
             ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // Since we have no max depth set, this should be fine.
             ->assertOk();
+    }
+
+    #[Test]
+    public function it_prevents_duplicate_uris_for_structured_entries_with_depth_conditional_routes()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test entries', 'access en site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(
+            Collection::make('test')
+                ->routes('{{ if depth > 1 }}{{ parent_uri }}/{{ slug }}{{ else }}base/{{ slug }}{{ /if }}')
+                ->structureContents(['max_depth' => 10])
+        )->save();
+
+        EntryFactory::id('root-id')->slug('root')->collection('test')->create();
+        EntryFactory::id('child-id')->slug('child')->collection('test')->create();
+
+        $entry = EntryFactory::id('other-child-id')
+            ->slug('other-child')
+            ->collection('test')
+            ->data(['title' => 'Other Child'])
+            ->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'root-id', 'children' => [
+                ['entry' => 'child-id'],
+                ['entry' => 'other-child-id'],
+            ]],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Other Child', 'slug' => 'child'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
     }
 
     private function seedUserAndCollection()

@@ -8,8 +8,12 @@ use Statamic\Rules\Handle;
 use Statamic\Rules\UniqueFormHandle;
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class DuplicateForm extends Action
 {
+    protected $icon = 'duplicate';
+
     public static function title()
     {
         return __('Duplicate');

@@ -9,6 +9,9 @@ use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
 use Statamic\Support\Arr;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Parser
 {
     use Macroable;
@@ -185,7 +188,7 @@ class Parser
 
     public function newInstance(array $config = [])
     {
-        $parser = new self(array_replace_recursive($this->config, $config));
+        $parser = new static(array_replace_recursive($this->config, $config));
 
         foreach ($this->extensions as $ext) {
             $parser->addExtensions($ext);

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelProvider;
 use Rebing\GraphQL\GraphQLController;
 use Statamic\Contracts\GraphQL\ResponseCache;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\ResponseCache\DefaultCache;
 use Statamic\GraphQL\ResponseCache\NullCache;
 use Statamic\Http\Middleware\HandleToken;
@@ -32,6 +33,7 @@ class ServiceProvider extends LaravelProvider
 
             $this->disableGraphiql();
             $this->setDefaultSchema();
+            $this->configureIntrospection();
         });
     }
 
@@ -70,5 +72,10 @@ class ServiceProvider extends LaravelProvider
     private function setDefaultSchema()
     {
         config(['graphql.schemas.default' => DefaultSchema::class]);
+    }
+
+    private function configureIntrospection()
+    {
+        config(['graphql.security.disable_introspection' => ! GraphQL::introspectionEnabled()]);
     }
 }

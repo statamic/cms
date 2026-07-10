@@ -172,7 +172,7 @@ class Glide extends Tags
         $params = $this->getGlideParams($item);
 
         if (is_string($item) && Str::isUrl($item)) {
-            return Str::startsWith($item, ['http://', 'https://'])
+            return URL::isAbsolute($item)
                 ? $this->getGenerator()->generateByUrl($item, $params)
                 : $this->getGenerator()->generateByPath($item, $params);
         }
@@ -279,8 +279,12 @@ class Glide extends Tags
             return $item;
         }
 
+        if (Str::startsWith($item, config('app.url'))) {
+            $item = Str::after($item, config('app.url'));
+        }
+
         // External URLs are already fine as-is.
-        if (Str::startsWith($item, ['http://', 'https://'])) {
+        if (URL::isAbsolute($item)) {
             return $item;
         }
 
@@ -354,10 +358,10 @@ class Glide extends Tags
 
     private function useAbsoluteUrls(string $url): bool
     {
-        if (! $this->isValidExtension($url) && Str::startsWith($url, ['http://', 'https://'])) {
+        if (! $this->isValidExtension($url) && URL::isAbsolute($url)) {
             return true;
         }
 
-        return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
+        return URL::isAbsolute(GlideManager::url());
     }
 }

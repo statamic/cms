@@ -27,22 +27,15 @@ class CollectionStructure extends Structure
         });
     }
 
-    private function flattenedPages($entry)
-    {
-        return Blink::once('collection-structure-flattened-pages-collection'.$this->handle().'-'.$entry->locale(), function () use ($entry) {
-            return $this->in($entry->locale())->flattenedPages();
-        });
-    }
-
     public function entryUri($entry)
     {
         if (! $this->route($entry->locale())) {
             return null;
         }
 
-        $page = $this->flattenedPages($entry)
-            ->keyBy->reference()
-            ->get($entry->id());
+        $page = $this->in($entry->locale())->findByEntry($entry->id());
+
+        $page?->setEntry($entry);
 
         return optional($page)->uri();
     }
@@ -72,9 +65,8 @@ class CollectionStructure extends Structure
             throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection()->handle()}] collection's structure.");
         }
 
-        $thisCollectionsEntries = $this->collection()->queryEntries()
-            ->where('site', $locale)
-            ->pluck('id');
+        $thisCollectionsEntries = Blink::once('collection-structure-tree-entries::'.$this->handle().'::'.$locale, fn () => $this->collection()->queryEntries())
+            ->where('site', $locale)->pluck('id');
 
         $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
 

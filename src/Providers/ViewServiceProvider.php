@@ -2,10 +2,10 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
@@ -26,7 +26,6 @@ use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
 use Statamic\View\Interop\Stacks;
-use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -37,8 +36,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Store::class);
-
         $this->app->singleton(Cascade::class, function ($app) {
             return new Cascade($app['request'], Site::current());
         });
@@ -103,7 +100,17 @@ class ViewServiceProvider extends ServiceProvider
             $runtimeConfig->guardedContentVariablePatterns = config('statamic.antlers.guardedContentVariables', []);
             $runtimeConfig->guardedContentTagPatterns = config('statamic.antlers.guardedContentTags', []);
             $runtimeConfig->guardedContentModifiers = config('statamic.antlers.guardedContentModifiers', []);
+            $runtimeConfig->allowedContentTagPatterns = $this->mergeContentAllowlist(
+                config('statamic.antlers.allowedContentTags'),
+                $this->defaultAllowedContentTagPatterns($app)
+            );
+
+            $runtimeConfig->allowedContentModifiers = $this->mergeContentAllowlist(
+                config('statamic.antlers.allowedContentModifiers'),
+                $this->defaultAllowedContentModifiers($app)
+            );
             $runtimeConfig->allowPhpInUserContent = config('statamic.antlers.allowPhpInContent', false);
+            $runtimeConfig->allowMethodsInUserContent = config('statamic.antlers.allowMethodsInContent', false);
 
             $runtimeConfig->guardedContentVariablePatterns = array_merge(
                 $runtimeConfig->guardedVariablePatterns,
@@ -157,6 +164,227 @@ class ViewServiceProvider extends ServiceProvider
         });
     }
 
+    private function getAppTagPatternsForContentAllowlist(Application $app): array
+    {
+        $namespace = $app->getNamespace().'Tags\\';
+
+        return collect($app->make('statamic.tags'))
+            ->filter(fn ($binding) => is_string($binding) && str_starts_with($binding, $namespace))
+            ->keys()
+            ->flatMap(fn ($handle) => [$handle, $handle.':*'])
+            ->values()
+            ->all();
+    }
+
+    private function getAppModifierHandlesForContentAllowlist(Application $app): array
+    {
+        $namespace = $app->getNamespace().'Modifiers\\';
+
+        return collect($app->make('statamic.modifiers'))
+            ->filter(fn ($binding) => is_string($binding) && str_starts_with($binding, $namespace))
+            ->keys()
+            ->values()
+            ->all();
+    }
+
+    private function defaultAllowedContentTagPatterns(Application $app): array
+    {
+        return [
+            'link:*',
+            'obfuscate:*',
+            'trans:*',
+            'trans_choice:*',
+            'widont:*',
+            ...$this->getAppTagPatternsForContentAllowlist($app),
+        ];
+    }
+
+    private function defaultAllowedContentModifiers(Application $app): array
+    {
+        return [
+            'add_query_param',
+            'add_slashes',
+            'alias',
+            'ampersand_list',
+            'ascii',
+            'at',
+            'backspace',
+            'background_position',
+            'bool_string',
+            'camelize',
+            'cdata',
+            'ceil',
+            'chunk',
+            'classes',
+            'collapse',
+            'collapse_whitespace',
+            'contains_any',
+            'count',
+            'count_substring',
+            'dashify',
+            'days_ago',
+            'decode',
+            'deslugify',
+            'diff_for_humans',
+            'divide',
+            'dl',
+            'embed_url',
+            'ends_with',
+            'ensure_left',
+            'ensure_right',
+            'entities',
+            'excerpt',
+            'explode',
+            'extension',
+            'favicon',
+            'filter_empty',
+            'first',
+            'flatten',
+            'flip',
+            'floor',
+            'format',
+            'format_number',
+            'format_translated',
+            'full_urls',
+            'has_lower_case',
+            'has_upper_case',
+            'headline',
+            'hex_to_rgb',
+            'hours_ago',
+            'insert',
+            'is_alpha',
+            'is_alphanumeric',
+            'is_array',
+            'is_blank',
+            'is_email',
+            'is_embeddable',
+            'is_empty',
+            'is_external_url',
+            'is_future',
+            'is_iterable',
+            'is_json',
+            'is_leap_year',
+            'is_lowercase',
+            'is_numeric',
+            'is_past',
+            'is_today',
+            'is_tomorrow',
+            'is_uppercase',
+            'is_url',
+            'is_weekday',
+            'is_weekend',
+            'is_yesterday',
+            'iso_format',
+            'join',
+            'key_by',
+            'keys',
+            'kebab',
+            'last',
+            'lcfirst',
+            'length',
+            'limit',
+            'localize',
+            'lower',
+            'markdown',
+            'md5',
+            'minutes_ago',
+            'mod',
+            'modify_date',
+            'months_ago',
+            'multiply',
+            'nl2br',
+            'obfuscate',
+            'obfuscate_email',
+            'offset',
+            'ol',
+            'option_list',
+            'parse_url',
+            'pathinfo',
+            'pluck',
+            'random',
+            'rawurlencode',
+            'read_time',
+            'relative',
+            'remove_left',
+            'remove_query_param',
+            'remove_right',
+            'replace',
+            'resolve',
+            'reverse',
+            'round',
+            'safe_truncate',
+            'sanitize',
+            'scope',
+            'seconds_ago',
+            'select',
+            'sentence_list',
+            'set_query_param',
+            'shuffle',
+            'singular',
+            'slugify',
+            'smartypants',
+            'snake',
+            'sort',
+            'spaceless',
+            'split',
+            'starts_with',
+            'str_pad',
+            'str_pad_both',
+            'str_pad_left',
+            'str_pad_right',
+            'strip_tags',
+            'studly',
+            'subtract',
+            'substr',
+            'sum',
+            'surround',
+            'swap_case',
+            'table',
+            'tidy',
+            'timestamp',
+            'timezone',
+            'title',
+            'to_bool',
+            'to_qs',
+            'to_spaces',
+            'to_tabs',
+            'to_string',
+            'trans',
+            'trans_choice',
+            'trackable_embed_url',
+            'trim',
+            'truncate',
+            'type_of',
+            'ucfirst',
+            'underscored',
+            'unique',
+            'upper',
+            'urldecode',
+            'urlencode',
+            'values',
+            'weeks_ago',
+            'where',
+            'where_in',
+            'widont',
+            'word_count',
+            'years_ago',
+            ...$this->getAppModifierHandlesForContentAllowlist($app),
+        ];
+    }
+
+    private function mergeContentAllowlist(mixed $configured, array $defaults): array
+    {
+        if ($configured === null) {
+            return $defaults;
+        }
+
+        return collect((array) $configured)
+            ->flatMap(fn ($item) => $item === '@default' ? $defaults : [$item])
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function registerBladeDirectives()
     {
         Blade::directive('tags', function ($expression) {
@@ -178,18 +406,17 @@ if (! isset(\$view)) { \$view = []; }
                 $nested = '$children';
             }
 
-            $recursiveChildren = <<<'PHP'
-@include('compiled__views::'.$__currentStatamicNavView, array_merge(get_defined_vars(), [
-    'depth' => ($depth ?? 0) + 1,
-    '__statamicOverrideTagResultValue' => #varName#,
-]))
+            return <<<PHP
+<?php
+    echo \$___statamicNavCallback(
+        array_merge(get_defined_vars(), [
+            'depth' => (\$depth ?? 0) + 1,
+            '__statamicOverrideTagResultValue' => $nested,
+        ]),
+        \$___statamicNavCallback
+    );
+?>
 PHP;
-
-            $recursiveChildren = Str::swap([
-                '#varName#' => $nested,
-            ], $recursiveChildren);
-
-            return Blade::compileString($recursiveChildren);
         });
 
     }
@@ -209,8 +436,8 @@ PHP;
         });
 
         View::macro('withoutExtractions', function () {
-            if ($this->engine instanceof Engine) {
-                $this->engine->withoutExtractions();
+            if ($this->getEngine() instanceof Engine) {
+                $this->getEngine()->withoutExtractions();
             }
 
             return $this;

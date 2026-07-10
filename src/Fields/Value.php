@@ -12,8 +12,12 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
+use Statamic\View\Cascade;
 use Traversable;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 {
     private $resolver;
@@ -82,11 +86,14 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
             $raw = $this->fieldtype->field()?->defaultValue() ?? null;
         }
 
-        $value = $this->shallow
+        return $this->getAugmentedValue($raw);
+    }
+
+    private function getAugmentedValue($raw)
+    {
+        return $this->shallow
             ? $this->fieldtype->shallowAugment($raw)
             : $this->fieldtype->augment($raw);
-
-        return $value;
     }
 
     private function iteratorValue()
@@ -150,9 +157,23 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         }
 
         if ($shouldParseAntlers) {
+            if ($parseFromRawString = $this->fieldtype?->shouldParseAntlersFromRawString()) {
+                $value = $this->raw();
+            }
+
             $value = (new DocumentTransformer())->correct($value);
 
-            return $parser->parse($value, $variables);
+            if (isset($variables['config'])) {
+                $variables['config'] = Cascade::config();
+            }
+
+            $parsed = $parser->parse($value, $variables);
+
+            if (! $parseFromRawString) {
+                return $parsed;
+            }
+
+            return $this->getAugmentedValue($parsed);
         }
 
         if (Str::contains($value, '{')) {

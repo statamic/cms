@@ -42,6 +42,16 @@ class NullCacher implements Cacher
         //
     }
 
+    public function refreshUrls($urls)
+    {
+        //
+    }
+
+    public function refreshUrl($url)
+    {
+        //
+    }
+
     public function getUrls($domain = null)
     {
         return collect();

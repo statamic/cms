@@ -14,7 +14,7 @@ class Cache extends Tags implements CachesOutput
     public function index()
     {
         if (! $this->isEnabled()) {
-            return [];
+            return $this->parse([]);
         }
 
         $store = LaraCache::store($this->params->get('store'));
@@ -64,8 +64,11 @@ class Cache extends Tags implements CachesOutput
             return false;
         }
 
-        // Only GET requests. This disables the cache during live preview.
-        return request()->method() === 'GET';
+        if (request()->isLivePreview()) {
+            return false;
+        }
+
+        return true;
     }
 
     private function getCacheKey()

@@ -12,23 +12,28 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\GraphQL\Types\LinkValueType;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class Link extends Fieldtype
 {
+    use UpdatesReferences;
     protected $categories = ['relationship'];
 
     protected function configFieldItems(): array
     {
         return [
             [
-                'display' => __('Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::fieldtypes.link.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                        'width' => '50',
                     ],
                     'container' => [
                         'display' => __('Container'),
@@ -36,11 +41,28 @@ class Link extends Fieldtype
                         'type' => 'asset_container',
                         'mode' => 'select',
                         'max_items' => 1,
+                        'width' => '50',
                     ],
                     'select_across_sites' => [
                         'display' => __('Select Across Sites'),
                         'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
                         'type' => 'toggle',
+                        'width' => '50',
+                    ],
+                    'default_option' => [
+                        'display' => __('Default Option'),
+                        'instructions' => __('statamic::fieldtypes.link.config.default_option'),
+                        'type' => 'select',
+                        'max_items' => 1,
+                        'width' => '50',
+                        'clearable' => true,
+                        'placeholder' => __('Default'),
+                        'options' => [
+                            'asset' => __('Asset'),
+                            'entry' => __('Entry'),
+                            'first-child' => __('First Child'),
+                            'url' => __('URL'),
+                        ],
                     ],
                 ],
             ],
@@ -57,6 +79,34 @@ class Link extends Fieldtype
                 : null,
             ['select_across_sites' => $this->canSelectAcrossSites()]
         );
+    }
+
+    public function preProcessIndex($data)
+    {
+        if (! $data) {
+            return null;
+        }
+
+        if ($data === '@child' && ! $this->field->parent() instanceof Entry) {
+            return null;
+        }
+
+        if (! $item = ResolveRedirect::item($data, $this->field->parent())) {
+            return null;
+        }
+
+        if (! ($url = is_object($item) ? $item->url() : $item)) {
+            return null;
+        }
+
+        $type = match (true) {
+            $data === '@child' => 'child',
+            Str::startsWith($data, 'asset::') => 'asset',
+            Str::startsWith($data, 'entry::') => 'entry',
+            default => 'url',
+        };
+
+        return ['type' => $type, 'url' => $url];
     }
 
     public function preload()
@@ -96,7 +146,18 @@ class Link extends Fieldtype
     private function initialOption($value, $entry, $asset)
     {
         if (! $value) {
-            return $this->field->isRequired() ? 'url' : null;
+            $fallback = $this->field->isRequired() ? 'url' : null;
+            $option = $this->field->get('default_option', $fallback);
+
+            if ($option === 'first-child' && ! $this->showFirstChildOption()) {
+                return $fallback;
+            }
+
+            if ($option === 'asset' && ! $this->showAssetOption()) {
+                return $fallback;
+            }
+
+            return $option;
         }
 
         if ($value === '@child') {
@@ -186,18 +247,7 @@ class Link extends Fieldtype
 
     public function toGqlType()
     {
-        return [
-            'type' => GraphQL::string(),
-            'resolve' => function ($item, $args, $context, $info) {
-                if (! $augmented = $item->resolveGqlValue($info->fieldName)) {
-                    return null;
-                }
-
-                $item = $augmented->value();
-
-                return is_object($item) ? $item->url() : $item;
-            },
-        ];
+        return GraphQL::type(LinkValueType::NAME);
     }
 
     protected function getConfiguredCollections()
@@ -225,5 +275,18 @@ class Link extends Fieldtype
             ->map->handle()
             ->values()
             ->all();
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->config('container') !== $container) {
+            return $data;
+        }
+
+        if ($data !== "asset::{$container}::{$oldValue}") {
+            return $data;
+        }
+
+        return $newValue !== null ? "asset::{$container}::{$newValue}" : null;
     }
 }

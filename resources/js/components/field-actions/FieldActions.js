@@ -1,4 +1,4 @@
-import uid from 'uniqid';
+import { nanoid as uid } from 'nanoid';
 
 class FieldActions {
     constructor() {

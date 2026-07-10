@@ -5,6 +5,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Terms extends FieldtypeFilter
 {
     public function fieldItems()
@@ -20,10 +22,12 @@ class Terms extends FieldtypeFilter
                 'default' => 'like',
             ],
             'term' => [
-                'type' => 'select',
-                'options' => $this->options()->all(),
+                'type' => 'terms',
                 'placeholder' => __('Term'),
                 'clearable' => true,
+                'mode' => 'select',
+                'max_items' => 1,
+                'taxonomies' => $this->fieldtype->taxonomies(),
                 'if' => [
                     'operator' => 'contains_any like',
                 ],
@@ -64,20 +68,18 @@ class Terms extends FieldtypeFilter
         return $field.': '.$term;
     }
 
-    protected function options()
+    public function isComplete($values): bool
     {
-        return collect($this->fieldtype->taxonomies())
-            ->map(function ($handle) {
-                return Facades\Taxonomy::find($handle);
-            })
-            ->filter()
-            ->flatMap(function ($taxonomy) {
-                return $taxonomy->queryTerms()->get();
-            })
-            ->mapWithKeys(function ($term) {
-                $value = $this->fieldtype->usingSingleTaxonomy() ? $term->slug() : $term->id();
+        $values = Arr::removeNullValues($values);
 
-                return [$value => $term->title()];
-            });
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        return Arr::has($values, 'term');
     }
 }
