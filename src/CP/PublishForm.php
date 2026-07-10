@@ -98,16 +98,18 @@ class PublishForm implements Responsable
             ->addValues($this->values)
             ->preProcess();
 
+        $asConfig = $this->asConfig || $this->blueprint->asConfig();
+
         $viewData = [
             'blueprint' => $this->blueprint->toPublishArray(),
-            'icon' => $this->icon ?? ($this->asConfig ? 'cog' : null),
+            'icon' => $this->icon ?? ($asConfig ? 'cog' : null),
             'title' => $this->title,
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'readOnly' => $this->readOnly,
             'submitUrl' => $this->submitUrl,
             'submitMethod' => $this->submitMethod,
-            'asConfig' => $this->asConfig,
+            'asConfig' => $asConfig,
         ];
 
         if ($request->wantsJson()) {

@@ -78,6 +78,14 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_as_config_property_which_is_false_by_default()
+    {
+        $this->assertFalse((new Blueprint)->asConfig());
+        $this->assertFalse((new Blueprint)->setContents(['as_config' => false])->asConfig());
+        $this->assertTrue((new Blueprint)->setContents(['as_config' => true])->asConfig());
+    }
+
+    #[Test]
     public function it_gets_the_hidden_property_which_is_false_by_default()
     {
         $blueprint = new Blueprint;
