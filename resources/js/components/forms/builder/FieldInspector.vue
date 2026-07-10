@@ -45,6 +45,8 @@ const blueprint = ref(null);
 const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
 const modifiedFields = ref<string[]>([]);
 
+let skipNextPreviewUpdate = false;
+
 const shouldShowValidationTab = computed(() => !['structure', 'information'].includes(getFieldtypeCategory(field.value.config.type).handle));
 
 const adjustedBlueprint = computed(() => {
@@ -68,7 +70,8 @@ const load = () => {
         loading.value = false;
         fieldtype.value = cached.fieldtype;
         blueprint.value = cached.blueprint;
-        values.value = cached.values;
+        skipNextPreviewUpdate = true;
+        withoutDirtying(() => (values.value = cached.values));
         meta.value = cached.meta;
         originValues.value = cached.originValues;
         originMeta.value = cached.originMeta;
@@ -87,6 +90,7 @@ const load = () => {
             loading.value = false;
             fieldtype.value = response.data.fieldtype;
             blueprint.value = response.data.blueprint;
+            skipNextPreviewUpdate = true;
             withoutDirtying(() => (values.value = response.data.values));
             meta.value = response.data.meta;
             originValues.value = response.data.originValues;
@@ -186,6 +190,12 @@ watch(field, () => {
 
 watch(values, () => {
     dirty();
+
+    if (skipNextPreviewUpdate) {
+        skipNextPreviewUpdate = false;
+        return;
+    }
+
     updatePreview();
 }, { deep: true });
 
