@@ -31,7 +31,6 @@ const props = defineProps({
 const errors = ref({});
 const saving = ref(false);
 const saveBinding = ref(null);
-const escBinding = ref(null);
 const formFields = ref(props.formFields);
 const selected = ref<Selection>(null);
 const view = ref<View>(preferences.get('forms.logic.view', View.List));
@@ -174,14 +173,11 @@ onMounted(() => {
         e.preventDefault();
         save();
     });
-
-    escBinding.value = keys.bindGlobal(['esc'], () => (selected.value = null));
 });
 
 onUnmounted(() => {
     clearDirtyState();
     saveBinding.value?.destroy();
-    escBinding.value?.destroy();
 });
 </script>
 

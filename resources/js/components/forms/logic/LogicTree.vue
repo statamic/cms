@@ -23,7 +23,7 @@ import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
 import PageInspector from '@/components/forms/builder/PageInspector.vue';
 import { Button, Icon } from '@ui';
 import { useSortable } from '@/composables/forms/use-drag-and-drop';
-import { computed, ref, useTemplateRef, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import type { PropType } from 'vue';
 
 const emit = defineEmits(['update:pages', 'select']);
@@ -36,6 +36,7 @@ const props = defineProps({
 
 const tree = useTemplateRef('tree');
 const isInspectorOpen = ref(false);
+const isRightPanelCollapsed = ref(true);
 
 const pageAnchor = (pageIndex) => `--page-${pageIndex + 1}`;
 
@@ -139,7 +140,34 @@ useSortable({
     onMirrorCreated,
 });
 
-watch(() => props.selected, () => isInspectorOpen.value = false);
+watch(() => props.selected, (selection) => {
+    isInspectorOpen.value = false;
+
+    if (selection) {
+        isRightPanelCollapsed.value = false;
+    }
+});
+
+const onEscape = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return;
+
+    if (isInspectorOpen.value) {
+        isInspectorOpen.value = false;
+        return;
+    }
+
+    if (props.selected) {
+        emit('select', null);
+        return;
+    }
+
+    if (!isRightPanelCollapsed.value) {
+        isRightPanelCollapsed.value = true;
+    }
+};
+
+onMounted(() => document.addEventListener('keydown', onEscape));
+onUnmounted(() => document.removeEventListener('keydown', onEscape));
 </script>
 
 <template>
@@ -243,7 +271,7 @@ watch(() => props.selected, () => isInspectorOpen.value = false);
         @click="isInspectorOpen = !isInspectorOpen"
     />
 
-    <LayoutPanel v-if="selected" side="right" :mobile-open="isInspectorOpen">
+    <LayoutPanel v-if="!isRightPanelCollapsed" side="right" :mobile-open="isInspectorOpen">
         <PageInspector v-if="selected.type === SelectionType.Page" />
         <FieldInspector v-else-if="selected.type === SelectionType.Field" />
     </LayoutPanel>
