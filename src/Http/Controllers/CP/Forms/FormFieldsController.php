@@ -15,9 +15,9 @@ use Statamic\Support\Arr;
 
 class FormFieldsController extends CpController
 {
-    public function edit(Request $request)
+    public function edit(Request $request, $form)
     {
-        // todo: add authorization
+        $this->authorize('editFields', $form);
 
         $request->validate([
             'type' => 'required',
@@ -56,9 +56,9 @@ class FormFieldsController extends CpController
         ];
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $form)
     {
-        // todo: add authorization
+        $this->authorize('editFields', $form);
 
         $request->validate([
             'type' => 'required',

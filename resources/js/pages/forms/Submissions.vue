@@ -14,6 +14,7 @@ defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
 const props = defineProps([
     'form',
+    'can',
     'columns',
     'filters',
     'actionUrl',
@@ -127,11 +128,11 @@ function exportSubmissions() {
                 {{ __(form.title) }}
             </template>
 
-            <Dropdown v-if="form.canEdit || form.canDelete" placement="left-start" class="me-2">
+            <Dropdown v-if="can.edit || can.delete" placement="left-start" class="me-2">
                 <DropdownMenu>
-                    <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
+                    <DropdownItem v-if="can.edit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
                     <DropdownItem
-                        v-if="form.canDelete"
+                        v-if="can.delete"
                         :text="__('Delete Form')"
                         icon="trash"
                         variant="destructive"
@@ -155,7 +156,7 @@ function exportSubmissions() {
             />
 
             <ResourceDeleter
-                v-if="form.canDelete"
+                v-if="can.delete"
                 ref="deleter"
                 :resource-title="form.title"
                 :route="form.deleteUrl"
