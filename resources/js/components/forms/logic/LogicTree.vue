@@ -272,8 +272,8 @@ onUnmounted(() => document.removeEventListener('keydown', onEscape));
     />
 
     <LayoutPanel v-if="!isRightPanelCollapsed" side="right" :mobile-open="isInspectorOpen">
-        <PageInspector v-if="selected.type === SelectionType.Page" />
-        <FieldInspector v-else-if="selected.type === SelectionType.Field" />
+        <PageInspector v-if="selected?.type === SelectionType.Page" />
+        <FieldInspector v-else-if="selected?.type === SelectionType.Field" />
     </LayoutPanel>
 
     <div
