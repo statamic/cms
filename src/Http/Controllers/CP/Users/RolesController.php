@@ -155,8 +155,8 @@ class RolesController extends CpController
 
         if ($request->super && User::current()->isSuper()) {
             $role->permissions(['super']);
-        } elseif (! in_array('super', $request->permissions ?? [])) {
-            $role->permissions($request->permissions);
+        } elseif ($request->has('permissions') && ! in_array('super', $request->permissions)) {
+            $role->permissions($this->preserveUnregisteredPermissions($role, $request->permissions));
         }
 
         $role->save();
@@ -177,6 +177,24 @@ class RolesController extends CpController
         $role->delete();
 
         return response('', 204);
+    }
+
+    protected function preserveUnregisteredPermissions($role, $permissions)
+    {
+        $unregistered = $role->permissions()
+            ->diff($this->registeredPermissions())
+            ->reject(fn ($permission) => $permission === 'super');
+
+        return collect($permissions)->merge($unregistered)->unique()->values()->all();
+    }
+
+    protected function registeredPermissions()
+    {
+        $flatten = function ($permissions) use (&$flatten) {
+            return collect($permissions)->flatMap(fn ($permission) => [$permission['value'], ...$flatten($permission['children'])]);
+        };
+
+        return Permission::boot()->tree()->flatMap(fn ($group) => $flatten($group['permissions']));
     }
 
     protected function updateTree($tree, $role = null)
