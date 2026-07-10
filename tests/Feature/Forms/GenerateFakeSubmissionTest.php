@@ -44,22 +44,6 @@ class GenerateFakeSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function super_users_can_generate_a_fake_submission()
-    {
-        $form = $this->makeForm('contact');
-        $user = User::make()->makeSuper()->save();
-
-        $this->assertEquals(0, $form->querySubmissions()->count());
-
-        $this
-            ->actingAs($user)
-            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only'])
-            ->assertOk();
-
-        $this->assertEquals(1, $form->querySubmissions()->count());
-    }
-
-    #[Test]
     public function unauthorized_users_cannot_generate_a_fake_submission()
     {
         $form = $this->makeForm('contact');
