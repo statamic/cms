@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue';
 import PageRuleBuilder from './pages/PageRuleBuilder.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 
-const { deletePage, dirty, fieldtypes, inspecting: page, pages } = injectBuilderContext();
+const { deletePage, dirty, fieldtypes, inspecting: page, pages, showFieldDirection } = injectBuilderContext();
 
 enum PageInspectorTabs {
     Settings = 'settings',
@@ -89,7 +89,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                         </div>
                         <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                             {{ pageTitle }}
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -120,7 +120,7 @@ watch(() => page.value.rules, dirty, { deep: true });
                         </div>
                         <a :href="`#page-${page._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
                             {{ pageTitle }}
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
