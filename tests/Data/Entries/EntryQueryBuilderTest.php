@@ -860,6 +860,18 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_an_empty_page_when_the_offset_overflows()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        // A page number large enough to overflow the offset arithmetic used to crash
+        // array_slice() with a float; it should just yield an empty page.
+        $entries = Entry::query()->forPage(PHP_INT_MAX, 6)->get();
+
+        $this->assertCount(0, $entries);
+    }
+
+    #[Test]
     public function entries_are_found_using_where_has_when_max_items_1()
     {
         $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
