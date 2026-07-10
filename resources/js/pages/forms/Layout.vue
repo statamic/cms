@@ -34,7 +34,7 @@ const closeMobileNavPopover = () => {
 <template>
     <Teleport to="#global-header-slot">
         <div class="flex items-center justify-center">
-            <div class="global-header-nav-popover lg:hidden">
+            <div v-if="navItems.length > 1" class="global-header-nav-popover lg:hidden">
                 <Button
                     id="anchor-global-header-nav"
                     variant="ghost"
@@ -43,7 +43,7 @@ const closeMobileNavPopover = () => {
                     :text="activeSectionLabel"
                     icon-append="chevron-down"
                 />
-                <nav v-if="navItems.length > 1" id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
+                <nav id="popover-global-header-nav" popover class="global-header-nav-popover__menu">
                     <ul>
                         <li v-for="navItem in navItems" :key="`m-${navItem.href}`">
                             <Link
