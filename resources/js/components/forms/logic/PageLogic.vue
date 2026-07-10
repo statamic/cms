@@ -2,6 +2,7 @@
 import { Button, Card, Heading, Icon, Panel, PanelHeader } from '@ui';
 import AddLogicRuleButton from './AddLogicRuleButton.vue';
 import PageLogicRule from './PageLogicRule.vue';
+import LogicEmptyState from './LogicEmptyState.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 import { nanoid as uniqid } from 'nanoid';
 
@@ -157,32 +158,50 @@ watch(
             </div>
         </PanelHeader>
         <Card>
-            <div v-if="rules.length > 0" class="relative space-y-6 mb-0" data-logic-list>
-                <PageLogicRule
-                    v-for="rule in rules"
-                    :id="rule._id"
-                    :key="rule._id"
-                    :rule="rule"
-                    :page-id="rule._pageId"
-                    :page-display="rule._pageDisplay"
-                    :collapsed="collapsed.includes(rule._id)"
-                    :suggestable-fields="getSuggestableFieldsForPage(rule._pageId)"
-                    :page-destination-options="getPageDestinationOptions(rule._pageId)"
-                    :fieldtypes
-                    @collapsed="collapse(rule._id)"
-                    @expanded="expand(rule._id)"
-                    @removed="removeRule(rule._id, rule._pageId)"
-                    @update:rule="updateRule(rule._id, rule._pageId, $event)"
+            <LogicEmptyState
+                v-if="rules.length === 0"
+                :heading="__('No page logic yet')"
+                :description="__('Send users to different pages based on their answers.')"
+            >
+                <AddLogicRuleButton
+                    v-if="availablePages.length > 0"
+                    flush
+                    :items="availablePages"
+                    :show-connector="false"
+                    :label="__('Add Rule')"
+                    :search-placeholder="__('Search Pages')"
+                    @added="addRule"
                 />
-            </div>
-            <AddLogicRuleButton
-                v-if="availablePages.length > 0"
-                :items="availablePages"
-                :show-connector="rules.length > 0"
-                :label="__('Add Rule')"
-                :search-placeholder="__('Search Pages')"
-                @added="addRule"
-            />
+            </LogicEmptyState>
+
+            <template v-else>
+                <div class="relative space-y-6 mb-0" data-logic-list>
+                    <PageLogicRule
+                        v-for="rule in rules"
+                        :id="rule._id"
+                        :key="rule._id"
+                        :rule="rule"
+                        :page-id="rule._pageId"
+                        :page-display="rule._pageDisplay"
+                        :collapsed="collapsed.includes(rule._id)"
+                        :suggestable-fields="getSuggestableFieldsForPage(rule._pageId)"
+                        :page-destination-options="getPageDestinationOptions(rule._pageId)"
+                        :fieldtypes
+                        @collapsed="collapse(rule._id)"
+                        @expanded="expand(rule._id)"
+                        @removed="removeRule(rule._id, rule._pageId)"
+                        @update:rule="updateRule(rule._id, rule._pageId, $event)"
+                    />
+                </div>
+                <AddLogicRuleButton
+                    v-if="availablePages.length > 0"
+                    :items="availablePages"
+                    :show-connector="rules.length > 0"
+                    :label="__('Add Rule')"
+                    :search-placeholder="__('Search Pages')"
+                    @added="addRule"
+                />
+            </template>
         </Card>
     </Panel>
 </template>
