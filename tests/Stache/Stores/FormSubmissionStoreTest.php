@@ -30,6 +30,24 @@ class FormSubmissionStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_has_handle_in_key()
+    {
+        Facades\Form::make('contact_form')->save();
+        Facades\Form::make('other_form')->save();
+        $contactSubmission = $this->parent->store('contact_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/contact_form/1631083591.2832.yaml',
+            'contact form submission'
+        );
+        $otherSubmission = $this->parent->store('other_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/other_form/1631083591.2832.yaml',
+            'other form submissions'
+        );
+
+        $this->assertEquals('contact_form::1631083591.2832', $this->parent->store('contact_form')->getItemKey($contactSubmission));
+        $this->assertEquals('other_form::1631083591.2832', $this->parent->store('other_form')->getItemKey($otherSubmission));
+    }
+
+    #[Test]
     public function it_makes_entry_instances_from_files()
     {
         $item = $this->parent->store('contact_form')->makeItemFromFile(
