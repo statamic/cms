@@ -17,17 +17,10 @@ const props = defineProps({
 
 const collapsed = ref([]);
 
-const fieldsWithLogic = computed(() => {
-    return props.fields.filter(field => {
-        return field.hidden || KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
-    });
-});
+const fieldHasLogic = (field) => field.hidden || KEYS.some(key => field[key]);
 
-const fieldsWithoutLogic = computed(() => {
-    return props.fields.filter(field => {
-        return !field.hidden && !KEYS.some(key => field[key] && Object.keys(field[key]).length > 0);
-    });
-});
+const fieldsWithLogic = computed(() => props.fields.filter(fieldHasLogic));
+const fieldsWithoutLogic = computed(() => props.fields.filter(field => !fieldHasLogic(field)));
 
 const expand = (id) => collapsed.value = collapsed.value.filter(setId => setId !== id);
 const expandAll = () => collapsed.value = [];
