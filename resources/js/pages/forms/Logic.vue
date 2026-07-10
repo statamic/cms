@@ -135,6 +135,7 @@ provideBuilderContext({
     form: props.form,
     inspecting,
     pages,
+    showFieldDirection: false,
     withoutDirtying,
 });
 

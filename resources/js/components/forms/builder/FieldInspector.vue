@@ -11,7 +11,7 @@ import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, withoutDirtying } = injectBuilderContext();
+const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, showFieldDirection, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};
@@ -218,7 +218,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -251,7 +251,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -300,7 +300,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
