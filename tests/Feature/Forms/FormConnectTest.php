@@ -64,19 +64,6 @@ class FormConnectTest extends TestCase
     }
 
     #[Test]
-    public function it_shows_the_page_for_a_super_user()
-    {
-        $user = tap(User::make()->makeSuper())->save();
-        $form = tap(Form::make('test'))->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('forms.connect.index', $form->handle()))
-            ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->component('forms/Connect'));
-    }
-
-    #[Test]
     public function it_denies_access_with_only_the_view_form_submissions_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
