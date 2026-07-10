@@ -7,11 +7,12 @@ import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from './categories';
+import { writeFieldConditions } from '@/composables/forms/field-conditions';
 import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, withoutDirtying } = injectBuilderContext();
+const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, showFieldDirection, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};
@@ -168,7 +169,7 @@ const fieldIconClasses = (fieldtypeHandle: string) => `size-4 shrink-0 ${categor
 const findSuggestableField = (handle: string) => suggestableConditionFields.value.find((f) => f.handle === handle);
 
 const updateFieldConditions = (conditions: Record<string, any>) => {
-    Object.assign(field.value.config, conditions);
+    writeFieldConditions(field.value, conditions);
     Object.assign(values.value, conditions);
     dirty();
 };
@@ -218,7 +219,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -251,7 +252,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>
@@ -300,7 +301,7 @@ onMounted(() => load());
                         </div>
                         <a :href="`#field-${field._id}`" class="inline-flex min-w-0 items-center gap-1.5 text-xl font-medium antialiased">
                             <span class="truncate">{{ field.config.display }}</span>
-                            <div class="grid *:[grid-area:1/1]">
+                            <div v-if="showFieldDirection" class="grid *:[grid-area:1/1]">
                                 <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                                 <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
                             </div>

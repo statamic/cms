@@ -357,6 +357,7 @@ provideBuilderContext({
     isLeftPanelOpen,
     isRightPanelOpen,
     pages,
+    showFieldDirection: true,
     toggleLeftPanel,
     toggleRightPanel,
     withoutDirtying,
