@@ -48,6 +48,7 @@ class GlobalVariablesController extends CpController
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
+            'asConfig' => $blueprint->asConfig(),
             'locale' => $variables->locale(),
             'localizedFields' => $variables->data()->keys()->all(),
             'hasOrigin' => $hasOrigin,

@@ -10,6 +10,7 @@ defineProps([
     'reference',
     'blueprintHandle',
     'blueprint',
+    'asConfig',
     'values',
     'localizedFields',
     'meta',
@@ -41,6 +42,7 @@ defineProps([
             :initial-reference="reference"
             :initial-blueprint-handle="blueprintHandle"
             :initial-fieldset="blueprint"
+            :as-config="asConfig"
             :initial-values="values"
             :initial-localized-fields="localizedFields"
             :initial-meta="meta"
