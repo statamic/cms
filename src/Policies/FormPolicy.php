@@ -82,4 +82,9 @@ class FormPolicy
         return $user->hasPermission('delete form submissions')
             || $user->hasPermission("delete {$form->handle()} form submissions");
     }
+
+    public function generateFakeSubmissions($user, $form)
+    {
+        // handled by before()
+    }
 }

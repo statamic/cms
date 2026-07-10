@@ -42,6 +42,8 @@ class FormSubmissionsController extends CpController
             ->rejectUnlisted()
             ->values();
 
+        $can = $this->formAbilities($form);
+
         return Inertia::render('forms/Submissions', [
             'form' => [
                 'title' => __($form->title()),
@@ -49,9 +51,9 @@ class FormSubmissionsController extends CpController
                 'status' => $form->status(),
                 'editUrl' => $form->editUrl(),
                 'deleteUrl' => $form->deleteUrl(),
-                'canGenerateFakeSubmissions' => (bool) $form->get('generate_fake_submissions', true),
+                'canGenerateFakeSubmissions' => $can['generateFakeSubmissions'] && (bool) $form->get('generate_fake_submissions', true),
             ],
-            'can' => $this->formAbilities($form),
+            'can' => $can,
             'columns' => $columns,
             'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
@@ -142,7 +144,7 @@ class FormSubmissionsController extends CpController
 
     public function generateFake(Request $request, $form, FakeSubmissionGenerator $generator)
     {
-        $this->authorize('viewSubmissions', $form);
+        $this->authorize('generateFakeSubmissions', $form);
 
         if (! $form->get('generate_fake_submissions', true)) {
             return response([

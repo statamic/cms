@@ -16,6 +16,7 @@ trait ProvidesFormAbilities
             'delete' => $user->can('delete', $form),
             'editFields' => $user->can('editFields', $form),
             'viewSubmissions' => $user->can('viewSubmissions', $form),
+            'generateFakeSubmissions' => $user->can('generateFakeSubmissions', $form),
         ];
     }
 }

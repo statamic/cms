@@ -30,7 +30,7 @@ class GenerateFakeSubmissionTest extends TestCase
     public function authorized_users_can_generate_a_fake_submission()
     {
         $form = $this->makeForm('contact');
-        $user = $this->userWithViewPermission($form->handle());
+        $user = $this->userWithConfigureFormsPermission();
 
         $this->assertEquals(0, $form->querySubmissions()->count());
 
@@ -41,6 +41,22 @@ class GenerateFakeSubmissionTest extends TestCase
 
         $this->assertEquals(1, $form->querySubmissions()->count());
         $this->assertTrue((bool) $form->querySubmissions()->first()->get('_fake'));
+    }
+
+    #[Test]
+    public function super_users_can_generate_a_fake_submission()
+    {
+        $form = $this->makeForm('contact');
+        $user = User::make()->makeSuper()->save();
+
+        $this->assertEquals(0, $form->querySubmissions()->count());
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only'])
+            ->assertOk();
+
+        $this->assertEquals(1, $form->querySubmissions()->count());
     }
 
     #[Test]
@@ -58,13 +74,29 @@ class GenerateFakeSubmissionTest extends TestCase
     }
 
     #[Test]
+    public function users_with_view_submissions_permission_cannot_generate_a_fake_submission()
+    {
+        $form = $this->makeForm('contact');
+        $user = $this->userWithViewPermission($form->handle());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only'])
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+
+        $this->assertEquals(0, $form->querySubmissions()->count());
+    }
+
+    #[Test]
     public function cp_only_mode_does_not_dispatch_full_pipeline_side_effects()
     {
         Event::fake([FormSubmitted::class]);
         Bus::fake();
 
         $form = $this->makeForm('contact');
-        $user = $this->userWithViewPermission($form->handle());
+        $user = $this->userWithConfigureFormsPermission();
 
         $this
             ->actingAs($user)
@@ -83,7 +115,7 @@ class GenerateFakeSubmissionTest extends TestCase
         Bus::fake();
 
         $form = $this->makeForm('contact');
-        $user = $this->userWithViewPermission($form->handle());
+        $user = $this->userWithConfigureFormsPermission();
 
         $this
             ->actingAs($user)
@@ -99,7 +131,7 @@ class GenerateFakeSubmissionTest extends TestCase
     public function unsupported_fields_fallback_to_null()
     {
         $form = $this->makeForm('contact');
-        $user = $this->userWithViewPermission($form->handle());
+        $user = $this->userWithConfigureFormsPermission();
 
         $this
             ->actingAs($user)
@@ -116,7 +148,7 @@ class GenerateFakeSubmissionTest extends TestCase
     public function it_cannot_generate_fake_submissions_when_disabled_in_form_configuration()
     {
         $form = $this->makeForm('contact', false);
-        $user = $this->userWithViewPermission($form->handle());
+        $user = $this->userWithConfigureFormsPermission();
 
         $this
             ->actingAs($user)
@@ -169,6 +201,13 @@ class GenerateFakeSubmissionTest extends TestCase
     private function userWithoutViewPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
+
+        return User::make()->assignRole('test')->save();
+    }
+
+    private function userWithConfigureFormsPermission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
 
         return User::make()->assignRole('test')->save();
     }
