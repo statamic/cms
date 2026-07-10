@@ -7,6 +7,7 @@ import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses } from './categories';
+import { writeFieldConditions } from '@/composables/forms/field-conditions';
 import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
@@ -168,7 +169,7 @@ const fieldIconClasses = (fieldtypeHandle: string) => `size-4 shrink-0 ${categor
 const findSuggestableField = (handle: string) => suggestableConditionFields.value.find((f) => f.handle === handle);
 
 const updateFieldConditions = (conditions: Record<string, any>) => {
-    Object.assign(field.value.config, conditions);
+    writeFieldConditions(field.value, conditions);
     Object.assign(values.value, conditions);
     dirty();
 };
