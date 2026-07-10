@@ -27,6 +27,7 @@ class Paragraph extends FormFieldtype
             'text' => [
                 'display' => __('Text'),
                 'type' => 'textarea',
+                'validate' => 'required',
             ],
         ];
     }
