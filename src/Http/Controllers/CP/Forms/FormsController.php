@@ -25,26 +25,30 @@ class FormsController extends CpController
     {
         $this->authorize('index', FormContract::class);
 
+        $user = User::current();
+
         $columns = [Column::make('title')->label(__('Title'))];
 
-        $forms = Form::all()->filter(fn ($form) => User::current()->can('view', $form));
+        $forms = Form::all()->filter(fn ($form) => $user->can('view', $form));
 
-        if ($forms->contains(fn ($form) => User::current()->can('viewSubmissions', $form))) {
+        if ($forms->contains(fn ($form) => $user->can('viewSubmissions', $form))) {
             $columns[] = Column::make('submissions')->label(__('Submissions'));
         }
 
         $forms = $forms
-            ->map(function ($form) {
+            ->map(function ($form) use ($user) {
+                $canViewSubmissions = $user->can('viewSubmissions', $form);
+
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
-                    'submissions' => $form->querySubmissions()->whereNull('partial')->count(),
+                    'submissions' => $canViewSubmissions ? $form->querySubmissions()->whereNull('partial')->count() : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'edit_url' => $form->editUrl(),
-                    'can_edit' => User::current()->can('edit', $form),
-                    'can_view_submissions' => User::current()->can('viewSubmissions', $form),
+                    'can_edit' => $user->can('edit', $form),
+                    'can_view_submissions' => $canViewSubmissions,
                 ];
             })
             ->values();
@@ -53,7 +57,7 @@ class FormsController extends CpController
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
-            'canCreate' => User::current()->can('create', FormContract::class) && $this->canCreateAdditionalForms(),
+            'canCreate' => $user->can('create', FormContract::class) && $this->canCreateAdditionalForms(),
             'createUrl' => cp_route('forms.create'),
             'configureEmailUrl' => cp_route('utilities.email'),
         ]);

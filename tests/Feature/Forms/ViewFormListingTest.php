@@ -144,4 +144,53 @@ class ViewFormListingTest extends TestCase
                 ->count('initialColumns', 1)
             );
     }
+
+    #[Test]
+    public function it_includes_the_submission_count_when_the_user_can_view_submissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+        $this->makeSubmission($form);
+        $this->makeSubmission($form);
+        $this->makeSubmission($form);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->where('forms.0.can_view_submissions', true)
+                ->where('forms.0.submissions', 3)
+            );
+    }
+
+    #[Test]
+    public function it_excludes_the_submission_count_when_the_user_cannot_view_submissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+        $this->makeSubmission($form);
+        $this->makeSubmission($form);
+        $this->makeSubmission($form);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->where('forms.0.can_view_submissions', false)
+                ->where('forms.0.submissions', null)
+            );
+    }
+
+    private function makeSubmission($form)
+    {
+        $submission = $form->makeSubmission();
+        $submission->data(['name' => 'John Doe']);
+        $submission->save();
+    }
 }
