@@ -90,6 +90,6 @@ class FormSubmissionStoreTest extends TestCase
         @unlink($path);
         $this->assertFileDoesNotExist($path);
 
-        $this->assertEquals($path, $this->parent->store('test_form')->paths()->get($submission->id()));
+        $this->assertEquals($path, $this->parent->store('test_form')->paths()->get('test_form::'.$submission->id()));
     }
 }
