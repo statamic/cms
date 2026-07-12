@@ -145,7 +145,7 @@ class Nav extends Structure implements ContainsQueryableValues, Contract
 
     public function existsIn($site)
     {
-        return $this->trees()->has($site);
+        return $this->in($site) !== null;
     }
 
     public function blueprint()

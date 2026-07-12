@@ -119,6 +119,10 @@ class Site implements Augmentable
                 ->all();
         }
 
+        if (! is_string($value) || ! Str::contains($value, ['{', '@'])) {
+            return $value;
+        }
+
         $value = Parse::config($value);
 
         $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
