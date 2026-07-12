@@ -598,4 +598,51 @@ class GridTest extends TestCase
         $this->assertEquals('test.-1.words', $value['new']['words']['fieldPathPrefix']);
         $this->assertEquals('test.-1.words', $value['defaults']['words']);
     }
+
+    #[Test]
+    public function it_allows_replicator_nested_inside_grid()
+    {
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.text')
+            ->andReturnUsing(function () {
+                return new Field('text', ['type' => 'text']);
+            });
+
+        $field = (new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'title', 'field' => ['type' => 'text']],
+                ['handle' => 'blocks', 'field' => [
+                    'type' => 'replicator',
+                    'sets' => [
+                        [
+                            'handle' => 'block_one',
+                            'display' => 'Block One',
+                            'fields' => [
+                                ['handle' => 'content', 'field' => 'testfieldset.text'],
+                            ],
+                        ],
+                    ],
+                ]],
+            ],
+        ]))->setValue([
+            [
+                'title' => 'Row 1',
+                'blocks' => [
+                    [
+                        'type' => 'block_one',
+                        'content' => 'Some content',
+                    ],
+                ],
+            ],
+        ]);
+
+        $preprocessed = $field->preProcess()->value();
+
+        $this->assertCount(1, $preprocessed);
+        $this->assertEquals('Row 1', $preprocessed[0]['title']);
+        $this->assertIsArray($preprocessed[0]['blocks']);
+        $this->assertEquals('block_one', $preprocessed[0]['blocks'][0]['type']);
+        $this->assertEquals('Some content', $preprocessed[0]['blocks'][0]['content']);
+    }
 }

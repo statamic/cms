@@ -84,6 +84,10 @@
             .grid-cell :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
                 @apply hidden;
             }
+
+            .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
+                @apply block;
+            }
         }
 
         tbody .grid-row-controls {
