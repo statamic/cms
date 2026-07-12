@@ -156,6 +156,8 @@ class DataRepositoryTest extends TestCase
             'missing with slash' => ['http://localhost/unknown/', null],
             'missing with query' => ['http://localhost/unknown?a=b', null],
             'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+            'missing with double leading slashes' => ['http://localhost//unknown', null],
+            'missing with multiple leading slashes' => ['http://localhost////unknown', null],
         ];
     }
 
