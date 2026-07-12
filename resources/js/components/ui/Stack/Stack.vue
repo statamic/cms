@@ -194,6 +194,24 @@ function cleanup() {
     escBinding.value?.destroy();
 }
 
+function forwardKeyboardShortcuts(event) {
+    // Allow document-level keyboard shortcuts (like Cmd+S for save) to propagate
+    if ((event.metaKey || event.ctrlKey) && (event.key === 's' || event.key === 'return' || event.key === 'Return')) {
+        // Dispatch a new event at the document level to ensure global handlers see it
+        const shortcutEvent = new KeyboardEvent(event.type, {
+            key: event.key,
+            code: event.code,
+            metaKey: event.metaKey,
+            ctrlKey: event.ctrlKey,
+            shiftKey: event.shiftKey,
+            altKey: event.altKey,
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(shortcutEvent);
+    }
+}
+
 watch(
     () => props.open,
     (value) => value ? open() : close(),
@@ -253,6 +271,7 @@ provide('closeStack', close);
                             size === 'full' ? 'inset-2 w-[calc(100svw-1rem)]' : 'inset-y-2',
                             { '-translate-x-4 rtl:translate-x-4': isHovering && !isStackEntering }
                         ]"
+                        @keydown="forwardKeyboardShortcuts"
                     >
                         <template v-if="shouldAddHeader">
                             <Header :title="title" :icon="icon">
