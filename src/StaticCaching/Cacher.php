@@ -1,0 +1,77 @@
+<?php
+
+namespace Statamic\StaticCaching;
+
+use Illuminate\Http\Request;
+
+interface Cacher
+{
+    /**
+     * Cache a page.
+     *
+     * @param  \Illuminate\Http\Request  $request  Request associated with the page to be cached
+     * @param  string  $content  The response content to be cached
+     */
+    public function cachePage(Request $request, $content);
+
+    /**
+     * Check if a page has been cached.
+     *
+     * @return bool
+     */
+    public function hasCachedPage(Request $request);
+
+    /**
+     * Get a cached page.
+     *
+     * @return Page
+     */
+    public function getCachedPage(Request $request);
+
+    /**
+     * Flush out the entire static cache.
+     *
+     * @return void
+     */
+    public function flush();
+
+    /**
+     * Invalidate a URL.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    public function invalidateUrl($url);
+
+    /**
+     * Invalidate multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function invalidateUrls($urls);
+
+    /**
+     * Refresh a URL.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    public function refreshUrl($url);
+
+    /**
+     * Refresh multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function refreshUrls($urls);
+
+    /**
+     * Get all the URLs that have been cached.
+     *
+     * @param  string|null  $domain
+     * @return \Illuminate\Support\Collection
+     */
+    public function getUrls($domain = null);
+}

@@ -1,0 +1,48 @@
+/* Basic Component
+  ========================================================================== */
+
+.field-width-selector {
+    @apply relative flex h-5 w-12 cursor-pointer;
+
+    .field-width-label {
+        @apply pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center text-4xs font-bold text-gray-700 dark:text-gray-300;
+    }
+
+    .field-width-notch {
+        @apply relative flex-1 border border-gray-400 dark:border-gray-600 ltr:border-l-0 rtl:border-r-0;
+
+        &:first-of-type {
+            @apply ltr:rounded-l-sm ltr:border-l rtl:rounded-r-sm rtl:border-r;
+        }
+
+        &.filled {
+            @apply -my-px border-gray-400 bg-white dark:border-gray-600 dark:bg-gray-700 ltr:border-r-0 ltr:pr-px rtl:border-l-0 rtl:pl-px;
+        }
+
+        &.selected {
+            @apply ltr:rounded-r-sm ltr:border-r rtl:rounded-l-sm rtl:border-l;
+        }
+    }
+}
+
+/* The Fieldtype
+  ========================================================================== */
+
+.width-fieldtype .field-width-selector {
+    @apply mt-px h-9 w-16;
+
+    .field-width-notch {
+        @apply border-y-gray-500 border-r-gray-400 bg-gray-200 dark:border-gray-800 dark:border-y-gray-800 dark:bg-gray-700;
+        &:last-child {
+            @apply border-r-gray-500 dark:border-gray-800 ltr:rounded-r-sm rtl:rounded-l-sm;
+        }
+
+        &.filled {
+            @apply border-gray-500 bg-linear-to-b from-white to-gray-100 dark:border-gray-800 dark:from-gray-600 dark:to-gray-600;
+        }
+    }
+
+    .field-width-label {
+        @apply text-2xs;
+    }
+}

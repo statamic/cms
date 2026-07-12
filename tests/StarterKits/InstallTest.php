@@ -1,0 +1,1774 @@
+<?php
+
+namespace Tests\StarterKits;
+
+use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Console\Processes\TtyDetector;
+use Facades\Statamic\StarterKits\Hook;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Http;
+use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Config;
+use Statamic\Facades\Path;
+use Statamic\Facades\Search;
+use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Tests\Fakes\Composer\FakeComposer;
+use Tests\TestCase;
+
+class InstallTest extends TestCase
+{
+    use Concerns\BacksUpSite;
+
+    protected $files;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->files = app(Filesystem::class);
+
+        $this->restoreSite();
+        $this->backupSite();
+        $this->prepareRepo();
+
+        Composer::swap(new FakeComposer($this));
+    }
+
+    public function tearDown(): void
+    {
+        $this->restoreSite();
+
+        if ($this->files->exists($kitRepo = $this->kitRepoPath())) {
+            $this->files->deleteDirectory($kitRepo);
+        }
+
+        parent::tearDown();
+    }
+
+    #[Test]
+    public function it_installs_starter_kit()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHavePackage('statamic/cool-runnings');
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_starter_kit_from_updatable_package_with_export_directory()
+    {
+        // Move everything in the kit repo's `export` folder, except for `composer.json` and `starter-kit.yaml`
+        collect($this->files->allFiles($this->kitRepoPath()))
+            ->reject(fn ($file) => in_array($file->getRelativePathname(), ['composer.json', 'starter-kit.yaml']))
+            ->each(fn ($file) => $this->files->move(
+                $this->kitRepoPath($file->getRelativePathname()),
+                $this->preparePath($this->kitRepoPath('export/'.$file->getRelativePathname())),
+            ));
+
+        $this->assertFileDoesNotExist($this->kitRepoPath('copied.md'));
+        $this->assertFileExists($this->kitRepoPath('export/copied.md'));
+        $this->assertFileExists($this->kitRepoPath('composer.json'));
+        $this->assertFileExists($this->kitRepoPath('starter-kit.yaml'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_from_export_paths()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(config_path('filesystems.php'));
+        $this->assertFileHasContent('bobsled_pics', config_path('filesystems.php'));
+    }
+
+    #[Test]
+    public function it_installs_from_github()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://github.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_from_bitbucket()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'bitbucket.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://bitbucket.org/statamic/cool-runnings.git', Blink::get('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_from_gitlab()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'gitlab.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://gitlab.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_successfully_without_pinging_cloud_when_local_option_is_passed()
+    {
+        Http::fake(function ($request) {
+            return Str::contains($request->url(), 'outpost.')
+                ? Http::response(['data' => ['price' => null]], 200)
+                : $this->fail('We should not be checking cloud for repo when passing `--local` option.');
+        });
+
+        $this->installCoolRunnings(['--local' => true]);
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_restores_existing_repositories_after_successful_install()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $expectedRepositories = $composerJson['repositories'] = [
+            [
+                'type' => 'path',
+                'path' => '/some/path',
+            ],
+            [
+                'type' => 'vcs',
+                'url' => 'https://example.com/some/url',
+            ],
+        ];
+
+        $this->files->put(
+            base_path('composer.json'),
+            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+        );
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertEquals('https://github.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileExists(base_path('copied.md'));
+
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertCount(2, $composerJson['repositories']);
+        $this->assertEquals($expectedRepositories, $composerJson['repositories']);
+    }
+
+    #[Test]
+    public function it_installs_as_living_package_with_custom_config()
+    {
+        $this->setConfig([
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        // Keep package around
+        $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
+
+        // But ensure we still delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+    }
+
+    #[Test]
+    public function it_leaves_custom_repository_for_living_packages_that_need_it()
+    {
+        $this->setConfig([
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertFileExists(base_path('copied.md'));
+
+        // Keep package around
+        $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
+
+        // As well as custom repository, which will be needed for composer updates, if it was needed for install
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $this->assertCount(1, $composerJson['repositories']);
+        $this->assertEquals([[
+            'type' => 'vcs',
+            'url' => 'https://github.com/statamic/cool-runnings',
+        ]], $composerJson['repositories']);
+
+        // But delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+    }
+
+    #[Test]
+    public function it_fails_if_starter_kit_config_does_not_exist()
+    {
+        $this->files->delete($this->kitRepoPath('starter-kit.yaml'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_fails_if_an_export_path_doesnt_exist()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+                'does_not_exist',
+            ],
+        ]);
+
+        $this->installCoolRunnings();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_merges_folders()
+    {
+        $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
+
+        $this->assertFileExists(base_path('content/collections/pages/contact.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/pages/home.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('content/collections/pages/contact.md'));
+        $this->assertFileExists(base_path('content/collections/pages/home.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_copy_files_not_defined_as_export_paths()
+    {
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('not-copied.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('not-copied.md'));
+    }
+
+    #[Test]
+    public function it_overwrites_files()
+    {
+        $this->assertFileExists(config_path('filesystems.php'));
+        $this->assertFileDoesntHaveContent('bobsled_pics', config_path('filesystems.php'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileHasContent('bobsled_pics', config_path('filesystems.php'));
+    }
+
+    #[Test]
+    public function it_doesnt_copy_starter_kit_config_by_default()
+    {
+        $this->installCoolRunnings();
+
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
+    }
+
+    #[Test]
+    public function it_copies_starter_kit_config_when_option_is_passed()
+    {
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertFileExists($configPath = base_path('starter-kit.yaml'));
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+  - content
+  - resources
+  - copied.md\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get($configPath));
+    }
+
+    #[Test]
+    public function it_copies_starter_kit_post_install_script_hook_when_with_config_option_is_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn(null);
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertFileExists($hookPath = base_path('StarterKitPostInstall.php'));
+        $this->assertFileHasContent('<?php', $hookPath);
+    }
+
+    #[Test]
+    public function it_doesnt_copy_starter_kit_post_install_script_hook_when_with_config_option_is_not_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn(null);
+
+        $this->installCoolRunnings();
+
+        $this->assertFileDoesNotExist(base_path('StarterKitPostInstall.php'));
+    }
+
+    #[Test]
+    public function it_overwrites_starter_kit_config_when_option_is_passed()
+    {
+        $this->files->put($configPath = base_path('starter-kit.yaml'), 'old config');
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+  - content
+  - resources
+  - copied.md\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get($configPath));
+    }
+
+    #[Test]
+    public function it_doesnt_clear_site_by_default()
+    {
+        $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
+        $this->files->put($this->preparePath(base_path('content/collections/blog/article.md')), 'Article');
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('content/collections/pages/home.md'));
+        $this->assertFileExists(base_path('content/collections/pages/contact.md'));
+        $this->assertFileExists(base_path('content/collections/blog/article.md'));
+    }
+
+    #[Test]
+    public function it_clears_site_when_option_is_passed()
+    {
+        $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
+        $this->files->put($this->preparePath(base_path('content/collections/blog/article.md')), 'Article');
+
+        $this->installCoolRunnings(['--clear-site' => true]);
+
+        $this->assertFileExists(base_path('content/collections/pages/home.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/blog'));
+    }
+
+    #[Test]
+    public function it_clears_site_when_interactively_confirmed()
+    {
+        $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
+        $this->files->put($this->preparePath(base_path('content/collections/blog/article.md')), 'Article');
+
+        $this
+            ->installCoolRunningsInteractively(['--without-user' => true])
+            ->expectsConfirmation('Clear site first?', 'yes')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no');
+
+        $this->assertFileExists(base_path('content/collections/pages/home.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/blog'));
+    }
+
+    #[Test]
+    public function it_installs_dependencies()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies' => [
+                'statamic/seo-pro' => '^0.2.0',
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/seo-pro'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('vendor/bobsled/speed-calculator'));
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this->installCoolRunnings();
+
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileExists(base_path('vendor/statamic/seo-pro'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileExists(base_path('vendor/bobsled/speed-calculator'));
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+    }
+
+    #[Test]
+    public function it_installs_dev_dependencies()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '*',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/ssg'));
+        $this->assertComposerJsonDoesntHave('statamic/ssg');
+
+        $this->installCoolRunnings();
+
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileExists(base_path('vendor/statamic/ssg'));
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
+    }
+
+    #[Test]
+    public function it_installs_both_types_of_dependencies()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies' => [
+                'statamic/seo-pro' => '^0.2.0',
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '*',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/seo-pro'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('vendor/bobsled/speed-calculator'));
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/ssg'));
+        $this->assertComposerJsonDoesntHave('statamic/ssg');
+
+        $this->installCoolRunnings();
+
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileExists(base_path('vendor/statamic/seo-pro'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileExists(base_path('vendor/bobsled/speed-calculator'));
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+        $this->assertFileExists(base_path('vendor/statamic/ssg'));
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
+    }
+
+    #[Test]
+    public function it_removes_dependency_versions_in_starter_kit_config_to_encourage_management_with_composer()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies' => [
+                'statamic/seo-pro' => '^0.2.0',
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '*',
+            ],
+        ]);
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+dependencies:
+  - statamic/seo-pro
+  - bobsled/speed-calculator
+  - statamic/ssg\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get(base_path('starter-kit.yaml')));
+    }
+
+    #[Test]
+    public function it_leaves_dependency_versions_in_starter_kit_config_if_dependencies_are_not_installed()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'config',
+            ],
+            'dependencies' => [
+                'statamic/seo-pro' => '^0.2.0',
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '*',
+            ],
+        ]);
+
+        $this->installCoolRunnings(['--with-config' => true, '--without-dependencies' => true]);
+
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonDoesntHave('statamic/ssg');
+
+        $expected = <<<"EOT"
+export_paths:
+  - config
+dependencies:
+  statamic/seo-pro: ^0.2.0
+  bobsled/speed-calculator: ^1.0.0
+dependencies_dev:
+  statamic/ssg: '*'\n
+EOT;
+
+        $this->assertEquals($expected, $this->files->get(base_path('starter-kit.yaml')));
+    }
+
+    #[Test]
+    public function it_installs_paid_starter_kit_with_valid_license_key()
+    {
+        Config::set('statamic.system.license_key', 'site-key');
+
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
+                'price' => 100,
+                'slug' => 'cool-runnings',
+                'seller' => ['slug' => 'statamic'],
+            ]], 200),
+            'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
+                'valid' => true,
+            ]], 200),
+            '*' => Http::response('', 200),
+        ]);
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_install_paid_starter_kit_with_invalid_license_key()
+    {
+        Config::set('statamic.system.license_key', 'site-key');
+
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([], [
+            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
+                'price' => 100,
+                'slug' => 'cool-runnings',
+                'seller' => ['slug' => 'statamic'],
+            ]], 200),
+            'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
+                'valid' => false,
+            ]], 200),
+            '*' => Http::response('', 200),
+        ]);
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_runs_post_install_script_hook_when_available()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        $this->installCoolRunnings();
+    }
+
+    #[Test]
+    public function it_can_register_and_run_newly_installed_command_in_post_install_hook()
+    {
+        Hook::shouldReceive('find')->andReturn(new StarterKitPostInstall);
+
+        $this->assertFalse(Blink::has('starter-kit-command-run'));
+
+        $this->installCoolRunnings();
+
+        $this->assertTrue(Blink::has('starter-kit-command-run'));
+    }
+
+    #[Test]
+    public function it_caches_post_install_hook_instructions_when_tty_is_not_available_during_a_cli_install()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')->never();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        TtyDetector::shouldReceive('isTtySupported')->andReturn(false);
+
+        $this->installCoolRunnings(['--cli-install' => true]);
+
+        $cachedInstructionsPath = storage_path('statamic/tmp/cli/post-install-instructions.txt');
+
+        $this->assertFileExists($cachedInstructionsPath);
+        $this->assertFileHasContent('Warning', $cachedInstructionsPath);
+        $this->assertFileHasContent('php please starter-kit:run-post-install statamic/cool-runnings', $cachedInstructionsPath);
+
+        // Ensure the starter kit repo is not cleaned up so that `starter-kit:run-post-install` can be run by the
+        // user afterwards. It will be cleaned up after the post-install hook is successfully run instead.
+        $this->assertFileExists(base_path('vendor/statamic/cool-runnings'));
+    }
+
+    #[Test]
+    public function it_doesnt_caches_post_install_hook_instructions_when_not_being_run_as_a_cli_install()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        TtyDetector::shouldReceive('isTtySupported')->andReturn(false);
+
+        $this->installCoolRunnings(['--cli-install' => false]);
+
+        $this->assertFileDoesNotExist(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+    }
+
+    #[Test]
+    public function it_parses_branch_from_package_param_when_installing()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([
+            'package' => 'statamic/cool-runnings:dev-custom-branch',
+        ]);
+
+        // Ensure `Composer::requireDev()` gets called with `package:branch`
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-custom-branch');
+
+        // But ensure the rest of the installer handles parsed `package` without branch messing things up
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_branch_with_slash_without_failing_package_validation()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([
+            'package' => 'statamic/cool-runnings:dev-feature/custom-branch',
+        ]);
+
+        // Ensure `Composer::requireDev()` gets called with `package:branch`
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-feature/custom-branch');
+
+        // But ensure the rest of the installer handles parsed `package` without branch messing things up
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_no_modules_by_default_when_running_non_interactively()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
+    #[Test]
+    public function it_can_still_install_modules_with_prompt_false_or_default_config()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'hockey' => [
+                    'default' => true, // Setting `default: true` will still ask user for confirmation, but should still get installed non-interactively
+                    'export_paths' => [
+                        'resources/css/hockey.css',
+                    ],
+                ],
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
+                    ],
+                ],
+                'js' => [
+                    'default' => 'vue', // Setting a `default` option will still ask user for confirmation, but should still get installed non-interactively
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                    ],
+                ],
+                'js_invalid' => [
+                    'prompt' => false, // Setting `prompt: false` doesn't do anything for select modules, should use `default` like above
+                    'options' => [
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileExists(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_installs_only_the_modules_confirmed_interactively_via_prompt()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
+                    ],
+                ],
+                'js' => [
+                    'options' => [
+                        'react' => [
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                            'dependencies' => [
+                                'bobsled/vue-components' => '^1.5',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+                'oldschool_js' => [
+                    'options' => [
+                        'jquery' => [
+                            'export_paths' => [
+                                'resources/js/jquery.js',
+                            ],
+                        ],
+                        'mootools' => [
+                            'export_paths' => [
+                                'resources/js/jquery.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonDoesntHave('bobsled/vue-components');
+
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [bobsled] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install one of the following [oldschool js] modules?', 'skip_module');
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/vue-components', '^1.5');
+    }
+
+    #[Test]
+    public function it_allows_user_to_skip_in_select_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this->installCoolRunningsModules();
+
+        $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
+            'skip_module' => 'No',
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
+
+        $command->run();
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_can_disable_skip_option_in_select_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'skip_option' => false,
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this->installCoolRunningsModules();
+
+        $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+            // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
+
+        $command->run();
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_display_custom_module_prompts_and_option_labels()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => 'Want some extra SEO magic?',
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'skip_option' => 'No, thank you!',
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Want some extra SEO magic?', 'yes');
+
+        $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+            'skip_module' => 'No, thank you!',
+            'react' => 'React JS',
+            'vue' => 'Vue JS',
+            'svelte' => 'Svelte',
+        ]);
+
+        $command->run();
+
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_installs_modules_without_dependencies()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'dependencies' => [
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this
+            ->installCoolRunningsModules(['--without-dependencies' => true])
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes');
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
+    #[Test]
+    public function it_requires_valid_config_at_top_level()
+    {
+        $this->setConfig([
+            // no installable config!
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_requires_valid_module_config()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => false,
+                    // no installable config!
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_require_anything_installable_if_module_contains_nested_modules()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => false,
+                    'modules' => [
+                        'js' => [
+                            'prompt' => false,
+                            'export_paths' => [
+                                'copied.md',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    #[DataProvider('validModuleConfigs')]
+    public function it_passes_validation_if_module_export_paths_or_dependencies_or_nested_modules_are_properly_configured($config)
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => array_merge(['prompt' => false], $config),
+            ],
+        ]);
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+    }
+
+    public static function validModuleConfigs()
+    {
+        return [
+            'export paths' => [[
+                'export_paths' => [
+                    'copied.md',
+                ],
+            ]],
+            'dependencies' => [[
+                'dependencies' => [
+                    'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+            'dev dependencies' => [[
+                'dependencies_dev' => [
+                    'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+            'nested modules' => [[
+                'modules' => [
+                    'js' => [
+                        'export_paths' => [
+                            'resources/js/vue.js',
+                        ],
+                    ],
+                ],
+            ]],
+        ];
+    }
+
+    #[Test]
+    public function it_can_still_install_nested_modules_with_prompt_false_or_default_config()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'canada' => [
+                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
+                    'export_paths' => [
+                        'resources/css/hockey.css',
+                    ],
+                    'modules' => [
+                        'hockey_players' => [
+                            'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
+                            'export_paths' => [
+                                'resources/dictionaries/players.yaml',
+                            ],
+                            'dependencies' => [
+                                'nhl/hockey-league' => '*',
+                            ],
+                            'modules' => [
+                                'hockey_night_in_usa' => [
+                                    'export_paths' => [
+                                        'resources/dictionaries/american_players.yaml',
+                                    ],
+                                ],
+                                'hockey_night_in_canada' => [
+                                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
+                                    'export_paths' => [
+                                        'resources/dictionaries/canadian_players.yaml',
+                                    ],
+                                ],
+                                'js' => [
+                                    'default' => 'vue', // Setting a `default` option, so this module should still get installed
+                                    'options' => [
+                                        'react' => [
+                                            'label' => 'React JS',
+                                            'export_paths' => [
+                                                'resources/js/react.js',
+                                            ],
+                                        ],
+                                        'vue' => [
+                                            'label' => 'Vue JS',
+                                            'export_paths' => [
+                                                'resources/js/vue.js',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertComposerJsonDoesntHave('nhl/hockey-league');
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/canadian_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/hockey.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'nhl/hockey-league', '*');
+        $this->assertFileExists(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
+        $this->assertFileExists(base_path('resources/dictionaries/canadian_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+    }
+
+    #[Test]
+    public function it_installs_nested_modules_confirmed_interactively_via_prompt()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                    'modules' => [
+                        'js' => [
+                            'options' => [
+                                'react' => [
+                                    'export_paths' => [
+                                        'resources/js/react.js',
+                                    ],
+                                    'modules' => [
+                                        'testing_tools' => [
+                                            'export_paths' => [
+                                                'resources/js/react-testing-tools.js',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'vue' => [
+                                    'export_paths' => [
+                                        'resources/js/vue.js',
+                                    ],
+                                    'dependencies_dev' => [
+                                        'i-love-vue/test-helpers' => '^1.5',
+                                    ],
+                                    'modules' => [
+                                        'testing_tools' => [
+                                            'export_paths' => [
+                                                'resources/js/vue-testing-tools.js',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'svelte' => [
+                                    'export_paths' => [
+                                        'resources/js/svelte.js',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'oldschool_js' => [
+                            'options' => [
+                                'jquery' => [
+                                    'export_paths' => [
+                                        'resources/js/jquery.js',
+                                    ],
+                                ],
+                                'mootools' => [
+                                    'export_paths' => [
+                                        'resources/js/jquery.js',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'canada' => [
+                    'export_paths' => [
+                        'resources/css/hockey.css',
+                    ],
+                    'modules' => [
+                        'hockey_players' => [
+                            'export_paths' => [
+                                'resources/dictionaries/players.yaml',
+                            ],
+                        ],
+                    ],
+                ],
+                'jamaica' => [
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
+                    ],
+                    'modules' => [
+                        'bobsled' => [
+                            'export_paths' => [
+                                'resources/css/bobsled.css',
+                            ],
+                            'dependencies' => [
+                                'bobsled/speed-calculator' => '^1.0.0',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react-testing-tools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue-testing-tools.js'));
+        $this->assertComposerJsonDoesntHave('i-love-vue/test-helpers');
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [seo js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install the [seo js vue testing tools] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [seo oldschool js] modules?', 'skip_module')
+            ->expectsConfirmation('Would you like to install the [canada] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [jamaica bobsled] module?', 'yes');
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react-testing-tools.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/vue-testing-tools.js'));
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'i-love-vue/test-helpers', '^1.5');
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
+        $this->assertFileExists(base_path('resources/css/bobsled.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+    }
+
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_non_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_update_search_flag_is_passed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunnings(['--update-search' => true])
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no')
+            ->doesntExpectOutput('statamic:search:update')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_installed_interactively_confirmed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'yes')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    private function kitRepoPath($path = null)
+    {
+        return Path::tidy(collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/'));
+    }
+
+    protected function kitVendorPath($path = null)
+    {
+        return Path::tidy(collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/'));
+    }
+
+    private function prepareRepo()
+    {
+        $this->files->copyDirectory(__DIR__.'/__fixtures__/cool-runnings', $this->kitRepoPath());
+    }
+
+    private function setConfig($config)
+    {
+        $this->files->put($this->kitRepoPath('starter-kit.yaml'), YAML::dump($config));
+    }
+
+    private function preparePath($path)
+    {
+        $folder = preg_replace('/(.*)\/[^\/]+\.[^\/]+/', '$1', $path);
+
+        if (! $this->files->exists($folder)) {
+            $this->files->makeDirectory($folder, 0755, true);
+        }
+
+        return Path::tidy($path);
+    }
+
+    private function installCoolRunnings($options = [], $customHttpFake = null)
+    {
+        $this->httpFake($customHttpFake);
+
+        return $this->artisan('statamic:starter-kit:install', array_merge([
+            'package' => 'statamic/cool-runnings',
+            '--no-interaction' => true,
+        ], $options));
+    }
+
+    private function installCoolRunningsInteractively($options = [], $customHttpFake = null)
+    {
+        $this->httpFake($customHttpFake);
+
+        return $this->artisan('statamic:starter-kit:install', array_merge([
+            'package' => 'statamic/cool-runnings',
+        ], $options));
+    }
+
+    private function installCoolRunningsModules($options = [], $customHttpFake = null)
+    {
+        return $this->installCoolRunningsInteractively(array_merge($options, [
+            '--clear-site' => true,   // skip clear site prompt
+            '--without-user' => true, // skip create user prompt
+            '--update-search' => true, // skip update search index prompt
+        ]), $customHttpFake);
+    }
+
+    private function httpFake($customFake = null)
+    {
+        Http::fake($customFake ?? [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'repo.packagist.org/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+    }
+
+    private function assertFileHasContent($expected, $path)
+    {
+        $this->assertFileExists($path);
+
+        $this->assertStringContainsString($expected, $this->files->get($path));
+    }
+
+    private function assertFileDoesntHaveContent($expected, $path)
+    {
+        $this->assertFileExists($path);
+
+        $this->assertStringNotContainsString($expected, $this->files->get($path));
+    }
+
+    private function assertComposerJsonHasPackage($requireKey, $package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertTrue(Arr::has($composerJson, "{$requireKey}.{$package}"));
+    }
+
+    private function assertComposerJsonDoesntHavePackage($package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertFalse(Arr::has($composerJson, "require.{$package}"));
+        $this->assertFalse(Arr::has($composerJson, "require-dev.{$package}"));
+    }
+
+    private function assertComposerJsonHasPackageVersion($requireKey, $package, $version)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertEquals($version, $composerJson[$requireKey][$package]);
+    }
+
+    private function assertComposerJsonDoesntHave($package)
+    {
+        $this->assertFileDoesntHaveContent($package, base_path('composer.json'));
+    }
+}
+
+class StarterKitPostInstall
+{
+    public $registerCommands = [
+        StarterKitTestCommand::class,
+    ];
+
+    public function handle($console)
+    {
+        $console->call('statamic:test:starter-kit-command');
+    }
+}
+
+class StarterKitTestCommand extends \Illuminate\Console\Command
+{
+    protected $name = 'statamic:test:starter-kit-command';
+
+    public function handle()
+    {
+        Blink::put('starter-kit-command-run', true);
+    }
+}

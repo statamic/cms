@@ -1,0 +1,53 @@
+<?php
+
+namespace Statamic\Actions;
+
+use Statamic\Contracts\Auth\User as UserContract;
+
+use function Statamic\trans as __;
+
+class SendPasswordReset extends Action
+{
+    public $icon = 'mail';
+
+    public static function title()
+    {
+        return __('Send Password Reset');
+    }
+
+    public function visibleTo($item)
+    {
+        return $item instanceof UserContract;
+    }
+
+    public function authorize($authed, $user)
+    {
+        return $authed->can('sendPasswordReset', $user);
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Would you like to email a reset link to this user?|Would you like to email a reset link to these :count users?';
+    }
+
+    public function dirtyWarningText()
+    {
+        return null;
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Send|Send to :count users';
+    }
+
+    public function run($users, $values)
+    {
+        $users->each(function ($user) {
+            $user->password()
+                ? $user->generateTokenAndSendPasswordResetNotification()
+                : $user->generateTokenAndSendActivateAccountNotification();
+        });
+    }
+}

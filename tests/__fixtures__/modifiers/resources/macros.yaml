@@ -1,0 +1,8 @@
+headline:
+  title: true
+  widont: true
+  remove_right: .
+excerpt:
+  safe_truncate:
+    - 26
+    - ...

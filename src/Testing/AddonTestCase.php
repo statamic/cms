@@ -1,0 +1,128 @@
+<?php
+
+namespace Statamic\Testing;
+
+use Facades\Statamic\Version;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use ReflectionClass;
+use Statamic\Addons\Manifest;
+use Statamic\Console\Processes\Composer;
+use Statamic\Facades\Path;
+use Statamic\Providers\StatamicServiceProvider;
+use Statamic\Statamic;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+
+abstract class AddonTestCase extends OrchestraTestCase
+{
+    protected string $addonServiceProvider;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMix();
+        $this->withoutVite();
+
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
+            $reflector = new ReflectionClass($this->addonServiceProvider);
+            $this->fakeStacheDirectory = Path::resolve(dirname($reflector->getFileName()).'/../tests/__fixtures__/dev-null');
+
+            $this->preventSavingStacheItemsToDisk();
+        }
+
+        Version::shouldReceive('get')->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
+
+        \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn(collect());
+        \Statamic\Facades\CP\Nav::shouldReceive('clearCachedUrls');
+    }
+
+    protected function tearDown(): void
+    {
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
+            $this->deleteFakeStacheDirectory();
+        }
+
+        parent::tearDown();
+    }
+
+    protected function getPackageProviders($app)
+    {
+        $serviceProviders = [
+            StatamicServiceProvider::class,
+            \Inertia\ServiceProvider::class,
+            $this->addonServiceProvider,
+        ];
+
+        if (class_exists('Rebing\GraphQL\GraphQLServiceProvider')) {
+            array_unshift($serviceProviders, 'Rebing\GraphQL\GraphQLServiceProvider');
+        }
+
+        return $serviceProviders;
+    }
+
+    protected function getPackageAliases($app)
+    {
+        return [
+            'Statamic' => Statamic::class,
+        ];
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $reflector = new ReflectionClass($this->addonServiceProvider);
+        $directory = dirname($reflector->getFileName());
+
+        $providerParts = explode('\\', $this->addonServiceProvider, -1);
+        $namespace = implode('\\', $providerParts);
+
+        $json = json_decode($app['files']->get($directory.'/../composer.json'), true);
+        $statamic = $json['extra']['statamic'] ?? [];
+        $autoload = $json['autoload']['psr-4'][$namespace.'\\'];
+
+        $app->make(Manifest::class)->manifest = [
+            $json['name'] => [
+                'id' => $json['name'],
+                'slug' => $statamic['slug'] ?? null,
+                'version' => 'dev-main',
+                'namespace' => $namespace,
+                'autoload' => $autoload,
+                'provider' => $this->addonServiceProvider,
+            ],
+        ];
+
+        $app['config']->set('inertia.testing.ensure_pages_exist', false);
+        $app['config']->set('inertia.testing.page_paths', [$directory.'/../resources/js/pages']);
+
+        $app['config']->set('statamic.users.repository', 'file');
+
+        $app['config']->set('statamic.stache.watcher', false);
+        $app['config']->set('statamic.stache.stores.taxonomies.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.terms.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.collections.directory', $directory.'/../tests/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.entries.directory', $directory.'/../tests/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.navigation.directory', $directory.'/../tests/__fixtures__/content/navigation');
+        $app['config']->set('statamic.stache.stores.globals.directory', $directory.'/../tests/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.global-variables.directory', $directory.'/../tests/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.asset-containers.directory', $directory.'/../tests/__fixtures__/content/assets');
+        $app['config']->set('statamic.stache.stores.nav-trees.directory', $directory.'/../tests/__fixtures__/content/structures/navigation');
+        $app['config']->set('statamic.stache.stores.collection-trees.directory', $directory.'/../tests/__fixtures__/content/structures/collections');
+        $app['config']->set('statamic.stache.stores.form-submissions.directory', $directory.'/../tests/__fixtures__/content/submissions');
+        $app['config']->set('statamic.stache.stores.users.directory', $directory.'/../tests/__fixtures__/users');
+    }
+
+    protected function getPackage(): string
+    {
+        $reflector = new ReflectionClass($this->addonServiceProvider);
+        $directory = dirname($reflector->getFileName());
+
+        $json = json_decode($this->app['files']->get($directory.'/../composer.json'), true);
+
+        return $json['name'];
+    }
+}

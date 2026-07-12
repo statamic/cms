@@ -1,0 +1,239 @@
+<template>
+    <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
+        <div
+            class="table-fieldtype-container"
+            :class="{ 'table-fullscreen bg-white dark:bg-gray-800': fullScreenMode }"
+        >
+            <publish-field-fullscreen-header
+                v-if="fullScreenMode"
+                :title="config.display"
+                :field-actions="fieldActions"
+                @close="toggleFullscreen"
+            >
+            </publish-field-fullscreen-header>
+
+            <section :class="{ 'mt-14 p-4 dark:bg-gray-800': fullScreenMode }">
+                <table class="table-contained" v-if="rowCount">
+                    <thead>
+                        <tr>
+                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                            <th v-for="(column, index) in columnCount" :key="index">
+                                <div class="flex h-6 items-center justify-between">
+                                    <span class="column-count">{{ index + 1 }}</span>
+                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')" v-tooltip="__('Delete Column')" class="-me-1" />
+                                </div>
+                            </th>
+                            <th class="row-controls"></th>
+                        </tr>
+                    </thead>
+
+                    <sortable-list
+                        v-model="data"
+                        :vertical="true"
+                        item-class="sortable-row"
+                        handle-class="table-drag-handle"
+                        :mirror="false"
+                        @dragstart="$emit('focus')"
+                        @dragend="$emit('blur')"
+                    >
+                        <tbody>
+                            <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
+                                <td class="table-drag-handle" v-if="!isReadOnly"></td>
+                                <td v-for="(cell, cellIndex) in row.value.cells">
+                                    <ui-input
+                                        v-model="row.value.cells[cellIndex]"
+                                        :readonly="isReadOnly"
+                                    />
+                                </td>
+                                <td class="row-controls" v-if="canDeleteRows">
+                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteRow(rowIndex)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </sortable-list>
+                </table>
+
+                <div class="flex gap-2">
+                    <ui-button @click="addRow" :disabled="atRowMax" v-if="canAddRows" :text="__('Add Row')" size="sm" />
+
+                    <ui-button @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns" :text="__('Add Column')" size="sm" />
+                </div>
+            </section>
+
+            <confirmation-modal
+                :open="deletingRow !== false"
+                :title="__('Delete Row')"
+                :bodyText="__('Are you sure you want to delete this row?')"
+                :buttonText="__('Delete')"
+                :danger="true"
+                @confirm="deleteRow(deletingRow)"
+                @cancel="deleteCancelled"
+            >
+            </confirmation-modal>
+
+            <confirmation-modal
+                :open="deletingColumn !== false"
+                :title="__('Delete Column')"
+                :bodyText="__('Are you sure you want to delete this column?')"
+                :buttonText="__('Delete')"
+                :danger="true"
+                @confirm="deleteColumn(deletingColumn)"
+                @cancel="deleteCancelled"
+            >
+            </confirmation-modal>
+        </div>
+    </portal>
+</template>
+
+<script>
+import Fieldtype from './Fieldtype.vue';
+import { SortableList, SortableHelpers } from '../sortable/Sortable';
+
+export default {
+    mixins: [Fieldtype, SortableHelpers],
+
+    components: {
+        SortableList,
+    },
+
+    data: function () {
+        return {
+            data: this.arrayToSortable(this.value || []),
+            deletingRow: false,
+            deletingColumn: false,
+            fullScreenMode: false,
+        };
+    },
+
+    watch: {
+        data: {
+            deep: true,
+            handler(data) {
+                this.updateDebounced(this.sortableToArray(data));
+            },
+        },
+
+        value(value, oldValue) {
+            if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
+            this.data = this.arrayToSortable(value);
+        },
+    },
+
+    computed: {
+        maxRows() {
+            return this.config.max_rows || null;
+        },
+
+        maxColumns() {
+            return this.config.max_columns || null;
+        },
+
+        rowCount() {
+            return this.data.length;
+        },
+
+        columnCount() {
+            return data_get(this, 'data.0.value.cells.length', 0);
+        },
+
+        atRowMax() {
+            return this.maxRows ? this.rowCount >= this.maxRows : false;
+        },
+
+        atColumnMax() {
+            return this.maxColumns ? this.columnCount >= this.maxColumns : false;
+        },
+
+        canAddRows() {
+            return !this.isReadOnly;
+        },
+
+        canDeleteRows() {
+            return !this.isReadOnly;
+        },
+
+        canAddColumns() {
+            return !this.isReadOnly && this.rowCount > 0;
+        },
+
+        canDeleteColumns() {
+            return !this.isReadOnly && this.columnCount > 1;
+        },
+
+        replicatorPreview() {
+            if (!this.showFieldPreviews) return;
+
+            // Join all values with commas. Exclude any empties.
+            return this.data
+                .map((row) => row.value.cells.filter((cell) => !!cell).join(', '))
+                .filter((row) => !!row)
+                .join(', ');
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
+                    quick: true,
+                    visible: this.config.fullscreen,
+                    visibleWhenReadOnly: true,
+                    run: this.toggleFullscreen,
+                },
+            ];
+        },
+    },
+
+    methods: {
+        addRow() {
+            this.data.push(
+                this.newSortableValue({
+                    cells: new Array(this.columnCount || 1),
+                }),
+            );
+        },
+
+        addColumn() {
+            var rows = this.data.length;
+
+            for (var i = 0; i < rows; i++) {
+                this.data[i].value.cells.push('');
+            }
+        },
+
+        confirmDeleteRow(index) {
+            this.deletingRow = index;
+        },
+
+        confirmDeleteColumn(index) {
+            this.deletingColumn = index;
+        },
+
+        deleteRow(index) {
+            this.deletingRow = false;
+
+            this.data.splice(index, 1);
+        },
+
+        deleteColumn(index) {
+            this.deletingColumn = false;
+
+            var rows = this.data.length;
+
+            for (var i = 0; i < rows; i++) {
+                this.data[i].value.cells.splice(index, 1);
+            }
+        },
+
+        deleteCancelled() {
+            this.deletingRow = false;
+            this.deletingColumn = false;
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
+    },
+};
+</script>

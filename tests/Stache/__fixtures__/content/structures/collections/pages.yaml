@@ -1,0 +1,13 @@
+tree:
+  -
+    entry: pages-home
+  -
+    entry: pages-about
+    children:
+      -
+        entry: pages-board
+        children:
+          -
+            entry: pages-directors
+  -
+    entry: pages-blog

@@ -1,0 +1,463 @@
+<?php
+
+namespace Statamic\Providers;
+
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View as ViewFactory;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\View\View;
+use Statamic\Contracts\View\Antlers\Parser as ParserContract;
+use Statamic\Facades\Site;
+use Statamic\Statamic;
+use Statamic\View\Antlers\Engine;
+use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
+use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
+use Statamic\View\Antlers\Language\Runtime\EnvironmentDetails;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\ModifierManager;
+use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
+use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
+use Statamic\View\Blade\AntlersBladePrecompiler;
+use Statamic\View\Blade\StatamicTagCompiler;
+use Statamic\View\Cascade;
+use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
+use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
+use Statamic\View\Interop\Stacks;
+
+class ViewServiceProvider extends ServiceProvider
+{
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->singleton(Cascade::class, function ($app) {
+            return new Cascade($app['request'], Site::current());
+        });
+
+        $this->registerAntlers();
+
+        $this->app->singleton(Engine::class, function ($app) {
+            return new Engine($app['files'], $app[ParserContract::class]);
+        });
+    }
+
+    private function registerAntlers()
+    {
+        Stacks::register();
+        GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
+
+        // Set the debug mode before anything else starts.
+        GlobalRuntimeState::$isDebugMode = config('app.debug', false);
+
+        if (GlobalRuntimeState::$isDebugMode) {
+            $debugPath = storage_path('antlers/_debug/');
+
+            if (file_exists($debugPath)) {
+                GlobalDebugManager::loadDebugConfiguration($debugPath, resource_path());
+            }
+        }
+
+        $this->app->bind(EnvironmentDetails::class, function ($app) {
+            $envDetails = new EnvironmentDetails();
+
+            $envDetails->setTagNames($app->make('statamic.tags')->keys()->all());
+            $envDetails->setModifierNames($app->make('statamic.modifiers')->keys()->all());
+
+            NodeTypeAnalyzer::$environmentDetails = $envDetails;
+
+            return $envDetails;
+        });
+
+        $this->app->singleton(ModifierManager::class, function ($app) {
+            return new ModifierManager();
+        });
+
+        $this->app->singleton(PerformanceTracer::class, function () {
+            return new PerformanceTracer();
+        });
+
+        $this->app->bind(ParserContract::class, function ($app) {
+            /** @var RuntimeParser $parser */
+            $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
+            $runtimeConfig = new RuntimeConfiguration();
+
+            $isTracingOn = config('statamic.antlers.tracing', false);
+            $runtimeConfig->fatalErrorOnUnpairedLoop = config('statamic.antlers.fatalErrorOnUnpairedLoop', false);
+            $runtimeConfig->fatalErrorOnStringObject = config('statamic.antlers.fatalErrorOnPrintObjects', false);
+            $runtimeConfig->throwErrorOnAccessViolation = config('statamic.antlers.errorOnAccessViolation', false);
+            $runtimeConfig->guardedVariablePatterns = config('statamic.antlers.guardedVariables', [
+                'config.app.key',
+            ]);
+            $runtimeConfig->guardedTagPatterns = config('statamic.antlers.guardedTags', []);
+            $runtimeConfig->guardedModifiers = config('statamic.antlers.guardedModifiers', []);
+
+            $runtimeConfig->guardedContentVariablePatterns = config('statamic.antlers.guardedContentVariables', []);
+            $runtimeConfig->guardedContentTagPatterns = config('statamic.antlers.guardedContentTags', []);
+            $runtimeConfig->guardedContentModifiers = config('statamic.antlers.guardedContentModifiers', []);
+            $runtimeConfig->allowedContentTagPatterns = $this->mergeContentAllowlist(
+                config('statamic.antlers.allowedContentTags'),
+                $this->defaultAllowedContentTagPatterns($app)
+            );
+
+            $runtimeConfig->allowedContentModifiers = $this->mergeContentAllowlist(
+                config('statamic.antlers.allowedContentModifiers'),
+                $this->defaultAllowedContentModifiers($app)
+            );
+            $runtimeConfig->allowPhpInUserContent = config('statamic.antlers.allowPhpInContent', false);
+            $runtimeConfig->allowMethodsInUserContent = config('statamic.antlers.allowMethodsInContent', false);
+
+            $runtimeConfig->guardedContentVariablePatterns = array_merge(
+                $runtimeConfig->guardedVariablePatterns,
+                $runtimeConfig->guardedContentVariablePatterns
+            );
+
+            $runtimeConfig->guardedContentTagPatterns = array_merge(
+                $runtimeConfig->guardedTagPatterns,
+                $runtimeConfig->guardedContentTagPatterns
+            );
+
+            $runtimeConfig->guardedContentModifiers = array_merge(
+                $runtimeConfig->guardedModifiers,
+                $runtimeConfig->guardedContentModifiers
+            );
+
+            if ($isTracingOn) {
+                $traceManager = new TraceManager();
+                $tracers = config('statamic.antlers.tracers', []);
+
+                foreach ($tracers as $abstract) {
+                    $traceManager->registerTracer($app->make($abstract));
+                }
+
+                $runtimeConfig->traceManager = $traceManager;
+                $runtimeConfig->isTracingEnabled = true;
+            }
+
+            if (GlobalDebugManager::isDebugSessionActive()) {
+                if (! $isTracingOn) {
+                    $runtimeConfig->traceManager = new TraceManager();
+                    $runtimeConfig->isTracingEnabled = true;
+                }
+
+                $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
+            }
+
+            if ($this->profilerEnabled()) {
+                if (! $isTracingOn) {
+                    $runtimeConfig->traceManager = new TraceManager();
+                    $runtimeConfig->isTracingEnabled = true;
+                }
+
+                $runtimeConfig->traceManager->registerTracer(app(PerformanceTracer::class));
+            }
+
+            $parser->isolateRuntimes(GlobalRuntimeState::$requiresRuntimeIsolation)
+                ->setRuntimeConfiguration($runtimeConfig);
+
+            return $parser;
+        });
+    }
+
+    private function getAppTagPatternsForContentAllowlist(Application $app): array
+    {
+        $namespace = $app->getNamespace().'Tags\\';
+
+        return collect($app->make('statamic.tags'))
+            ->filter(fn ($binding) => is_string($binding) && str_starts_with($binding, $namespace))
+            ->keys()
+            ->flatMap(fn ($handle) => [$handle, $handle.':*'])
+            ->values()
+            ->all();
+    }
+
+    private function getAppModifierHandlesForContentAllowlist(Application $app): array
+    {
+        $namespace = $app->getNamespace().'Modifiers\\';
+
+        return collect($app->make('statamic.modifiers'))
+            ->filter(fn ($binding) => is_string($binding) && str_starts_with($binding, $namespace))
+            ->keys()
+            ->values()
+            ->all();
+    }
+
+    private function defaultAllowedContentTagPatterns(Application $app): array
+    {
+        return [
+            'link:*',
+            'obfuscate:*',
+            'trans:*',
+            'trans_choice:*',
+            'widont:*',
+            ...$this->getAppTagPatternsForContentAllowlist($app),
+        ];
+    }
+
+    private function defaultAllowedContentModifiers(Application $app): array
+    {
+        return [
+            'add_query_param',
+            'add_slashes',
+            'alias',
+            'ampersand_list',
+            'ascii',
+            'at',
+            'backspace',
+            'background_position',
+            'bool_string',
+            'camelize',
+            'cdata',
+            'ceil',
+            'chunk',
+            'classes',
+            'collapse',
+            'collapse_whitespace',
+            'contains_any',
+            'count',
+            'count_substring',
+            'dashify',
+            'days_ago',
+            'decode',
+            'deslugify',
+            'diff_for_humans',
+            'divide',
+            'dl',
+            'embed_url',
+            'ends_with',
+            'ensure_left',
+            'ensure_right',
+            'entities',
+            'excerpt',
+            'explode',
+            'extension',
+            'favicon',
+            'filter_empty',
+            'first',
+            'flatten',
+            'flip',
+            'floor',
+            'format',
+            'format_number',
+            'format_translated',
+            'full_urls',
+            'has_lower_case',
+            'has_upper_case',
+            'headline',
+            'hex_to_rgb',
+            'hours_ago',
+            'insert',
+            'is_alpha',
+            'is_alphanumeric',
+            'is_array',
+            'is_blank',
+            'is_email',
+            'is_embeddable',
+            'is_empty',
+            'is_external_url',
+            'is_future',
+            'is_iterable',
+            'is_json',
+            'is_leap_year',
+            'is_lowercase',
+            'is_numeric',
+            'is_past',
+            'is_today',
+            'is_tomorrow',
+            'is_uppercase',
+            'is_url',
+            'is_weekday',
+            'is_weekend',
+            'is_yesterday',
+            'iso_format',
+            'join',
+            'key_by',
+            'keys',
+            'kebab',
+            'last',
+            'lcfirst',
+            'length',
+            'limit',
+            'localize',
+            'lower',
+            'markdown',
+            'md5',
+            'minutes_ago',
+            'mod',
+            'modify_date',
+            'months_ago',
+            'multiply',
+            'nl2br',
+            'obfuscate',
+            'obfuscate_email',
+            'offset',
+            'ol',
+            'option_list',
+            'parse_url',
+            'pathinfo',
+            'pluck',
+            'random',
+            'rawurlencode',
+            'read_time',
+            'relative',
+            'remove_left',
+            'remove_query_param',
+            'remove_right',
+            'replace',
+            'resolve',
+            'reverse',
+            'round',
+            'safe_truncate',
+            'sanitize',
+            'scope',
+            'seconds_ago',
+            'select',
+            'sentence_list',
+            'set_query_param',
+            'shuffle',
+            'singular',
+            'slugify',
+            'smartypants',
+            'snake',
+            'sort',
+            'spaceless',
+            'split',
+            'starts_with',
+            'str_pad',
+            'str_pad_both',
+            'str_pad_left',
+            'str_pad_right',
+            'strip_tags',
+            'studly',
+            'subtract',
+            'substr',
+            'sum',
+            'surround',
+            'swap_case',
+            'table',
+            'tidy',
+            'timestamp',
+            'timezone',
+            'title',
+            'to_bool',
+            'to_qs',
+            'to_spaces',
+            'to_tabs',
+            'to_string',
+            'trans',
+            'trans_choice',
+            'trackable_embed_url',
+            'trim',
+            'truncate',
+            'type_of',
+            'ucfirst',
+            'underscored',
+            'unique',
+            'upper',
+            'urldecode',
+            'urlencode',
+            'values',
+            'weeks_ago',
+            'where',
+            'where_in',
+            'widont',
+            'word_count',
+            'years_ago',
+            ...$this->getAppModifierHandlesForContentAllowlist($app),
+        ];
+    }
+
+    private function mergeContentAllowlist(mixed $configured, array $defaults): array
+    {
+        if ($configured === null) {
+            return $defaults;
+        }
+
+        return collect((array) $configured)
+            ->flatMap(fn ($item) => $item === '@default' ? $defaults : [$item])
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    public function registerBladeDirectives()
+    {
+        Blade::directive('tags', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
+        });
+        Blade::directive('cascade', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\CascadeDirective::handle($expression)) ?>";
+        });
+        Blade::directive('frontmatter', function ($exp) {
+            return "<?php
+if (! isset(\$view)) { \$view = []; }
+\$view = array_merge({$exp}, \$view ?? [], \$__frontmatter ?? []);
+?>";
+        });
+        Blade::directive('recursive_children', function ($exp) {
+            $nested = $exp ?? '$children';
+
+            if (! $nested) {
+                $nested = '$children';
+            }
+
+            return <<<PHP
+<?php
+    echo \$___statamicNavCallback(
+        array_merge(get_defined_vars(), [
+            'depth' => (\$depth ?? 0) + 1,
+            '__statamicOverrideTagResultValue' => $nested,
+        ]),
+        \$___statamicNavCallback
+    );
+?>
+PHP;
+        });
+
+    }
+
+    public function boot()
+    {
+        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        $this->registerBladeDirectives();
+
+        Blade::precompiler(function ($content) {
+            return (new StatamicTagCompiler())->compile($content);
+        });
+
+        Blade::precompiler(function ($content) {
+            return AntlersBladePrecompiler::compile($content);
+        });
+
+        View::macro('withoutExtractions', function () {
+            if ($this->getEngine() instanceof Engine) {
+                $this->getEngine()->withoutExtractions();
+            }
+
+            return $this;
+        });
+
+        foreach (Engine::EXTENSIONS as $extension) {
+            $this->app['view']->addExtension($extension, 'antlers', function () {
+                return $this->app[Engine::class];
+            });
+        }
+
+        ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
+
+        if ($this->profilerEnabled()) {
+            debugbar()->addCollector(new PerformanceCollector);
+        }
+    }
+
+    private function profilerEnabled()
+    {
+        return debugbar()->isEnabled() && config('statamic.antlers.debugbar', true) && ! Statamic::isCpRoute();
+    }
+}

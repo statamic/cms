@@ -1,0 +1,56 @@
+<?php
+
+namespace Statamic\Contracts\Auth;
+
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
+
+interface User extends Authenticatable
+{
+    /**
+     * Get or set a user's email address.
+     *
+     * @param  string|null  $email
+     * @return mixed
+     */
+    public function email($email = null);
+
+    /**
+     * Get or set a user's password.
+     *
+     * @param  string|null  $password
+     * @return string
+     */
+    public function password($password = null);
+
+    public function roles(): Collection;
+
+    public function explicitRoles($roles = null);
+
+    public function assignRole($role);
+
+    public function removeRole($role);
+
+    public function hasRole($role);
+
+    public function groups($groups = null);
+
+    public function addToGroup($group);
+
+    public function removeFromGroup($group);
+
+    public function isInGroup($group);
+
+    public function permissions();
+
+    public function hasPermission($permission);
+
+    public function isSuper();
+
+    public function makeSuper();
+
+    /**
+     * @return Collection<string, Passkey>
+     */
+    public function passkeys(): Collection;
+}

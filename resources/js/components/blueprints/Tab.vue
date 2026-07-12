@@ -1,0 +1,231 @@
+<template>
+    <TabTrigger :name="tab._id" class="blueprint-tab flex items-center">
+        <Icon
+            v-if="tab.icon"
+            :name="tab.icon"
+            :set="iconSet"
+            class="h-4 w-4 me-1"
+        />
+
+        <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
+
+        <Dropdown v-if="isActive" placement="left-start" class="me-3">
+            <template #trigger>
+                <Button class="absolute! top-0.25 -right-4 starting-style-transition starting-style-transition--slow" variant="ghost" size="xs" icon="chevron-down" :aria-label="__('Open Dropdown')" />
+            </template>
+            <DropdownMenu>
+                <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
+                <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="remove" />
+            </DropdownMenu>
+        </Dropdown>
+
+        <Stack
+	        size="narrow"
+            :open="editing"
+            @opened="() => $nextTick(() => $refs.title.select())"
+            @update:open="editCancelled"
+            :title="editText"
+        >
+            <div class="">
+                <div class="space-y-6">
+                    <Field :label="__('Title')" class="form-group field-w-100">
+                        <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                    </Field>
+                    <Field :label="__('Handle')" class="form-group field-w-100">
+                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)">
+                            <template #append>
+                                <Button
+                                    icon="sync"
+                                    size="sm"
+                                    variant="ghost"
+                                    :aria-label="__('Regenerate from: :field', { field: __('Title') })"
+                                    @click="regenerateHandle"
+                                    v-tooltip="__('Regenerate from: :field', { field: __('Title') })"
+                                />
+                            </template>
+                        </Input>
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
+                        <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
+                        <publish-field-meta
+                            :config="{
+                            handle: 'icon',
+                            type: 'icon',
+                            set: iconSet,
+                        }"
+                            :initial-value="icon"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="fieldUpdated('icon', $event)"
+                            />
+                        </publish-field-meta>
+                    </Field>
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
+                        <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
+                    </div>
+                </div>
+            </div>
+        </Stack>
+    </TabTrigger>
+</template>
+
+<script>
+import { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
+
+export default {
+    components: { TabTrigger, Dropdown, DropdownMenu, DropdownItem, Button, Icon, Field, Input, Stack, StackClose },
+
+    props: {
+        tab: {
+            type: Object,
+            required: true,
+        },
+        currentTab: {
+            type: String,
+            required: true,
+        },
+        showInstructions: {
+            type: Boolean,
+            default: false,
+        },
+        editText: {
+            type: String,
+        },
+    },
+
+    data() {
+        return {
+            handle: this.tab.handle,
+            display: this.tab.display,
+            instructions: this.tab.instructions,
+            icon: this.tab.icon,
+            editing: false,
+            handleSyncedWithDisplay: false,
+            saveKeyBinding: null,
+        };
+    },
+
+    computed: {
+        isActive() {
+            return this.currentTab === this.tab._id;
+        },
+
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
+        },
+
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
+        },
+    },
+
+    watch: {
+        editing: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleSaveOrConfirm();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
+        },
+    },
+
+    methods: {
+        regenerateHandle() {
+            this.handle = snake_case(this.display);
+        },
+
+        edit() {
+            this.display = this.tab.display;
+            this.handle = this.tab.handle;
+            this.instructions = this.tab.instructions;
+            this.icon = this.tab.icon;
+            this.handleSyncedWithDisplay = !this.tab.handle || ['new_tab', 'new_set_group'].includes(this.tab.handle);
+            this.editing = true;
+        },
+
+        editConfirmed() {
+            if (!this.handle) {
+                this.handle = snake_case(this.display);
+            }
+
+            this.$emit('updated', {
+                ...this.tab,
+                handle: this.handle,
+                display: this.display,
+                instructions: this.instructions,
+                icon: this.icon,
+            });
+
+            this.editing = false;
+        },
+
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            // First confirm the tab changes
+            this.editConfirmed();
+            
+            // Then trigger the blueprint save
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
+        },
+
+        editCancelled() {
+            this.editing = false;
+            this.handle = this.tab.handle;
+            this.display = this.tab.display;
+        },
+
+        fieldUpdated(handle, value) {
+            if (handle === 'display' && this.handleSyncedWithDisplay) {
+                this.handle = snake_case(value);
+            }
+
+            if (handle === 'handle') {
+                this.handleSyncedWithDisplay = false;
+            }
+
+            this[handle] = value;
+        },
+
+        remove() {
+            this.$emit('removed');
+        },
+    },
+
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
+    },
+};
+</script>

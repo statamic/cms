@@ -1,0 +1,64 @@
+<?php
+
+namespace Statamic\Http\Resources\CP\Users;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Facades\User;
+
+use function Statamic\trans as __;
+
+class ListedUser extends JsonResource
+{
+    protected $blueprint;
+    protected $columns;
+
+    public function blueprint($blueprint)
+    {
+        $this->blueprint = $blueprint;
+
+        return $this;
+    }
+
+    public function columns($columns)
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
+
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id(),
+            'last_login' => optional($this->lastLogin())->diffForHumans() ?? __('Never'),
+            $this->merge($this->values([
+                'email' => $this->email(),
+                'roles' => $this->roles()->map->handle()->all(),
+                'groups' => $this->groups()->map->handle()->all(),
+                'two_factor' => $this->hasEnabledTwoFactorAuthentication(),
+            ])),
+            'super' => $this->isSuper(),
+            'edit_url' => $this->editUrl(),
+            'avatar' => $this->avatar(),
+            'initials' => $this->initials(),
+            'editable' => User::current()->can('edit', $this->resource),
+            'deleteable' => User::current()->can('delete', $this->resource),
+        ];
+    }
+
+    protected function values($extra = [])
+    {
+        return $this->columns->mapWithKeys(function ($column) use ($extra) {
+            $key = $column->field;
+            $field = $this->blueprint->field($key);
+
+            $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
+
+            if ($field) {
+                $value = $field->setValue($value)->preProcessIndex()->value();
+            }
+
+            return [$key => $value];
+        });
+    }
+}

@@ -1,0 +1,36 @@
+<?php
+
+namespace Statamic\Fieldtypes;
+
+use Statamic\Fields\Fieldtype;
+
+use function Statamic\trans as __;
+
+class Html extends Fieldtype
+{
+    protected $categories = ['special'];
+
+    protected function configFieldItems(): array
+    {
+        return [
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'html' => [
+                        'display' => 'HTML',
+                        'instructions' => __('statamic::fieldtypes.html.config.html_instruct'),
+                        'type' => 'code',
+                        'mode' => 'htmlmixed',
+                        'mode_selectable' => false,
+                    ],
+                    'sanitize' => [
+                        'display' => __('Sanitize'),
+                        'instructions' => __('statamic::fieldtypes.html.config.sanitize_instruct'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                ],
+            ],
+        ];
+    }
+}

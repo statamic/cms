@@ -1,0 +1,429 @@
+<template>
+    <div class="relationship-input @container w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+        <RelationshipSelectField
+            v-if="!initializing && usesSelectField"
+            :config="config"
+            :items="items"
+            :multiple="maxItems > 1"
+            :typeahead="mode === 'typeahead'"
+            :taggable="taggable"
+            :max-selections="maxItems"
+            :read-only="readOnly"
+            :url="selectionsUrl"
+            :site="site"
+            @input="selectFieldSelected"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
+
+        <Icon v-if="initializing" name="loading" />
+
+        <template v-if="shouldShowSelectedItems">
+            <div
+                v-if="items.length"
+                ref="items"
+                :class="{ 'mt-2': usesSelectField && items.length }"
+            >
+                <component
+                    :is="itemComponent"
+                    v-for="(item, i) in items"
+                    :key="item.id"
+                    :item="item"
+                    :config="config"
+                    :status-icon="statusIcons"
+                    :editable="canEdit && (item.editable || item.editable === undefined)"
+                    :sortable="!readOnly && canReorder"
+                    :read-only="readOnly"
+                    :form-component="formComponent"
+                    :form-component-props="formComponentProps"
+                    :form-stack-size="formStackSize"
+                    class="related-item"
+                    @removed="remove(i)"
+                />
+            </div>
+
+            <div class="ml-1 text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
+                <span class="mr-1">{{ __('Maximum items selected:') }}</span>
+                <span>{{ maxItems }}/{{ maxItems }}</span>
+            </div>
+            <div
+                v-if="canSelectOrCreate"
+                class="relationship-input-buttons @container relative"
+                :class="{ 'mt-3': items.length > 0 }"
+            >
+                <div class="flex flex-wrap items-center gap-2">
+                    <CreateButton
+                        v-if="canCreate && creatables.length"
+                        :creatables="creatables"
+                        :component="formComponent"
+                        :component-props="formComponentProps"
+                        :icon="icon"
+                        :text="createLabel"
+                        :site="site"
+                        :stack-size="formStackSize"
+                        @created="itemCreated"
+                    />
+                    <Button
+                        ref="existing"
+                        icon="link"
+                        :size="buttonSize"
+                        :text="linkLabel"
+                        @click.prevent="openSelector"
+                    />
+                </div>
+            </div>
+
+            <Stack v-model:open="isSelecting" inset :show-close-button="false">
+                <ItemSelector
+                    :name="name"
+                    :filters-url="filtersUrl"
+                    :selections-url="selectionsUrl"
+                    :site="site"
+                    :initial-columns="columns"
+                    :initial-sort-column="initialSortColumn"
+                    :initial-sort-direction="initialSortDirection"
+                    :initial-selections="value"
+                    :max-selections="maxItems"
+                    :search="search"
+                    :exclusions="exclusions"
+                    :type="config.type"
+                    :tree="config.query_scopes?.length > 0 ? null : tree"
+                    @selected="selectionsUpdated"
+                    @closed="isSelecting = false"
+                />
+            </Stack>
+
+            <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
+        </template>
+    </div>
+</template>
+
+<script>
+import RelatedItem from './Item.vue';
+import ItemSelector from './Selector.vue';
+import CreateButton from './CreateButton.vue';
+import { Sortable, Plugins } from '@shopify/draggable';
+import RelationshipSelectField from './SelectField.vue';
+import { Button, Icon, Stack } from '@/components/ui';
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+
+const inFlightRequests = new Map();
+
+function detachFromInFlightRequest(component) {
+    const entry = component._activeRequest;
+    if (!entry) return;
+    component._activeRequest = null;
+    entry.subscribers--;
+    if (entry.subscribers > 0) return;
+    entry.controller.abort();
+    if (inFlightRequests.get(entry.cacheKey) === entry) {
+        inFlightRequests.delete(entry.cacheKey);
+    }
+}
+
+export default {
+    props: {
+        canCreate: { type: Boolean },
+        canEdit: { type: Boolean },
+        canReorder: { type: Boolean },
+        columns: { type: Array, default: () => [] },
+        config: { type: Object },
+        creatables: { type: Array },
+        data: { type: Array },
+        exclusions: { type: Array },
+        filtersUrl: { type: String },
+        formComponent: { type: String },
+        formComponentProps: { type: Object },
+        formStackSize: { type: String },
+        initialSortColumn: { type: String, default: 'title' },
+        initialSortDirection: { type: String, default: 'asc' },
+        itemComponent: { type: String, default: 'RelatedItem' },
+        itemDataUrl: { type: String },
+        maxItems: { type: Number },
+        mode: { type: String, default: 'default' },
+        name: { type: String },
+        readOnly: { type: Boolean },
+        search: { type: Boolean },
+        selectionsUrl: { type: String },
+        site: { type: String },
+        buttonSize: { type: String, default: 'sm' },
+        statusIcons: { type: Boolean },
+        taggable: { type: Boolean },
+        tree: { type: Object },
+        value: { required: true },
+    },
+
+    emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],
+
+    components: {
+        ItemSelector,
+        RelatedItem,
+        CreateButton,
+        RelationshipSelectField,
+        Button,
+        Icon,
+	    Stack,
+    },
+
+    data() {
+        return {
+            isSelecting: false,
+            isCreating: false,
+            itemData: [],
+            initializing: true,
+            loading: true,
+            inline: false,
+            sortable: null,
+            removeNavigationListener: null,
+        };
+    },
+
+    computed: {
+        icon() {
+            if (this.config.type === 'taxonomies') {
+                return 'add-tag';
+            }
+
+            if (this.config.type === 'users') {
+                return 'add-user';
+            }
+
+            return 'add-entry';
+        },
+
+        createLabel() {
+            if (this.config.type === 'entries') {
+                return __('Create Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Create Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Create User');
+            }
+
+            return __('Create Item');
+        },
+
+        linkLabel() {
+            if (this.config.type === 'entries') {
+                return __('Link Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Link Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Link User');
+            }
+
+            return __('Link Item');
+        },
+
+        items() {
+            if (this.value === null) return [];
+
+            return this.value?.map((selection) => {
+                const data = this.data.find((item) => item.id == selection);
+
+                if (!data) return { id: selection, title: selection };
+
+                return data;
+            });
+        },
+
+        maxItemsReached() {
+            return this.value?.length >= this.maxItems;
+        },
+
+        canSelectOrCreate() {
+            return !this.usesSelectField && !this.readOnly && !this.maxItemsReached;
+        },
+
+        usesSelectField() {
+            return ['select', 'typeahead'].includes(this.mode);
+        },
+
+        shouldShowSelectedItems() {
+            if (this.initializing) return false;
+
+            if (this.usesSelectField && this.maxItems === 1) return false;
+
+            return true;
+        },
+    },
+
+    created() {
+        this.removeNavigationListener = router.on('before', () => {
+            detachFromInFlightRequest(this);
+        });
+    },
+
+    mounted() {
+        this.initializeData().then(() => {
+            this.initializing = false;
+            if (this.canReorder) {
+                this.$nextTick(() => this.makeSortable());
+            }
+        });
+    },
+
+    beforeUnmount() {
+        detachFromInFlightRequest(this);
+        if (this.removeNavigationListener) this.removeNavigationListener();
+        if (this.sortable) {
+            this.sortable.destroy();
+            this.sortable = null;
+        }
+        this.setLoadingProgress(false);
+    },
+
+    watch: {
+        loading: {
+            immediate: true,
+            handler(loading) {
+                this.$emit('loading', loading);
+                this.setLoadingProgress(loading);
+            },
+        },
+
+        isSelecting(selecting) {
+            this.$emit(selecting ? 'focus' : 'blur');
+        },
+
+        itemData(data, olddata) {
+            if (this.initializing) return;
+            this.$emit('item-data-updated', data);
+        },
+
+        value(value) {
+            if (this.initializing || this.loading) return;
+
+            // A value set from outside (e.g. a save response normalizing a typed term) may
+            // reference an id we have no data for yet, which would render as a raw id.
+            if (value?.some((selection) => !this.data?.find((item) => item.id == selection))) {
+                this.getDataForSelections(value);
+            }
+        },
+
+        items(items, oldItems) {
+            if (items.length > 0 && oldItems.length === 0) {
+                if (this.canReorder) {
+                    this.$nextTick(() => this.makeSortable());
+                }
+            }
+        },
+    },
+
+    methods: {
+        update(selections) {
+            if (JSON.stringify(selections) == JSON.stringify(this.value)) return;
+            this.$emit('input', selections);
+        },
+
+        remove(index) {
+            this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        },
+
+	    openSelector() {
+			this.isSelecting = true;
+	    },
+
+        selectionsUpdated(selections) {
+            this.getDataForSelections(selections).then(() => {
+                this.update(selections);
+            });
+        },
+
+        initializeData() {
+            if (!this.data) {
+                return this.getDataForSelections(this.value);
+            }
+
+            this.loading = false;
+            return Promise.resolve();
+        },
+
+        getDataForSelections(selections) {
+            this.loading = true;
+
+            detachFromInFlightRequest(this);
+
+            const cacheKey = JSON.stringify([this.itemDataUrl, this.site, selections?.slice().sort()]);
+            let entry = inFlightRequests.get(cacheKey);
+
+            if (!entry) {
+                const controller = new AbortController();
+                entry = { cacheKey, controller, subscribers: 0 };
+                entry.promise = this.$axios
+                    .post(this.itemDataUrl, { site: this.site, selections }, { signal: controller.signal })
+                    .finally(() => {
+                        if (inFlightRequests.get(cacheKey) === entry) {
+                            inFlightRequests.delete(cacheKey);
+                        }
+                    });
+                inFlightRequests.set(cacheKey, entry);
+            }
+
+            entry.subscribers++;
+            this._activeRequest = entry;
+
+            return entry.promise
+                .then((response) => {
+                    if (this._activeRequest !== entry) return;
+                    this.$emit('item-data-updated', response.data.data);
+                })
+                .catch((e) => {
+                    if (axios.isCancel(e)) return;
+                    if (this._activeRequest !== entry) return;
+                    throw e;
+                })
+                .finally(() => {
+                    if (this._activeRequest !== entry) return;
+                    this.loading = false;
+                });
+        },
+
+        makeSortable() {
+            if (! this.$refs.items) return;
+
+            this.sortable = new Sortable(this.$refs.items, {
+                draggable: '.related-item',
+                handle: '.item-move',
+                mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
+                swapAnimation: { vertical: true },
+                plugins: [Plugins.SwapAnimation],
+            })
+                .on('drag:start', (e) => {
+                    this.value.length === 1 ? e.cancel() : this.$emit('focus');
+                })
+                .on('drag:stop', (e) => {
+                    this.$emit('blur');
+                })
+                .on('sortable:stop', (e) => {
+                    const val = [...this.value];
+                    val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
+                    this.update(val);
+                });
+        },
+
+        itemCreated(item) {
+            this.$emit('item-data-updated', [...this.data, item]);
+            this.update([...this.value, item.id]);
+        },
+
+        selectFieldSelected(selectedItemData) {
+            this.$emit('item-data-updated', selectedItemData);
+            this.update(selectedItemData.map((item) => item.id));
+        },
+
+        setLoadingProgress(state) {
+            this.$progress.loading(`relationship-fieldtype-${this.$.uid}`, state);
+        },
+    },
+};
+</script>

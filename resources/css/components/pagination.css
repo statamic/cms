@@ -1,0 +1,35 @@
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+
+.pagination {
+    @apply flex list-none items-center justify-center overflow-hidden rounded-sm p-0 shadow dark:shadow-lg;
+
+    li a {
+        @apply block h-full bg-white px-3 py-2 text-gray-900 dark:border-gray-900 dark:bg-gray-700 dark:text-gray-300 ltr:border-r rtl:border-l;
+
+        &:hover {
+            @apply bg-gray-100 text-gray-900 dark:bg-gray-850 dark:text-gray-200;
+        }
+    }
+
+    li > .unclickable {
+        @apply block h-full bg-white px-3 py-2 text-gray-500 dark:border-gray-900 dark:bg-gray-700 dark:text-gray-500 ltr:border-r rtl:border-l;
+
+        &:hover {
+            cursor: text;
+        }
+    }
+
+    li:last-child a {
+        @apply ltr:border-r-0 rtl:border-l-0;
+    }
+
+    li.current a {
+        @apply bg-gray-100 text-blue-600 shadow-inner dark:bg-gray-850 dark:text-dark-blue-100;
+    }
+}
+
+.pagination.pagination-inline {
+    @apply rounded-none shadow-none;
+}

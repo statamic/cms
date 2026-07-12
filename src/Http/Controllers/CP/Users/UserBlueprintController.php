@@ -1,0 +1,55 @@
+<?php
+
+namespace Statamic\Http\Controllers\CP\Users;
+
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
+
+class UserBlueprintController extends CpController
+{
+    use ManagesBlueprints;
+
+    public function __construct()
+    {
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
+    }
+
+    public function edit()
+    {
+        $blueprint = User::make()->blueprint();
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'User',
+        ));
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: 'User',
+            icon: 'users',
+            url: cp_route('blueprints.users.edit'),
+            links: [
+                [
+                    'text' => 'Group',
+                    'icon' => 'groups',
+                    'url' => cp_route('blueprints.user-groups.edit'),
+                ],
+            ],
+        ));
+
+        return $this->renderEditPage([
+            'blueprint' => $this->toVueObject($blueprint),
+            'action' => cp_route('blueprints.users.update'),
+            'canDefineLocalizable' => false,
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate(['tabs' => 'array']);
+
+        $this->updateBlueprint($request, User::make()->blueprint());
+    }
+}

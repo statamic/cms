@@ -1,0 +1,43 @@
+.toasted-container.bottom-right {
+    bottom: 32px !important;
+    right: 32px !important;
+}
+
+.toasted-container.bottom-left {
+    bottom: 32px !important;
+    left: 14px !important;
+}
+
+.toasted-container {
+    @apply items-start fixed;
+}
+
+.toasted-container .toasted.statamic {
+    @apply mt-4 rounded-xl bg-white p-0 text-base text-gray-900 shadow dark:bg-gray-900 dark:text-gray-200;
+    height: 45px;
+
+    i {
+        @apply flex items-center justify-center h-3/4 aspect-square text-white ms-1.5 me-4 rounded-full;
+    }
+
+    &.success i {
+        @apply bg-green-400 text-green-900 dark:bg-green-400 dark:text-green-950;
+    }
+
+    &.error i {
+        @apply bg-red-600 dark:bg-red-600;
+    }
+
+    &.default i {
+        @apply bg-gray-800 dark:bg-gray-900;
+    }
+
+    .action {
+        @apply m-0 flex h-full items-center px-4 text-xl font-normal text-gray-600 dark:text-gray-300 ms-2 opacity-50;
+        /* Compensate for the "x" button being a slightly bigger font-size */
+        transform: translateY(-1.5px);
+        &:hover {
+            @apply text-gray-900 no-underline dark:text-gray-200;
+        }
+    }
+}

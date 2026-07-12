@@ -1,0 +1,18 @@
+name: Pull Requests
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    types:
+      - opened
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  uneditable:
+    uses: statamic/.github/.github/workflows/pull-requests.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
+    permissions:
+      pull-requests: write # post comment and close PRs that don't allow maintainer edits

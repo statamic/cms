@@ -1,0 +1,221 @@
+replicatorKey1 - Replicator Value 1
+        
+
+            replicatorKey2 - Replicator Value 2
+        
+        
+        
+
+            
+            Rep AK V1
+            
+            Rep AK V2
+
+        
+        
+        button3
+        
+        
+        
+        &lt;?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Statamic\Statamic;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // Statamic::script('app', 'cp');
+        // Statamic::style('app', 'cp');
+    }
+}
+        
+        #1624C0
+        
+        42
+        
+        
+
+            
+            RG_1
+            
+            RG_2
+
+        
+
+            
+            RG_3
+            
+            RG_4
+
+        
+
+            
+            RG_5
+            
+            RG_6
+
+        
+        
+        
+
+            
+            RGS1
+            
+            RGS2
+
+        
+
+            
+            RGS3
+            
+            RGS4
+
+        
+
+            
+            RGS5
+            
+            RGS6
+
+        
+        
+        
+        
+        
+        
+        32
+        
+        https://statamic.dev/
+        
+        <pre><code>{{# Bard - bard #}}
+{{ bard }}
+
+    
+    {{ if type == 'new_set' }}
+    
+        {{# Array Dynamic - array #}}
+        {{ foreach:array_dynamic }}
+        
+            {{ key }} - {{ value }}
+        {{ /foreach:array_dynamic }}
+        {{# Array Keyed - array #}}
+        {{ array_keyed }}
+        
+            {{# Label1 #}}
+            {{ key1 }}
+            {{# Label2 #}}
+            {{ key2 }}
+            
+        {{ /array_keyed }}
+        {{# Button Group - button_group #}}
+        {{ button_group }}
+        {{# Checkboxes - checkboxes #}}
+        {{ checkboxes }}
+        {{# Code - code #}}
+        {{ code }}
+        {{# Color - color #}}
+        {{ color }}
+        {{# Float - float #}}
+        {{ float }}
+        {{# Grid - grid #}}
+        {{ grid }}
+        
+            {{# Grid Text 1 - text #}}
+            {{ grid_text_1 }}
+            {{# Grid Text 2 - text #}}
+            {{ grid_text_2 }}
+            
+        {{ /grid }}
+        {{# Stacked Grid - grid #}}
+        {{ stacked_grid }}
+        
+            {{# Stacked Grid Text 1 - text #}}
+            {{ stacked_grid_text_1 }}
+            {{# Stacked Grid Text 2 - text #}}
+            {{ stacked_grid_text_2 }}
+            
+        {{ /stacked_grid }}
+        {{# Hidden Field - hidden #}}
+        {{ hidden_field }}
+        {{# HTML Field - html #}}
+        {{ html_field }}
+        {{# Integer Field - integer #}}
+        {{ integer_field }}
+        {{# Link Field - link #}}
+        {{ link_field }}
+        {{# Markdown - markdown #}}
+        {{ markdown }}
+        {{# Radio - radio #}}
+        {{ radio }}
+        {{# Range Field - range #}}
+        {{ range_field }}
+        {{# Select Field - select #}}
+        {{ select_field }}
+        {{# Table - table #}}
+        {{ table | table }}
+        {{# Textarea - textarea #}}
+        {{ textarea }}
+        {{# Time - time #}}
+        {{ time }}
+        {{# Toggle - toggle #}}
+        {{ if toggle }} Yes. {{ /if }}
+        {{# Video - video #}}
+        {{ video }}
+        {{# Yaml - yaml #}}
+        {{ yaml }}
+            {{# Replace with your YAML keys. #}}
+        {{ /yaml }}
+        
+    {{ /if }}
+{{ /bard }}
+
+</code></pre>
+
+        
+        radio3
+        
+        60
+        
+        option2
+        
+        <table><tr><td>RTR1C1</td><td>RTR1C2</td><td>RTR1C3</td></tr><tr><td>RTR2C1</td><td>RTR2C2</td><td>RTR2C3</td></tr><tr><td>RTR3C1</td><td>RTR2C2</td><td>RTR2C3</td></tr><tr><td>RTR4C1</td><td>RTR4C2</td><td>RTR4C3</td></tr></table>
+        
+        TextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextareaTextarea
+        
+        01:33
+        
+         Yes. 
+        
+        https://www.youtube.com/watch?v=dQw4w9WgXcQ
+        
+        
+
+        
+            
+                RG_1
+                RG_2
+            
+                RG_3
+                RG_4
+            
+                RG_5
+                RG_6

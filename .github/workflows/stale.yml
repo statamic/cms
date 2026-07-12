@@ -1,0 +1,13 @@
+name: "Close stale issues"
+on: # zizmor: ignore[concurrency-limits]
+  workflow_dispatch:
+  schedule:
+  - cron: "30 1 * * *"
+
+permissions: {}
+
+jobs:
+  stale:
+    uses: statamic/.github/.github/workflows/stale.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
+    permissions:
+      issues: write # mark issues stale and close them

@@ -1,0 +1,1 @@
+By default, Antlers expressions and tags are not parsed inside your content. This is for performance and security reasons.

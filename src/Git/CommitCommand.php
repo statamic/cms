@@ -1,0 +1,52 @@
+<?php
+
+namespace Statamic\Git;
+
+use Illuminate\Console\Command;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Git;
+
+use function Statamic\trans as __;
+
+class CommitCommand extends Command
+{
+    use RunsInPlease;
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'statamic:git:commit';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Git add and commit tracked content';
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        if (! config('statamic.git.enabled')) {
+            $this->info(__('statamic::messages.git_disabled'));
+
+            return;
+        }
+
+        if (! Git::statuses()) {
+            $this->info(__('statamic::messages.git_nothing_to_commit'));
+
+            return;
+        }
+
+        Git::commit();
+
+        $this->info(__('Content committed'));
+    }
+}

@@ -1,0 +1,33 @@
+<template>
+    <Combobox
+        :clearable="config.clearable"
+        :disabled="config.disabled"
+        :model-value="value"
+        :multiple="true"
+        :options="options"
+        :placeholder="__(config.placeholder)"
+        :paste-delimiter="config.paste_delimiter || ','"
+        :read-only="isReadOnly"
+        :taggable="true"
+        :should-open-dropdown="(open) => open && options.length > 0"
+        @update:modelValue="update"
+    />
+</template>
+
+<script>
+import Fieldtype from './Fieldtype.vue';
+import HasInputOptions from './HasInputOptions.js';
+import { Combobox } from '@/components/ui';
+
+export default {
+    mixins: [Fieldtype, HasInputOptions],
+
+    components: { Combobox },
+
+    computed: {
+        options() {
+            return this.normalizeInputOptions(this.config.options || []);
+        },
+    },
+};
+</script>

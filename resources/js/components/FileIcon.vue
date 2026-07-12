@@ -1,0 +1,113 @@
+<template>
+    <component v-if="icon" :is="icon" />
+</template>
+
+<script>
+import { defineAsyncComponent } from 'vue';
+
+export default {
+    props: {
+        extension: String,
+    },
+
+    computed: {
+        name() {
+            switch (this.extension.toLowerCase()) {
+                case 'folder':
+                    return 'folder';
+                case '7z':
+                case 'pkg':
+                case 'rar':
+                case 'tar':
+                case 'gz':
+                case 'z':
+                case 'zip':
+                    return 'archive';
+                case 'aac':
+                case 'aif':
+                case 'cda':
+                case 'flac':
+                case 'm4a':
+                case 'mp3':
+                case 'mp4a':
+                case 'mpa':
+                case 'ogg':
+                case 'mid':
+                case 'midi':
+                case 'wav':
+                case 'wma':
+                    return 'audio';
+                case 'doc':
+                case 'docx':
+                case 'epub':
+                case 'mobi':
+                    return 'doc';
+                case 'xls':
+                case 'xlsx':
+                    return 'excel';
+                case 'json':
+                    return 'json';
+                case 'af':
+                case 'ai':
+                case 'eps':
+                case 'fig':
+                case 'indb':
+                case 'indd':
+                case 'psd':
+                case 'psb':
+                case 'sketch':
+                    return 'layered';
+                case 'pdf':
+                    return 'pdf';
+                case 'key':
+                case 'odp':
+                case 'pps':
+                case 'ppt':
+                case 'pptx':
+                    return 'presentation';
+                case '3g2':
+                case '3gp':
+                case 'avi':
+                case 'flv':
+                case 'h264':
+                case 'm4v':
+                case 'mvk':
+                case 'mp4':
+                case 'mpg':
+                case 'mpeg':
+                case 'mov':
+                case 'rm':
+                case 'swf':
+                case 'vob':
+                case 'wmv':
+                    return 'video';
+                case 'xml':
+                    return 'xml';
+                case 'avif':
+                case 'bmp':
+                case 'gif':
+                case 'heic':
+                case 'heif':
+                case 'ico':
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                case 'apng':
+                case 'raw':
+                case 'dng':
+                case 'nef':
+                case 'tif':
+                case 'tiff':
+                case 'webp':
+                    return 'image';
+                default:
+                    return 'generic';
+            }
+        },
+
+        icon() {
+            return defineAsyncComponent(() => import(`./../../svg/filetypes/${this.name}.svg`));
+        },
+    },
+};
+</script>

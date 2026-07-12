@@ -1,0 +1,80 @@
+/* ==========================================================================
+   STACKS ON STACKS ON STACKS
+   ========================================================================== */
+
+.portal-targets {
+    /* position on top of global header but ignore clicks */
+    @apply pointer-events-none fixed inset-0;
+    z-index: var(--z-index-portal);
+
+    .vue-portal-target {
+        @apply pointer-events-auto;
+        /* allow clicks that we disabled above */
+        isolation: isolate;
+    }
+}
+
+.stacks-on-stacks {
+    body:has(&) {
+        /* Reka poppers should be on top of open stacks. Reka's popper z-index in this case is set to auto and we can't control it through Reka. We also can't use a direct descendant selector because the popper is inside a portal, so instead we'll check to see if certain conditions are present. */
+        [data-reka-popper-content-wrapper] {
+            z-index: var(--z-index-portal)!important;
+        }
+    }
+    .stack-container {
+        @apply absolute inset-0;
+        transition: transform 200ms ease-out;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .stack-overlay {
+        @apply pointer-events-none;
+    }
+
+    .stack-hit-area {
+        @apply absolute inset-0 cursor-pointer;
+    }
+
+    .stack-content {
+        @apply relative h-[calc(100svh-1rem)];
+    }
+
+    .stack-slide-enter-active,
+    .stack-slide-leave-active {
+        transition: transform 200ms ease-out, opacity 200ms ease-out;
+        will-change: transform, opacity;
+    }
+
+    .stack-slide-enter-from {
+        transform: translateX(10%);
+        opacity: 0;
+
+        [dir='rtl'] & {
+            transform: translateX(-10%);
+        }
+    }
+
+    .stack-slide-leave-to {
+        transform: translateX(10%);
+        opacity: 0;
+
+        [dir='rtl'] & {
+            transform: translateX(-10%);
+        }
+    }
+}
+
+@media all and (max-width: 980px) {
+    .stacks-on-stacks .stack-container {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        transform: translateX(0) !important;
+
+        [dir='rtl'] & {
+            left: 0 !important;
+            right: 0 !important;
+            transform: translateX(0) !important;
+        }
+    }
+}

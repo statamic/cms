@@ -1,0 +1,38 @@
+Count: 1
+Evaluated Count: 3
+Total_Results: 3
+Index: 0
+
+Stacked Grid 1
+Stacked Grid 2
+
+
+14
+14
+===============================
+
+Count: 2
+Evaluated Count: 3
+Total_Results: 3
+Index: 1
+
+Stacked Grid 3
+Stacked Grid 4
+
+
+14
+14
+===============================
+
+Count: 3
+Evaluated Count: 3
+Total_Results: 3
+Index: 2
+
+Stacked Grid 5
+Stacked Grid 6
+
+
+14
+14
+===============================

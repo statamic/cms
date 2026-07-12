@@ -1,0 +1,55 @@
+<template>
+        <Input
+            ref="input"
+            :id="fieldId"
+            :name="name"
+            :value="value"
+            @update:model-value="updateDebounced"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        >
+            <template #append>
+                <Button
+                    size="sm"
+                    :icon="hidden ? 'eye-closed' : 'eye'"
+                    variant="ghost"
+                    v-tooltip="hideDisplayTooltip"
+                    @click="toggleHidden"
+                />
+            </template>
+        </Input>
+</template>
+
+<script>
+import Fieldtype from './Fieldtype.vue';
+import { Button, Input } from '@/components/ui';
+
+export default {
+    mixins: [Fieldtype],
+
+    components: { Button, Input },
+
+    inject: ['getFieldSettingsValue', 'updateFieldSettingsValue'],
+
+    computed: {
+        hidden() {
+            return this.getFieldSettingsValue('hide_display');
+        },
+        hideDisplayTooltip() {
+            return this.hidden ? __('Show Display Label') : __('Hide Display Label');
+        },
+    },
+
+    mounted() {
+        this.$nextTick(() => {
+            this.$el.querySelector(`#${this.fieldId}`)?.select();
+        });
+    },
+
+    methods: {
+        toggleHidden() {
+            this.updateFieldSettingsValue('hide_display', !this.hidden);
+        },
+    },
+};
+</script>

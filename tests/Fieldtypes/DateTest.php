@@ -1,0 +1,848 @@
+<?php
+
+namespace Tests\Fieldtypes;
+
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Fieldtypes\Date;
+use Tests\TestCase;
+
+class DateTest extends TestCase
+{
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Set "now" to an arbitrary time so we can make sure that when date
+        // instances are created in the fieldtype, they aren't inheriting
+        // default values from the current time.
+        Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i', '2010-12-25 13:43'));
+    }
+
+    #[Test]
+    #[DataProvider('augmentProvider')]
+    public function it_augments($timezone, $config, $value, $expected)
+    {
+        config()->set('app.timezone', $timezone);
+
+        $augmented = $this->fieldtype($config)->augment($value);
+
+        $this->assertInstanceOf(Carbon::class, $augmented);
+        $this->assertEquals($expected, $augmented->format('Y M d H:i:s'));
+    }
+
+    public static function augmentProvider()
+    {
+        return [
+            'date' => [
+                'UTC',
+                [],
+                '2012-01-04',
+                '2012 Jan 04 00:00:00',
+            ],
+            'date with custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d'],
+                '2012--01--04',
+                '2012 Jan 04 00:00:00',
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -5000
+                [],
+                '2012-01-04',
+                '2012 Jan 04 05:00:00',
+            ],
+
+            // The time and seconds configs are important, otherwise
+            // when when parsing dates without times, the time would inherit from "now".
+            // We need to rely on the configs to know when or when not to reset the time.
+
+            'date with time' => [
+                'UTC',
+                ['time_enabled' => true],
+                '2012-01-04 15:32',
+                '2012 Jan 04 15:32:00',
+            ],
+            'date with time but seconds disabled' => [
+                'UTC',
+                ['time_enabled' => true],
+                '2012-01-04 15:32:54',
+                '2012 Jan 04 15:32:00',
+            ],
+            'date with time and seconds' => [
+                'UTC',
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                '2012-01-04 15:32:54',
+                '2012 Jan 04 15:32:54',
+            ],
+            'date with time in a different timezone' => [
+                'America/New_York', // -5000
+                ['time_enabled' => true],
+                '2012-01-04 15:32',
+                '2012 Jan 04 20:32:00',
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_augments_null()
+    {
+        $augmented = $this->fieldtype()->augment(null);
+
+        $this->assertNull($augmented);
+    }
+
+    #[Test]
+    public function it_augments_a_carbon_instance()
+    {
+        // Could happen if you are using the date fieldtype to augment a manually provided value.
+
+        $instance = new Carbon;
+        $augmented = $this->fieldtype()->augment($instance);
+
+        $this->assertSame($instance, $augmented);
+    }
+
+    #[Test]
+    public function it_augments_a_range()
+    {
+        $augmented = $this->fieldtype(['mode' => 'range'])->augment([
+            'start' => '2012-01-04',
+            'end' => '2013-02-06',
+        ]);
+
+        $this->assertIsArray($augmented);
+        $this->assertEquals(['start', 'end'], array_keys($augmented));
+        $this->assertInstanceOf(Carbon::class, $augmented['start']);
+        $this->assertInstanceOf(Carbon::class, $augmented['end']);
+        $this->assertEquals('2012 Jan 04 00:00', $augmented['start']->format('Y M d H:i'));
+        $this->assertEquals('2013 Feb 06 00:00', $augmented['end']->format('Y M d H:i'));
+    }
+
+    #[Test]
+    public function it_augments_a_range_in_a_positive_offset_timezone()
+    {
+        config()->set('app.timezone', 'Europe/Berlin');
+
+        $augmented = $this->fieldtype(['mode' => 'range'])->augment([
+            'start' => '2026-02-02',
+            'end' => '2026-02-05',
+        ]);
+
+        $this->assertIsArray($augmented);
+        $this->assertInstanceOf(Carbon::class, $augmented['start']);
+        $this->assertInstanceOf(Carbon::class, $augmented['end']);
+        $this->assertEquals('2026 Feb 02', $augmented['start']->setTimezone('Europe/Berlin')->format('Y M d'));
+        $this->assertEquals('2026 Feb 05', $augmented['end']->setTimezone('Europe/Berlin')->format('Y M d'));
+    }
+
+    #[Test]
+    public function it_augments_a_null_range()
+    {
+        $augmented = $this->fieldtype(['mode' => 'range'])->augment(null);
+
+        $this->assertNull($augmented);
+    }
+
+    #[Test]
+    #[DataProvider('processProvider')]
+    public function it_processes_on_save($timezone, $config, $value, $expected)
+    {
+        config()->set('app.timezone', $timezone);
+
+        $this->assertSame($expected, $this->fieldtype($config)->process($value));
+    }
+
+    public static function processProvider()
+    {
+        return [
+            'null' => [
+                'UTC',
+                [],
+                null,
+                null,
+            ],
+            'date with default format' => [
+                'UTC',
+                [],
+                '2012-08-29T00:00:00Z',
+                '2012-08-29 00:00',
+            ],
+            'date with custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                '2012-08-29T00:00:00Z',
+                '2012--08--29 00/00',
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -4000
+                [],
+                '2012-08-29T00:00:00Z',
+                '2012-08-28 20:00',
+            ],
+            'date with time' => [
+                'UTC',
+                ['time_enabled' => true],
+                '2012-08-29T13:43:00Z',
+                '2012-08-29 13:43',
+            ],
+            'null range' => [
+                'UTC',
+                ['mode' => 'range'],
+                ['start' => null, 'end' => null],
+                null,
+            ],
+            'range with default format' => [
+                'UTC',
+                ['mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+            ],
+            'range with custom format' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+            ],
+            'range in a different timezone' => [
+                'America/New_York', // -4000
+                ['mode' => 'range'],
+                ['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'],
+                ['start' => '2012-08-28 20:00', 'end' => '2013-09-27 19:59'],
+            ],
+            'date-only format' => [
+                'UTC',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only format in a different timezone' => [
+                'America/New_York',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d'],
+                '2012-08-29',
+                '2012--08--29',
+            ],
+            'date-only format range' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+            'date-only format range in a different timezone' => [
+                'America/New_York',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_saves_date_as_integer_if_format_results_in_a_number()
+    {
+        $this->assertSame(20120829, $this->fieldtype(['format' => 'Ymd'])->process('2012-08-29T00:00:00Z'));
+    }
+
+    #[Test]
+    public function it_saves_ranges_as_integers_if_format_results_in_a_number()
+    {
+        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'YmdHi']);
+
+        $this->assertSame(
+            ['start' => 201208290000, 'end' => 201309272359],
+            $fieldtype->process(['start' => '2012-08-29T00:00:00Z', 'end' => '2013-09-27T23:59:00Z'])
+        );
+    }
+
+    #[Test]
+    #[DataProvider('preProcessProvider')]
+    public function it_preprocesses($timezone, $config, $value, $expected)
+    {
+        config()->set('app.timezone', $timezone);
+
+        $this->assertSame($expected, $this->fieldtype($config)->preProcess($value));
+    }
+
+    public static function preProcessProvider()
+    {
+        return [
+            'null' => [
+                'UTC',
+                [],
+                null,
+                null,
+            ],
+            'now' => [
+                'UTC',
+                [],
+                'now', // this would happen if the value was null, but default was "now"
+                'now', // handled on the frontend
+            ],
+            'date without time' => [
+                'UTC',
+                [],
+                '2012-08-29',
+                '2012-08-29T00:00:00.000Z',
+            ],
+            'date with default format' => [
+                'UTC',
+                [],
+                '2012-08-29 00:00',
+                '2012-08-29T00:00:00.000Z',
+            ],
+            'date with custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                '2012-08-29T00:00:00.000Z',
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -0400
+                [],
+                '2012-08-29 00:00',
+                '2012-08-29T04:00:00.000Z',
+            ],
+            'date with time' => [
+                'UTC',
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                '2012-08-29T13:43:00.000Z',
+            ],
+            'date with time in a different timezone' => [
+                'America/New_York', // -0400
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                '2012-08-29T17:43:00.000Z',
+            ],
+            'date-only format' => [
+                'UTC',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only format in a different timezone' => [
+                'America/New_York',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only format in a positive offset timezone' => [
+                'Australia/Sydney',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                '2012-08-29',
+            ],
+            'date-only custom format' => [
+                'America/New_York',
+                ['format' => 'Y--m--d'],
+                '2012--08--29',
+                '2012-08-29',
+            ],
+            'null range' => [
+                'UTC',
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
+            'range with default format' => [
+                'UTC',
+                ['mode' => 'range'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T23:59:00.000Z'],
+            ],
+            'range with custom format' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T23:59:00.000Z'],
+            ],
+            'range in a different timezone' => [
+                'America/New_York', // -4000
+                ['mode' => 'range'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-28T03:59:00.000Z'],
+            ],
+            'date-only format range' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+            'date-only format range in a different timezone' => [
+                'America/New_York',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+            'range where single date has been provided' => [
+                'UTC',
+                // e.g. If it was once a non-range field.
+                // Use the single date as both the start and end dates.
+                ['mode' => 'range'],
+                '2012-08-29',
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T23:59:59.999Z'],
+            ],
+            'range where single date has been provided with date-only custom format' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d'],
+                '2012--08--29',
+                ['start' => '2012-08-29', 'end' => '2012-08-29'],
+            ],
+            'date where range has been provided' => [
+                'UTC',
+                // e.g. If it was once a range field. Use the start date.
+                [],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                '2012-08-29T00:00:00.000Z',
+            ],
+            'date where range has been provided with custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+                '2012-08-29T00:00:00.000Z',
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('preProcessIndexProvider')]
+    public function it_preprocesses_for_index($timezone, $config, $value, $expected)
+    {
+        config()->set('app.timezone', $timezone);
+
+        $this->assertSame($expected, $this->fieldtype($config)->preProcessIndex($value));
+    }
+
+    public static function preProcessIndexProvider()
+    {
+        return [
+            'null' => [
+                'UTC',
+                [],
+                null,
+                null,
+            ],
+            'date with default format' => [
+                'UTC',
+                [],
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date with custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -0400
+                [],
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29T04:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date with time' => [
+                'UTC',
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date with time and custom format' => [
+                'UTC',
+                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
+                '2012--08--29 13:43',
+                ['date' => '2012-08-29T13:43:00.000Z', 'mode' => 'single', 'time_enabled' => true, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date with time in a different timezone' => [
+                'America/New_York', // -0400
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                ['date' => '2012-08-29T17:43:00.000Z', 'mode' => 'single', 'time_enabled' => true, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'null range' => [
+                'UTC',
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
+            'range with default format' => [
+                'UTC',
+                ['mode' => 'range'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'range with custom format' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'range in a different timezone' => [
+                'America/New_York', // -4000
+                ['mode' => 'range'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => '2012-08-29T04:00:00.000Z', 'end' => '2013-09-27T04:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'range where single date has been provided' => [
+                // e.g. If it was once a non-range field.
+                // Use the single date as both the start and end dates.
+                'UTC',
+                ['mode' => 'range'],
+                '2012-08-29',
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'range where single date has been provided with custom format' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2012-08-29T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date where range has been provided' => [
+                // e.g. If it was once a range field. Use the start date.
+                'UTC',
+                [],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date where range has been provided with custom format' => [
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
+                ['date' => '2012-08-29T00:00:00.000Z', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'range where time has been enabled' => [
+                'UTC',
+                ['mode' => 'range', 'time_enabled' => true],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => '2012-08-29T00:00:00.000Z', 'end' => '2013-09-27T00:00:00.000Z', 'mode' => 'range', 'time_enabled' => true, 'timezone' => 'auto', 'format_has_time' => true],
+            ],
+            'date-only format' => [
+                'UTC',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                ['date' => '2012-08-29', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => false],
+            ],
+            'date-only format in a different timezone' => [
+                'America/New_York',
+                ['format' => 'Y-m-d'],
+                '2012-08-29',
+                ['date' => '2012-08-29', 'mode' => 'single', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => false],
+            ],
+            'date-only format range' => [
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => false],
+            ],
+            'date-only format range in a different timezone' => [
+                'America/New_York',
+                ['mode' => 'range', 'format' => 'Y-m-d'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27', 'mode' => 'range', 'time_enabled' => false, 'timezone' => 'auto', 'format_has_time' => false],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('validatablesProvider')]
+    public function it_preprocess_validatables($config, $input, $expected)
+    {
+        $fieldtype = $this->fieldtype($config);
+
+        $value = $fieldtype->preProcessValidatable($input);
+
+        if ($expected === null) {
+            $this->assertNull($value);
+        } else {
+            $this->assertInstanceOf(Carbon::class, $value);
+            $this->assertEquals($expected, $value->toIso8601ZuluString('millisecond'));
+        }
+    }
+
+    public static function validatablesProvider()
+    {
+        // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
+
+        return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
+            'null date when not required' => [
+                [],
+                null,
+                null,
+            ],
+            'valid date' => [
+                [],
+                '2012-01-29T00:00:00.000Z',
+                '2012-01-29T00:00:00.000Z',
+            ],
+            'valid date and time' => [
+                ['time_enabled' => true],
+                '2012-01-29T13:00:00.000Z',
+                '2012-01-29T13:00:00.000Z',
+            ],
+            'valid date and time with seconds' => [
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                '2012-01-29T13:14:15.000Z',
+                '2012-01-29T13:14:15.000Z',
+            ],
+            // A carbon instance would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instance' => [
+                [],
+                Carbon::parse('2012-01-29'),
+                '2012-01-29T00:00:00.000Z',
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('rangeValidatablesProvider')]
+    public function it_preprocess_range_validatables($config, $input, $expected)
+    {
+        $fieldtype = $this->fieldtype($config);
+
+        $value = $fieldtype->preProcessValidatable($input);
+
+        if ($expected === null) {
+            $this->assertNull($value);
+        } else {
+            $this->assertArrayHasKey('start', $value);
+            $this->assertArrayHasKey('end', $value);
+            $this->assertInstanceOf(Carbon::class, $start = $value['start']);
+            $this->assertInstanceOf(Carbon::class, $end = $value['end']);
+            $this->assertEquals($expected, [
+                'start' => $start->toIso8601ZuluString('millisecond'),
+                'end' => $end->toIso8601ZuluString('millisecond'),
+            ]);
+        }
+    }
+
+    public static function rangeValidatablesProvider()
+    {
+        // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
+
+        return [
+            'null' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
+            'valid date range' => [
+                ['mode' => 'range'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
+            ],
+            // Start/end array with carbon instances would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instances' => [
+                ['mode' => 'range'],
+                ['start' => Carbon::parse('2012-01-29'), 'end' => Carbon::parse('2012-02-14')],
+                [
+                    'start' => '2012-01-29T00:00:00.000Z',
+                    'end' => '2012-02-14T00:00:00.000Z',
+                ],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('validationProvider')]
+    public function it_validates($config, $input, $expected)
+    {
+        $messages = [];
+        $field = $this->fieldtype($config)->field();
+        $fields = (new Fields)->setFields(collect([$field]))->addValues(['test' => $input]);
+
+        try {
+            $fields->validate();
+        } catch (ValidationException $e) {
+            $messages = $e->validator->errors()->all();
+        }
+
+        $this->assertEquals($expected, $messages);
+    }
+
+    public static function validationProvider()
+    {
+        return [
+            'valid date' => [
+                [],
+                '2012-01-29T00:00:00.000Z',
+                [],
+            ],
+            'null' => [
+                [],
+                null,
+                [],
+            ],
+            'invalid date format' => [
+                [],
+                '2024-01-29',
+                ['Not a valid date.'],
+            ],
+            'valid date-only format' => [
+                ['format' => 'Y-m-d'],
+                '2024-01-29',
+                [],
+            ],
+            'invalid date-only format' => [
+                ['format' => 'Y-m-d'],
+                'marchtember oneteenth',
+                ['Not a valid date.'],
+            ],
+            'ridiculous invalid date format' => [
+                [],
+                'marchtember oneteenth',
+                ['Not a valid date.'],
+            ],
+            'invalid date' => [
+                [],
+                '2010-06-50T00:00:00.000Z',
+                ['Not a valid date.'],
+            ],
+            'valid date range' => [
+                ['mode' => 'range'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
+                [],
+            ],
+            'null date in range mode required via validate' => [
+                ['mode' => 'range', 'validate' => 'required'],
+                null,
+                ['The Test field is required.'],
+            ],
+            'missing start date' => [
+                ['mode' => 'range'],
+                ['end' => '2012-01-30T00:00:00.000Z'],
+                ['Start date is required.'],
+            ],
+            'missing end date' => [
+                ['mode' => 'range'],
+                ['start' => '2012-01-29T00:00:00.000Z'],
+                ['End date is required.'],
+            ],
+            'null start date' => [
+                ['mode' => 'range'],
+                ['start' => null, 'end' => '2012-01-30T00:00:00.000Z'],
+                ['Start date is required.'],
+            ],
+            'null end date' => [
+                ['mode' => 'range'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => null],
+                ['End date is required.'],
+            ],
+            'both dates null' => [
+                ['mode' => 'range'],
+                ['start' => null, 'end' => null],
+                ['Date is required.'], // Invalid because if you want null, the whole value should be null.
+            ],
+            'both dates null, required via bool' => [
+                ['mode' => 'range', 'required' => true],
+                ['start' => null, 'end' => null],
+                ['Date is required.'],
+            ],
+            'both dates null, required via validate' => [
+                ['mode' => 'range', 'validate' => 'required'],
+                ['start' => null, 'end' => null],
+                ['Date is required.'],
+            ],
+            'invalid start date' => [
+                ['mode' => 'range'],
+                ['start' => '2010-06-50T00:00:00.000Z', 'end' => '2012-01-30T00:00:00.000Z'],
+                ['Not a valid start date.'],
+            ],
+            'invalid end date' => [
+                ['mode' => 'range'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => '2010-06-50T00:00:00.000Z'],
+                ['Not a valid end date.'],
+            ],
+            'invalid start date format' => [
+                ['mode' => 'range'],
+                ['start' => 'marchtember oneteenth', 'end' => '2012-01-30T00:00:00.000Z'],
+                ['Not a valid start date.'],
+            ],
+            'invalid end date format' => [
+                ['mode' => 'range'],
+                ['start' => '2012-01-29T00:00:00.000Z', 'end' => 'marchtember oneteenth'],
+                ['Not a valid end date.'],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_preloads_auto_timezone_by_default()
+    {
+        $this->assertEquals('auto', $this->fieldtype()->preload()['timezone']);
+    }
+
+    #[Test]
+    public function it_preloads_per_field_timezone()
+    {
+        $this->assertEquals(
+            'America/New_York',
+            $this->fieldtype(['timezone' => 'America/New_York'])->preload()['timezone']
+        );
+    }
+
+    #[Test]
+    public function it_preloads_cp_default_timezone_when_no_per_field_timezone()
+    {
+        config()->set('statamic.cp.default_timezone', 'Europe/London');
+
+        $this->assertEquals('Europe/London', $this->fieldtype()->preload()['timezone']);
+    }
+
+    #[Test]
+    public function per_field_timezone_takes_precedence_over_cp_default()
+    {
+        config()->set('statamic.cp.default_timezone', 'Europe/London');
+
+        $this->assertEquals(
+            'America/New_York',
+            $this->fieldtype(['timezone' => 'America/New_York'])->preload()['timezone']
+        );
+    }
+
+    #[Test]
+    public function it_preloads_auto_when_cp_default_timezone_is_auto()
+    {
+        config()->set('statamic.cp.default_timezone', 'auto');
+
+        $this->assertEquals('auto', $this->fieldtype()->preload()['timezone']);
+    }
+
+    #[Test]
+    public function it_includes_timezone_in_config_field_items()
+    {
+        $fieldtype = $this->fieldtype();
+        $configFields = (new \ReflectionMethod($fieldtype, 'configFieldItems'))->invoke($fieldtype);
+
+        $dateTimeSection = collect($configFields)->firstWhere('display', __('Date & Time'));
+
+        $this->assertArrayHasKey('timezone', $dateTimeSection['fields']);
+        $this->assertEquals('dictionary', $dateTimeSection['fields']['timezone']['type']);
+        $this->assertEquals('timezones', $dateTimeSection['fields']['timezone']['dictionary']);
+    }
+
+    public function fieldtype($config = [])
+    {
+        $field = new Field('test', array_replace([
+            'type' => 'date',
+            'mode' => 'single',
+        ], $config));
+
+        return (new Date)->setField($field);
+    }
+}

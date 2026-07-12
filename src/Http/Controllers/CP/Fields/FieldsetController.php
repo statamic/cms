@@ -1,0 +1,287 @@
+<?php
+
+namespace Statamic\Http\Controllers\CP\Fields;
+
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Statamic\CP\Breadcrumbs\Breadcrumb;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
+use Statamic\Facades;
+use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fieldset;
+use Statamic\Fields\FieldTransformer;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+
+use function Statamic\trans as __;
+
+class FieldsetController extends CpController
+{
+    use ManagesFields;
+
+    public function __construct()
+    {
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
+    }
+
+    public function index(Request $request)
+    {
+        $fieldsets = Facades\Fieldset::all()
+            ->filter(fn ($fieldset) => $request->user()->can('edit', $fieldset))
+            ->mapToGroups(function (Fieldset $fieldset) {
+                return [
+                    $this->groupKey($fieldset) => [
+                        'handle' => $fieldset->handle(),
+                        'id' => $fieldset->handle(),
+                        'delete_url' => $fieldset->deleteUrl(),
+                        'edit_url' => $fieldset->editUrl(),
+                        'reset_url' => $fieldset->resetUrl(),
+                        'fields' => $fieldset->fields()->all()->count(),
+                        'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
+                            return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
+                        }),
+                        'is_deletable' => $fieldset->isDeletable(),
+                        'is_resettable' => $fieldset->isResettable(),
+                        'title' => $fieldset->title(),
+                    ],
+                ];
+            })
+            ->sortBy(fn ($value, $key) => $key === __('My Fieldsets') ? '0' : $key);
+
+        if ($request->wantsJson()) {
+            return $fieldsets;
+        }
+
+        if ($fieldsets->count() === 0) {
+            return Inertia::render('fieldsets/Empty', [
+                'createUrl' => cp_route('fieldsets.create'),
+            ]);
+        }
+
+        return Inertia::render('fieldsets/Index', [
+            'fieldsets' => $fieldsets,
+            'createUrl' => cp_route('fieldsets.create'),
+        ]);
+    }
+
+    private function group(Blueprint|Fieldset $item)
+    {
+        if ($item instanceof Fieldset) {
+            return __('Fieldsets');
+        }
+
+        if ($namespace = $item->namespace()) {
+            return match (Str::before($namespace, '.')) {
+                'collections' => __('Collections'),
+                'taxonomies' => __('Taxonomies'),
+                'navigation' => __('Navigation'),
+                'globals' => __('Globals'),
+                'assets' => __('Asset Containers'),
+                'forms' => __('Forms'),
+            };
+        }
+
+        return match ($item->handle()) {
+            'user', 'user_group' => __('Users'),
+            default => __('Other'),
+        };
+    }
+
+    public function edit($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        Breadcrumbs::push(new Breadcrumb(
+            text: $fieldset->title(),
+            url: request()->url(),
+            icon: 'fieldsets',
+            links: Facades\Fieldset::all()
+                ->reject(fn ($f) => $f->handle() === $fieldset->handle())
+                ->map(fn ($f) => [
+                    'text' => $f->title(),
+                    'icon' => 'fieldsets',
+                    'url' => $f->editUrl(),
+                ])
+                ->values()
+                ->all(),
+        ));
+
+        $fieldset->validateRecursion();
+
+        $vue = [
+            'title' => $fieldset->title(),
+            'handle' => $fieldset->handle(),
+            'sections' => $this->sectionsToVue($fieldset),
+        ];
+
+        return Inertia::render('fieldsets/Edit', [
+            'initialFieldset' => $vue,
+            'action' => cp_route('fieldsets.update', $fieldset->handle()),
+            ...$this->fieldProps(),
+        ]);
+    }
+
+    public function update(Request $request, $fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $request->validate([
+            'title' => 'required',
+            'sections' => 'array',
+            'fields' => 'array',
+        ]);
+
+        $base = array_merge(
+            Arr::except($fieldset->contents(), ['fields', 'sections']),
+            ['title' => $request->title],
+        );
+
+        if ($request->has('sections')) {
+            $sections = $this->sectionsFromVueRequest($request->sections);
+
+            $fieldset->setContents(
+                $this->shouldStoreAsFlatFields($sections)
+                    ? $base + ['fields' => Arr::get($sections, '0.fields', [])]
+                    : $base + ['sections' => $sections]
+            );
+        } else {
+            $fieldset->setContents($base + [
+                'fields' => collect($request->fields)
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
+        }
+
+        $fieldset->validateRecursion();
+
+        $fieldset->save();
+
+        return response('', 204);
+    }
+
+    public function create()
+    {
+        return Inertia::render('fieldsets/Create', [
+            'route' => cp_route('fieldsets.store'),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required',
+            'handle' => ['required', 'regex:/^[a-zA-Z0-9._-]+$/'],
+        ]);
+
+        if (Facades\Fieldset::find($request->handle)) {
+            $error = __('A fieldset with that name already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
+        $fieldset = (new Fieldset)
+            ->setHandle($request->handle)
+            ->setContents([
+                'title' => $request->title,
+                'fields' => [],
+            ])->save();
+
+        session()->flash('success', __('Fieldset created'));
+
+        return ['redirect' => $fieldset->editUrl()];
+    }
+
+    public function destroy($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->delete();
+
+        return response('');
+    }
+
+    public function reset($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->reset();
+
+        return response('');
+    }
+
+    private function groupKey(Fieldset $fieldset): string
+    {
+        if ($fieldset->isNamespaced()) {
+            return Str::of($fieldset->namespace())->replace('_', ' ')->title();
+        }
+
+        if (str_contains($fieldset->handle(), '.')) {
+            return Str::of($fieldset->handle())->beforeLast('.')->title();
+        }
+
+        return __('My Fieldsets');
+    }
+
+    private function sectionsFromVueRequest(array $sections): array
+    {
+        return collect($sections)->map(function ($section) {
+            return Arr::removeNullValues([
+                'display' => Arr::get($section, 'display'),
+                'instructions' => Arr::get($section, 'instructions'),
+                'collapsible' => ($collapsible = Arr::get($section, 'collapsible')) ?: null,
+                'collapsed' => ($collapsible && Arr::get($section, 'collapsed')) ?: null,
+                'fields' => collect(Arr::get($section, 'fields', []))
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
+        })->all();
+    }
+
+    private function sectionsToVue(Fieldset $fieldset): array
+    {
+        $sections = $fieldset->hasSections()
+            ? Arr::get($fieldset->contents(), 'sections', [])
+            : [[
+                'display' => __('Fields'),
+                'fields' => Arr::get($fieldset->contents(), 'fields', []),
+            ]];
+
+        return collect($sections)->map(function ($section, $sectionIndex) {
+            return Arr::removeNullValues([
+                '_id' => "section-{$sectionIndex}",
+                'display' => Arr::get($section, 'display'),
+                'instructions' => Arr::get($section, 'instructions'),
+                'collapsible' => Arr::get($section, 'collapsible'),
+                'collapsed' => Arr::get($section, 'collapsed'),
+            ]) + [
+                'fields' => collect(Arr::get($section, 'fields', []))->map(function ($field, $fieldIndex) use ($sectionIndex) {
+                    return array_merge(FieldTransformer::toVue($field), ['_id' => "section-{$sectionIndex}-{$fieldIndex}"]);
+                })->all(),
+            ];
+        })->all();
+    }
+
+    private function shouldStoreAsFlatFields(array $sections): bool
+    {
+        if (count($sections) !== 1) {
+            return false;
+        }
+
+        $section = $sections[0];
+        $display = Arr::get($section, 'display');
+
+        return in_array($display, [null, '', __('Fields')], true)
+            && Arr::get($section, 'instructions') === null
+            && Arr::get($section, 'collapsible') !== true
+            && Arr::get($section, 'collapsed') !== true;
+    }
+}

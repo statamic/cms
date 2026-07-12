@@ -1,0 +1,70 @@
+<script setup>
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer } from '@/components/ui';
+import { ref, useTemplateRef } from 'vue';
+import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
+import { router } from '@inertiajs/vue3';
+
+let saving = ref(false);
+let errors = ref({});
+let container = useTemplateRef('container');
+
+const props = defineProps({
+    publishContainer: String,
+    initialFieldset: Object,
+    initialValues: Object,
+    initialMeta: Object,
+    initialReference: String,
+    initialTitle: String,
+    actions: Object,
+    method: String,
+    canEditBlueprint: Boolean,
+    isCreating: Boolean,
+});
+
+const fieldset = ref(props.initialFieldset);
+const values = ref(props.initialValues);
+const meta = ref(props.initialMeta);
+const title = ref(props.initialTitle);
+
+function save() {
+    new Pipeline()
+        .provide({ container, errors, saving })
+        .through([new Request(props.actions.save, props.method)])
+        .then((response) => {
+            if (props.isCreating) router.get(response.data.redirect);
+            Statamic.$toast.success(__('Saved'));
+            title.value = response.data.title;
+        });
+}
+</script>
+
+<template>
+    <div class="max-w-page mx-auto">
+        <Header :title="__(title)" icon="groups">
+            <Dropdown v-if="canEditBlueprint" class="me-2">
+                <template #trigger>
+                    <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />
+                </DropdownMenu>
+            </Dropdown>
+
+            <Button variant="primary" @click.prevent="save" :text="__('Save')" />
+
+            <slot name="action-buttons-right" />
+        </Header>
+
+        <PublishContainer
+            v-if="fieldset"
+            ref="container"
+            :name="publishContainer"
+            :blueprint="fieldset"
+            v-model="values"
+            :reference="initialReference"
+            :meta="meta"
+            :errors="errors"
+            as-config
+        />
+    </div>
+</template>

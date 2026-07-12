@@ -1,0 +1,118 @@
+<template>
+    <div class="p-3 overflow-hidden dark:border-gray-700 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex flex-1 items-center gap-2 sm:gap-3">
+            <div class="size-7 flex items-center justify-center">
+                <ui-icon name="warning-diamond" class="size-5 text-red-600" v-tooltip="error" v-if="status === 'error'" />
+                <Icon v-else name="loading" />
+            </div>
+
+            <div class="truncate">{{ basename }}</div>
+
+            <div v-if="status !== 'error'" class="h-1.5 flex-1 rounded-lg bg-gray-100">
+                <div class="h-full rounded-sm bg-blue-500" :style="{ width: percent + '%' }" />
+            </div>
+            <div class="flex-1" v-else />
+
+            <div class="flex items-center gap-2" v-if="status === 'error'">
+                <Dropdown v-if="errorStatus === 409">
+                    <template #trigger>
+                        <Button size="xs" :text="`${__('Fix')}...`" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
+                        <DropdownItem @click="openNewFilenameModal" :text="`${__('messages.uploader_choose_new_filename')}...`" />
+                        <DropdownItem @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
+                        <DropdownItem @click="selectExisting" v-if="allowSelectingExisting" :text="__('messages.uploader_discard_use_existing')" />
+                    </DropdownMenu>
+                </Dropdown>
+                <Button size="xs" @click="clear" :text="__('Discard')" />
+            </div>
+        </div>
+
+
+
+        <confirmation-modal
+            :open="showNewFilenameModal"
+            :title="__('New Filename')"
+            @cancel="showNewFilenameModal = false"
+            @confirm="confirmNewFilename"
+        >
+            <Input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
+        </confirmation-modal>
+    </div>
+</template>
+
+<script>
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input, Icon } from '@/components/ui';
+
+export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        Input,
+        Icon,
+    },
+
+    props: {
+        extension: String,
+        basename: String,
+        percent: Number,
+        error: String,
+        errorStatus: Number,
+        allowSelectingExisting: Boolean,
+    },
+
+    data() {
+        return {
+            showNewFilenameModal: false,
+            newFilename: '',
+        };
+    },
+
+    computed: {
+        status() {
+            if (this.error) {
+                return 'error';
+            } else if (this.percent === 100) {
+                return 'pending';
+            } else {
+                return 'uploading';
+            }
+        },
+    },
+
+    methods: {
+        clear() {
+            this.$emit('clear');
+        },
+
+        retryAndOverwrite() {
+            this.$emit('retry', { option: 'overwrite' });
+        },
+
+        retryWithTimestamp() {
+            this.$emit('retry', { option: 'timestamp' });
+        },
+
+        openNewFilenameModal() {
+            this.showNewFilenameModal = true;
+            this.newFilename = this.basename.substring(0, this.basename.lastIndexOf('.'));
+        },
+
+        confirmNewFilename() {
+            this.showNewFilenameModal = false;
+            this.retryWithNewFilename();
+        },
+
+        retryWithNewFilename() {
+            this.$emit('retry', { option: 'rename', filename: this.newFilename });
+        },
+
+        selectExisting() {
+            this.$emit('existing-selected');
+        },
+    },
+};
+</script>

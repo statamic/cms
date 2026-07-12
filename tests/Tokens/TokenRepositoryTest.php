@@ -1,0 +1,186 @@
+<?php
+
+namespace Tests\Tokens;
+
+use Facades\Statamic\Tokens\Generator;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Tokens\Token;
+use Statamic\Facades\File;
+use Statamic\Tokens\FileTokenRepository;
+use Tests\TestCase;
+
+class TokenRepositoryTest extends TestCase
+{
+    private $tokens;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->tokens = new FileTokenRepository;
+    }
+
+    #[Test]
+    public function it_makes_a_token()
+    {
+        Generator::shouldReceive('generate')->never();
+
+        $token = $this->tokens->make('test-token', 'HandlerClassName', ['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertInstanceOf(Token::class, $token);
+        $this->assertEquals('HandlerClassName', $token->handler());
+        $this->assertInstanceOf(Collection::class, $token->data());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $token->data()->all());
+        $this->assertEquals('bar', $token->get('foo'));
+        $this->assertEquals('qux', $token->get('baz'));
+        $this->assertEquals('test-token', $token->token());
+    }
+
+    #[Test]
+    public function it_generates_a_token_string_if_passing_in_null_when_making_a_token()
+    {
+        Generator::shouldReceive('generate')->once()->andReturn('test-token');
+
+        $token = $this->tokens->make(null, 'HandlerClassName', ['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertEquals('test-token', $token->token());
+    }
+
+    #[Test]
+    public function it_saves_a_token()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 0, 0, 0));
+
+        $token = $this->tokens->make('test-token', 'The\\Test\\Class', ['foo' => 'bar', 'baz' => 'qux']);
+
+        $return = $this->tokens->save($token);
+
+        $expected = <<<YAML
+handler: The\Test\Class
+expires_at: 1577840400
+data:
+  foo: bar
+  baz: qux
+
+YAML;
+
+        $this->assertStringEqualsFile(storage_path('statamic/tokens/test-token.yaml'), $expected);
+        $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function it_deletes_a_token()
+    {
+        $token = tap($this->tokens->make('test-token', 'The\\Test\\Class', ['foo' => 'bar', 'baz' => 'qux']))->save();
+
+        $this->assertNotNull($this->tokens->find('test-token'));
+
+        $return = $this->tokens->delete($token);
+
+        $this->assertNull($this->tokens->find('test-token'));
+        $this->assertFalse(file_exists(storage_path('statamic/tokens/test-token.yaml')));
+        $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function it_finds_a_token()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 0, 0, 0));
+
+        $contents = <<<YAML
+handler: 'The\Test\Class'
+expires_at: 1577849700
+data:
+  foo: bar
+  baz: qux
+YAML;
+
+        File::put(storage_path('statamic/tokens/test-token.yaml'), $contents);
+
+        $token = $this->tokens->find('test-token');
+
+        $this->assertInstanceOf(Token::class, $token);
+        $this->assertEquals('The\Test\Class', $token->handler());
+        $this->assertInstanceOf(Collection::class, $token->data());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $token->data()->all());
+        $this->assertEquals('bar', $token->get('foo'));
+        $this->assertEquals('qux', $token->get('baz'));
+        $this->assertEquals('test-token', $token->token());
+        $this->assertTrue($token->expiry()->eq(Carbon::create(2020, 1, 1, 3, 35)));
+    }
+
+    #[Test]
+    public function it_returns_null_and_deletes_expired_token_on_find()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
+
+        $this->tokens->make('expired-token', 'test')->expireAt(Carbon::now()->subMinute())->save();
+
+        $this->assertFileExists(storage_path('statamic/tokens/expired-token.yaml'));
+        $this->assertNull($this->tokens->find('expired-token'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/expired-token.yaml'));
+    }
+
+    #[Test]
+    public function attempting_to_find_a_non_existent_token_returns_null()
+    {
+        $this->assertNull($this->tokens->find('missing-token'));
+    }
+
+    #[Test]
+    public function it_prevents_path_traversal_in_find()
+    {
+        File::put(storage_path('statamic/evil.yaml'), "handler: 'Handler'\nexpires_at: 9999999999\ndata: []");
+
+        $this->assertNull($this->tokens->find('../evil'));
+    }
+
+    #[Test]
+    #[DataProvider('invalidTokenNameProvider')]
+    public function it_throws_when_making_a_token_with_an_invalid_name($token)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->tokens->make($token, 'Handler');
+    }
+
+    public static function invalidTokenNameProvider()
+    {
+        return [
+            'parent traversal' => ['../evil'],
+            'backslash traversal' => ['..\\evil'],
+            'nested traversal' => ['foo/../../evil'],
+            'forward slash' => ['foo/evil'],
+            'dots only' => ['..'],
+            'absolute path' => ['/etc/passwd'],
+            'windows drive' => ['C:\\evil'],
+            'trailing newline' => ["evil\n"],
+        ];
+    }
+
+    #[Test]
+    public function it_deletes_expired_tokens()
+    {
+        Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
+
+        $this->tokens->make('a', 'test')->save();
+        $this->tokens->make('b', 'test')->expireAt(Carbon::now()->subMinute())->save();
+        $this->tokens->make('c', 'test')->expireAt(Carbon::now()->subHour())->save();
+        $this->tokens->make('d', 'test')->expireAt(Carbon::now()->addMinute())->save();
+
+        $this->assertFileExists(storage_path('statamic/tokens/a.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/b.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/c.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/d.yaml'));
+
+        $this->tokens->collectGarbage();
+
+        $this->assertFileExists(storage_path('statamic/tokens/a.yaml'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/b.yaml'));
+        $this->assertFileDoesNotExist(storage_path('statamic/tokens/c.yaml'));
+        $this->assertFileExists(storage_path('statamic/tokens/d.yaml'));
+    }
+}

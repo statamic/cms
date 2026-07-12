@@ -1,0 +1,484 @@
+<?php
+
+namespace Statamic\Facades\Endpoint;
+
+use Illuminate\Support\Collection;
+use Statamic\Facades\Config;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
+
+/**
+ * Manipulate URLs.
+ */
+class URL
+{
+    private static $enforceTrailingSlashes = false;
+    private static $absoluteSiteUrlsCache;
+    private static $hasRelativeSiteCache;
+    private static $siteCachesLoaded = false;
+    private static $externalSiteUrlsCache;
+    private static $externalAppUrlsCache;
+
+    /**
+     * Configure whether or not to enforce trailing slashes when normalizing URL output throughout this class.
+     */
+    public function enforceTrailingSlashes(bool $bool = true): void
+    {
+        self::$enforceTrailingSlashes = $bool;
+    }
+
+    /**
+     * Check whether trailing slashes are currently being enforced.
+     */
+    public function isEnforcingTrailingSlashes(): bool
+    {
+        return self::$enforceTrailingSlashes;
+    }
+
+    /**
+     * Tidy a URL (normalize slashes).
+     */
+    public function tidy(?string $url, ?bool $external = false, ?bool $withTrailingSlash = null): string
+    {
+        // Remove occurrences of '//', except when part of protocol.
+        $url = Path::tidy($url);
+
+        // If URL is external to this Statamic application, we'll leave leading/trailing slashes by default.
+        if (! $external && $this->shouldLeaveExternalAbsoluteUrlUntouched($url)) {
+            return $url;
+        }
+
+        // If not an absolute URL, enforce leading slash.
+        if (! self::isAbsolute($url)) {
+            $url = Str::ensureLeft($url, '/');
+        }
+
+        // Trim trailing slash, unless `enforceTrailingSlashes()` or explicit `$withTrailingSlash` boolean is used.
+        $url = self::normalizeTrailingSlash($url, $withTrailingSlash);
+
+        return $url;
+    }
+
+    /**
+     * Assemble a URL from an ordered list of segments.
+     */
+    public function assemble(?string ...$segments): string
+    {
+        return self::tidy(Path::assemble($segments));
+    }
+
+    /**
+     * Get the slug at the end of a URL.
+     */
+    public function slug(?string $url): ?string
+    {
+        $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
+
+        if (parse_url($url)['path'] === '/') {
+            return null;
+        }
+
+        return basename(self::removeQueryAndFragment($url));
+    }
+
+    /**
+     * Replace the slug at the end of a URL with the provided slug.
+     */
+    public function replaceSlug(?string $url, string $slug): string
+    {
+        if (parse_url(Str::ensureRight($url, '/'))['path'] === '/') {
+            return self::tidy($url);
+        }
+
+        $parts = str($url)
+            ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
+            ->all();
+
+        $url = Str::removeRight(array_shift($parts), '/');
+        $queryAndFragments = implode($parts);
+
+        $url = self::tidy(Path::replaceSlug($url, $slug));
+
+        return $url.$queryAndFragments;
+    }
+
+    /**
+     * Get the parent URL.
+     */
+    public function parent(?string $url): string
+    {
+        $trailingSlash = $this->shouldLeaveExternalAbsoluteUrlUntouched($url)
+            ? self::hasTrailingSlash($url)
+            : self::$enforceTrailingSlashes;
+
+        $strMethod = $trailingSlash
+            ? 'ensureRight'
+            : 'removeRight';
+
+        $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
+
+        if (parse_url($url)['path'] !== '/') {
+            $url = preg_replace('/[^\/]*\/$/', '', $url);
+        }
+
+        return Str::$strMethod(self::tidy($url), '/') ?: '/';
+    }
+
+    /**
+     * Check if one URL is an ancestor of another.
+     */
+    public function isAncestorOf(?string $child, ?string $ancestor): bool
+    {
+        $child = Str::ensureRight(self::removeQueryAndFragment($child), '/');
+        $ancestor = Str::ensureRight(self::removeQueryAndFragment($ancestor), '/');
+
+        if ($child === $ancestor) {
+            return false;
+        }
+
+        return Str::startsWith($child, $ancestor);
+    }
+
+    /**
+     * Prepend site URL to a URL.
+     */
+    public function prependSiteUrl(?string $url, ?string $locale = null, bool $controller = true): string
+    {
+        $prepend = Str::removeRight(Config::getSiteUrl($locale), '/');
+
+        // If we don't want the front controller, we'll have to strip
+        // it out since it should be in the site URL already.
+        if (! $controller) {
+            // The controller file is index.php in 99% of cases but hey might as well be sure.
+            $file = pathinfo(request()->getScriptName())['basename'];
+            $prepend = Str::removeRight($prepend, $file);
+        }
+
+        return self::tidy($prepend.'/'.$url);
+    }
+
+    /**
+     * Remove current site URL from the beginning of a URL.
+     */
+    public function removeSiteUrl(?string $url): string
+    {
+        $url = URL::makeAbsolute($url);
+        $url = Str::removeLeft($url, Site::current()->absoluteUrl());
+
+        return self::tidy($url);
+    }
+
+    /**
+     * Make an absolute URL relative (with leading slash).
+     */
+    public function makeRelative(?string $url): string
+    {
+        $parsed = parse_url($url);
+
+        $url = $parsed['path'] ?? '/';
+
+        if (isset($parsed['query'])) {
+            $url .= '?'.$parsed['query'];
+        }
+
+        if (isset($parsed['fragment'])) {
+            $url .= '#'.$parsed['fragment'];
+        }
+
+        return self::tidy($url);
+    }
+
+    /**
+     * Make a relative URL absolute (prepends domain if not already absolute).
+     */
+    public function makeAbsolute(?string $url): string
+    {
+        // If URL is external to this Statamic application, we'll just leave it as-is.
+        if ($this->shouldLeaveExternalAbsoluteUrlUntouched($url)) {
+            return $url;
+        }
+
+        if (self::isAbsolute($url)) {
+            return self::tidy($url);
+        }
+
+        $url = Str::ensureLeft($url, '/');
+        $url = Str::ensureLeft($url, self::getRequestRootUrl());
+
+        return self::tidy($url);
+    }
+
+    /**
+     * Get the current URL.
+     */
+    public function getCurrent(): string
+    {
+        return self::tidy(request()->path());
+    }
+
+    private function shouldLeaveExternalAbsoluteUrlUntouched(?string $url): bool
+    {
+        if (! self::isAbsolute($url) || ! self::isExternalToApplication($url)) {
+            return false;
+        }
+
+        return ! $this->hostMatchesConfiguredAppUrl($url);
+    }
+
+    private function hostMatchesConfiguredAppUrl(?string $url): bool
+    {
+        if (! $url || ! self::isAbsolute($url)) {
+            return false;
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+        $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        return $host && $appHost && strtolower($host) === strtolower($appHost);
+    }
+
+    /**
+     * Check whether a URL is absolute.
+     */
+    public function isAbsolute(?string $url): bool
+    {
+        return Str::startsWith($url, ['http:', 'https:']);
+    }
+
+    /**
+     * Check whether a URL is external to current site.
+     */
+    public function isExternal(?string $url): bool
+    {
+        if (isset(self::$externalSiteUrlsCache[$url])) {
+            return self::$externalSiteUrlsCache[$url];
+        }
+
+        if (! $url) {
+            return false;
+        }
+
+        $url = Str::ensureRight($url, '/');
+
+        if (Str::startsWith($url, ['/', '?', '#'])) {
+            return self::$externalSiteUrlsCache[$url] = false;
+        }
+
+        $isExternal = ! Str::startsWith($url, Str::ensureRight(Site::current()->absoluteUrl(), '/'));
+
+        return self::$externalSiteUrlsCache[$url] = $isExternal;
+    }
+
+    /**
+     * Check whether a URL is external to whole Statamic application.
+     */
+    public function isExternalToApplication(?string $url): bool
+    {
+        if (isset(self::$externalAppUrlsCache[$url])) {
+            return self::$externalAppUrlsCache[$url];
+        }
+
+        if (! $url) {
+            return false;
+        }
+
+        $cacheKey = $url;
+
+        if (! Str::startsWith($url, ['/', 'http://', 'https://', '#', '?']) || Str::startsWith($url, '//')) {
+            return self::$externalAppUrlsCache[$cacheKey] = true;
+        }
+
+        // Normalize backslashes to forward slashes.
+        // Browsers treat \ as / for special schemes (http/https), which can
+        // cause parse_url() to extract a different host than the browser uses.
+        $url = str_replace('\\', '/', $url);
+        $url = preg_replace('/%5c/i', '/', $url);
+
+        $url = Str::ensureRight($url, '/');
+
+        if (Str::startsWith($url, ['/', '?', '#'])) {
+            return self::$externalAppUrlsCache[$cacheKey] = false;
+        }
+
+        $urlWithoutQuery = Str::of($url)->before('?')->before('#');
+        $urlDomain = self::getDomainFromAbsolute($urlWithoutQuery);
+
+        $isExternalToSites = self::getAbsoluteSiteUrls()
+            ->filter(fn ($siteUrl) => $urlDomain === $siteUrl)
+            ->isEmpty();
+
+        if (! $this->hasRelativeSite()) {
+            return self::$externalAppUrlsCache[$cacheKey] = $isExternalToSites;
+        }
+
+        $isExternalToCurrentRequestDomain = $urlDomain !== self::getDomainFromAbsolute(url()->to('/'));
+
+        return self::$externalAppUrlsCache[$cacheKey] = $isExternalToSites && $isExternalToCurrentRequestDomain;
+    }
+
+    /**
+     * Encode a URL.
+     */
+    public function encode(?string $url): string
+    {
+        $dontEncode = [
+            '%2F' => '/',
+            '%40' => '@',
+            '%3A' => ':',
+            '%3B' => ';',
+            '%2C' => ',',
+            '%3D' => '=',
+            '%2B' => '+',
+            '%21' => '!',
+            '%2A' => '*',
+            '%7C' => '|',
+            '%3F' => '?',
+            '%26' => '&',
+            '%23' => '#',
+            '%25' => '%',
+        ];
+
+        return self::tidy(strtr(rawurlencode($url), $dontEncode));
+    }
+
+    /**
+     * Return a gravatar image URL for an email address.
+     */
+    public function gravatar(string $email, ?int $size = null): string
+    {
+        $url = 'https://www.gravatar.com/avatar/'.e(md5(strtolower($email)));
+
+        if ($size) {
+            $url .= '?s='.$size;
+        }
+
+        return $url;
+    }
+
+    /**
+     * Remove query and fragment from end of URL.
+     */
+    public function removeQueryAndFragment(?string $url): ?string
+    {
+        $url = Str::before($url, '?'); // Remove query params
+        $url = Str::before($url, '#'); // Remove anchor fragment
+
+        return self::tidy($url);
+    }
+
+    /**
+     * Clear URL property caches.
+     */
+    public function clearUrlCache(): void
+    {
+        self::$siteCachesLoaded = false;
+        self::$absoluteSiteUrlsCache = null;
+        self::$hasRelativeSiteCache = null;
+        self::$externalSiteUrlsCache = null;
+        self::$externalAppUrlsCache = null;
+    }
+
+    /**
+     * Normalize trailing slash before query and fragment (trims by default, but can be enforced).
+     */
+    private function normalizeTrailingSlash(?string $url, ?bool $withTrailingSlash = null): string
+    {
+        $parts = str($url)
+            ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
+            ->all();
+
+        $url = array_shift($parts);
+        $queryAndFragments = implode($parts);
+
+        $withTrailingSlash ??= self::$enforceTrailingSlashes;
+
+        $isFile = Str::contains(basename(parse_url($url)['path'] ?? ''), '.');
+
+        if (in_array($url, ['', '/'])) {
+            $url = '/';
+        } elseif ($withTrailingSlash && ! $isFile) {
+            $url = Str::ensureRight($url, '/');
+        } else {
+            $url = Str::removeRight($url, '/');
+        }
+
+        return $url.$queryAndFragments;
+    }
+
+    /**
+     * Warm site-derived caches from a single Site::all() call
+     */
+    private function ensureSiteCaches(): void
+    {
+        if (self::$siteCachesLoaded) {
+            return;
+        }
+
+        $sites = Site::all();
+
+        self::$hasRelativeSiteCache = $sites->contains(
+            fn ($site) => Str::startsWith((string) ($site->rawConfig()['url'] ?? ''), '/')
+        );
+
+        self::$absoluteSiteUrlsCache = $sites
+            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
+            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
+            ->map(fn ($siteUrl) => self::getDomainFromAbsolute($siteUrl));
+
+        self::$siteCachesLoaded = true;
+    }
+
+    /**
+     * Get and cache absolute site URLs for external checks.
+     */
+    private function getAbsoluteSiteUrls(): Collection
+    {
+        $this->ensureSiteCaches();
+
+        return self::$absoluteSiteUrlsCache;
+    }
+
+    /**
+     * Checks whether there is a site configured with a relative URL.
+     */
+    private function hasRelativeSite(): bool
+    {
+        $this->ensureSiteCaches();
+
+        return self::$hasRelativeSiteCache;
+    }
+
+    /**
+     * Get the domain of an absolute URL for external checks.
+     */
+    private function getDomainFromAbsolute(string $url): string
+    {
+        return parse_url($url, PHP_URL_HOST) ?? $url;
+    }
+
+    /**
+     * Get the current root URL from request headers.
+     */
+    private function hasTrailingSlash(string $url): string
+    {
+        return substr(preg_replace('/([^?#]*)(.*)/', '$1', $url), -1) === '/';
+    }
+
+    /**
+     * Get the current root URL from request headers.
+     */
+    private function getRequestRootUrl(): string
+    {
+        $rootUrl = url()->to('/');
+
+        // When the request hits the front controller directly (e.g. /index.php),
+        // Laravel's root URL ends with the script name. Strip it so the site's
+        // absolute URL stays invariant to whether the request came through it.
+        if ($script = pathinfo(request()->getScriptName())['basename'] ?? null) {
+            $rootUrl = Str::removeRight($rootUrl, '/'.$script);
+        }
+
+        return self::tidy($rootUrl);
+    }
+}

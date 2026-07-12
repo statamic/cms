@@ -1,0 +1,638 @@
+/* CODEMIRROR 
+=================================================== */
+.CodeMirror {
+    /* Set height, width, borders, and global font properties here */
+    @apply text-gray-900 dark:text-gray-300 leading-normal min-h-20;
+}
+
+/* CODEMIRROR / PADDING
+=================================================== */
+.CodeMirror-lines {
+    padding: 16px 0; /* Vertical padding around content */
+}
+
+.CodeMirror pre {
+    padding: 0 16px; /* Horizontal padding of content */
+}
+
+.CodeMirror-scrollbar-filler,
+.CodeMirror-gutter-filler {
+    background-color: white; /* The little square between H and V scrollbars */
+}
+
+/* CODEMIRROR / GUTTERS
+=================================================== */
+.CodeMirror-gutters {
+    @apply border-r bg-gray-50;
+    height: 100% !important;
+    white-space: nowrap;
+}
+
+.CodeMirror-linenumber {
+    padding: 0 3px 0 5px;
+    min-width: 20px;
+    /* Can't pull over any more really otherwise it looks rubbish when you get into the 100s lines */
+    margin-inline-start: -0.5px;
+    @apply text-right;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+}
+
+.CodeMirror-guttermarker {
+    color: black;
+}
+
+.CodeMirror-guttermarker-subtle {
+    color: #999;
+}
+
+/* CODEMIRROR / CURSOR
+=================================================== */
+.CodeMirror-cursor {
+    border-left: 1px solid black;
+    border-right: none;
+    width: 0;
+}
+
+/* Shown when moving in bi-directional text */
+.CodeMirror div.CodeMirror-secondarycursor {
+    border-left: 1px solid silver;
+}
+
+.cm-fat-cursor {
+    .CodeMirror-cursor {
+        width: auto;
+        border: 0;
+        background: #7e7;
+    }
+    div.CodeMirror-cursors {
+        z-index: var(--z-index-above);
+    }
+}
+
+.cm-animate-fat-cursor {
+    width: auto;
+    border: 0;
+    -webkit-animation: blink 1.06s steps(1) infinite;
+    -moz-animation: blink 1.06s steps(1) infinite;
+    animation: blink 1.06s steps(1) infinite;
+    background-color: #7e7;
+}
+
+@keyframes blink {
+    50% {
+        background-color: transparent;
+    }
+}
+
+.cm-tab {
+    display: inline-block;
+    text-decoration: inherit;
+}
+
+.CodeMirror-ruler {
+    border-left: 1px solid #ccc;
+    position: absolute;
+}
+
+/* CODEMIRROR / DEFAULT THEME
+=================================================== */
+.cm-s-default {
+    /* Explicitly set some colors rather than inherit from the body, because we could have a dark cp > light code field, which would result in pale text on a white background, etc. */
+    &.CodeMirror pre.CodeMirror-line,
+    &.CodeMirror pre.CodeMirror-line-like {
+        @apply text-gray-900 dark:text-gray-300;
+    }
+
+    .CodeMirror-gutters {
+        @apply border-r-gray-300;
+    }
+
+    .cm-header {
+        color: blue;
+    }
+
+    .cm-quote {
+        color: #090;
+    }
+
+    .cm-keyword {
+        color: #708;
+        @apply dark:text-purple-dark;
+    }
+
+    .cm-atom {
+        color: #219;
+    }
+
+    .cm-number {
+        color: #164;
+    }
+
+    .cm-def {
+        color: #00f;
+        @apply dark:text-blue-600;
+    }
+
+    .cm-variable-2 {
+        color: #05a;
+        @apply dark:text-blue-600;
+    }
+
+    .cm-variable-3 {
+        color: #085;
+        @apply dark:text-green-600;
+    }
+
+    .cm-comment {
+        color: #a50;
+        @apply dark:text-orange-dark;
+    }
+
+    .cm-string {
+        color: #a11;
+        @apply dark:text-red-600;
+    }
+
+    .cm-string-2 {
+        color: #f50;
+    }
+
+    .cm-meta {
+        color: #555;
+    }
+
+    .cm-qualifier {
+        color: #555;
+    }
+
+    .cm-builtin {
+        color: #30a;
+    }
+
+    .cm-bracket {
+        color: #997;
+    }
+
+    .cm-tag {
+        color: #170;
+    }
+
+    .cm-attribute {
+        color: #00c;
+    }
+
+    .cm-hr {
+        color: #999;
+    }
+
+    .cm-link {
+        color: #00c;
+        @apply dark:text-blue-500;
+    }
+
+    .cm-error {
+        color: #f00;
+    }
+}
+
+.cm-negative {
+    color: #d44;
+}
+
+.cm-positive {
+    color: #292;
+}
+
+.cm-header,
+.cm-strong {
+    font-weight: bold;
+}
+
+.cm-em {
+    font-style: italic;
+}
+
+.cm-link {
+    text-decoration: underline;
+}
+
+.cm-strikethrough {
+    text-decoration: line-through;
+}
+
+.cm-invalidchar {
+    color: #f00;
+}
+
+.CodeMirror-composing {
+    border-bottom: 2px solid;
+}
+
+/* CODEMIRROR / DEFAULT ADDONS
+=================================================== */
+/* Default styles for common addons */
+div.CodeMirror span {
+    &.CodeMirror-matchingbracket {
+        color: #0f0;
+    }
+    &.CodeMirror-nonmatchingbracket {
+        color: #f22;
+    }
+}
+
+.CodeMirror-matchingtag {
+    background: rgba(255, 150, 0, 0.3);
+}
+
+.CodeMirror-activeline-background {
+    background: #e8f2ff;
+}
+
+/* CODEMIRROR / OTHER
+=================================================== */
+/* The rest of this file contains styles related to the mechanics of
+     the editor. You probably shouldn't touch them. */
+
+.CodeMirror {
+    position: relative;
+    overflow: hidden;
+    background: white;
+}
+
+.CodeMirror-scroll {
+    overflow: scroll !important; /* Things will break if this is overridden */
+    /* 50px is the magic margin used to hide the element's real scrollbars */
+    /* See overflow: hidden in .CodeMirror */
+    margin-bottom: -50px;
+    margin-right: -50px;
+    padding-bottom: 50px;
+    height: 100%;
+    outline: none; /* Prevent dragging from highlighting the element */
+    position: relative;
+}
+
+.CodeMirror-sizer {
+    position: relative;
+    border-right: 50px solid transparent;
+}
+
+/* The fake, visible scrollbars. Used to force redraw during scrolling
+      before actual scrolling happens, thus preventing shaking and
+      flickering artifacts. */
+.CodeMirror-vscrollbar,
+.CodeMirror-hscrollbar,
+.CodeMirror-scrollbar-filler,
+.CodeMirror-gutter-filler {
+    position: absolute;
+    z-index: 6;
+    display: none;
+}
+
+.CodeMirror-vscrollbar {
+    right: 0;
+    top: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.CodeMirror-hscrollbar {
+    bottom: 0;
+    left: 0;
+    overflow-y: hidden;
+    overflow-x: scroll;
+}
+
+.CodeMirror-scrollbar-filler {
+    right: 0;
+    bottom: 0;
+}
+
+.CodeMirror-gutter-filler {
+    left: 0;
+    bottom: 0;
+}
+
+.CodeMirror-gutters {
+    position: absolute;
+    left: 0;
+    top: 0;
+    min-height: 100%;
+}
+
+.CodeMirror-gutter {
+    white-space: normal;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: -50px;
+}
+
+.CodeMirror-gutter-wrapper {
+    position: absolute;
+    z-index: var(--z-index-above);
+    background: none !important;
+    border: none !important;
+}
+
+.CodeMirror-gutter-background {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 4;
+}
+
+.CodeMirror-gutter-elt {
+    position: absolute;
+    cursor: default;
+}
+
+.CodeMirror-gutter-wrapper ::selection {
+    background-color: transparent;
+}
+
+.CodeMirror-gutter-wrapper ::-moz-selection {
+    background-color: transparent;
+}
+
+.CodeMirror-lines {
+    cursor: text;
+    min-height: 1px; /* prevents collapsing before first draw */
+}
+
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
+    /* Reset some styles that the rest of the page might have set */
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    border-width: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    margin: 0;
+    white-space: pre;
+    word-wrap: normal;
+    line-height: inherit;
+    color: inherit;
+    position: relative;
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-variant-ligatures: contextual;
+    font-variant-ligatures: contextual;
+}
+
+.CodeMirror-wrap pre.CodeMirror-line,
+.CodeMirror-wrap pre.CodeMirror-line-like {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    word-break: normal;
+}
+
+.CodeMirror-linebackground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+}
+
+.CodeMirror-linewidget {
+    position: relative;
+    z-index: 2;
+    padding: 0.1px; /* Force widget margins to stay inside of the container */
+}
+
+.CodeMirror-rtl pre {
+    direction: ltr;
+}
+
+.CodeMirror-code {
+    outline: none;
+}
+
+/* Force content-box sizing for the elements where we expect it */
+.CodeMirror-scroll,
+.CodeMirror-sizer,
+.CodeMirror-gutter,
+.CodeMirror-gutters,
+.CodeMirror-linenumber {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+.CodeMirror-measure {
+    position: absolute;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.CodeMirror-cursor {
+    position: absolute;
+    pointer-events: none;
+}
+.CodeMirror-measure pre {
+    position: static;
+}
+
+div.CodeMirror-cursors {
+    visibility: hidden;
+    position: relative;
+    z-index: 3;
+}
+div.CodeMirror-dragcursors {
+    visibility: visible;
+}
+
+.CodeMirror-focused div.CodeMirror-cursors {
+    visibility: visible;
+}
+
+.CodeMirror-selected {
+    background: #d9d9d9;
+}
+.CodeMirror-focused .CodeMirror-selected {
+    background: #d7d4f0;
+}
+.CodeMirror-crosshair {
+    cursor: crosshair;
+}
+
+.cm-searching {
+    background-color: #ffa;
+    background-color: rgba(255, 255, 0, 0.4);
+}
+
+/* Used to force a border model for a node */
+.cm-force-border {
+    padding-right: 0.1px;
+}
+
+@media print {
+    /* Hide the cursor when printing */
+    .CodeMirror div.CodeMirror-cursors {
+        visibility: hidden;
+    }
+}
+
+/* See issue #2901 */
+.cm-tab-wrap-hack:after {
+    content: '';
+}
+
+/* Help users use markselection to safely style text background */
+span.CodeMirror-selectedtext {
+    background: none;
+}
+
+.CodeMirror-fullscreen {
+    @apply fixed inset-0 h-auto rounded-none pt-12;
+}
+
+.CodeMirror-rulers {
+    @apply absolute left-0 right-0 overflow-hidden;
+    top: -50px;
+    bottom: -20px;
+}
+
+.CodeMirror-ruler {
+    @apply bottom-0 top-0;
+}
+
+/* CODEMIRROR / MATERIAL THEME
+========================================================================== */
+.cm-s-material {
+    &.CodeMirror {
+        background: #263238;
+        @apply dark:bg-gray-900;
+        color: #eeffff;
+    }
+
+    .CodeMirror-gutters {
+        background: #263238;
+        @apply dark:bg-gray-900;
+        color: #678695;
+        border: none;
+    }
+
+    .CodeMirror-guttermarker,
+    .CodeMirror-guttermarker-subtle,
+    .CodeMirror-linenumber {
+        color: #678695;
+    }
+
+    .CodeMirror-cursor {
+        border-left: 1px solid #ffcc00;
+    }
+
+    div.CodeMirror-selected {
+        background: rgba(128, 203, 196, 0.2);
+    }
+
+    .CodeMirror-focused div.CodeMirror-selected {
+        background: rgba(128, 203, 196, 0.2);
+    }
+
+    .CodeMirror-line::selection,
+    .CodeMirror-line > span::selection,
+    .CodeMirror-line > span > span::selection {
+        background: rgba(128, 203, 196, 0.2);
+    }
+
+    .CodeMirror-line::-moz-selection,
+    .CodeMirror-line > span::-moz-selection,
+    .CodeMirror-line > span > span::-moz-selection {
+        background: rgba(128, 203, 196, 0.2);
+    }
+
+    .CodeMirror-activeline-background {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .cm-keyword {
+        color: #c792ea;
+    }
+
+    .cm-operator {
+        color: #89ddff;
+    }
+
+    .cm-variable-2 {
+        color: #eeffff;
+    }
+
+    .cm-variable-3,
+    .cm-type {
+        color: #f07178;
+    }
+
+    .cm-builtin {
+        color: #ffcb6b;
+    }
+
+    .cm-atom {
+        color: #f78c6c;
+    }
+
+    .cm-number {
+        color: #ff5370;
+    }
+
+    .cm-def {
+        color: #82aaff;
+    }
+
+    .cm-string {
+        color: #c3e88d;
+    }
+
+    .cm-string-2 {
+        color: #f07178;
+    }
+
+    .cm-comment {
+        color: #678695;
+    }
+
+    .cm-variable {
+        color: #f07178;
+    }
+
+    .cm-tag {
+        color: #ff5370;
+    }
+
+    .cm-meta {
+        color: #ffcb6b;
+    }
+
+    .cm-attribute {
+        color: #c792ea;
+    }
+
+    .cm-property {
+        color: #c792ea;
+    }
+
+    .cm-qualifier {
+        color: #decb6b;
+    }
+
+    .cm-variable-3,
+    .cm-type {
+        color: #decb6b;
+    }
+
+    .cm-error {
+        color: rgba(255, 255, 255, 1);
+        background-color: #ff5370;
+    }
+
+    .CodeMirror-matchingbracket {
+        text-decoration: underline;
+        color: white !important;
+    }
+}

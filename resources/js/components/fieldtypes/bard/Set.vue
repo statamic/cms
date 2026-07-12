@@ -1,0 +1,382 @@
+<template>
+    <node-view-wrapper class="my-4">
+        <div
+            ref="container"
+            class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :class="{
+                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
+                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
+                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
+                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
+                'border-red-500': hasError,
+            }"
+            :data-type="config.handle"
+            contenteditable="false"
+            @copy.stop
+            @paste.stop
+            @cut.stop
+        >
+            <div ref="content" hidden />
+            <header
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :class="{
+                    'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
+                }"
+            >
+                <span v-if="!isReadOnly" data-drag-handle class="flex cursor-grab" @mousedown="enableDragging">
+                    <Icon name="handles" class="size-4 text-gray-400" />
+                </span>
+                <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
+                    <Badge size="lg" :pill="true" color="white" class="px-3">
+                        <span v-if="isSetGroupVisible" class="flex items-center gap-2">
+                            {{ __(setGroup.display) }}
+                            <Icon name="chevron-right" class="relative top-px size-3" />
+                        </span>
+                        {{ __(config.display) || config.handle }}
+                    </Badge>
+                    <Icon
+                        v-if="config.instructions && !collapsed"
+                        name="info-square"
+                        class="size-3.5! text-gray-500"
+                        v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                    />
+                    <Subheading
+                        v-show="collapsed"
+                        v-html="previewText"
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+                </button>
+                <div class="flex items-center gap-2" v-if="!isReadOnly">
+                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+
+                    <Dropdown>
+                        <template #trigger>
+                            <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="fieldActions.length"
+                                v-for="action in fieldActions"
+                                :text="action.title"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run(action)"
+                            />
+                            <DropdownSeparator v-if="fieldActions.length" />
+                            <DropdownItem
+                                :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                @click="toggleCollapsedState"
+                            />
+                            <DropdownItem :text="__('Duplicate Set')" @click="duplicate" />
+                            <DropdownItem
+                                :text="__('Delete Set')"
+                                variant="destructive"
+                                @click="deleteNode"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+            </header>
+
+            <div
+                v-if="index !== undefined && hasFields"
+                v-show="!collapsed"
+                :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
+                class="border-t border-t-gray-300! dark:border-t-white/10!"
+            >
+                <FieldsProvider
+                    :fields="fields"
+                    :as-config="false"
+                    :read-only="isReadOnly"
+                    :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
+                >
+                    <Fields class="p-4" />
+                </FieldsProvider>
+            </div>
+        </div>
+    </node-view-wrapper>
+</template>
+
+<script>
+import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3';
+import ManagesPreviewText from '../replicator/ManagesPreviewText';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import {
+    Badge,
+    Button,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    Icon,
+    Subheading,
+    Switch,
+    PublishFieldsProvider as FieldsProvider,
+    PublishFields as Fields
+} from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { watch } from 'vue';
+import { reveal } from '@api';
+
+export default {
+    props: nodeViewProps,
+
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        Fields,
+        FieldsProvider,
+        Switch,
+        Subheading,
+        Badge,
+        Icon,
+        NodeViewWrapper,
+    },
+
+    mixins: [ManagesPreviewText, HasFieldActions],
+
+    inject: {
+        bard: {},
+        bardSets: {},
+        publishContainer: { from: containerContextKey },
+    },
+
+    computed: {
+        fields() {
+            return this.config.fields;
+        },
+
+        hasFields() {
+            return Array.isArray(this.fields)
+                ? this.fields.length > 0
+                : Object.keys(this.fields || {}).length > 0;
+        },
+
+        display() {
+            return __(this.config.display || this.values.type);
+        },
+
+        values() {
+            return this.node.attrs.values;
+        },
+
+        extraValues() {
+            return {};
+        },
+
+        meta() {
+            return this.extension.options.bard.meta.existing[this.node.attrs.id] || {};
+        },
+
+        previews() {
+            return data_get(this.publishContainer.previews.value, this.fieldPathPrefix) || {};
+        },
+
+        collapsed() {
+            return this.extension.options.bard.collapsed.includes(this.node.attrs.id);
+        },
+
+        config() {
+            return this.setConfigs.find((c) => c.handle === this.values.type) || {};
+        },
+
+        setConfigs() {
+            return this.bard.setConfigs;
+        },
+
+        setGroup() {
+            if (this.bardSets.length < 1) return null;
+
+            return this.bardSets.find((group) => {
+                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
+            });
+        },
+
+        isSetGroupVisible() {
+            return this.bardSets.length > 1 && this.setGroup?.display;
+        },
+
+        isReadOnly() {
+            return this.bard.isReadOnly;
+        },
+
+        enabled: {
+            get() {
+                return this.node.attrs.enabled;
+            },
+            set(enabled) {
+                return this.updateAttributes({ enabled });
+            },
+        },
+
+        parentName() {
+            return this.extension.options.bard.name;
+        },
+
+        index() {
+            return this.extension.options.bard.setIndexes[this.node.attrs.id];
+        },
+
+        fieldPathPrefix() {
+            const fpf = this.extension.options.bard.fieldPathPrefix;
+            const handle = this.extension.options.bard.handle;
+            const prefix = fpf ? `${fpf}.${handle}` : handle;
+
+            return `${prefix}.${this.index}.attrs.values`;
+        },
+
+        metaPathPrefix() {
+            const mpp = this.extension.options.bard.metaPathPrefix;
+            const handle = this.extension.options.bard.handle;
+            const prefix = mpp ? `${mpp}.${handle}` : handle;
+
+            return `${prefix}.existing.${this.node.attrs.id}`;
+        },
+
+        instructions() {
+            return this.config.instructions ? markdown(__(this.config.instructions)) : null;
+        },
+
+        hasError() {
+            return this.extension.options.bard.setHasError(this.node.attrs.id);
+        },
+
+        showFieldPreviews() {
+            return this.extension.options.bard.config.previews;
+        },
+
+        isInvalid() {
+            return Object.keys(this.config).length === 0;
+        },
+
+        decorationSpecs() {
+            return Object.assign({}, ...this.decorations.map((decoration) => decoration.type.spec));
+        },
+
+        withinSelection() {
+            return this.decorationSpecs.withinSelection;
+        },
+
+        showSelectionHighlight() {
+            return (this.selected || this.withinSelection) && this.bard.hasBeenFocused;
+        },
+
+        fieldVm() {
+            return this.extension.options.bard;
+        },
+
+        fieldActionPayload() {
+            return {
+                // vm: this,
+                // fieldVm: this.fieldVm,
+                // fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
+                index: this.index,
+                values: this.values,
+                config: this.config,
+                // meta: this.meta,
+                update: (handle, value) =>
+                    this.publishContainer.setFieldValue(`${this.fieldPathPrefix}.${handle}`, value),
+                updateMeta: (handle, value) =>
+                    this.publishContainer.setFieldMeta(`${this.metaPathPrefix}.${handle}`, value),
+                isReadOnly: this.isReadOnly,
+            };
+        },
+
+        fieldActionBinding() {
+            return 'bard-fieldtype-set';
+        }
+    },
+
+    methods: {
+        focused() {
+            this.extension.options.bard.$emit('focus');
+        },
+
+        blurred() {
+            // Bard should only blur if we focus somewhere outside of Bard entirely.
+            // We use a timeout because activeElement only exists after the blur event.
+            setTimeout(() => {
+                const bard = this.extension.options.bard;
+                if (!bard.$el.contains(document.activeElement)) bard.$emit('blur');
+            }, 1);
+        },
+
+        toggleCollapsedState() {
+            if (this.collapsed) {
+                this.expand();
+            } else {
+                this.collapse();
+            }
+        },
+
+        collapse() {
+            // this.$events.$emit('collapsed', this.node.attrs.id);
+            this.extension.options.bard.collapseSet(this.node.attrs.id);
+        },
+
+        expand() {
+            // this.$events.$emit('expanded', this.node.attrs.id);
+            this.extension.options.bard.expandSet(this.node.attrs.id);
+        },
+
+        duplicate() {
+            // this.$events.$emit('duplicated', this.node.attrs.id);
+            this.extension.options.bard.duplicateSet(
+                this.node.attrs.id,
+                this.node.attrs,
+                this.getPos,
+            );
+        },
+
+        enableDragging() {
+            this._draggableObserver?.disconnect();
+            this.$el.setAttribute('draggable', true);
+
+            document.addEventListener('mouseup', this.disableDragging, { once: true });
+            document.addEventListener('dragend', this.disableDragging, { once: true });
+        },
+
+        disableDragging() {
+            this.$el.setAttribute('draggable', false);
+            this._draggableObserver?.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+        },
+    },
+
+    mounted() {
+        watch(
+            () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
+            (values) => {
+				if (! values) return;
+                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
+
+                this.updateAttributes({ values });
+            },
+            { deep: true }
+        );
+
+        reveal.mount(this.$refs.container, this.expand);
+
+        // Firefox bug 739071: text selection doesn't work inside elements with a
+        // draggable ancestor. ProseMirror sets draggable=true on the node-view-wrapper
+        // because the Set node spec has draggable:true. We must keep it false.
+        this.$el.setAttribute('draggable', false);
+        this._draggableObserver = new MutationObserver(() => {
+            if (this.$el.getAttribute('draggable') !== 'false') {
+                this.$el.setAttribute('draggable', false);
+            }
+        });
+        this._draggableObserver.observe(this.$el, { attributes: true, attributeFilter: ['draggable'] });
+    },
+
+    updated() {
+        this.$el.setAttribute('draggable', false);
+    },
+
+    beforeUnmount() {
+        this._draggableObserver?.disconnect();
+    },
+};
+</script>

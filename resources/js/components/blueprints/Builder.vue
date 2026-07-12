@@ -1,0 +1,140 @@
+<template>
+    <div>
+        <ui-header :title="__('Edit Blueprint')" icon="blueprints">
+            <template #actions>
+                <slot name="actions"></slot>
+                <ui-command-palette-item
+                    :category="$commandPalette.category.Actions"
+                    :text="__('Save')"
+                    icon="save"
+                    :action="save"
+                    prioritize
+                    v-slot="{ text, action }"
+                >
+                    <ui-button type="submit" variant="primary" @click.prevent="action" v-text="text" />
+                </ui-command-palette-item>
+            </template>
+        </ui-header>
+
+        <ui-panel v-if="showTitle" :heading="__('Settings')">
+            <ui-card class="p-0! divide-y divide-gray-200 dark:divide-gray-800">
+                <ui-field inline :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors?.title">
+                    <ui-input v-model="blueprint.title" />
+                </ui-field>
+                <ui-field inline :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors?.hidden" variant="inline">
+                    <ui-switch v-model="blueprint.hidden" />
+                </ui-field>
+            </ui-card>
+        </ui-panel>
+
+        <Tabs
+            class="mt-8"
+            :single-tab="!useTabs"
+            :initial-tabs="tabs"
+            :errors="errors?.tabs"
+            :can-define-localizable="canDefineLocalizable"
+            show-section-collapsible-field
+            @updated="tabsUpdated"
+        />
+    </div>
+</template>
+
+<script>
+import SuggestsConditionalFields from './SuggestsConditionalFields';
+import Tabs from './Tabs.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+
+export default {
+    mixins: [SuggestsConditionalFields, CanDefineLocalizable],
+
+    components: {
+        Tabs,
+    },
+
+    props: {
+        action: String,
+        initialBlueprint: Object,
+        showTitle: Boolean,
+        useTabs: { type: Boolean, default: true },
+        isFormBlueprint: { type: Boolean, default: false },
+    },
+
+    data() {
+        return {
+            blueprint: this.initializeBlueprint(),
+            errors: {},
+	        saveKeyBinding: null,
+        };
+    },
+
+    computed: {
+        tabs() {
+            return this.blueprint.tabs;
+        },
+    },
+
+    created() {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            e.preventDefault();
+            this.save();
+        });
+
+        // Listen for root-form-save events from child components
+        // This also happens on the fieldset builder.
+        this.$events.$on('root-form-save', () => {
+            this.$nextTick(() => this.save());
+        });
+
+        if (this.isFormBlueprint) {
+            Statamic.$config.set('isFormBlueprint', true);
+        }
+    },
+
+    beforeUnmount() {
+		Statamic.$config.set('isFormBlueprint', false);
+
+        this.$events.$off('root-form-save');
+
+		this.saveKeyBinding.destroy();
+    },
+
+    watch: {
+        blueprint: {
+            deep: true,
+            handler() {
+                this.$dirty.add('blueprints');
+            },
+        },
+    },
+
+    methods: {
+        initializeBlueprint() {
+            let blueprint = clone(this.initialBlueprint);
+
+            if (!this.showTitle) delete blueprint.title;
+
+            return blueprint;
+        },
+
+        tabsUpdated(tabs) {
+            this.blueprint.tabs = tabs;
+        },
+
+        save() {
+            this.$axios['patch'](this.action, this.blueprint)
+                .then((response) => this.saved(response))
+                .catch((e) => {
+                    console.error('Blueprint save failed:', e);
+                    this.$toast.error(e.response.data.message);
+                    this.errors = e.response.data.errors;
+                });
+        },
+
+        saved() {
+            this.$toast.success(__('Saved'));
+            this.errors = {};
+            this.$dirty.remove('blueprints');
+        },
+    },
+};
+</script>

@@ -1,0 +1,7 @@
+title: Numeric
+route: 'numeric/{slug}'
+orderable: true
+entry_order:
+  - numeric-one
+  - numeric-two
+  - numeric-three

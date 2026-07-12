@@ -1,0 +1,12 @@
+one:
+  title: One
+  permissions:
+    - foo
+    - bar
+empty:
+  title: Empty
+super:
+  title: Super
+  permissions:
+    - super
+    - another

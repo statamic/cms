@@ -1,0 +1,685 @@
+<template>
+    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl">
+        <div
+            v-if="hasPendingDynamicFolder"
+            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
+            v-html="pendingText"
+        />
+
+        <uploader
+            ref="uploader"
+            :container="container.id"
+            :enabled="canUpload"
+            :path="folder"
+            @updated="uploadsUpdated"
+            @upload-complete="uploadComplete"
+            @error="uploadError"
+            v-slot="{ dragging }"
+        >
+            <div>
+                <div
+                    v-if="config.allow_uploads"
+                    v-show="dragging && !showSelector"
+                    class="absolute inset-0 z-(--z-index-above) flex gap-2 items-center justify-center bg-white/80 border border-gray-400 border-dashed rounded-lg text-gray-700"
+                >
+                    <ui-icon name="upload-cloud" class="size-5" />
+                    <span class="text-sm">{{ __('Drop to Upload') }}</span>
+                </div>
+
+                <div
+                    v-if="!isReadOnly && showPicker"
+                    data-asset-picker
+                    class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-col @[22rem]:flex-row gap-2 sm:gap-3 gap-y-3"
+                    :class="{
+                        'rounded-b-none': expanded,
+                        'bard-drag-handle': isInBardField,
+                    }"
+                >
+                    <Button
+                        v-if="canBrowse"
+                        icon="folder-open"
+                        tabindex="0"
+                        :text="__('Browse Assets')"
+                        class="w-full @2xs:w-auto"
+                        @click="openSelector"
+                        @keyup.space.enter="openSelector"
+                    />
+
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 gap-1 ms-1" v-if="canUpload">
+                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
+                        <div class="text-xs">
+                            <span class="leading-tight" v-text="`${__('Drag & drop here or')}&nbsp;`" />
+                            <button type="button" class="text-left underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
+                                {{ __('choose a file') }}
+                            </button>.
+                            <span class="leading-tight whitespace-nowrap" v-if="selectedFilesText" v-text="selectedFilesText" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end" v-if="meta.rename_folder">
+                        <ItemActions
+                            :url="meta.rename_folder.url"
+                            :actions="[meta.rename_folder.action]"
+                            :item="folder"
+                             @completed="renameFolderActionCompleted"
+                            v-slot="{ actions }"
+                        >
+                            <Dropdown placement="left-start">
+                                <DropdownMenu>
+                                    <DropdownItem
+                                        v-for="action in actions"
+                                        :key="action.handle"
+                                        :text="__(action.title)"
+                                        :icon="action.icon"
+                                        :variant="action.dangerous ? 'destructive' : 'default'"
+                                        @click="action.run"
+                                    />
+                                </DropdownMenu>
+                            </Dropdown>
+                        </ItemActions>
+                    </div>
+                </div>
+
+                <div v-if="uploads.length" class="divide-y">
+                    <uploads
+                        :uploads="uploads"
+                        allow-selecting-existing
+                        @existing-selected="uploadSelected"
+                    />
+                </div>
+
+                <div v-if="isReadOnly && !expanded" class="border border-gray-300 dark:border-gray-700 border-dashed rounded-lg p-3 text-center">
+                    <ui-icon name="assets" class="size-5 text-gray-300 dark:text-gray-700 mx-auto" />
+                </div>
+
+                <template v-if="expanded">
+                    <sortable-list
+                        v-if="expanded && displayMode === 'grid'"
+                        append-to="body"
+                        handle-class="asset-thumb-container"
+                        item-class="asset-tile"
+                        v-model="assets"
+                        :animate="false"
+                        :constrain-dimensions="true"
+                        :disabled="config.disabled || isReadOnly"
+                        :distance="5"
+                        @dragend="$emit('blur')"
+                        @dragstart="$emit('focus')"
+                    >
+                        <div
+                            class="bg-white relative grid gap-4 2xl:gap-10 p-3 relative rounded-xl border border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                            :class="{ 'border-t-0 rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
+                            ref="assets"
+                            style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));"
+                        >
+                            <asset-tile
+                                v-for="asset in assets"
+                                :key="asset.id"
+                                :asset="asset"
+                                :siblings="assets"
+                                :read-only="isReadOnly"
+                                :show-filename="config.show_filename"
+                                :show-set-alt="showSetAlt"
+                                :checkerboard-mode="checkerboardMode"
+                                @updated="assetUpdated"
+                                @removed="assetRemoved"
+                                @id-changed="idChanged"
+                            >
+                            </asset-tile>
+                        </div>
+                    </sortable-list>
+
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700"
+                        :class="{ 'not-[.link-fieldtype_&]:border-t-0! not-[.link-fieldtype_&]:rounded-t-none': !isReadOnly && (showPicker || uploads.length), 'border-dashed': isReadOnly }"
+                        v-if="displayMode === 'list'"
+                    >
+                        <table class="table-fixed w-full">
+                            <thead class="sr-only">
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <sortable-list
+                                v-model="assets"
+                                item-class="asset-row"
+                                handle-class="asset-row"
+                                :disabled="config.disabled || isReadOnly"
+                                :distance="5"
+                                :mirror="false"
+                                :vertical="true"
+                            >
+                                <tbody ref="assets">
+                                    <component
+                                        is="assetRow"
+                                        class="asset-row"
+                                        v-for="asset in assets"
+                                        :key="asset.id"
+                                        :asset="asset"
+                                        :siblings="assets"
+                                        :read-only="isReadOnly"
+                                        :show-filename="config.show_filename"
+                                        :show-set-alt="showSetAlt"
+                                        @updated="assetUpdated"
+                                        @removed="assetRemoved"
+                                        @id-changed="idChanged"
+                                    />
+                                </tbody>
+                            </sortable-list>
+                        </table>
+                    </div>
+                </template>
+            </div>
+        </uploader>
+
+        <Stack v-model:open="showSelector" inset :show-close-button="false">
+            <Selector
+                :container="container"
+                :folder="folder"
+                :restrict-folder-navigation="restrictNavigation"
+                :selected="selectedAssets"
+                :max-files="maxFiles"
+                :query-scopes="queryScopes"
+                :columns="columns"
+                @selected="assetsSelected"
+                @closed="showSelector = false"
+            />
+        </Stack>
+    </div>
+</template>
+
+<script>
+import Fieldtype from '../Fieldtype.vue';
+import AssetRow from './AssetRow.vue';
+import AssetTile from './AssetTile.vue';
+import Selector from '../../assets/Selector.vue';
+import Uploader from '../../assets/Uploader.vue';
+import Uploads from '../../assets/Uploads.vue';
+import { SortableList } from '../../sortable/Sortable';
+import { isEqual } from 'lodash-es';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Stack } from '@/components/ui';
+import ItemActions from '@/components/actions/ItemActions.vue';
+import useCheckerboard from '@/composables/checkerboard.js';
+
+export default {
+    components: {
+        AssetTile,
+        AssetRow,
+        Button,
+        Selector,
+        Uploader,
+        Uploads,
+        SortableList,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        ItemActions,
+	    Stack,
+    },
+
+    mixins: [Fieldtype],
+
+    setup() {
+        const checkerboard = useCheckerboard();
+        return {
+            checkerboardIcon: checkerboard.icon,
+            checkerboardMode: checkerboard.mode,
+            cycleCheckerboard: checkerboard.cycle,
+        };
+    },
+
+    inject: {
+        isInBardField: {
+            name: 'isInBardField',
+            default: false,
+        },
+        isInGridField: {
+            name: 'isInGridField',
+            default: false,
+        },
+        isInLinkField: {
+            name: 'isInLinkField',
+            default: false,
+        },
+    },
+
+    data() {
+        return {
+            assets: [],
+            loading: true,
+            initializing: true,
+            showSelector: false,
+            draggingFile: false,
+            uploads: [],
+            innerDragging: false,
+            displayMode: 'grid',
+            lockedDynamicFolder: this.meta.dynamicFolder,
+        };
+    },
+
+    computed: {
+        /**
+         * Whether any assets have been selected.
+         */
+        hasAssets() {
+            return Boolean(this.assets.length);
+        },
+
+        /**
+         * The initial container to be displayed in the selector.
+         */
+        container() {
+            return this.meta.container;
+        },
+
+        /**
+         * The initial folder to be displayed in the selector.
+         */
+        folder() {
+            let folder = this.configuredFolder;
+
+            if (this.isUsingDynamicFolder) {
+                folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
+            }
+
+            folder = folder.replace(/^\/+/, '');
+
+            return folder === '' ? '/' : folder;
+        },
+
+        configuredFolder() {
+            return this.config.folder || '/';
+        },
+
+        isUsingDynamicFolder() {
+            return !!this.config.dynamic;
+        },
+
+        hasPendingDynamicFolder() {
+            return this.isUsingDynamicFolder && !this.lockedDynamicFolder && !this.dynamicFolder;
+        },
+
+        dynamicFolder() {
+            const field = this.config.dynamic;
+            if (!['id', 'slug', 'author'].includes(field)) {
+                throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
+            }
+
+            const value = this.publishContainer.values[field];
+
+            // If value is an array (e.g. a users fieldtype), get the first item.
+            return Array.isArray(value) ? value[0] : value;
+        },
+
+        columns() {
+            return this.meta.columns;
+        },
+
+        /**
+         * Whether assets should be restricted to the specified container
+         * and folder. This will prevent navigation to other places.
+         */
+        restrictNavigation() {
+            return this.isUsingDynamicFolder || this.config.restrict || false;
+        },
+
+        /**
+         * The maximum number of files allowed.
+         */
+        maxFiles() {
+            if (!this.config.max_files) return Infinity;
+
+            return parseInt(this.config.max_files);
+        },
+
+        /**
+         * Whether the maximum number of files have been selected.
+         */
+        maxFilesReached() {
+            if (this.maxFiles === 0) return false;
+
+            return this.assets.length >= this.maxFiles;
+        },
+
+        /**
+         * True if a single asset.
+         */
+        soloAsset() {
+            return this.maxFiles === 1;
+        },
+
+        /**
+         * The selected assets.
+         *
+         * The asset browser expects an array of asset IDs to be passed in as a prop.
+         */
+        selectedAssets() {
+            return clone(this.value);
+        },
+
+        /**
+         * The IDs of the assets.
+         */
+        assetIds() {
+            return this.assets.map((asset) => asset.id);
+        },
+
+        /**
+         * Whether the fieldtype is in the expanded UI state.
+         */
+        expanded() {
+            return this.assets.length > 0;
+        },
+
+        /**
+         * The DOM element the uploader component will bind to.
+         */
+        uploadElement() {
+            return this.$el;
+        },
+
+        /**
+         * The scopes to use to filter the queries.
+         */
+        queryScopes() {
+            return this.config.query_scopes || [];
+        },
+
+        replicatorPreview() {
+            if (!this.showFieldPreviews) return;
+
+            return replicatorPreviewHtml(
+                this.assets
+                    .map((asset) => {
+                        return asset.isImage || asset.isSvg
+                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5 rounded-sm mr-1 object-cover" height="20" title="${asset.basename}" />`
+                            : asset.basename;
+                    })
+                    .join(' '),
+            );
+        },
+
+        showPicker() {
+            if (!this.canBrowse && !this.canUpload) return false;
+
+            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
+
+            return true;
+        },
+
+        showSetAlt() {
+            return this.config.show_set_alt && !this.isReadOnly;
+        },
+
+        canBrowse() {
+            if (!this.container.can_view) return false;
+
+            return !this.hasPendingDynamicFolder;
+        },
+
+        canUpload() {
+            if (!this.config.allow_uploads) return false;
+
+            if (!this.container.can_upload) return false;
+
+            return !this.hasPendingDynamicFolder;
+        },
+
+        pendingText() {
+            return this.config.dynamic === 'id'
+                ? __('statamic::fieldtypes.assets.dynamic_folder_pending_save')
+                : __('statamic::fieldtypes.assets.dynamic_folder_pending_field', {
+                      field: `<code>${this.config.dynamic}</code>`,
+                  });
+        },
+
+        selectedFilesText() {
+            if (this.maxFiles !== Infinity) {
+                return __n(':count\/:max selected', this.assets.length, { max: this.maxFiles });
+            }
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Transparency'),
+                    icon: this.checkerboardIcon,
+                    run: () => this.cycleCheckerboard(),
+                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    quick: true,
+                },
+                {
+                    title: __('Remove All'),
+                    dangerous: true,
+                    run: this.removeAll,
+                    visible: this.assets.length > 0,
+                },
+            ];
+        },
+    },
+
+    events: {
+        'close-selector'() {
+            this.showSelector = false;
+        },
+    },
+
+    methods: {
+        initializeAssets() {
+            if (!this.meta.data) {
+                this.loadAssets(this.value);
+                this.initializing = false;
+                return;
+            }
+
+            this.assets = clone(this.meta.data);
+            this.$nextTick(() => {
+                this.initializing = false;
+                this.loading = false;
+            });
+
+            this.$emit('replicator-preview-updated', this.replicatorPreview);
+        },
+
+        /**
+         * Get asset data from the server
+         *
+         * Accepts an array of asset URLs and/or IDs.
+         */
+        loadAssets(assets) {
+            if (!assets || !assets.length) {
+                this.loading = false;
+                this.assets = [];
+                return;
+            }
+
+            this.loading = true;
+
+            this.$axios
+                .post(cp_url('assets-fieldtype'), {
+                    assets,
+                })
+                .then((response) => {
+                    this.assets = response.data;
+                    this.loading = false;
+                });
+        },
+
+        /**
+         * When a user has finished selecting items in the browser.
+         *
+         * We should update the fieldtype with any selections.
+         */
+        assetsSelected(selections) {
+            this.loadAssets(selections);
+            this.lockDynamicFolder();
+        },
+
+        /**
+         * Open the asset selector modal
+         */
+        openSelector() {
+            this.showSelector = true;
+        },
+
+        /**
+         * When an asset is updated in the editor
+         */
+        assetUpdated(asset) {
+            const index = this.assets.findIndex((a) => a.id === asset.id);
+            this.assets.splice(index, 1, asset);
+        },
+
+        /**
+         * When an asset remove button was clicked.
+         */
+        assetRemoved(asset) {
+            const index = this.assets.findIndex((a) => a.id === asset.id);
+            this.assets.splice(index, 1);
+        },
+
+        /**
+         * Remove all assets from the field.
+         */
+        removeAll() {
+            this.assets = [];
+        },
+
+        /**
+         * When the uploader component has finished uploading a file.
+         */
+        uploadComplete(asset) {
+            this.assets.push(asset);
+
+            this.lockDynamicFolder();
+        },
+
+        /**
+         * When the uploader component has modified the uploads array
+         */
+        uploadsUpdated(uploads) {
+            this.uploads = uploads;
+        },
+
+        /**
+         * When the uploader component encounters an error
+         */
+        uploadError(upload, uploads) {
+            this.uploads = uploads;
+            this.$toast.error(upload.errorMessage);
+        },
+
+        /**
+         * Show the file upload finder window.
+         */
+        uploadFile() {
+            this.$refs.uploader.browse();
+        },
+
+        idChanged(oldId, newId) {
+            const index = this.value.indexOf(oldId);
+            this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
+        },
+
+        lockDynamicFolder() {
+            if (this.isUsingDynamicFolder && !this.lockedDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
+        },
+
+        syncDynamicFolderFromValue(value) {
+            if (!this.isUsingDynamicFolder) return;
+
+            this.lockedDynamicFolder = null;
+
+            if (value.length === 0) {
+                // If there are no assets, we should get the dynamic folder naturally.
+                this.lockDynamicFolder();
+            } else {
+                // Otherwise, figure it out from the first selected asset.
+                const first = value[0];
+                const segments = first.split('::')[1].split('/');
+                this.lockedDynamicFolder = segments[segments.length - 2];
+            }
+
+            // Set the new folder in the rename action.
+            const meta = this.meta;
+            meta.rename_folder.action.context.folder = this.folder;
+            this.updateMeta(meta);
+        },
+
+        renameFolderActionCompleted(successful = null, response = {}) {
+            if (successful === false) return;
+
+            this.$events.$emit('reset-action-modals');
+
+            if (response.message !== false) {
+                this.$toast.success(response.message || __('Action completed'));
+            }
+
+            // Update the folder in the current asset values.
+            // They will be adjusted in the content but not here automatically since there's no refresh.
+            const newFolder = response[0].path;
+            this.update(this.value.map((id) => id.replace(`::${this.folder}`, `::${newFolder}`)));
+            this.lockedDynamicFolder = this.configuredFolder
+                ? newFolder.replace(`${this.configuredFolder}/`, '')
+                : newFolder;
+        },
+
+        uploadSelected(upload) {
+            const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container.id}::${path}`;
+
+            this.uploads.splice(this.uploads.indexOf(upload), 1);
+
+            if (this.value.includes(id)) return;
+
+            if (this.maxFiles === 1) {
+                this.loadAssets([id]);
+            } else {
+                this.loadAssets([...this.value, id]);
+            }
+        },
+    },
+
+    watch: {
+        assets: {
+            deep: true,
+            handler(assets) {
+                if (this.initializing) return;
+
+                // The components deal with passing around asset objects, however
+                // our fieldtype is only concerned with their respective IDs.
+                this.update(this.assetIds);
+
+                this.updateMeta({
+                    ...this.meta,
+                    data: [...assets],
+                });
+            }
+        },
+
+        loading(loading) {
+            this.$progress.loading(`assets-fieldtype-${this.$.uid}`, loading);
+        },
+
+        value(value) {
+            if (isEqual(value, this.assetIds)) return;
+
+            this.syncDynamicFolderFromValue(value);
+
+            this.loadAssets(value);
+        },
+
+        showSelector(selecting) {
+            this.$emit(selecting ? 'focus' : 'blur');
+        },
+    },
+
+    mounted() {
+        this.displayMode = this.isInsideGridField ? 'list' : this.config.mode || 'grid';
+
+        // We only have URLs in the field data, so we'll need to get the asset data.
+        this.initializeAssets();
+    },
+};
+</script>

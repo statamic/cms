@@ -1,0 +1,597 @@
+<?php
+
+namespace Statamic\Fieldtypes;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection as SupportCollection;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Column;
+use Statamic\CP\Columns;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
+use Statamic\Query\OrderBy;
+use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filter;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
+use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Index;
+use Statamic\Search\Result;
+use Statamic\Statamic;
+use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
+
+class Entries extends Relationship
+{
+    use QueriesFilters;
+
+    protected $categories = ['relationship'];
+    protected $keywords = ['entry'];
+    protected $canEdit = true;
+    protected $canCreate = true;
+    protected $canSearch = true;
+    protected $statusIcons = true;
+    protected $formComponent = 'entry-publish-form';
+    protected $activeFilterBadges;
+
+    protected $formComponentProps = [
+        'initialActions' => 'actions',
+        'initialTitle' => 'title',
+        'initialReference' => 'reference',
+        'initialFieldset' => 'blueprint',
+        'initialValues' => 'values',
+        'initialExtraValues' => 'extraValues',
+        'initialLocalizedFields' => 'localizedFields',
+        'initialMeta' => 'meta',
+        'initialPermalink' => 'permalink',
+        'initialLocalizations' => 'localizations',
+        'initialHasOrigin' => 'hasOrigin',
+        'initialOriginValues' => 'originValues',
+        'initialOriginMeta' => 'originMeta',
+        'initialSite' => 'locale',
+        'initialIsWorkingCopy' => 'hasWorkingCopy',
+        'initialReadOnly' => 'readOnly',
+        'revisionsEnabled' => 'revisionsEnabled',
+        'collectionHandle' => 'collection',
+        'canManagePublishState' => 'canManagePublishState',
+    ];
+
+    protected function configFieldItems(): array
+    {
+        return [
+            [
+                'display' => __('Input Behavior'),
+                'fields' => [
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                        'width' => 50,
+                    ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
+                        'width' => 50,
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                        'width' => 50,
+                    ],
+                    'create' => [
+                        'display' => __('Allow Creating'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'if' => [
+                            'mode' => 'default',
+                        ],
+                        'width' => 50,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public function getIndexItems($request)
+    {
+        $configuredCollections = $this->getConfiguredCollections();
+
+        // When the user can't view any of the configured collections, return an empty result
+        // set instead of throwing. The picker treats this like the filter-to-viewable case.
+        if ($this->getViewableCollections($configuredCollections)->isEmpty()) {
+            return collect();
+        }
+
+        $query = $this->getIndexQuery($request);
+
+        $filters = $request->filters;
+
+        if (! isset($filters['collection'])) {
+            $query->whereIn(
+                'collection',
+                $this->getViewableCollections($configuredCollections)->map->handle()->all()
+            );
+        }
+
+        if ($blueprints = $this->config('blueprints')) {
+            $query->whereIn('blueprint', $blueprints);
+        }
+
+        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
+
+        if ($sort = $this->getSortColumn($request)) {
+            $query->orderBy($sort, $this->getSortDirection($request));
+        }
+
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15) : $query->get();
+
+        $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
+
+        return $paginate ? $results->setCollection($items) : $items;
+    }
+
+    private function getViewableCollections(array $collections): SupportCollection
+    {
+        $user = User::current();
+
+        return collect($collections)
+            ->map(fn (string $collectionHandle) => Collection::findByHandle($collectionHandle))
+            ->filter(fn ($collection) => $collection && $user->can('view', $collection));
+    }
+
+    public function getResourceCollection($request, $items)
+    {
+        // Derive columns only from a collection the user can view. With none viewable, return
+        // empty data and no columns rather than leaking the structure of an unviewable blueprint.
+        if (! $collection = $this->getColumnCollection($request)) {
+            return JsonResource::collection($items)->additional(['meta' => ['columns' => []]]);
+        }
+
+        return (new EntriesFieldtypeEntries($items, $this))
+            ->blueprint($collection->entryBlueprint())
+            ->columnPreferenceKey("collections.{$collection->handle()}.columns")
+            ->additional(['meta' => [
+                'activeFilterBadges' => $this->activeFilterBadges,
+            ]]);
+    }
+
+    protected function getBlueprint($request = null)
+    {
+        return $this->getColumnCollection($request)?->entryBlueprint();
+    }
+
+    protected function getColumnCollection($request = null)
+    {
+        $collection = $this->getFirstCollectionFromRequest($request);
+
+        // Only derive columns from a collection the user can view. If the first requested or
+        // configured collection isn't viewable, fall back to the first viewable configured
+        // collection, or none at all when the user can view none of them.
+        return User::current()->can('view', $collection)
+            ? $collection
+            : $this->getViewableCollections($this->getConfiguredCollections())->first();
+    }
+
+    protected function getFirstCollectionFromRequest($request)
+    {
+        $collections = $request
+            ? $request->input('filters.collection.collections', [])
+            : [];
+
+        if (empty($collections)) {
+            $collections = $this->getConfiguredCollections();
+        }
+
+        $collection = Collection::findByHandle($collectionHandle = Arr::first($collections));
+
+        throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+        return $collection;
+    }
+
+    public function getSortColumn($request)
+    {
+        $column = OrderBy::column($request->sort, 'title');
+
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+            $column = $this->getFirstCollectionFromRequest($request)->sortField();
+        }
+
+        return $column;
+    }
+
+    public function getSortDirection($request)
+    {
+        $order = $request->order ?? 'asc';
+
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+            $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
+        }
+
+        return $order;
+    }
+
+    public function initialSortColumn()
+    {
+        return $this->getSortColumn(optional());
+    }
+
+    public function initialSortDirection()
+    {
+        return $this->getSortDirection(optional());
+    }
+
+    protected function getIndexQuery($request)
+    {
+        $query = Entry::query();
+
+        $query = $this->toSearchQuery($query, $request);
+
+        if ($this->canSelectAcrossSites()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
+        } elseif ($site = $request->site) {
+            $query->where('site', $site);
+        }
+
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
+        }
+
+        $this->applyIndexQueryScopes($query, $request->all());
+
+        return $query;
+    }
+
+    private function toSearchQuery($query, $request)
+    {
+        if (! $search = $request->search) {
+            return $query;
+        }
+
+        if ($index = $this->getSearchIndex($request)) {
+            return $index->search($search);
+        }
+
+        return $query->where('title', 'like', '%'.$search.'%');
+    }
+
+    private function getSearchIndex($request): ?Index
+    {
+        $index = $this->getExplicitSearchIndex() ?? $this->getCollectionSearchIndex($request);
+
+        return $index?->ensureExists();
+    }
+
+    private function getExplicitSearchIndex(): ?Index
+    {
+        return ($explicit = $this->config('search_index'))
+            ? Search::in($explicit)
+            : null;
+    }
+
+    private function getCollectionSearchIndex($request): ?Index
+    {
+        // Use the collections being filtered, or the configured collections.
+        $collections = collect(
+            $request->input('filters.collection.collections') ?? $this->getConfiguredCollections()
+        );
+
+        $indexes = $collections->map(fn ($handle) => Collection::findByHandle($handle)->searchIndex());
+
+        // If all the collections use the same index, return it.
+        // Even if they're all null, that's fine. It'll just return null.
+        return $indexes->unique()->count() === 1
+            ? $indexes->first()
+            : null;
+    }
+
+    protected function getCreatables()
+    {
+        if ($url = $this->getCreateItemUrl()) {
+            return [['url' => $url]];
+        }
+
+        $collections = $this->getConfiguredCollections();
+
+        $user = User::current();
+
+        return collect($collections)->flatMap(function ($collectionHandle) use ($user) {
+            $collection = Collection::findByHandle($collectionHandle);
+
+            throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+            if (! $user->can('create', [EntryContract::class, $collection])) {
+                return null;
+            }
+
+            $blueprints = $collection->entryBlueprints();
+
+            return $blueprints
+                ->reject->hidden()
+                ->map(function ($blueprint) use ($collection) {
+                    return [
+                        'parent_title' => $collection->title(),
+                        'blueprint' => $blueprint->title(),
+                        'handle' => $blueprint->handle(),
+                        'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
+                    ];
+                });
+        })->all();
+    }
+
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Entry::find($id));
+    }
+
+    protected function toItemArray($id)
+    {
+        if (! $entry = Entry::find($id)) {
+            return $this->invalidItemArray($id);
+        }
+
+        return (new EntryResource($entry, $this))->resolve()['data'];
+    }
+
+    protected function collect($value)
+    {
+        return new \Statamic\Entries\EntryCollection($value);
+    }
+
+    private function queryBuilder($values)
+    {
+        $site = Site::current()->handle();
+        if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
+            $site = $parent->locale();
+        }
+
+        // If they've opted into selecting across sites, we won't automatically localize or
+        // filter out entries that don't exist in the current site. They would do that.
+        $shouldLocalize = ! $this->canSelectAcrossSites();
+
+        $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
+            ->whereIn('id', $ids)
+            ->get()
+            ->when($shouldLocalize, fn ($entries) => $entries
+                ->map(fn ($entry) => $entry->in($site))
+                ->filter()
+            )
+            ->map->id()
+            ->all();
+
+        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+            ->whereIn('id', $ids);
+    }
+
+    public function augment($values)
+    {
+        $single = $this->config('max_items') === 1;
+
+        if ($single && Blink::has($key = 'entries-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
+        $query = $this->queryBuilder($values);
+
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
+    }
+
+    public function shallowAugment($values)
+    {
+        $items = $this->augment($values);
+
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        } else {
+            $items = $items->get();
+        }
+
+        $items = $items->filter()->map(function ($item) {
+            return $item->toShallowAugmentedCollection();
+        })->collect();
+
+        return $this->config('max_items') === 1 ? $items->first() : $items;
+    }
+
+    public function getSelectionFilters()
+    {
+        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext());
+    }
+
+    protected function getSelectionFilterContext()
+    {
+        return [
+            'collections' => $this->getConfiguredCollections(),
+            'showSiteFilter' => $this->canSelectAcrossSites(),
+        ];
+    }
+
+    protected function getConfiguredCollections()
+    {
+        return empty($collections = $this->config('collections'))
+            ? Collection::handles()->all()
+            : $collections;
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type('EntryInterface');
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
+    }
+
+    public function getColumns()
+    {
+        // Don't derive columns from a blueprint the user can't view; fall back to the
+        // default columns when none of the configured collections are viewable.
+        if (! $collection = $this->getColumnCollection()) {
+            return parent::getColumns();
+        }
+
+        $columns = $collection->entryBlueprint()->columns();
+
+        if (count($this->getConfiguredCollections()) === 1) {
+            $this->addColumn($columns, 'status');
+
+            $columns->setPreferred("collections.{$collection->handle()}.columns");
+
+            return $columns->rejectUnlisted()->values();
+        }
+
+        if ($this->canSelectAcrossSites()) {
+            $this->addColumn($columns, 'site');
+        }
+
+        return $columns->values();
+    }
+
+    protected function getItemsForPreProcessIndex($values): SupportCollection
+    {
+        return $this->queryBuilder($values)->whereAnyStatus()->get();
+    }
+
+    public function relationshipQueryBuilder()
+    {
+        $collections = $this->config('collections');
+
+        return Entry::query()
+            ->when($collections, fn ($query) => $query->whereIn('collection', $collections));
+    }
+
+    public function filter()
+    {
+        return new EntriesFilter($this);
+    }
+
+    public function preload()
+    {
+        $collection = count($this->getConfiguredCollections()) === 1
+            ? Collection::findByHandle($this->getConfiguredCollections()[0])
+            : null;
+
+        if (! $collection || ! $collection->hasStructure()) {
+            return parent::preload();
+        }
+
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.tree.index', $collection),
+            'showSlugs' => $collection->structure()->showSlugs(),
+            'expectsRoot' => $collection->structure()->expectsRoot(),
+            'blueprints' => $blueprints,
+        ]]);
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return collect([
+            count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,
+            $this->canSelectAcrossSites() && count($this->availableSites()) > 1 ? $item->site()->name() : null,
+        ])->filter()->implode(' • ');
+    }
+
+    private function addColumn(Columns $columns, string $columnKey): void
+    {
+        $column = Column::make($columnKey)
+            ->listable(true)
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(false);
+
+        $columns->put($columnKey, $column);
+    }
+
+    private function canSelectAcrossSites(): bool
+    {
+        return $this->config('select_across_sites', false);
+    }
+
+    private function availableSites()
+    {
+        if (! Site::hasMultiple()) {
+            return [];
+        }
+
+        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn ($collection) => Collection::find($collection)->sites());
+
+        return Site::authorized()
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())))
+            ->map->handle()
+            ->values()
+            ->all();
+    }
+}

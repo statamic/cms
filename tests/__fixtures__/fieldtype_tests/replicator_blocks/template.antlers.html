@@ -1,0 +1,12 @@
+{{ counter = 0 }}
+
+{{ replicator_blocks }}
+    {{ partial:echo }}
+        {{ counter += 1 }}
+        {{ partial:components/{type} /}}
+        <counter:{{ counter }}>
+        <text:{{ text }}>
+    {{ /partial:echo }}
+{{ /replicator_blocks }}
+
+<final:{{ counter }}>

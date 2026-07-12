@@ -1,0 +1,218 @@
+<template>
+    <node-view-wrapper>
+        <div
+            class="bard-inline-image-container shadow-sm"
+            :class="{
+                'border-blue-400': selected,
+            }"
+        >
+            <div v-if="src" class="p-2 text-center" draggable="true" data-drag-handle>
+                <div ref="content" hidden />
+                <img :src="src" class="mx-auto block rounded-xs" />
+            </div>
+
+            <div
+                class="flex flex-wrap items-center justify-center gap-2 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-gray-900 dark:text-gray-300"
+            >
+                <Button v-if="!src" size="sm" icon="folder-photos" :text="__('Choose Image')" @mousedown.prevent @click="openSelector" />
+
+                <Button v-if="src" size="sm" icon="edit" :text="__('Edit Image')" @mousedown.prevent @click="edit" />
+                <Button v-if="src" size="sm" icon="rename" :text="__('Override Alt')" :class="{ active: showingAltEdit }" @mousedown.prevent @click="toggleAltEditor" />
+                <Button v-if="src" size="sm" icon="replace" :text="__('Replace')" @mousedown.prevent @click="openSelector" />
+                <Button v-if="src" size="sm" icon="trash" :text="__('Remove')" @mousedown.prevent @click="deleteNode" />
+            </div>
+
+            <div
+                v-if="showingAltEdit"
+                class="flex items-center rounded-b border-t p-2 dark:border-gray-900"
+                @paste.stop
+            >
+                <Input
+	                ref="alt"
+                    name="alt"
+                    v-model="alt"
+                    :placeholder="assetAlt"
+                    :prepend="__('Alt Text')"
+                    class="flex-1"
+                />
+            </div>
+
+            <Stack v-model:open="showingSelector" inset :show-close-button="false">
+                <selector
+                    :container="extension.options.bard.meta.assets.container"
+                    :folder="extension.options.bard.config.folder || '/'"
+                    :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
+                    :selected="selections"
+                    :max-files="1"
+                    :columns="extension.options.bard.meta.assets.columns"
+                    @selected="assetsSelected"
+                    @closed="showingSelector = false"
+                />
+            </Stack>
+
+            <asset-editor
+                v-if="editing"
+                :id="assetId"
+                :showToolbar="false"
+                :allow-deleting="false"
+                :show-navigation="false"
+                @closed="closeEditor"
+                @saved="editorAssetSaved"
+                @actionCompleted="actionCompleted"
+            >
+            </asset-editor>
+        </div>
+    </node-view-wrapper>
+</template>
+
+<script>
+import Asset from '../assets/Asset';
+import { NodeViewWrapper } from '@tiptap/vue-3';
+import Selector from '../../assets/Selector.vue';
+import { Input, Button, Stack } from '@ui';
+import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+
+export default {
+    mixins: [Asset],
+
+    components: {
+        NodeViewWrapper,
+        Selector,
+        Input,
+        Button,
+	    Stack,
+    },
+
+    inject: {
+        publishContainer: {
+            from: containerContextKey,
+        },
+    },
+
+    props: [
+        'editor', // the editor instance
+        'node', // access the current node
+        'decorations', // an array of decorations
+        'selected', // true when there is a NodeSelection at the current node view
+        'extension', // access to the node extension, for example to get options
+        'getPos', // get the document position of the current node
+        'updateAttributes', // update attributes of the current node.
+        'deleteNode', // delete the current node
+    ],
+
+    data() {
+        return {
+            assetId: null,
+            assetAlt: null,
+            editorAsset: null,
+            showingSelector: false,
+            loading: false,
+            alt: this.node.attrs.alt,
+            showingAltEdit: !!this.node.attrs.alt,
+        };
+    },
+
+    computed: {
+        src() {
+            if (this.editorAsset) {
+                return this.editorAsset.url;
+            }
+        },
+
+        actualSrc() {
+            if (this.editorAsset) {
+                return `asset::${this.assetId}`;
+            }
+
+            return this.src;
+        },
+
+        selections() {
+            return this.assetId ? [this.assetId] : [];
+        },
+    },
+
+    created() {
+        let src = this.node.attrs.src;
+
+        if (this.node.isNew) {
+            this.openSelector();
+        }
+
+        if (src && src.startsWith('asset:')) {
+            this.assetId = src.substr(7);
+        }
+
+        let id = this.assetId || src;
+        if (id) this.loadAsset(id);
+    },
+
+    watch: {
+        actualSrc(src) {
+            if (!this.node.attrs.src) {
+                this.updateAttributes({ src, asset: !!this.assetId });
+            }
+        },
+
+        alt(alt) {
+            this.updateAttributes({ alt });
+        },
+
+	    showingAltEdit(showingAltEdit) {
+		    if (showingAltEdit) {
+				this.$nextTick(() => this.$refs.alt.focus());
+		    }
+	    },
+    },
+
+    methods: {
+        openSelector() {
+            this.showingSelector = true;
+        },
+
+        assetsSelected(selections) {
+            this.loading = true;
+            this.assetId = selections[0];
+            this.loadAsset(this.assetId);
+        },
+
+        loadAsset(id) {
+            const cache = this.extension.options.bard.assetsCache;
+
+            if (cache[id]) {
+                this.setAsset(cache[id]);
+                return;
+            }
+
+            this.$axios
+                .post(cp_url('assets-fieldtype'), {
+                    assets: [id],
+                })
+                .then((response) => {
+                    this.setAsset(response.data[0]);
+                });
+        },
+
+        setAsset(asset) {
+            this.extension.options.bard.assetsCache[asset.id] = asset;
+            this.editorAsset = asset;
+            this.assetId = asset.id;
+            this.assetAlt = asset.values.alt;
+            this.loading = false;
+            this.updateAttributes({ src: this.actualSrc });
+        },
+
+        toggleAltEditor() {
+            this.showingAltEdit = !this.showingAltEdit;
+            if (!this.showingAltEdit) {
+                this.alt = null;
+            }
+        },
+
+        editorAssetSaved(asset) {
+            this.setAsset(asset);
+            this.closeEditor();
+        },
+    },
+};
+</script>

@@ -1,0 +1,14 @@
+<?php
+
+namespace DummyNamespace;
+
+use Statamic\Widgets\VueComponent;
+use Statamic\Widgets\Widget;
+
+class DummyClass extends Widget
+{
+    public function component()
+    {
+        return VueComponent::render('DummyComponent', ['message' => 'Hello World!']);
+    }
+}

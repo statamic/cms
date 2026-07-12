@@ -1,0 +1,39 @@
+<?php
+
+namespace Statamic\GraphQL\Middleware;
+
+use Closure;
+use Statamic\Contracts\GraphQL\ResponseCache;
+
+class CacheResponse
+{
+    public function handle($request, Closure $next)
+    {
+        if ($request->statamicToken()) {
+            return $next($request);
+        }
+
+        if ($this->isMutation($request)) {
+            return $next($request);
+        }
+
+        $cache = app(ResponseCache::class);
+
+        if ($response = $cache->get($request)) {
+            return $response;
+        }
+
+        $response = $next($request);
+
+        $cache->put($request, $response);
+
+        return $response;
+    }
+
+    protected function isMutation($request): bool
+    {
+        $query = ltrim(strtolower($request->get('query', '')));
+
+        return str_starts_with($query, 'mutation');
+    }
+}

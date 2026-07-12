@@ -1,0 +1,1145 @@
+<template>
+    <portal name="bard-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+        <!-- These wrappers allow any css that expected the field to
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
+        <div :class="{ 'publish-fields': fullScreenMode }">
+            <div :class="fullScreenMode && wrapperClasses">
+                <div
+                    class="bard-fieldtype antialiased with-contrast:border-gray-500 shadow-ui-sm"
+                    :class="{ 'bard-fullscreen': fullScreenMode }"
+                    ref="container"
+                    @dragstart.stop="ignorePageHeader(true)"
+                    @dragend="ignorePageHeader(false)"
+                >
+                    <publish-field-fullscreen-header
+                        v-if="fullScreenMode"
+                        :title="config.display"
+                        :field-actions="fieldActions"
+                        @close="toggleFullscreen"
+                    >
+                        <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
+                            <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
+                                <component
+                                    v-for="button in visibleButtons(buttons)"
+                                    :key="button.name"
+                                    :is="button.component || 'BardToolbarButton'"
+                                    :button="button"
+                                    :active="buttonIsActive(button)"
+                                    :config="config"
+                                    :bard="this"
+                                    :editor="editor"
+                                />
+                            </div>
+                        </div>
+                    </publish-field-fullscreen-header>
+
+                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
+                            <component
+                                v-for="button in visibleButtons(buttons)"
+                                :key="button.name"
+                                :is="button.component || 'BardToolbarButton'"
+                                :button="button"
+                                :active="buttonIsActive(button)"
+                                :config="config"
+                                :bard="this"
+                                :editor="editor"
+                            />
+                        </div>
+                    </div>
+
+                    <div
+                        class="bard-editor @container/bard"
+                        :class="{
+                            'mode:read-only': readOnly,
+                            'mode:minimal': !showFixedToolbar,
+                            'mode:inline': inputIsInline,
+                            'focus-within:focus-outline': !fullScreenMode,
+                        }"
+                        tabindex="0"
+                    >
+                        <bubble-menu
+                            :editor="editor"
+                            :key="`bubble-menu-${fullScreenMode}`"
+                            :options="{ placement: 'top', offset: [0, 10] }"
+                            v-if="editor && toolbarIsFloating && !readOnly"
+                        >
+                        <div class="bard-floating-toolbar">
+                            <component
+                                v-for="button in visibleButtons(buttons)"
+                                :key="button.name"
+                                :is="button.component || 'BardToolbarButton'"
+                                :button="button"
+                                :active="buttonIsActive(button)"
+                                :bard="this"
+                                :config="config"
+                                :editor="editor"
+                                variant="floating"
+                            />
+                        </div>
+                        </bubble-menu>
+
+                        <floating-menu
+                            :editor="editor"
+                            :should-show="shouldShowSetButton"
+                            :is-showing="showAddSetButton"
+                            v-if="editor"
+                            v-slot="{ y }"
+                            @shown="showAddSetButton = true"
+                            @hidden="showAddSetButton = false"
+                        >
+                            <set-picker
+                                ref="setPicker"
+                                v-if="showAddSetButton"
+                                :sets="groupConfigs"
+                                class="bard-set-selector"
+                                :loading-set="loadingSet"
+                                @added="addSet"
+                            >
+                                <template #trigger>
+                                    <div class="absolute flex items-center gap-2 top-[-6px] z-1 -start-7 @lg/bard:-start-4.5 group" :style="{ transform: `translateY(${y}px)` }">
+                                        <ui-button
+                                            icon="plus"
+                                            size="sm"
+                                            :aria-label="__('Add Set')"
+                                            v-tooltip="__('Add Set')"
+                                        />
+                                        <ui-description
+                                            v-show="shouldShowAddSetHelperText"
+                                            :text="__('Type \'/\' to insert a set')"
+                                            :class="{'ps-9': fullScreenMode}"
+                                        />
+                                    </div>
+                                </template>
+                            </set-picker>
+                        </floating-menu>
+
+                        <div class="bard-error" v-if="initError" v-text="initError"></div>
+                        <editor-content :editor="editor" :id="fieldId" />
+                    </div>
+                    <div
+                        class="bard-footer-toolbar"
+                        v-if="editor && (config.reading_time || config.character_limit || config.word_count)"
+                    >
+                        <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+                        <div v-else />
+                        <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </portal>
+</template>
+
+<script>
+import Fieldtype from '../Fieldtype.vue';
+import { nanoid as uniqid } from 'nanoid';
+import Emitter from 'tiny-emitter';
+import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
+import { BubbleMenu } from '@tiptap/vue-3/menus';
+import { Extension } from '@tiptap/core';
+import { FloatingMenu } from './FloatingMenu';
+import Blockquote from '@tiptap/extension-blockquote';
+import Bold from '@tiptap/extension-bold';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
+import CharacterCount from '@tiptap/extension-character-count';
+import Code from '@tiptap/extension-code';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import HardBreak from '@tiptap/extension-hard-break';
+import Heading from '@tiptap/extension-heading';
+import History from '@tiptap/extension-history';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Italic from '@tiptap/extension-italic';
+import Paragraph from '@tiptap/extension-paragraph';
+import Strike from '@tiptap/extension-strike';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import Text from '@tiptap/extension-text';
+import TextAlign from '@tiptap/extension-text-align';
+import Typography from '@tiptap/extension-typography';
+import Underline from '@tiptap/extension-underline';
+import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
+import SetPicker from '../replicator/SetPicker.vue';
+import { DocumentBlock, DocumentInline } from './Document';
+import { Set } from './Set';
+import { Small } from './Small';
+import { Image } from './Image';
+import { Link } from './Link';
+import LinkToolbarButton from './LinkToolbarButton.vue';
+import BardToolbarButton from './ToolbarButton.vue';
+import ManagesSetMeta from '../replicator/ManagesSetMeta';
+import { availableButtons, addButtonHtml } from '../bard/buttons';
+import readTimeEstimate from 'read-time-estimate';
+import { common, createLowlight } from 'lowlight';
+import 'highlight.js/styles/github.css';
+import importTiptap from '@/util/tiptap.js';
+import { computed } from 'vue';
+import { data_get } from "@/bootstrap/globals.js";
+
+const lowlight = createLowlight(common);
+let tiptap = null;
+let commandPaletteCallbackRegistered = false;
+
+export default {
+    mixins: [Fieldtype, ManagesSetMeta],
+
+    components: {
+        BubbleMenu,
+        BardToolbarButton,
+        SetPicker,
+        EditorContent,
+        FloatingMenu,
+        LinkToolbarButton,
+    },
+
+    provide: {
+        isInBardField: true,
+    },
+
+    data() {
+        return {
+            events: new Emitter(),
+            editor: null,
+            html: null,
+            json: [],
+            fullScreenMode: false,
+            buttons: [],
+            collapsed: this.meta.collapsed,
+            mounted: false,
+            initError: null,
+            pageHeader: null,
+            escBinding: null,
+            showAddSetButton: false,
+            hasBeenFocused: false,
+            provide: {
+                bard: this.makeBardProvide(),
+                bardSets: this.config.sets,
+                showReplicatorFieldPreviews: this.config.previews,
+            },
+            errorsById: {},
+            debounceNextUpdate: true,
+            setsCache: {},
+            assetsCache: {},
+            loadingSet: null,
+        };
+    },
+
+    computed: {
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
+        toolbarIsFixed() {
+            return this.config.toolbar_mode === 'fixed';
+        },
+
+        toolbarIsFloating() {
+            return this.config.toolbar_mode === 'floating';
+        },
+
+        showFixedToolbar() {
+            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.hasExtraButtons);
+        },
+
+        hasExtraButtons() {
+            return this.setConfigs.length > 0 || this.config.fullscreen;
+        },
+
+        readingTime() {
+            if (this.html) {
+                var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
+                var durationMs = stats.duration * 60 * 1000;
+                var minutes = Math.floor(durationMs / 60000);
+                var seconds = Math.floor((durationMs % 60000) / 1000);
+
+                return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            }
+        },
+
+        characterAndWordCountText() {
+            const showWordCount = this.config.word_count;
+            const wordCount = this.editor.storage.characterCount.words();
+            const wordCountText = `${__n(':count word|:count words', wordCount)}`;
+            const charLimit = this.config.character_limit;
+            const showCharLimit = charLimit > 0;
+            const charCount = this.editor.storage.characterCount.characters();
+
+            // If both are enabled, show a more verbose combined string.
+            if (showCharLimit && showWordCount) {
+                return `${wordCountText}, ${__(':count/:total characters', { count: charCount, total: charLimit })}`;
+            }
+
+            // Otherwise show one or the other.
+            if (showCharLimit) return `${charCount}/${charLimit}`;
+            if (showWordCount) return wordCountText;
+        },
+
+        setIndexes() {
+            let indexes = {};
+
+            this.json.forEach((item, i) => {
+                if (item.type === 'set') {
+                    indexes[item.attrs.id] = i;
+                }
+            });
+
+            return indexes;
+        },
+
+        site() {
+            return this.publishContainer.site ?? this.$config.get('selectedSite');
+        },
+
+        replicatorPreview() {
+            if (!this.showFieldPreviews) return;
+            const stack = [...this.value];
+            let text = '';
+            while (stack.length) {
+                const node = stack.shift();
+                if (node.type === 'text') {
+                    text += ` ${node.text || ''}`;
+                } else if (node.type === 'set') {
+                    const handle = node.attrs.values.type;
+                    const set = this.setConfigs.find((set) => set.handle === handle);
+                    text += ` [${__(set ? set.display : handle)}]`;
+                }
+                if (text.length > 150) {
+                    break;
+                }
+                if (node.content) {
+                    stack.unshift(...node.content);
+                }
+            }
+            return text;
+        },
+
+        inputIsInline() {
+            return this.config.inline;
+        },
+
+        wrapperClasses() {
+            return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
+        },
+
+        hasSets() {
+            return this.value.some(item => item.type === 'set')
+        },
+
+        setConfigs() {
+            return this.groupConfigs.reduce((sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
+        },
+
+        groupConfigs() {
+            return this.config.sets;
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Expand All Sets'),
+                    icon: 'expand',
+                    quick: true,
+                    disabled: () => this.collapsed.length === 0,
+                    visibleWhenReadOnly: true,
+                    run: this.expandAll,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
+                },
+                {
+                    title: __('Collapse All Sets'),
+                    icon: 'collapse',
+                    quick: true,
+                    disabled: () => this.collapsed.length > 0,
+                    visibleWhenReadOnly: true,
+                    run: this.collapseAll,
+                    visible: this.setConfigs.length > 0 && this.hasSets,
+                },
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visibleWhenReadOnly: true,
+                    visible: this.config.fullscreen,
+                },
+            ];
+        },
+
+        shouldShowAddSetHelperText() {
+            return !this.$refs.setPicker?.isOpen && this.suitableToShowSetButton(this.editor);
+        },
+    },
+
+    created() {
+        if (! Statamic.$components.has('NodeViewWrapper')) {
+            Statamic.$components.register('NodeViewWrapper', NodeViewWrapper);
+        }
+
+        if (! Statamic.$components.has('NodeViewContent')) {
+            Statamic.$components.register('NodeViewContent', NodeViewContent);
+        }
+    },
+
+    async mounted() {
+        tiptap = await importTiptap();
+
+        this.initToolbarButtons();
+        this.initEditor();
+
+        this.json = this.editor.getJSON().content;
+        this.html = this.editor.getHTML();
+
+		this.$nextTick(() => this.mounted = true);
+
+        this.pageHeader = document.querySelector('.global-header');
+
+        if (!commandPaletteCallbackRegistered) {
+            commandPaletteCallbackRegistered = true;
+
+            Statamic.$commandPalette.preventIf(() => {
+                const selection = window.getSelection();
+                const node = selection?.anchorNode;
+                const isInBard = node?.parentElement?.closest('.bard-editor') !== null;
+                return isInBard && selection?.toString().length > 0;
+            });
+        }
+
+        this.$nextTick(() => {
+            let el = document.querySelector(`label[for="${this.fieldId}"]`);
+            if (el) {
+                el.addEventListener('click', () => {
+                    this.editor.commands.focus();
+                });
+            }
+        });
+    },
+
+    beforeUnmount() {
+        this.editor?.destroy();
+        this.escBinding?.destroy();
+    },
+
+    watch: {
+        json(json, oldJson) {
+            if (!this.mounted) return;
+
+            if (JSON.stringify(json) === JSON.stringify(oldJson)) return;
+
+            const shouldDebounce = this.debounceNextUpdate;
+            this.debounceNextUpdate = true;
+
+            if (shouldDebounce) {
+                this.updateDebounced(json);
+            } else {
+                this.updateDebounced.cancel();
+                this.update(json);
+            }
+        },
+
+        value(value, oldValue) {
+            if (!this.editor) return;
+
+            if (document.activeElement?.closest('.bard-content')) return;
+
+            const oldContent = this.editor.getJSON();
+            const content = this.valueToContent(value);
+
+            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.commands.clearContent(false);
+                this.editor.commands.setContent(content, true);
+            }
+        },
+
+        readOnly(readOnly) {
+            this.editor.setEditable(!this.readOnly);
+        },
+
+        collapsed(value) {
+            const meta = this.meta;
+            meta.collapsed = value;
+            this.updateMeta(meta);
+        },
+
+        fullScreenMode(fullScreenMode) {
+            this.initEditor();
+
+            if (fullScreenMode) {
+                this.escBinding = this.$keys.bindGlobal('esc', this.closeFullscreen);
+                // Focus the editor content when entering fullscreen mode
+                this.$nextTick(() => {
+                    if (this.editor) {
+                        this.editor.commands.focus();
+                    }
+                });
+            } else {
+                this.escBinding?.destroy();
+            }
+        },
+
+        loadingSet(loading) {
+            this.$progress.loading('bard-set', !!loading);
+        },
+
+        'publishContainer.errors': {
+            immediate: true,
+            handler(errors) {
+                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
+                    if (!key.startsWith(this.setFieldPathPrefix)) {
+                        return acc;
+                    }
+
+                    const subKey = key.replace(`${this.setFieldPathPrefix}.`, '');
+                    const setIndex = subKey.split('.').shift();
+                    const setId = this.value[setIndex]?.attrs.id;
+
+                    if (setId) {
+                        acc[setId] = value;
+                    }
+
+                    return acc;
+                }, {});
+            },
+        },
+    },
+
+    methods: {
+        addSet(handle) {
+            this.loadingSet = handle;
+
+            this.fetchSet(handle)
+                .then(data => this._addSet(handle, data))
+                .catch(() => this.$toast.error(__('Something went wrong')))
+                .finally(() => this.loadingSet = null);
+        },
+
+        _addSet(handle, data) {
+            const id = uniqid();
+            const deepCopy = JSON.parse(JSON.stringify(data.defaults));
+            const values = Object.assign({}, { type: handle }, deepCopy);
+
+            this.updateSetMeta(id, data.new);
+
+            const { $head } = this.editor.view.state.selection;
+            const { nodeBefore } = $head;
+
+            this.debounceNextUpdate = false;
+
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                if (nodeBefore) {
+                    this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                } else {
+                    this.editor.commands.set({ id, values });
+                }
+            });
+        },
+
+        async fetchSet(set) {
+            return new Promise(async (resolve, reject) => {
+                const field = this.bardFieldPath();
+                const setCacheKey = `${field}.${set}`;
+                const reference = this.publishContainer.reference;
+                const token = this.publishContainer.blueprint.token;
+
+	            if (this.meta.new?.hasOwnProperty(set)) {
+		            let meta = this.meta.new[set];
+		            let defaults = this.meta.defaults[set];
+
+		            resolve({ new: meta, defaults });
+		            return;
+	            }
+
+                if (this.setsCache[setCacheKey]) {
+                    resolve(this.setsCache[setCacheKey]);
+                    return;
+                }
+
+                this.$axios.post(cp_url('fieldtypes/replicator/set'), { token, reference, field, set })
+                    .then(response => {
+                        this.setsCache[setCacheKey] = response.data;
+                        resolve(response.data);
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        /**
+         * Returns the path to the Bard field, replacing any set indexes with handles.
+         */
+        bardFieldPath() {
+            if (!this.fieldPathPrefix) {
+                return this.handle;
+            }
+
+            return this.fieldPathKeys
+                .map((key, index) => {
+	                if (['attrs', 'values'].includes(key)) return;
+
+                    if (Number.isInteger(parseInt(key))) {
+	                    let setValues =  data_get(this.publishContainer.values, this.fieldPathKeys.slice(0, index + 1).join('.'));
+
+						return setValues.attrs?.values.type || setValues.type;
+                    }
+
+                    return key;
+                })
+                .filter((key) => key !== undefined)
+                .concat(this.handle)
+                .join('.');
+        },
+
+        duplicateSet(old_id, attrs, getPos) {
+            const id = uniqid();
+            const enabled = attrs.enabled;
+            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
+            const values = Object.assign({}, deepCopy);
+
+            this.updateSetMeta(id, this.meta.existing[old_id]);
+
+            this.debounceNextUpdate = false;
+
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                const pos = getPos();
+                const node = this.editor.state.doc.nodeAt(pos);
+                const insertPos = pos + (node?.nodeSize || 0);
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos: insertPos });
+            });
+        },
+
+        async pasteSet(attrs) {
+            const old_id = attrs.id;
+            const id = uniqid();
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            if (this.meta.existing[old_id]) {
+                this.updateSetMeta(id, this.meta.existing[old_id]);
+            } else {
+                const data = await this.fetchSet(values.type);
+                this.updateSetMeta(id, data.new);
+            }
+
+            return { id, enabled, values };
+        },
+
+        collapseSet(id) {
+            if (!this.collapsed.includes(id)) {
+                this.collapsed.push(id);
+            }
+        },
+
+        expandSet(id) {
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = Object.keys(this.meta.existing).filter((v) => v !== id);
+                return;
+            }
+
+            if (this.collapsed.includes(id)) {
+                var index = this.collapsed.indexOf(id);
+                this.collapsed.splice(index, 1);
+            }
+        },
+
+        collapseAll() {
+            this.collapsed = Object.keys(this.meta.existing);
+        },
+
+        expandAll() {
+            this.collapsed = [];
+        },
+
+        toggleCollapseSets() {
+            this.collapsed.length === 0 ? this.collapseAll() : this.expandAll();
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
+
+        closeFullscreen() {
+            this.fullScreenMode = false;
+        },
+
+        shouldShowSetButton({ view, state }) {
+            const isActive = this.suitableToShowSetButton({ view, state });
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
+        },
+
+        suitableToShowSetButton({ view, state }) {
+            const { selection } = state;
+            const { $anchor, empty } = selection;
+            const isRootDepth = $anchor.depth === 1;
+            const isEmptyTextBlock =
+                ($anchor.parent.isTextblock && !$anchor.parent.firstChild) && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+            const isAroundInlineImage =
+                state.selection.$to.nodeBefore?.type.name === 'image' ||
+                state.selection.$to.nodeAfter?.type.name === 'image';
+            return view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
+        },
+
+        initToolbarButtons() {
+            const selectedButtons = this.config.buttons || [
+                'h2',
+                'h3',
+                'bold',
+                'italic',
+                'unorderedlist',
+                'orderedlist',
+                'removeformat',
+                'quote',
+                'anchor',
+                'table',
+            ];
+
+            if (selectedButtons.includes('table')) {
+                selectedButtons.push(
+                    'deletetable',
+                    'addcolumnbefore',
+                    'addcolumnafter',
+                    'deletecolumn',
+                    'addrowbefore',
+                    'addrowafter',
+                    'deleterow',
+                    'togglecellmerge',
+                    'toggleheadercell',
+                );
+            }
+
+            // Get the configured buttons and swap them with corresponding objects
+            let buttons = selectedButtons.map((button) => {
+                return availableButtons().find((b) => b.name === button.toLowerCase()) || button;
+            });
+
+            // Let addons add, remove, or control the position of buttons.
+            this.$bard.buttonCallbacks.forEach((callback) => {
+                // Since the developer uses the same callback to add buttons to the field itself, and for the
+                // button configurator, we need to make the button conditional when on the Bard fieldtype
+                // but not in the button configurator. So here we'll filter it out if it's not selected.
+                const buttonFn = (button) => (selectedButtons.includes(button.name) ? button : null);
+
+                const addedButtons = callback(buttons, buttonFn);
+
+                // No return value means either they literally returned nothing, with the intention
+                // of manipulating the buttons object manually. Or, they used the button() and
+                // the button was not configured in the field so it was stripped out.
+                if (!addedButtons) return;
+
+                buttons = buttons.concat(Array.isArray(addedButtons) ? addedButtons : [addedButtons]);
+            });
+
+            // Remove any nulls. This could happen if a developer-added button was not specified in this field's buttons array.
+            buttons = buttons.filter((button) => !!button);
+
+            // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
+            buttons = buttons.filter((button) => typeof button != 'string');
+
+            // Generate fallback html for each button
+            buttons = addButtonHtml(buttons);
+
+            // Remove buttons that don't pass conditions.
+            // eg. only the insert asset button can be shown if a container has been set.
+            buttons = buttons.filter((button) => {
+                return button.condition ? button.condition.call(null, this.config) : true;
+            });
+
+            if (buttons.find((b) => b.name === 'table')) {
+                buttons.push(
+                    {
+                        name: 'deletetable',
+                        text: __('Delete Table'),
+                        command: (editor) => editor.commands.deleteTable(),
+                        svg: 'delete-table',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addcolumnbefore',
+                        text: __('Add Column Before'),
+                        command: (editor) => editor.commands.addColumnBefore(),
+                        svg: 'add-col-before',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addcolumnafter',
+                        text: __('Add Column After'),
+                        command: (editor) => editor.commands.addColumnAfter(),
+                        svg: 'add-col-after',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'deletecolumn',
+                        text: __('Delete Column'),
+                        command: (editor) => editor.commands.deleteColumn(),
+                        svg: 'delete-col',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addrowbefore',
+                        text: __('Add Row Before'),
+                        command: (editor) => editor.commands.addRowBefore(),
+                        svg: 'add-row-before',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'addrowafter',
+                        text: __('Add Row After'),
+                        command: (editor) => editor.commands.addRowAfter(),
+                        svg: 'add-row-after',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'deleterow',
+                        text: __('Delete Row'),
+                        command: (editor) => editor.commands.deleteRow(),
+                        svg: 'delete-row',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'toggleheadercell',
+                        text: __('Toggle Header Cell'),
+                        command: (editor) => editor.commands.toggleHeaderCell(),
+                        svg: 'flip-vertical',
+                        visibleWhenActive: 'table',
+                    },
+                    {
+                        name: 'togglecellmerge',
+                        text: __('Merge Cells'),
+                        command: (editor) => editor.commands.mergeCells(),
+                        svg: 'combine-cells',
+                        visibleWhenActive: 'table',
+                    },
+                );
+            }
+
+            this.buttons = buttons;
+        },
+
+        buttonIsActive(button) {
+            if (button.hasOwnProperty('active')) {
+                return button.active(this.editor, button.args);
+            }
+            const nameProperty = button.hasOwnProperty('activeName') ? 'activeName' : 'name';
+            const name = button[nameProperty];
+            return this.editor.isActive(name, button.args);
+        },
+
+        buttonIsVisible(button) {
+            if (button.hasOwnProperty('visible')) {
+                return button.visible(this.editor, button.args);
+            }
+            if (!button.hasOwnProperty('visibleWhenActive')) return true;
+            return this.editor.isActive(button.visibleWhenActive, button.args);
+        },
+
+        visibleButtons(buttons) {
+            return buttons.filter((button) => this.buttonIsVisible(button));
+        },
+
+        initEditor() {
+            if (this.editor) this.editor.destroy();
+
+            const content = this.valueToContent(clone(this.value));
+
+            this.editor = new Editor({
+                extensions: this.getExtensions(),
+                content: content,
+                editable: !this.readOnly,
+                enableInputRules: this.config.enable_input_rules,
+                enablePasteRules: this.config.enable_paste_rules,
+                editorProps: { attributes: { class: 'bard-content' } },
+                onDrop: () => this.debounceNextUpdate = false,
+                onFocus: () => {
+                    this.hasBeenFocused = true;
+                    this.$emit('focus');
+                },
+                onBlur: () => {
+                    // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                    // blur event immediately. We need to make sure that the newly focused element is outside
+                    // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    // Additionally, check that the focused element isn't the set picker's search input.
+                    setTimeout(() => {
+                        const isInsideBard = this.$refs.container.contains(document.activeElement);
+                        const isSetPickerSearch = document.activeElement.hasAttribute('data-set-picker-search-input');
+                        const isSetPickerOpen = !!this.$refs.setPicker?.isOpen;
+                        if (!isInsideBard && !isSetPickerSearch && !isSetPickerOpen) {
+                            this.$emit('blur');
+                            this.showAddSetButton = false;
+                        }
+                    }, 1);
+                },
+                onUpdate: () => {
+                    const oldJson = this.json;
+                    const newJson = clone(this.editor.getJSON().content);
+
+                    const countNodes = (nodes) => {
+                        if (!nodes || !Array.isArray(nodes)) return 0;
+                        let count = nodes.length;
+                        nodes.forEach(node => {
+                            if (node.content) {
+                                count += countNodes(node.content);
+                            }
+                        });
+                        return count;
+                    };
+
+                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+
+                    this.json = newJson;
+                    this.html = this.editor.getHTML();
+                },
+                onCreate: ({ editor }) => {
+                    const state = editor.view.state;
+                    if (content !== null && typeof content === 'object') {
+                        try {
+                            state.schema.nodeFromJSON(content);
+                        } catch (error) {
+                            const invalidError = this.invalidError(error);
+                            if (invalidError) {
+                                this.initError = invalidError;
+                            } else {
+                                this.initError = __('Something went wrong');
+                                console.error(error);
+                            }
+                        }
+                    }
+                },
+            });
+        },
+
+        invalidError(error) {
+            const messages = {
+                'Invalid text node in JSON': 'Invalid content, text values must be strings',
+                'Empty text nodes are not allowed': 'Invalid content, text values cannot be empty',
+            };
+
+            if (messages[error.message]) {
+                return __(messages[error.message]);
+            }
+
+            let match;
+            if (
+                (match = error.message.match(
+                    /^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/,
+                ))
+            ) {
+                if (match[1]) {
+                    return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
+                } else {
+                    return __('Invalid content, nodes and marks must have a type');
+                }
+            }
+        },
+
+        setHasError(id) {
+            return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
+        },
+
+        valueToContent(value) {
+            return value.length ? { type: 'doc', content: value } : null;
+        },
+
+        getExtensions() {
+            let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+
+            if (this.inputIsInline && this.config.inline_hard_breaks) {
+                modeExts.push(
+                    HardBreak.extend({
+                        addKeyboardShortcuts() {
+                            return {
+                                ...this.parent?.(),
+                                Enter: () => this.editor.commands.setHardBreak(),
+                            };
+                        },
+                    }),
+                );
+            }
+
+            if (this.config.placeholder) {
+                modeExts.push(Placeholder.configure({ placeholder: __(this.config.placeholder) }));
+            }
+
+            // Allow passthrough of Ctrl/Cmd + Enter to submit the form
+            const DisableCtrlEnter = Extension.create({
+                name: 'disableCtrlEnter',
+                addKeyboardShortcuts() {
+                    return {
+                        'Ctrl-Enter': () => true,
+                        'Cmd-Enter': () => true,
+                    };
+                },
+            });
+
+            // Handle forward slash to open set picker
+            const SlashSetPicker = Extension.create({
+                name: 'slashSetPicker',
+                addKeyboardShortcuts() {
+                    return {
+                        '/': () => {
+                            const { view, state } = this.editor;
+
+                            if (this.options.allowed({ view, state})) {
+                                if (this.options.setConfigs.length === 1) {
+                                    this.options.addSet(this.options.setConfigs[0].handle);
+                                } else {
+                                    this.options.openSetPicker();
+                                }
+                                return true; // Prevent inserting a slash.
+                            }
+
+                            return false; // Allow default behavior (insert slash)
+                        },
+                    };
+                },
+            });
+
+            let exts = [
+                CharacterCount.configure({ limit: this.config.character_limit }),
+                ...modeExts,
+                DisableCtrlEnter,
+                SlashSetPicker.configure({
+                    shown: computed(() => this.showAddSetButton),
+                    allowed: this.suitableToShowSetButton,
+                    openSetPicker: this.openSetPicker,
+                    setConfigs: this.setConfigs,
+                    addSet: this.addSet,
+                }),
+                Dropcursor,
+                Gapcursor,
+                History,
+                Paragraph,
+                Set.configure({ bard: this, foo: 'bar' }),
+                Text,
+            ];
+
+            if (this.config.smart_typography) {
+                exts.push(Typography);
+            }
+
+            let btns = this.buttons.map((button) => button.name);
+
+            if (btns.includes('anchor')) exts.push(Link.configure({ vm: this }));
+            if (btns.includes('bold')) exts.push(Bold);
+            if (btns.includes('code')) exts.push(Code);
+            if (btns.includes('codeblock')) exts.push(CodeBlockLowlight.configure({ lowlight }));
+            if (btns.includes('horizontalrule')) exts.push(HorizontalRule);
+            if (btns.includes('image')) exts.push(Image.configure({ bard: this }));
+            if (btns.includes('italic')) exts.push(Italic);
+            if (btns.includes('quote')) exts.push(Blockquote);
+            if (btns.includes('orderedlist')) exts.push(OrderedList);
+            if (btns.includes('orderedlist') || btns.includes('unorderedlist')) exts.push(ListItem);
+            if (btns.includes('underline')) exts.push(Underline);
+            if (btns.includes('unorderedlist')) exts.push(BulletList);
+            if (btns.includes('small')) exts.push(Small);
+            if (btns.includes('strikethrough')) exts.push(Strike);
+            if (btns.includes('subscript')) exts.push(Subscript);
+            if (btns.includes('superscript')) exts.push(Superscript);
+
+            let levels = [];
+            if (btns.includes('h1')) levels.push(1);
+            if (btns.includes('h2')) levels.push(2);
+            if (btns.includes('h3')) levels.push(3);
+            if (btns.includes('h4')) levels.push(4);
+            if (btns.includes('h5')) levels.push(5);
+            if (btns.includes('h6')) levels.push(6);
+            if (levels.length) exts.push(Heading.configure({ levels }));
+
+            let alignmentTypes = ['paragraph'];
+            if (levels.length) alignmentTypes.push('heading');
+
+            let alignments = [];
+            if (btns.includes('alignleft')) alignments.push('left');
+            if (btns.includes('aligncenter')) alignments.push('center');
+            if (btns.includes('alignright')) alignments.push('right');
+            if (btns.includes('alignjustify')) alignments.push('justify');
+            if (alignments.length) exts.push(TextAlign.configure({ types: alignmentTypes, alignments }));
+
+            if (btns.includes('table')) {
+                exts.push(Table.configure({ resizable: true }), TableHeader, TableCell, TableRow);
+            }
+
+            this.$bard.extensionCallbacks.forEach((callback) => {
+                let returned = callback({ bard: this, tiptap });
+                exts = exts.concat(Array.isArray(returned) ? returned : [returned]);
+            });
+
+            this.$bard.extensionReplacementCallbacks.forEach(({ callback, name }) => {
+                let index = exts.findIndex((ext) => ext.name === name);
+                if (index === -1) return;
+                let extension = exts[index];
+                let newExtension = callback({ bard: this, extension });
+                exts[index] = newExtension;
+            });
+
+            return exts;
+        },
+
+        ignorePageHeader(ignore) {
+            if (this.pageHeader) {
+                this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
+            }
+        },
+
+        makeBardProvide() {
+            const bard = {};
+            Object.defineProperties(bard, {
+                setConfigs: { get: () => this.setConfigs },
+                isReadOnly: { get: () => this.readOnly },
+                hasBeenFocused: { get: () => this.hasBeenFocused },
+            });
+            return bard;
+        },
+
+        openSetPicker() {
+            this.$refs.setPicker.open();
+        }
+    },
+};
+</script>
+
+<style>
+@layer ui {
+    /* This container query is inline because it breaks Vite's CSS compilation. Possibly because of the container query syntax and nesting */
+    .bard-fixed-toolbar {
+        /* While the fixed toolbar is "stuck", mask the focus state of the editor to prevent blue focus lines appearing around the side of the toolbar while scrolling */
+        container-type: scroll-state;
+        @container scroll-state(stuck: top) {
+            > * {
+                position: relative;
+                &::after {
+                    content: '';
+                    position: absolute;
+                    z-index: var(--z-index-below);
+                    inset: -4px -8px;
+                    box-shadow:
+                        /* Left Mask */
+                        -1px 0px 0px var(--color-gray-300),
+                        /* Right Mask */
+                        1px 0px 0px var(--color-gray-300),
+                        /* Bottom "Shadow" */
+                        0 4px 5px -3px hsl(0deg 0% 85%)
+                    ;
+                    border-inline-width: 2px;
+                    border-inline-color: var(--color-gray-50);
+                }
+                :is(.dark) & {
+                    &::after {
+                        box-shadow:
+                            /* Left Mask */
+                            -1px 0px 0px var(--color-gray-700),
+                            /* Right Mask */
+                            1px 0px 0px var(--color-gray-700),
+                            /* Bottom "Shadow" */
+                            0 4px 5px -3px hsl(0deg 0% 10%)
+                        ;
+                        border-inline-color: var(--color-gray-850);
+                    }
+                }
+            }
+        }
+    }
+}
+</style>
+

@@ -1,0 +1,10 @@
+/**
+     * Because sometimes you just gotta /shrug.
+     *
+     * @param $value
+     * @return string
+     */
+    public function shrug($value)
+    {
+        return '¯\_(ツ)_/¯';
+    }

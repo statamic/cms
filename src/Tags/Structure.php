@@ -1,0 +1,180 @@
+<?php
+
+namespace Statamic\Tags;
+
+use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Data\BulkAugmentor;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Exceptions\NavigationNotFoundException;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Query\ItemQueryBuilder;
+use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Str;
+use Statamic\Tags\Concerns\GetsQuerySelectKeys;
+use Statamic\Tags\Concerns\QueriesConditions;
+
+class Structure extends Tags
+{
+    use GetsQuerySelectKeys;
+    use QueriesConditions;
+
+    protected $currentUrl;
+    protected $siteAbsoluteUrl;
+
+    public function __construct()
+    {
+        $this->currentUrl = URL::getCurrent();
+        $this->siteAbsoluteUrl = Site::current()->absoluteUrl();
+    }
+
+    public function wildcard($tag)
+    {
+        // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
+        $handle = str_replace(':', '::', $tag);
+
+        return $this->structure($handle);
+    }
+
+    public function index()
+    {
+        return $this->structure($this->params->get('for'));
+    }
+
+    protected function structure($handle)
+    {
+        if ($handle instanceof StructureContract) {
+            $handle = $handle->handle();
+        }
+
+        $this->ensureStructureExists($handle);
+
+        $tree = (new TreeBuilder)->build([
+            'structure' => $handle,
+            'query' => $this->query($handle),
+            'include_home' => $this->params->get('include_home'),
+            'site' => $this->params->get('site', Site::current()->handle()),
+            'from' => $this->params->get('from'),
+            'max_depth' => $this->params->get('max_depth'),
+        ]);
+
+        $value = $this->toArray($tree);
+
+        if ($this->parser && ($as = $this->params->get('as'))) {
+            return [$as => $value];
+        }
+
+        return $value;
+    }
+
+    protected function ensureStructureExists(string $handle): void
+    {
+        if (Str::startsWith($handle, 'collection::')) {
+            $collection = Str::after($handle, 'collection::');
+            throw_unless(Collection::findByHandle($collection), new CollectionNotFoundException($collection));
+
+            return;
+        }
+
+        throw_unless(Nav::findByHandle($handle), new NavigationNotFoundException($handle));
+    }
+
+    protected function query($handle)
+    {
+        $query = new ItemQueryBuilder();
+
+        return Str::startsWith($handle, 'collection::')
+            ? $this->queryForCollection($query)
+            : $this->queryForNav($query);
+    }
+
+    protected function queryForCollection($query)
+    {
+        if (! $this->isQueryingStatus()) {
+            $this->queryStatus($query);
+        }
+        $this->queryConditions($query);
+
+        return $query;
+    }
+
+    protected function queryForNav($query)
+    {
+        return $this->queryStatus($query);
+    }
+
+    protected function queryStatus($query)
+    {
+        if (! $this->params->get('show_unpublished')) {
+            $query->whereIn('status', ['published', null]);
+        }
+
+        return $query;
+    }
+
+    protected function isQueryingStatus()
+    {
+        return
+            $this->isQueryingCondition('status') ||
+            $this->isQueryingCondition('published');
+    }
+
+    public function toArray($tree, $parent = null, $depth = 1)
+    {
+        $pages = BulkAugmentor::tree($tree, $this->params->explode('select'))->map(function ($item, $data, $index) use ($depth, $tree, $parent) {
+            $page = $item['page'];
+            $children = empty($item['children']) ? [] : $this->toArray($item['children'], $page, $depth + 1);
+
+            $url = $page->urlWithoutRedirect();
+            $absoluteUrl = $page->absoluteUrl();
+
+            return array_merge($data, [
+                'children' => $children,
+                'depth' => $depth,
+                'index' => $index,
+                'count' => $index + 1,
+                'first' => $index === 0,
+                'last' => $index === count($tree) - 1,
+                'is_current' => ! is_null($url) && $url === $this->currentUrl,
+                'is_parent' => $this->isParent($url, $absoluteUrl),
+                'is_external' => URL::isExternal((string) $absoluteUrl),
+            ], $this->params->bool('include_parents', true) ? ['parent' => $parent] : []);
+        })->filter()->values();
+
+        $this->updateIsParent($pages);
+
+        return $pages->all();
+    }
+
+    private function isParent(?string $url, ?string $absoluteUrl): bool
+    {
+        if (is_null($url)) {
+            return false;
+        }
+
+        if ($url === '#') {
+            return false;
+        }
+
+        if ($this->siteAbsoluteUrl === $absoluteUrl) {
+            return false;
+        }
+
+        return URL::isAncestorOf($this->currentUrl, $url);
+    }
+
+    protected function updateIsParent($pages, &$parent = null)
+    {
+        $pages->transform(function ($page) use (&$parent) {
+            $this->updateIsParent(collect($page['children'] ?? []), $page);
+
+            if ($parent && ($page['is_current'] || $page['is_parent'])) {
+                $parent['is_parent'] = true;
+            }
+
+            return $page;
+        });
+    }
+}

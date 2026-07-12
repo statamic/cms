@@ -1,0 +1,12 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Feature Requests and Ideas
+    url: https://github.com/statamic/ideas/issues/new
+    about: Please submit feature requests to the ideas repo.
+  - name: Support Questions & Other
+    url: https://statamic.com/support
+    about: 'If you have a question or need help using Statamic'
+  - name: Documentation issue
+    url: https://github.com/statamic/docs
+    about: For documentation issues, open a pull request at the statamic/docs repository

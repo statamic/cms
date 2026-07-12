@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as CardStories from '../Card.stories';
+
+<Meta of={CardStories} />
+
+# Card
+The ubiquitous container of all elements! The div of any component system. Cards can contain anything you want – content, widgets, settings, forms, you name it.
+<Canvas of={CardStories._DocsIntro} sourceState={'shown'} />
+
+## Inset
+Remove all the inner padding to set the content flush to the sides with the `inset` prop.
+<Canvas of={CardStories._Inset} sourceState={'shown'} />
+
+## Variants
+Use the `variant` prop to change the appearance of the card.
+<Canvas of={CardStories._Variants} sourceState={'shown'} />
+
+## Card Panels
+Card panels are one of the most common patterns throughout our UI system. They help create visual context to your interfaces and help break up long forms.
+<Canvas of={CardStories._CardPanel} sourceState={'shown'} />
+
+## Composing Card Panels
+The UI Kit's components are designed to be composable. You can create your own unique card panels by combining smaller components however you wish, even mixing in your own HTML, CSS, and/or Tailwind.
+<Canvas of={CardStories._Composed} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={CardStories} />

@@ -1,0 +1,74 @@
+<?php
+
+namespace Statamic\Fieldtypes;
+
+use Statamic\CP\Column;
+use Statamic\Facades\Collection;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\User;
+use Statamic\GraphQL\Types\CollectionType;
+
+class Collections extends Relationship
+{
+    protected $categories = ['relationship'];
+    protected $keywords = ['entries'];
+    protected $canEdit = false;
+    protected $canCreate = false;
+    protected $canSearch = false;
+    protected $statusIcons = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Collection::findByHandle($id));
+    }
+
+    protected function toItemArray($id, $site = null)
+    {
+        if ($collection = Collection::findByHandle($id)) {
+            return [
+                'title' => $collection->title(),
+                'id' => $collection->handle(),
+            ];
+        }
+
+        return $this->invalidItemArray($id);
+    }
+
+    public function getIndexItems($request)
+    {
+        return Collection::all()
+            ->filter(fn ($collection) => User::current()->can('view', $collection))
+            ->sortBy('title')
+            ->map(function ($collection) {
+                return [
+                    'id' => $collection->handle(),
+                    'title' => $collection->title(),
+                    'entries' => $collection->queryEntries()->count(),
+                ];
+            })->values();
+    }
+
+    protected function getColumns()
+    {
+        return [
+            Column::make('title'),
+            Column::make('entries'),
+        ];
+    }
+
+    protected function augmentValue($value)
+    {
+        return Collection::findByHandle($value);
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(CollectionType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
+    }
+}

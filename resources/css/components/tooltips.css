@@ -1,0 +1,11 @@
+/* ==========================================================================
+   TOOLTIPS
+   ========================================================================== */
+
+.v-popper--theme-tooltip {
+    @apply text-2xs text-white;
+}
+
+.v-popper--theme-tooltip .v-popper__inner {
+    padding: 5px 10px !important;
+}

@@ -1,0 +1,28 @@
+<?php
+
+namespace DummyNamespace;
+
+use Statamic\Tags\Tags;
+
+class DummyClass extends Tags
+{
+    /**
+     * The {{ dummy_tag }} tag.
+     *
+     * @return string|array
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * The {{ dummy_tag:example }} tag.
+     *
+     * @return string|array
+     */
+    public function example()
+    {
+        //
+    }
+}

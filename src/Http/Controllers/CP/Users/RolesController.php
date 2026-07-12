@@ -1,0 +1,211 @@
+<?php
+
+namespace Statamic\Http\Controllers\CP\Users;
+
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Statamic\CP\Column;
+use Statamic\Facades\Permission;
+use Statamic\Facades\Role;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
+use Statamic\Http\Middleware\RequireStatamicPro;
+use Statamic\Rules\Handle;
+use Statamic\Support\Str;
+
+use function Statamic\trans as __;
+
+class RolesController extends CpController
+{
+    public function __construct()
+    {
+        $this->middleware(RequireStatamicPro::class);
+        $this->middleware(RequireElevatedSession::class)->except('index');
+    }
+
+    public function index(Request $request)
+    {
+        $this->authorize('edit roles');
+
+        $roles = Role::all()->map(function ($role) {
+            return [
+                'id' => $role->handle(),
+                'title' => __($role->title()),
+                'handle' => $role->handle(),
+                'permissions' => $role->isSuper() ? __('Super User') : $role->permissions()->count(),
+                'edit_url' => $role->editUrl(),
+                'delete_url' => $role->deleteUrl(),
+            ];
+        })->values();
+
+        if ($request->wantsJson()) {
+            return $roles;
+        }
+
+        if ($roles->count() === 0) {
+            return Inertia::render('roles/Empty', [
+                'createUrl' => cp_route('roles.create'),
+            ]);
+        }
+
+        return Inertia::render('roles/Index', [
+            'roles' => $roles,
+            'columns' => [
+                Column::make('title')->label(__('Title')),
+                Column::make('handle')->label(__('Handle')),
+                Column::make('permissions')->label(__('Permissions')),
+            ],
+            'createUrl' => cp_route('roles.create'),
+        ]);
+    }
+
+    public function create()
+    {
+        $this->authorize('edit roles');
+
+        return Inertia::render('roles/Create', [
+            'permissions' => $this->updateTree(Permission::tree()),
+            'canAssignSuper' => User::current()->isSuper(),
+            'action' => cp_route('roles.store'),
+            'indexUrl' => cp_route('roles.index'),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorize('edit roles');
+
+        $request->validate([
+            'title' => 'required',
+            'handle' => [new Handle],
+            'super' => 'boolean',
+            'permissions' => 'array',
+        ]);
+
+        $handle = $request->handle ?: Str::snake($request->title);
+
+        if (Role::find($handle)) {
+            $error = __('A Role with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $error], 422);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
+        $role = Role::make()
+            ->title($request->title)
+            ->handle($handle);
+
+        if ($request->super && User::current()->isSuper()) {
+            $role->permissions(['super']);
+        } elseif (! in_array('super', $request->permissions ?? [])) {
+            $role->permissions($request->permissions);
+        }
+
+        $role->save();
+
+        session()->flash('success', __('Role created'));
+
+        return ['redirect' => cp_route('roles.index')];
+    }
+
+    public function edit($role)
+    {
+        $this->authorize('edit roles');
+
+        if (! $role = Role::find($role)) {
+            return $this->pageNotFound();
+        }
+
+        return Inertia::render('roles/Edit', [
+            'role' => [
+                'handle' => $role->handle(),
+                'title' => $role->title(),
+            ],
+            'super' => $role->isSuper(),
+            'permissions' => $this->updateTree(Permission::tree(), $role),
+            'canAssignSuper' => User::current()->isSuper(),
+            'action' => cp_route('roles.update', $role->handle()),
+        ]);
+    }
+
+    public function update(Request $request, $role)
+    {
+        $this->requireElevatedSession();
+
+        $this->authorize('edit roles');
+
+        if (! $role = Role::find($role)) {
+            return $this->pageNotFound();
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'handle' => [new Handle],
+            'super' => 'boolean',
+            'permissions' => 'array',
+        ]);
+
+        $role
+            ->title($request->title)
+            ->handle($request->handle ?: Str::snake($request->title));
+
+        if ($request->super && User::current()->isSuper()) {
+            $role->permissions(['super']);
+        } elseif ($request->has('permissions') && ! in_array('super', $request->permissions)) {
+            $role->permissions($this->preserveUnregisteredPermissions($role, $request->permissions));
+        }
+
+        $role->save();
+
+        session()->flash('success', __('Role updated'));
+
+        return ['redirect' => cp_route('roles.index')];
+    }
+
+    public function destroy($role)
+    {
+        $this->authorize('edit roles');
+
+        if (! $role = Role::find($role)) {
+            return $this->pageNotFound();
+        }
+
+        $role->delete();
+
+        return response('', 204);
+    }
+
+    private function preserveUnregisteredPermissions($role, $permissions)
+    {
+        $registered = Permission::boot()->flattened()->map->value();
+
+        $unregistered = $role->permissions()
+            ->diff($registered)
+            ->reject(fn ($permission) => $permission === 'super');
+
+        return collect($permissions)->merge($unregistered)->unique()->values()->all();
+    }
+
+    protected function updateTree($tree, $role = null)
+    {
+        return $tree->map(function ($group) use ($role) {
+            return array_merge($group, [
+                'permissions' => $this->updatePermissions($group['permissions'], $role),
+            ]);
+        });
+    }
+
+    protected function updatePermissions($permissions, $role = null)
+    {
+        return collect($permissions)->map(function ($item) use ($role) {
+            return array_merge($item, [
+                'checked' => $role ? $role->hasPermission($item['value']) : false,
+                'children' => $this->updatePermissions($item['children'], $role),
+            ]);
+        })->all();
+    }
+}

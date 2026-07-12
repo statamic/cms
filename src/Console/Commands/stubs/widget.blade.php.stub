@@ -1,0 +1,5 @@
+<ui-widget title="{{ name }}">
+    <div class="px-4 py-3">
+        <p>👋 @{{ $message }}!</p>
+    </div>
+</ui-widget>

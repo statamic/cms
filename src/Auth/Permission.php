@@ -1,0 +1,238 @@
+<?php
+
+namespace Statamic\Auth;
+
+use Statamic\Support\Arr;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Statamic\trans as __;
+
+class Permission
+{
+    use FluentlyGetsAndSets;
+
+    protected $value;
+    protected $placeholder;
+    protected $placeholderLabel;
+    protected $placeholderValue;
+    protected $callback;
+    protected $children;
+    protected $label;
+    protected $description;
+    protected $group;
+    protected $hiddenBy;
+
+    /**
+     * @return ($value is null ? string|string[] : static)
+     */
+    public function value(?string $value = null)
+    {
+        if (func_num_args() > 0) {
+            $this->value = $value;
+
+            return $this;
+        }
+
+        return str_replace('{'.$this->placeholder.'}', (string) $this->placeholderValue, $this->value);
+    }
+
+    public function originalValue()
+    {
+        return $this->value;
+    }
+
+    public function originalLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return ($label is null ? string|null : static)
+     */
+    public function label(?string $label = null)
+    {
+        if (func_num_args() > 0) {
+            $this->label = $label;
+
+            return $this;
+        }
+
+        $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
+
+        return $this->placeholder
+            ? __($label, [$this->placeholder => $this->placeholderLabel])
+            : __($label);
+    }
+
+    public function placeholder(?string $placeholder = null)
+    {
+        return $this->fluentlyGetOrSet('placeholder')->args(func_get_args());
+    }
+
+    public function placeholderLabel(?string $label = null)
+    {
+        return $this->fluentlyGetOrSet('placeholderLabel')->args(func_get_args());
+    }
+
+    public function placeholderValue(?string $placeholderValue = null)
+    {
+        return $this->fluentlyGetOrSet('placeholderValue')->args(func_get_args());
+    }
+
+    public function replacements(string $placeholder, callable $callback)
+    {
+        $this->placeholder = $placeholder;
+        $this->callback = $callback;
+
+        return $this;
+    }
+
+    public function permissions()
+    {
+        if (! $this->callback) {
+            return collect([$this]);
+        }
+
+        // The callback should return an array where the keys are the replacements for the
+        // permission values, and the values are the strings to be replaced inside the
+        // labels. eg. ['blog' => 'Blog', 'downloads' => 'Downloadable Products']
+        $items = call_user_func($this->callback);
+
+        return collect($items)->map(function ($replacement) {
+            $replaced = (new self)
+                ->value($this->value)
+                ->label($this->label)
+                ->description($this->description())
+                ->placeholder($this->placeholder)
+                ->placeholderLabel($replacement['label'])
+                ->placeholderValue($replacement['value'])
+                ->group($this->group())
+                ->hiddenBy($this->hiddenBy());
+
+            if ($this->children()) {
+                $replaced->children($this->children()->all());
+            }
+
+            return $replaced;
+        })->values();
+    }
+
+    public function flattened()
+    {
+        if (! $this->callback) {
+            return [
+                $this,
+                ...$this->children()->map(function ($child) {
+                    return (new self)
+                        ->value($child->value())
+                        ->label($child->label())
+                        ->placeholder($this->placeholder)
+                        ->placeholderLabel($this->placeholderLabel)
+                        ->placeholderValue($this->placeholderValue)
+                        ->children($child->children()->all())
+                        ->group($this->group());
+                })->flatMap->flattened()->all(),
+            ];
+        }
+
+        $items = call_user_func($this->callback);
+
+        return collect($items)->flatMap(function ($replacement) {
+            $replaced = (new self)
+                ->value($this->value)
+                ->label($this->label)
+                ->placeholder($this->placeholder)
+                ->placeholderLabel($replacement['label'])
+                ->placeholderValue($replacement['value'])
+                ->group($this->group());
+
+            $children = $this->children()->map(function ($child) use ($replacement) {
+                return (new self)
+                    ->value($child->originalValue())
+                    ->label($child->originalLabel())
+                    ->placeholder($this->placeholder)
+                    ->placeholderLabel($replacement['label'])
+                    ->placeholderValue($replacement['value'])
+                    ->children($child->children()->all())
+                    ->group($this->group());
+            });
+
+            return [$replaced, ...$children->flatMap->flattened()->all()];
+        })->values();
+    }
+
+    public function children(?array $children = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('children')
+            ->getter(function ($children) {
+                return $children ?? collect();
+            })
+            ->setter(function ($children) {
+                return collect($children)->map->group($this->group);
+            })
+            ->args(func_get_args());
+    }
+
+    public function addChild($child)
+    {
+        $children = $this->children()->merge([$child])->all();
+
+        return $this->children($children);
+    }
+
+    public function toTree()
+    {
+        return $this->permissions()->map(function ($permission) {
+            $children = $permission->children();
+
+            if ($permission->placeholder()) {
+                $children = $children->map(function ($child) use ($permission) {
+                    $replaced = (new self)
+                        ->value($child->originalValue())
+                        ->label($child->originalLabel())
+                        ->description($child->description())
+                        ->placeholder($permission->placeholder())
+                        ->placeholderLabel($permission->placeholderLabel())
+                        ->placeholderValue($permission->placeholderValue())
+                        ->group($permission->group())
+                        ->hiddenBy($child->hiddenBy());
+
+                    if ($children = $child->children()) {
+                        $replaced->children($children->all());
+                    }
+
+                    return $replaced;
+                });
+            }
+
+            return [
+                'value' => $permission->value(),
+                'label' => $permission->label(),
+                'description' => $permission->description(),
+                'group' => $permission->group(),
+                'hidden_by' => $permission->hiddenBy(),
+                'children' => $children->flatMap->toTree()->all(),
+            ];
+        })->all();
+    }
+
+    public function group(?string $group = null)
+    {
+        return $this->fluentlyGetOrSet('group')->args(func_get_args());
+    }
+
+    public function description()
+    {
+        return $this->fluentlyGetOrSet('description')->args(func_get_args());
+    }
+
+    public function hiddenBy(string|array|null $permissions = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('hiddenBy')
+            ->getter(fn ($permissions) => $permissions ?? [])
+            ->setter(fn ($permissions) => Arr::wrap($permissions))
+            ->args(func_get_args());
+    }
+}

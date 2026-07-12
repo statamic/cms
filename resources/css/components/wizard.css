@@ -1,0 +1,57 @@
+.wizard-steps {
+    @apply flex justify-between;
+
+    .step {
+        @apply relative mx-auto flex-1 text-center text-xs cursor-pointer border-0 bg-transparent p-0;
+    }
+
+    .step:not(:first-child)::before {
+        @apply absolute h-1 w-1/2 bg-gray-300 start-0 top-[18px];
+        content: '';
+    }
+
+    .dark .step:not(:first-child)::before {
+        @apply bg-gray-700;
+    }
+
+    .step:not(:last-child)::after {
+        @apply absolute h-1 w-1/2 bg-gray-300 start-[50%] top-[18px];
+        content: '';
+    }
+
+    .dark .step:not(:last-child)::after {
+        @apply bg-gray-700;
+    }
+
+    .step.complete::before,
+    .step.complete::after {
+        @apply bg-gray-900;
+    }
+
+    .ball {
+        @apply relative z-10 mx-auto size-10 rounded-full bg-gray-300 text-center text-base text-gray-600 dark:bg-gray-700 dark:text-gray-300 leading-10;
+    }
+
+    .label {
+        @apply mt-1 text-xs text-gray-500 dark:text-gray-400;
+    }
+
+    .complete .ball {
+        @apply bg-gray-900 text-white dark:bg-white dark:text-gray-900;
+    }
+
+    .complete .label {
+        @apply text-gray-900 dark:text-gray-200;
+    }
+}
+
+/* Dark mode overrides for pseudo elements */
+.dark .wizard-steps .step:before,
+.dark .wizard-steps .step:after {
+    @apply bg-gray-700;
+}
+
+.dark .wizard-steps .complete:before,
+.dark .wizard-steps .complete:after {
+    @apply bg-white;
+}

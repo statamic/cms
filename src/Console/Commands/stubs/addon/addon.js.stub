@@ -1,0 +1,5 @@
+import {{ name }} from './components/fieldtypes/{{ name }}.vue'
+
+Statamic.booting(() => {
+    Statamic.component('{{ name | snake }}-fieldtype', {{ name }})
+})

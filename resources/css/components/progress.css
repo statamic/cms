@@ -1,0 +1,21 @@
+/* Make clicks pass-through */
+#nprogress {
+    pointer-events: none;
+}
+
+#nprogress .bar.bar {
+    @apply fixed top-0 w-full bg-progress-bar start-0;
+    height: 2px;
+    /* above global-header */
+    z-index: var(--z-index-portal);
+}
+
+.nprogress-custom-parent {
+    overflow: hidden;
+    position: relative;
+}
+
+.nprogress-custom-parent #nprogress .spinner,
+.nprogress-custom-parent #nprogress .bar {
+    position: absolute;
+}

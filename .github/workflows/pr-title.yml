@@ -1,0 +1,16 @@
+name: Pull Request Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-title:
+    uses: statamic/.github/.github/workflows/pr-title.yml@bebe92309b4276e45ebc0d0c65854fb2ecf786ba
+    permissions: {}

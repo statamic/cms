@@ -1,0 +1,9 @@
+{
+    "name": "statamic/cool-runnings",
+    "extra": {
+        "statamic": {
+            "name": "Cool Runnings",
+            "description": "Cool Runnings Starter Kit"
+        }
+    }
+}

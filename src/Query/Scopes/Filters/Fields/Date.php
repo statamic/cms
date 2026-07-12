@@ -1,0 +1,100 @@
+<?php
+
+namespace Statamic\Query\Scopes\Filters\Fields;
+
+use Illuminate\Support\Carbon;
+use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
+
+class Date extends FieldtypeFilter
+{
+    public function fieldItems()
+    {
+        return [
+            'operator' => [
+                'type' => 'select',
+                'placeholder' => __('Select Operator'),
+                'options' => [
+                    '<' => __('Before'),
+                    '>' => __('After'),
+                    'between' => __('Between'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
+                ],
+            ],
+            'value' => [
+                'type' => 'date',
+                'full_width' => true,
+                'clearable' => false,
+                'if' => [
+                    'operator' => 'contains_any >, <',
+                ],
+            ],
+            'range_value' => [
+                'type' => 'date',
+                'mode' => 'range',
+                'full_width' => true,
+                'clearable' => false,
+                'if' => [
+                    'operator' => 'between',
+                ],
+            ],
+        ];
+    }
+
+    public function apply($query, $handle, $values)
+    {
+        $operator = $values['operator'];
+
+        if ($operator == 'between') {
+            $query->whereDate($handle, '>=', Carbon::parse($values['range_value']['start']));
+            $query->whereDate($handle, '<=', Carbon::parse($values['range_value']['end']));
+
+            return;
+        }
+
+        $value = Carbon::parse($values['value']);
+
+        match ($operator) {
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+            default => $query->where($handle, $operator, $value),
+        };
+    }
+
+    public function badge($values)
+    {
+        $field = $this->fieldtype->field()->display();
+        $operator = $values['operator'];
+        $translatedOperator = strtolower(Arr::get($this->fieldItems(), "operator.options.{$operator}"));
+
+        $value = ($operator == 'between')
+            ? [
+                'start' => Carbon::parse($values['range_value']['start'])->toIso8601ZuluString('millisecond'),
+                'end' => Carbon::parse($values['range_value']['end'])->toIso8601ZuluString('millisecond'),
+            ]
+            : Carbon::parse(Arr::get($values, 'value'))->toIso8601ZuluString('millisecond');
+
+        return compact('field', 'operator', 'translatedOperator', 'value');
+    }
+
+    public function isComplete($values): bool
+    {
+        $values = Arr::removeNullValues($values);
+
+        if (! $operator = Arr::get($values, 'operator')) {
+            return false;
+        }
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            return true;
+        }
+
+        if ($operator === 'between') {
+            return Arr::has($values, 'range_value.start') && Arr::has($values, 'range_value.end');
+        }
+
+        return Arr::has($values, 'value');
+    }
+}

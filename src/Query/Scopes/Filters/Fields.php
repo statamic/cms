@@ -1,0 +1,127 @@
+<?php
+
+namespace Statamic\Query\Scopes\Filters;
+
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Form;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
+use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
+
+class Fields extends Filter
+{
+    protected $pinned = true;
+
+    public static function title()
+    {
+        return __('Fields');
+    }
+
+    public function extra()
+    {
+        return $this->getFields()
+            ->map(function ($field) {
+                return [
+                    'handle' => $field->handle(),
+                    'display' => __($field->display()),
+                    'fields' => ($fields = $field->fieldtype()->filter()->fields())->toPublishArray(),
+                    'meta' => $fields->meta(),
+                ];
+            })
+            ->sortBy('display')
+            ->values()
+            ->all();
+    }
+
+    public function apply($query, $values)
+    {
+        $this->getFields()
+            ->each(function ($field, $handle) use ($query, $values) {
+                $filter = $field->fieldtype()->filter();
+                if (! isset($values[$handle]) || ! $filter->isComplete($values[$handle])) {
+                    return null;
+                }
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+                $filter->apply($query, $handle, $values);
+            });
+    }
+
+    public function badge($values)
+    {
+        return $this->getFields()
+            ->map(function ($field, $handle) use ($values) {
+                $filter = $field->fieldtype()->filter();
+                if (! isset($values[$handle]) || ! $filter->isComplete($values[$handle])) {
+                    return null;
+                }
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+
+                return $filter->badge($values);
+            })
+            ->filter()
+            ->all();
+    }
+
+    public function visibleTo($key)
+    {
+        return in_array($key, ['entries', 'entries-fieldtype', 'form-submissions', 'terms', 'users', 'usergroup-users', 'assets']);
+    }
+
+    protected function getFields()
+    {
+        return $this->getBlueprints()->flatMap(function ($blueprint) {
+            return $blueprint
+                ->fields()
+                ->all()
+                ->filter
+                ->isFilterable();
+        });
+    }
+
+    protected function getBlueprints()
+    {
+        if ($collections = Arr::getFirst($this->context, ['collection', 'collections'])) {
+            return collect(Arr::wrap($collections))->flatMap(function ($collection) {
+                return Collection::findByHandle($collection)->entryBlueprints();
+            });
+        }
+
+        if ($taxonomies = Arr::getFirst($this->context, ['taxonomy', 'taxonomies'])) {
+            return collect(Arr::wrap($taxonomies))->flatMap(function ($taxonomy) {
+                return Taxonomy::findByHandle($taxonomy)->termBlueprints();
+            });
+        }
+
+        if ($containers = Arr::getFirst($this->context, ['container', 'containers'])) {
+            return collect(Arr::wrap($containers))->map(function ($container) {
+                return AssetContainer::find($container)->blueprint();
+            });
+        }
+
+        if ($forms = Arr::getFirst($this->context, ['form', 'forms'])) {
+            return collect(Arr::wrap($forms))->map(function ($form) {
+                return Form::find($form)
+                    ->blueprint()
+                    ->ensureField('date', [
+                        'type' => 'date',
+                        'filterable' => true,
+                    ]);
+            });
+        }
+
+        if (isset($this->context['blueprints'])) {
+            return collect($this->context['blueprints'])->map(function ($handle) {
+                return $handle === 'user'
+                    ? User::blueprint()
+                    : Blueprint::find($handle);
+            });
+        }
+
+        return collect();
+    }
+}

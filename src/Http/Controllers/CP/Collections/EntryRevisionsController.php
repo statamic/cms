@@ -1,0 +1,130 @@
+<?php
+
+namespace Statamic\Http\Controllers\CP\Collections;
+
+use Illuminate\Http\Request;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+
+class EntryRevisionsController extends CpController
+{
+    use ExtractsFromEntryFields;
+
+    public function index(Request $request, $collection, $entry)
+    {
+        $this->authorize('view', $entry);
+
+        $revisions = $entry
+            ->revisions()
+            ->reverse()
+            ->each(fn ($revision) => $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
+                'collection' => $collection,
+                'entry' => $entry->id(),
+                'revision' => $revision->date()->timestamp,
+            ])))
+            ->prepend($this->workingCopy($entry))
+            ->filter();
+
+        // The first non manually created revision would be considered the "current"
+        // version. It's what corresponds to what's in the content directory.
+        optional($revisions->first(function ($revision) {
+            return $revision->action() != 'revision';
+        }))->attribute('current', true);
+
+        return $revisions
+            ->groupBy(function ($revision) {
+                return $revision->date()->clone()->startOfDay()->format('U');
+            })->map(function ($revisions, $day) {
+                return compact('day', 'revisions');
+            })->reverse()->values();
+    }
+
+    public function store(Request $request, $collection, $entry)
+    {
+        $this->authorize('edit', $entry);
+
+        $entry->createRevision([
+            'message' => $request->message,
+            'user' => User::fromUser($request->user()),
+        ]);
+
+        return new EntryResource($entry);
+    }
+
+    public function show(Request $request, $collection, $entry, $revision)
+    {
+        $this->authorize('view', $entry);
+
+        $entry = $entry->makeFromRevision($revision);
+
+        // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.
+
+        $blueprint = $entry->blueprint();
+
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
+
+        return [
+            'title' => $entry->value('title'),
+            'editing' => true,
+            'actions' => [
+                'save' => $entry->updateUrl(),
+                'publish' => $entry->publishUrl(),
+                'unpublish' => $entry->unpublishUrl(),
+                'revisions' => $entry->revisionsUrl(),
+                'restore' => $entry->restoreRevisionUrl(),
+                'createRevision' => $entry->createRevisionUrl(),
+            ],
+            'values' => $values,
+            'meta' => $meta,
+            'collection' => $this->collectionToArray($entry->collection()),
+            'blueprint' => $blueprint->toPublishArray(),
+            'readOnly' => true,
+            'published' => $entry->published(),
+            'locale' => $entry->locale(),
+            'localizations' => $this->getAuthorizedSitesForCollection($entry->collection())->map(function ($handle) use ($entry) {
+                $localized = $entry->in($handle);
+                $exists = $localized !== null;
+
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $entry->locale(),
+                    'exists' => $exists,
+                    'root' => $exists ? $localized->isRoot() : false,
+                    'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
+                    'published' => $exists ? $localized->published() : false,
+                    'url' => $exists ? $localized->editUrl() : null,
+                ];
+            })->all(),
+        ];
+    }
+
+    protected function workingCopy($entry)
+    {
+        if ($entry->published()) {
+            return $entry->workingCopy();
+        }
+
+        return $entry
+            ->makeWorkingCopy()
+            ->date($entry->lastModified())
+            ->user($entry->lastModifiedBy());
+    }
+
+    protected function collectionToArray($collection)
+    {
+        return [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.show', $collection->handle()),
+        ];
+    }
+
+    private function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+}

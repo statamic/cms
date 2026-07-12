@@ -1,0 +1,51 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class StatamicAuthTables extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        USERS_TABLE_REPLACE
+        Schema::create('ROLE_USER_TABLE', function (Blueprint $table) {
+            $table->id('id');
+            $table->foreignId('user_id')->constrained('USERS_TABLE')->cascadeOnDelete();
+            $table->string('role_id');
+        });
+
+        Schema::create('GROUP_USER_TABLE', function (Blueprint $table) {
+            $table->id('id');
+            $table->foreignId('user_id')->constrained('USERS_TABLE')->cascadeOnDelete();
+            $table->string('group_id');
+        });
+
+        Schema::create('password_activation_tokens', function (Blueprint $table) {
+            $table->string('email')->index();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+     public function down()
+     {
+         Schema::table('USERS_TABLE', function (Blueprint $table) {
+             $table->dropColumn(['super', 'avatar', 'preferences', 'last_login']);
+             $table->string('password')->nullable(false)->change();
+         });
+
+         Schema::dropIfExists('ROLE_USER_TABLE');
+         Schema::dropIfExists('GROUP_USER_TABLE');
+
+         Schema::dropIfExists('password_activation_tokens');
+     }
+}

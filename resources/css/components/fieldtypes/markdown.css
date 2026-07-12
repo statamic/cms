@@ -1,0 +1,131 @@
+/* ==========================================================================
+   MARKDOWN FIELDTYPE
+   ========================================================================== */
+
+
+/* Inside a Grid fieldtype
+  ========================================================================== */
+
+.grid-fieldtype .grid-table .markdown-fieldtype {
+    .markdown-preview {
+        @apply border-none p-2 text-start;
+        p {
+            line-height: 1.2;
+        }
+    }
+}
+
+/* Writing Mode Typography
+  ========================================================================== */
+
+.markdown-fieldtype .cm-header {
+    @apply text-gray-900 dark:text-gray-300;
+
+    &.cm-header-1 {
+        @apply text-lg;
+    }
+
+    &.cm-header-2 {
+        @apply text-base;
+    }
+
+    &.cm-header-3 {
+        @apply text-sm;
+    }
+}
+
+.markdown-fieldtype .cm-quote {
+    @apply text-sm italic text-gray-900 dark:text-gray-300;
+}
+
+.markdown-fieldtype .cm-variable-2 {
+    @apply text-gray-900 dark:text-gray-300;
+}
+
+.markdown-fieldtype .CodeMirror {
+    @apply bg-transparent;
+}
+
+
+/* Sticky Toolbar
+========================================================================== */
+[data-markdown-toolbar] {
+    @apply flex items-center justify-between rounded-t-[calc(var(--radius-lg)-1px)] bg-gray-50 px-2 py-1 overflow-x-auto;
+    @apply border-b border-gray-300 dark:border-white/20 dark:border-b-white/10 dark:bg-gray-925;
+}
+
+.grid-cell [data-markdown-toolbar] {
+    @apply top-8;
+}
+
+/* Preview Mode Typography
+  ========================================================================== */
+
+.markdown-preview {
+    @apply mx-auto px-3 py-2 @md/markdown:px-5 @md/markdown:py-4 min-h-16;
+
+    ol {
+        @apply list-decimal;
+    }
+
+    ul {
+        @apply list-disc;
+    }
+
+    pre {
+        @apply rounded-sm px-4 py-2 dark:bg-gray-700 dark:text-red-600;
+        color: #c7254e;
+        background-color: #f9f2f4;
+        direction: ltr;
+
+        code {
+            @apply p-0;
+        }
+    }
+
+    .heading-permalink {
+        @apply hidden;
+    }
+}
+
+.markdown-fullscreen {
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none border-0 bg-gray-100 pt-12;
+    will-change: transform;
+
+    .mode-wrap {
+        height: calc(100vh - 80px); /*  sans toolbars */
+        overflow-y: scroll;
+        cursor: text;
+        &.mode-preview {
+            height: calc(100vh - 44px); /*  no footer toolbar */
+        }
+    }
+
+    [data-markdown-toolbar] {
+        @apply relative top-0 border-b-0;
+    }
+
+    [data-markdown-mode-toggle] {
+        @apply ms-6;
+    }
+
+    .editor {
+        @apply relative mx-auto my-6 max-w-page rounded-lg bg-white dark:bg-gray-900! px-2 shadow-ui-md md:px-8 md:pt-8;
+
+        .CodeMirror-scroll {
+            @apply m-0;
+        }
+    }
+
+    .CodeMirror {
+        @apply shadow-none outline-hidden;
+        &:focus,
+        &:focus-within {
+            @apply ring-0!;
+        }
+    }
+
+    .markdown-preview {
+        @apply relative mx-auto max-w-page bg-transparent p-8 text-lg;
+    }
+}

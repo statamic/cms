@@ -1,0 +1,19 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as MiddleEllipsisStories from '../MiddleEllipsis.stories';
+
+<Meta of={MiddleEllipsisStories} />
+
+# MiddleEllipsis
+Truncates text from the middle when it overflows its container, preserving both the beginning and end of the string. This is useful for displaying file paths, URLs, and other strings where context at both ends is important.
+<Canvas of={MiddleEllipsisStories._DocsIntro} sourceState={'shown'} />
+
+## Responsive Behavior
+The component fills its container and automatically truncates when needed. The full text is always available in the element's `title` attribute for hover tooltips.
+<Canvas of={MiddleEllipsisStories._DifferentWidths} sourceState={'shown'} />
+
+## Live Resizing
+The truncation updates in real-time as the container is resized. Try dragging the corner of the box below.
+<Canvas of={MiddleEllipsisStories._Resizable} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={MiddleEllipsisStories} />

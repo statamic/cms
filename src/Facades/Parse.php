@@ -1,0 +1,24 @@
+<?php
+
+namespace Statamic\Facades;
+
+use Illuminate\Support\Facades\Facade;
+use Statamic\View\Antlers\AntlersString;
+
+/**
+ * @method static AntlersString template($str, $variables = [], $context = [], $trusted = false)
+ * @method static string templateLoop($content, $data, $supplement = true, $context = [], $trusted = false)
+ * @method static array YAML($str)
+ * @method static array frontMatter($string)
+ * @method static mixed env($val)
+ * @method static mixed config($value)
+ *
+ * @see \Statamic\Facades\Endpoint\Parse
+ */
+class Parse extends Facade
+{
+    protected static function getFacadeAccessor()
+    {
+        return Endpoint\Parse::class;
+    }
+}

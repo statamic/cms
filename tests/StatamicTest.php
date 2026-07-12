@@ -1,0 +1,368 @@
+<?php
+
+namespace Tests;
+
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Statamic;
+use Statamic\Support\Str;
+use Tests\Fakes\FakeArtisanRequest;
+
+class StatamicTest extends TestCase
+{
+    use PreventSavingStacheItemsToDisk;
+
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']->set('statamic.system.date_format', 'system-date-format');
+
+        Route::get('date-format', function () {
+            return [
+                'dateFormat' => Statamic::dateFormat(),
+                'dateTimeFormat' => Statamic::dateTimeFormat(),
+            ];
+        });
+    }
+
+    #[Test]
+    public function it_checks_for_cp_route()
+    {
+        $this->get('/not-cp');
+        $this->assertFalse(Statamic::isCpRoute());
+
+        $this->get('/cp');
+        $this->assertTrue(Statamic::isCpRoute());
+
+        $this->get('/cp/foo');
+        $this->assertTrue(Statamic::isCpRoute());
+
+        $this->get('/cpa');
+        $this->assertFalse(Statamic::isCpRoute());
+
+        config(['statamic.cp.enabled' => false]);
+        $this->get('/cp/foo');
+        $this->assertFalse(Statamic::isCpRoute());
+    }
+
+    #[Test]
+    public function it_gets_the_system_date_format()
+    {
+        $this->assertEquals('system-date-format', Statamic::dateFormat());
+    }
+
+    #[Test]
+    public function it_appends_time_if_system_date_format_doesnt_have_time_in_it()
+    {
+        config(['statamic.system.date_format' => 'Y--m--d']);
+
+        $this->assertEquals('Y--m--d H:i', Statamic::dateTimeFormat());
+    }
+
+    #[Test]
+    #[DataProvider('formatsWithTimeProvider')]
+    public function it_doesnt_append_time_if_system_date_format_already_has_time_in_it($format)
+    {
+        config(['statamic.system.date_format' => $format]);
+
+        $this->assertEquals($format, Statamic::dateTimeFormat());
+    }
+
+    #[Test]
+    public function it_wraps_fluent_tag_helper()
+    {
+        $this->assertInstanceOf(\Statamic\Tags\FluentTag::class, Statamic::tag('some_tag'));
+    }
+
+    #[Test]
+    public function it_wraps_fluent_modifier_helper()
+    {
+        $this->assertInstanceOf(\Statamic\Modifiers\Modify::class, Statamic::modify('some_value'));
+    }
+
+    public static function formatsWithTimeProvider()
+    {
+        return [
+            '12-hour without leading zeros' => ['g'],
+            '24-hour without leading zeros' => ['G'],
+            '12-hour with leading zeros' => ['h'],
+            '24-hour with leading zeros' => ['H'],
+            'unix timestamp' => ['U'],
+            'ISO 8601' => ['c'],
+            'RFC 2822' => ['r'],
+        ];
+    }
+
+    #[Test]
+    public function it_translates_a_string()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('Hello', Statamic::trans('package::messages.hello'));
+        $this->assertEquals('Hello, Bob', Statamic::trans('package::messages.hello_name', ['name' => 'Bob']));
+    }
+
+    #[Test]
+    public function trans_returns_the_key_when_the_value_is_an_array()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('package::messages', Statamic::trans('package::messages'));
+    }
+
+    #[Test]
+    public function it_pluralizes_with_trans_choice()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('There is one apple', Statamic::transChoice('package::messages.apples', 1));
+        $this->assertEquals('There are 5 apples', Statamic::transChoice('package::messages.apples', 5));
+    }
+
+    #[Test]
+    public function trans_choice_returns_the_key_when_the_value_is_an_array()
+    {
+        app('translator')->addNamespace('package', __DIR__.'/__fixtures__/lang');
+
+        $this->assertEquals('package::messages', Statamic::transChoice('package::messages', 1));
+    }
+
+    #[Test]
+    public function it_aliases_query_builders()
+    {
+        app()->bind('statamic.queries.test', function () {
+            return 'the test query builder';
+        });
+
+        $this->assertEquals('the test query builder', Statamic::query('test'));
+    }
+
+    #[Test]
+    public function native_query_builder_aliases_are_bound()
+    {
+        $aliases = [
+            'entries' => \Statamic\Stache\Query\EntryQueryBuilder::class,
+            'terms' => \Statamic\Stache\Query\TermQueryBuilder::class,
+            'assets' => \Statamic\Assets\QueryBuilder::class,
+            'users' => \Statamic\Stache\Query\UserQueryBuilder::class,
+            'form-submissions' => \Statamic\Stache\Query\SubmissionQueryBuilder::class,
+        ];
+
+        foreach ($aliases as $alias => $class) {
+            $this->assertInstanceOf($class, Statamic::query($alias));
+        }
+    }
+
+    #[Test]
+    public function it_throws_exception_for_invalid_query_builder_alias()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Target class [statamic.queries.test] does not exist.');
+
+        Statamic::query('test');
+    }
+
+    #[Test]
+    public function scripts_will_automatically_be_versioned()
+    {
+        Statamic::script('test-a', 'test');
+
+        $allScripts = Statamic::availableScripts(Request::create('/'));
+
+        $this->assertArrayHasKey('test-a', $allScripts);
+
+        $testScript = $allScripts['test-a'][0];
+
+        $this->assertTrue(Str::startsWith($testScript, 'test.js?v='));
+        // Check if the version is 16 characters long.
+        $this->assertEquals(16, strlen(Str::of($testScript)->after('.js?v=')));
+    }
+
+    #[Test]
+    public function styles_will_automatically_be_versioned()
+    {
+        Statamic::style('test-b', 'test');
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertArrayHasKey('test-b', $allStyles);
+
+        $testStyle = $allStyles['test-b'][0];
+
+        $this->assertTrue(Str::startsWith($testStyle, 'test.css?v='));
+        // Check if the version is 16 characters long.
+        $this->assertEquals(16, strlen(Str::of($testStyle)->after('.css?v=')));
+    }
+
+    #[Test]
+    public function scripts_can_be_passed_with_a_laravel_mix_version()
+    {
+        $path = 'test.js?id=some-random-laravel-mix-version';
+
+        // We can't test the mix helper, so we emulate it by adding `?id=`, as this is
+        // the versioning syntax provied by Laravel Mix.
+        // Statamic::script('test', mix('your-path'));
+
+        Statamic::script('test-c', $path);
+
+        $allScripts = Statamic::availableScripts(Request::create('/'));
+
+        $this->assertArrayHasKey('test-c', $allScripts);
+
+        $testScript = $allScripts['test-c'][0];
+
+        $this->assertEquals($testScript, $path);
+    }
+
+    #[Test]
+    public function styles_can_be_passed_with_a_laravel_mix_version()
+    {
+        $path = 'test.css?id=some-random-laravel-mix-version';
+
+        // We can't test the mix helper, so we emulate it by adding `?id=`, as this is
+        // the versioning syntax provied by Laravel Mix.
+        // Statamic::script('test', mix('your-path'));
+
+        Statamic::style('test-d', $path);
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertArrayHasKey('test-d', $allStyles);
+
+        $testStyle = $allStyles['test-d'][0];
+
+        $this->assertEquals($testStyle, $path);
+    }
+
+    #[Test]
+    public function assets_with_equal_names_will_be_cached_differently()
+    {
+        Statamic::style('test-name', __DIR__.'/../resources/css/test-path-1.css');
+        Statamic::style('test-name', __DIR__.'/../resources/css/test-path-2.css');
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertNotEquals($allStyles['test-name'][0], $allStyles['test-name'][1]);
+    }
+
+    #[Test]
+    #[DefineEnvironment('customAssetUrl')]
+    #[DataProvider('cpAssetUrlProvider')]
+    public function it_gets_a_cp_asset_url($url, $expected)
+    {
+        $this->assertEquals($expected, Statamic::cpAssetUrl($url));
+    }
+
+    public static function cpAssetUrlProvider()
+    {
+        return [
+            'slash' => ['/foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
+            'no slash' => ['foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
+        ];
+    }
+
+    #[Test]
+    #[DefineEnvironment('customAssetUrl')]
+    #[DataProvider('vendorPackageAssetUrlProvider')]
+    public function it_gets_the_vendor_package_asset_url($arguments, $expected)
+    {
+        $this->assertEquals($expected, Statamic::vendorPackageAssetUrl(...$arguments));
+    }
+
+    public static function vendorPackageAssetUrlProvider()
+    {
+        return [
+            'package' => [['package', 'cp.js'], 'http://test-asset-url.com/vendor/package/cp.js'],
+            'package with type' => [['package', 'test.jpg', 'images'], 'http://test-asset-url.com/vendor/package/images/test.jpg'],
+            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://test-asset-url.com/vendor/statamic/cp/cp.js'],
+            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://test-asset-url.com/vendor/foo/bar.js'],
+            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://test-asset-url.com/vendor/foo/bar.js'],
+        ];
+    }
+
+    #[Test]
+    #[DefineEnvironment('useFixtureTranslations')]
+    public function it_makes_breadcrumbs()
+    {
+        // confirm the fake translations are being loaded
+        $this->assertIsArray(__('messages'));
+
+        $this->assertEquals('one ‹ messages ‹ two', Statamic::crumb('one', 'messages', 'two'));
+    }
+
+    public function useFixtureTranslations($app)
+    {
+        $app->useLangPath(__DIR__.'/__fixtures__/lang');
+    }
+
+    #[Test]
+    public function it_can_detect_if_running_in_a_queue_worker()
+    {
+        // It should return false by default
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return false when being called from a custom command
+        Request::swap(new FakeArtisanRequest('stache:clear'));
+        $this->assertFalse(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('statamic:install'));
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return true when being called from any command beginning with `queue:`
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('queue:work'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('horizon:work'));
+        $this->assertTrue(Statamic::isWorker());
+
+        // It should always return false when not running in console
+        App::shouldReceive('runningInConsole')->andReturn(false);
+        $this->assertFalse(Statamic::isWorker());
+    }
+
+    public function customAssetUrl($app)
+    {
+        $app['config']->set('app.asset_url', 'http://test-asset-url.com');
+    }
+
+    #[Test]
+    #[DataProvider('cpPerPageProvider')]
+    public function it_resolves_cp_per_page($input, $expected)
+    {
+        config(['statamic.cp.pagination_size_options' => [10, 25, 50, 100, 500]]);
+
+        $this->assertSame($expected, Statamic::cpPerPage($input));
+    }
+
+    public static function cpPerPageProvider()
+    {
+        return [
+            'in range' => [10, 10],
+            'at ceiling' => [500, 500],
+            'above ceiling' => [99999, 500],
+            'numeric string above ceiling' => ['99999', 500],
+            'null' => [null, null],
+            'empty string' => ['', null],
+            'zero' => [0, 1],
+            'negative' => [-5, 1],
+        ];
+    }
+
+    #[Test]
+    public function cp_per_page_falls_back_to_pagination_size_when_options_empty()
+    {
+        config([
+            'statamic.cp.pagination_size_options' => [],
+            'statamic.cp.pagination_size' => 50,
+        ]);
+
+        $this->assertSame(50, Statamic::cpPerPage(1000));
+        $this->assertSame(25, Statamic::cpPerPage(25));
+    }
+}

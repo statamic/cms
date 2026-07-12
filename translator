@@ -1,0 +1,132 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+$files = new Illuminate\Filesystem\Filesystem;
+$discovery = new Statamic\Translator\MethodDiscovery($files, [
+    __DIR__.'/src',
+    __DIR__.'/resources/js',
+    __DIR__.'/resources/views',
+]);
+
+// Translation strings starting with these substrings will be ignored.
+$ignoredSubstrings = [
+    'permissions.',
+    'statamic::permissions.',
+];
+
+// These files will not be generated from method discovery, but they will be
+// copied to the other languages from English.
+$manualFiles = [
+    'permissions',
+    'markdown',
+    'validation',
+    'dictionary-countries',
+    'dictionary-currencies',
+];
+
+// Don't translate the following files.
+$dontTranslate = [
+    'markdown',
+];
+
+// Additional strings to be translated that aren't picked up by the scanner.
+// eg. When variables as passed into translation helpers, like nav items.
+$additionalStrings = [
+    'Author',
+    'Content',
+    'Content Search',
+    'Groups',
+    'Tools',
+    'Laptop',
+    'Tablet',
+    'Mobile',
+    'Hello!',
+    'Whoops!',
+    'Regards,',
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:",
+    'All rights reserved.',
+    'The given data was invalid.',
+    'Protected Page',
+    'User group',
+];
+
+// Additional keys to be translated that aren't picked up by the scanner.
+// eg. concatenated keys, like licensing errors.
+$additionalKeys = [
+    'messages' => [
+        'licensing_error_unlicensed',
+        'licensing_error_invalid_domain',
+        'licensing_error_no_domains',
+        'licensing_error_outside_license_range',
+        'licensing_error_no_site_key',
+        'licensing_error_unknown_site',
+        'password_protect_enter_password',
+        'password_protect_token_missing',
+    ],
+    'fieldtypes' => [
+        'array.title',
+        'assets.title',
+        'bard.title',
+        'button_group.title',
+        'checkboxes.title',
+        'code.title',
+        'collections.title',
+        'color.title',
+        'date.title',
+        'dictionary.title',
+        'entries.title',
+        'float.title',
+        'form.title',
+        'grid.title',
+        'group.title',
+        'hidden.title',
+        'html.title',
+        'icon.title',
+        'integer.title',
+        'link.title',
+        'list.title',
+        'markdown.title',
+        'navs.title',
+        'radio.title',
+        'range.title',
+        'replicator.title',
+        'revealer.title',
+        'section.title',
+        'select.title',
+        'sites.title',
+        'spacer.title',
+        'structures.title',
+        'slug.title',
+        'table.title',
+        'taggable.title',
+        'terms.title',
+        'taxonomies.title',
+        'template.title',
+        'text.title',
+        'textarea.title',
+        'time.title',
+        'toggle.title',
+        'user_groups.title',
+        'user_roles.title',
+        'users.title',
+        'video.title',
+        'width.title',
+        'yaml.title',
+    ],
+];
+
+// Translation keys that may get picked up but shouldn't.
+// Really just a way to prevent parts of concatenated keys from being included.
+$excludedKeys = [
+    'messages' => ['licensing_error_'],
+];
+
+$app = new Symfony\Component\Console\Application('Statamic Translator');
+$app->addCommand(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
+$app->addCommand(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings, $additionalKeys, $excludedKeys));
+$app->addCommand(new Statamic\Translator\Commands\Translate($files, $dontTranslate));
+$app->addCommand(new Statamic\Translator\Commands\Review($files));
+
+$app->run();

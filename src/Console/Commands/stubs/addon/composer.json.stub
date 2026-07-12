@@ -1,0 +1,37 @@
+{
+    "name": "dummy/package",
+    "autoload": {
+        "psr-4": {
+            "DummyNamespace\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DummyNamespace\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "statamic/cms": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.8"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "DummyTitle",
+            "description": "DummyTitle addon"
+        },
+        "laravel": {
+            "providers": [
+                "DummyNamespace\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

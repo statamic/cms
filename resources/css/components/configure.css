@@ -1,0 +1,17 @@
+/* ==========================================================================
+   CONFIGURE COMPONENT: A variation of the publish component
+   ========================================================================== */
+
+.configure-tab {
+    .publish-fields .form-group:not(:last-child) {
+        @apply border-b;
+    }
+
+    /*  Push toggle off to the right */
+    > .publish-fields > .toggle-fieldtype {
+        @apply flex flex-wrap items-center justify-between;
+        .field-inner {
+            @apply pe-8;
+        }
+    }
+}

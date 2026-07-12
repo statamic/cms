@@ -1,0 +1,108 @@
+<?php
+
+namespace Statamic\Auth;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
+use Statamic\Facades\URL;
+
+use function Statamic\trans;
+use function Statamic\trans as __;
+
+/**
+ * A copy of Illuminate\Auth\SendsPasswordResetEmails.
+ *
+ * It was moved to laravel/ui, but we can't require it because it requires
+ * Laravel 7 and would force us to drop support for Laravel <=6
+ *
+ * @see https://github.com/laravel/ui/blob/2.x/auth-backend/SendsPasswordResetEmails.php
+ */
+trait SendsPasswordResetEmails
+{
+    /**
+     * Display the form to request a password reset link.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showLinkRequestForm()
+    {
+        return view('auth.passwords.email');
+    }
+
+    /**
+     * Send a reset link to the given user.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $this->validateEmail($request);
+
+        // Always return the generic "reset link sent" response regardless of the broker's
+        // actual result. INVALID_USER and RESET_THROTTLED would each reveal whether the
+        // email belongs to a registered account (the broker only throttles real users).
+        $this->broker()->sendResetLink($this->credentials($request));
+
+        return $this->sendResetLinkResponse($request, Password::RESET_LINK_SENT);
+    }
+
+    /**
+     * Validate the email for the given request.
+     *
+     * @return void
+     */
+    protected function validateEmail(Request $request)
+    {
+        // Workaround for `$request->validateWithBag()` not being available in older Laravel versions.
+        try {
+            $request->validate(['email' => 'required|email']);
+        } catch (ValidationException $e) {
+            $e->errorBag = 'user.forgot_password';
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Get the needed authentication credentials from the request.
+     *
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        return $request->only('email');
+    }
+
+    /**
+     * Get the response for a successful password reset link.
+     *
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendResetLinkResponse(Request $request, $response)
+    {
+        session()->flash('user.forgot_password.success', __(Password::RESET_LINK_SENT));
+
+        $successRedirect = $request->input('_redirect');
+
+        $redirect = $successRedirect && ! URL::isExternalToApplication($successRedirect)
+            ? redirect($successRedirect)
+            : back();
+
+        return $request->wantsJson()
+            ? new JsonResponse(['message' => trans($response)], 200)
+            : $redirect->with('status', trans($response));
+    }
+
+    /**
+     * Get the broker to be used during password reset.
+     *
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
+     */
+    public function broker()
+    {
+        return Password::broker();
+    }
+}

@@ -1,0 +1,75 @@
+<?php
+
+namespace Statamic\Actions;
+
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
+
+use function Statamic\trans as __;
+
+class MoveAsset extends Action
+{
+    protected $icon = 'move-folder';
+
+    public static function title()
+    {
+        return __('Move');
+    }
+
+    public function visibleTo($item)
+    {
+        return $item instanceof Asset;
+    }
+
+    public function authorize($user, $asset)
+    {
+        return $user->can('move', $asset);
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Move Asset|Move :count Assets';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to move this asset?|Are you sure you want to move these :count assets?';
+    }
+
+    public function run($assets, $values)
+    {
+        $oldIds = $assets->map->id()->all();
+
+        $newIds = $assets->each->move($values['folder'])->map->id()->all();
+
+        return [
+            'ids' => $newIds,
+            'callback' => ['replaceInSelections', array_combine($oldIds, $newIds)],
+        ];
+    }
+
+    protected function fieldItems()
+    {
+        $options = Blink::once('action-move-asset-folders', function () {
+            return AssetContainer::find($this->context['container'])
+                ->assetFolders()
+                ->mapWithKeys(function ($folder) {
+                    return [$folder->path() => $folder->path()];
+                })
+                ->prepend('/', '/')
+                ->all();
+        });
+
+        return [
+            'folder' => [
+                'display' => __('Folder'),
+                'type' => 'select',
+                'options' => $options,
+                'validate' => 'required',
+            ],
+        ];
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "a4ed0bb4604b27724281f4780add9b5c",
+    "packages": [
+        {
+            "name": "statamic/composer-test-example-dependency",
+            "version": "1.2.3",
+            "dist": {
+                "type": "path",
+                "url": "example-dependency",
+                "reference": "549107a0c12aec6f5557b0af742c11951585a083"
+            },
+            "type": "library",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "statamic/composer-test-example-dev-dependency",
+            "version": "1.2.4",
+            "dist": {
+                "type": "path",
+                "url": "example-dev-dependency",
+                "reference": "22f2373e08f19ba97f3955750051d607e2796e41"
+            },
+            "type": "library",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {},
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+}

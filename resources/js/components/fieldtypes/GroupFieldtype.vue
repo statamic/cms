@@ -1,0 +1,161 @@
+<template>
+    <portal name="group-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+        <element-container @resized="containerWidth = $event.width">
+            <div :class="{ '@apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 dark:bg-gray-900 z-998': fullScreenMode }">
+                <publish-field-fullscreen-header
+                    v-if="fullScreenMode"
+                    :title="config.display"
+                    :field-actions="fieldActions"
+                    @close="toggleFullscreen"
+                >
+                </publish-field-fullscreen-header>
+                <section :class="{ 'mt-14 p-4': fullScreenMode }">
+                    <div :class="{
+                        'bg-white dark:bg-gray-800 dark:border-gray-900 rounded-lg border': config.border,
+                        'hidden' : isCollapsed && !fullScreenMode
+                    }">
+                        <FieldsProvider
+                            :fields="fields"
+                            :as-config="false"
+                            :read-only="isReadOnly"
+                            :field-path-prefix="fieldPathPrefix ? `${fieldPathPrefix}.${handle}` : handle"
+                            :meta-path-prefix="metaPathPrefix ? `${metaPathPrefix}.${handle}` : handle"
+                        >
+                            <Fields :class="{ 'px-4 py-4': config.border, 'pt-4': !config.border && !config.hide_display }"/>
+                        </FieldsProvider>
+                    </div>
+                </section>
+            </div>
+        </element-container>
+    </portal>
+</template>
+
+<script>
+import Fieldtype from './Fieldtype.vue';
+import ManagesPreviewText from './replicator/ManagesPreviewText';
+import {PublishFields as Fields, PublishFieldsProvider as FieldsProvider} from '@ui';
+
+export default {
+    mixins: [Fieldtype, ManagesPreviewText],
+    components: {Fields, FieldsProvider },
+    data() {
+        return {
+            containerWidth: null,
+            isCollapsed: (this.config.collapsible ? this.config.collapsed : false),
+            isFocused: false,
+            fullScreenMode: false,
+            provide: {
+                group: this.makeGroupProvide(),
+            },
+        };
+    },
+    computed: {
+        values() {
+            return this.value;
+        },
+        extraValues() {
+            return {};
+        },
+        fields() {
+            return this.config.fields;
+        },
+        previews() {
+            return data_get(this.publishContainer.previews, this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle) || {};
+        },
+        replicatorPreview() {
+            if (!this.showFieldPreviews) return;
+
+            return replicatorPreviewHtml(this.previewText);
+        },
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Expand'),
+                    icon: 'expand',
+                    quick: true,
+                    run: this.toggleCollapsed,
+                    visible: this.config.collapsible && this.isCollapsed && !this.fullScreenMode,
+                    visibleWhenReadOnly: true,
+                },
+                {
+                    title: __('Collapse'),
+                    icon: 'collapse',
+                    quick: true,
+                    run: this.toggleCollapsed,
+                    visible: this.config.collapsible && !this.isCollapsed && !this.fullScreenMode,
+                    visibleWhenReadOnly: true,
+                },
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'fullscreen-close' : 'fullscreen-open'),
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visible: this.config.fullscreen,
+                    visibleWhenReadOnly: true,
+                },
+            ];
+        },
+    },
+    methods: {
+        blurred() {
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.isFocused = false;
+                }
+            }, 1);
+        },
+
+        toggleCollapsed() {
+            this.isCollapsed = !this.isCollapsed;
+        },
+
+        toggleFullScreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
+
+        makeGroupProvide() {
+            const group = {};
+            Object.defineProperties(group, {
+                config: { get: () => this.config },
+                isReadOnly: { get: () => this.isReadOnly },
+                handle: { get: () => this.handle },
+                fieldPathPrefix: { get: () => this.fieldPathPrefix || this.handle },
+                fullScreenMode: { get: () => this.fullScreenMode },
+                toggleFullScreen: { get: () => this.toggleFullScreen },
+            });
+            return group;
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                }
+            }, 1);
+        },
+
+        updated(handle, value) {
+            this.update({
+                ...this.value,
+                [handle]: value,
+            });
+        },
+
+        updateMeta(handle, value) {
+            this.$emit('meta-updated', { ...this.meta, [handle]: value });
+        },
+
+        fieldPath(handle) {
+            return (this.fieldPathPrefix || this.handle) + '.' + handle;
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
+    },
+};
+</script>

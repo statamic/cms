@@ -1,0 +1,82 @@
+<?php
+
+namespace Statamic\Fieldtypes;
+
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Role;
+use Statamic\Facades\Scope;
+use Statamic\Facades\User;
+use Statamic\GraphQL\Types\RoleType;
+
+use function Statamic\trans as __;
+
+class UserRoles extends Relationship
+{
+    protected $canEdit = false;
+    protected $canCreate = false;
+    protected $statusIcons = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return User::current()->can('assign roles');
+    }
+
+    protected function toItemArray($id, $site = null)
+    {
+        if ($role = Role::find($id)) {
+            return [
+                'title' => __($role->title()),
+                'id' => $role->handle(),
+            ];
+        }
+
+        return $this->invalidItemArray($id);
+    }
+
+    public function preProcessIndex($data)
+    {
+        $roles = collect($data)
+            ->filter(function ($id) {
+                return Role::exists($id);
+            })
+            ->values()
+            ->all();
+
+        return parent::preProcessIndex($roles);
+    }
+
+    public function getIndexItems($request)
+    {
+        if (! User::current()->can('assign roles')) {
+            return collect();
+        }
+
+        return Role::all()->sortBy('title')->map(function ($role) {
+            return [
+                'id' => $role->handle(),
+                'title' => __($role->title()),
+            ];
+        })->values();
+    }
+
+    protected function augmentValue($value)
+    {
+        return Role::find($value);
+    }
+
+    public function getSelectionFilters()
+    {
+        return Scope::filters('user-roles-fieldtype', []);
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(RoleType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
+    }
+}
