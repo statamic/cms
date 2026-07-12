@@ -244,6 +244,18 @@ class DateTest extends TestCase
                 ['start' => '2012-08-29', 'end' => '2013-09-27'],
                 ['start' => '2012-08-29', 'end' => '2013-09-27'],
             ],
+            'range with field timezone' => [
+                'UTC',
+                ['mode' => 'range', 'time_enabled' => true, 'timezone' => 'America/New_York'],
+                ['start' => '2012-08-29T05:00:00', 'end' => '2013-09-27T23:59:00'],
+                ['start' => '2012-08-29 09:00', 'end' => '2013-09-28 03:59'],
+            ],
+            'date with time and field timezone' => [
+                'UTC',
+                ['time_enabled' => true, 'timezone' => 'America/New_York'],
+                '2012-08-29T05:00:00',
+                '2012-08-29 09:00',
+            ],
         ];
     }
 

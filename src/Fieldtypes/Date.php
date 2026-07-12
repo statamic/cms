@@ -251,7 +251,12 @@ class Date extends Fieldtype
             return $this->formatAndCast($date, $this->saveFormat());
         }
 
-        $date = Carbon::parse($value, 'UTC');
+        $timezone = $this->resolvedTimezone();
+        if ($timezone !== 'auto') {
+            $date = Carbon::parse($value, $timezone);
+        } else {
+            $date = Carbon::parse($value, 'UTC');
+        }
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
