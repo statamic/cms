@@ -1,7 +1,5 @@
 <?php
 
-use Statamic\Stache\Stores;
-
 return [
 
     /*
@@ -40,78 +38,7 @@ return [
     */
 
     'stores' => [
-
-        'taxonomies' => [
-            'class' => Stores\TaxonomiesStore::class,
-            'directory' => base_path('content/taxonomies'),
-        ],
-
-        'terms' => [
-            'class' => Stores\TermsStore::class,
-            'directory' => base_path('content/taxonomies'),
-        ],
-
-        'collections' => [
-            'class' => Stores\CollectionsStore::class,
-            'directory' => base_path('content/collections'),
-        ],
-
-        'entries' => [
-            'class' => Stores\EntriesStore::class,
-            'directory' => base_path('content/collections'),
-        ],
-
-        'navigation' => [
-            'class' => Stores\NavigationStore::class,
-            'directory' => base_path('content/navigation'),
-        ],
-
-        'collection-trees' => [
-            'class' => Stores\CollectionTreeStore::class,
-            'directory' => base_path('content/trees/collections'),
-        ],
-
-        'nav-trees' => [
-            'class' => Stores\NavTreeStore::class,
-            'directory' => base_path('content/trees/navigation'),
-        ],
-
-        'globals' => [
-            'class' => Stores\GlobalsStore::class,
-            'directory' => base_path('content/globals'),
-        ],
-
-        'global-variables' => [
-            'class' => Stores\GlobalVariablesStore::class,
-            'directory' => base_path('content/globals'),
-        ],
-
-        'asset-containers' => [
-            'class' => Stores\AssetContainersStore::class,
-            'directory' => base_path('content/assets'),
-        ],
-
-        'assets' => [
-            'class' => Stores\AssetsStore::class,
-        ],
-
-        'users' => [
-            'class' => Stores\UsersStore::class,
-            'directory' => base_path('users'),
-        ],
-
-        'form-submissions' => [
-            'class' => Stores\SubmissionsStore::class,
-            'directory' => storage_path('forms'),
-        ],
-
-        'revisions' => [
-            'class' => Stores\RevisionsStore::class,
-            'directory' => env('STATAMIC_REVISIONS_PATH')
-                ? base_path(env('STATAMIC_REVISIONS_PATH'))
-                : config('statamic.revisions.path', storage_path('statamic/revisions')),
-        ],
-
+        //
     ],
 
     /*

@@ -2,6 +2,7 @@
 
 namespace Tests\Console\Commands;
 
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -12,34 +13,34 @@ class SiteClearTest extends TestCase
     {
         // site:clear overwrites the published stache.php and users.php with these
         // stubs (see SiteClear::resetStatamicConfigs), copying them verbatim, so
-        // they need to keep the same defaults as a fresh Statamic install.
+        // they need to stay in sync with the package's own config defaults, aside
+        // from the values a fresh Statamic site intentionally overrides.
         $stubs = statamic_path('src/Console/Commands/stubs/config');
 
         $stache = require $stubs.'/stache.php.stub';
+        $stacheDefaults = require statamic_path('config/stache.php');
 
-        $this->assertArrayHasKey('watcher', $stache);
-        $this->assertArrayHasKey('cache_store', $stache);
-        $this->assertArrayHasKey('warming', $stache);
-        $this->assertArrayHasKey('collection-trees', $stache['stores']);
-        $this->assertArrayHasKey('nav-trees', $stache['stores']);
-        $this->assertArrayHasKey('global-variables', $stache['stores']);
-        $this->assertArrayHasKey('assets', $stache['stores']);
-        $this->assertArrayHasKey('form-submissions', $stache['stores']);
-        $this->assertArrayHasKey('revisions', $stache['stores']);
+        // A fresh Statamic install leaves 'stores' empty and relies on the
+        // native defaults being merged in by Stache\ServiceProvider, rather
+        // than duplicating every store definition in the published config.
+        $this->assertSame([], $stache['stores']);
+
+        $this->assertEquals(
+            Arr::except($stacheDefaults, 'stores'),
+            Arr::except($stache, 'stores')
+        );
 
         $users = require $stubs.'/users.php.stub';
+        $usersDefaults = require statamic_path('config/users.php');
 
-        $this->assertSame('eloquent', $users['repository']);
-        $this->assertArrayHasKey('registration_form_honeypot_field', $users);
-        $this->assertArrayHasKey('wizard_invitation', $users);
-        $this->assertArrayHasKey('roles', $users['tables']);
-        $this->assertArrayHasKey('groups', $users['tables']);
-        $this->assertArrayHasKey('webauthn', $users['tables']);
-        $this->assertArrayHasKey('impersonate', $users);
-        $this->assertArrayHasKey('elevated_sessions_enabled', $users);
-        $this->assertArrayHasKey('elevated_session_duration', $users);
-        $this->assertArrayHasKey('two_factor_enabled', $users);
-        $this->assertArrayHasKey('two_factor_enforced_roles', $users);
-        $this->assertArrayHasKey('sort_field', $users);
+        // Fresh Statamic sites intentionally use the file repository, not
+        // eloquent, which is only the default when installing into an
+        // existing Laravel app.
+        $this->assertSame('file', $users['repository']);
+
+        $this->assertEquals(
+            Arr::except($usersDefaults, 'repository'),
+            Arr::except($users, 'repository')
+        );
     }
 }
